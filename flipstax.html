@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>FlipStax</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔥</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #14181f; --panel: #191e27;
+    --a: #e8a33d; --b: #3fa7a6;
+    --ink: #f2efe9; --dim: #8b93a1;
+    --pulse: #f2545b; --divider: #262c37;
+  }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){ --bg:#14181f; --panel:#191e27; --ink:#f2efe9; --dim:#8b93a1; }
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Inter', system-ui, -apple-system, sans-serif;
+    overflow:hidden; -webkit-tap-highlight-color: transparent; user-select:none;
+  }
+  .app{ height:100dvh; width:100vw; display:flex; flex-direction:column; }
+
+  header{ padding:12px 16px 8px; flex-shrink:0; z-index:6; }
+  .top-row{ display:flex; align-items:center; justify-content:space-between; }
+  .logo{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:23px; letter-spacing:0.3px; }
+  .logo .flip{ color:var(--a); }
+  .logo .stax{ color:var(--b); }
+  .stat-line{ display:flex; align-items:center; gap:8px; font-size:12px; color:var(--dim); font-variant-numeric: tabular-nums; }
+  .tier{ color:var(--ink); font-weight:700; }
+  .left-group{ display:flex; align-items:center; gap:8px; }
+  .sound-toggle{ cursor:pointer; padding:4px 6px; opacity:0.8; font-size:16px; }
+  .sound-toggle:active{ opacity:1; }
+  .badges-row{ display:none; }
+  .badge-pill{ font-size:10.5px; background:var(--panel); border:1px solid var(--divider); color:var(--dim); padding:2px 8px; border-radius:20px; }
+  .bonus-banner{
+    display:none; margin-top:6px; background:linear-gradient(90deg,#f2545b,#e8a33d);
+    color:#1c1006; font-weight:800; font-size:12px; padding:5px 10px; border-radius:8px; text-align:center;
+  }
+  .daily-banner{
+    margin-top:8px; background:var(--panel); border:1px solid var(--divider); border-radius:8px;
+    padding:6px 10px; font-size:12px; color:var(--ink); display:flex; align-items:center; justify-content:space-between;
+  }
+  .daily-play-link, .daily-share-link{
+    color:var(--pulse); font-weight:700; cursor:pointer; padding:2px 6px;
+  }
+  .vibe-wrap{ display:none; margin-top:8px; }
+  .vibe-track{ position:relative; height:7px; border-radius:6px; background:linear-gradient(90deg, var(--b), var(--divider) 50%, var(--a)); }
+  .vibe-dot{
+    position:absolute; top:50%; left:50%; width:13px; height:13px; border-radius:50%;
+    background:#fff; border:2px solid var(--bg); transform:translate(-50%,-50%);
+    transition:left 0.4s ease; box-shadow:0 0 6px rgba(0,0,0,0.4);
+  }
+  .vibe-label{ font-size:11px; color:var(--dim); margin-top:4px; text-align:center; }
+
+  .board{ position:relative; flex:1; display:flex; flex-direction:column; min-height:0; }
+  .round-timer{ position:absolute; top:0; left:0; right:0; height:4px; background:rgba(255,255,255,0.08); z-index:5; overflow:hidden; }
+  .round-timer::after{
+    content:''; position:absolute; top:0; left:-40%; width:40%; height:100%;
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: shimmerSweep 2.2s linear infinite;
+  }
+  @keyframes shimmerSweep{ 0%{ left:-40%; } 100%{ left:100%; } }
+  @keyframes cardIn{ 0%{ opacity:0; transform:scale(0.92); } 100%{ opacity:1; transform:scale(1); } }
+  .content.pop-in{ animation: cardIn 0.22s ease-out; }
+  @keyframes revealFlash{ 0%{ filter:brightness(1); } 30%{ filter:brightness(1.4); } 100%{ filter:brightness(1); } }
+  .board.flash{ animation: revealFlash 0.4s ease-out; }
+  @media (prefers-reduced-motion: reduce){
+    .round-timer::after{ animation:none !important; }
+    .content.pop-in, .board.flash{ animation:none !important; }
+  }
+  .round-timer-fill{ height:100%; background:var(--pulse); width:100%; }
+
+  .half{
+    position:relative; flex:1; display:flex; align-items:center; justify-content:center;
+    padding:20px 24px; cursor:pointer; overflow:hidden; min-height:0;
+  }
+  .scene{ position:absolute; inset:0; z-index:0; display:flex; align-items:center; justify-content:center; }
+  .scene .glyph{ font-size:min(28vh,170px); opacity:0.5; transform:translateY(4%); }
+
+  .fill{ position:absolute; inset:0; width:0%; z-index:1; transition: width 0.75s cubic-bezier(.2,.8,.2,1); }
+  .half.top .fill{ background: rgba(232,163,61,0.82); }
+  .half.bottom .fill{ background: rgba(63,167,166,0.82); }
+
+  .content{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; }
+
+  .avatar{
+    width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:20px;
+    margin-bottom:9px; border:2px solid rgba(255,255,255,0.25);
+  }
+  .half.top .avatar{ background:var(--a); color:#2a1c05; }
+  .half.bottom .avatar{ background:var(--b); color:#06201f; }
+
+  .take{
+    font-family:'Big Shoulders Display', sans-serif; font-weight:700;
+    font-size:clamp(18px, 4.4vw, 32px); line-height:1.08; text-align:center;
+    max-width:600px; text-wrap:balance; color:var(--ink);
+    text-shadow: 0 2px 10px rgba(0,0,0,0.35); transition: color 0.4s ease;
+  }
+  .half.revealed.top .take{ color:#2a1c05; text-shadow:none; }
+  .half.revealed.bottom .take{ color:#06201f; text-shadow:none; }
+
+  .pct{
+    font-family:'Big Shoulders Display', sans-serif; font-weight:900;
+    font-size:clamp(24px, 6.4vw, 44px); opacity:0; margin-top:7px; transition: opacity 0.4s ease 0.25s;
+  }
+  .half.revealed .pct{ opacity:1; }
+  .half.top .pct{ color:#2a1c05; }
+  .half.bottom .pct{ color:#06201f; }
+
+  .votes-n{ font-size:11px; font-weight:500; opacity:0; margin-top:2px; transition: opacity 0.4s ease 0.3s; }
+  .half.revealed .votes-n{ opacity:0.75; }
+  .half.top .votes-n{ color:#2a1c05; }
+  .half.bottom .votes-n{ color:#06201f; }
+
+  .you-tag{
+    font-size:11px; font-weight:600; margin-top:6px; padding:3px 10px; border-radius:20px;
+    background:rgba(0,0,0,0.18); opacity:0; transition: opacity 0.3s ease 0.5s;
+  }
+  .half.revealed .you-tag{ opacity:1; }
+  .half.top .you-tag{ color:#2a1c05; }
+  .half.bottom .you-tag{ color:#06201f; }
+
+  .cat-chip{
+    position:absolute; top:8px; left:50%; transform:translateX(-50%); z-index:3;
+    font-size:10px; font-weight:600; letter-spacing:0.3px; color:rgba(255,255,255,0.8);
+    background:rgba(0,0,0,0.28); padding:2px 9px; border-radius:20px;
+  }
+  .half.bottom .cat-chip{ top:auto; bottom:8px; }
+
+  .divider{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:4;
+    width:48px; height:48px; border-radius:50%; background:var(--bg);
+    border:3px solid var(--divider); display:flex; align-items:center; justify-content:center;
+    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:13px;
+    color:var(--dim); pointer-events:none;
+  }
+
+  .hint{ text-align:center; font-size:12px; color:var(--dim); padding:9px 0 calc(9px + env(safe-area-inset-bottom)); flex-shrink:0; }
+
+  .toast{
+    position:fixed; left:50%; bottom:14px; transform:translateX(-50%) translateY(20px);
+    background:var(--panel); border:1px solid var(--divider); color:var(--ink);
+    padding:9px 18px; border-radius:20px; font-size:13px; opacity:0; text-align:center;
+    max-width:86vw; transition: all 0.35s ease; pointer-events:none; z-index:10;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  .event-overlay{
+    position:absolute; inset:0; z-index:8; background:#0a0a12; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; padding:24px; text-align:center;
+  }
+  .event-overlay.hidden{ display:none; }
+  .event-subtitle{ font-size:12px; letter-spacing:0.4px; color:var(--pulse); font-weight:700; margin-bottom:6px; }
+  .event-prompt{
+    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:clamp(19px,5vw,30px);
+    margin-bottom:16px; color:#fff; text-shadow:0 2px 10px rgba(0,0,0,0.5);
+  }
+  .event-timerbar{ width:80%; max-width:320px; height:6px; background:rgba(255,255,255,0.15); border-radius:4px; overflow:hidden; margin-bottom:20px; }
+  .event-timerbar-fill{ height:100%; background:#fff; width:100%; }
+  .event-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; width:100%; max-width:360px; }
+  .event-tile{
+    padding:22px 10px; border-radius:14px; font-family:'Big Shoulders Display', sans-serif; font-weight:800;
+    font-size:17px; color:#fff; cursor:pointer; text-align:center; border:2px solid rgba(255,255,255,0.25);
+    transition: transform 0.12s ease;
+  }
+  .event-tile:active{ transform:scale(0.92); }
+  .pu-icon{ font-size:28px; display:block; margin-bottom:4px; }
+  .pu-label{ font-size:14px; }
+  @keyframes tilePulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.05); } }
+  .event-overlay.powerup .event-tile{ animation: tilePulse 1.6s ease-in-out infinite; }
+  .event-overlay.powerup .event-tile:nth-child(1){ animation-delay:0s; }
+  .event-overlay.powerup .event-tile:nth-child(2){ animation-delay:0.2s; }
+  .event-overlay.powerup .event-tile:nth-child(3){ animation-delay:0.4s; }
+  .event-overlay.powerup .event-tile:nth-child(4){ animation-delay:0.6s; }
+  @media (prefers-reduced-motion: reduce){ .event-overlay.powerup .event-tile{ animation:none !important; } }
+  .daily-results.hidden{ display:none; }
+  .daily-emojis{ font-size:32px; letter-spacing:4px; margin-bottom:10px; }
+  .daily-score{
+    font-family:'Big Shoulders Display', sans-serif; font-weight:900; color:#fff;
+    font-size:clamp(24px,6vw,36px); margin-bottom:16px;
+  }
+  .daily-buttons{ display:flex; gap:10px; justify-content:center; }
+  .daily-btn{
+    font-size:13px; font-weight:700; padding:9px 16px; border-radius:10px; cursor:pointer;
+    background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.25);
+  }
+  .daily-btn:active{ background:rgba(255,255,255,0.25); }
+  .daily-btn.primary{ background:var(--pulse); border-color:var(--pulse); }
+  .debug-row{ position:fixed; left:10px; bottom:10px; display:flex; gap:6px; z-index:30; }
+  .debug-btn{
+    font-size:10.5px; padding:6px 9px; border-radius:8px; background:rgba(255,255,255,0.07);
+    color:rgba(255,255,255,0.45); border:1px solid rgba(255,255,255,0.14); cursor:pointer;
+  }
+  .debug-btn:active{ background:rgba(255,255,255,0.2); color:rgba(255,255,255,0.8); }
+
+  .levelup-overlay{
+    position:fixed; inset:0; z-index:20; background:rgba(10,12,16,0.82); display:flex;
+    align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.25s ease;
+  }
+  .levelup-overlay.show{ opacity:1; pointer-events:auto; }
+  .levelup-inner{ text-align:center; animation: popIn 0.5s cubic-bezier(.2,1.4,.4,1); }
+  .levelup-flame{ font-size:60px; }
+  .levelup-label{
+    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:clamp(30px,9vw,58px);
+    color:#fff; text-shadow:0 0 24px rgba(242,84,91,0.6);
+  }
+  .levelup-sub{ color:var(--dim); font-size:13px; margin-top:6px; }
+  @keyframes popIn{ 0%{ transform:scale(0.4); opacity:0; } 60%{ transform:scale(1.08); opacity:1; } 100%{ transform:scale(1); } }
+
+  .personality-overlay{
+    position:fixed; inset:0; z-index:21; background:rgba(10,12,16,0.86); display:flex;
+    align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.25s ease;
+    padding:24px;
+  }
+  .personality-overlay.show{ opacity:1; pointer-events:auto; }
+  .personality-inner{ text-align:center; max-width:340px; animation: popIn 0.5s cubic-bezier(.2,1.4,.4,1); }
+  .personality-mask{ font-size:52px; }
+  .personality-eyebrow{ color:#b98bf0; font-size:12px; font-weight:700; letter-spacing:0.6px; margin-top:4px; }
+  .personality-label{
+    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:clamp(26px,8vw,46px);
+    color:#fff; text-shadow:0 0 24px rgba(157,95,214,0.65); margin-top:2px;
+  }
+  .personality-blurb{ color:var(--dim); font-size:13.5px; margin-top:8px; line-height:1.4; }
+  .personality-pct{ color:#b98bf0; font-size:12px; font-weight:600; margin-top:10px; }
+
+  @media (prefers-reduced-motion: reduce){ .fill, .pct, .you-tag, .toast, .levelup-overlay{ transition:none !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="top-row">
+      <div class="left-group">
+        <span class="sound-toggle" id="soundToggle">🔊</span>
+        <div class="logo"><span class="flip">Flip</span><span class="stax">Stax</span></div>
+      </div>
+      <div class="stat-line">
+        <span id="streakEl"></span>
+        <span id="flipCount">0 flipz</span>
+        <span class="tier" id="tierEl">Unranked</span>
+      </div>
+    </div>
+    <div class="vibe-wrap" id="vibeWrap">
+      <div class="vibe-track"><div class="vibe-dot" id="vibeDot"></div></div>
+      <div class="vibe-label" id="vibeLabel"></div>
+    </div>
+    <div class="daily-banner" id="dailyBanner"></div>
+    <div class="badges-row" id="badgesRow"></div>
+    <div class="bonus-banner" id="bonusBanner"></div>
+  </header>
+
+  <div class="board" id="board">
+    <div class="round-timer"><div class="round-timer-fill" id="roundTimerFill"></div></div>
+
+    <div class="half top" id="halfA">
+      <div class="cat-chip" id="chipA"></div>
+      <div class="scene" id="sceneA"></div>
+      <div class="fill" id="fillA"></div>
+      <div class="content">
+        <div class="avatar" id="avatarA" style="display:none;"></div>
+        <div class="take" id="takeA"></div>
+        <div class="pct" id="pctA"></div>
+        <div class="votes-n" id="votesA"></div>
+        <div class="you-tag" id="tagA"></div>
+      </div>
+    </div>
+    <div class="divider">VS</div>
+    <div class="half bottom" id="halfB">
+      <div class="cat-chip" id="chipB"></div>
+      <div class="scene" id="sceneB"></div>
+      <div class="fill" id="fillB"></div>
+      <div class="content">
+        <div class="avatar" id="avatarB" style="display:none;"></div>
+        <div class="take" id="takeB"></div>
+        <div class="pct" id="pctB"></div>
+        <div class="votes-n" id="votesB"></div>
+        <div class="you-tag" id="tagB"></div>
+      </div>
+    </div>
+
+    <div class="event-overlay hidden" id="eventOverlay">
+      <div class="event-subtitle" id="eventSubtitle"></div>
+      <div class="event-prompt" id="eventPrompt"></div>
+      <div class="event-timerbar" id="eventTimerBar"><div class="event-timerbar-fill" id="eventTimerFill"></div></div>
+      <div class="event-grid" id="eventGrid">
+        <div class="event-tile" data-i="0"></div>
+        <div class="event-tile" data-i="1"></div>
+        <div class="event-tile" data-i="2"></div>
+        <div class="event-tile" data-i="3"></div>
+      </div>
+      <div class="daily-results hidden" id="dailyResultsView">
+        <div class="daily-emojis" id="dailyEmojis"></div>
+        <div class="daily-score" id="dailyScoreText"></div>
+        <div class="daily-buttons">
+          <div class="daily-btn primary" id="dailyShareBtn">📋 Copy result</div>
+          <div class="daily-btn" id="dailyDoneBtn">Done</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hint" id="hint">Tap the one you'd pick</div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="debug-row">
+  <div class="debug-btn" id="debugTrivia">🎲 Preview trivia</div>
+  <div class="debug-btn" id="debugPowerup">🎁 Preview power-up</div>
+  <div class="debug-btn" id="debugPersonality">🎭 Preview vibe</div>
+</div>
+<div class="levelup-overlay" id="levelupOverlay">
+  <div class="levelup-inner">
+    <div class="levelup-flame">🔥</div>
+    <div class="levelup-label" id="levelupLabel"></div>
+    <div class="levelup-sub">new level unlocked</div>
+  </div>
+</div>
+<div class="personality-overlay" id="personalityOverlay">
+  <div class="personality-inner">
+    <div class="personality-mask">🎭</div>
+    <div class="personality-eyebrow">YOUR VIBE, REVEALED</div>
+    <div class="personality-label" id="personalityLabel"></div>
+    <div class="personality-blurb" id="personalityBlurb"></div>
+    <div class="personality-pct" id="personalityPct"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+
+  const CAT_META = {
+    sports: { label:'Sports', badge:'🏆 Sports Head' },
+    music:  { label:'Music',  badge:'🎵 Music Head' },
+    movies: { label:'Movies', badge:'🎬 Movie Head' },
+    brands: { label:'Brands', badge:'🏷️ Brand Loyalist' },
+    money:  { label:'Money',  badge:'💰 Money Mind' },
+    style:  { label:'Style',  badge:'👕 Style Icon' },
+    wild:   { label:'Wild Card', badge:'🌀 Wildcard Menace' },
+    food:   { label:'Food', badge:'🍔 Food Head' },
+    fitness:{ label:'Fitness', badge:'💪 Fitness Head' },
+    geography: { label:'Geography', badge:'🌍 Globetrotter' },
+    history: { label:'History', badge:'📜 History Head' },
+  };
+  const BADGE_THRESHOLD = 10;
+
+  const TIERS = [
+    { min:0,    label:'Unranked' },
+    { min:15,   label:'Certified Flipper' },
+    { min:65,   label:'No Cap Flipper' },
+    { min:165,  label:'Built Different' },
+    { min:325,  label:'Elite Flipper' },
+    { min:550,  label:'Goated' },
+    { min:850,  label:'Flip Legend' },
+    { min:1250, label:'Certified Menace' },
+    { min:1750, label:'Unreal' },
+    { min:2500, label:'Flip God' },
+  ];
+
+  const WILD_GRADIENTS = [
+    'linear-gradient(165deg,#1f0f3d,#5a2f8a)', 'linear-gradient(165deg,#0f2740,#3a6ea5)',
+    'linear-gradient(165deg,#3d150f,#8a2f1f)', 'linear-gradient(165deg,#0d3b36,#2f9e8f)',
+    'linear-gradient(165deg,#3d2a0f,#8a6a2f)', 'linear-gradient(165deg,#25252b,#55555f)',
+    'linear-gradient(165deg,#111a12,#2c4a2c)', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)',
+  ];
+
+  const VIBE_TIERS = [
+    { max:10,  label:'Total Iconoclast', blurb:'You disagree with almost everyone. Bold, or unhinged \u2014 hard to say.' },
+    { max:25,  label:'Against the Grain', blurb:'You like what you like, crowd be damned.' },
+    { max:40,  label:'Contrarian Streak', blurb:'You lean the other way more than most.' },
+    { max:59,  label:'Wildcard',          blurb:"Nobody can call your taste either way." },
+    { max:74,  label:'Crowd Pleaser',     blurb:'You tend to land with the room.' },
+    { max:89,  label:'Mainstream Icon',   blurb:"If it's popular, you're probably into it." },
+    { max:101, label:'The Zeitgeist',     blurb:'You basically ARE the crowd.' },
+  ];
+  function vibeTierFor(pct){ for (const t of VIBE_TIERS){ if (pct <= t.max) return t; } return VIBE_TIERS[VIBE_TIERS.length-1]; }
+
+  const TILE_COLORS = ['#c73e3e','#3e6bc7','#3ec76b','#c7a63e'];
+  const POWERUPS = [
+    { key:'flips10',  icon:'\u26A1',      label:'+10 Flipz', color:'#c7a63e' },
+    { key:'slowmo',   icon:'\uD83D\uDC0C', label:'Slow-Mo',    color:'#3e6bc7' },
+    { key:'skip',     icon:'\u23ED\uFE0F', label:'Skip',       color:'#3ec76b' },
+    { key:'wildcard', icon:'\uD83C\uDF81', label:'Wild Card',  color:'#c73e3e' },
+  ];
+  const MYSTERY_POOL = [5,5,5,5,15,15,15,30,30,50];
+  const FLAVOR_INTROS = [
+    '\uD83D\uDC7D THE ALIENS WANT AN ANSWER', '\uD83D\uDEF8 BEAMED UP. SOLVE FAST.',
+    '\uD83D\uDD2E THE ORACLE TESTS YOU', '\uD83E\uDDFF PROVE YOUR FATE',
+    '\u26A1 THE MACHINE DEMANDS PROOF',
+  ];
+  const SPELLING_SETS = [
+    { correct:'Receive', wrongs:['Recieve','Receeve','Receve'] },
+    { correct:'Definitely', wrongs:['Definately','Definitly','Defintely'] },
+    { correct:'Separate', wrongs:['Seperate','Separrate','Seperrate'] },
+    { correct:'Necessary', wrongs:['Neccessary','Necesary','Neccesary'] },
+    { correct:'Occurred', wrongs:['Occured','Ocurred','Occureed'] },
+    { correct:'Embarrass', wrongs:['Embarass','Emberrass','Embarras'] },
+    { correct:'Accommodate', wrongs:['Acommodate','Accomodate','Accommadate'] },
+    { correct:'Rhythm', wrongs:['Rythm','Rhythem','Rhytm'] },
+    { correct:'Maintenance', wrongs:['Maintainance','Maintenence','Maintanance'] },
+    { correct:'Restaurant', wrongs:['Resturant','Restaraunt','Restuarant'] },
+    { correct:'Government', wrongs:['Goverment','Governmant','Govermant'] },
+    { correct:'February', wrongs:['Feburary','Febuary','Februrary'] },
+    { correct:'Weird', wrongs:['Wierd','Weerd','Wyrd'] },
+    { correct:'Vacuum', wrongs:['Vaccuum','Vacume','Vaccum'] },
+  ];
+  // Daily Challenge subject banks - one question, one guaranteed-correct
+  // answer. Kept to well-established, uncontested facts on purpose.
+  const GEOGRAPHY_SETS = [
+    { q:'What is the capital of France?', correct:'Paris', wrongs:['Lyon','Marseille','Nice'] },
+    { q:'What is the largest ocean on Earth?', correct:'Pacific Ocean', wrongs:['Atlantic Ocean','Indian Ocean','Arctic Ocean'] },
+    { q:'Which continent is Egypt located on?', correct:'Africa', wrongs:['Asia','Europe','South America'] },
+    { q:'What is the smallest country in the world by area?', correct:'Vatican City', wrongs:['Monaco','San Marino','Liechtenstein'] },
+    { q:'Mount Everest is part of which mountain range?', correct:'The Himalayas', wrongs:['The Andes','The Rockies','The Alps'] },
+    { q:'What is the capital of Japan?', correct:'Tokyo', wrongs:['Osaka','Kyoto','Yokohama'] },
+    { q:'Which is the largest hot desert in the world?', correct:'The Sahara', wrongs:['The Gobi','The Kalahari','The Mojave'] },
+    { q:'What is the capital of Australia?', correct:'Canberra', wrongs:['Sydney','Melbourne','Perth'] },
+    { q:'Which country is home to the Great Barrier Reef?', correct:'Australia', wrongs:['Indonesia','Philippines','New Zealand'] },
+    { q:'What is the capital of Canada?', correct:'Ottawa', wrongs:['Toronto','Vancouver','Montreal'] },
+    { q:'Which continent has the most countries?', correct:'Africa', wrongs:['Asia','Europe','South America'] },
+    { q:'What is the capital of Brazil?', correct:'Brasília', wrongs:['Rio de Janeiro','São Paulo','Salvador'] },
+    { q:'Which sea is famous for being extremely salty?', correct:'The Dead Sea', wrongs:['The Red Sea','The Caspian Sea','The Mediterranean'] },
+    { q:'Which country has the most time zones?', correct:'France', wrongs:['Russia','United States','China'] },
+  ];
+  const ENGLISH_SETS = [
+    { q:"Which word means 'happy'?", correct:'Joyful', wrongs:['Somber','Irate','Weary'] },
+    { q:"Which word means the opposite of 'ancient'?", correct:'Modern', wrongs:['Archaic','Antique','Primitive'] },
+    { q:"Which word means 'brave'?", correct:'Courageous', wrongs:['Timid','Cowardly','Fearful'] },
+    { q:"Which word means 'to look at closely'?", correct:'Examine', wrongs:['Ignore','Dismiss','Overlook'] },
+    { q:"Which word means 'huge'?", correct:'Enormous', wrongs:['Tiny','Minuscule','Petite'] },
+    { q:"Which word means 'to end'?", correct:'Conclude', wrongs:['Begin','Commence','Initiate'] },
+    { q:"What is the plural of 'child'?", correct:'Children', wrongs:['Childs','Childes','Childrens'] },
+    { q:"Which word means 'to agree'?", correct:'Concur', wrongs:['Dispute','Object','Refute'] },
+    { q:"What is the past tense of 'go'?", correct:'Went', wrongs:['Goed','Gone','Going'] },
+    { q:"Which word means 'shy'?", correct:'Timid', wrongs:['Bold','Brash','Confident'] },
+    { q:"Which word means 'quick'?", correct:'Swift', wrongs:['Sluggish','Lethargic','Gradual'] },
+    { q:"Which word means the opposite of 'genuine'?", correct:'Fake', wrongs:['Authentic','Sincere','Real'] },
+    { q:"Which word means 'to combine'?", correct:'Merge', wrongs:['Separate','Divide','Split'] },
+    { q:"Which word means the opposite of 'benevolent'?", correct:'Malevolent', wrongs:['Generous','Kind','Charitable'] },
+  ];
+  const HISTORY_SETS = [
+    { q:'Who was the first President of the United States?', correct:'George Washington', wrongs:['Thomas Jefferson','John Adams','Abraham Lincoln'] },
+    { q:'In which year did World War II end?', correct:'1945', wrongs:['1943','1944','1946'] },
+    { q:'Which ancient civilization built the pyramids of Giza?', correct:'The Egyptians', wrongs:['The Romans','The Greeks','The Mayans'] },
+    { q:'Who painted the Mona Lisa?', correct:'Leonardo da Vinci', wrongs:['Michelangelo','Raphael','Donatello'] },
+    { q:'Julius Caesar was a leader of which ancient civilization?', correct:'Rome', wrongs:['Greece','Egypt','Persia'] },
+    { q:'In which year did the Titanic sink?', correct:'1912', wrongs:['1905','1920','1898'] },
+    { q:'Who was the first person to walk on the Moon?', correct:'Neil Armstrong', wrongs:['Buzz Aldrin','Yuri Gagarin','John Glenn'] },
+    { q:'Which wall divided a European city during the Cold War?', correct:'The Berlin Wall', wrongs:['The Great Wall','Hadrian\u2019s Wall','The Vienna Wall'] },
+    { q:'Who was the primary author of the Declaration of Independence?', correct:'Thomas Jefferson', wrongs:['George Washington','Benjamin Franklin','John Adams'] },
+    { q:'Which country gifted the Statue of Liberty to the United States?', correct:'France', wrongs:['England','Spain','Italy'] },
+    { q:'In which century did the Renaissance begin?', correct:'The 14th century', wrongs:['The 10th century','The 18th century','The 20th century'] },
+    { q:'Which Egyptian queen was famously linked to Julius Caesar and Mark Antony?', correct:'Cleopatra', wrongs:['Nefertiti','Hatshepsut','Isis'] },
+    { q:'Which country was the first to grant women the right to vote nationally?', correct:'New Zealand', wrongs:['United States','United Kingdom','France'] },
+    { q:'The Great Wall was built to protect which ancient country?', correct:'China', wrongs:['Japan','Mongolia','Korea'] },
+  ];
+  const SCIENCE_SETS = [
+    { q:'What is the chemical symbol for water?', correct:'H2O', wrongs:['CO2','O2','NaCl'] },
+    { q:'How many planets are in our solar system?', correct:'8', wrongs:['7','9','10'] },
+    { q:'What gas do plants absorb from the atmosphere?', correct:'Carbon dioxide', wrongs:['Oxygen','Nitrogen','Hydrogen'] },
+    { q:'What is often called the powerhouse of the cell?', correct:'Mitochondria', wrongs:['Nucleus','Ribosome','Golgi apparatus'] },
+    { q:'What force pulls objects toward the Earth?', correct:'Gravity', wrongs:['Magnetism','Friction','Inertia'] },
+    { q:'What is the closest planet to the Sun?', correct:'Mercury', wrongs:['Venus','Earth','Mars'] },
+    { q:'What is the hardest natural substance on Earth?', correct:'Diamond', wrongs:['Gold','Quartz','Iron'] },
+    { q:'How many bones are in the adult human body?', correct:'206', wrongs:['150','180','300'] },
+    { q:'What is the boiling point of water at sea level, in Celsius?', correct:'100', wrongs:['90','80','120'] },
+    { q:'Which organ pumps blood through the body?', correct:'The heart', wrongs:['The liver','The lungs','The kidneys'] },
+    { q:'What is the chemical symbol for gold?', correct:'Au', wrongs:['Ag','Gd','Go'] },
+    { q:'What type of animal is a dolphin?', correct:'Mammal', wrongs:['Fish','Reptile','Amphibian'] },
+    { q:'Roughly how fast does light travel, per second?', correct:'300,000 km', wrongs:['150,000 km','3,000 km','1,000,000 km'] },
+    { q:'Which part of a plant carries out photosynthesis?', correct:'The leaves', wrongs:['The roots','The stem','The flower'] },
+  ];
+  function rand(min,max,rng){ rng = rng || Math.random; return Math.floor(rng()*(max-min+1))+min; }
+  function generateMathTrivia(rng){
+    rng = rng || Math.random;
+    const op = pick(['+','\u2212','\u00D7'], rng);
+    let a, b, correct;
+    if (op === '+'){ a = rand(4,40,rng); b = rand(4,40,rng); correct = a+b; }
+    else if (op === '\u2212'){ a = rand(15,50,rng); b = rand(1,a-1,rng); correct = a-b; }
+    else { a = rand(2,12,rng); b = rand(2,12,rng); correct = a*b; }
+    const wrongs = new Set();
+    let guard = 0;
+    while (wrongs.size < 3 && guard < 50){
+      guard++;
+      const w = correct + rand(1,9,rng) * (rng()<0.5 ? -1 : 1);
+      if (w !== correct && w >= 0 && !wrongs.has(w)) wrongs.add(w);
+    }
+    const opts = shuffle([correct, ...Array.from(wrongs)], rng);
+    return { question: a+' '+op+' '+b+' = ?', opts: opts.map(String), correctIdx: opts.indexOf(correct) };
+  }
+  function generateSpellingTrivia(rng){
+    rng = rng || Math.random;
+    const set = pick(SPELLING_SETS, rng);
+    const opts = shuffle([set.correct, ...set.wrongs], rng);
+    return { question:'Which is spelled correctly?', opts, correctIdx: opts.indexOf(set.correct) };
+  }
+  // Deterministic RNG (mulberry32) so a given calendar date always produces
+  // the exact same 5 questions for every player - the whole point of a daily
+  // challenge is that everyone is solving the identical puzzle.
+  function mulberry32(seed){
+    return function(){
+      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const DAILY_SUBJECTS = ['math','geography','english','history','science'];
+  const DAILY_SUBJECT_LABEL = { math:'Math', geography:'Geography', english:'English', history:'History', science:'Science' };
+  function generateSubjectTrivia(subject, rng){
+    if (subject === 'math') return Object.assign({ category:'math' }, generateMathTrivia(rng));
+    const bank = subject === 'geography' ? GEOGRAPHY_SETS
+               : subject === 'english' ? ENGLISH_SETS
+               : subject === 'history' ? HISTORY_SETS
+               : SCIENCE_SETS;
+    const set = pick(bank, rng);
+    const opts = shuffle([set.correct, ...set.wrongs], rng);
+    return { category: subject, question: set.q, opts, correctIdx: opts.indexOf(set.correct) };
+  }
+  function getDailyQuestions(dateStr){
+    const rng = mulberry32(hashStr('flipstax-daily-' + dateStr));
+    const order = shuffle(DAILY_SUBJECTS, rng);
+    return order.map(subject => generateSubjectTrivia(subject, rng));
+  }
+
+  function initials(name){ return name.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join(''); }
+  function pick(arr,rng){ rng = rng || Math.random; return arr[Math.floor(rng()*arr.length)]; }
+  function hashStr(str){ let h=0; for(let i=0;i<str.length;i++){ h=(h<<5)-h+str.charCodeAt(i); h|=0; } return Math.abs(h); }
+  // Races a promise against a hard deadline. If the underlying call (a network
+  // request to the shared vote store) never settles, this still resolves -
+  // with null - so the game can never hang waiting on it. Any late real
+  // result/error is swallowed, never left as an unhandled rejection.
+  function withTimeout(promise, ms){
+    return new Promise((resolve)=>{
+      let done = false;
+      const timer = setTimeout(()=>{ if (!done){ done = true; resolve(null); } }, ms);
+      promise.then((v)=>{ if (!done){ done = true; clearTimeout(timer); resolve(v); } })
+             .catch(()=>{ if (!done){ done = true; clearTimeout(timer); resolve(null); } });
+    });
+  }
+  function nameGradient(name){
+    const h = hashStr(name) % 360;
+    return 'linear-gradient(165deg, hsl('+h+',42%,15%), hsl('+h+',55%,26%))';
+  }
+
+  // ---------- sound + haptics (synthesized, no audio files needed) ----------
+  let soundOn = localStorage.getItem('flipstax_sound') !== 'off';
+  let audioCtx = null;
+  function getAudioCtx(){
+    if (!audioCtx){
+      try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+      catch(e){ return null; }
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
+    return audioCtx;
+  }
+  function playTone(freq, startDelay, duration, type, vol){
+    if (!soundOn) return;
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    try{
+      const t0 = ctx.currentTime + (startDelay || 0);
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type || 'sine';
+      osc.frequency.setValueAtTime(freq, t0);
+      gain.gain.setValueAtTime(0.0001, t0);
+      gain.gain.linearRampToValueAtTime(vol || 0.12, t0 + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + duration);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(t0); osc.stop(t0 + duration + 0.03);
+    }catch(e){}
+  }
+  function haptic(pattern){
+    if (!soundOn) return;
+    if (navigator.vibrate){ try{ navigator.vibrate(pattern); }catch(e){} }
+  }
+  // A short, filtered burst of noise - reads as a natural tactile "click"
+  // rather than a synthesized beep. This is what most native UI tap sounds
+  // actually are under the hood.
+  function playClick(vol){
+    if (!soundOn) return;
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    try{
+      const dur = 0.028;
+      const bufferSize = Math.floor(ctx.sampleRate * dur);
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i=0;i<bufferSize;i++){ data[i] = (Math.random()*2-1) * Math.pow(1 - i/bufferSize, 2); }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.value = 3200;
+      const gain = ctx.createGain();
+      gain.gain.value = vol || 0.22;
+      noise.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+      noise.start();
+    }catch(e){}
+  }
+  const sfx = {
+    tap: ()=>{ playClick(0.2); haptic(8); },
+    revealWin: ()=>{ playTone(660,0,0.09,'sine',0.1); playTone(880,0.08,0.14,'sine',0.1); },
+    revealLose: ()=>{ playTone(320,0,0.15,'sine',0.07); },
+    combo: ()=>{ playTone(784,0,0.06,'triangle',0.09); playTone(988,0.05,0.08,'triangle',0.09); haptic(12); },
+    levelUp: ()=>{ playTone(523,0,0.14,'triangle',0.12); playTone(659,0.11,0.14,'triangle',0.12); playTone(784,0.22,0.3,'triangle',0.14); haptic([15,40,15]); },
+    correct: ()=>{ playTone(660,0,0.09,'sine',0.11); playTone(990,0.09,0.2,'sine',0.11); haptic([10,30,10]); },
+    wrong: ()=>{ playTone(220,0,0.22,'sawtooth',0.06); },
+    powerUp: ()=>{ playTone(440,0,0.07,'square',0.09); playTone(660,0.06,0.09,'square',0.09); playTone(880,0.13,0.18,'square',0.1); haptic([10,20,10]); },
+    spinTick: (i)=>{ playTone(280 + i*35, 0, 0.05, 'square', 0.05); },
+    bonusZone: ()=>{ playTone(500,0,0.1,'sine',0.08); playTone(700,0.09,0.14,'sine',0.08); },
+    personality: ()=>{ playTone(392,0,0.14,'sine',0.1); playTone(494,0.12,0.14,'sine',0.1); playTone(587,0.24,0.14,'sine',0.1); playTone(784,0.36,0.32,'sine',0.12); haptic([15,30,15,30,25]); },
+  };
+  function setSoundOn(on){
+    soundOn = on;
+    try{ localStorage.setItem('flipstax_sound', on ? 'on' : 'off'); }catch(e){}
+    els.soundToggle.textContent = on ? '\uD83D\uDD0A' : '\uD83D\uDD07';
+  }
+
+
+  // ---- Curated content. Anything naming a real person/brand/franchise lives
+  // here, hand-written, never AI-generated at runtime. ----
+  const MATCH_RAW = [
+    ['sports', 'LeBron James', 'Michael Jordan'],
+    ['sports', 'Messi', 'Cristiano Ronaldo'],
+    ['sports', 'Muhammad Ali', 'Mike Tyson'],
+    ['music',  'Kendrick Lamar', 'Drake'],
+    ['music',  'The Beatles', 'Rolling Stones'],
+    ['movies', 'Quentin Tarantino', 'Christopher Nolan'],
+    ['movies', 'The Matrix', 'Star Wars'],
+    ['movies', 'Marvel', 'DC'],
+    ['movies', 'Harry Potter', 'Lord of the Rings'],
+    ['brands', 'iPhone', 'Android'],
+    ['brands', 'Xbox', 'PlayStation'],
+    ['brands', 'Coke', 'Pepsi'],
+    ['brands', 'New Balance', 'Nike'],
+    ['brands', 'Adidas', 'Puma'],
+    ['food', 'Five Guys', 'In-N-Out'],
+    ['food', 'Chick-fil-A', 'Popeyes'],
+    ['food', 'Chipotle', 'Taco Bell'],
+    ['sports', 'Serena Williams', 'Venus Williams'],
+    ['sports', 'Tiger Woods', 'Rory McIlroy'],
+    ['movies', 'Star Wars', 'Star Trek'],
+    ['movies', 'The Godfather', 'Goodfellas'],
+  ];
+  const MATCH = MATCH_RAW.map(([cat,a,b],i)=>({
+    id:'m-'+i, mode:'match', category:cat, a, b, avatarA:initials(a), avatarB:initials(b)
+  }));
+
+  const SCENE_RAW = [
+    ['music', '90s grunge, flannel and feedback', '🎸', 'linear-gradient(165deg,#232a1f,#4a5c3f)',
+              '2000s nu metal, turntables and rage', '🤘', 'linear-gradient(165deg,#2a1414,#5c1f1f)'],
+    ['music', 'Vinyl, crackle and all', '💿', 'linear-gradient(165deg,#2b2410,#6b5b1f)',
+              'Everything on shuffle, streaming', '📱', 'linear-gradient(165deg,#0f2740,#2e7bb5)'],
+    ['music', 'Front row at a sweaty club show', '🎤', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)',
+              'Main stage at a huge festival', '🎪', 'linear-gradient(165deg,#0f2e1d,#2f6b45)'],
+    ['money', 'The S&P 500, boring and steady', '📈', 'linear-gradient(165deg,#0f2e1d,#2f6b45)',
+              'Real estate, hands-on and leveraged', '🏘️', 'linear-gradient(165deg,#331a1f,#7a3f4a)'],
+    ['money', 'Crypto for the upside', '🪙', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+              'Bonds for the safety', '🛡️', 'linear-gradient(165deg,#1c2733,#3f5b70)'],
+    ['money', 'Frugal, save aggressively', '🐖', 'linear-gradient(165deg,#152e0f,#3a6b1f)',
+              'YOLO, enjoy it now', '💳', 'linear-gradient(165deg,#3d150f,#8a3a2f)'],
+    ['style', 'Clean-shaven, every time', '🪒', 'linear-gradient(165deg,#1c2733,#3f5b70)',
+              'Full beard, no debate', '🧔', 'linear-gradient(165deg,#2b1e12,#6b4a28)'],
+    ['style', 'Tattoos and piercings', '🖋️', 'linear-gradient(165deg,#1f0f3d,#5a2f8a)',
+              'No ink, ever', '🤍', 'linear-gradient(165deg,#25252b,#55555f)'],
+    ['style', 'A tiny capsule wardrobe', '🧥', 'linear-gradient(165deg,#232733,#4a5568)',
+              'A closet full of statement pieces', '👗', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
+    ['wild', 'Live in a mansion in the Arctic, totally isolated', '🧊', 'linear-gradient(165deg,#0f2740,#3a6ea5)',
+             'Live in a hut with no electricity on a tropical island', '🏝️', 'linear-gradient(165deg,#0d3b36,#2f9e8f)'],
+    ['wild', 'Be famous but broke', '🎤', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)',
+             'Be rich but anonymous forever', '🕶️', 'linear-gradient(165deg,#2b2410,#6b5b1f)'],
+    ['wild', 'Unlimited money, but you can never travel again', '🏠', 'linear-gradient(165deg,#0f2e1d,#2f6b45)',
+             'Travel forever, but live paycheck to paycheck', '✈️', 'linear-gradient(165deg,#0f2740,#2e7bb5)'],
+    ['wild', 'Always know when someone is lying to you', '🕵️', 'linear-gradient(165deg,#1a1a3d,#3f3f8f)',
+             'Get away with one lie a day, no matter what', '🤫', 'linear-gradient(165deg,#2e0f2e,#7a2f6b)'],
+    ['wild', 'Live 200 years, but never leave your hometown', '🏘️', 'linear-gradient(165deg,#331a1f,#7a3f4a)',
+             'Live a normal lifespan, but see the whole world', '🌍', 'linear-gradient(165deg,#0f2e33,#2f7d8c)'],
+    ['wild', 'Live on a yacht surrounded by models, but 100 venomous snakes and spiders are loose on board', '🐍', 'linear-gradient(165deg,#0d1f0f,#274d1f)',
+             'Have a million dollars, but live alone in a cabin 2 miles from anyone', '🌲', 'linear-gradient(165deg,#111a12,#2c4a2c)'],
+    ['wild', 'You can fly, but only 3 feet off the ground', '🦆', 'linear-gradient(165deg,#1a2b3d,#3f6f9e)',
+             "You're invisible, but only when nobody is looking at you", '👻', 'linear-gradient(165deg,#25252b,#55555f)'],
+    ['wild', 'Win $10,000 today, guaranteed', '💵', 'linear-gradient(165deg,#0f2e1d,#1f7a4a)',
+             'Flip a coin: $50,000 or nothing, decided in 10 seconds', '🎲', 'linear-gradient(165deg,#3d1a0f,#8a3a1f)'],
+    ['wild', 'Fight one horse-sized duck', '🦆', 'linear-gradient(165deg,#3d2f0f,#8a6a1f)',
+             'Fight a hundred duck-sized horses', '🐴', 'linear-gradient(165deg,#2b1a0f,#6b4423)'],
+    ['wild', 'Read minds, but you can never turn it off', '🧠', 'linear-gradient(165deg,#1f0f3d,#5a2f8a)',
+             'Time travel, but only backward and only by yourself', '⏳', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)'],
+    ['wild', 'Be the smartest person alive, but have no friends', '🎓', 'linear-gradient(165deg,#0f1a3d,#2f4a8a)',
+             'Be average, but never be alone', '🤝', 'linear-gradient(165deg,#3d150f,#8a3a2f)'],
+    // food
+    ['food', 'Italian food, every time', '🍝', 'linear-gradient(165deg,#331a14,#7a3f2a)',
+             'Chinese food, every time', '🥡', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
+    ['food', 'Sweet, always', '🍩', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+             'Salty, always', '🥨', 'linear-gradient(165deg,#232a1f,#4a5c3f)'],
+    ['food', 'Pizza, no contest', '🍕', 'linear-gradient(165deg,#3d150f,#8a2f1f)',
+             'Tacos, no contest', '🌮', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)'],
+    // fitness
+    ['fitness', 'Burpees', '🤸', 'linear-gradient(165deg,#152e0f,#3a6b1f)',
+                'Deadlifts', '🏋️', 'linear-gradient(165deg,#1c2733,#3f5b70)'],
+    ['fitness', 'Running', '🏃', 'linear-gradient(165deg,#0f2740,#2e7bb5)',
+                'Lifting weights', '💪', 'linear-gradient(165deg,#3d150f,#8a3a2f)'],
+    ['fitness', 'Yoga', '🧘', 'linear-gradient(165deg,#1f0f3d,#5a2f8a)',
+                'HIIT', '🔥', 'linear-gradient(165deg,#3d1a0f,#8a3a1f)'],
+    ['fitness', 'A rest day, guilt-free', '😌', 'linear-gradient(165deg,#0f2e1d,#2f6b45)',
+                'Never skip a day', '⏰', 'linear-gradient(165deg,#2b1e12,#6b4a28)'],
+    // geography
+    ['geography', 'Africa', '🌍', 'linear-gradient(165deg,#2b2410,#6b5b1f)',
+                   'South America', '🌎', 'linear-gradient(165deg,#152e0f,#3a6b1f)'],
+    ['geography', 'Mountains', '⛰️', 'linear-gradient(165deg,#1c2733,#3f5b70)',
+                   'Beaches', '🏖️', 'linear-gradient(165deg,#0d3b36,#2f9e8f)'],
+    ['geography', 'The Sahara Desert', '🏜️', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+                   'The Amazon Rainforest', '🌳', 'linear-gradient(165deg,#152e0f,#3a6b1f)'],
+    ['geography', 'Visiting every US state', '🗺️', 'linear-gradient(165deg,#0f2740,#2e7bb5)',
+                   'Visiting every country in Europe', '🏰', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)'],
+    // history (eras/ideas, not judging real people)
+    ['history', 'Ancient Egypt', '🏺', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+                'Ancient Rome', '🏛️', 'linear-gradient(165deg,#1c2733,#3f5b70)'],
+    ['history', 'The Renaissance', '🎨', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)',
+                'The Industrial Revolution', '⚙️', 'linear-gradient(165deg,#232733,#4a5568)'],
+    ['history', 'Handwritten letters', '✉️', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+                'Text messages', '📱', 'linear-gradient(165deg,#0f2740,#2e7bb5)'],
+    // more style / fashion
+    ['style', 'Flats, comfort wins', '🥿', 'linear-gradient(165deg,#331a1f,#7a3f4a)',
+              'Heels, always', '👠', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
+    ['style', 'A summer dress', '👗', 'linear-gradient(165deg,#3d150f,#8a2f1f)',
+              'Leggings, no debate', '🧘\u200D♀️', 'linear-gradient(165deg,#1f0f3d,#5a2f8a)'],
+    // wild - routines
+    ['wild', 'Cold showers every morning', '🥶', 'linear-gradient(165deg,#0f2740,#3a6ea5)',
+             'Hitting snooze three times', '😴', 'linear-gradient(165deg,#25252b,#55555f)'],
+    ['wild', 'Making your bed every single day', '🛏️', 'linear-gradient(165deg,#152e0f,#3a6b1f)',
+             'Never making your bed', '🌪️', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)'],
+    // wild - silly / mildly gross, per your brief
+    ['wild', 'Cannonball into a pool of spoiled milk', '🥛', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+             'Take a 10-second shower in hot sauce', '🌶️', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
+    ['wild', 'Eat a whole raw onion like an apple', '🧅', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)',
+             'Drink a full cup of pickle juice in one go', '🥒', 'linear-gradient(165deg,#152e0f,#3a6b1f)'],
+    ['wild', 'Wear a shirt dipped in ranch dressing all day', '🥗', 'linear-gradient(165deg,#232a1f,#4a5c3f)',
+             'Wear socks soaked in maple syrup all day', '🥞', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)'],
+    ['wild', 'Sleep in a bathtub full of jello', '🍮', 'linear-gradient(165deg,#3d150f,#8a2f1f)',
+             'Sleep in a pile of packing peanuts', '📦', 'linear-gradient(165deg,#2b2410,#6b5b1f)'],
+    ['wild', 'Have hiccups nonstop for a week', '😵', 'linear-gradient(165deg,#1a1a3d,#3f3f8f)',
+             'Have one foot asleep for a week', '🦶', 'linear-gradient(165deg,#0f2740,#3a6ea5)'],
+  ];
+  const SCENES = SCENE_RAW.map((row,i)=>({
+    id:'s-'+i, mode:'scenario', category:row[0],
+    a:row[1], glyphA:row[2], gradA:row[3],
+    b:row[4], glyphB:row[5], gradB:row[6],
+  }));
+
+  const CURATED = MATCH.concat(SCENES);
+  let masterPool = CURATED.slice();
+  let deck = [], idx = 0, current = null, voted = false, votedSinceTime = null;
+  let db = null, dbReady = false, unsubscribe = null;
+  let sampleFn = null, sampleReady = false, aiRequested = false;
+
+  let stats = loadStats();
+  let sessionFlips = 0;
+  let comboCount = 0;
+  let bonusActive = false, bonusEndsAt = 0, bonusInterval = null, lastBonusEnd = 0;
+  let slowMoRoundsLeft = 0;
+  let lastWasEvent = false;
+  let roundTimeoutId = null;
+  let eventTimeoutId = null;
+
+  const els = {
+    board: document.getElementById('board'),
+    halfA: document.getElementById('halfA'), halfB: document.getElementById('halfB'),
+    contentA: document.querySelector('#halfA .content'), contentB: document.querySelector('#halfB .content'),
+    chipA: document.getElementById('chipA'), chipB: document.getElementById('chipB'),
+    sceneA: document.getElementById('sceneA'), sceneB: document.getElementById('sceneB'),
+    fillA: document.getElementById('fillA'), fillB: document.getElementById('fillB'),
+    avatarA: document.getElementById('avatarA'), avatarB: document.getElementById('avatarB'),
+    takeA: document.getElementById('takeA'), takeB: document.getElementById('takeB'),
+    pctA: document.getElementById('pctA'), pctB: document.getElementById('pctB'),
+    votesA: document.getElementById('votesA'), votesB: document.getElementById('votesB'),
+    tagA: document.getElementById('tagA'), tagB: document.getElementById('tagB'),
+    hint: document.getElementById('hint'), toast: document.getElementById('toast'),
+    flipCount: document.getElementById('flipCount'), tierEl: document.getElementById('tierEl'),
+    streakEl: document.getElementById('streakEl'), badgesRow: document.getElementById('badgesRow'),
+    soundToggle: document.getElementById('soundToggle'),
+    bonusBanner: document.getElementById('bonusBanner'),
+    roundTimerFill: document.getElementById('roundTimerFill'),
+    eventOverlay: document.getElementById('eventOverlay'), eventPrompt: document.getElementById('eventPrompt'),
+    eventSubtitle: document.getElementById('eventSubtitle'),
+    eventTimerFill: document.getElementById('eventTimerFill'),
+    eventTimerBar: document.getElementById('eventTimerBar'), eventGrid: document.getElementById('eventGrid'),
+    dailyBanner: document.getElementById('dailyBanner'), dailyResultsView: document.getElementById('dailyResultsView'),
+    dailyEmojis: document.getElementById('dailyEmojis'), dailyScoreText: document.getElementById('dailyScoreText'),
+    dailyShareBtn: document.getElementById('dailyShareBtn'), dailyDoneBtn: document.getElementById('dailyDoneBtn'),
+    eventTiles: Array.from(document.querySelectorAll('.event-tile')),
+    levelupOverlay: document.getElementById('levelupOverlay'), levelupLabel: document.getElementById('levelupLabel'),
+    personalityOverlay: document.getElementById('personalityOverlay'), personalityLabel: document.getElementById('personalityLabel'),
+    personalityBlurb: document.getElementById('personalityBlurb'), personalityPct: document.getElementById('personalityPct'),
+    vibeWrap: document.getElementById('vibeWrap'), vibeDot: document.getElementById('vibeDot'),
+    vibeLabel: document.getElementById('vibeLabel'),
+  };
+
+  // ---------- personal stats (this device, permanent - never wiped) ----------
+  function todayStr(){ return new Date().toISOString().slice(0,10); }
+  function loadStats(){
+    const blank = { flips:0, lastDate:null, streak:0, byCat:{}, badges:{}, agree:0, decided:0, personalityMilestone:0 };
+    try{
+      const raw = localStorage.getItem('flipstax_stats_v1');
+      if (!raw) return blank;
+      const parsed = JSON.parse(raw);
+      return Object.assign(blank, parsed, {
+        byCat:parsed.byCat||{}, badges:parsed.badges||{},
+        agree:parsed.agree||0, decided:parsed.decided||0,
+        personalityMilestone: parsed.personalityMilestone||0,
+      });
+    }catch(e){ return blank; }
+  }
+  function saveStats(){ try{ localStorage.setItem('flipstax_stats_v1', JSON.stringify(stats)); }catch(e){} }
+  function bumpStreakIfNeeded(){
+    const today = todayStr();
+    if (stats.lastDate === today) return;
+    if (stats.lastDate){
+      const diffDays = Math.round((new Date(today) - new Date(stats.lastDate)) / 86400000);
+      stats.streak = diffDays === 1 ? stats.streak + 1 : 1;
+    } else { stats.streak = 1; }
+    stats.lastDate = today;
+  }
+
+  // ---------- daily challenge (same 5 questions for everyone, once a day) ----------
+  const DAILY_EPOCH = new Date('2026-09-16T00:00:00');
+  function dailyPuzzleNumber(){
+    const today = new Date(todayStr() + 'T00:00:00');
+    return Math.max(1, Math.round((today - DAILY_EPOCH) / 86400000) + 1);
+  }
+  function loadDailyState(){
+    try{
+      const raw = localStorage.getItem('flipstax_daily_v1');
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed && parsed.date === todayStr() ? parsed : null; // only valid for today
+    }catch(e){ return null; }
+  }
+  function saveDailyState(state){ try{ localStorage.setItem('flipstax_daily_v1', JSON.stringify(state)); }catch(e){} }
+
+  let dailyState = loadDailyState();
+  let dailyRunning = false, dailyIndex = 0, dailyResults = [], dailyQuestions = [];
+
+  function renderDailyBanner(){
+    const n = dailyPuzzleNumber();
+    if (dailyState){
+      els.dailyBanner.innerHTML = '\u2705 Daily #' + n + ': ' + dailyState.score + '/5 &nbsp;<span class="daily-share-link" id="dailyShareLink">Share</span>';
+      const link = document.getElementById('dailyShareLink');
+      if (link) link.addEventListener('click', ()=> shareDailyResult(dailyState));
+    } else {
+      els.dailyBanner.innerHTML = '\uD83D\uDCC5 Daily Challenge #' + n + ' &nbsp;<span class="daily-play-link" id="dailyPlayLink">Play</span>';
+      const link = document.getElementById('dailyPlayLink');
+      if (link) link.addEventListener('click', startDailyChallenge);
+    }
+  }
+
+  function startDailyChallenge(){
+    if (dailyState || dailyRunning || levelUpActive || personalityActive) return;
+    dailyRunning = true;
+    dailyIndex = 0;
+    dailyResults = [];
+    dailyQuestions = getDailyQuestions(todayStr());
+    if (unsubscribe){ unsubscribe(); unsubscribe = null; }
+    clearRoundTimer();
+    els.dailyResultsView.classList.add('hidden');
+    els.eventTimerBar.style.display = '';
+    els.eventGrid.style.display = '';
+    runDailyQuestion();
+  }
+  function runDailyQuestion(){
+    const q = dailyQuestions[dailyIndex];
+    els.eventOverlay.classList.remove('hidden', 'powerup');
+    els.eventSubtitle.textContent = 'DAILY \u00B7 ' + (DAILY_SUBJECT_LABEL[q.category] || 'Question ' + (dailyIndex+1)) + ' \u00B7 ' + (dailyIndex+1) + '/5';
+    els.eventPrompt.textContent = q.question;
+    els.eventTiles.forEach((tileEl,i)=>{
+      tileEl.textContent = q.opts[i];
+      tileEl.style.background = TILE_COLORS[i];
+      tileEl.onclick = ()=> resolveDailyQuestion(i === q.correctIdx);
+    });
+    els.eventTimerFill.style.transition = 'none';
+    els.eventTimerFill.style.width = '100%';
+    requestAnimationFrame(()=>{
+      els.eventTimerFill.style.transition = 'width 6s linear';
+      els.eventTimerFill.style.width = '0%';
+    });
+    clearTimeout(eventTimeoutId);
+    eventTimeoutId = setTimeout(()=> resolveDailyQuestion(false), 6000);
+  }
+  function resolveDailyQuestion(correct){
+    clearTimeout(eventTimeoutId);
+    els.eventTiles.forEach(t=> t.onclick = null);
+    dailyResults.push(correct);
+    if (correct){ sfx.correct(); sessionFlips++; recordFlip('wild', 5); }
+    else{ sfx.wrong(); }
+    els.eventSubtitle.textContent = '';
+    els.eventPrompt.textContent = correct ? '\u2705 Correct' : '\u274C Not quite';
+    setTimeout(()=>{
+      dailyIndex++;
+      if (dailyIndex < 5) runDailyQuestion();
+      else finishDailyChallenge();
+    }, 800);
+  }
+  function finishDailyChallenge(){
+    dailyRunning = false;
+    const score = dailyResults.filter(Boolean).length;
+    dailyState = { date: todayStr(), score, results: dailyResults };
+    saveDailyState(dailyState);
+    renderDailyBanner();
+
+    const tagline = score===5 ? 'Perfect run \uD83D\uDD25' : score===4 ? 'So close' : score>=2 ? 'Solid' : 'Tough one today';
+    els.eventSubtitle.textContent = '';
+    els.eventPrompt.textContent = tagline;
+    els.eventTimerBar.style.display = 'none';
+    els.eventGrid.style.display = 'none';
+    els.dailyEmojis.textContent = dailyResults.map(r=> r ? '\u2705' : '\u274C').join('');
+    els.dailyScoreText.textContent = score + '/5';
+    els.dailyResultsView.classList.remove('hidden');
+    sfx.levelUp();
+  }
+  function buildDailyShareText(state){
+    return 'FlipStax Daily #' + dailyPuzzleNumber() + '\n' +
+      state.results.map(r=> r ? '\u2705' : '\u274C').join('') + '  ' + state.score + '/5';
+  }
+  async function shareDailyResult(state){
+    const text = buildDailyShareText(state);
+    if (navigator.share){
+      try{ await navigator.share({ text }); return; }catch(e){}
+    }
+    try{
+      await navigator.clipboard.writeText(text);
+      showToast('\uD83D\uDCCB Copied \u2014 paste it anywhere');
+    }catch(e){
+      showToast(text);
+    }
+  }
+  function closeDailyResults(){
+    els.dailyResultsView.classList.add('hidden');
+    els.eventOverlay.classList.add('hidden');
+    els.eventTimerBar.style.display = '';
+    els.eventGrid.style.display = '';
+    loadNext();
+  }
+
+  function tierFor(flips){ let t = TIERS[0]; for (const tier of TIERS){ if (flips >= tier.min) t = tier; } return t.label; }
+  function renderStats(){
+    els.flipCount.textContent = stats.flips + (stats.flips===1?' flip':' flipz');
+    els.tierEl.textContent = tierFor(stats.flips);
+    els.streakEl.textContent = stats.streak > 0 ? ('\uD83D\uDD25 ' + stats.streak) : '';
+    els.badgesRow.innerHTML = '';
+    Object.keys(stats.badges).forEach(cat=>{
+      if (stats.badges[cat] && CAT_META[cat]){
+        const pill = document.createElement('span');
+        pill.className = 'badge-pill'; pill.textContent = CAT_META[cat].badge;
+        els.badgesRow.appendChild(pill);
+      }
+    });
+    updateVibeMeter();
+  }
+  function updateVibeMeter(){
+    if (stats.decided < 5){ els.vibeWrap.style.display = 'none'; return; }
+    const pct = Math.round((stats.agree / stats.decided) * 100);
+    const tier = vibeTierFor(pct);
+    els.vibeWrap.style.display = 'block';
+    els.vibeDot.style.left = pct + '%';
+    els.vibeLabel.textContent = pct + '% with the crowd \u00B7 ' + tier.label;
+  }
+  let levelUpActive = false;
+  function showLevelUp(label){
+    els.levelupLabel.textContent = label;
+    els.levelupOverlay.classList.add('show');
+    levelUpActive = true;
+    clearTimeout(showLevelUp._t);
+    showLevelUp._t = setTimeout(()=>{ els.levelupOverlay.classList.remove('show'); levelUpActive = false; }, 1300);
+  }
+  els.levelupOverlay.addEventListener('click', ()=>{
+    els.levelupOverlay.classList.remove('show');
+    levelUpActive = false;
+    clearTimeout(showLevelUp._t);
+  });
+
+  let personalityActive = false;
+  function showPersonalityReveal(){
+    const pct = stats.decided > 0 ? Math.round((stats.agree / stats.decided) * 100) : 50;
+    const tier = vibeTierFor(pct);
+    els.personalityLabel.textContent = tier.label;
+    els.personalityBlurb.textContent = tier.blurb;
+    els.personalityPct.textContent = pct + '% with the crowd';
+    els.personalityOverlay.classList.add('show');
+    personalityActive = true;
+    sfx.personality();
+    clearTimeout(showPersonalityReveal._t);
+    showPersonalityReveal._t = setTimeout(()=>{ els.personalityOverlay.classList.remove('show'); personalityActive = false; }, 2600);
+  }
+  els.personalityOverlay.addEventListener('click', ()=>{
+    els.personalityOverlay.classList.remove('show');
+    personalityActive = false;
+    clearTimeout(showPersonalityReveal._t);
+  });
+
+  // Never advances to the next round while the level-up flash or the
+  // personality reveal is still up, no matter which path (normal vote,
+  // trivia, power-up) is trying to advance or how its own timing is tuned -
+  // this is the actual guard against the "flash still covering the screen
+  // when the next round loads" freeze.
+  function scheduleNext(delay){
+    setTimeout(function tick(){
+      if (levelUpActive || personalityActive){ setTimeout(tick, 150); return; }
+      loadNext();
+    }, delay);
+  }
+
+  // baseAmount: how many flipz this action is worth before the 2x bonus zone multiplier.
+  // Misses/timeouts never call this - a miss simply earns nothing, it never subtracts.
+  function recordFlip(category, baseAmount){
+    baseAmount = baseAmount || 1;
+    const amount = baseAmount * (bonusActive ? 2 : 1);
+    const prevTier = tierFor(stats.flips);
+    stats.flips += amount;
+    stats.byCat[category] = (stats.byCat[category] || 0) + 1;
+    bumpStreakIfNeeded();
+    const newTier = tierFor(stats.flips);
+    if (newTier !== prevTier){ sfx.levelUp(); showLevelUp(newTier); }
+    if (!stats.badges[category] && stats.byCat[category] >= BADGE_THRESHOLD && CAT_META[category]){
+      stats.badges[category] = true;
+      showToast(CAT_META[category].badge + ' unlocked!');
+    }
+    const newMilestone = Math.floor(stats.flips / 100);
+    if (newMilestone > stats.personalityMilestone && stats.decided >= 5){
+      stats.personalityMilestone = newMilestone;
+      showPersonalityReveal();
+    }
+    saveStats();
+    renderStats();
+  }
+
+  // ---------- deck mechanics ----------
+  function shuffle(arr,rng){ rng = rng || Math.random; const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(rng()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+  // Shuffles, then breaks up any run of 3+ same-category cards in a row so
+  // one flavor (fashion, sports, whatever) never dominates a stretch of play.
+  function smartShuffle(pool){
+    const arr = shuffle(pool);
+    for (let i=2;i<arr.length;i++){
+      if (arr[i].category === arr[i-1].category && arr[i].category === arr[i-2].category){
+        for (let j=i+1;j<arr.length;j++){
+          if (arr[j].category !== arr[i-1].category){
+            const tmp = arr[i]; arr[i] = arr[j]; arr[j] = tmp;
+            break;
+          }
+        }
+      }
+    }
+    return arr;
+  }
+  function mockPercentA(pairId, textA){
+    const h = hashStr(pairId + '::' + textA);
+    const base = h % 1000 / 1000;
+    const shaped = Math.pow(base, base < 0.5 ? 1.15 : 0.87);
+    return Math.round(18 + shaped * 64);
+  }
+  function resetDeck(){ deck = smartShuffle(masterPool); idx = 0; }
+  function setScene(el, glyph){ el.innerHTML = glyph ? '<span class="glyph">'+glyph+'</span>' : ''; }
+
+  function renderUnvoted(){
+    els.halfA.classList.remove('revealed'); els.halfB.classList.remove('revealed');
+    els.fillA.style.width = '0%'; els.fillB.style.width = '0%';
+    els.pctA.textContent=''; els.pctB.textContent='';
+    els.votesA.textContent=''; els.votesB.textContent='';
+    els.tagA.textContent=''; els.tagB.textContent='';
+    els.hint.innerHTML = current && current.mode === 'match' ? 'Tap who wins' : "Tap the one you'd pick";
+  }
+
+  function clearRoundTimer(){ clearTimeout(roundTimeoutId); roundTimeoutId = null; }
+  function startRoundTimer(durationMs){
+    clearRoundTimer();
+    els.roundTimerFill.style.transition = 'none';
+    els.roundTimerFill.style.width = '100%';
+    requestAnimationFrame(()=>{
+      els.roundTimerFill.style.transition = 'width ' + (durationMs/1000) + 's linear';
+      els.roundTimerFill.style.width = '0%';
+    });
+    roundTimeoutId = setTimeout(onRoundTimeout, durationMs);
+  }
+  function onRoundTimeout(){
+    if (voted || !current) return;
+    voted = true;
+    votedSinceTime = Date.now();
+    comboCount = 0;
+    showToast('\u23F1\uFE0F Too slow \u2014 no flip that round');
+    scheduleNext(900);
+  }
+
+  function maybeTriggerBonusZone(){
+    if (bonusActive) return;
+    const now = Date.now();
+    if (lastBonusEnd && now - lastBonusEnd < 45000) return;
+    if (sessionFlips < 3) return;
+    if (Math.random() < 0.08) startBonusZone();
+  }
+  function startBonusZone(){
+    bonusActive = true;
+    bonusEndsAt = Date.now() + 60000;
+    sfx.bonusZone();
+    els.bonusBanner.style.display = 'block';
+    updateBonusBanner();
+    clearInterval(bonusInterval);
+    bonusInterval = setInterval(()=>{
+      const remain = bonusEndsAt - Date.now();
+      if (remain <= 0){ endBonusZone(); return; }
+      updateBonusBanner(remain);
+    }, 500);
+    showToast('\u26A1 2x Flip Zone! Next 60 seconds count double');
+  }
+  function updateBonusBanner(remainMs){
+    const s = Math.max(0, Math.ceil((remainMs!==undefined?remainMs:60000)/1000));
+    els.bonusBanner.textContent = '\u26A1 2x FLIP ZONE \u00B7 ' + s + 's';
+  }
+  function endBonusZone(){
+    bonusActive = false; clearInterval(bonusInterval);
+    els.bonusBanner.style.display = 'none';
+    lastBonusEnd = Date.now();
+  }
+
+  // loadNext is the public entry point every round-advance path calls. The
+  // real work is in loadNextImpl; loadNext wraps it so that if anything
+  // unexpected throws partway through (a null reference, anything), the game
+  // doesn't get left stuck with voted=true and no running timer - it logs
+  // the error and retries shortly instead of freezing.
+  function loadNext(){
+    try{
+      loadNextImpl();
+    }catch(err){
+      console.error('FlipStax: loadNext failed, recovering', err);
+      voted = false;
+      votedSinceTime = null;
+      setTimeout(loadNext, 400);
+    }
+  }
+  function loadNextImpl(){
+    if (unsubscribe){ unsubscribe(); unsubscribe = null; }
+    clearRoundTimer();
+    maybeTriggerBonusZone();
+
+    if (!lastWasEvent && sessionFlips >= 4){
+      const roll = Math.random();
+      if (roll < 0.12){ lastWasEvent = true; runWildEvent(); return; }
+      if (roll < 0.20){ lastWasEvent = true; runPowerUpRound(); return; }
+    }
+    lastWasEvent = false;
+
+    if (idx >= deck.length) resetDeck();
+    current = deck[idx++];
+
+    const label = (CAT_META[current.category] || {}).label || '';
+    els.chipA.textContent = label; els.chipB.textContent = label;
+
+    if (current.mode === 'match'){
+      els.halfA.style.background = nameGradient(current.a);
+      els.halfB.style.background = nameGradient(current.b);
+      setScene(els.sceneA, null); setScene(els.sceneB, null);
+      els.avatarA.style.display = 'flex'; els.avatarB.style.display = 'flex';
+      els.avatarA.textContent = current.avatarA; els.avatarB.textContent = current.avatarB;
+    } else {
+      els.avatarA.style.display = 'none'; els.avatarB.style.display = 'none';
+      els.halfA.style.background = current.gradA; els.halfB.style.background = current.gradB;
+      setScene(els.sceneA, current.glyphA); setScene(els.sceneB, current.glyphB);
+    }
+    els.takeA.textContent = current.a; els.takeB.textContent = current.b;
+    [els.contentA, els.contentB].forEach(c=>{
+      if (!c) return;
+      c.classList.remove('pop-in');
+      void c.offsetWidth; // force reflow so the animation restarts every round
+      c.classList.add('pop-in');
+    });
+
+    renderUnvoted();
+    voted = false;
+    votedSinceTime = null;
+    let roundMs = bonusActive ? 3000 : 5000;
+    if (slowMoRoundsLeft > 0){ roundMs += 3000; slowMoRoundsLeft--; }
+    startRoundTimer(roundMs);
+
+    if (dbReady && db){
+      try{
+        const ref = db.doc('votes/' + current.id);
+        unsubscribe = ref.onSnapshot((snap)=>{ if (voted) reveal(snap.exists ? snap.data() : {a:0,b:0}); }, ()=>{});
+      }catch(e){}
+    }
+    maybeRequestMoreWild();
+  }
+
+  function reveal(counts){
+    const a = (counts && counts.a) || 0;
+    const b = (counts && counts.b) || 0;
+    const total = a + b;
+    let pctA, pctB;
+    if (total > 0){ pctA = Math.round((a/total)*100); pctB = 100 - pctA; }
+    else { pctA = mockPercentA(current.id, current.a); pctB = 100 - pctA; }
+    els.halfA.classList.add('revealed'); els.halfB.classList.add('revealed');
+    els.fillA.style.width = pctA + '%'; els.fillB.style.width = pctB + '%';
+    animateCount(els.pctA, pctA); animateCount(els.pctB, pctB);
+    els.board.classList.remove('flash');
+    void els.board.offsetWidth;
+    els.board.classList.add('flash');
+    if (total > 0){
+      els.votesA.textContent = a + (a===1?' vote':' votes');
+      els.votesB.textContent = b + (b===1?' vote':' votes');
+    } else { els.votesA.textContent = 'be the first'; els.votesB.textContent = 'be the first'; }
+    return { pctA, pctB };
+  }
+
+  // Tumbles a percentage up from 0 to its target, slot-machine style, instead
+  // of just snapping the text in.
+  function animateCount(el, target){
+    const startTime = performance.now();
+    const duration = 550;
+    function tick(now){
+      const t = Math.min(1, (now - startTime) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = Math.round(target * eased) + '%';
+      if (t < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function showToast(msg){
+    els.toast.textContent = msg; els.toast.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(()=> els.toast.classList.remove('show'), 1700);
+  }
+
+  async function vote(side){
+    try{
+      await voteImpl(side);
+    }catch(err){
+      console.error('FlipStax: vote failed, recovering', err);
+      votedSinceTime = null;
+      scheduleNext(400);
+    }
+  }
+  async function voteImpl(side){
+    if (voted || !current) return;
+    voted = true;
+    votedSinceTime = Date.now();
+    clearRoundTimer();
+    els.roundTimerFill.style.transition = 'none';
+    els.roundTimerFill.style.width = '0%';
+
+    let counts = {a:0,b:0};
+    if (dbReady && db){
+      try{
+        const ref = db.doc('votes/' + current.id);
+        const snap = await withTimeout(ref.get(), 2500);
+        if (snap){
+          counts = snap.exists ? Object.assign({a:0,b:0}, snap.data()) : {a:0,b:0};
+          counts[side==='A'?'a':'b'] = (counts[side==='A'?'a':'b'] || 0) + 1;
+          await withTimeout(ref.set(counts), 2500);
+        } else {
+          counts = {a:0,b:0}; // read timed out - fall back to the local percentage
+        }
+      }catch(e){ counts = {a:0,b:0}; }
+    }
+
+    const { pctA, pctB } = reveal(counts);
+    const won = side==='A' ? pctA>=pctB : pctB>=pctA;
+    if (won) sfx.revealWin(); else sfx.revealLose();
+    els.tagA.textContent = side==='A' ? 'Your pick' : '';
+    els.tagB.textContent = side==='B' ? 'Your pick' : '';
+
+    if (Math.abs(pctA-pctB) <= 6) els.hint.innerHTML = 'Nearly split down the middle';
+    else if (won) els.hint.innerHTML = "You're with the majority";
+    else els.hint.innerHTML = "You're in the minority on this one";
+
+    stats.decided++;
+    if (won) stats.agree++;
+    if (stats.decided === 5) showToast('\uD83C\uDFAD Vibe meter unlocked \u2014 see where you land');
+
+    comboCount++;
+    let base = 1;
+    if (comboCount % 3 === 0){ base = 2; sfx.combo(); showToast('\uD83D\uDD25 Combo x' + comboCount + '! +2 flipz'); }
+
+    sessionFlips++;
+    recordFlip(current.category, base);
+
+    scheduleNext(1650);
+  }
+
+  els.halfA.addEventListener('click', ()=>{ sfx.tap(); vote('A'); });
+  els.halfB.addEventListener('click', ()=>{ sfx.tap(); vote('B'); });
+  document.addEventListener('keydown', (e)=>{
+    if (e.key==='ArrowUp' || e.key==='1') vote('A');
+    if (e.key==='ArrowDown' || e.key==='2') vote('B');
+  });
+
+  // ---------- wild trivia bonus round (real answer, real reward) ----------
+  function runWildEvent(forceType){
+    const useMath = forceType ? forceType === 'math' : Math.random() < 0.5;
+    const trivia = useMath ? generateMathTrivia() : generateSpellingTrivia();
+    els.eventSubtitle.textContent = pick(FLAVOR_INTROS);
+    els.eventPrompt.textContent = trivia.question;
+    els.eventTiles.forEach((tileEl,i)=>{
+      tileEl.textContent = trivia.opts[i];
+      tileEl.style.background = TILE_COLORS[i];
+      tileEl.onclick = ()=> resolveEvent(i === trivia.correctIdx);
+    });
+    els.eventOverlay.classList.remove('hidden');
+    els.eventTimerFill.style.transition = 'none';
+    els.eventTimerFill.style.width = '100%';
+    requestAnimationFrame(()=>{
+      els.eventTimerFill.style.transition = 'width 6s linear';
+      els.eventTimerFill.style.width = '0%';
+    });
+    clearTimeout(eventTimeoutId);
+    eventTimeoutId = setTimeout(()=> resolveEvent(null), 6000);
+  }
+  function resolveEvent(wasCorrect){
+    clearTimeout(eventTimeoutId);
+    els.eventTiles.forEach(t=> t.onclick = null);
+    if (wasCorrect === true){
+      sfx.correct();
+      sessionFlips++; recordFlip('wild', 25);
+      els.eventSubtitle.textContent = '';
+      els.eventPrompt.textContent = '\u2705 CORRECT! +25 FLIPZ';
+    } else if (wasCorrect === false){
+      sfx.wrong();
+      els.eventSubtitle.textContent = 'No flip this time';
+      els.eventPrompt.textContent = '\u274C NOT QUITE';
+    } else {
+      sfx.wrong();
+      els.eventSubtitle.textContent = 'No flip this time';
+      els.eventPrompt.textContent = '\u23F1\uFE0F TOO SLOW';
+    }
+    setTimeout(()=>{ els.eventOverlay.classList.add('hidden'); scheduleNext(0); }, 1100);
+  }
+
+  // ---------- power-up round (choose one, animated) ----------
+  function runPowerUpRound(){
+    els.eventOverlay.classList.remove('hidden');
+    els.eventOverlay.classList.add('powerup');
+    els.eventSubtitle.textContent = '\uD83C\uDF89 POWER-UP DROPPED';
+    els.eventPrompt.textContent = "Choose one \u2014 it's yours";
+    els.eventTiles.forEach((tileEl,i)=>{
+      const pu = POWERUPS[i];
+      tileEl.innerHTML = '<span class="pu-icon">'+pu.icon+'</span><span class="pu-label">'+pu.label+'</span>';
+      tileEl.style.background = pu.color;
+      tileEl.onclick = ()=> resolvePowerUp(pu.key);
+    });
+    els.eventTimerFill.style.transition = 'none';
+    els.eventTimerFill.style.width = '100%';
+    requestAnimationFrame(()=>{
+      els.eventTimerFill.style.transition = 'width 5s linear';
+      els.eventTimerFill.style.width = '0%';
+    });
+    clearTimeout(eventTimeoutId);
+    eventTimeoutId = setTimeout(()=> resolvePowerUp(null), 5000);
+  }
+  function resolvePowerUp(key){
+    clearTimeout(eventTimeoutId);
+    els.eventTiles.forEach(t=> t.onclick = null);
+    els.eventOverlay.classList.remove('powerup');
+    els.eventSubtitle.textContent = '';
+
+    if (key === null){
+      els.eventPrompt.textContent = '\u23F1\uFE0F Power-up expired';
+      finishPowerUp();
+    } else if (key === 'flips10'){
+      sfx.powerUp();
+      sessionFlips++; recordFlip('wild', 10);
+      els.eventPrompt.textContent = '\u26A1 +10 FLIPZ!';
+      finishPowerUp();
+    } else if (key === 'slowmo'){
+      sfx.powerUp();
+      slowMoRoundsLeft = 3;
+      els.eventPrompt.textContent = '\uD83D\uDC0C SLOW-MO for your next 3 rounds';
+      finishPowerUp();
+    } else if (key === 'skip'){
+      sfx.powerUp();
+      els.eventPrompt.textContent = '\u23ED\uFE0F SKIPPED AHEAD';
+      finishPowerUp(true);
+    } else if (key === 'wildcard'){
+      let ticks = 0;
+      const rollInterval = setInterval(()=>{
+        sfx.spinTick(ticks);
+        els.eventPrompt.textContent = '\uD83C\uDF81 +' + pick(MYSTERY_POOL) + '?';
+        ticks++;
+        if (ticks >= 6){
+          clearInterval(rollInterval);
+          const amount = pick(MYSTERY_POOL);
+          sfx.correct();
+          sessionFlips++; recordFlip('wild', amount);
+          els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: +' + amount + ' FLIPZ';
+          finishPowerUp();
+        }
+      }, 90);
+    }
+  }
+  function finishPowerUp(extraSkip){
+    setTimeout(()=>{
+      els.eventOverlay.classList.add('hidden');
+      scheduleNext(0);
+      if (extraSkip) scheduleNext(0);
+    }, 1100);
+  }
+
+  // ---------- live AI-generated wildcards (made-up scenarios only) ----------
+  async function maybeRequestMoreWild(){
+    if (aiRequested || !sampleReady || !sampleFn) return;
+    if (sessionFlips < 10) return;
+    aiRequested = true;
+    try{
+      const prompt = 'Generate 6 short, weird "would you rather"-style hypothetical dilemma pairs for a ' +
+        'fast tap-to-vote game. Each side must be ONE punchy sentence under 16 words. Do not use any real ' +
+        'people, celebrities, brands, or copyrighted characters/franchises - only made-up hypothetical ' +
+        'situations. Return STRICT JSON ONLY, no markdown, no commentary: an array of exactly 6 objects, ' +
+        'each with keys "a", "b", "emojiA", "emojiB" (emojiA/emojiB are a single emoji each).';
+      const result = await sampleFn.json(prompt, { modelTier: 'quick' });
+      if (Array.isArray(result)){
+        const fresh = result.filter(r => r && typeof r.a === 'string' && typeof r.b === 'string')
+          .slice(0,6)
+          .map((r,i)=>({
+            id: 'ai-' + Date.now() + '-' + i, mode:'scenario', category:'wild',
+            a: r.a, b: r.b,
+            glyphA: typeof r.emojiA === 'string' ? r.emojiA : '\u2753',
+            glyphB: typeof r.emojiB === 'string' ? r.emojiB : '\u2753',
+            gradA: pick(WILD_GRADIENTS), gradB: pick(WILD_GRADIENTS),
+          }));
+        if (fresh.length){
+          masterPool = masterPool.concat(fresh);
+          deck = deck.concat(shuffle(fresh));
+          showToast('\uD83C\uDF00 Fresh wildcards just landed');
+        }
+      }
+    }catch(e){}
+  }
+
+  resetDeck();
+  loadNext();
+  renderStats();
+  setSoundOn(soundOn); // sync the 🔊/🔇 icon to whatever was saved from last time
+  els.dailyShareBtn.addEventListener('click', ()=> shareDailyResult(dailyState));
+  els.dailyDoneBtn.addEventListener('click', closeDailyResults);
+  renderDailyBanner();
+  els.soundToggle.addEventListener('click', ()=> setSoundOn(!soundOn));
+
+  // Dev-only preview buttons: jump straight to a round type instead of
+  // waiting on the random trigger. Safe to remove once you're done testing.
+  function forceDemoRound(type){
+    if (type === 'personality'){ showPersonalityReveal(); return; }
+    if (unsubscribe){ unsubscribe(); unsubscribe = null; }
+    clearRoundTimer();
+    clearTimeout(eventTimeoutId);
+    els.eventOverlay.classList.add('hidden');
+    els.eventOverlay.classList.remove('powerup');
+    voted = false;
+    votedSinceTime = null;
+    lastWasEvent = true;
+    if (type === 'trivia') runWildEvent('math');
+    else runPowerUpRound();
+  }
+  document.getElementById('debugTrivia').addEventListener('click', ()=> forceDemoRound('trivia'));
+  document.getElementById('debugPowerup').addEventListener('click', ()=> forceDemoRound('powerup'));
+  document.getElementById('debugPersonality').addEventListener('click', ()=> forceDemoRound('personality'));
+
+  // Last line of defense: if the game has been sitting "voted, waiting to
+  // advance" for far longer than any legitimate transition (reveal pause,
+  // level-up flash, trivia/power-up resolve) should ever take, something
+  // went wrong somewhere we didn't catch above. Force it forward rather
+  // than leave it stuck.
+  setInterval(()=>{
+    if (voted && votedSinceTime && (Date.now() - votedSinceTime > 8000)){
+      const overlayVisible = !els.eventOverlay.classList.contains('hidden');
+      const levelupVisible = els.levelupOverlay.classList.contains('show');
+      if (!overlayVisible && !levelupVisible){
+        console.warn('FlipStax: watchdog recovering a stalled round');
+        voted = false;
+        votedSinceTime = null;
+        loadNext();
+      }
+    }
+  }, 2000);
+
+  if (window.claude && typeof window.claude.use === 'function'){
+    window.claude.use('db').then((ns)=>{ if (ns){ db = ns; dbReady = true; } }).catch(()=>{});
+    window.claude.use('sample').then((ns)=>{ if (ns){ sampleFn = ns; sampleReady = true; } }).catch(()=>{});
+  }
+})();
+</script>
+</body>
+</html>
