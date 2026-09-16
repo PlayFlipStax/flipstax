@@ -37,14 +37,16 @@
   .sound-toggle:active{ opacity:1; }
   .badges-row{ display:none; }
   .badge-pill{ font-size:10.5px; background:var(--panel); border:1px solid var(--divider); color:var(--dim); padding:2px 8px; border-radius:20px; }
-  .bonus-banner{
-    display:none; margin-top:6px; background:linear-gradient(90deg,#f2545b,#e8a33d);
-    color:#1c1006; font-weight:800; font-size:12px; padding:5px 10px; border-radius:8px; text-align:center;
+  .status-banner{
+    margin-top:6px; border-radius:8px; padding:6px 10px; font-size:12px; font-weight:700;
+    text-align:center; display:flex; align-items:center; justify-content:center; gap:6px;
   }
-  .daily-banner{
-    margin-top:8px; background:var(--panel); border:1px solid var(--divider); border-radius:8px;
-    padding:6px 10px; font-size:12px; color:var(--ink); display:flex; align-items:center; justify-content:space-between;
+  .status-banner.daily{
+    background:var(--panel); border:1px solid var(--divider); color:var(--ink);
+    justify-content:space-between; font-weight:400;
   }
+  .status-banner.bonus{ background:linear-gradient(90deg,#f2545b,#e8a33d); color:#1c1006; }
+  .status-banner.noon{ background:linear-gradient(90deg,#5b3ec7,#3e6bc7); color:#fff; }
   .daily-play-link, .daily-share-link{
     color:var(--pulse); font-weight:700; cursor:pointer; padding:2px 6px;
   }
@@ -74,13 +76,21 @@
     .content.pop-in, .board.flash{ animation:none !important; }
   }
   .round-timer-fill{ height:100%; background:var(--pulse); width:100%; }
+  .slowdown-btn{
+    position:absolute; top:10px; right:10px; z-index:6;
+    background:rgba(20,24,31,0.75); border:1px solid rgba(255,255,255,0.2); color:var(--ink);
+    font-size:12px; font-weight:700; padding:5px 10px; border-radius:20px; cursor:pointer;
+  }
+  .slowdown-btn:active{ background:rgba(255,255,255,0.2); }
+  .slowdown-btn.disabled{ opacity:0.35; pointer-events:none; }
+  .slowdown-btn.hidden{ display:none; }
 
   .half{
     position:relative; flex:1; display:flex; align-items:center; justify-content:center;
-    padding:20px 24px; cursor:pointer; overflow:hidden; min-height:0;
+    padding:12px 20px; cursor:pointer; overflow:hidden; min-height:0;
   }
   .scene{ position:absolute; inset:0; z-index:0; display:flex; align-items:center; justify-content:center; }
-  .scene .glyph{ font-size:min(28vh,170px); opacity:0.5; transform:translateY(4%); }
+  .scene .glyph{ font-size:min(24vh,150px); opacity:0.5; transform:translateY(4%); }
 
   .fill{ position:absolute; inset:0; width:0%; z-index:1; transition: width 0.75s cubic-bezier(.2,.8,.2,1); }
   .half.top .fill{ background: rgba(232,163,61,0.82); }
@@ -89,16 +99,16 @@
   .content{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; }
 
   .avatar{
-    width:60px; height:60px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:20px;
-    margin-bottom:9px; border:2px solid rgba(255,255,255,0.25);
+    width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:18px;
+    margin-bottom:7px; border:2px solid rgba(255,255,255,0.25);
   }
   .half.top .avatar{ background:var(--a); color:#2a1c05; }
   .half.bottom .avatar{ background:var(--b); color:#06201f; }
 
   .take{
     font-family:'Big Shoulders Display', sans-serif; font-weight:700;
-    font-size:clamp(18px, 4.4vw, 32px); line-height:1.08; text-align:center;
+    font-size:clamp(16px, 4vw, 28px); line-height:1.06; text-align:center;
     max-width:600px; text-wrap:balance; color:var(--ink);
     text-shadow: 0 2px 10px rgba(0,0,0,0.35); transition: color 0.4s ease;
   }
@@ -107,7 +117,7 @@
 
   .pct{
     font-family:'Big Shoulders Display', sans-serif; font-weight:900;
-    font-size:clamp(24px, 6.4vw, 44px); opacity:0; margin-top:7px; transition: opacity 0.4s ease 0.25s;
+    font-size:clamp(20px, 5.6vw, 38px); opacity:0; margin-top:5px; transition: opacity 0.4s ease 0.25s;
   }
   .half.revealed .pct{ opacity:1; }
   .half.top .pct{ color:#2a1c05; }
@@ -192,12 +202,6 @@
   }
   .daily-btn:active{ background:rgba(255,255,255,0.25); }
   .daily-btn.primary{ background:var(--pulse); border-color:var(--pulse); }
-  .debug-row{ position:fixed; left:10px; bottom:10px; display:flex; gap:6px; z-index:30; }
-  .debug-btn{
-    font-size:10.5px; padding:6px 9px; border-radius:8px; background:rgba(255,255,255,0.07);
-    color:rgba(255,255,255,0.45); border:1px solid rgba(255,255,255,0.14); cursor:pointer;
-  }
-  .debug-btn:active{ background:rgba(255,255,255,0.2); color:rgba(255,255,255,0.8); }
 
   .levelup-overlay{
     position:fixed; inset:0; z-index:20; background:rgba(10,12,16,0.82); display:flex;
@@ -228,6 +232,14 @@
   }
   .personality-blurb{ color:var(--dim); font-size:13.5px; margin-top:8px; line-height:1.4; }
   .personality-pct{ color:#b98bf0; font-size:12px; font-weight:600; margin-top:10px; }
+  .intro-overlay{
+    position:fixed; inset:0; z-index:30; background:var(--bg); display:flex;
+    align-items:center; justify-content:center; padding:24px; text-align:center;
+  }
+  .intro-overlay.hidden{ display:none; }
+  .intro-inner{ max-width:320px; }
+  .intro-inner .logo{ font-size:32px; margin-bottom:18px; }
+  .intro-lines{ color:var(--ink); font-size:15px; line-height:1.7; margin-bottom:22px; }
 
   @media (prefers-reduced-motion: reduce){ .fill, .pct, .you-tag, .toast, .levelup-overlay{ transition:none !important; } }
 </style>
@@ -250,13 +262,13 @@
       <div class="vibe-track"><div class="vibe-dot" id="vibeDot"></div></div>
       <div class="vibe-label" id="vibeLabel"></div>
     </div>
-    <div class="daily-banner" id="dailyBanner"></div>
+    <div class="status-banner daily" id="statusBanner"></div>
     <div class="badges-row" id="badgesRow"></div>
-    <div class="bonus-banner" id="bonusBanner"></div>
   </header>
 
   <div class="board" id="board">
     <div class="round-timer"><div class="round-timer-fill" id="roundTimerFill"></div></div>
+    <div class="slowdown-btn" id="slowdownBtn">⏱️ +5s</div>
 
     <div class="half top" id="halfA">
       <div class="cat-chip" id="chipA"></div>
@@ -309,11 +321,6 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<div class="debug-row">
-  <div class="debug-btn" id="debugTrivia">🎲 Preview trivia</div>
-  <div class="debug-btn" id="debugPowerup">🎁 Preview power-up</div>
-  <div class="debug-btn" id="debugPersonality">🎭 Preview vibe</div>
-</div>
 <div class="levelup-overlay" id="levelupOverlay">
   <div class="levelup-inner">
     <div class="levelup-flame">🔥</div>
@@ -328,6 +335,17 @@
     <div class="personality-label" id="personalityLabel"></div>
     <div class="personality-blurb" id="personalityBlurb"></div>
     <div class="personality-pct" id="personalityPct"></div>
+  </div>
+</div>
+<div class="intro-overlay hidden" id="introOverlay">
+  <div class="intro-inner">
+    <div class="logo"><span class="flip">Flip</span><span class="stax">Stax</span></div>
+    <div class="intro-lines">
+      Tap the one you'd pick.<br>
+      Watch for bonus rounds &mdash; they're worth extra.<br>
+      Come back daily for something new.
+    </div>
+    <div class="daily-btn primary" id="introDismiss">Got it</div>
   </div>
 </div>
 
@@ -767,6 +785,7 @@
   let slowMoRoundsLeft = 0;
   let lastWasEvent = false;
   let roundTimeoutId = null;
+  let roundDurationMs = 0, roundStartedAt = 0;
   let eventTimeoutId = null;
 
   const els = {
@@ -785,19 +804,20 @@
     flipCount: document.getElementById('flipCount'), tierEl: document.getElementById('tierEl'),
     streakEl: document.getElementById('streakEl'), badgesRow: document.getElementById('badgesRow'),
     soundToggle: document.getElementById('soundToggle'),
-    bonusBanner: document.getElementById('bonusBanner'),
-    roundTimerFill: document.getElementById('roundTimerFill'),
+    statusBanner: document.getElementById('statusBanner'),
+    roundTimerFill: document.getElementById('roundTimerFill'), slowdownBtn: document.getElementById('slowdownBtn'),
     eventOverlay: document.getElementById('eventOverlay'), eventPrompt: document.getElementById('eventPrompt'),
     eventSubtitle: document.getElementById('eventSubtitle'),
     eventTimerFill: document.getElementById('eventTimerFill'),
     eventTimerBar: document.getElementById('eventTimerBar'), eventGrid: document.getElementById('eventGrid'),
-    dailyBanner: document.getElementById('dailyBanner'), dailyResultsView: document.getElementById('dailyResultsView'),
+    dailyResultsView: document.getElementById('dailyResultsView'),
     dailyEmojis: document.getElementById('dailyEmojis'), dailyScoreText: document.getElementById('dailyScoreText'),
     dailyShareBtn: document.getElementById('dailyShareBtn'), dailyDoneBtn: document.getElementById('dailyDoneBtn'),
     eventTiles: Array.from(document.querySelectorAll('.event-tile')),
     levelupOverlay: document.getElementById('levelupOverlay'), levelupLabel: document.getElementById('levelupLabel'),
     personalityOverlay: document.getElementById('personalityOverlay'), personalityLabel: document.getElementById('personalityLabel'),
     personalityBlurb: document.getElementById('personalityBlurb'), personalityPct: document.getElementById('personalityPct'),
+    introOverlay: document.getElementById('introOverlay'), introDismiss: document.getElementById('introDismiss'),
     vibeWrap: document.getElementById('vibeWrap'), vibeDot: document.getElementById('vibeDot'),
     vibeLabel: document.getElementById('vibeLabel'),
   };
@@ -805,7 +825,7 @@
   // ---------- personal stats (this device, permanent - never wiped) ----------
   function todayStr(){ return new Date().toISOString().slice(0,10); }
   function loadStats(){
-    const blank = { flips:0, lastDate:null, streak:0, byCat:{}, badges:{}, agree:0, decided:0, personalityMilestone:0 };
+    const blank = { flips:0, lastDate:null, streak:0, byCat:{}, badges:{}, agree:0, decided:0, personalityMilestone:0, freezeAvailable:false, slowdownCharges:3, slowdownDate:null };
     try{
       const raw = localStorage.getItem('flipstax_stats_v1');
       if (!raw) return blank;
@@ -814,18 +834,45 @@
         byCat:parsed.byCat||{}, badges:parsed.badges||{},
         agree:parsed.agree||0, decided:parsed.decided||0,
         personalityMilestone: parsed.personalityMilestone||0,
+        freezeAvailable: !!parsed.freezeAvailable,
+        slowdownCharges: parsed.slowdownCharges != null ? parsed.slowdownCharges : 3,
+        slowdownDate: parsed.slowdownDate || null,
       });
     }catch(e){ return blank; }
   }
   function saveStats(){ try{ localStorage.setItem('flipstax_stats_v1', JSON.stringify(stats)); }catch(e){} }
+  function refreshSlowdownCharges(){
+    const today = todayStr();
+    if (stats.slowdownDate !== today){
+      stats.slowdownDate = today;
+      stats.slowdownCharges = 3;
+      saveStats();
+    }
+  }
   function bumpStreakIfNeeded(){
     const today = todayStr();
     if (stats.lastDate === today) return;
     if (stats.lastDate){
       const diffDays = Math.round((new Date(today) - new Date(stats.lastDate)) / 86400000);
-      stats.streak = diffDays === 1 ? stats.streak + 1 : 1;
-    } else { stats.streak = 1; }
+      if (diffDays === 1){
+        stats.streak += 1;
+      } else if (diffDays === 2 && stats.freezeAvailable){
+        // Missed exactly one day, but a freeze was banked - streak survives.
+        stats.streak += 1;
+        stats.freezeAvailable = false;
+        showToast('\uD83E\uDDCA Streak Freeze used \u2014 your streak is safe!');
+      } else {
+        stats.streak = 1;
+      }
+    } else {
+      stats.streak = 1;
+    }
     stats.lastDate = today;
+    refreshSlowdownCharges();
+    if (stats.streak > 0 && stats.streak % 5 === 0 && !stats.freezeAvailable){
+      stats.freezeAvailable = true;
+      showToast('\uD83E\uDDCA Streak Freeze earned \u2014 one missed day won\u2019t break your streak');
+    }
   }
 
   // ---------- daily challenge (same 5 questions for everyone, once a day) ----------
@@ -847,14 +894,29 @@
   let dailyState = loadDailyState();
   let dailyRunning = false, dailyIndex = 0, dailyResults = [], dailyQuestions = [];
 
-  function renderDailyBanner(){
+  // One status slot instead of three stacked banners. Shows whichever is
+  // most relevant right now: an active bonus zone beats Noon Rush beats the
+  // ordinary daily-challenge status.
+  function renderStatusBanner(){
+    if (bonusActive){
+      const remain = Math.max(0, Math.ceil((bonusEndsAt - Date.now())/1000));
+      els.statusBanner.className = 'status-banner bonus';
+      els.statusBanner.textContent = '\u26A1 2x FLIP ZONE \u00B7 ' + remain + 's';
+      return;
+    }
+    if (isNoonRush()){
+      els.statusBanner.className = 'status-banner noon';
+      els.statusBanner.textContent = '\uD83D\uDD14 NOON RUSH \u2014 bonus rounds supercharged';
+      return;
+    }
+    els.statusBanner.className = 'status-banner daily';
     const n = dailyPuzzleNumber();
     if (dailyState){
-      els.dailyBanner.innerHTML = '\u2705 Daily #' + n + ': ' + dailyState.score + '/5 &nbsp;<span class="daily-share-link" id="dailyShareLink">Share</span>';
+      els.statusBanner.innerHTML = '\u2705 Daily #' + n + ': ' + dailyState.score + '/5 &nbsp;<span class="daily-share-link" id="dailyShareLink">Share</span>';
       const link = document.getElementById('dailyShareLink');
       if (link) link.addEventListener('click', ()=> shareDailyResult(dailyState));
     } else {
-      els.dailyBanner.innerHTML = '\uD83D\uDCC5 Daily Challenge #' + n + ' &nbsp;<span class="daily-play-link" id="dailyPlayLink">Play</span>';
+      els.statusBanner.innerHTML = '\uD83D\uDCC5 Daily Challenge #' + n + ' &nbsp;<span class="daily-play-link" id="dailyPlayLink">Play</span>';
       const link = document.getElementById('dailyPlayLink');
       if (link) link.addEventListener('click', startDailyChallenge);
     }
@@ -876,6 +938,7 @@
   function runDailyQuestion(){
     const q = dailyQuestions[dailyIndex];
     els.eventOverlay.classList.remove('hidden', 'powerup');
+    renderSlowdownBtn();
     els.eventSubtitle.textContent = 'DAILY \u00B7 ' + (DAILY_SUBJECT_LABEL[q.category] || 'Question ' + (dailyIndex+1)) + ' \u00B7 ' + (dailyIndex+1) + '/5';
     els.eventPrompt.textContent = q.question;
     els.eventTiles.forEach((tileEl,i)=>{
@@ -911,7 +974,7 @@
     const score = dailyResults.filter(Boolean).length;
     dailyState = { date: todayStr(), score, results: dailyResults };
     saveDailyState(dailyState);
-    renderDailyBanner();
+    renderStatusBanner();
 
     const tagline = score===5 ? 'Perfect run \uD83D\uDD25' : score===4 ? 'So close' : score>=2 ? 'Solid' : 'Tough one today';
     els.eventSubtitle.textContent = '';
@@ -951,7 +1014,7 @@
   function renderStats(){
     els.flipCount.textContent = stats.flips + (stats.flips===1?' flip':' flipz');
     els.tierEl.textContent = tierFor(stats.flips);
-    els.streakEl.textContent = stats.streak > 0 ? ('\uD83D\uDD25 ' + stats.streak) : '';
+    els.streakEl.textContent = (stats.streak > 0 ? ('\uD83D\uDD25 ' + stats.streak) : '') + (stats.freezeAvailable ? ' \uD83E\uDDCA' : '');
     els.badgesRow.innerHTML = '';
     Object.keys(stats.badges).forEach(cat=>{
       if (stats.badges[cat] && CAT_META[cat]){
@@ -962,13 +1025,25 @@
     });
     updateVibeMeter();
   }
+  // Second personality axis: which category someone plays the most, reusing
+  // the byCat counts already tracked for every flip. Requires a minimum
+  // sample so nobody gets branded a "specialist" off one lucky category run.
+  function topCategorySpecialist(){
+    const cats = Object.keys(stats.byCat);
+    if (!cats.length) return null;
+    let top = cats[0];
+    for (const c of cats){ if (stats.byCat[c] > stats.byCat[top]) top = c; }
+    if (stats.byCat[top] < 8) return null;
+    return (CAT_META[top] || {}).badge || null;
+  }
   function updateVibeMeter(){
     if (stats.decided < 5){ els.vibeWrap.style.display = 'none'; return; }
     const pct = Math.round((stats.agree / stats.decided) * 100);
     const tier = vibeTierFor(pct);
+    const specialist = topCategorySpecialist();
     els.vibeWrap.style.display = 'block';
     els.vibeDot.style.left = pct + '%';
-    els.vibeLabel.textContent = pct + '% with the crowd \u00B7 ' + tier.label;
+    els.vibeLabel.textContent = pct + '% with the crowd \u00B7 ' + tier.label + (specialist ? ' \u00B7 ' + specialist : '');
   }
   let levelUpActive = false;
   function showLevelUp(label){
@@ -988,8 +1063,9 @@
   function showPersonalityReveal(){
     const pct = stats.decided > 0 ? Math.round((stats.agree / stats.decided) * 100) : 50;
     const tier = vibeTierFor(pct);
+    const specialist = topCategorySpecialist();
     els.personalityLabel.textContent = tier.label;
-    els.personalityBlurb.textContent = tier.blurb;
+    els.personalityBlurb.textContent = tier.blurb + (specialist ? ' Plus, you\u2019re a ' + specialist.replace(/^[^\s]+\s/,'') + '.' : '');
     els.personalityPct.textContent = pct + '% with the crowd';
     els.personalityOverlay.classList.add('show');
     personalityActive = true;
@@ -1078,6 +1154,8 @@
   function clearRoundTimer(){ clearTimeout(roundTimeoutId); roundTimeoutId = null; }
   function startRoundTimer(durationMs){
     clearRoundTimer();
+    roundDurationMs = durationMs;
+    roundStartedAt = Date.now();
     els.roundTimerFill.style.transition = 'none';
     els.roundTimerFill.style.width = '100%';
     requestAnimationFrame(()=>{
@@ -1085,7 +1163,41 @@
       els.roundTimerFill.style.width = '0%';
     });
     roundTimeoutId = setTimeout(onRoundTimeout, durationMs);
+    renderSlowdownBtn();
   }
+  function renderSlowdownBtn(){
+    const eventShowing = !els.eventOverlay.classList.contains('hidden');
+    if (eventShowing || voted || !current){
+      els.slowdownBtn.classList.add('hidden');
+      return;
+    }
+    els.slowdownBtn.classList.remove('hidden');
+    els.slowdownBtn.textContent = '\u23F1\uFE0F +5s (' + stats.slowdownCharges + ')';
+    els.slowdownBtn.classList.toggle('disabled', stats.slowdownCharges <= 0);
+  }
+  function addSlowdownTime(){
+    if (stats.slowdownCharges <= 0 || voted || !current) return;
+    stats.slowdownCharges--;
+    saveStats();
+    const trackWidth = els.roundTimerFill.parentElement.clientWidth;
+    const currentWidthPx = parseFloat(getComputedStyle(els.roundTimerFill).width) || 0;
+    const currentPct = trackWidth ? (currentWidthPx / trackWidth * 100) : 0;
+    const elapsed = Date.now() - roundStartedAt;
+    const remaining = Math.max(0, roundDurationMs - elapsed) + 5000;
+    roundDurationMs = elapsed + remaining;
+    clearTimeout(roundTimeoutId);
+    roundTimeoutId = setTimeout(onRoundTimeout, remaining);
+    els.roundTimerFill.style.transition = 'none';
+    els.roundTimerFill.style.width = currentPct + '%';
+    requestAnimationFrame(()=>{
+      els.roundTimerFill.style.transition = 'width ' + (remaining/1000) + 's linear';
+      els.roundTimerFill.style.width = '0%';
+    });
+    sfx.powerUp();
+    showToast('\u23F1\uFE0F +5 seconds');
+    renderSlowdownBtn();
+  }
+  els.slowdownBtn.addEventListener('click', addSlowdownTime);
   function onRoundTimeout(){
     if (voted || !current) return;
     voted = true;
@@ -1095,35 +1207,35 @@
     scheduleNext(900);
   }
 
+  // Noon Rush: a per-timezone local event, not a global one - every player's
+  // OWN device clock decides their own noon, same trick the Daily Challenge
+  // uses for "today". No server coordination needed.
+  function isNoonRush(){ return new Date().getHours() === 12; }
+
   function maybeTriggerBonusZone(){
     if (bonusActive) return;
     const now = Date.now();
     if (lastBonusEnd && now - lastBonusEnd < 45000) return;
     if (sessionFlips < 3) return;
-    if (Math.random() < 0.08) startBonusZone();
+    const chance = isNoonRush() ? 0.08 * 2.5 : 0.08;
+    if (Math.random() < chance) startBonusZone();
   }
   function startBonusZone(){
     bonusActive = true;
     bonusEndsAt = Date.now() + 60000;
     sfx.bonusZone();
-    els.bonusBanner.style.display = 'block';
-    updateBonusBanner();
+    renderStatusBanner();
     clearInterval(bonusInterval);
     bonusInterval = setInterval(()=>{
-      const remain = bonusEndsAt - Date.now();
-      if (remain <= 0){ endBonusZone(); return; }
-      updateBonusBanner(remain);
+      if (Date.now() >= bonusEndsAt){ endBonusZone(); return; }
+      renderStatusBanner();
     }, 500);
     showToast('\u26A1 2x Flip Zone! Next 60 seconds count double');
   }
-  function updateBonusBanner(remainMs){
-    const s = Math.max(0, Math.ceil((remainMs!==undefined?remainMs:60000)/1000));
-    els.bonusBanner.textContent = '\u26A1 2x FLIP ZONE \u00B7 ' + s + 's';
-  }
   function endBonusZone(){
     bonusActive = false; clearInterval(bonusInterval);
-    els.bonusBanner.style.display = 'none';
     lastBonusEnd = Date.now();
+    renderStatusBanner();
   }
 
   // loadNext is the public entry point every round-advance path calls. The
@@ -1144,12 +1256,14 @@
   function loadNextImpl(){
     if (unsubscribe){ unsubscribe(); unsubscribe = null; }
     clearRoundTimer();
+    renderStatusBanner();
     maybeTriggerBonusZone();
 
     if (!lastWasEvent && sessionFlips >= 4){
+      const boost = isNoonRush() ? 2.5 : 1;
       const roll = Math.random();
-      if (roll < 0.12){ lastWasEvent = true; runWildEvent(); return; }
-      if (roll < 0.20){ lastWasEvent = true; runPowerUpRound(); return; }
+      if (roll < 0.12 * boost){ lastWasEvent = true; runWildEvent(); return; }
+      if (roll < 0.20 * boost){ lastWasEvent = true; runPowerUpRound(); return; }
     }
     lastWasEvent = false;
 
@@ -1208,8 +1322,8 @@
     void els.board.offsetWidth;
     els.board.classList.add('flash');
     if (total > 0){
-      els.votesA.textContent = a + (a===1?' vote':' votes');
-      els.votesB.textContent = b + (b===1?' vote':' votes');
+      els.votesA.textContent = a.toLocaleString() + (a===1?' person':' people');
+      els.votesB.textContent = b.toLocaleString() + (b===1?' person':' people');
     } else { els.votesA.textContent = 'be the first'; els.votesB.textContent = 'be the first'; }
     return { pctA, pctB };
   }
@@ -1248,6 +1362,7 @@
     voted = true;
     votedSinceTime = Date.now();
     clearRoundTimer();
+    renderSlowdownBtn();
     els.roundTimerFill.style.transition = 'none';
     els.roundTimerFill.style.width = '0%';
 
@@ -1272,7 +1387,9 @@
     els.tagA.textContent = side==='A' ? 'Your pick' : '';
     els.tagB.textContent = side==='B' ? 'Your pick' : '';
 
-    if (Math.abs(pctA-pctB) <= 6) els.hint.innerHTML = 'Nearly split down the middle';
+    const myPct = side==='A' ? pctA : pctB;
+    if (Math.abs(pctA-pctB) <= 6) els.hint.innerHTML = '\u2696\uFE0F Dead heat \u2014 almost split down the middle';
+    else if (myPct <= 20) els.hint.innerHTML = '\uD83D\uDD25 Hot take \u2014 only ' + myPct + '% picked this';
     else if (won) els.hint.innerHTML = "You're with the majority";
     else els.hint.innerHTML = "You're in the minority on this one";
 
@@ -1309,6 +1426,7 @@
       tileEl.onclick = ()=> resolveEvent(i === trivia.correctIdx);
     });
     els.eventOverlay.classList.remove('hidden');
+    renderSlowdownBtn();
     els.eventTimerFill.style.transition = 'none';
     els.eventTimerFill.style.width = '100%';
     requestAnimationFrame(()=>{
@@ -1342,6 +1460,7 @@
   function runPowerUpRound(){
     els.eventOverlay.classList.remove('hidden');
     els.eventOverlay.classList.add('powerup');
+    renderSlowdownBtn();
     els.eventSubtitle.textContent = '\uD83C\uDF89 POWER-UP DROPPED';
     els.eventPrompt.textContent = "Choose one \u2014 it's yours";
     els.eventTiles.forEach((tileEl,i)=>{
@@ -1439,32 +1558,14 @@
   }
 
   resetDeck();
+  refreshSlowdownCharges();
   loadNext();
   renderStats();
   setSoundOn(soundOn); // sync the 🔊/🔇 icon to whatever was saved from last time
   els.dailyShareBtn.addEventListener('click', ()=> shareDailyResult(dailyState));
   els.dailyDoneBtn.addEventListener('click', closeDailyResults);
-  renderDailyBanner();
+  renderStatusBanner();
   els.soundToggle.addEventListener('click', ()=> setSoundOn(!soundOn));
-
-  // Dev-only preview buttons: jump straight to a round type instead of
-  // waiting on the random trigger. Safe to remove once you're done testing.
-  function forceDemoRound(type){
-    if (type === 'personality'){ showPersonalityReveal(); return; }
-    if (unsubscribe){ unsubscribe(); unsubscribe = null; }
-    clearRoundTimer();
-    clearTimeout(eventTimeoutId);
-    els.eventOverlay.classList.add('hidden');
-    els.eventOverlay.classList.remove('powerup');
-    voted = false;
-    votedSinceTime = null;
-    lastWasEvent = true;
-    if (type === 'trivia') runWildEvent('math');
-    else runPowerUpRound();
-  }
-  document.getElementById('debugTrivia').addEventListener('click', ()=> forceDemoRound('trivia'));
-  document.getElementById('debugPowerup').addEventListener('click', ()=> forceDemoRound('powerup'));
-  document.getElementById('debugPersonality').addEventListener('click', ()=> forceDemoRound('personality'));
 
   // Last line of defense: if the game has been sitting "voted, waiting to
   // advance" for far longer than any legitimate transition (reveal pause,
@@ -1483,6 +1584,18 @@
       }
     }
   }, 2000);
+  setInterval(renderStatusBanner, 30000);
+
+  // First-time onboarding - shown once ever, dismissed and never shown again.
+  try{
+    if (localStorage.getItem('flipstax_seen_intro') !== '1'){
+      els.introOverlay.classList.remove('hidden');
+    }
+  }catch(e){}
+  els.introDismiss.addEventListener('click', ()=>{
+    els.introOverlay.classList.add('hidden');
+    try{ localStorage.setItem('flipstax_seen_intro','1'); }catch(e){}
+  });
 
   if (window.claude && typeof window.claude.use === 'function'){
     window.claude.use('db').then((ns)=>{ if (ns){ db = ns; dbReady = true; } }).catch(()=>{});
