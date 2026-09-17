@@ -32,6 +32,7 @@
   .logo .stax{ color:var(--b); }
   .stat-line{ display:flex; align-items:center; gap:8px; font-size:12px; color:var(--dim); font-variant-numeric: tabular-nums; }
   .tier{ color:var(--ink); font-weight:700; }
+  .race-status{ color:var(--pulse); font-weight:700; }
   .left-group{ display:flex; align-items:center; gap:8px; }
   .sound-toggle{ cursor:pointer; padding:4px 6px; opacity:0.8; font-size:16px; }
   .sound-toggle:active{ opacity:1; }
@@ -149,7 +150,10 @@
     border:3px solid var(--divider); display:flex; align-items:center; justify-content:center;
     font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:13px;
     color:var(--dim); pointer-events:none;
+    animation: dividerPulse 2.4s ease-in-out infinite;
   }
+  @keyframes dividerPulse{ 0%,100%{ border-color:var(--divider); } 50%{ border-color:var(--pulse); } }
+  @media (prefers-reduced-motion: reduce){ .divider{ animation:none !important; } }
 
   .hint{ text-align:center; font-size:12px; color:var(--dim); padding:9px 0 calc(9px + env(safe-area-inset-bottom)); flex-shrink:0; }
 
@@ -253,6 +257,7 @@
         <div class="logo"><span class="flip">Flip</span><span class="stax">Stax</span></div>
       </div>
       <div class="stat-line">
+        <span id="raceStatus" class="race-status">🏁 0/250</span>
         <span id="streakEl"></span>
         <span id="flipCount">0 flipz</span>
         <span class="tier" id="tierEl">Unranked</span>
@@ -405,7 +410,6 @@
     { key:'skip',     icon:'\u23ED\uFE0F', label:'Skip',       color:'#3ec76b' },
     { key:'wildcard', icon:'\uD83C\uDF81', label:'Wild Card',  color:'#c73e3e' },
   ];
-  const MYSTERY_POOL = [5,5,5,5,15,15,15,30,30,50];
   const FLAVOR_INTROS = [
     '\uD83D\uDC7D THE ALIENS WANT AN ANSWER', '\uD83D\uDEF8 BEAMED UP. SOLVE FAST.',
     '\uD83D\uDD2E THE ORACLE TESTS YOU', '\uD83E\uDDFF PROVE YOUR FATE',
@@ -426,6 +430,26 @@
     { correct:'February', wrongs:['Feburary','Febuary','Februrary'] },
     { correct:'Weird', wrongs:['Wierd','Weerd','Wyrd'] },
     { correct:'Vacuum', wrongs:['Vaccuum','Vacume','Vaccum'] },
+    { correct:'Conscience', wrongs:['Concience','Consience','Conscense'] },
+    { correct:'Privilege', wrongs:['Priviledge','Privilage','Priviliege'] },
+    { correct:'Questionnaire', wrongs:['Questionaire','Questionnair','Questionaires'] },
+    { correct:'Millennium', wrongs:['Millenium','Millenneum','Milennium'] },
+    { correct:'Committee', wrongs:['Comittee','Commitee','Committe'] },
+    { correct:'Broccoli', wrongs:['Brocoli','Broccolli','Brocolli'] },
+    { correct:'Liaison', wrongs:['Liason','Liaisson','Liasion'] },
+    { correct:'Sincerely', wrongs:['Sincerly','Sinceerly','Sincirely'] },
+    { correct:'Handkerchief', wrongs:['Hankerchief','Handkercheif','Handkerchef'] },
+    { correct:'Entrepreneur', wrongs:['Entreprenuer','Entrepeneur','Entreprenur'] },
+    { correct:'Occasionally', wrongs:['Occasionaly','Occassionally','Ocasionally'] },
+    { correct:'Perseverance', wrongs:['Perseverence','Persaverance','Perseverrance'] },
+    { correct:'Independent', wrongs:['Independant','Independint','Independet'] },
+    { correct:'Occurrence', wrongs:['Occurence','Occurrance','Ocurrence'] },
+    { correct:'Definite', wrongs:['Definate','Definit','Deffinite'] },
+    { correct:'Beginning', wrongs:['Begining','Beginnning','Beggining'] },
+    { correct:'Immediately', wrongs:['Immediatly','Imediately','Immediatley'] },
+    { correct:'Recommend', wrongs:['Recomend','Reccomend','Recommand'] },
+    { correct:'Tomorrow', wrongs:['Tommorow','Tomorow','Tommorrow'] },
+    { correct:'Twelfth', wrongs:['Twelth','Twelfeth','Twelvth'] },
   ];
   // Daily Challenge subject banks - one question, one guaranteed-correct
   // answer. Kept to well-established, uncontested facts on purpose.
@@ -444,6 +468,25 @@
     { q:'What is the capital of Brazil?', correct:'Brasília', wrongs:['Rio de Janeiro','São Paulo','Salvador'] },
     { q:'Which sea is famous for being extremely salty?', correct:'The Dead Sea', wrongs:['The Red Sea','The Caspian Sea','The Mediterranean'] },
     { q:'Which country has the most time zones?', correct:'France', wrongs:['Russia','United States','China'] },
+    { q:'What is the longest river in Africa?', correct:'The Nile', wrongs:['The Congo','The Niger','The Zambezi'] },
+    { q:'What is the capital of Italy?', correct:'Rome', wrongs:['Milan','Venice','Naples'] },
+    { q:'What is the capital of Germany?', correct:'Berlin', wrongs:['Munich','Frankfurt','Hamburg'] },
+    { q:'Which country is shaped like a boot?', correct:'Italy', wrongs:['Greece','Spain','Portugal'] },
+    { q:'What is the largest country in the world by area?', correct:'Russia', wrongs:['Canada','China','United States'] },
+    { q:'Which US state is the largest by area?', correct:'Alaska', wrongs:['Texas','California','Montana'] },
+    { q:'What is the capital of Egypt?', correct:'Cairo', wrongs:['Alexandria','Giza','Luxor'] },
+    { q:'Which mountain range separates Europe and Asia?', correct:'The Urals', wrongs:['The Alps','The Carpathians','The Pyrenees'] },
+    { q:'What is the smallest continent by land area?', correct:'Australia', wrongs:['Europe','Antarctica','South America'] },
+    { q:'Which country has the most natural lakes?', correct:'Canada', wrongs:['United States','Russia','Finland'] },
+    { q:'What is the capital of Spain?', correct:'Madrid', wrongs:['Barcelona','Seville','Valencia'] },
+    { q:'What is the capital of Russia?', correct:'Moscow', wrongs:['St. Petersburg','Kiev','Minsk'] },
+    { q:'Which river flows through Paris?', correct:'The Seine', wrongs:['The Rhine','The Thames','The Loire'] },
+    { q:'What is the capital of South Korea?', correct:'Seoul', wrongs:['Busan','Incheon','Tokyo'] },
+    { q:'Which US state is known as the Sunshine State?', correct:'Florida', wrongs:['California','Arizona','Texas'] },
+    { q:'What is the capital of Mexico?', correct:'Mexico City', wrongs:['Guadalajara','Cancun','Tijuana'] },
+    { q:'What is the capital of India?', correct:'New Delhi', wrongs:['Mumbai','Bangalore','Kolkata'] },
+    { q:'Which country is home to Machu Picchu?', correct:'Peru', wrongs:['Bolivia','Chile','Ecuador'] },
+    { q:'What is the tallest mountain in Africa?', correct:'Mount Kilimanjaro', wrongs:['Mount Kenya','Table Mountain','Mount Meru'] },
   ];
   const ENGLISH_SETS = [
     { q:"Which word means 'happy'?", correct:'Joyful', wrongs:['Somber','Irate','Weary'] },
@@ -460,6 +503,26 @@
     { q:"Which word means the opposite of 'genuine'?", correct:'Fake', wrongs:['Authentic','Sincere','Real'] },
     { q:"Which word means 'to combine'?", correct:'Merge', wrongs:['Separate','Divide','Split'] },
     { q:"Which word means the opposite of 'benevolent'?", correct:'Malevolent', wrongs:['Generous','Kind','Charitable'] },
+    { q:"Which word means 'to make clear'?", correct:'Clarify', wrongs:['Confuse','Obscure','Complicate'] },
+    { q:"Which word means 'lazy'?", correct:'Idle', wrongs:['Diligent','Active','Energetic'] },
+    { q:"What is the plural of 'mouse' (the animal)?", correct:'Mice', wrongs:['Mouses','Meece','Mices'] },
+    { q:"Which word means 'to praise highly'?", correct:'Extol', wrongs:['Criticize','Condemn','Belittle'] },
+    { q:"Which word means 'generous'?", correct:'Charitable', wrongs:['Stingy','Selfish','Greedy'] },
+    { q:"What is the comparative form of 'good'?", correct:'Better', wrongs:['Gooder','Best','More good'] },
+    { q:"Which word means 'to make angry'?", correct:'Infuriate', wrongs:['Soothe','Calm','Appease'] },
+    { q:"Which word means 'honest'?", correct:'Candid', wrongs:['Deceptive','Dishonest','Evasive'] },
+    { q:"What is the past tense of 'swim'?", correct:'Swam', wrongs:['Swimmed','Swum','Swimming'] },
+    { q:"Which word means 'to give up'?", correct:'Relinquish', wrongs:['Retain','Acquire','Keep'] },
+    { q:"Which word means 'to postpone'?", correct:'Defer', wrongs:['Advance','Expedite','Hasten'] },
+    { q:"Which word means 'stubborn'?", correct:'Obstinate', wrongs:['Flexible','Agreeable','Compliant'] },
+    { q:"What is the plural of 'goose'?", correct:'Geese', wrongs:['Gooses','Geeses','Gees'] },
+    { q:"Which word means 'to imitate'?", correct:'Mimic', wrongs:['Originate','Invent','Create'] },
+    { q:"Which word means 'plentiful'?", correct:'Abundant', wrongs:['Scarce','Sparse','Limited'] },
+    { q:"What is the superlative form of 'bad'?", correct:'Worst', wrongs:['Baddest','More bad','Worser'] },
+    { q:"Which word means 'to wander aimlessly'?", correct:'Meander', wrongs:['Rush','Sprint','Hurry'] },
+    { q:"Which word means 'clear and easy to understand'?", correct:'Lucid', wrongs:['Murky','Confusing','Ambiguous'] },
+    { q:"What is the past tense of 'begin'?", correct:'Began', wrongs:['Begun','Beginned','Begins'] },
+    { q:"Which word means 'to soothe'?", correct:'Placate', wrongs:['Provoke','Agitate','Irritate'] },
   ];
   const HISTORY_SETS = [
     { q:'Who was the first President of the United States?', correct:'George Washington', wrongs:['Thomas Jefferson','John Adams','Abraham Lincoln'] },
@@ -476,6 +539,26 @@
     { q:'Which Egyptian queen was famously linked to Julius Caesar and Mark Antony?', correct:'Cleopatra', wrongs:['Nefertiti','Hatshepsut','Isis'] },
     { q:'Which country was the first to grant women the right to vote nationally?', correct:'New Zealand', wrongs:['United States','United Kingdom','France'] },
     { q:'The Great Wall was built to protect which ancient country?', correct:'China', wrongs:['Japan','Mongolia','Korea'] },
+    { q:'Who was the first woman to fly solo across the Atlantic?', correct:'Amelia Earhart', wrongs:['Bessie Coleman','Harriet Quimby','Jacqueline Cochran'] },
+    { q:'Which country was first to reach the South Pole?', correct:'Norway', wrongs:['United Kingdom','United States','France'] },
+    { q:'What ancient wonder stood in Alexandria, Egypt?', correct:'The Lighthouse', wrongs:['The Hanging Gardens','The Colossus','The Great Pyramid'] },
+    { q:'Who is credited with inventing the telephone?', correct:'Alexander Graham Bell', wrongs:['Thomas Edison','Nikola Tesla','Guglielmo Marconi'] },
+    { q:'In which year did the Berlin Wall fall?', correct:'1989', wrongs:['1985','1991','1993'] },
+    { q:'Who was the first Emperor of Rome?', correct:'Augustus', wrongs:['Julius Caesar','Nero','Constantine'] },
+    { q:'Which document did American colonists sign in 1776?', correct:'The Declaration of Independence', wrongs:['The Constitution','The Bill of Rights','The Magna Carta'] },
+    { q:'What was the name of the ship the Pilgrims sailed on?', correct:'The Mayflower', wrongs:['The Santa Maria','The Endeavour','The Beagle'] },
+    { q:'Which ancient city was buried by a volcanic eruption in 79 AD?', correct:'Pompeii', wrongs:['Athens','Carthage','Troy'] },
+    { q:'Who was the first Chancellor of a unified Germany, in 1871?', correct:'Otto von Bismarck', wrongs:['Kaiser Wilhelm','Otto von Habsburg','Klemens von Metternich'] },
+    { q:'Who was President of the United States during the Civil War?', correct:'Abraham Lincoln', wrongs:['Andrew Johnson','Ulysses S. Grant','James Buchanan'] },
+    { q:'In which year did the American Civil War begin?', correct:'1861', wrongs:['1850','1865','1870'] },
+    { q:'Which ancient civilization built the Great Pyramid of Giza?', correct:'The Egyptians', wrongs:['The Sumerians','The Babylonians','The Phoenicians'] },
+    { q:'Who was the first female Prime Minister of the United Kingdom?', correct:'Margaret Thatcher', wrongs:['Theresa May','Indira Gandhi','Golda Meir'] },
+    { q:'Which explorer is credited with reaching the Americas in 1492?', correct:'Christopher Columbus', wrongs:['Ferdinand Magellan','Vasco da Gama','Marco Polo'] },
+    { q:'In which year did World War I begin?', correct:'1914', wrongs:['1910','1918','1920'] },
+    { q:'Which ancient civilization used hieroglyphics?', correct:'The Egyptians', wrongs:['The Aztecs','The Vikings','The Romans'] },
+    { q:'Which US president appears on the $1 bill?', correct:'George Washington', wrongs:['Abraham Lincoln','Thomas Jefferson','Benjamin Franklin'] },
+    { q:'Which European country was divided into East and West during the Cold War?', correct:'Germany', wrongs:['Poland','Austria','Hungary'] },
+    { q:'Who was the ancient Greek philosopher who taught Alexander the Great?', correct:'Aristotle', wrongs:['Socrates','Plato','Pythagoras'] },
   ];
   const SCIENCE_SETS = [
     { q:'What is the chemical symbol for water?', correct:'H2O', wrongs:['CO2','O2','NaCl'] },
@@ -492,6 +575,26 @@
     { q:'What type of animal is a dolphin?', correct:'Mammal', wrongs:['Fish','Reptile','Amphibian'] },
     { q:'Roughly how fast does light travel, per second?', correct:'300,000 km', wrongs:['150,000 km','3,000 km','1,000,000 km'] },
     { q:'Which part of a plant carries out photosynthesis?', correct:'The leaves', wrongs:['The roots','The stem','The flower'] },
+    { q:'What is the largest organ in the human body?', correct:'The skin', wrongs:['The liver','The lungs','The intestines'] },
+    { q:'What gas makes up most of Earth\u2019s atmosphere?', correct:'Nitrogen', wrongs:['Oxygen','Carbon dioxide','Hydrogen'] },
+    { q:'How many chambers does the human heart have?', correct:'4', wrongs:['2','3','6'] },
+    { q:'What is the chemical formula for table salt?', correct:'NaCl', wrongs:['KCl','CaCl2','NaOH'] },
+    { q:'What force keeps planets in orbit around the Sun?', correct:'Gravity', wrongs:['Magnetism','Friction','Inertia'] },
+    { q:'What is the study of weather called?', correct:'Meteorology', wrongs:['Astrology','Geology','Seismology'] },
+    { q:'How many legs does an insect have?', correct:'6', wrongs:['4','8','10'] },
+    { q:'What part of the eye controls how much light enters?', correct:'The pupil', wrongs:['The retina','The cornea','The lens'] },
+    { q:'What is the freezing point of water, in Fahrenheit?', correct:'32', wrongs:['0','100','212'] },
+    { q:'Which planet is known for its prominent rings?', correct:'Saturn', wrongs:['Jupiter','Uranus','Neptune'] },
+    { q:'What is the process by which plants make their own food called?', correct:'Photosynthesis', wrongs:['Respiration','Digestion','Fermentation'] },
+    { q:'What is the smallest unit of matter?', correct:'The atom', wrongs:['The molecule','The cell','The electron'] },
+    { q:'Which blood type is known as the universal donor?', correct:'O negative', wrongs:['AB positive','A positive','B negative'] },
+    { q:'What is the main gas found in the Sun?', correct:'Hydrogen', wrongs:['Helium','Oxygen','Nitrogen'] },
+    { q:'What is the largest planet in our solar system?', correct:'Jupiter', wrongs:['Saturn','Neptune','Earth'] },
+    { q:'What do bees produce that humans eat?', correct:'Honey', wrongs:['Nectar','Pollen','Wax'] },
+    { q:'What is the human body\u2019s largest internal organ?', correct:'The liver', wrongs:['The stomach','The kidney','The pancreas'] },
+    { q:'Which vitamin do we get primarily from sunlight?', correct:'Vitamin D', wrongs:['Vitamin C','Vitamin A','Vitamin B12'] },
+    { q:'What type of energy does a moving object have?', correct:'Kinetic energy', wrongs:['Potential energy','Thermal energy','Chemical energy'] },
+    { q:'What is the process of a caterpillar becoming a butterfly called?', correct:'Metamorphosis', wrongs:['Photosynthesis','Pollination','Germination'] },
   ];
   function rand(min,max,rng){ rng = rng || Math.random; return Math.floor(rng()*(max-min+1))+min; }
   function generateMathTrivia(rng){
@@ -666,6 +769,66 @@
     ['sports', 'Tiger Woods', 'Rory McIlroy'],
     ['movies', 'Star Wars', 'Star Trek'],
     ['movies', 'The Godfather', 'Goodfellas'],
+    ['sports', 'Tom Brady', 'Patrick Mahomes'],
+    ['sports', 'Usain Bolt', 'Michael Phelps'],
+    ['sports', 'Kobe Bryant', 'Shaquille O\u2019Neal'],
+    ['sports', 'Steph Curry', 'Kevin Durant'],
+    ['sports', 'Wayne Gretzky', 'Sidney Crosby'],
+    ['sports', 'Novak Djokovic', 'Roger Federer'],
+    ['music', 'Taylor Swift', 'Beyonc\u00E9'],
+    ['music', 'Jay-Z', 'Eminem'],
+    ['music', 'Queen', 'Led Zeppelin'],
+    ['music', 'Nirvana', 'Pearl Jam'],
+    ['music', 'Metallica', 'Iron Maiden'],
+    ['music', 'Ariana Grande', 'Dua Lipa'],
+    ['movies', 'Pixar', 'DreamWorks'],
+    ['movies', 'James Bond', 'Jason Bourne'],
+    ['movies', 'Breaking Bad', 'The Sopranos'],
+    ['movies', 'Jurassic Park', 'Jaws'],
+    ['movies', 'The Avengers', 'Justice League'],
+    ['movies', 'Toy Story', 'Shrek'],
+    ['brands', 'Amazon', 'Walmart'],
+    ['brands', 'Tesla', 'Toyota'],
+    ['brands', 'Netflix', 'HBO Max'],
+    ['brands', 'Spotify', 'Apple Music'],
+    ['brands', 'Instagram', 'TikTok'],
+    ['brands', 'YouTube', 'Twitch'],
+    ['food', 'Shake Shack', 'In-N-Out'],
+    ['food', 'Dunkin\u2019', 'Starbucks'],
+    ['food', 'Domino\u2019s', 'Papa John\u2019s'],
+    ['food', 'Ben & Jerry\u2019s', 'H\u00E4agen-Dazs'],
+    ['food', 'Panera', 'Subway'],
+    ['food', 'Olive Garden', 'Applebee\u2019s'],
+    ['sports', 'Serena Williams', 'Naomi Osaka'],
+    ['sports', 'Lionel Messi', 'Pel\u00E9'],
+    ['sports', 'Tom Brady', 'Joe Montana'],
+    ['sports', 'Michael Jordan', 'Kobe Bryant'],
+    ['sports', 'Tiger Woods', 'Jack Nicklaus'],
+    ['sports', 'Muhammad Ali', 'Floyd Mayweather'],
+    ['sports', 'Simone Biles', 'Nadia Comaneci'],
+    ['music', 'Bruno Mars', 'The Weeknd'],
+    ['music', 'Adele', 'Whitney Houston'],
+    ['music', 'Kanye West', 'Jay-Z'],
+    ['music', 'Coldplay', 'Imagine Dragons'],
+    ['music', 'Elvis Presley', 'Michael Jackson'],
+    ['music', 'Ed Sheeran', 'Bruno Mars'],
+    ['movies', 'Titanic', 'Avatar'],
+    ['movies', 'The Dark Knight', 'The Godfather'],
+    ['movies', 'Friends', 'The Office'],
+    ['movies', 'Game of Thrones', 'Lord of the Rings'],
+    ['movies', 'The Lion King', 'Aladdin'],
+    ['movies', 'Spider-Man', 'Batman'],
+    ['movies', 'The Matrix', 'Inception'],
+    ['brands', 'Google', 'Microsoft'],
+    ['brands', 'Nike', 'Under Armour'],
+    ['brands', 'Samsung', 'Apple'],
+    ['brands', 'Uber', 'Lyft'],
+    ['brands', 'DoorDash', 'Uber Eats'],
+    ['food', 'McDonald\u2019s', 'Burger King'],
+    ['food', 'Wendy\u2019s', 'Chick-fil-A'],
+    ['food', 'Pizza Hut', 'Papa John\u2019s'],
+    ['food', 'Krispy Kreme', 'Dunkin\u2019'],
+    ['food', 'In-N-Out', 'Whataburger'],
   ];
   const MATCH = MATCH_RAW.map(([cat,a,b],i)=>({
     id:'m-'+i, mode:'match', category:cat, a, b, avatarA:initials(a), avatarB:initials(b)
@@ -765,6 +928,133 @@
              'Sleep in a pile of packing peanuts', '📦', 'linear-gradient(165deg,#2b2410,#6b5b1f)'],
     ['wild', 'Have hiccups nonstop for a week', '😵', 'linear-gradient(165deg,#1a1a3d,#3f3f8f)',
              'Have one foot asleep for a week', '🦶', 'linear-gradient(165deg,#0f2740,#3a6ea5)'],
+    // money
+    ['money', 'A side hustle that barely breaks even', '\uD83D\uDCBC', 'linear-gradient(165deg,#1c2733,#3f5b70)',
+              'A 9-to-5 with full benefits', '\uD83C\uDFE2', 'linear-gradient(165deg,#0f2740,#2e7bb5)'],
+    ['money', 'Paying off debt aggressively', '\uD83D\uDCC9', 'linear-gradient(165deg,#152e0f,#3a6b1f)',
+              'Investing every spare dollar', '\uD83D\uDCC8', 'linear-gradient(165deg,#0f2e1d,#2f6b45)'],
+    ['money', 'A guaranteed $50k a year forever', '\uD83D\uDCB5', 'linear-gradient(165deg,#152e0f,#3a6b1f)',
+              'A 10% chance at $10 million', '\uD83C\uDFB0', 'linear-gradient(165deg,#3d1a0f,#8a3a1f)'],
+    // style
+    ['style', 'Sneakers with everything', '\uD83D\uDC5F', 'linear-gradient(165deg,#1c2733,#3f5b70)',
+              'Dress shoes, always', '\uD83D\uDC5E', 'linear-gradient(165deg,#2b1e12,#6b4a28)'],
+    ['style', 'Bold prints and patterns', '\uD83C\uDFA8', 'linear-gradient(165deg,#3d150f,#8a2f1f)',
+              'Solid neutral colors only', '\u2b1c', 'linear-gradient(165deg,#232733,#4a5568)'],
+    ['style', 'A messy, lived-in home', '\uD83C\uDFDA\uFE0F', 'linear-gradient(165deg,#2b1e12,#6b4a28)',
+              'A spotless, minimalist home', '\u2728', 'linear-gradient(165deg,#1c2733,#3f5b70)'],
+    // fitness
+    ['fitness', 'Working out at 5am', '\uD83C\uDF05', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+                'Working out at 9pm', '\uD83C\uDF19', 'linear-gradient(165deg,#1f0f3d,#5a2f8a)'],
+    ['fitness', 'Counting your steps every day', '\uD83D\uDC63', 'linear-gradient(165deg,#152e0f,#3a6b1f)',
+                'No idea and no interest in step count', '\uD83E\uDD37', 'linear-gradient(165deg,#25252b,#55555f)'],
+    ['fitness', 'A gym membership you actually use', '\uD83D\uDCAA', 'linear-gradient(165deg,#3d150f,#8a3a2f)',
+                'Home workouts, no gym needed', '\uD83C\uDFE0', 'linear-gradient(165deg,#0f2e1d,#2f6b45)'],
+    // geography
+    ['geography', 'A road trip with no plan', '\uD83D\uDE97', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+                   'A fully scheduled itinerary', '\uD83D\uDCCB', 'linear-gradient(165deg,#0f2740,#2e7bb5)'],
+    ['geography', 'Tokyo', '\uD83D\uDDFC', 'linear-gradient(165deg,#3d150f,#8a2f1f)',
+                   'Paris', '\uD83D\uDDFC', 'linear-gradient(165deg,#1f0f3d,#5a2f8a)'],
+    ['geography', 'Living on a boat', '\u26F5', 'linear-gradient(165deg,#0d3b36,#2f9e8f)',
+                   'Living in an RV', '\uD83D\uDE90', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)'],
+    // history
+    ['history', 'The Wright Brothers\u2019 first flight', '\u2708\uFE0F', 'linear-gradient(165deg,#0f2740,#3a6ea5)',
+               'The first Moon landing', '\uD83C\uDF15', 'linear-gradient(165deg,#1f0f3d,#5a2f8a)'],
+    ['history', 'The invention of the printing press', '\uD83D\uDCD6', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+               'The invention of the internet', '\uD83D\uDCBB', 'linear-gradient(165deg,#0f1a3d,#2f4a8a)'],
+    ['history', 'Ancient Greece', '\uD83C\uDFFA', 'linear-gradient(165deg,#1c2733,#3f5b70)',
+               'Ancient China', '\uD83D\uDC09', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
+    ['history', 'The fall of the Roman Empire', '\uD83C\uDFDB\uFE0F', 'linear-gradient(165deg,#1c2733,#3f5b70)',
+               'The fall of the Berlin Wall', '\uD83E\uDDF1', 'linear-gradient(165deg,#0f1a3d,#2f4a8a)'],
+    // food
+    ['food', 'Breakfast for dinner', '\uD83E\uDD5E', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+             'Dinner for breakfast', '\uD83C\uDF5D', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
+    ['food', 'Spicy food, the hotter the better', '\uD83C\uDF36\uFE0F', 'linear-gradient(165deg,#3d150f,#8a2f1f)',
+             'Mild food, no heat at all', '\uD83E\uDD5B', 'linear-gradient(165deg,#0f2740,#2e7bb5)'],
+    ['food', 'Cooking every meal at home', '\uD83C\uDF73', 'linear-gradient(165deg,#152e0f,#3a6b1f)',
+             'Ordering in most nights', '\uD83E\uDD61', 'linear-gradient(165deg,#2b2410,#6b5b1f)'],
+    ['food', 'A buffet, all you can eat', '\uD83C\uDF7D\uFE0F', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+             'A tasting menu, small perfect bites', '\uD83C\uDF71', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)'],
+    // wild
+    ['wild', 'Never use social media again', '\uD83D\uDCF5', 'linear-gradient(165deg,#232733,#4a5568)',
+             'Post your entire life online, no privacy', '\uD83D\uDCF8', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)'],
+    ['wild', 'Live one day as anyone in history', '\u23F3', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+             'Live one day 200 years in the future', '\uD83D\uDE80', 'linear-gradient(165deg,#0f1a3d,#2f4a8a)'],
+    ['wild', 'Trade your sense of smell for perfect memory', '\uD83D\uDC43', 'linear-gradient(165deg,#152e0f,#3a6b1f)',
+             'Trade your sense of taste for perfect eyesight', '\uD83D\uDC41\uFE0F', 'linear-gradient(165deg,#1a2b3d,#3f6f9e)'],
+    ['wild', 'Speak every language fluently', '\uD83D\uDDE3\uFE0F', 'linear-gradient(165deg,#0f2740,#3a6ea5)',
+             'Play every instrument perfectly', '\uD83C\uDFB8', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
+    ['wild', 'Never feel physical pain again', '\uD83E\uDE79', 'linear-gradient(165deg,#1c2733,#3f5b70)',
+             'Never feel embarrassed again', '\uD83D\uDE33', 'linear-gradient(165deg,#331a1f,#7a3f4a)'],
+    ['wild', 'Always be 10 minutes late', '\u23F0', 'linear-gradient(165deg,#2b1e12,#6b4a28)',
+             'Always be 30 minutes early', '\u23F1\uFE0F', 'linear-gradient(165deg,#0d3b36,#2f9e8f)'],
+    ['wild', 'Only communicate in movie quotes for a week', '\uD83C\uDFAC', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)',
+             'Only communicate in song lyrics for a week', '\uD83C\uDFB5', 'linear-gradient(165deg,#0f2e1d,#2f6b45)'],
+    ['wild', 'Everyone can hear your thoughts for a day', '\uD83E\uDDE0', 'linear-gradient(165deg,#1f0f3d,#5a2f8a)',
+             'You can hear everyone else\u2019s thoughts for a day', '\uD83D\uDC42', 'linear-gradient(165deg,#0f2740,#3a6ea5)'],
+    // music
+    ['music', 'Live acoustic sets', '\uD83C\uDFBB', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+              'Full electric production', '\uD83C\uDF9B\uFE0F', 'linear-gradient(165deg,#1f0f3d,#5a2f8a)'],
+    ['music', 'Discovering music through algorithms', '\uD83E\uDD16', 'linear-gradient(165deg,#1c2733,#3f5b70)',
+              'Discovering music through friends', '\uD83D\uDC65', 'linear-gradient(165deg,#0f2e1d,#2f6b45)'],
+    // money
+    ['money', 'Budgeting every dollar', '\uD83D\uDCCA', 'linear-gradient(165deg,#152e0f,#3a6b1f)',
+              'Winging it and hoping it works out', '\uD83E\uDD1E', 'linear-gradient(165deg,#3d1a0f,#8a3a1f)'],
+    ['money', 'Owning a home', '\uD83C\uDFE1', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+              'Renting forever and staying flexible', '\uD83D\uDD11', 'linear-gradient(165deg,#0f2740,#2e7bb5)'],
+    ['money', 'A steady paycheck', '\uD83D\uDCB5', 'linear-gradient(165deg,#152e0f,#3a6b1f)',
+              'Commission-based, uncapped upside', '\uD83D\uDCC8', 'linear-gradient(165deg,#3d1a0f,#8a3a1f)'],
+    // style
+    ['style', 'A uniform \u2014 same outfit every day', '\uD83D\uDC54', 'linear-gradient(165deg,#1c2733,#3f5b70)',
+              'A different look every single day', '\uD83C\uDFAD', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)'],
+    ['style', 'Thrifted and vintage', '\uD83E\uDDF5', 'linear-gradient(165deg,#2b1e12,#6b4a28)',
+              'Brand new, straight off the shelf', '\uD83C\uDFF7\uFE0F', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
+    ['style', 'Long hair', '\uD83D\uDC87', 'linear-gradient(165deg,#331a1f,#7a3f4a)',
+              'Short hair, low maintenance', '\u2702\uFE0F', 'linear-gradient(165deg,#1c2733,#3f5b70)'],
+    // fitness
+    ['fitness', 'Tracking every macro', '\uD83D\uDCF1', 'linear-gradient(165deg,#0f2740,#2e7bb5)',
+                'Eating intuitively, no tracking', '\uD83C\uDF7D\uFE0F', 'linear-gradient(165deg,#152e0f,#3a6b1f)'],
+    ['fitness', 'Group fitness classes', '\uD83E\uDDD1\u200D\uD83E\uDD1D\u200D\uD83E\uDDD1', 'linear-gradient(165deg,#3d150f,#8a3a2f)',
+                'Working out completely alone', '\uD83C\uDFA7', 'linear-gradient(165deg,#25252b,#55555f)'],
+    ['fitness', 'Stretching every day', '\uD83E\uDDD8', 'linear-gradient(165deg,#1f0f3d,#5a2f8a)',
+                'Never stretching at all', '\uD83E\uDD38', 'linear-gradient(165deg,#0f2e1d,#2f6b45)'],
+    // geography
+    ['geography', 'A cabin in the mountains', '\uD83C\uDFD4\uFE0F', 'linear-gradient(165deg,#1c2733,#3f5b70)',
+                   'A cottage by the sea', '\uD83C\uDF0A', 'linear-gradient(165deg,#0d3b36,#2f9e8f)'],
+    ['geography', 'Iceland', '\uD83E\uDDCA', 'linear-gradient(165deg,#0f2740,#3a6ea5)',
+                   'Hawaii', '\uD83C\uDF3A', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
+    ['geography', 'A big backyard', '\uD83C\uDFE1', 'linear-gradient(165deg,#152e0f,#3a6b1f)',
+                   'A rooftop view', '\uD83C\uDFD9\uFE0F', 'linear-gradient(165deg,#0f1a3d,#2f4a8a)'],
+    // history
+    ['history', 'The Industrial Revolution', '\u2699\uFE0F', 'linear-gradient(165deg,#232733,#4a5568)',
+               'The Information Age', '\uD83D\uDCBE', 'linear-gradient(165deg,#0f1a3d,#2f4a8a)'],
+    ['history', 'The first printing press', '\uD83D\uDCDC', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+               'The first computer', '\uD83D\uDDA5\uFE0F', 'linear-gradient(165deg,#1c2733,#3f5b70)'],
+    ['history', 'The Space Race', '\uD83D\uDE80', 'linear-gradient(165deg,#0f1a3d,#2f4a8a)',
+               'The Digital Revolution', '\uD83D\uDCE1', 'linear-gradient(165deg,#1f0f3d,#5a2f8a)'],
+    // food
+    ['food', 'Homemade bread', '\uD83C\uDF5E', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+             'Store-bought, no shame', '\uD83D\uDED2', 'linear-gradient(165deg,#1c2733,#3f5b70)'],
+    ['food', 'Eating the same lunch every day', '\uD83E\uDD6A', 'linear-gradient(165deg,#2b2410,#6b5b1f)',
+             'A different lunch every day', '\uD83C\uDF71', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)'],
+    ['food', 'A home-cooked holiday meal', '\uD83C\uDF57', 'linear-gradient(165deg,#3d150f,#8a2f1f)',
+             'A restaurant holiday meal, zero cleanup', '\uD83C\uDF7D\uFE0F', 'linear-gradient(165deg,#0f2740,#2e7bb5)'],
+    // wild
+    ['wild', 'Live without hot water for a month', '\uD83E\uDD76', 'linear-gradient(165deg,#0f2740,#3a6ea5)',
+             'Live without WiFi for a month', '\uD83D\uDCF4', 'linear-gradient(165deg,#232733,#4a5568)'],
+    ['wild', 'Only whisper for a week', '\uD83E\uDD2B', 'linear-gradient(165deg,#25252b,#55555f)',
+             'Only shout for a week', '\uD83D\uDCE2', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
+    ['wild', 'Never see color again, only black and white', '\u26AB', 'linear-gradient(165deg,#232733,#4a5568)',
+             'See every color 10x more vivid', '\uD83C\uDF08', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)'],
+    ['wild', 'Be famous for something embarrassing', '\uD83D\uDE05', 'linear-gradient(165deg,#3d150f,#8a2f1f)',
+             'Never be famous for anything at all', '\uD83D\uDC64', 'linear-gradient(165deg,#25252b,#55555f)'],
+    ['wild', 'Win an argument you know you\u2019re wrong about', '\uD83C\uDFC6', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+             'Lose an argument you know you\u2019re right about', '\uD83D\uDE24', 'linear-gradient(165deg,#1a1a3d,#3f3f8f)'],
+    ['wild', 'A time machine that only goes forward', '\u23E9', 'linear-gradient(165deg,#0f1a3d,#2f4a8a)',
+             'A time machine that only goes backward', '\u23EA', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)'],
+    ['wild', 'Everyone forgets your name constantly', '\u2753', 'linear-gradient(165deg,#25252b,#55555f)',
+             'Everyone remembers everything you\u2019ve ever said', '\uD83E\uDDFE', 'linear-gradient(165deg,#1f0f3d,#5a2f8a)'],
+    ['wild', 'Live stream your entire day, every day', '\uD83D\uDCF9', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)',
+             'Never be recorded on camera again', '\uD83D\uDEAB', 'linear-gradient(165deg,#152e0f,#3a6b1f)'],
   ];
   const SCENES = SCENE_RAW.map((row,i)=>({
     id:'s-'+i, mode:'scenario', category:row[0],
@@ -803,6 +1093,7 @@
     hint: document.getElementById('hint'), toast: document.getElementById('toast'),
     flipCount: document.getElementById('flipCount'), tierEl: document.getElementById('tierEl'),
     streakEl: document.getElementById('streakEl'), badgesRow: document.getElementById('badgesRow'),
+    raceStatus: document.getElementById('raceStatus'),
     soundToggle: document.getElementById('soundToggle'),
     statusBanner: document.getElementById('statusBanner'),
     roundTimerFill: document.getElementById('roundTimerFill'), slowdownBtn: document.getElementById('slowdownBtn'),
@@ -893,6 +1184,56 @@
 
   let dailyState = loadDailyState();
   let dailyRunning = false, dailyIndex = 0, dailyResults = [], dailyQuestions = [];
+
+  // ---------- race to 250 (real stakes, resets daily, never touches your
+  // permanent Tier/flip count - this is its own separate score) ----------
+  const RACE_TARGET = 250;
+  function loadRaceState(){
+    try{
+      const raw = localStorage.getItem('flipstax_race_v1');
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed && parsed.date === todayStr() ? parsed : null;
+    }catch(e){ return null; }
+  }
+  function saveRaceState(){ try{ localStorage.setItem('flipstax_race_v1', JSON.stringify(raceState)); }catch(e){} }
+  let raceState = loadRaceState();
+  function ensureRaceToday(){
+    if (!raceState || raceState.date !== todayStr()){
+      raceState = { date: todayStr(), score: 0, startedAt: null, completed: false, completionMs: null };
+      saveRaceState();
+    }
+  }
+  function formatRaceTime(ms){
+    const totalSec = Math.max(0, Math.round(ms/1000));
+    const m = Math.floor(totalSec/60), s = totalSec%60;
+    return m + 'm ' + (s<10?'0':'') + s + 's';
+  }
+  function renderRaceStatus(){
+    ensureRaceToday();
+    if (raceState.completed){
+      els.raceStatus.textContent = '\uD83C\uDFC1 ' + formatRaceTime(raceState.completionMs);
+    } else {
+      els.raceStatus.textContent = '\uD83C\uDFC1 ' + raceState.score + '/' + RACE_TARGET;
+    }
+  }
+  function addRacePoints(delta){
+    ensureRaceToday();
+    if (raceState.completed) { renderRaceStatus(); return; }
+    if (raceState.startedAt == null) raceState.startedAt = Date.now();
+    raceState.score += delta;
+    if (raceState.score >= RACE_TARGET){
+      raceState.completed = true;
+      raceState.completionMs = Date.now() - raceState.startedAt;
+      saveRaceState();
+      recordFlip('wild', 20); // one-time bonus into your permanent flip count
+      sfx.levelUp();
+      showLevelUp('Hit ' + RACE_TARGET + '! ' + formatRaceTime(raceState.completionMs));
+    } else {
+      saveRaceState();
+    }
+    renderRaceStatus();
+  }
 
   // One status slot instead of three stacked banners. Shows whichever is
   // most relevant right now: an active bonus zone beats Noon Rush beats the
@@ -1094,7 +1435,7 @@
   // baseAmount: how many flipz this action is worth before the 2x bonus zone multiplier.
   // Misses/timeouts never call this - a miss simply earns nothing, it never subtracts.
   function recordFlip(category, baseAmount){
-    baseAmount = baseAmount || 1;
+    baseAmount = (typeof baseAmount === 'number') ? baseAmount : 1;
     const amount = baseAmount * (bonusActive ? 2 : 1);
     const prevTier = tierFor(stats.flips);
     stats.flips += amount;
@@ -1203,7 +1544,9 @@
     voted = true;
     votedSinceTime = Date.now();
     comboCount = 0;
-    showToast('\u23F1\uFE0F Too slow \u2014 no flip that round');
+    const penalty = current.bonusPoints ? 3 : 1;
+    addRacePoints(-penalty);
+    showToast('\u23F1\uFE0F Too slow \u2014 \u2212' + penalty + ' point' + (penalty>1?'s':''));
     scheduleNext(900);
   }
 
@@ -1269,8 +1612,11 @@
 
     if (idx >= deck.length) resetDeck();
     current = deck[idx++];
+    current.bonusPoints = Math.random() < 0.2;
 
-    const label = (CAT_META[current.category] || {}).label || '';
+    const meta = CAT_META[current.category] || {};
+    const icon = (meta.badge || '').split(' ')[0] || '';
+    const label = (current.bonusPoints ? '\u2B50 ' : '') + (icon ? (icon + ' ' + meta.label) : (meta.label || ''));
     els.chipA.textContent = label; els.chipB.textContent = label;
 
     if (current.mode === 'match'){
@@ -1363,6 +1709,7 @@
     votedSinceTime = Date.now();
     clearRoundTimer();
     renderSlowdownBtn();
+    addRacePoints(current.bonusPoints ? 3 : 1);
     els.roundTimerFill.style.transition = 'none';
     els.roundTimerFill.style.width = '0%';
 
@@ -1415,9 +1762,9 @@
   });
 
   // ---------- wild trivia bonus round (real answer, real reward) ----------
-  function runWildEvent(forceType){
-    const useMath = forceType ? forceType === 'math' : Math.random() < 0.5;
-    const trivia = useMath ? generateMathTrivia() : generateSpellingTrivia();
+  function runWildEvent(forceSubject){
+    const subject = forceSubject || pick(DAILY_SUBJECTS);
+    const trivia = generateSubjectTrivia(subject);
     els.eventSubtitle.textContent = pick(FLAVOR_INTROS);
     els.eventPrompt.textContent = trivia.question;
     els.eventTiles.forEach((tileEl,i)=>{
@@ -1505,14 +1852,19 @@
       let ticks = 0;
       const rollInterval = setInterval(()=>{
         sfx.spinTick(ticks);
-        els.eventPrompt.textContent = '\uD83C\uDF81 +' + pick(MYSTERY_POOL) + '?';
+        els.eventPrompt.textContent = '\uD83C\uDF81 ' + pick(['+25?','\u221225?']);
         ticks++;
         if (ticks >= 6){
           clearInterval(rollInterval);
-          const amount = pick(MYSTERY_POOL);
-          sfx.correct();
-          sessionFlips++; recordFlip('wild', amount);
-          els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: +' + amount + ' FLIPZ';
+          const win = Math.random() < 0.5;
+          addRacePoints(win ? 25 : -25);
+          if (win){
+            sfx.correct();
+            els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: +25 points!';
+          } else {
+            sfx.wrong();
+            els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: \u221225 points';
+          }
           finishPowerUp();
         }
       }, 90);
@@ -1565,6 +1917,7 @@
   els.dailyShareBtn.addEventListener('click', ()=> shareDailyResult(dailyState));
   els.dailyDoneBtn.addEventListener('click', closeDailyResults);
   renderStatusBanner();
+  renderRaceStatus();
   els.soundToggle.addEventListener('click', ()=> setSoundOn(!soundOn));
 
   // Last line of defense: if the game has been sitting "voted, waiting to
