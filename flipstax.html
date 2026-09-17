@@ -170,7 +170,9 @@
     align-items:center; justify-content:center; padding:24px; text-align:center;
   }
   .event-overlay.hidden{ display:none; }
+  .event-overlay.powerup{ background: radial-gradient(circle at 50% 32%, #3d2a0f, #0a0a12 70%); }
   .event-subtitle{ font-size:12px; letter-spacing:0.4px; color:var(--pulse); font-weight:700; margin-bottom:6px; }
+  .event-overlay.powerup .event-subtitle{ color:var(--a); }
   .event-prompt{
     font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:clamp(19px,5vw,30px);
     margin-bottom:16px; color:#fff; text-shadow:0 2px 10px rgba(0,0,0,0.5);
@@ -1290,11 +1292,11 @@
     els.eventTimerFill.style.transition = 'none';
     els.eventTimerFill.style.width = '100%';
     requestAnimationFrame(()=>{
-      els.eventTimerFill.style.transition = 'width 6s linear';
+      els.eventTimerFill.style.transition = 'width 10s linear';
       els.eventTimerFill.style.width = '0%';
     });
     clearTimeout(eventTimeoutId);
-    eventTimeoutId = setTimeout(()=> resolveDailyQuestion(false), 6000);
+    eventTimeoutId = setTimeout(()=> resolveDailyQuestion(false), 10000);
   }
   function resolveDailyQuestion(correct){
     clearTimeout(eventTimeoutId);
@@ -1777,11 +1779,11 @@
     els.eventTimerFill.style.transition = 'none';
     els.eventTimerFill.style.width = '100%';
     requestAnimationFrame(()=>{
-      els.eventTimerFill.style.transition = 'width 6s linear';
+      els.eventTimerFill.style.transition = 'width 10s linear';
       els.eventTimerFill.style.width = '0%';
     });
     clearTimeout(eventTimeoutId);
-    eventTimeoutId = setTimeout(()=> resolveEvent(null), 6000);
+    eventTimeoutId = setTimeout(()=> resolveEvent(null), 10000);
   }
   function resolveEvent(wasCorrect){
     clearTimeout(eventTimeoutId);
