@@ -38,27 +38,28 @@
   .sound-toggle:active{ opacity:1; }
   .badges-row{ display:none; }
   .badge-pill{ font-size:10.5px; background:var(--panel); border:1px solid var(--divider); color:var(--dim); padding:2px 8px; border-radius:20px; }
+  .pill-row{ display:flex; gap:6px; margin-top:6px; }
   .status-banner{
-    margin-top:6px; border-radius:8px; padding:6px 10px; font-size:12px; font-weight:700;
-    text-align:center; display:flex; align-items:center; justify-content:center; gap:6px;
+    flex:1; min-width:0; border-radius:20px; padding:5px 10px; font-size:11px; font-weight:700;
+    text-align:center; display:flex; align-items:center; justify-content:center; gap:4px;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
   .status-banner.daily{
-    background:var(--panel); border:1px solid var(--divider); color:var(--ink);
-    justify-content:space-between; font-weight:400;
+    background:var(--panel); border:1px solid var(--divider); color:var(--ink); font-weight:600;
   }
   .status-banner.bonus{ background:linear-gradient(90deg,#f2545b,#e8a33d); color:#1c1006; }
   .status-banner.noon{ background:linear-gradient(90deg,#5b3ec7,#3e6bc7); color:#fff; }
   .daily-play-link, .daily-share-link{
     color:var(--pulse); font-weight:700; cursor:pointer; padding:2px 6px;
   }
-  .vibe-wrap{ display:none; margin-top:8px; }
-  .vibe-track{ position:relative; height:7px; border-radius:6px; background:linear-gradient(90deg, var(--b), var(--divider) 50%, var(--a)); }
+  .vibe-wrap{ display:none; margin-top:5px; }
+  .vibe-track{ position:relative; height:5px; border-radius:6px; background:linear-gradient(90deg, var(--b), var(--divider) 50%, var(--a)); }
   .vibe-dot{
     position:absolute; top:50%; left:50%; width:13px; height:13px; border-radius:50%;
     background:#fff; border:2px solid var(--bg); transform:translate(-50%,-50%);
     transition:left 0.4s ease; box-shadow:0 0 6px rgba(0,0,0,0.4);
   }
-  .vibe-label{ font-size:11px; color:var(--dim); margin-top:4px; text-align:center; }
+  .vibe-label{ font-size:10px; color:var(--dim); margin-top:3px; text-align:center; }
 
   .board{ position:relative; flex:1; display:flex; flex-direction:column; min-height:0; }
   .round-timer{ position:absolute; top:0; left:0; right:0; height:4px; background:rgba(255,255,255,0.08); z-index:5; overflow:hidden; }
@@ -85,11 +86,27 @@
   .slowdown-btn:active{ background:rgba(255,255,255,0.2); }
   .slowdown-btn.disabled{ opacity:0.35; pointer-events:none; }
   .slowdown-btn.hidden{ display:none; }
+  .run-timer-wrap{ position:absolute; top:16px; bottom:16px; left:8px; width:10px; z-index:6; }
+  .run-timer-wrap.hidden{ display:none; }
+  .run-timer-track{
+    position:relative; width:100%; height:100%; background:rgba(255,255,255,0.1);
+    border-radius:6px; overflow:hidden; display:flex; align-items:flex-end;
+  }
+  .run-timer-fill{
+    width:100%; height:100%; background:#3fa7a6; border-radius:6px;
+    transition: height 0.5s linear, background 0.4s ease;
+  }
+  .run-timer-fill.warn{ background:#e8a33d; }
+  .run-timer-fill.danger{ background:#f2545b; animation: runTimerPulse 0.8s ease-in-out infinite; }
+  @keyframes runTimerPulse{ 0%,100%{ opacity:1; } 50%{ opacity:0.5; } }
 
   .half{
     position:relative; flex:1; display:flex; align-items:center; justify-content:center;
     padding:12px 20px; cursor:pointer; overflow:hidden; min-height:0;
+    transition: transform 0.18s ease, opacity 0.18s ease;
   }
+  .half.tap-chosen{ transform:scale(1.02); }
+  .half.tap-dimmed{ opacity:0.75; }
   .scene{ position:absolute; inset:0; z-index:0; display:flex; align-items:center; justify-content:center; }
   .scene .glyph{ font-size:min(24vh,150px); opacity:0.5; transform:translateY(4%); }
 
@@ -98,6 +115,10 @@
   .half.bottom .fill{ background: rgba(63,167,166,0.82); }
 
   .content{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; }
+  .half:not(.revealed) .content{
+    background:rgba(0,0,0,0.32); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,0.14); border-radius:18px; padding:16px 20px;
+  }
 
   .avatar{
     width:50px; height:50px; border-radius:50%; display:flex; align-items:center; justify-content:center;
@@ -152,7 +173,10 @@
     color:var(--dim); pointer-events:none;
     animation: dividerPulse 2.4s ease-in-out infinite;
   }
-  @keyframes dividerPulse{ 0%,100%{ border-color:var(--divider); } 50%{ border-color:var(--pulse); } }
+  @keyframes dividerPulse{
+    0%,100%{ border-color:var(--divider); box-shadow:0 0 0 rgba(242,84,91,0); }
+    50%{ border-color:var(--pulse); box-shadow:0 0 14px 2px rgba(242,84,91,0.5); }
+  }
   @media (prefers-reduced-motion: reduce){ .divider{ animation:none !important; } }
 
   .hint{ text-align:center; font-size:12px; color:var(--dim); padding:9px 0 calc(9px + env(safe-area-inset-bottom)); flex-shrink:0; }
@@ -170,9 +194,10 @@
     align-items:center; justify-content:center; padding:24px; text-align:center;
   }
   .event-overlay.hidden{ display:none; }
-  .event-overlay.powerup{ background: radial-gradient(circle at 50% 32%, #3d2a0f, #0a0a12 70%); }
   .event-subtitle{ font-size:12px; letter-spacing:0.4px; color:var(--pulse); font-weight:700; margin-bottom:6px; }
-  .event-overlay.powerup .event-subtitle{ color:var(--a); }
+  .powerup-icon{ font-size:56px; margin-bottom:6px; animation: powerupBounce 1s ease-in-out infinite; }
+  .powerup-icon.hidden{ display:none; }
+  @keyframes powerupBounce{ 0%,100%{ transform:translateY(0) rotate(-6deg); } 50%{ transform:translateY(-10px) rotate(6deg); } }
   .event-prompt{
     font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:clamp(19px,5vw,30px);
     margin-bottom:16px; color:#fff; text-shadow:0 2px 10px rgba(0,0,0,0.5);
@@ -189,12 +214,18 @@
   .pu-icon{ font-size:28px; display:block; margin-bottom:4px; }
   .pu-label{ font-size:14px; }
   @keyframes tilePulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.05); } }
-  .event-overlay.powerup .event-tile{ animation: tilePulse 1.6s ease-in-out infinite; }
-  .event-overlay.powerup .event-tile:nth-child(1){ animation-delay:0s; }
-  .event-overlay.powerup .event-tile:nth-child(2){ animation-delay:0.2s; }
-  .event-overlay.powerup .event-tile:nth-child(3){ animation-delay:0.4s; }
-  .event-overlay.powerup .event-tile:nth-child(4){ animation-delay:0.6s; }
-  @media (prefers-reduced-motion: reduce){ .event-overlay.powerup .event-tile{ animation:none !important; } }
+  @keyframes tileFire{
+    0%,100%{ box-shadow: 0 0 8px 2px rgba(255,140,0,0.55), 0 0 18px 5px rgba(255,60,0,0.3); }
+    50%{ box-shadow: 0 0 16px 5px rgba(255,190,0,0.8), 0 0 28px 9px rgba(255,90,0,0.45); }
+  }
+  .event-overlay.powerup{ background: radial-gradient(circle at 50% 40%, #2b2410, #0a0a12 70%); }
+  .event-overlay.powerup .event-subtitle{ color: #e8c33d; }
+  .event-overlay.powerup .event-tile{ animation: tilePulse 1.6s ease-in-out infinite, tileFire 1.1s ease-in-out infinite; }
+  .event-overlay.powerup .event-tile:nth-child(1){ animation-delay:0s, 0s; }
+  .event-overlay.powerup .event-tile:nth-child(2){ animation-delay:0.2s, 0.15s; }
+  .event-overlay.powerup .event-tile:nth-child(3){ animation-delay:0.4s, 0.3s; }
+  .event-overlay.powerup .event-tile:nth-child(4){ animation-delay:0.6s, 0.45s; }
+  @media (prefers-reduced-motion: reduce){ .event-overlay.powerup .event-tile{ animation:none !important; box-shadow:none !important; } }
   .daily-results.hidden{ display:none; }
   .daily-emojis{ font-size:32px; letter-spacing:4px; margin-bottom:10px; }
   .daily-score{
@@ -247,6 +278,52 @@
   .intro-inner .logo{ font-size:32px; margin-bottom:18px; }
   .intro-lines{ color:var(--ink); font-size:15px; line-height:1.7; margin-bottom:22px; }
 
+  .solve-overlay{
+    position:fixed; inset:0; z-index:32;
+    background: radial-gradient(circle at 50% 30%, #1f0f3d, var(--bg) 75%);
+    display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  .solve-overlay.hidden{ display:none; }
+  .solve-inner{ width:100%; max-width:440px; text-align:center; }
+  .solve-title{
+    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:clamp(22px,6vw,30px);
+    color:#fff; margin-bottom:10px; text-shadow:0 0 20px rgba(139,63,199,0.6);
+  }
+  .solve-header{
+    display:flex; justify-content:center; align-items:center; gap:10px; color:var(--ink);
+    font-weight:700; font-size:14px; margin-bottom:10px;
+  }
+  .solve-timer{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:28px; }
+  .solve-timer.danger{ color:var(--pulse); animation: runTimerPulse 0.8s ease-in-out infinite; }
+  .solve-hint-line{ color:var(--pulse); font-size:14px; min-height:20px; margin-bottom:16px; font-weight:600; }
+  .solve-slots{ display:flex; gap:clamp(4px,1.8vw,10px); justify-content:center; margin-bottom:26px; }
+  .solve-slot{
+    width:clamp(38px,11.5vw,54px); height:clamp(46px,13.5vw,64px); border:2px solid var(--divider); border-radius:10px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:clamp(20px,6vw,30px);
+    color:var(--ink); background:var(--panel); transition: transform 0.15s ease;
+  }
+  .solve-slot:active{ transform:scale(0.94); }
+  .solve-slot.locked{ background:#2f6b45; border-color:#2f6b45; color:#fff; cursor:default; box-shadow:0 0 16px rgba(63,167,116,0.5); }
+  .solve-rack{ display:flex; gap:clamp(4px,1.6vw,10px); justify-content:center; flex-wrap:wrap; margin-bottom:20px; }
+  .solve-tile{
+    width:clamp(34px,10vw,48px); height:clamp(40px,11.5vw,56px); border-radius:10px; background:var(--a); color:#2a1c05;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:clamp(16px,5vw,24px);
+    transition: transform 0.15s ease;
+  }
+  .solve-tile:active{ transform:scale(0.9); }
+  .solve-tile.used{ opacity:0.2; pointer-events:none; }
+  .solve-attempts{ color:var(--dim); font-size:13px; margin-bottom:16px; }
+  .solve-buttons{ display:flex; gap:10px; justify-content:center; }
+  .solve-history{ margin-top:22px; max-height:130px; overflow-y:auto; }
+  .solve-history-row{ display:flex; gap:8px; justify-content:center; margin-bottom:8px; }
+  .solve-history-row span{
+    width:32px; height:32px; border-radius:6px; background:var(--panel); color:var(--dim);
+    display:inline-flex; align-items:center; justify-content:center; font-size:15px; font-weight:700;
+  }
+  .solve-history-row span.hit{ background:#2f6b45; color:#fff; box-shadow:0 0 10px rgba(63,167,116,0.5); }
+
   @media (prefers-reduced-motion: reduce){ .fill, .pct, .you-tag, .toast, .levelup-overlay{ transition:none !important; } }
 </style>
 </head>
@@ -269,13 +346,19 @@
       <div class="vibe-track"><div class="vibe-dot" id="vibeDot"></div></div>
       <div class="vibe-label" id="vibeLabel"></div>
     </div>
-    <div class="status-banner daily" id="statusBanner"></div>
+    <div class="pill-row">
+      <div class="status-banner daily" id="statusBanner"></div>
+      <div class="status-banner daily" id="runBanner"></div>
+    </div>
     <div class="badges-row" id="badgesRow"></div>
   </header>
 
   <div class="board" id="board">
     <div class="round-timer"><div class="round-timer-fill" id="roundTimerFill"></div></div>
     <div class="slowdown-btn" id="slowdownBtn">⏱️ +5s</div>
+    <div class="run-timer-wrap hidden" id="runTimerWrap">
+      <div class="run-timer-track"><div class="run-timer-fill" id="runTimerFill"></div></div>
+    </div>
 
     <div class="half top" id="halfA">
       <div class="cat-chip" id="chipA"></div>
@@ -304,6 +387,7 @@
     </div>
 
     <div class="event-overlay hidden" id="eventOverlay">
+      <div class="powerup-icon hidden" id="powerupIcon">🎁</div>
       <div class="event-subtitle" id="eventSubtitle"></div>
       <div class="event-prompt" id="eventPrompt"></div>
       <div class="event-timerbar" id="eventTimerBar"><div class="event-timerbar-fill" id="eventTimerFill"></div></div>
@@ -356,6 +440,53 @@
   </div>
 </div>
 
+<div class="intro-overlay hidden" id="runIntroOverlay">
+  <div class="intro-inner">
+    <div class="logo"><span class="flip">Flip</span><span class="stax">Stax</span></div>
+    <div class="intro-lines">
+      FlipStax is for people who love opinions, trivia, and word jumbles &mdash;
+      all rolled into one.<br><br>
+      Swipe to earn points. Hit milestones to unlock trivia. Answer right to
+      earn a letter. Collect all 5, then solve the word before time runs out.
+    </div>
+    <div class="daily-btn primary" id="runIntroDismiss">Let's go</div>
+  </div>
+</div>
+
+<div class="solve-overlay hidden" id="solveOverlay">
+  <div class="solve-inner">
+    <div class="solve-title">🧩 Solve Today's Word</div>
+    <div class="solve-header">
+      <span class="solve-timer" id="solveTimer">1:00</span>
+    </div>
+    <div class="solve-hint-line" id="solveHint"></div>
+    <div class="solve-slots" id="solveSlots"></div>
+    <div class="solve-rack" id="solveRack"></div>
+    <div class="solve-attempts" id="solveAttempts">10 guesses left</div>
+    <div class="solve-buttons">
+      <div class="daily-btn" id="solveClearBtn">Clear</div>
+      <div class="daily-btn" id="solveHintBtn">💡 Hint (0)</div>
+      <div class="daily-btn primary" id="solveSubmit">Submit</div>
+    </div>
+    <div class="solve-history" id="solveHistory"></div>
+  </div>
+</div>
+
+<div class="personality-overlay" id="readoutOverlay">
+  <div class="personality-inner">
+    <div class="personality-mask">🏁</div>
+    <div class="personality-eyebrow">DAILY RUN COMPLETE</div>
+    <div class="personality-label" id="readoutScore"></div>
+    <div class="personality-blurb" id="readoutTrivia"></div>
+    <div class="personality-blurb" id="readoutWord"></div>
+    <div class="personality-pct" id="readoutVibe"></div>
+    <div class="solve-buttons" style="margin-top:14px;">
+      <div class="daily-btn" id="readoutDone">Done</div>
+      <div class="daily-btn primary" id="readoutShare">📋 Share</div>
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
 
@@ -371,20 +502,29 @@
     fitness:{ label:'Fitness', badge:'💪 Fitness Head' },
     geography: { label:'Geography', badge:'🌍 Globetrotter' },
     history: { label:'History', badge:'📜 History Head' },
+    games: { label:'Video Games', badge:'\uD83C\uDFAE Game Head' },
   };
   const BADGE_THRESHOLD = 10;
 
   const TIERS = [
-    { min:0,    label:'Unranked' },
-    { min:15,   label:'Certified Flipper' },
-    { min:65,   label:'No Cap Flipper' },
-    { min:165,  label:'Built Different' },
-    { min:325,  label:'Elite Flipper' },
-    { min:550,  label:'Goated' },
-    { min:850,  label:'Flip Legend' },
-    { min:1250, label:'Certified Menace' },
-    { min:1750, label:'Unreal' },
-    { min:2500, label:'Flip God' },
+    { min:0,     label:'Unranked' },
+    { min:15,    label:'Certified Flipper' },
+    { min:65,    label:'No Cap Flipper' },
+    { min:165,   label:'Built Different' },
+    { min:325,   label:'Elite Flipper' },
+    { min:550,   label:'Goated' },
+    { min:850,   label:'Flip Legend' },
+    { min:1250,  label:'Certified Menace' },
+    { min:1750,  label:'Unreal' },
+    { min:2500,  label:'Flip God' },
+    { min:3500,  label:'Flip Icon' },
+    { min:5000,  label:'Flip Royalty' },
+    { min:7000,  label:'Flip Prodigy' },
+    { min:9500,  label:'Ascended Flipper' },
+    { min:12500, label:'Flip Mythic' },
+    { min:16000, label:'Flip Immortal' },
+    { min:20000, label:'GOAT Flipper' },
+    { min:25000, label:'GOAT GOD FLIPSTAX' },
   ];
 
   const WILD_GRADIENTS = [
@@ -598,6 +738,57 @@
     { q:'What type of energy does a moving object have?', correct:'Kinetic energy', wrongs:['Potential energy','Thermal energy','Chemical energy'] },
     { q:'What is the process of a caterpillar becoming a butterfly called?', correct:'Metamorphosis', wrongs:['Photosynthesis','Pollination','Germination'] },
   ];
+  // "Elective" subjects for the Daily Run's 6th trivia question - rotates
+  // between these three, kept as a genuinely separate pool from the 5 core
+  // subjects so it always feels like a wildcard slot.
+  const ART_SETS = [
+    { q:'Which art movement is Salvador Dal\u00ED most associated with?', correct:'Surrealism', wrongs:['Cubism','Impressionism','Fauvism'] },
+    { q:'Which artist famously cut off part of his own ear?', correct:'Vincent van Gogh', wrongs:['Claude Monet','Pablo Picasso','Edgar Degas'] },
+    { q:'Which art movement is Pablo Picasso most associated with?', correct:'Cubism', wrongs:['Impressionism','Realism','Baroque'] },
+    { q:'Who painted "The Starry Night"?', correct:'Vincent van Gogh', wrongs:['Claude Monet','Georges Seurat','Paul C\u00E9zanne'] },
+    { q:'What color do you get by mixing blue and yellow?', correct:'Green', wrongs:['Purple','Orange','Brown'] },
+    { q:'Which museum houses the Mona Lisa?', correct:'The Louvre', wrongs:['The Met','The Prado','The Uffizi'] },
+    { q:'Which art technique uses small dots to form an image?', correct:'Pointillism', wrongs:['Cubism','Impressionism','Realism'] },
+    { q:'Which sculptor created the famous marble "David" in Florence?', correct:'Michelangelo', wrongs:['Donatello','Bernini','Rodin'] },
+    { q:'Which of these is NOT a primary color?', correct:'Green', wrongs:['Red','Blue','Yellow'] },
+    { q:'Which art style features geometric shapes and multiple perspectives at once?', correct:'Cubism', wrongs:['Realism','Romanticism','Impressionism'] },
+    { q:'What do we call a painting of oneself?', correct:'Self-portrait', wrongs:['Landscape','Still life','Portrait'] },
+    { q:'Which famous ceiling did Michelangelo paint?', correct:'The Sistine Chapel', wrongs:['Notre Dame','St. Peter\u2019s Basilica','Westminster Abbey'] },
+    { q:'What do we call a painting of an arrangement of objects like fruit or flowers?', correct:'Still life', wrongs:['Landscape','Portrait','Abstract'] },
+    { q:'Which artist is famous for his paintings of Campbell\u2019s soup cans?', correct:'Andy Warhol', wrongs:['Jackson Pollock','Roy Lichtenstein','Keith Haring'] },
+  ];
+  const MUSIC_SETS = [
+    { q:'How many strings does a standard guitar have?', correct:'6', wrongs:['4','8','12'] },
+    { q:'Which instrument has 88 keys?', correct:'Piano', wrongs:['Organ','Accordion','Harpsichord'] },
+    { q:'Who composed "The Four Seasons"?', correct:'Antonio Vivaldi', wrongs:['Johann Sebastian Bach','Wolfgang Amadeus Mozart','Ludwig van Beethoven'] },
+    { q:'Which family of instruments does the violin belong to?', correct:'Strings', wrongs:['Woodwinds','Brass','Percussion'] },
+    { q:'What does "forte" mean in music?', correct:'Loud', wrongs:['Soft','Fast','Slow'] },
+    { q:'How many musicians are typically in a string quartet?', correct:'4', wrongs:['2','6','8'] },
+    { q:'Which composer continued composing after going deaf?', correct:'Ludwig van Beethoven', wrongs:['Wolfgang Amadeus Mozart','Johann Sebastian Bach','Franz Joseph Haydn'] },
+    { q:'What do we call a piece written for a solo instrument and orchestra?', correct:'Concerto', wrongs:['Symphony','Sonata','Overture'] },
+    { q:'Which instrument is sometimes called the "king of instruments"?', correct:'The organ', wrongs:['The piano','The violin','The trumpet'] },
+    { q:'Which clef is typically used for lower-pitched instruments like the cello?', correct:'Bass clef', wrongs:['Treble clef','Alto clef','Tenor clef'] },
+    { q:'What do we call the speed at which a piece of music is played?', correct:'Tempo', wrongs:['Pitch','Timbre','Dynamics'] },
+    { q:'Which of these is a woodwind instrument?', correct:'Clarinet', wrongs:['Trumpet','Violin','Drum'] },
+    { q:'What do we call a group of singers performing together?', correct:'A choir', wrongs:['A band','An orchestra','A quartet'] },
+    { q:'Which decade is disco music most associated with?', correct:'The 1970s', wrongs:['The 1950s','The 1990s','The 2000s'] },
+  ];
+  const HEALTH_SETS = [
+    { q:'How many minutes of moderate exercise per week do health guidelines generally recommend for adults?', correct:'150 minutes', wrongs:['30 minutes','500 minutes','10 minutes'] },
+    { q:'Which provides the most energy per gram: fat, protein, or carbohydrates?', correct:'Fat', wrongs:['Protein','Carbohydrates','Water'] },
+    { q:'What is a main purpose of warming up before exercise?', correct:'To help prevent injury', wrongs:['To build muscle instantly','To lose weight instantly','To replace stretching entirely'] },
+    { q:'What does "BMI" stand for?', correct:'Body Mass Index', wrongs:['Basic Metabolic Index','Body Muscle Indicator','Balanced Meal Intake'] },
+    { q:'Which of these is considered a cardiovascular exercise?', correct:'Running', wrongs:['Weightlifting','Stretching','Yoga'] },
+    { q:'How many hours of sleep per night are generally recommended for adults?', correct:'7-9 hours', wrongs:['3-4 hours','12 hours','5 hours'] },
+    { q:'Which food group is the body\u2019s main source of dietary fiber?', correct:'Fruits and vegetables', wrongs:['Meat','Dairy','Oils'] },
+    { q:'What is your resting heart rate, measured in beats per minute, commonly called?', correct:'Pulse', wrongs:['Blood pressure','Respiration rate','Metabolism'] },
+    { q:'Which sport is played on a court with a net, using a racket?', correct:'Tennis', wrongs:['Soccer','Baseball','Football'] },
+    { q:'A balanced diet is generally said to include what?', correct:'A variety of food groups', wrongs:['Only protein','Only carbohydrates','No fats at all'] },
+    { q:'Which of these is an example of a team sport?', correct:'Basketball', wrongs:['Swimming','Golf','Running'] },
+    { q:'What is a commonly recommended way to cool down after exercise?', correct:'Stretching', wrongs:['Sprinting','Lifting heavy weights','Holding your breath'] },
+    { q:'Which of these is a well-established benefit of regular physical activity?', correct:'Improved mood', wrongs:['Increased stress','Weaker muscles','Poor sleep'] },
+    { q:'How many players are on a standard basketball team on the court at once?', correct:'5', wrongs:['4','6','7'] },
+  ];
   function rand(min,max,rng){ rng = rng || Math.random; return Math.floor(rng()*(max-min+1))+min; }
   function generateMathTrivia(rng){
     rng = rng || Math.random;
@@ -634,13 +825,60 @@
     };
   }
   const DAILY_SUBJECTS = ['math','geography','english','history','science'];
-  const DAILY_SUBJECT_LABEL = { math:'Math', geography:'Geography', english:'English', history:'History', science:'Science' };
+
+  // ---------- Daily Run: word list (6 letters, no repeated letters, so
+  // position-solving is unambiguous) with 3 escalating associative hints ----------
+  const RUN_WORDS = [
+    { word:'GARDEN', hints:['Soil','Flowers','Weeds'] },
+    { word:'PLANET', hints:['Orbit','Rocket','Solar System'] },
+    { word:'MARKET', hints:['Stalls','Vendors','Prices'] },
+    { word:'BRIDGE', hints:['River','Cross','Structure'] },
+    { word:'ISLAND', hints:['Ocean','Beach','Coconut'] },
+    { word:'CASTLE', hints:['Moat','Knight','Throne'] },
+    { word:'FOREST', hints:['Trees','Hiking','Wildlife'] },
+    { word:'WINTER', hints:['Snow','Cold','Holiday'] },
+    { word:'SPIDER', hints:['Web','Legs','Crawl'] },
+    { word:'GOLDEN', hints:['Shiny','Trophy','Sunset'] },
+    { word:'FLIGHT', hints:['Airport','Wings','Runway'] },
+    { word:'MODERN', hints:['New','Sleek','Contemporary'] },
+    { word:'SILVER', hints:['Shiny','Coin','Medal'] },
+    { word:'CANDLE', hints:['Wax','Flame','Birthday'] },
+    { word:'PICKLE', hints:['Sour','Jar','Cucumber'] },
+    { word:'JACKET', hints:['Coat','Zipper','Winter'] },
+    { word:'MONKEY', hints:['Banana','Jungle','Swing'] },
+    { word:'PENCIL', hints:['Eraser','Sharpen','Write'] },
+    { word:'BASKET', hints:['Weave','Picnic','Hoop'] },
+    { word:'VIOLET', hints:['Purple','Flower','Shy'] },
+  ];
+  const RUN_DURATION_MS = 9 * 60 * 1000;
+  const RUN_WORD_LENGTH = 6;
+  const RUN_SOLVE_MS = 2 * 60 * 1000;
+  const RUN_MAX_GUESSES = 5;
+  const RUN_HINT_TIME_COST_MS = 5000;
+  const RUN_THRESHOLDS = [50, 100, 150, 200, 250, 300]; // 6 trivia milestones now, one per letter
+  const RUN_POWERUP_THRESHOLDS = [25, 75, 125, 175, 225]; // 5 total, keeping the alternating rhythm up through 300
+  const RUN_POWERUPS = [
+    { key:'points10',  icon:'\u26A1', label:'+10 pts', color:'#c7a63e' },
+    { key:'slowclock', icon:'\uD83D\uDC0C', label:'+30s',    color:'#3e6bc7' },
+    { key:'wildcard',  icon:'\uD83C\uDF81', label:'Wild Card', color:'#c73e3e' },
+    { key:'extraguess', icon:'\u2795', label:'+1 Guess', color:'#3ec76b' },
+  ];
+  const DAILY_SUBJECT_LABEL = { math:'Math', geography:'Geography', english:'English', history:'History', science:'Science', art:'Art', music:'Music', health:'Health' };
+  // Daily Run trivia: 5 core subjects (always one each) + 1 rotating elective
+  // (always exactly one, randomly chosen each run) = 6 total, matching the
+  // 6-letter word. Kept separate from DAILY_SUBJECTS above, which is only
+  // used by the older, unrelated 5-question Daily Challenge.
+  const RUN_CORE_SUBJECTS = ['math','geography','english','history','science'];
+  const RUN_ELECTIVE_SUBJECTS = ['art','music','health'];
   function generateSubjectTrivia(subject, rng){
     if (subject === 'math') return Object.assign({ category:'math' }, generateMathTrivia(rng));
     const bank = subject === 'geography' ? GEOGRAPHY_SETS
                : subject === 'english' ? ENGLISH_SETS
                : subject === 'history' ? HISTORY_SETS
-               : SCIENCE_SETS;
+               : subject === 'science' ? SCIENCE_SETS
+               : subject === 'art' ? ART_SETS
+               : subject === 'music' ? MUSIC_SETS
+               : HEALTH_SETS;
     const set = pick(bank, rng);
     const opts = shuffle([set.correct, ...set.wrongs], rng);
     return { category: subject, question: set.q, opts, correctIdx: opts.indexOf(set.correct) };
@@ -666,9 +904,40 @@
              .catch(()=>{ if (!done){ done = true; clearTimeout(timer); resolve(null); } });
     });
   }
-  function nameGradient(name){
-    const h = hashStr(name) % 360;
-    return 'linear-gradient(165deg, hsl('+h+',42%,15%), hsl('+h+',55%,26%))';
+  // Given two names/texts, returns two background gradients that are
+  // ALWAYS at least 150 degrees apart on the color wheel - this replaces
+  // independently hashing each side, which could land on similar hues
+  // (the actual cause of "both halves look the same color" reports).
+  function pairGradients(textA, textB){
+    const hueA = hashStr(textA) % 360;
+    const hueB = (hueA + 150 + (hashStr(textB) % 60)) % 360;
+    return [
+      'linear-gradient(165deg, hsl('+hueA+',42%,15%), hsl('+hueA+',55%,26%))',
+      'linear-gradient(165deg, hsl('+hueB+',42%,15%), hsl('+hueB+',55%,26%))'
+    ];
+  }
+  // For hand-authored scenario gradients: extracts an approximate hue from
+  // the first hex color in a gradient string, so we can detect (and correct)
+  // two authored gradients that accidentally landed too close together.
+  function approxHue(gradientStr){
+    const m = gradientStr && gradientStr.match(/#([0-9a-fA-F]{6})/);
+    if (!m) return 0;
+    const hex = m[1];
+    const r = parseInt(hex.substr(0,2),16)/255, g = parseInt(hex.substr(2,2),16)/255, b = parseInt(hex.substr(4,2),16)/255;
+    const max = Math.max(r,g,b), min = Math.min(r,g,b);
+    let h = 0;
+    if (max !== min){
+      const d = max - min;
+      if (max === r) h = ((g-b)/d + (g<b?6:0));
+      else if (max === g) h = (b-r)/d + 2;
+      else h = (r-g)/d + 4;
+      h *= 60;
+    }
+    return h;
+  }
+  function hueDistance(h1,h2){
+    const d = Math.abs(h1-h2) % 360;
+    return d > 180 ? 360-d : d;
   }
 
   // ---------- sound + haptics (synthesized, no audio files needed) ----------
@@ -744,6 +1013,54 @@
     soundOn = on;
     try{ localStorage.setItem('flipstax_sound', on ? 'on' : 'off'); }catch(e){}
     els.soundToggle.textContent = on ? '\uD83D\uDD0A' : '\uD83D\uDD07';
+    if (on) startBackgroundMusic(); else stopBackgroundMusic();
+  }
+
+  // Simple generative ambient loop - a slowly cycling chord pad, quiet and
+  // unobtrusive. This is synthesized from oscillators, same as the sound
+  // effects - it reads as calm background atmosphere, not a produced track.
+  const MUSIC_CHORDS = [
+    [196.00, 246.94, 293.66], // G major
+    [220.00, 261.63, 329.63], // A minor
+    [174.61, 220.00, 261.63], // F major
+    [196.00, 246.94, 293.66], // G major
+  ];
+  let musicPlaying = false, musicInterval = null, musicChordIdx = 0;
+  function playMusicChord(freqs){
+    if (!soundOn) return;
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    try{
+      const t0 = ctx.currentTime;
+      freqs.forEach(f=>{
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(f, t0);
+        gain.gain.setValueAtTime(0.0001, t0);
+        gain.gain.linearRampToValueAtTime(0.025, t0 + 1.5);
+        gain.gain.linearRampToValueAtTime(0.0001, t0 + 7.5);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(t0); osc.stop(t0 + 8);
+      });
+    }catch(e){}
+  }
+  function startBackgroundMusic(){
+    if (musicPlaying || !soundOn) return;
+    musicPlaying = true;
+    musicChordIdx = 0;
+    playMusicChord(MUSIC_CHORDS[musicChordIdx]);
+    clearInterval(musicInterval);
+    musicInterval = setInterval(()=>{
+      if (!soundOn) return;
+      musicChordIdx = (musicChordIdx + 1) % MUSIC_CHORDS.length;
+      playMusicChord(MUSIC_CHORDS[musicChordIdx]);
+    }, 8000);
+  }
+  function stopBackgroundMusic(){
+    musicPlaying = false;
+    clearInterval(musicInterval);
+    musicInterval = null;
   }
 
 
@@ -831,6 +1148,16 @@
     ['food', 'Pizza Hut', 'Papa John\u2019s'],
     ['food', 'Krispy Kreme', 'Dunkin\u2019'],
     ['food', 'In-N-Out', 'Whataburger'],
+    ['games', 'Grand Theft Auto', 'Red Dead Redemption'],
+    ['games', 'GTA V', 'Call of Duty'],
+    ['games', 'Minecraft', 'Fortnite'],
+    ['games', 'The Legend of Zelda', 'Super Mario'],
+    ['games', 'Call of Duty', 'Battlefield'],
+    ['games', 'League of Legends', 'Dota 2'],
+    ['games', 'PlayStation 5', 'Xbox Series X'],
+    ['games', 'Halo', 'Gears of War'],
+    ['games', 'The Last of Us', 'Resident Evil'],
+    ['games', 'Elden Ring', 'Dark Souls'],
   ];
   const MATCH = MATCH_RAW.map(([cat,a,b],i)=>({
     id:'m-'+i, mode:'match', category:cat, a, b, avatarA:initials(a), avatarB:initials(b)
@@ -865,8 +1192,10 @@
              'Get away with one lie a day, no matter what', '🤫', 'linear-gradient(165deg,#2e0f2e,#7a2f6b)'],
     ['wild', 'Live 200 years, but never leave your hometown', '🏘️', 'linear-gradient(165deg,#331a1f,#7a3f4a)',
              'Live a normal lifespan, but see the whole world', '🌍', 'linear-gradient(165deg,#0f2e33,#2f7d8c)'],
-    ['wild', 'Live on a yacht surrounded by models, but 100 venomous snakes and spiders are loose on board', '🐍', 'linear-gradient(165deg,#0d1f0f,#274d1f)',
-             'Have a million dollars, but live alone in a cabin 2 miles from anyone', '🌲', 'linear-gradient(165deg,#111a12,#2c4a2c)'],
+    ['wild', 'Wake up every day at 5am for the rest of your life', '\u23F0', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+             'Never be able to sleep past 6am ever again either way', '\uD83D\uDE34', 'linear-gradient(165deg,#1f0f3d,#5a2f8a)'],
+    ['wild', 'Be able to talk to animals, but they never stop complaining', '\uD83D\uDC36', 'linear-gradient(165deg,#3d150f,#8a2f1f)',
+             'Be able to talk to plants, but they only gossip about you', '\uD83E\uDEB4', 'linear-gradient(165deg,#0f2740,#3a6ea5)'],
     ['wild', 'You can fly, but only 3 feet off the ground', '🦆', 'linear-gradient(165deg,#1a2b3d,#3f6f9e)',
              "You're invisible, but only when nobody is looking at you", '👻', 'linear-gradient(165deg,#25252b,#55555f)'],
     ['wild', 'Win $10,000 today, guaranteed', '💵', 'linear-gradient(165deg,#0f2e1d,#1f7a4a)',
@@ -953,7 +1282,7 @@
                 'Home workouts, no gym needed', '\uD83C\uDFE0', 'linear-gradient(165deg,#0f2e1d,#2f6b45)'],
     // geography
     ['geography', 'A road trip with no plan', '\uD83D\uDE97', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
-                   'A fully scheduled itinerary', '\uD83D\uDCCB', 'linear-gradient(165deg,#0f2740,#2e7bb5)'],
+                   'A fully scheduled itinerary', '📋', 'linear-gradient(165deg,#0f2740,#2e7bb5)'],
     ['geography', 'Tokyo', '\uD83D\uDDFC', 'linear-gradient(165deg,#3d150f,#8a2f1f)',
                    'Paris', '\uD83D\uDDFC', 'linear-gradient(165deg,#1f0f3d,#5a2f8a)'],
     ['geography', 'Living on a boat', '\u26F5', 'linear-gradient(165deg,#0d3b36,#2f9e8f)',
@@ -1076,6 +1405,7 @@
   let bonusActive = false, bonusEndsAt = 0, bonusInterval = null, lastBonusEnd = 0;
   let slowMoRoundsLeft = 0;
   let lastWasEvent = false;
+  let lastPowerUpMilestone = 0;
   let roundTimeoutId = null;
   let roundDurationMs = 0, roundStartedAt = 0;
   let eventTimeoutId = null;
@@ -1100,7 +1430,7 @@
     statusBanner: document.getElementById('statusBanner'),
     roundTimerFill: document.getElementById('roundTimerFill'), slowdownBtn: document.getElementById('slowdownBtn'),
     eventOverlay: document.getElementById('eventOverlay'), eventPrompt: document.getElementById('eventPrompt'),
-    eventSubtitle: document.getElementById('eventSubtitle'),
+    eventSubtitle: document.getElementById('eventSubtitle'), powerupIcon: document.getElementById('powerupIcon'),
     eventTimerFill: document.getElementById('eventTimerFill'),
     eventTimerBar: document.getElementById('eventTimerBar'), eventGrid: document.getElementById('eventGrid'),
     dailyResultsView: document.getElementById('dailyResultsView'),
@@ -1111,6 +1441,18 @@
     personalityOverlay: document.getElementById('personalityOverlay'), personalityLabel: document.getElementById('personalityLabel'),
     personalityBlurb: document.getElementById('personalityBlurb'), personalityPct: document.getElementById('personalityPct'),
     introOverlay: document.getElementById('introOverlay'), introDismiss: document.getElementById('introDismiss'),
+    runBanner: document.getElementById('runBanner'),
+    runTimerWrap: document.getElementById('runTimerWrap'), runTimerFill: document.getElementById('runTimerFill'),
+    runIntroOverlay: document.getElementById('runIntroOverlay'), runIntroDismiss: document.getElementById('runIntroDismiss'),
+    solveOverlay: document.getElementById('solveOverlay'), solveTimer: document.getElementById('solveTimer'),
+    solveHint: document.getElementById('solveHint'), solveSlots: document.getElementById('solveSlots'),
+    solveRack: document.getElementById('solveRack'), solveAttempts: document.getElementById('solveAttempts'),
+    solveClearBtn: document.getElementById('solveClearBtn'), solveHintBtn: document.getElementById('solveHintBtn'),
+    solveSubmit: document.getElementById('solveSubmit'), solveHistory: document.getElementById('solveHistory'),
+    readoutOverlay: document.getElementById('readoutOverlay'), readoutScore: document.getElementById('readoutScore'),
+    readoutTrivia: document.getElementById('readoutTrivia'), readoutWord: document.getElementById('readoutWord'),
+    readoutVibe: document.getElementById('readoutVibe'), readoutDone: document.getElementById('readoutDone'),
+    readoutShare: document.getElementById('readoutShare'),
     vibeWrap: document.getElementById('vibeWrap'), vibeDot: document.getElementById('vibeDot'),
     vibeLabel: document.getElementById('vibeLabel'),
   };
@@ -1214,9 +1556,9 @@
   function renderRaceStatus(){
     ensureRaceToday();
     if (raceState.completed){
-      els.raceStatus.textContent = '\uD83C\uDFC1 ' + formatRaceTime(raceState.completionMs);
+      els.raceStatus.textContent = '🏁 ' + formatRaceTime(raceState.completionMs);
     } else {
-      els.raceStatus.textContent = '\uD83C\uDFC1 ' + raceState.score + '/' + RACE_TARGET;
+      els.raceStatus.textContent = '🏁 ' + raceState.score + '/' + RACE_TARGET;
     }
   }
   function addRacePoints(delta){
@@ -1235,6 +1577,390 @@
       saveRaceState();
     }
     renderRaceStatus();
+  }
+
+  // ---------- Daily Run: an 8-10 minute bounded ritual - swipe for points,
+  // hit thresholds to unlock trivia, answer correctly to collect a letter of
+  // today's word, then solve it Wordle-style. One per day. ----------
+  function getTodayWord(){
+    const rng = mulberry32(hashStr('flipstax-word-' + todayStr()));
+    return RUN_WORDS[Math.floor(rng() * RUN_WORDS.length)];
+  }
+  function loadRunResult(){
+    try{
+      const raw = localStorage.getItem('flipstax_run_v1');
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed && parsed.date === todayStr() ? parsed : null;
+    }catch(e){ return null; }
+  }
+  function saveRunResultToday(result){ try{ localStorage.setItem('flipstax_run_v1', JSON.stringify(result)); }catch(e){} }
+  let runResultToday = loadRunResult();
+
+  let runActive = false, runPhase = 'idle';
+  let runScore = 0, runEndsAt = 0, runTimerInterval = null;
+  let runWord = null, runLetters = [], runThresholdsHit = [], runPowerupThresholdsHit = [];
+  let runTriviaAttempted = 0, runTriviaCorrect = 0;
+  let runSubjectSequence = [], runTriviaShown = 0;
+  let runHintsRevealed = 0, runBonusGuesses = 0;
+  let solveEndsAt = 0, solveInterval = null, solveGuesses = [], solveRack = [], solveCurrentGuess = [];
+  let solveLockedLetters = [];
+  let runPendingPowerUp = false;
+  let rackUsedFlags = [];
+
+  function renderRunBanner(){
+    if (runResultToday){
+      const r = runResultToday;
+      els.runBanner.innerHTML = '\u2705 Today\u2019s Run: ' + r.score + ' pts \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal +
+        ' trivia \u00B7 ' + (r.solved ? formatRaceTime(r.solveMs) : 'not solved') +
+        ' &nbsp;<span class="daily-share-link" id="runShareLink">Share</span>';
+      const link = document.getElementById('runShareLink');
+      if (link) link.addEventListener('click', shareRunResult);
+    } else if (runActive){
+      els.runBanner.innerHTML = '\uD83C\uDFAE Daily Run \u00B7 ' + runScore + ' pts \u00B7 ' + runLetters.length + '/' + RUN_WORD_LENGTH + ' letters';
+    } else {
+      els.runBanner.innerHTML = '\uD83C\uDFAE Daily Run (8\u201310 min) &nbsp;<span class="daily-play-link" id="runPlayLink">Play</span>';
+      const link = document.getElementById('runPlayLink');
+      if (link) link.addEventListener('click', startDailyRun);
+    }
+  }
+  function buildRunShareText(r){
+    return 'FlipStax Daily Run\n' + r.score + ' pts \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal + ' trivia \u00B7 ' +
+      (r.solved ? ('solved in ' + formatRaceTime(r.solveMs)) : 'word not solved');
+  }
+  async function shareRunResult(){
+    if (!runResultToday) return;
+    const text = buildRunShareText(runResultToday);
+    if (navigator.share){ try{ await navigator.share({ text }); return; }catch(e){} }
+    try{ await navigator.clipboard.writeText(text); showToast('📋 Copied \u2014 paste it anywhere'); }
+    catch(e){ showToast(text); }
+  }
+
+  function startDailyRun(){
+    if (runResultToday || runActive || levelUpActive || personalityActive) return;
+    try{
+      if (localStorage.getItem('flipstax_seen_run_intro') !== '1'){
+        els.runIntroOverlay.classList.remove('hidden');
+        return;
+      }
+    }catch(e){}
+    runActive = true; runPhase = 'running';
+    runScore = 0; runLetters = []; runThresholdsHit = []; runPowerupThresholdsHit = [];
+    runTriviaAttempted = 0; runTriviaCorrect = 0;
+    runSubjectSequence = shuffle(RUN_CORE_SUBJECTS.concat([pick(RUN_ELECTIVE_SUBJECTS)]));
+    runTriviaShown = 0;
+    runHintsRevealed = 0; runBonusGuesses = 0;
+    runWord = getTodayWord();
+    runEndsAt = Date.now() + RUN_DURATION_MS;
+    els.runTimerWrap.classList.remove('hidden');
+    updateRunTimerBar();
+    clearInterval(runTimerInterval);
+    runTimerInterval = setInterval(tickRunTimer, 500);
+    renderRunBanner();
+    showToast('\uD83C\uDFAE Daily Run started \u2014 swipe for points!');
+    if (unsubscribe){ unsubscribe(); unsubscribe = null; }
+    lastWasEvent = true;
+    loadNext();
+  }
+  function tickRunTimer(){
+    if (!runActive) return;
+    const remain = runEndsAt - Date.now();
+    if (remain <= 0){
+      updateRunTimerBar();
+      if (runPhase === 'running') endRun(false);
+      return;
+    }
+    updateRunTimerBar();
+  }
+  function updateRunTimerBar(){
+    const remain = Math.max(0, runEndsAt - Date.now());
+    const pct = Math.max(0, Math.min(100, (remain / RUN_DURATION_MS) * 100));
+    els.runTimerFill.style.height = pct + '%';
+    els.runTimerFill.classList.toggle('warn', remain <= 120000 && remain > 30000);
+    els.runTimerFill.classList.toggle('danger', remain <= 30000);
+  }
+
+  let runPendingTrivia = false;
+  function addRunScore(delta){
+    if (!runActive) return;
+    if (runPhase === 'trivia' || runPhase === 'solving') return;
+    runScore += delta;
+    let triviaTriggered = false;
+    for (const t of RUN_THRESHOLDS){
+      if (runScore >= t && runThresholdsHit.indexOf(t) === -1 && runLetters.length < RUN_WORD_LENGTH){
+        runThresholdsHit.push(t);
+        runPendingTrivia = true; // deferred - see loadNextImpl - never fire mid-vote
+        triviaTriggered = true;
+        break;
+      }
+    }
+    if (!triviaTriggered){
+      for (const t of RUN_POWERUP_THRESHOLDS){
+        if (runScore >= t && runPowerupThresholdsHit.indexOf(t) === -1){
+          runPowerupThresholdsHit.push(t);
+          runPendingPowerUp = true; // deferred, same reasoning
+          break;
+        }
+      }
+    }
+    renderRunBanner();
+  }
+
+  function runTriviaQuestion(){
+    if (!runActive) return;
+    runPhase = 'trivia';
+    if (unsubscribe){ unsubscribe(); unsubscribe = null; }
+    clearRoundTimer();
+    const subject = runSubjectSequence[runTriviaShown] || pick(RUN_CORE_SUBJECTS);
+    runTriviaShown++;
+    const q = generateSubjectTrivia(subject);
+    els.eventOverlay.classList.remove('hidden', 'powerup');
+    els.powerupIcon.classList.add('hidden');
+    renderSlowdownBtn();
+    els.eventSubtitle.textContent = '\uD83C\uDFAE RUN TRIVIA \u00B7 answer right, earn a letter';
+    els.eventPrompt.textContent = q.question;
+    els.eventTiles.forEach((tileEl,i)=>{
+      tileEl.textContent = q.opts[i];
+      tileEl.style.background = TILE_COLORS[i];
+      tileEl.onclick = ()=> resolveRunTrivia(i === q.correctIdx);
+    });
+    els.eventTimerFill.style.transition = 'none';
+    els.eventTimerFill.style.width = '100%';
+    requestAnimationFrame(()=>{
+      els.eventTimerFill.style.transition = 'width 10s linear';
+      els.eventTimerFill.style.width = '0%';
+    });
+    clearTimeout(eventTimeoutId);
+    eventTimeoutId = setTimeout(()=> resolveRunTrivia(false), 10000);
+  }
+  function resolveRunTrivia(correct){
+    clearTimeout(eventTimeoutId);
+    els.eventTiles.forEach(t=> t.onclick = null);
+    runTriviaAttempted++;
+    if (correct){
+      sfx.correct();
+      runTriviaCorrect++;
+      const nextLetter = runWord.word[runLetters.length];
+      runLetters.push(nextLetter);
+      els.eventSubtitle.textContent = '';
+      els.eventPrompt.textContent = '\u2705 Correct! Letter earned: ' + nextLetter;
+    } else {
+      sfx.wrong();
+      runScore -= 5; // trivia carries real stakes too, applied directly since we're deliberately in the 'trivia' phase
+      renderRunBanner();
+      els.eventSubtitle.textContent = '';
+      els.eventPrompt.textContent = '\u274C Not quite \u2014 \u22125 points, no letter this time';
+    }
+    setTimeout(()=>{
+      els.eventOverlay.classList.add('hidden');
+      if (!runActive) return;
+      if (runLetters.length >= RUN_WORD_LENGTH){ startSolvePhase(); }
+      else { runPhase = 'running'; loadNext(); }
+    }, 1100);
+  }
+
+  function runPowerUpRoundForRun(){
+    runPhase = 'powerup';
+    if (unsubscribe){ unsubscribe(); unsubscribe = null; }
+    clearRoundTimer();
+    els.eventOverlay.classList.remove('hidden');
+    els.eventOverlay.classList.add('powerup');
+    els.powerupIcon.classList.remove('hidden');
+    renderSlowdownBtn();
+    els.eventSubtitle.textContent = '\uD83C\uDF89 POWER-UP DROPPED';
+    els.eventPrompt.textContent = "Choose one \u2014 it's yours";
+    els.eventTiles.forEach((tileEl,i)=>{
+      const pu = RUN_POWERUPS[i];
+      tileEl.innerHTML = '<span class="pu-icon">'+pu.icon+'</span><span class="pu-label">'+pu.label+'</span>';
+      tileEl.style.background = pu.color;
+      tileEl.onclick = ()=> resolveRunPowerUp(pu.key);
+    });
+    els.eventTimerFill.style.transition = 'none';
+    els.eventTimerFill.style.width = '100%';
+    requestAnimationFrame(()=>{
+      els.eventTimerFill.style.transition = 'width 5s linear';
+      els.eventTimerFill.style.width = '0%';
+    });
+    clearTimeout(eventTimeoutId);
+    eventTimeoutId = setTimeout(()=> resolveRunPowerUp(null), 5000);
+  }
+  function resolveRunPowerUp(key){
+    clearTimeout(eventTimeoutId);
+    els.eventTiles.forEach(t=> t.onclick = null);
+    els.eventOverlay.classList.remove('powerup');
+    els.eventSubtitle.textContent = '';
+    if (key === null){
+      els.eventPrompt.textContent = '\u23F1\uFE0F Power-up expired';
+      finishRunPowerUp();
+    } else if (key === 'points10'){
+      sfx.powerUp();
+      addRunScore(10);
+      els.eventPrompt.textContent = '\u26A1 +10 points!';
+      finishRunPowerUp();
+    } else if (key === 'slowclock'){
+      sfx.powerUp();
+      runEndsAt += 30000;
+      updateRunTimerBar();
+      els.eventPrompt.textContent = '\uD83D\uDC0C +30 seconds on the clock';
+      finishRunPowerUp();
+    } else if (key === 'wildcard'){
+      let ticks = 0;
+      const rollInterval = setInterval(()=>{
+        sfx.spinTick(ticks);
+        els.eventPrompt.textContent = '\uD83C\uDF81 ' + pick(['+25?','\u221225?']);
+        ticks++;
+        if (ticks >= 6){
+          clearInterval(rollInterval);
+          const win = Math.random() < 0.5;
+          addRunScore(win ? 25 : -25);
+          if (win){ sfx.correct(); els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: +25 points!'; }
+          else{ sfx.wrong(); els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: \u221225 points'; }
+          finishRunPowerUp();
+        }
+      }, 90);
+    } else if (key === 'extraguess'){
+      sfx.powerUp();
+      runBonusGuesses++;
+      els.eventPrompt.textContent = '\u2795 +1 guess banked for the word solve';
+      finishRunPowerUp();
+    }
+  }
+  function finishRunPowerUp(){
+    setTimeout(()=>{
+      els.eventOverlay.classList.add('hidden');
+      if (!runActive) return;
+      runPhase = 'running';
+      loadNext();
+    }, 1100);
+  }
+
+  function startSolvePhase(){
+    runPhase = 'solving';
+    els.eventOverlay.classList.add('hidden');
+    els.runTimerWrap.classList.add('hidden');
+    solveGuesses = [];
+    solveCurrentGuess = [];
+    solveLockedLetters = new Array(RUN_WORD_LENGTH).fill(null);
+    solveRack = shuffle(runLetters.slice());
+    rackUsedFlags = [];
+    solveEndsAt = Date.now() + RUN_SOLVE_MS;
+    renderSolveUI();
+    els.solveOverlay.classList.remove('hidden');
+    clearInterval(solveInterval);
+    solveInterval = setInterval(tickSolveTimer, 500);
+    sfx.bonusZone();
+  }
+  function tickSolveTimer(){
+    const remain = Math.max(0, solveEndsAt - Date.now());
+    const totalSec = Math.ceil(remain/1000);
+    els.solveTimer.textContent = Math.floor(totalSec/60) + ':' + (totalSec%60<10?'0':'') + (totalSec%60);
+    els.solveTimer.classList.toggle('danger', remain <= 20000);
+    if (remain <= 0){ clearInterval(solveInterval); endRun(false); }
+  }
+  function renderSolveUI(){
+    els.solveHint.textContent = runHintsRevealed > 0 ? runWord.hints.slice(0, runHintsRevealed).join(' \u00B7 ') : '';
+    els.solveHintBtn.textContent = '💡 Hint (\u22125s)';
+    els.solveHintBtn.classList.toggle('disabled', runHintsRevealed >= runWord.hints.length);
+    els.solveAttempts.textContent = (RUN_MAX_GUESSES + runBonusGuesses - solveGuesses.length) + ' guesses left';
+    els.solveSlots.innerHTML = '';
+    for (let i=0;i<RUN_WORD_LENGTH;i++){
+      const filled = solveLockedLetters[i] || solveCurrentGuess[i];
+      const div = document.createElement('div');
+      div.className = 'solve-slot' + (solveLockedLetters[i] ? ' locked' : '');
+      div.textContent = filled || '';
+      if (!solveLockedLetters[i]) div.onclick = ()=> removeFromGuess(i);
+      els.solveSlots.appendChild(div);
+    }
+    els.solveRack.innerHTML = '';
+    solveRack.forEach((letter,i)=>{
+      const isLocked = solveLockedLetters.indexOf(letter) !== -1;
+      const div = document.createElement('div');
+      div.className = 'solve-tile' + ((rackUsedFlags[i] || isLocked) ? ' used' : '');
+      div.textContent = letter;
+      if (!isLocked) div.onclick = ()=> addToGuess(letter, i);
+      els.solveRack.appendChild(div);
+    });
+    els.solveHistory.innerHTML = solveGuesses.map(g=>
+      '<div class="solve-history-row">' + g.map((l,i)=> '<span class="' + (l===runWord.word[i]?'hit':'') + '">'+l+'</span>').join('') + '</div>'
+    ).join('');
+  }
+  function addToGuess(letter, rackIdx){
+    if (rackUsedFlags[rackIdx]) return;
+    const nextOpen = solveLockedLetters.findIndex((v,i)=> !v && !solveCurrentGuess[i]);
+    if (nextOpen === -1) return;
+    solveCurrentGuess[nextOpen] = letter;
+    rackUsedFlags[rackIdx] = true;
+    renderSolveUI();
+  }
+  function removeFromGuess(slotIdx){
+    if (!solveCurrentGuess[slotIdx]) return;
+    const letter = solveCurrentGuess[slotIdx];
+    solveCurrentGuess[slotIdx] = null;
+    const idx = rackUsedFlags.findIndex((used,i)=> used && solveRack[i]===letter);
+    if (idx !== -1) rackUsedFlags[idx] = false;
+    renderSolveUI();
+  }
+  function submitSolveGuess(){
+    const filled = solveLockedLetters.map((v,i)=> v || solveCurrentGuess[i]);
+    if (filled.some(v=>!v)) return;
+    solveGuesses.push(filled.slice());
+    let allCorrect = true;
+    filled.forEach((l,i)=>{
+      if (l === runWord.word[i]) solveLockedLetters[i] = l;
+      else allCorrect = false;
+    });
+    solveCurrentGuess = [];
+    rackUsedFlags = [];
+    if (allCorrect){
+      sfx.levelUp();
+      clearInterval(solveInterval);
+      endRun(true);
+      return;
+    }
+    if (solveGuesses.length >= RUN_MAX_GUESSES + runBonusGuesses){
+      clearInterval(solveInterval);
+      endRun(false);
+      return;
+    }
+    sfx.wrong();
+    renderSolveUI();
+  }
+  function useSolveHint(){
+    if (runHintsRevealed >= runWord.hints.length) return;
+    runHintsRevealed++;
+    solveEndsAt -= RUN_HINT_TIME_COST_MS;
+    tickSolveTimer();
+    sfx.combo();
+    renderSolveUI();
+  }
+
+  function endRun(solved){
+    runActive = false;
+    clearInterval(runTimerInterval);
+    clearInterval(solveInterval);
+    els.runTimerWrap.classList.add('hidden');
+    els.solveOverlay.classList.add('hidden');
+    els.eventOverlay.classList.add('hidden');
+    const solveMs = solved ? (RUN_SOLVE_MS - Math.max(0, solveEndsAt - Date.now())) : null;
+    runResultToday = {
+      date: todayStr(), score: runScore, triviaCorrect: runTriviaCorrect,
+      triviaTotal: runTriviaAttempted, solved: !!solved, solveMs: solveMs,
+      word: runWord ? runWord.word : null,
+    };
+    saveRunResultToday(runResultToday);
+    renderRunBanner();
+    showRunReadout();
+    voted = false; votedSinceTime = null;
+  }
+  function showRunReadout(){
+    const r = runResultToday;
+    const pct = stats.decided > 0 ? Math.round((stats.agree/stats.decided)*100) : 50;
+    els.readoutScore.textContent = r.score + ' pts';
+    els.readoutTrivia.textContent = r.triviaCorrect + '/' + r.triviaTotal + ' trivia correct';
+    els.readoutWord.textContent = r.solved ? ('\u2705 Solved in ' + formatRaceTime(r.solveMs)) : ('\u274C Word not solved (' + (r.word||'') + ')');
+    els.readoutVibe.textContent = 'Today you were ' + vibeTierFor(pct).label;
+    els.readoutOverlay.classList.add('show');
+    sfx.personality();
   }
 
   // One status slot instead of three stacked banners. Shows whichever is
@@ -1281,6 +2007,7 @@
   function runDailyQuestion(){
     const q = dailyQuestions[dailyIndex];
     els.eventOverlay.classList.remove('hidden', 'powerup');
+    els.powerupIcon.classList.add('hidden');
     renderSlowdownBtn();
     els.eventSubtitle.textContent = 'DAILY \u00B7 ' + (DAILY_SUBJECT_LABEL[q.category] || 'Question ' + (dailyIndex+1)) + ' \u00B7 ' + (dailyIndex+1) + '/5';
     els.eventPrompt.textContent = q.question;
@@ -1340,7 +2067,7 @@
     }
     try{
       await navigator.clipboard.writeText(text);
-      showToast('\uD83D\uDCCB Copied \u2014 paste it anywhere');
+      showToast('📋 Copied \u2014 paste it anywhere');
     }catch(e){
       showToast(text);
     }
@@ -1394,7 +2121,7 @@
     els.levelupOverlay.classList.add('show');
     levelUpActive = true;
     clearTimeout(showLevelUp._t);
-    showLevelUp._t = setTimeout(()=>{ els.levelupOverlay.classList.remove('show'); levelUpActive = false; }, 1300);
+    showLevelUp._t = setTimeout(()=>{ els.levelupOverlay.classList.remove('show'); levelUpActive = false; }, 2600);
   }
   els.levelupOverlay.addEventListener('click', ()=>{
     els.levelupOverlay.classList.remove('show');
@@ -1547,7 +2274,7 @@
     votedSinceTime = Date.now();
     comboCount = 0;
     const penalty = current.bonusPoints ? 3 : 1;
-    addRacePoints(-penalty);
+    if (runActive) addRunScore(-penalty); else addRacePoints(-penalty);
     showToast('\u23F1\uFE0F Too slow \u2014 \u2212' + penalty + ' point' + (penalty>1?'s':''));
     scheduleNext(900);
   }
@@ -1601,16 +2328,26 @@
   function loadNextImpl(){
     if (unsubscribe){ unsubscribe(); unsubscribe = null; }
     clearRoundTimer();
-    renderStatusBanner();
-    maybeTriggerBonusZone();
 
-    if (!lastWasEvent && sessionFlips >= 4){
-      const boost = isNoonRush() ? 2.5 : 1;
-      const roll = Math.random();
-      if (roll < 0.12 * boost){ lastWasEvent = true; runWildEvent(); return; }
-      if (roll < 0.20 * boost){ lastWasEvent = true; runPowerUpRound(); return; }
+    if (runActive){
+      if (runPendingTrivia){ runPendingTrivia = false; runTriviaQuestion(); return; }
+      if (runPendingPowerUp){ runPendingPowerUp = false; runPowerUpRoundForRun(); return; }
+    } else {
+      renderStatusBanner();
+      maybeTriggerBonusZone();
+      if (!lastWasEvent && sessionFlips >= 4){
+        const boost = isNoonRush() ? 2.5 : 1;
+        const roll = Math.random();
+        if (roll < 0.12 * boost){ lastWasEvent = true; runWildEvent(); return; }
+      }
+      // Power-ups are a milestone now, not a random roll - fires exactly
+      // once per 15 flips instead of "sometimes every few flips."
+      if (!lastWasEvent && sessionFlips > 0 && sessionFlips % 15 === 0 && sessionFlips !== lastPowerUpMilestone){
+        lastPowerUpMilestone = sessionFlips;
+        lastWasEvent = true; runPowerUpRound(); return;
+      }
+      lastWasEvent = false;
     }
-    lastWasEvent = false;
 
     if (idx >= deck.length) resetDeck();
     current = deck[idx++];
@@ -1622,14 +2359,21 @@
     els.chipA.textContent = label; els.chipB.textContent = label;
 
     if (current.mode === 'match'){
-      els.halfA.style.background = nameGradient(current.a);
-      els.halfB.style.background = nameGradient(current.b);
+      const grads = pairGradients(current.a, current.b);
+      els.halfA.style.background = grads[0];
+      els.halfB.style.background = grads[1];
+      els.halfB.style.filter = '';
       setScene(els.sceneA, null); setScene(els.sceneB, null);
       els.avatarA.style.display = 'flex'; els.avatarB.style.display = 'flex';
       els.avatarA.textContent = current.avatarA; els.avatarB.textContent = current.avatarB;
     } else {
       els.avatarA.style.display = 'none'; els.avatarB.style.display = 'none';
       els.halfA.style.background = current.gradA; els.halfB.style.background = current.gradB;
+      // Safety net for hand-authored scenario gradients that happen to land
+      // on similar hues (e.g. two different greens) - nudge side B's hue
+      // if the two are too close, otherwise leave the authored colors as-is.
+      const hueA = approxHue(current.gradA), hueB = approxHue(current.gradB);
+      els.halfB.style.filter = hueDistance(hueA, hueB) < 45 ? 'hue-rotate(150deg)' : '';
       setScene(els.sceneA, current.glyphA); setScene(els.sceneB, current.glyphB);
     }
     els.takeA.textContent = current.a; els.takeB.textContent = current.b;
@@ -1711,7 +2455,8 @@
     votedSinceTime = Date.now();
     clearRoundTimer();
     renderSlowdownBtn();
-    addRacePoints(current.bonusPoints ? 3 : 1);
+    const points = current.bonusPoints ? 3 : 1;
+    if (runActive) addRunScore(points); else addRacePoints(points);
     els.roundTimerFill.style.transition = 'none';
     els.roundTimerFill.style.width = '0%';
 
@@ -1756,8 +2501,13 @@
     scheduleNext(1650);
   }
 
-  els.halfA.addEventListener('click', ()=>{ sfx.tap(); vote('A'); });
-  els.halfB.addEventListener('click', ()=>{ sfx.tap(); vote('B'); });
+  function tapFeedback(chosen, other){
+    chosen.classList.add('tap-chosen');
+    other.classList.add('tap-dimmed');
+    setTimeout(()=>{ chosen.classList.remove('tap-chosen'); other.classList.remove('tap-dimmed'); }, 400);
+  }
+  els.halfA.addEventListener('click', ()=>{ sfx.tap(); startBackgroundMusic(); tapFeedback(els.halfA, els.halfB); vote('A'); });
+  els.halfB.addEventListener('click', ()=>{ sfx.tap(); startBackgroundMusic(); tapFeedback(els.halfB, els.halfA); vote('B'); });
   document.addEventListener('keydown', (e)=>{
     if (e.key==='ArrowUp' || e.key==='1') vote('A');
     if (e.key==='ArrowDown' || e.key==='2') vote('B');
@@ -1767,6 +2517,7 @@
   function runWildEvent(forceSubject){
     const subject = forceSubject || pick(DAILY_SUBJECTS);
     const trivia = generateSubjectTrivia(subject);
+    els.powerupIcon.classList.add('hidden');
     els.eventSubtitle.textContent = pick(FLAVOR_INTROS);
     els.eventPrompt.textContent = trivia.question;
     els.eventTiles.forEach((tileEl,i)=>{
@@ -1809,6 +2560,7 @@
   function runPowerUpRound(){
     els.eventOverlay.classList.remove('hidden');
     els.eventOverlay.classList.add('powerup');
+    els.powerupIcon.classList.remove('hidden');
     renderSlowdownBtn();
     els.eventSubtitle.textContent = '\uD83C\uDF89 POWER-UP DROPPED';
     els.eventPrompt.textContent = "Choose one \u2014 it's yours";
@@ -1920,6 +2672,17 @@
   els.dailyDoneBtn.addEventListener('click', closeDailyResults);
   renderStatusBanner();
   renderRaceStatus();
+  renderRunBanner();
+  els.readoutDone.addEventListener('click', ()=>{ els.readoutOverlay.classList.remove('show'); loadNext(); });
+  els.readoutShare.addEventListener('click', shareRunResult);
+  els.solveSubmit.addEventListener('click', submitSolveGuess);
+  els.solveClearBtn.addEventListener('click', ()=>{ solveCurrentGuess = []; rackUsedFlags = []; renderSolveUI(); });
+  els.solveHintBtn.addEventListener('click', useSolveHint);
+  els.runIntroDismiss.addEventListener('click', ()=>{
+    els.runIntroOverlay.classList.add('hidden');
+    try{ localStorage.setItem('flipstax_seen_run_intro','1'); }catch(e){}
+    startDailyRun();
+  });
   els.soundToggle.addEventListener('click', ()=> setSoundOn(!soundOn));
 
   // Last line of defense: if the game has been sitting "voted, waiting to
