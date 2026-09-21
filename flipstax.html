@@ -49,9 +49,9 @@
   }
   .status-banner.bonus{ background:linear-gradient(90deg,#f2545b,#e8a33d); color:#1c1006; }
   .status-banner.noon{ background:linear-gradient(90deg,#5b3ec7,#3e6bc7); color:#fff; }
-  .daily-play-link, .daily-share-link{
-    color:var(--pulse); font-weight:700; cursor:pointer; padding:2px 6px;
-  }
+  .status-banner.hidden{ display:none; }
+  .status-banner.solo{ flex:1 1 100%; }
+  .run-link{ color:var(--pulse); font-weight:700; cursor:pointer; padding:2px 6px; }
   .vibe-wrap{ display:none; margin-top:5px; }
   .vibe-track{ position:relative; height:5px; border-radius:6px; background:linear-gradient(90deg, var(--b), var(--divider) 50%, var(--a)); }
   .vibe-dot{
@@ -109,6 +109,13 @@
   .half.tap-dimmed{ opacity:0.75; }
   .scene{ position:absolute; inset:0; z-index:0; display:flex; align-items:center; justify-content:center; }
   .scene .glyph{ font-size:min(24vh,150px); opacity:0.5; transform:translateY(4%); }
+  /* When a half has a background glyph, stack it directly above the text as
+     one tight, centered group instead of letting the frosted-glass text
+     panel sit on top of (and hide) it, or spreading them apart. */
+  .half.has-glyph{ flex-direction:column; align-items:center; justify-content:center; gap:2px; }
+  .half.has-glyph .scene{ position:relative; inset:auto; flex:0 0 auto; }
+  .half.has-glyph .scene .glyph{ font-size:min(13vh,88px); opacity:0.85; transform:none; }
+  .half.has-glyph:not(.revealed) .content{ background:none; backdrop-filter:none; -webkit-backdrop-filter:none; border:none; padding:2px 20px; }
 
   .fill{ position:absolute; inset:0; width:0%; z-index:1; transition: width 0.75s cubic-bezier(.2,.8,.2,1); }
   .half.top .fill{ background: rgba(232,163,61,0.82); }
@@ -226,13 +233,6 @@
   .event-overlay.powerup .event-tile:nth-child(3){ animation-delay:0.4s, 0.3s; }
   .event-overlay.powerup .event-tile:nth-child(4){ animation-delay:0.6s, 0.45s; }
   @media (prefers-reduced-motion: reduce){ .event-overlay.powerup .event-tile{ animation:none !important; box-shadow:none !important; } }
-  .daily-results.hidden{ display:none; }
-  .daily-emojis{ font-size:32px; letter-spacing:4px; margin-bottom:10px; }
-  .daily-score{
-    font-family:'Big Shoulders Display', sans-serif; font-weight:900; color:#fff;
-    font-size:clamp(24px,6vw,36px); margin-bottom:16px;
-  }
-  .daily-buttons{ display:flex; gap:10px; justify-content:center; }
   .daily-btn{
     font-size:13px; font-weight:700; padding:9px 16px; border-radius:10px; cursor:pointer;
     background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.25);
@@ -397,14 +397,6 @@
         <div class="event-tile" data-i="2"></div>
         <div class="event-tile" data-i="3"></div>
       </div>
-      <div class="daily-results hidden" id="dailyResultsView">
-        <div class="daily-emojis" id="dailyEmojis"></div>
-        <div class="daily-score" id="dailyScoreText"></div>
-        <div class="daily-buttons">
-          <div class="daily-btn primary" id="dailyShareBtn">📋 Copy result</div>
-          <div class="daily-btn" id="dailyDoneBtn">Done</div>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -432,9 +424,10 @@
   <div class="intro-inner">
     <div class="logo"><span class="flip">Flip</span><span class="stax">Stax</span></div>
     <div class="intro-lines">
-      Tap the one you'd pick.<br>
-      Watch for bonus rounds &mdash; they're worth extra.<br>
-      Come back daily for something new.
+      FlipStax is a game that combines opinions, polls, trivia, and word
+      puzzles.<br><br>
+      Tap the one you'd pick. Watch for bonus rounds &mdash; they're worth
+      extra. Come back daily for something new.
     </div>
     <div class="daily-btn primary" id="introDismiss">Got it</div>
   </div>
@@ -593,8 +586,8 @@
     { correct:'Tomorrow', wrongs:['Tommorow','Tomorow','Tommorrow'] },
     { correct:'Twelfth', wrongs:['Twelth','Twelfeth','Twelvth'] },
   ];
-  // Daily Challenge subject banks - one question, one guaranteed-correct
-  // answer. Kept to well-established, uncontested facts on purpose.
+  // Trivia subject banks - one question, one guaranteed-correct answer.
+  // Kept to well-established, uncontested facts on purpose.
   const GEOGRAPHY_SETS = [
     { q:'What is the capital of France?', correct:'Paris', wrongs:['Lyon','Marseille','Nice'] },
     { q:'What is the largest ocean on Earth?', correct:'Pacific Ocean', wrongs:['Atlantic Ocean','Indian Ocean','Arctic Ocean'] },
@@ -850,7 +843,7 @@
     { word:'BASKET', hints:['Weave','Picnic','Hoop'] },
     { word:'VIOLET', hints:['Purple','Flower','Shy'] },
   ];
-  const RUN_DURATION_MS = 9 * 60 * 1000;
+  const RUN_DURATION_MS = 10 * 60 * 1000;
   const RUN_WORD_LENGTH = 6;
   const RUN_SOLVE_MS = 2 * 60 * 1000;
   const RUN_MAX_GUESSES = 5;
@@ -863,11 +856,10 @@
     { key:'wildcard',  icon:'\uD83C\uDF81', label:'Wild Card', color:'#c73e3e' },
     { key:'extraguess', icon:'\u2795', label:'+1 Guess', color:'#3ec76b' },
   ];
-  const DAILY_SUBJECT_LABEL = { math:'Math', geography:'Geography', english:'English', history:'History', science:'Science', art:'Art', music:'Music', health:'Health' };
   // Daily Run trivia: 5 core subjects (always one each) + 1 rotating elective
   // (always exactly one, randomly chosen each run) = 6 total, matching the
-  // 6-letter word. Kept separate from DAILY_SUBJECTS above, which is only
-  // used by the older, unrelated 5-question Daily Challenge.
+  // 6-letter word. Kept separate from DAILY_SUBJECTS above, which is used
+  // by the wild trivia bonus round instead.
   const RUN_CORE_SUBJECTS = ['math','geography','english','history','science'];
   const RUN_ELECTIVE_SUBJECTS = ['art','music','health'];
   function generateSubjectTrivia(subject, rng){
@@ -883,12 +875,6 @@
     const opts = shuffle([set.correct, ...set.wrongs], rng);
     return { category: subject, question: set.q, opts, correctIdx: opts.indexOf(set.correct) };
   }
-  function getDailyQuestions(dateStr){
-    const rng = mulberry32(hashStr('flipstax-daily-' + dateStr));
-    const order = shuffle(DAILY_SUBJECTS, rng);
-    return order.map(subject => generateSubjectTrivia(subject, rng));
-  }
-
   function initials(name){ return name.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join(''); }
   function pick(arr,rng){ rng = rng || Math.random; return arr[Math.floor(rng()*arr.length)]; }
   function hashStr(str){ let h=0; for(let i=0;i<str.length;i++){ h=(h<<5)-h+str.charCodeAt(i); h|=0; } return Math.abs(h); }
@@ -1019,7 +1005,7 @@
   // Light, bouncy chiptune-style loop - a simple hummable melody over a
   // walking bass, square/triangle waves for that classic overworld-music
   // character, no drum kit. A full drum groove reads as "driving" and gets
-  // fatiguing over an 8-10 minute session; a cheerful melodic phrase reads
+  // fatiguing over a 10 minute session; a cheerful melodic phrase reads
   // as "game show / Nintendo" and can loop indefinitely without wearing on
   // the ear. Uses the same lookahead scheduler as before so timing stays
   // tight, just driving notes instead of drum hits.
@@ -1318,7 +1304,7 @@
                 'Home workouts, no gym needed', '\uD83C\uDFE0', 'linear-gradient(165deg,#0f2e1d,#2f6b45)'],
     // geography
     ['geography', 'A road trip with no plan', '\uD83D\uDE97', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
-                   'A fully scheduled itinerary', '📋', 'linear-gradient(165deg,#0f2740,#2e7bb5)'],
+                   'A fully scheduled itinerary', '\uD83D\uDCCB', 'linear-gradient(165deg,#0f2740,#2e7bb5)'],
     ['geography', 'Tokyo', '\uD83D\uDDFC', 'linear-gradient(165deg,#3d150f,#8a2f1f)',
                    'Paris', '\uD83D\uDDFC', 'linear-gradient(165deg,#1f0f3d,#5a2f8a)'],
     ['geography', 'Living on a boat', '\u26F5', 'linear-gradient(165deg,#0d3b36,#2f9e8f)',
@@ -1469,9 +1455,6 @@
     eventSubtitle: document.getElementById('eventSubtitle'), powerupIcon: document.getElementById('powerupIcon'),
     eventTimerFill: document.getElementById('eventTimerFill'),
     eventTimerBar: document.getElementById('eventTimerBar'), eventGrid: document.getElementById('eventGrid'),
-    dailyResultsView: document.getElementById('dailyResultsView'),
-    dailyEmojis: document.getElementById('dailyEmojis'), dailyScoreText: document.getElementById('dailyScoreText'),
-    dailyShareBtn: document.getElementById('dailyShareBtn'), dailyDoneBtn: document.getElementById('dailyDoneBtn'),
     eventTiles: Array.from(document.querySelectorAll('.event-tile')),
     levelupOverlay: document.getElementById('levelupOverlay'), levelupLabel: document.getElementById('levelupLabel'),
     personalityOverlay: document.getElementById('personalityOverlay'), personalityLabel: document.getElementById('personalityLabel'),
@@ -1546,25 +1529,6 @@
     }
   }
 
-  // ---------- daily challenge (same 5 questions for everyone, once a day) ----------
-  const DAILY_EPOCH = new Date('2026-09-16T00:00:00');
-  function dailyPuzzleNumber(){
-    const today = new Date(todayStr() + 'T00:00:00');
-    return Math.max(1, Math.round((today - DAILY_EPOCH) / 86400000) + 1);
-  }
-  function loadDailyState(){
-    try{
-      const raw = localStorage.getItem('flipstax_daily_v1');
-      if (!raw) return null;
-      const parsed = JSON.parse(raw);
-      return parsed && parsed.date === todayStr() ? parsed : null; // only valid for today
-    }catch(e){ return null; }
-  }
-  function saveDailyState(state){ try{ localStorage.setItem('flipstax_daily_v1', JSON.stringify(state)); }catch(e){} }
-
-  let dailyState = loadDailyState();
-  let dailyRunning = false, dailyIndex = 0, dailyResults = [], dailyQuestions = [];
-
   // ---------- race to 250 (real stakes, resets daily, never touches your
   // permanent Tier/flip count - this is its own separate score) ----------
   const RACE_TARGET = 250;
@@ -1615,7 +1579,7 @@
     renderRaceStatus();
   }
 
-  // ---------- Daily Run: an 8-10 minute bounded ritual - swipe for points,
+  // ---------- Daily Run: a 10 minute bounded ritual - swipe for points,
   // hit thresholds to unlock trivia, answer correctly to collect a letter of
   // today's word, then solve it Wordle-style. One per day. ----------
   function getTodayWord(){
@@ -1649,13 +1613,13 @@
       const r = runResultToday;
       els.runBanner.innerHTML = '\u2705 Today\u2019s Run: ' + r.score + ' pts \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal +
         ' trivia \u00B7 ' + (r.solved ? formatRaceTime(r.solveMs) : 'not solved') +
-        ' &nbsp;<span class="daily-share-link" id="runShareLink">Share</span>';
+        ' &nbsp;<span class="run-link" id="runShareLink">Share</span>';
       const link = document.getElementById('runShareLink');
       if (link) link.addEventListener('click', shareRunResult);
     } else if (runActive){
       els.runBanner.innerHTML = '\uD83C\uDFAE Daily Run \u00B7 ' + runScore + ' pts \u00B7 ' + runLetters.length + '/' + RUN_WORD_LENGTH + ' letters';
     } else {
-      els.runBanner.innerHTML = '\uD83C\uDFAE Daily Run (8\u201310 min) &nbsp;<span class="daily-play-link" id="runPlayLink">Play</span>';
+      els.runBanner.innerHTML = '\uD83C\uDFAE Daily Run &nbsp;<span class="run-link" id="runPlayLink">Play</span>';
       const link = document.getElementById('runPlayLink');
       if (link) link.addEventListener('click', startDailyRun);
     }
@@ -1668,7 +1632,7 @@
     if (!runResultToday) return;
     const text = buildRunShareText(runResultToday);
     if (navigator.share){ try{ await navigator.share({ text }); return; }catch(e){} }
-    try{ await navigator.clipboard.writeText(text); showToast('📋 Copied \u2014 paste it anywhere'); }
+    try{ await navigator.clipboard.writeText(text); showToast('\uD83D\uDCCB Copied \u2014 paste it anywhere'); }
     catch(e){ showToast(text); }
   }
 
@@ -1880,6 +1844,12 @@
     solveRack = shuffle(runLetters.slice());
     rackUsedFlags = [];
     solveEndsAt = Date.now() + RUN_SOLVE_MS;
+    // The solve minigame isn't a normal vote-and-reveal round, so the stale
+    // voted/votedSinceTime from whichever vote triggered it must be cleared
+    // here — otherwise the watchdog thinks the round has been stuck for the
+    // entire 60-120s solve window and force-advances every 8 seconds.
+    voted = false;
+    votedSinceTime = null;
     renderSolveUI();
     els.solveOverlay.classList.remove('hidden');
     clearInterval(solveInterval);
@@ -1895,7 +1865,7 @@
   }
   function renderSolveUI(){
     els.solveHint.textContent = runHintsRevealed > 0 ? runWord.hints.slice(0, runHintsRevealed).join(' \u00B7 ') : '';
-    els.solveHintBtn.textContent = '💡 Hint (\u22125s)';
+    els.solveHintBtn.textContent = '\uD83D\uDCA1 Hint (\u22125s)';
     els.solveHintBtn.classList.toggle('disabled', runHintsRevealed >= runWord.hints.length);
     els.solveAttempts.textContent = (RUN_MAX_GUESSES + runBonusGuesses - solveGuesses.length) + ' guesses left';
     els.solveSlots.innerHTML = '';
@@ -1999,9 +1969,8 @@
     sfx.personality();
   }
 
-  // One status slot instead of three stacked banners. Shows whichever is
-  // most relevant right now: an active bonus zone beats Noon Rush beats the
-  // ordinary daily-challenge status.
+  // One status slot for transient events (2x Flip Zone, Noon Rush). When
+  // neither is active it collapses so Daily Run's pill takes the full row.
   function renderStatusBanner(){
     if (bonusActive){
       const remain = Math.max(0, Math.ceil((bonusEndsAt - Date.now())/1000));
@@ -2014,106 +1983,11 @@
       els.statusBanner.textContent = '\uD83D\uDD14 NOON RUSH \u2014 bonus rounds supercharged';
       return;
     }
-    els.statusBanner.className = 'status-banner daily';
-    const n = dailyPuzzleNumber();
-    if (dailyState){
-      els.statusBanner.innerHTML = '\u2705 Daily #' + n + ': ' + dailyState.score + '/5 &nbsp;<span class="daily-share-link" id="dailyShareLink">Share</span>';
-      const link = document.getElementById('dailyShareLink');
-      if (link) link.addEventListener('click', ()=> shareDailyResult(dailyState));
-    } else {
-      els.statusBanner.innerHTML = '\uD83D\uDCC5 Daily Challenge #' + n + ' &nbsp;<span class="daily-play-link" id="dailyPlayLink">Play</span>';
-      const link = document.getElementById('dailyPlayLink');
-      if (link) link.addEventListener('click', startDailyChallenge);
-    }
-  }
-
-  function startDailyChallenge(){
-    if (dailyState || dailyRunning || levelUpActive || personalityActive) return;
-    dailyRunning = true;
-    dailyIndex = 0;
-    dailyResults = [];
-    dailyQuestions = getDailyQuestions(todayStr());
-    if (unsubscribe){ unsubscribe(); unsubscribe = null; }
-    clearRoundTimer();
-    els.dailyResultsView.classList.add('hidden');
-    els.eventTimerBar.style.display = '';
-    els.eventGrid.style.display = '';
-    runDailyQuestion();
-  }
-  function runDailyQuestion(){
-    const q = dailyQuestions[dailyIndex];
-    els.eventOverlay.classList.remove('hidden', 'powerup');
-    els.powerupIcon.classList.add('hidden');
-    renderSlowdownBtn();
-    els.eventSubtitle.textContent = 'DAILY \u00B7 ' + (DAILY_SUBJECT_LABEL[q.category] || 'Question ' + (dailyIndex+1)) + ' \u00B7 ' + (dailyIndex+1) + '/5';
-    els.eventPrompt.textContent = q.question;
-    els.eventTiles.forEach((tileEl,i)=>{
-      tileEl.textContent = q.opts[i];
-      tileEl.style.background = TILE_COLORS[i];
-      tileEl.onclick = ()=> resolveDailyQuestion(i === q.correctIdx);
-    });
-    els.eventTimerFill.style.transition = 'none';
-    els.eventTimerFill.style.width = '100%';
-    requestAnimationFrame(()=>{
-      els.eventTimerFill.style.transition = 'width 10s linear';
-      els.eventTimerFill.style.width = '0%';
-    });
-    clearTimeout(eventTimeoutId);
-    eventTimeoutId = setTimeout(()=> resolveDailyQuestion(false), 10000);
-  }
-  function resolveDailyQuestion(correct){
-    clearTimeout(eventTimeoutId);
-    els.eventTiles.forEach(t=> t.onclick = null);
-    dailyResults.push(correct);
-    if (correct){ sfx.correct(); sessionFlips++; recordFlip('wild', 5); }
-    else{ sfx.wrong(); }
-    els.eventSubtitle.textContent = '';
-    els.eventPrompt.textContent = correct ? '\u2705 Correct' : '\u274C Not quite';
-    setTimeout(()=>{
-      dailyIndex++;
-      if (dailyIndex < 5) runDailyQuestion();
-      else finishDailyChallenge();
-    }, 800);
-  }
-  function finishDailyChallenge(){
-    dailyRunning = false;
-    const score = dailyResults.filter(Boolean).length;
-    dailyState = { date: todayStr(), score, results: dailyResults };
-    saveDailyState(dailyState);
-    renderStatusBanner();
-
-    const tagline = score===5 ? 'Perfect run \uD83D\uDD25' : score===4 ? 'So close' : score>=2 ? 'Solid' : 'Tough one today';
-    els.eventSubtitle.textContent = '';
-    els.eventPrompt.textContent = tagline;
-    els.eventTimerBar.style.display = 'none';
-    els.eventGrid.style.display = 'none';
-    els.dailyEmojis.textContent = dailyResults.map(r=> r ? '\u2705' : '\u274C').join('');
-    els.dailyScoreText.textContent = score + '/5';
-    els.dailyResultsView.classList.remove('hidden');
-    sfx.levelUp();
-  }
-  function buildDailyShareText(state){
-    return 'FlipStax Daily #' + dailyPuzzleNumber() + '\n' +
-      state.results.map(r=> r ? '\u2705' : '\u274C').join('') + '  ' + state.score + '/5';
-  }
-  async function shareDailyResult(state){
-    const text = buildDailyShareText(state);
-    if (navigator.share){
-      try{ await navigator.share({ text }); return; }catch(e){}
-    }
-    try{
-      await navigator.clipboard.writeText(text);
-      showToast('📋 Copied \u2014 paste it anywhere');
-    }catch(e){
-      showToast(text);
-    }
-  }
-  function closeDailyResults(){
-    els.dailyResultsView.classList.add('hidden');
-    els.eventOverlay.classList.add('hidden');
-    els.eventTimerBar.style.display = '';
-    els.eventGrid.style.display = '';
-    loadNext();
+    // Nothing else to show right now - collapse this pill so Daily Run's
+    // pill takes the full row instead of leaving an empty slot beside it.
+    els.statusBanner.className = 'status-banner hidden';
+    els.statusBanner.innerHTML = '';
+    els.runBanner.classList.toggle('solo', els.statusBanner.classList.contains('hidden'));
   }
 
   function tierFor(flips){ let t = TIERS[0]; for (const tier of TIERS){ if (flips >= tier.min) t = tier; } return t.label; }
@@ -2246,7 +2120,11 @@
     return Math.round(18 + shaped * 64);
   }
   function resetDeck(){ deck = smartShuffle(masterPool); idx = 0; }
-  function setScene(el, glyph){ el.innerHTML = glyph ? '<span class="glyph">'+glyph+'</span>' : ''; }
+  function setScene(el, glyph){
+    el.innerHTML = glyph ? '<span class="glyph">'+glyph+'</span>' : '';
+    const half = el.closest('.half');
+    if (half) half.classList.toggle('has-glyph', !!glyph);
+  }
 
   function renderUnvoted(){
     els.halfA.classList.remove('revealed'); els.halfB.classList.remove('revealed');
@@ -2316,8 +2194,8 @@
   }
 
   // Noon Rush: a per-timezone local event, not a global one - every player's
-  // OWN device clock decides their own noon, same trick the Daily Challenge
-  // uses for "today". No server coordination needed.
+  // OWN device clock decides their own noon, same trick Daily Run uses for
+  // "today". No server coordination needed.
   function isNoonRush(){ return new Date().getHours() === 12; }
 
   function maybeTriggerBonusZone(){
@@ -2704,8 +2582,6 @@
   loadNext();
   renderStats();
   setSoundOn(soundOn); // sync the 🔊/🔇 icon to whatever was saved from last time
-  els.dailyShareBtn.addEventListener('click', ()=> shareDailyResult(dailyState));
-  els.dailyDoneBtn.addEventListener('click', closeDailyResults);
   renderStatusBanner();
   renderRaceStatus();
   renderRunBanner();
@@ -2730,7 +2606,9 @@
     if (voted && votedSinceTime && (Date.now() - votedSinceTime > 8000)){
       const overlayVisible = !els.eventOverlay.classList.contains('hidden');
       const levelupVisible = els.levelupOverlay.classList.contains('show');
-      if (!overlayVisible && !levelupVisible){
+      const solveVisible = !els.solveOverlay.classList.contains('hidden');
+      const personalityVisible = els.personalityOverlay.classList.contains('show');
+      if (!overlayVisible && !levelupVisible && !solveVisible && !personalityVisible){
         console.warn('FlipStax: watchdog recovering a stalled round');
         voted = false;
         votedSinceTime = null;
