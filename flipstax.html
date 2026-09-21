@@ -447,7 +447,7 @@
       FlipStax is for people who love opinions, trivia, and word jumbles &mdash;
       all rolled into one.<br><br>
       Swipe to earn points. Hit milestones to unlock trivia. Answer right to
-      earn a letter. Collect all 5, then solve the word before time runs out.
+      earn a letter. Collect all 6, then solve the word before time runs out.
     </div>
     <div class="daily-btn primary" id="runIntroDismiss">Let's go</div>
   </div>
@@ -1016,51 +1016,87 @@
     if (on) startBackgroundMusic(); else stopBackgroundMusic();
   }
 
-  // Simple generative ambient loop - a slowly cycling chord pad, quiet and
-  // unobtrusive. This is synthesized from oscillators, same as the sound
-  // effects - it reads as calm background atmosphere, not a produced track.
-  const MUSIC_CHORDS = [
-    [196.00, 246.94, 293.66], // G major
-    [220.00, 261.63, 329.63], // A minor
-    [174.61, 220.00, 261.63], // F major
-    [196.00, 246.94, 293.66], // G major
+  // Light, bouncy chiptune-style loop - a simple hummable melody over a
+  // walking bass, square/triangle waves for that classic overworld-music
+  // character, no drum kit. A full drum groove reads as "driving" and gets
+  // fatiguing over an 8-10 minute session; a cheerful melodic phrase reads
+  // as "game show / Nintendo" and can loop indefinitely without wearing on
+  // the ear. Uses the same lookahead scheduler as before so timing stays
+  // tight, just driving notes instead of drum hits.
+  const BEAT_BPM = 116;
+  const BEAT_SCHEDULE_AHEAD = 0.1;   // seconds to schedule into the future each tick
+  const BEAT_LOOKAHEAD_MS = 25;      // how often the scheduler wakes up
+  let musicPlaying = false, beatTimerId = null, beatStep = 0, beatNextTime = 0;
+
+  // 4-bar phrase, 4 eighth-notes per bar = 16 steps, then loops. Progression
+  // is C - G - Am - F (the classic cheerful pop/game-jingle progression),
+  // melody ends back on C5 so the loop seams smoothly into itself.
+  const MELODY_NOTES = [
+    523.25, 659.25, 783.99, 659.25, // bar 1 (C):  C5 E5 G5 E5
+    587.33, 783.99, 493.88, 783.99, // bar 2 (G):  D5 G5 B4 G5
+    440.00, 523.25, 659.25, 523.25, // bar 3 (Am): A4 C5 E5 C5
+    349.23, 440.00, 349.23, 523.25, // bar 4 (F):  F4 A4 F4 C5 -> loops to C5
   ];
-  let musicPlaying = false, musicInterval = null, musicChordIdx = 0;
-  function playMusicChord(freqs){
-    if (!soundOn) return;
+  const BASS_NOTES = [130.81, 196.00, 220.00, 174.61]; // C3, G3, A3, F3 - one per bar
+
+  function playMelodyNote(t0, freq){
     const ctx = getAudioCtx();
     if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(freq, t0);
+    const stepDur = (60.0 / BEAT_BPM) / 2;
+    const noteDur = stepDur * 0.62; // staccato - gives the "bounce", avoids mush
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.linearRampToValueAtTime(0.045, t0 + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + noteDur);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(t0); osc.stop(t0 + noteDur + 0.02);
+  }
+  function playBassNote(t0, freq){
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, t0);
+    const barDur = (60.0 / BEAT_BPM) / 2 * 4;
+    gain.gain.setValueAtTime(0.0001, t0);
+    gain.gain.linearRampToValueAtTime(0.05, t0 + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + barDur * 0.92);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(t0); osc.stop(t0 + barDur);
+  }
+  function scheduleBeatStep(step, t0){
     try{
-      const t0 = ctx.currentTime;
-      freqs.forEach(f=>{
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(f, t0);
-        gain.gain.setValueAtTime(0.0001, t0);
-        gain.gain.linearRampToValueAtTime(0.025, t0 + 1.5);
-        gain.gain.linearRampToValueAtTime(0.0001, t0 + 7.5);
-        osc.connect(gain); gain.connect(ctx.destination);
-        osc.start(t0); osc.stop(t0 + 8);
-      });
+      playMelodyNote(t0, MELODY_NOTES[step]);
+      if (step % 4 === 0) playBassNote(t0, BASS_NOTES[step / 4]);
     }catch(e){}
+  }
+  function beatScheduler(){
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    while (beatNextTime < ctx.currentTime + BEAT_SCHEDULE_AHEAD){
+      scheduleBeatStep(beatStep, beatNextTime);
+      beatNextTime += (60.0 / BEAT_BPM) / 2; // eighth-note step length
+      beatStep = (beatStep + 1) % MELODY_NOTES.length;
+    }
   }
   function startBackgroundMusic(){
     if (musicPlaying || !soundOn) return;
+    const ctx = getAudioCtx();
+    if (!ctx) return;
     musicPlaying = true;
-    musicChordIdx = 0;
-    playMusicChord(MUSIC_CHORDS[musicChordIdx]);
-    clearInterval(musicInterval);
-    musicInterval = setInterval(()=>{
-      if (!soundOn) return;
-      musicChordIdx = (musicChordIdx + 1) % MUSIC_CHORDS.length;
-      playMusicChord(MUSIC_CHORDS[musicChordIdx]);
-    }, 8000);
+    beatStep = 0;
+    beatNextTime = ctx.currentTime + 0.05;
+    clearInterval(beatTimerId);
+    beatTimerId = setInterval(beatScheduler, BEAT_LOOKAHEAD_MS);
   }
   function stopBackgroundMusic(){
     musicPlaying = false;
-    clearInterval(musicInterval);
-    musicInterval = null;
+    clearInterval(beatTimerId);
+    beatTimerId = null;
   }
 
 
