@@ -96,8 +96,7 @@
     width:100%; height:100%; background:#3fa7a6; border-radius:6px;
     transition: height 0.5s linear, background 0.4s ease;
   }
-  .run-timer-fill.warn{ background:#e8a33d; }
-  .run-timer-fill.danger{ background:#f2545b; animation: runTimerPulse 0.8s ease-in-out infinite; }
+  .run-timer-fill.danger{ animation: runTimerPulse 0.8s ease-in-out infinite; }
   @keyframes runTimerPulse{ 0%,100%{ opacity:1; } 50%{ opacity:0.5; } }
 
   .half{
@@ -200,15 +199,15 @@
     position:absolute; inset:0; z-index:8; display:flex; flex-direction:column;
     align-items:center; justify-content:center; padding:24px; text-align:center;
     background:
-      radial-gradient(circle at 22% 24%, rgba(63,140,230,0.4), transparent 46%),
-      radial-gradient(circle at 80% 30%, rgba(139,95,214,0.32), transparent 46%),
-      radial-gradient(circle at 55% 88%, rgba(63,167,166,0.22), transparent 42%),
-      #0a0a12;
-    background-size: 165% 165%;
-    animation: eventBgDrift 9s ease-in-out infinite alternate;
+      radial-gradient(circle at 22% 24%, rgba(90,160,255,0.95), transparent 58%),
+      radial-gradient(circle at 80% 30%, rgba(178,110,255,0.9), transparent 58%),
+      radial-gradient(circle at 55% 88%, rgba(60,220,210,0.75), transparent 55%),
+      linear-gradient(160deg, #1c1550, #3a1a68 45%, #10203f 100%);
+    background-size: 190% 190%;
+    animation: eventBgDrift 6s ease-in-out infinite alternate;
   }
   .event-overlay.hidden{ display:none; }
-  @keyframes eventBgDrift{ 0%{ background-position: 0% 15%; } 100%{ background-position: 100% 85%; } }
+  @keyframes eventBgDrift{ 0%{ background-position: 0% 10%; } 100%{ background-position: 100% 90%; } }
   @media (prefers-reduced-motion: reduce){ .event-overlay{ animation:none !important; } }
   .event-subtitle{ font-size:12px; letter-spacing:0.4px; color:var(--pulse); font-weight:700; margin-bottom:6px; }
   .powerup-icon{ font-size:56px; margin-bottom:6px; animation: powerupBounce 1s ease-in-out infinite; }
@@ -236,12 +235,12 @@
   }
   .event-overlay.powerup{
     background:
-      radial-gradient(circle at 25% 22%, rgba(232,195,61,0.42), transparent 46%),
-      radial-gradient(circle at 78% 68%, rgba(255,140,0,0.3), transparent 46%),
-      radial-gradient(circle at 50% 92%, rgba(200,60,60,0.2), transparent 42%),
-      #0a0a12;
-    background-size: 165% 165%;
-    animation: eventBgDrift 7s ease-in-out infinite alternate;
+      radial-gradient(circle at 25% 22%, rgba(255,214,80,0.95), transparent 58%),
+      radial-gradient(circle at 78% 68%, rgba(255,140,0,0.9), transparent 58%),
+      radial-gradient(circle at 50% 92%, rgba(230,70,70,0.7), transparent 55%),
+      linear-gradient(160deg, #5a2a00, #7a1a1a 45%, #401200 100%);
+    background-size: 190% 190%;
+    animation: eventBgDrift 5s ease-in-out infinite alternate;
   }
   .event-overlay.powerup .event-subtitle{ color: #e8c33d; }
   .event-overlay.powerup .event-tile{ animation: tilePulse 1.6s ease-in-out infinite, tileFire 1.1s ease-in-out infinite; }
@@ -1045,90 +1044,65 @@
     soundOn = on;
     try{ localStorage.setItem('flipstax_sound', on ? 'on' : 'off'); }catch(e){}
     els.soundToggle.textContent = on ? '\uD83D\uDD0A' : '\uD83D\uDD07';
-    if (on) startBackgroundMusic(); else stopBackgroundMusic();
+    if (on) playTrack(currentTrackKey || 'run'); else pauseAllTracks();
   }
 
-  // Light, bouncy chiptune-style loop - a simple hummable melody over a
-  // walking bass, square/triangle waves for that classic overworld-music
-  // character, no drum kit. A full drum groove reads as "driving" and gets
-  // fatiguing over a 10 minute session; a cheerful melodic phrase reads
-  // as "game show / Nintendo" and can loop indefinitely without wearing on
-  // the ear. Uses the same lookahead scheduler as before so timing stays
-  // tight, just driving notes instead of drum hits.
-  const BEAT_BPM = 116;
-  const BEAT_SCHEDULE_AHEAD = 0.1;   // seconds to schedule into the future each tick
-  const BEAT_LOOKAHEAD_MS = 25;      // how often the scheduler wakes up
-  let musicPlaying = false, beatTimerId = null, beatStep = 0, beatNextTime = 0;
-
-  // 4-bar phrase, 4 eighth-notes per bar = 16 steps, then loops. Progression
-  // is C - G - Am - F (the classic cheerful pop/game-jingle progression),
-  // melody ends back on C5 so the loop seams smoothly into itself.
-  const MELODY_NOTES = [
-    523.25, 659.25, 783.99, 659.25, // bar 1 (C):  C5 E5 G5 E5
-    587.33, 783.99, 493.88, 783.99, // bar 2 (G):  D5 G5 B4 G5
-    440.00, 523.25, 659.25, 523.25, // bar 3 (Am): A4 C5 E5 C5
-    349.23, 440.00, 349.23, 523.25, // bar 4 (F):  F4 A4 F4 C5 -> loops to C5
-  ];
-  const BASS_NOTES = [130.81, 196.00, 220.00, 174.61]; // C3, G3, A3, F3 - one per bar
-
-  function playMelodyNote(t0, freq){
-    const ctx = getAudioCtx();
-    if (!ctx) return;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(freq, t0);
-    const stepDur = (60.0 / BEAT_BPM) / 2;
-    const noteDur = stepDur * 0.62; // staccato - gives the "bounce", avoids mush
-    gain.gain.setValueAtTime(0.0001, t0);
-    gain.gain.linearRampToValueAtTime(0.045, t0 + 0.008);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + noteDur);
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.start(t0); osc.stop(t0 + noteDur + 0.02);
-  }
-  function playBassNote(t0, freq){
-    const ctx = getAudioCtx();
-    if (!ctx) return;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(freq, t0);
-    const barDur = (60.0 / BEAT_BPM) / 2 * 4;
-    gain.gain.setValueAtTime(0.0001, t0);
-    gain.gain.linearRampToValueAtTime(0.05, t0 + 0.015);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + barDur * 0.92);
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.start(t0); osc.stop(t0 + barDur);
-  }
-  function scheduleBeatStep(step, t0){
-    try{
-      playMelodyNote(t0, MELODY_NOTES[step]);
-      if (step % 4 === 0) playBassNote(t0, BASS_NOTES[step / 4]);
-    }catch(e){}
-  }
-  function beatScheduler(){
-    const ctx = getAudioCtx();
-    if (!ctx) return;
-    while (beatNextTime < ctx.currentTime + BEAT_SCHEDULE_AHEAD){
-      scheduleBeatStep(beatStep, beatNextTime);
-      beatNextTime += (60.0 / BEAT_BPM) / 2; // eighth-note step length
-      beatStep = (beatStep + 1) % MELODY_NOTES.length;
+  // ---- Real recorded music, two tracks for two phases of the game: "run"
+  // (Bonus Stage Anthem) for everything except the word-solve phase
+  // (including the intro screen - there's no separate intro track), and
+  // "solve" (The Final Buzzer) for the word-solve phase itself. Plain
+  // <audio> elements with native looping - simpler and better-sounding
+  // than synthesizing notes, now that we have real tracks to work with.
+  const TRACK_SRC = {
+    run:   'audio/bonus-stage-anthem.mp3',
+    solve: 'audio/final-buzzer.mp3',
+  };
+  const trackEls = {};
+  let currentTrackKey = null;
+  function getTrackEl(key){
+    if (!trackEls[key]){
+      const a = new Audio(TRACK_SRC[key]);
+      a.loop = true;
+      a.preload = 'auto';
+      a.volume = 0.55;
+      trackEls[key] = a;
     }
+    return trackEls[key];
   }
-  function startBackgroundMusic(){
-    if (musicPlaying || !soundOn) return;
-    const ctx = getAudioCtx();
-    if (!ctx) return;
-    musicPlaying = true;
-    beatStep = 0;
-    beatNextTime = ctx.currentTime + 0.05;
-    clearInterval(beatTimerId);
-    beatTimerId = setInterval(beatScheduler, BEAT_LOOKAHEAD_MS);
+  function pauseAllTracks(){
+    Object.keys(trackEls).forEach(k=>{ try{ trackEls[k].pause(); }catch(e){} });
   }
-  function stopBackgroundMusic(){
-    musicPlaying = false;
-    clearInterval(beatTimerId);
-    beatTimerId = null;
+  // Switches to a track, restarting it from the top only if it wasn't
+  // already the one playing (so re-entering the same phase repeatedly -
+  // e.g. tapping cards - doesn't keep restarting the song).
+  function playTrack(key){
+    currentTrackKey = key;
+    if (!soundOn) return;
+    const already = trackEls[key] && !trackEls[key].paused && !trackEls[key].muted;
+    Object.keys(trackEls).forEach(k=>{ if (k !== key) try{ trackEls[k].pause(); }catch(e){} });
+    const el = getTrackEl(key);
+    el.muted = false;
+    if (!already){
+      try{ el.currentTime = 0; }catch(e){}
+    }
+    el.play().catch(()=>{});
+  }
+  // Browsers block audio.play() before any user gesture on the page, but
+  // muted autoplay is universally allowed - so whichever track should be
+  // playing at launch can start silently the instant the page loads and
+  // unmute itself on the very first tap, instead of only starting once
+  // that first tap already happens.
+  function primeMusic(key){
+    currentTrackKey = key;
+    if (!soundOn) return;
+    const el = getTrackEl(key);
+    el.muted = true;
+    el.play().catch(()=>{});
+    const unmute = ()=>{
+      if (soundOn && currentTrackKey === key){ el.muted = false; el.play().catch(()=>{}); }
+      document.removeEventListener('pointerdown', unmute);
+    };
+    document.addEventListener('pointerdown', unmute, { once:true });
   }
 
 
@@ -1721,11 +1695,25 @@
     }
     updateRunTimerBar();
   }
+  // Smoothly blends from green (plenty of time) through yellow/orange to red
+  // (running out), instead of jumping between three flat colors at fixed
+  // thresholds - reads as a continuous countdown, not a sudden warning.
+  function lerp(a, b, t){ return a + (b - a) * t; }
+  function lerpColor(c1, c2, t){
+    return 'rgb(' + Math.round(lerp(c1[0], c2[0], t)) + ',' + Math.round(lerp(c1[1], c2[1], t)) + ',' + Math.round(lerp(c1[2], c2[2], t)) + ')';
+  }
+  const TIMER_GREEN = [62, 199, 107], TIMER_AMBER = [232, 163, 61], TIMER_RED = [242, 84, 91];
+  function timerColorForPct(pct){
+    if (pct > 50){
+      return lerpColor(TIMER_AMBER, TIMER_GREEN, (pct - 50) / 50);
+    }
+    return lerpColor(TIMER_RED, TIMER_AMBER, pct / 50);
+  }
   function updateRunTimerBar(){
     const remain = Math.max(0, runEndsAt - Date.now());
     const pct = Math.max(0, Math.min(100, (remain / RUN_DURATION_MS) * 100));
     els.runTimerFill.style.height = pct + '%';
-    els.runTimerFill.classList.toggle('warn', remain <= 120000 && remain > 30000);
+    els.runTimerFill.style.background = timerColorForPct(pct);
     els.runTimerFill.classList.toggle('danger', remain <= 30000);
   }
 
@@ -1919,6 +1907,7 @@
     // entire 60-120s solve window and force-advances every 8 seconds.
     voted = false;
     votedSinceTime = null;
+    playTrack('solve');
     renderSolveUI();
     els.solveOverlay.classList.remove('hidden');
     clearInterval(solveInterval);
@@ -2047,6 +2036,7 @@
     renderRunBanner();
     showRunReadout();
     voted = false; votedSinceTime = null;
+    playTrack('run');
   }
   function showRunReadout(){
     const r = runResultToday;
@@ -2510,8 +2500,8 @@
     other.classList.add('tap-dimmed');
     setTimeout(()=>{ chosen.classList.remove('tap-chosen'); other.classList.remove('tap-dimmed'); }, 400);
   }
-  els.halfA.addEventListener('click', ()=>{ sfx.tap(); startBackgroundMusic(); tapFeedback(els.halfA, els.halfB); vote('A'); });
-  els.halfB.addEventListener('click', ()=>{ sfx.tap(); startBackgroundMusic(); tapFeedback(els.halfB, els.halfA); vote('B'); });
+  els.halfA.addEventListener('click', ()=>{ sfx.tap(); playTrack('run'); tapFeedback(els.halfA, els.halfB); vote('A'); });
+  els.halfB.addEventListener('click', ()=>{ sfx.tap(); playTrack('run'); tapFeedback(els.halfB, els.halfA); vote('B'); });
   document.addEventListener('keydown', (e)=>{
     if (e.key==='ArrowUp' || e.key==='1') vote('A');
     if (e.key==='ArrowDown' || e.key==='2') vote('B');
@@ -2714,9 +2704,11 @@
       els.introOverlay.classList.remove('hidden');
     }
   }catch(e){}
+  primeMusic('run');
   els.introDismiss.addEventListener('click', ()=>{
     els.introOverlay.classList.add('hidden');
     try{ localStorage.setItem('flipstax_seen_intro','1'); }catch(e){}
+    playTrack('run');
   });
 
   if (window.claude && typeof window.claude.use === 'function'){
