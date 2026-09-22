@@ -106,6 +106,12 @@
   }
   .half.tap-chosen{ transform:scale(1.02); }
   .half.tap-dimmed{ opacity:0.75; }
+  /* Gold halo preview on hover (mouse/trackpad players) - shows which side
+     you're about to pick before you commit. Only while the round is still
+     live; a revealed half already has its answer, so no need to highlight. */
+  .half:hover:not(.revealed){
+    box-shadow: inset 0 0 0 4px #ffd93d, inset 0 0 55px rgba(255,217,61,0.4);
+  }
   .scene{ position:absolute; inset:0; z-index:0; display:flex; align-items:center; justify-content:center; }
   .scene .glyph{ font-size:min(24vh,150px); opacity:0.5; transform:translateY(4%); }
   /* When a half has a background glyph, stack it directly above the text as
@@ -226,6 +232,7 @@
     transition: transform 0.12s ease;
   }
   .event-tile:active{ transform:scale(0.92); }
+  .event-tile:hover{ box-shadow: inset 0 0 0 4px #ffd93d, inset 0 0 40px rgba(255,217,61,0.4); }
   .pu-icon{ font-size:28px; display:block; margin-bottom:4px; }
   .pu-label{ font-size:14px; }
   @keyframes tilePulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.05); } }
@@ -326,9 +333,11 @@
   .split-halves{ flex:1; display:flex; flex-direction:column; position:relative; min-height:0; }
   .split-half{
     flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    padding:20px 28px; cursor:pointer; text-align:center; transition: transform 0.15s ease, filter 0.15s ease;
+    padding:20px 28px; cursor:pointer; text-align:center;
+    transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
   }
   .split-half:active{ transform:scale(0.98); filter:brightness(1.08); }
+  .split-half:hover{ box-shadow: inset 0 0 0 5px #ffd93d, inset 0 0 70px rgba(255,217,61,0.4); }
   .split-top{ background: linear-gradient(165deg, #f0b955, #d68a1f); }
   .split-bottom{ background: linear-gradient(195deg, #58c2c1, #268584); }
   .split-icon{ font-size:42px; margin-bottom:8px; }
