@@ -967,11 +967,28 @@
     { word:'BASKET', hints:['Weave','Picnic','Hoop'] },
     { word:'VIOLET', hints:['Purple','Flower','Shy'] },
   ];
-  const RUN_DURATION_MS = 10 * 60 * 1000;
+  // DEV/TESTING ONLY: ?debug=fast speeds up run/solve timers so a full
+  // playthrough - trivia, power-ups, solve phase - can be tested without
+  // waiting 10 minutes. Round timers and reveal pauses scale 6x (fast
+  // enough to fly through, still slow enough to reliably tap through
+  // without timing out); the overall run clock only scales 2x (10min ->
+  // 5min), leaving comfortable real-time headroom to actually reach every
+  // threshold and the solve phase instead of racing the clock. Gated on an
+  // exact query param match so normal players never see or trigger it.
+  // Remove before shipping, or leave gated (off by default) if kept for
+  // future testing.
+  const DEBUG_FAST = new URLSearchParams(location.search).get('debug') === 'fast';
+  const DEBUG_TIME_SCALE = DEBUG_FAST ? 6 : 1;
+  const DEBUG_RUN_SCALE = DEBUG_FAST ? 2 : 1;
+  // Scales the fixed reveal/transition pauses between rounds and events
+  // (which dominate real wall-clock time far more than the round timers
+  // themselves) by the same debug factor.
+  function dt(ms){ return ms / DEBUG_TIME_SCALE; }
+  const RUN_DURATION_MS = (10 * 60 * 1000) / DEBUG_RUN_SCALE;
   const RUN_WORD_LENGTH = 6;
-  const RUN_SOLVE_MS = 2 * 60 * 1000;
+  const RUN_SOLVE_MS = (2 * 60 * 1000) / DEBUG_TIME_SCALE;
   const RUN_MAX_GUESSES = 5;
-  const RUN_HINT_TIME_COST_MS = 5000;
+  const RUN_HINT_TIME_COST_MS = 5000 / DEBUG_TIME_SCALE;
   const RUN_THRESHOLDS = [50, 100, 150, 200, 250, 300]; // 6 trivia milestones now, one per letter
   const RUN_POWERUP_THRESHOLDS = [25, 75, 125, 175, 225]; // 5 total, keeping the alternating rhythm up through 300
   const RUN_POWERUPS = [
@@ -1832,7 +1849,7 @@
     const pct = Math.max(0, Math.min(100, (remain / RUN_DURATION_MS) * 100));
     els.runTimerFill.style.height = pct + '%';
     els.runTimerFill.style.background = timerColorForPct(pct);
-    els.runTimerFill.classList.toggle('danger', remain <= 30000);
+    els.runTimerFill.classList.toggle('danger', remain <= 30000 / DEBUG_RUN_SCALE);
   }
 
   let runPendingTrivia = false;
@@ -1886,7 +1903,7 @@
       els.eventTimerFill.style.width = '0%';
     });
     clearTimeout(eventTimeoutId);
-    eventTimeoutId = setTimeout(()=> resolveRunTrivia(false), 10000);
+    eventTimeoutId = setTimeout(()=> resolveRunTrivia(false), dt(10000));
   }
   function resolveRunTrivia(correct){
     clearTimeout(eventTimeoutId);
@@ -1914,7 +1931,7 @@
       // guess with the keyboard instead of ones you already know.
       if (runTriviaAttempted >= RUN_THRESHOLDS.length){ startSolvePhase(); }
       else { runPhase = 'running'; loadNext(); }
-    }, 1100);
+    }, dt(1100));
   }
 
   function runPowerUpRoundForRun(){
@@ -1940,7 +1957,7 @@
       els.eventTimerFill.style.width = '0%';
     });
     clearTimeout(eventTimeoutId);
-    eventTimeoutId = setTimeout(()=> resolveRunPowerUp(null), 5000);
+    eventTimeoutId = setTimeout(()=> resolveRunPowerUp(null), dt(5000));
   }
   function resolveRunPowerUp(key){
     clearTimeout(eventTimeoutId);
@@ -1957,7 +1974,7 @@
       finishRunPowerUp();
     } else if (key === 'slowclock'){
       sfx.powerUp();
-      runEndsAt += 30000;
+      runEndsAt += 30000 / DEBUG_RUN_SCALE;
       updateRunTimerBar();
       els.eventPrompt.textContent = '\uD83D\uDC0C +30 seconds on the clock';
       finishRunPowerUp();
@@ -1989,7 +2006,7 @@
       if (!runActive) return;
       runPhase = 'running';
       loadNext();
-    }, 1100);
+    }, dt(1100));
   }
 
   function buildSolveKeyboard(){
@@ -2388,7 +2405,7 @@
     const penalty = current.bonusPoints ? 3 : 1;
     if (runActive) addRunScore(-penalty); else addRacePoints(-penalty);
     showToast('\u23F1\uFE0F Too slow \u2014 \u2212' + penalty + ' point' + (penalty>1?'s':''));
-    scheduleNext(900);
+    scheduleNext(dt(900));
   }
 
   // Noon Rush: a per-timezone local event, not a global one - every player's
@@ -2501,7 +2518,7 @@
     votedSinceTime = null;
     let roundMs = bonusActive ? 3000 : 5000;
     if (slowMoRoundsLeft > 0){ roundMs += 3000; slowMoRoundsLeft--; }
-    startRoundTimer(roundMs);
+    startRoundTimer(roundMs / DEBUG_TIME_SCALE);
 
     if (dbReady && db){
       try{
@@ -2610,7 +2627,7 @@
     sessionFlips++;
     recordFlip(current.category, base);
 
-    scheduleNext(1650);
+    scheduleNext(dt(1650));
   }
 
   function tapFeedback(chosen, other){
