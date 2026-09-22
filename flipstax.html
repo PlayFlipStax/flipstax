@@ -315,7 +315,12 @@
     background-size:150px 300px;
   }
   .home-overlay.hidden{ display:none; }
-  .home-logo-img{ width:100%; max-width:440px; height:auto; margin-bottom:34px; filter:drop-shadow(0 8px 20px rgba(20,60,90,0.25)); }
+  .home-logo-img{
+    width:100%; max-width:440px; height:auto; margin-bottom:34px;
+    filter:drop-shadow(0 8px 20px rgba(20,60,90,0.25));
+    -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 30%, transparent 100%);
+    mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 30%, transparent 100%);
+  }
   .home-enter-btn{ padding:13px 48px; font-size:16px; box-shadow:0 6px 18px rgba(242,84,91,0.4); }
 
   /* Mode picker, built as a literal split-screen (top/bottom halves +
