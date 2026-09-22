@@ -8,13 +8,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #14181f; --panel: #191e27;
-    --a: #e8a33d; --b: #3fa7a6;
-    --ink: #f2efe9; --dim: #8b93a1;
-    --pulse: #f2545b; --divider: #262c37;
+    --bg: #1a1442; --panel: #241b5c;
+    --a: #ffb833; --b: #2dd4c4;
+    --ink: #f8f4ff; --dim: #b0a8e0;
+    --pulse: #ff5f6d; --divider: #3d2f7a;
   }
   @media (prefers-color-scheme: light){
-    :root:not([data-theme="dark"]){ --bg:#14181f; --panel:#191e27; --ink:#f2efe9; --dim:#8b93a1; }
+    :root:not([data-theme="dark"]){ --bg:#1a1442; --panel:#241b5c; --ink:#f8f4ff; --dim:#b0a8e0; }
   }
   *{box-sizing:border-box;}
   html,body{height:100%;}
@@ -117,8 +117,8 @@
   .half.has-glyph:not(.revealed) .content{ background:none; backdrop-filter:none; -webkit-backdrop-filter:none; border:none; padding:2px 20px; }
 
   .fill{ position:absolute; inset:0; width:0%; z-index:1; transition: width 0.75s cubic-bezier(.2,.8,.2,1); }
-  .half.top .fill{ background: rgba(232,163,61,0.82); }
-  .half.bottom .fill{ background: rgba(63,167,166,0.82); }
+  .half.top .fill{ background: rgba(255,184,51,0.82); }
+  .half.bottom .fill{ background: rgba(45,212,196,0.82); }
 
   .content{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; }
   .half:not(.revealed) .content{
@@ -1008,8 +1008,8 @@
     const hueA = hashStr(textA) % 360;
     const hueB = (hueA + 150 + (hashStr(textB) % 60)) % 360;
     return [
-      'linear-gradient(165deg, hsl('+hueA+',42%,15%), hsl('+hueA+',55%,26%))',
-      'linear-gradient(165deg, hsl('+hueB+',42%,15%), hsl('+hueB+',55%,26%))'
+      'linear-gradient(165deg, hsl('+hueA+',72%,34%), hsl('+hueA+',88%,48%))',
+      'linear-gradient(165deg, hsl('+hueB+',72%,34%), hsl('+hueB+',88%,48%))'
     ];
   }
   // For hand-authored scenario gradients: extracts an approximate hue from
@@ -1034,6 +1034,38 @@
   function hueDistance(h1,h2){
     const d = Math.abs(h1-h2) % 360;
     return d > 180 ? 360-d : d;
+  }
+  // The ~50 hand-authored scenario-card gradients were all written dark and
+  // muted to match the old theme. Rather than hand-editing every single hex
+  // pair, boost each one's saturation/lightness at runtime - same colors,
+  // same hue relationships (so the earlier same-hue contrast fix still
+  // applies), just punched up to match the new bright/vivid theme.
+  function boostGradient(gradientStr){
+    if (!gradientStr) return gradientStr;
+    return gradientStr.replace(/#([0-9a-fA-F]{6})/g, function(m, hex){
+      const r = parseInt(hex.substr(0,2),16)/255, g = parseInt(hex.substr(2,2),16)/255, b = parseInt(hex.substr(4,2),16)/255;
+      const max = Math.max(r,g,b), min = Math.min(r,g,b);
+      let h = 0, s = 0, l = (max+min)/2;
+      const d = max - min;
+      if (d !== 0){
+        s = d / (1 - Math.abs(2*l-1));
+        if (max === r) h = ((g-b)/d) % 6;
+        else if (max === g) h = (b-r)/d + 2;
+        else h = (r-g)/d + 4;
+        h *= 60; if (h < 0) h += 360;
+      }
+      s = Math.min(1, s * 1.55 + 0.18);
+      l = Math.min(0.6, l * 1.65 + 0.1);
+      const c = (1 - Math.abs(2*l-1)) * s;
+      const x = c * (1 - Math.abs((h/60) % 2 - 1));
+      const mm = l - c/2;
+      let r2,g2,b2;
+      if (h < 60){ r2=c; g2=x; b2=0; } else if (h < 120){ r2=x; g2=c; b2=0; }
+      else if (h < 180){ r2=0; g2=c; b2=x; } else if (h < 240){ r2=0; g2=x; b2=c; }
+      else if (h < 300){ r2=x; g2=0; b2=c; } else { r2=c; g2=0; b2=x; }
+      const toHex = v => Math.round((v+mm)*255).toString(16).padStart(2,'0');
+      return '#'+toHex(r2)+toHex(g2)+toHex(b2);
+    });
   }
 
   // ---------- sound + haptics (synthesized, no audio files needed) ----------
@@ -2434,7 +2466,7 @@
       els.avatarA.textContent = current.avatarA; els.avatarB.textContent = current.avatarB;
     } else {
       els.avatarA.style.display = 'none'; els.avatarB.style.display = 'none';
-      els.halfA.style.background = current.gradA; els.halfB.style.background = current.gradB;
+      els.halfA.style.background = boostGradient(current.gradA); els.halfB.style.background = boostGradient(current.gradB);
       // Safety net for hand-authored scenario gradients that happen to land
       // on similar hues (e.g. two different greens) - nudge side B's hue
       // if the two are too close, otherwise leave the authored colors as-is.
