@@ -294,6 +294,39 @@
   .intro-inner .logo{ font-size:32px; margin-bottom:18px; }
   .intro-lines{ color:var(--ink); font-size:15px; line-height:1.7; margin-bottom:22px; }
 
+  /* True landing screen - shown every visit, sits above every other
+     overlay (including the word-solve screen) since it's the very first
+     thing anyone sees. */
+  .home-overlay{
+    z-index:41;
+    background:
+      radial-gradient(circle at 22% 24%, rgba(90,160,255,0.5), transparent 58%),
+      radial-gradient(circle at 80% 30%, rgba(178,110,255,0.42), transparent 58%),
+      radial-gradient(circle at 55% 88%, rgba(60,220,210,0.32), transparent 55%),
+      linear-gradient(160deg, #14183a, #1c1550 45%, #0e1a30 100%);
+  }
+  .home-logo{ font-size:54px; letter-spacing:0.5px; margin-bottom:14px; text-shadow:0 0 34px rgba(232,163,61,0.4); }
+  .home-tagline{ color:var(--ink); font-size:16px; line-height:1.6; margin-bottom:30px; }
+  .home-enter-btn{ padding:12px 40px; font-size:15px; }
+
+  .mode-select-overlay{ z-index:40; }
+  .mode-select-logo{ font-size:24px; margin-bottom:20px; }
+  .mode-select-title{
+    color:var(--dim); font-size:12px; font-weight:700; letter-spacing:0.5px;
+    text-transform:uppercase; margin-bottom:18px;
+  }
+  .mode-card{
+    width:100%; max-width:320px; background:var(--panel); border:1px solid var(--divider);
+    border-radius:16px; padding:18px 20px; margin-bottom:14px; cursor:pointer; text-align:left;
+    transition: transform 0.12s ease, border-color 0.12s ease;
+  }
+  .mode-card:active{ transform:scale(0.97); border-color:var(--a); }
+  .mode-card-title{
+    font-family:'Big Shoulders Display', sans-serif; font-weight:800; font-size:18px;
+    color:var(--ink); margin-bottom:6px;
+  }
+  .mode-card-desc{ font-size:12.5px; color:var(--dim); line-height:1.5; }
+
   .solve-overlay{
     position:fixed; inset:0; z-index:32; overflow:hidden;
     background: radial-gradient(circle at 50% 30%, #3d1f7a, var(--bg) 75%);
@@ -461,16 +494,34 @@
     <div class="personality-pct" id="personalityPct"></div>
   </div>
 </div>
-<div class="intro-overlay hidden" id="introOverlay">
+<div class="intro-overlay home-overlay" id="homeOverlay">
   <div class="intro-inner">
-    <div class="logo"><span class="flip">Flip</span><span class="stax">Stax</span></div>
-    <div class="intro-lines">
-      FlipStax is a game that combines opinions, polls, trivia, and word
-      puzzles.<br><br>
-      Tap the one you'd pick. Watch for bonus rounds &mdash; they're worth
-      extra. Come back daily for something new.
+    <div class="home-logo logo"><span class="flip">Flip</span><span class="stax">Stax</span></div>
+    <div class="home-tagline">
+      Opinions. Trivia. Word puzzles.<br>All in one game.
     </div>
-    <div class="daily-btn primary" id="introDismiss">Got it</div>
+    <div class="daily-btn primary home-enter-btn" id="homeEnterBtn">Enter</div>
+  </div>
+</div>
+
+<div class="intro-overlay hidden mode-select-overlay" id="modeSelectOverlay">
+  <div class="intro-inner">
+    <div class="logo mode-select-logo"><span class="flip">Flip</span><span class="stax">Stax</span></div>
+    <div class="mode-select-title">Choose your mode</div>
+    <div class="mode-card" id="modeDailyBtn">
+      <div class="mode-card-title">🗓️ Daily FlipStax</div>
+      <div class="mode-card-desc">
+        One 10-minute run, once a day. Swipe for points, answer trivia,
+        collect letters, and solve today's hidden word before time runs out.
+      </div>
+    </div>
+    <div class="mode-card" id="modeInfinityBtn">
+      <div class="mode-card-title">♾️ Infinity Flips</div>
+      <div class="mode-card-desc">
+        Endless swiping. Vote on opinions forever, climb the tiers, and
+        chase streaks and bonus rounds - no clock, no limit.
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1074,17 +1125,22 @@
   }
   // Switches to a track, restarting it from the top only if it wasn't
   // already the one playing (so re-entering the same phase repeatedly -
-  // e.g. tapping cards - doesn't keep restarting the song).
+  // e.g. tapping cards - doesn't keep restarting the song). Calling
+  // .play() on an element that's already playing SHOULD be a harmless
+  // no-op per spec, but doing it on every single card tap was a real
+  // source of audible glitching in practice (overlapping in-flight
+  // play() promises racing a pause() from a fast mode/phase switch) -
+  // so now it's skipped entirely once the right track is already
+  // audibly playing, instead of just skipping the currentTime reset.
   function playTrack(key){
     currentTrackKey = key;
     if (!soundOn) return;
     const already = trackEls[key] && !trackEls[key].paused && !trackEls[key].muted;
     Object.keys(trackEls).forEach(k=>{ if (k !== key) try{ trackEls[k].pause(); }catch(e){} });
+    if (already) return;
     const el = getTrackEl(key);
     el.muted = false;
-    if (!already){
-      try{ el.currentTime = 0; }catch(e){}
-    }
+    try{ el.currentTime = 0; }catch(e){}
     el.play().catch(()=>{});
   }
   // Browsers block audio.play() before any user gesture on the page, but
@@ -1479,7 +1535,9 @@
     levelupOverlay: document.getElementById('levelupOverlay'), levelupLabel: document.getElementById('levelupLabel'),
     personalityOverlay: document.getElementById('personalityOverlay'), personalityLabel: document.getElementById('personalityLabel'),
     personalityBlurb: document.getElementById('personalityBlurb'), personalityPct: document.getElementById('personalityPct'),
-    introOverlay: document.getElementById('introOverlay'), introDismiss: document.getElementById('introDismiss'),
+    homeOverlay: document.getElementById('homeOverlay'), homeEnterBtn: document.getElementById('homeEnterBtn'),
+    modeSelectOverlay: document.getElementById('modeSelectOverlay'), modeDailyBtn: document.getElementById('modeDailyBtn'),
+    modeInfinityBtn: document.getElementById('modeInfinityBtn'),
     runBanner: document.getElementById('runBanner'),
     runTimerWrap: document.getElementById('runTimerWrap'), runTimerFill: document.getElementById('runTimerFill'),
     runIntroOverlay: document.getElementById('runIntroOverlay'), runIntroDismiss: document.getElementById('runIntroDismiss'),
@@ -2698,17 +2756,22 @@
   }, 2000);
   setInterval(renderStatusBanner, 30000);
 
-  // First-time onboarding - shown once ever, dismissed and never shown again.
-  try{
-    if (localStorage.getItem('flipstax_seen_intro') !== '1'){
-      els.introOverlay.classList.remove('hidden');
-    }
-  }catch(e){}
+  // Real homepage - shown every visit (not a one-time tutorial), sitting
+  // above everything else including the already-running endless game
+  // underneath. Enter -> pick a mode -> that overlay hides and either
+  // reveals the already-loaded endless board, or kicks off Daily Run.
   primeMusic('run');
-  els.introDismiss.addEventListener('click', ()=>{
-    els.introOverlay.classList.add('hidden');
-    try{ localStorage.setItem('flipstax_seen_intro','1'); }catch(e){}
+  els.homeEnterBtn.addEventListener('click', ()=>{
+    els.homeOverlay.classList.add('hidden');
+    els.modeSelectOverlay.classList.remove('hidden');
+  });
+  els.modeInfinityBtn.addEventListener('click', ()=>{
+    els.modeSelectOverlay.classList.add('hidden');
     playTrack('run');
+  });
+  els.modeDailyBtn.addEventListener('click', ()=>{
+    els.modeSelectOverlay.classList.add('hidden');
+    startDailyRun();
   });
 
   if (window.claude && typeof window.claude.use === 'function'){
