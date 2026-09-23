@@ -49,6 +49,15 @@
   .left-group{ display:flex; align-items:center; gap:8px; }
   .sound-toggle{ cursor:pointer; padding:4px 6px; opacity:0.8; font-size:16px; }
   .sound-toggle:active{ opacity:1; }
+  /* Fixed (not header-relative) so it stays reachable above every gameplay
+     overlay - trivia, puzzle, riddle - not just the base VS board, while
+     matching the sound-toggle's own bare-icon chrome style. */
+  .back-btn{
+    position:fixed; top:14px; left:14px; z-index:65;
+    cursor:pointer; padding:4px 6px; opacity:0.8; font-size:22px; font-weight:700;
+  }
+  .back-btn:active{ opacity:1; }
+  .back-btn.hidden{ display:none; }
   .badges-row{ display:none; }
   .badge-pill{ font-size:10.5px; background:var(--panel); border:1px solid var(--divider); color:var(--dim); padding:2px 8px; border-radius:20px; }
   .pill-row{ display:flex; gap:6px; margin-top:6px; }
@@ -99,6 +108,20 @@
   .slowdown-btn:active{ background:rgba(255,255,255,0.2); }
   .slowdown-btn.disabled{ opacity:0.35; pointer-events:none; }
   .slowdown-btn.hidden{ display:none; }
+  /* Same pill chrome as .slowdown-btn, stacked underneath it - VS screen only. */
+  .pause-btn{
+    position:absolute; top:44px; right:10px; z-index:6;
+    background:rgba(20,24,31,0.75); border:1px solid rgba(255,255,255,0.2); color:var(--ink);
+    font-size:12px; font-weight:700; padding:5px 10px; border-radius:20px; cursor:pointer;
+  }
+  .pause-btn:active{ background:rgba(255,255,255,0.2); }
+  .pause-btn.hidden{ display:none; }
+  .pause-overlay{
+    position:absolute; inset:0; z-index:9; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:16px; background:rgba(10,12,20,0.88);
+  }
+  .pause-overlay.hidden{ display:none; }
+  .pause-title{ font-size:22px; font-weight:800; color:#fff; letter-spacing:0.5px; }
   .run-timer-wrap{ position:absolute; top:16px; bottom:16px; left:8px; width:10px; z-index:6; }
   .run-timer-wrap.hidden{ display:none; }
   .run-timer-track{
@@ -599,6 +622,7 @@
 </head>
 <body>
 <div class="app">
+  <span class="back-btn hidden" id="backBtn">←</span>
   <header>
     <div class="top-row">
       <div class="left-group">
@@ -626,8 +650,13 @@
   <div class="board" id="board">
     <div class="round-timer"><div class="round-timer-fill" id="roundTimerFill"></div></div>
     <div class="slowdown-btn" id="slowdownBtn">⏱️ +5s</div>
+    <div class="pause-btn hidden" id="pauseBtn">⏸️ Pause</div>
     <div class="run-timer-wrap hidden" id="runTimerWrap">
       <div class="run-timer-track"><div class="run-timer-fill" id="runTimerFill"></div></div>
+    </div>
+    <div class="pause-overlay hidden" id="pauseOverlay">
+      <div class="pause-title">⏸️ Paused</div>
+      <div class="daily-btn primary" id="pauseResumeBtn">Resume</div>
     </div>
 
     <div class="half top" id="halfA">
@@ -2136,6 +2165,7 @@
   let lastPowerUpMilestone = 0;
   let roundTimeoutId = null;
   let roundDurationMs = 0, roundStartedAt = 0;
+  let isPaused = false, pausedRoundRemainingMs = null, pausedRoundPct = 0, pausedRunRemainingMs = null;
   let eventTimeoutId = null;
 
   const els = {
@@ -2154,9 +2184,11 @@
     flipCount: document.getElementById('flipCount'), tierEl: document.getElementById('tierEl'),
     streakEl: document.getElementById('streakEl'), badgesRow: document.getElementById('badgesRow'),
     raceStatus: document.getElementById('raceStatus'),
-    soundToggle: document.getElementById('soundToggle'),
+    soundToggle: document.getElementById('soundToggle'), backBtn: document.getElementById('backBtn'),
     statusBanner: document.getElementById('statusBanner'),
     roundTimerFill: document.getElementById('roundTimerFill'), slowdownBtn: document.getElementById('slowdownBtn'),
+    pauseBtn: document.getElementById('pauseBtn'), pauseOverlay: document.getElementById('pauseOverlay'),
+    pauseResumeBtn: document.getElementById('pauseResumeBtn'),
     eventOverlay: document.getElementById('eventOverlay'), eventPrompt: document.getElementById('eventPrompt'),
     eventSubtitle: document.getElementById('eventSubtitle'), powerupIcon: document.getElementById('powerupIcon'),
     eventTimerFill: document.getElementById('eventTimerFill'),
@@ -3161,6 +3193,93 @@
     scheduleNext(dt(900));
   }
 
+  // The pause button only makes sense on the base VS/comparison screen - not
+  // mid-trivia, mid-puzzle, or mid-riddle, all of which have their own timers
+  // and flows. This is the same "which overlay is actually showing" check
+  // the stalled-round watchdog already uses, since runPhase alone isn't a
+  // reliable signal in Infinity mode (see resolveEvent/resolvePowerUp, which
+  // never touch runPhase).
+  function isOnVsScreen(){
+    return els.eventOverlay.classList.contains('hidden') &&
+           els.solveOverlay.classList.contains('hidden') &&
+           els.riddleOverlay.classList.contains('hidden') &&
+           els.runIntroOverlay.classList.contains('hidden') &&
+           els.modeSelectOverlay.classList.contains('hidden');
+  }
+  function updatePauseBtnVisibility(){
+    if (isPaused){ els.pauseBtn.classList.add('hidden'); return; }
+    els.pauseBtn.classList.toggle('hidden', !isOnVsScreen());
+  }
+  function pauseGame(){
+    if (isPaused || !isOnVsScreen()) return;
+    isPaused = true;
+
+    // Freeze the round's decision countdown - same "read the current visual
+    // width, stop the timeout, pin the bar" trick addSlowdownTime() already
+    // uses to extend it, just stopping instead of extending.
+    if (roundTimeoutId){
+      const trackWidth = els.roundTimerFill.parentElement.clientWidth;
+      const currentWidthPx = parseFloat(getComputedStyle(els.roundTimerFill).width) || 0;
+      pausedRoundPct = trackWidth ? (currentWidthPx / trackWidth * 100) : 0;
+      const elapsed = Date.now() - roundStartedAt;
+      pausedRoundRemainingMs = Math.max(0, roundDurationMs - elapsed);
+      clearTimeout(roundTimeoutId); roundTimeoutId = null;
+      els.roundTimerFill.style.transition = 'none';
+      els.roundTimerFill.style.width = pausedRoundPct + '%';
+    } else {
+      pausedRoundRemainingMs = null;
+    }
+
+    // Freeze the Daily Run's overall clock too - otherwise a "paused" run
+    // could still time out in the background while the resume overlay sits
+    // on screen. Infinity mode has no run timer, so this is a no-op there.
+    if (runActive && runTimerInterval){
+      pausedRunRemainingMs = Math.max(0, runEndsAt - Date.now());
+      clearInterval(runTimerInterval); runTimerInterval = null;
+    } else {
+      pausedRunRemainingMs = null;
+    }
+
+    els.pauseBtn.classList.add('hidden');
+    els.pauseOverlay.classList.remove('hidden');
+  }
+  function resumeGame(){
+    if (!isPaused) return;
+    isPaused = false;
+
+    if (pausedRoundRemainingMs != null){
+      const remaining = pausedRoundRemainingMs;
+      roundDurationMs = remaining;
+      roundStartedAt = Date.now();
+      roundTimeoutId = setTimeout(onRoundTimeout, remaining);
+      requestAnimationFrame(()=>{
+        els.roundTimerFill.style.transition = 'width ' + (remaining/1000) + 's linear';
+        els.roundTimerFill.style.width = '0%';
+      });
+      pausedRoundRemainingMs = null;
+    }
+
+    if (pausedRunRemainingMs != null){
+      runEndsAt = Date.now() + pausedRunRemainingMs;
+      clearInterval(runTimerInterval);
+      runTimerInterval = setInterval(tickRunTimer, 500);
+      pausedRunRemainingMs = null;
+    }
+
+    els.pauseOverlay.classList.add('hidden');
+    updatePauseBtnVisibility();
+  }
+  els.pauseBtn.addEventListener('click', pauseGame);
+  els.pauseResumeBtn.addEventListener('click', resumeGame);
+  // Whenever any gameplay overlay's visibility changes - trivia/power-up
+  // opening or closing, puzzle or riddle starting or ending - re-check
+  // whether the pause button should be showing, instead of having to thread
+  // an explicit call through every one of their many show/hide call sites.
+  new MutationObserver(updatePauseBtnVisibility).observe(els.eventOverlay, { attributes:true, attributeFilter:['class'] });
+  new MutationObserver(updatePauseBtnVisibility).observe(els.solveOverlay, { attributes:true, attributeFilter:['class'] });
+  new MutationObserver(updatePauseBtnVisibility).observe(els.riddleOverlay, { attributes:true, attributeFilter:['class'] });
+  new MutationObserver(updatePauseBtnVisibility).observe(els.runIntroOverlay, { attributes:true, attributeFilter:['class'] });
+
   // Noon Rush: a per-timezone local event, not a global one - every player's
   // OWN device clock decides their own noon, same trick Daily Run uses for
   // "today". No server coordination needed.
@@ -3644,6 +3763,7 @@
   // tutorial still briefly hear it on the mode-select screen) and unmutes
   // on the first tap anywhere, same muted-autoplay pattern as before.
   primeMusic('intro');
+  updatePauseBtnVisibility();
   renderDoodleScatter(els.homeOverlay);
   renderDoodleScatter(els.halfA, {direction:'right'});
   renderDoodleScatter(els.halfB, {direction:'left'});
@@ -3671,6 +3791,8 @@
     els.modeSelectOverlay.classList.add('hidden');
     document.documentElement.classList.add('mode-infinity');
     document.documentElement.classList.remove('mode-daily');
+    els.backBtn.classList.remove('hidden');
+    updatePauseBtnVisibility();
     // Falls back to the single shared gameplay track until Infinity gets
     // its own distinct one.
     playTrack('run');
@@ -3679,10 +3801,53 @@
     els.modeSelectOverlay.classList.add('hidden');
     document.documentElement.classList.add('mode-daily');
     document.documentElement.classList.remove('mode-infinity');
+    els.backBtn.classList.remove('hidden');
     // Falls back to the single shared gameplay track until Daily gets its
     // own distinct one.
     playTrack('run');
     startDailyRun();
+    updatePauseBtnVisibility();
+  });
+  // Bails out of whatever's currently happening (VS board, trivia, puzzle,
+  // riddle) back to mode-select. Stops every live timer/interval so nothing
+  // left over keeps ticking or firing after we've navigated away, and hides
+  // every gameplay overlay so nothing is left showing underneath.
+  function returnToModeSelect(){
+    clearRoundTimer();
+    clearTimeout(eventTimeoutId); eventTimeoutId = null;
+    clearInterval(runTimerInterval); runTimerInterval = null;
+    clearInterval(solveInterval); solveInterval = null;
+    clearInterval(riddleInterval); riddleInterval = null;
+    clearInterval(bonusInterval); bonusInterval = null;
+    clearTimeout(halfwayTimeoutId); halfwayTimeoutId = null;
+    runActive = false; runPhase = 'idle';
+    voted = false; votedSinceTime = null;
+    bonusActive = false;
+    isPaused = false; pausedRoundRemainingMs = null; pausedRunRemainingMs = null;
+
+    els.eventOverlay.classList.add('hidden');
+    els.solveOverlay.classList.add('hidden');
+    els.riddleOverlay.classList.add('hidden');
+    els.runIntroOverlay.classList.add('hidden');
+    els.levelupOverlay.classList.remove('show');
+    els.personalityOverlay.classList.remove('show');
+    els.readoutOverlay.classList.remove('show');
+    els.runTimerWrap.classList.add('hidden');
+    els.pauseOverlay.classList.add('hidden');
+    els.pauseBtn.classList.add('hidden');
+
+    document.documentElement.classList.remove('mode-daily', 'mode-infinity');
+    els.backBtn.classList.add('hidden');
+    playTrack('intro');
+    els.modeSelectOverlay.classList.remove('hidden');
+  }
+  els.backBtn.addEventListener('click', ()=>{
+    // Only Daily Run's in-progress score/letters/trivia progress is ever at
+    // risk - it's only written to localStorage when a run actually ends, so
+    // backing out mid-run forfeits it. Infinity Flips (and an idle Daily
+    // screen) already have everything persisted, so no confirm needed there.
+    if (runActive && !confirm('Leave run? Progress will be lost.')) return;
+    returnToModeSelect();
   });
 
   if (window.claude && typeof window.claude.use === 'function'){
