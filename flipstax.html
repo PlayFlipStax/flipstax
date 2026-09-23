@@ -16,6 +16,19 @@
   @media (prefers-color-scheme: light){
     :root:not([data-theme="dark"]){ --bg:#1a1442; --panel:#241b5c; --ink:#f8f4ff; --dim:#b0a8e0; }
   }
+  /* Persistent per-mode visual signature, toggled on <html> when a mode is
+     chosen (see modeDailyBtn/modeInfinityBtn) - visible the whole time
+     playing, not just on hover. Falls back to transparent/none before a
+     mode is picked. */
+  :root.mode-daily{
+    --mode-accent: #e8b23d; --mode-accent-dark: #a97a1c; --mode-glow: rgba(232,178,61,0.35);
+  }
+  :root.mode-infinity{
+    --mode-accent: #3ec2c2; --mode-accent-dark: #6a3ec2; --mode-glow: rgba(106,62,194,0.35);
+  }
+  header{ border-bottom: 2px solid var(--mode-accent, transparent); }
+  .run-timer-fill{ box-shadow: 0 0 12px var(--mode-glow, transparent); }
+  .half{ border: 1px solid var(--mode-accent-dark, transparent); }
   *{box-sizing:border-box;}
   html,body{height:100%;}
   body{
@@ -410,6 +423,13 @@
   }
   .personality-blurb{ color:var(--dim); font-size:13.5px; margin-top:8px; line-height:1.4; }
   .personality-pct{ color:#b98bf0; font-size:12px; font-weight:600; margin-top:10px; }
+  .readout-type{
+    margin-top:16px; padding:14px 12px; border-radius:14px;
+    background:rgba(255,255,255,0.06); border:1px solid var(--divider);
+  }
+  .readout-type-icon{ font-size:30px; margin-bottom:4px; }
+  .readout-type-name{ font-family:'Big Shoulders Display', sans-serif; font-weight:800; font-size:19px; color:#fff; }
+  .readout-type-blurb{ color:var(--dim); font-size:12.5px; margin-top:4px; line-height:1.35; }
   .intro-overlay{
     position:fixed; inset:0; z-index:30; background:var(--bg); display:flex;
     align-items:center; justify-content:center; padding:24px; text-align:center;
@@ -676,7 +696,7 @@
       <div class="split-icon">🗓️</div>
       <div class="split-title">Daily FlipStax</div>
       <div class="split-desc">
-        One 10-minute run, once a day. Swipe for points, answer trivia,
+        One run, once a day. Swipe for points, answer trivia,
         collect letters, and solve today's hidden word before time runs out.
       </div>
     </div>
@@ -736,6 +756,11 @@
     <div class="personality-blurb" id="readoutTrivia"></div>
     <div class="personality-blurb" id="readoutWord"></div>
     <div class="personality-pct" id="readoutVibe"></div>
+    <div class="readout-type" id="readoutType">
+      <div class="readout-type-icon" id="readoutTypeIcon"></div>
+      <div class="readout-type-name" id="readoutTypeName"></div>
+      <div class="readout-type-blurb" id="readoutTypeBlurb"></div>
+    </div>
     <div class="solve-buttons" style="margin-top:14px;">
       <div class="daily-btn" id="readoutDone">Done</div>
       <div class="daily-btn primary" id="readoutShare">📋 Share</div>
@@ -762,26 +787,17 @@
   };
   const BADGE_THRESHOLD = 10;
 
-  const TIERS = [
-    { min:0,     label:'Unranked' },
-    { min:15,    label:'Certified Flipper' },
-    { min:65,    label:'No Cap Flipper' },
-    { min:165,   label:'Built Different' },
-    { min:325,   label:'Elite Flipper' },
-    { min:550,   label:'Goated' },
-    { min:850,   label:'Flip Legend' },
-    { min:1250,  label:'Certified Menace' },
-    { min:1750,  label:'Unreal' },
-    { min:2500,  label:'Flip God' },
-    { min:3500,  label:'Flip Icon' },
-    { min:5000,  label:'Flip Royalty' },
-    { min:7000,  label:'Flip Prodigy' },
-    { min:9500,  label:'Ascended Flipper' },
-    { min:12500, label:'Flip Mythic' },
-    { min:16000, label:'Flip Immortal' },
-    { min:20000, label:'GOAT Flipper' },
-    { min:25000, label:'GOAT GOD FLIPSTAX' },
+  // Infinity leveling curve: fast early levels, steep climb later for real
+  // grinding. Replaces the old hand-picked thresholds - same 18 tier names,
+  // recomputed thresholds.
+  function flipsNeededForLevel(level){ return Math.floor(50 * Math.pow(level, 1.5)); }
+  const TIER_LABELS = [
+    'Unranked', 'Certified Flipper', 'No Cap Flipper', 'Built Different', 'Elite Flipper',
+    'Goated', 'Flip Legend', 'Certified Menace', 'Unreal', 'Flip God', 'Flip Icon',
+    'Flip Royalty', 'Flip Prodigy', 'Ascended Flipper', 'Flip Mythic', 'Flip Immortal',
+    'GOAT Flipper', 'GOAT GOD FLIPSTAX',
   ];
+  const TIERS = TIER_LABELS.map((label,i)=> ({ min: i === 0 ? 0 : flipsNeededForLevel(i), label }));
 
   const WILD_GRADIENTS = [
     'linear-gradient(165deg,#1f0f3d,#5a2f8a)', 'linear-gradient(165deg,#0f2740,#3a6ea5)',
@@ -800,6 +816,48 @@
     { max:101, label:'The Zeitgeist',     blurb:'You basically ARE the crowd.' },
   ];
   function vibeTierFor(pct){ for (const t of VIBE_TIERS){ if (pct <= t.max) return t; } return VIBE_TIERS[VIBE_TIERS.length-1]; }
+
+  // Per-run personality type (16 types, one result per Daily Run) - a
+  // distinct axis from the lifetime vibe tier above: this reads THIS run's
+  // playstyle (speed, streaks, risk-taking, comeback shape), not a
+  // lifetime crowd-agreement average.
+  function determinePersonality(stats){
+    if (stats.riddleSolved) return 'riddler';
+    if (stats.triviaTotal >= 6 && stats.triviaCorrect === 6) return 'trivia_titan';
+    if (stats.triviaCorrect <= 1) return 'trivia_trainwreck';
+    if (stats.solved && stats.solveWrongGuesses === 0) return 'perfectionist';
+    if (stats.solved && stats.solveTimeRemainingPct < 10) return 'last_second_hero';
+    if (stats.wildcardCardsPicked >= 3) return 'wildcard_menace';
+    if (stats.maxCombo >= 20) return 'combo_king_queen';
+    if (stats.firstHalfScore < stats.secondHalfScore * 0.6) return 'comeback_kid';
+    if (stats.powerupCounts.points10 >= 3) return 'gambler';
+    if (stats.decisionTimePercentile <= 25) return 'speed_demon';
+    if (stats.decisionTimePercentile >= 75 || stats.powerupCounts.slowclock >= 3) return 'overthinker';
+    if (stats.avgCrowdAgreementPct < 35) return 'contrarian';
+    if (stats.avgCrowdAgreementPct > 70) return 'crowd_pleaser';
+    const totalPowerups = stats.powerupCounts.points10 + stats.powerupCounts.slowclock + stats.powerupCounts.wildcard + stats.powerupCounts.hint;
+    if (stats.triviaCorrect >= 4 && stats.maxCombo < 8 && totalPowerups <= 1) return 'silent_assassin';
+    if (stats.lowestPercentagePicks >= 3) return 'chaos_agent';
+    return 'fence_sitter';
+  }
+  const PERSONALITY_META = {
+    riddler: { name: 'The Riddler', icon: '🎭', blurb: 'Cracked the impossible.' },
+    trivia_titan: { name: 'Trivia Titan', icon: '🧠', blurb: 'Perfect trivia run.' },
+    trivia_trainwreck: { name: 'Trivia Trainwreck', icon: '💥', blurb: 'Came for the vibes, not the answers.' },
+    perfectionist: { name: 'The Perfectionist', icon: '✨', blurb: 'Zero wrong guesses.' },
+    last_second_hero: { name: 'Last Second Hero', icon: '⏱️', blurb: 'Solved with the clock nearly out.' },
+    wildcard_menace: { name: 'Wildcard Menace', icon: '🌀', blurb: 'Chaos incarnate.' },
+    combo_king_queen: { name: 'The Combo Royalty', icon: '🔥', blurb: 'Unstoppable streak.' },
+    comeback_kid: { name: 'Comeback Kid', icon: '📈', blurb: 'Slow start, big finish.' },
+    gambler: { name: 'The Gambler', icon: '🎲', blurb: 'Always chasing the big score.' },
+    speed_demon: { name: 'Speed Demon', icon: '⚡', blurb: 'Fastest fingers in the game.' },
+    overthinker: { name: 'The Overthinker', icon: '🐌', blurb: 'Took their sweet time.' },
+    contrarian: { name: 'The Contrarian', icon: '😈', blurb: 'Against the grain, on principle.' },
+    crowd_pleaser: { name: 'The Crowd Pleaser', icon: '🤝', blurb: 'Rolled with the majority.' },
+    silent_assassin: { name: 'Silent Assassin', icon: '🥷', blurb: 'Quiet, efficient, deadly accurate.' },
+    chaos_agent: { name: 'The Chaos Agent', icon: '🎪', blurb: 'Picked the underdog every time.' },
+    fence_sitter: { name: 'The Fence Sitter', icon: '🪑', blurb: 'Never quite committed.' },
+  };
 
   const TILE_COLORS = ['#c73e3e','#3e6bc7','#3ec76b','#c7a63e'];
   const POWERUPS = [
@@ -1173,13 +1231,25 @@
   // (which dominate real wall-clock time far more than the round timers
   // themselves) by the same debug factor.
   function dt(ms){ return ms / DEBUG_TIME_SCALE; }
-  const RUN_DURATION_MS = (10 * 60 * 1000) / DEBUG_RUN_SCALE;
+  // Timing restructure: 6min voting/trivia phase + 75s fixed solve phase
+  // (7:15 baseline; +45s if the riddle fires, 8:00 total). Thresholds
+  // re-tuned lower than the old 300-point ceiling so a realistically-paced
+  // (not superhuman) player actually reaches all 6 trivia and a reasonable
+  // power-up cadence inside the 6-minute window - verified with a real,
+  // non-debug playthrough rather than just the fast-forward.
+  const RUN_DURATION_MS = (6 * 60 * 1000) / DEBUG_RUN_SCALE;
   const RUN_WORD_LENGTH = 6;
-  const RUN_SOLVE_MS = (2 * 60 * 1000) / DEBUG_TIME_SCALE;
+  const RUN_SOLVE_MS = (75 * 1000) / DEBUG_TIME_SCALE;
   const RUN_MAX_GUESSES = 5;
   const RUN_HINT_TIME_COST_MS = 5000 / DEBUG_TIME_SCALE;
-  const RUN_THRESHOLDS = [50, 100, 150, 200, 250, 300]; // 6 trivia milestones now, one per letter
-  const RUN_POWERUP_THRESHOLDS = [25, 75, 125, 175, 225]; // 5 total, keeping the alternating rhythm up through 300
+  // Re-tuned a second time after a real (non-debug) playthrough showed an
+  // attentive, immediately-responding player only reaches ~130 net points
+  // in 6 minutes (vote cadence is capped by the ~1.65s reveal pause between
+  // rounds, and trivia misses/wildcard losses can claw back real progress)
+  // - the first pass (max 220) was still too high. These leave real margin
+  // under that observed ceiling.
+  const RUN_THRESHOLDS = [15, 35, 55, 75, 95, 115]; // 6 trivia milestones, one per letter
+  const RUN_POWERUP_THRESHOLDS = [8, 25, 45, 65, 85]; // 5 total, interleaved between trivia milestones
   const RUN_POWERUPS = [
     { key:'points10',  icon:'\u26A1', label:'+10 pts', color:'#c7a63e' },
     { key:'slowclock', icon:'\uD83D\uDC0C', label:'+30s',    color:'#3e6bc7' },
@@ -1197,8 +1267,8 @@
   const RIDDLES = [
     { q:'The more you take, the more you leave behind. What am I?', a:'FOOTSTEPS' },
     { q:'I have keys but no locks, space but no room, and you can enter but can’t go outside. What am I?', a:'KEYBOARD' },
-    { q:'What has a face and two hands but no arms or legs?', a:'CLOCK' },
-    { q:'What gets wetter the more it dries?', a:'TOWEL' },
+    { q:'What has a heart that doesn’t beat?', a:'ARTICHOKE' },
+    { q:'The more you feed me, the bigger I grow — but give me water and I die. What am I?', a:'FIRE' },
     { q:'I’m tall when I’m young and short when I’m old. What am I?', a:'CANDLE' },
   ];
   // Daily Run trivia: 5 core subjects (always one each) + 1 rotating elective
@@ -1386,6 +1456,7 @@
   // <audio> elements with native looping - simpler and better-sounding
   // than synthesizing notes, now that we have real tracks to work with.
   const TRACK_SRC = {
+    intro: 'audio/grand-flipstax-party.mp3',
     run:   'audio/bonus-stage-anthem.mp3',
     solve: 'audio/final-buzzer.mp3',
   };
@@ -1987,6 +2058,8 @@
     readoutOverlay: document.getElementById('readoutOverlay'), readoutScore: document.getElementById('readoutScore'),
     readoutTrivia: document.getElementById('readoutTrivia'), readoutWord: document.getElementById('readoutWord'),
     readoutVibe: document.getElementById('readoutVibe'), readoutDone: document.getElementById('readoutDone'),
+    readoutType: document.getElementById('readoutType'), readoutTypeIcon: document.getElementById('readoutTypeIcon'),
+    readoutTypeName: document.getElementById('readoutTypeName'), readoutTypeBlurb: document.getElementById('readoutTypeBlurb'),
     readoutShare: document.getElementById('readoutShare'),
     vibeWrap: document.getElementById('vibeWrap'), vibeDot: document.getElementById('vibeDot'),
     vibeLabel: document.getElementById('vibeLabel'),
@@ -2095,7 +2168,8 @@
     renderRaceStatus();
   }
 
-  // ---------- Daily Run: a 10 minute bounded ritual - swipe for points,
+  // ---------- Daily Run: a bounded ritual (6min voting/trivia + 75s solve,
+  // 7:15 baseline, 8:00 if the riddle fires) - swipe for points,
   // hit thresholds to unlock trivia, answer correctly to collect a letter of
   // today's word, then solve it Wordle-style. One per day. ----------
   function getTodayWord(){
@@ -2131,19 +2205,51 @@
   // secret, not something to trigger repeatedly).
   let runPowerupPickOrder = [], runTriviaStreak = 0, riddleTriggeredThisRun = false;
   let riddleEndsAt = 0, riddleInterval = null, currentRiddle = null;
+  // Personality-system tracking (see determinePersonality) - all reset at
+  // startDailyRun, all read once at endRun.
+  let runRiddleSolved = false, runMaxCombo = 0, runWildcardCategoryVotes = 0;
+  let runSolveWrongGuesses = 0, runLowestPctPicks = 0;
+  let runVotesDecided = 0, runVotesAgreed = 0, runDecisionMsTotal = 0, runDecisionCount = 0;
+  let runScoreAtHalfway = null, halfwayTimeoutId = null;
+
+  // Day streak for completing a Daily Run specifically - a narrower, separate
+  // metric from the general "played at all" streak already shown in the
+  // header (stats.streak/els.streakEl). Reading (peekDailyStreak) never
+  // mutates state; updateDailyStreak both updates and returns the count,
+  // and is only ever called once, from endRun.
+  let dailyRunStreak = 0;
+  function peekDailyStreak(){
+    try{ const d = JSON.parse(localStorage.getItem('flipstax_streak') || '{}'); return d.streak || 0; }
+    catch(e){ return 0; }
+  }
+  function updateDailyStreak(){
+    const today = todayStr();
+    let streak = 0, lastDay = null;
+    try{
+      const d = JSON.parse(localStorage.getItem('flipstax_streak') || '{}');
+      streak = d.streak || 0; lastDay = d.lastDay || null;
+    }catch(e){}
+    if (lastDay === today) return streak;
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+    streak = (lastDay === yesterday) ? streak + 1 : 1;
+    try{ localStorage.setItem('flipstax_streak', JSON.stringify({ streak, lastDay: today })); }catch(e){}
+    return streak;
+  }
+  dailyRunStreak = peekDailyStreak();
 
   function renderRunBanner(){
+    const streakTag = dailyRunStreak > 0 ? (' \uD83D\uDD25' + dailyRunStreak) : '';
     if (runResultToday){
       const r = runResultToday;
       els.runBanner.innerHTML = '\u2705 Today\u2019s Run: ' + r.score + ' pts \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal +
-        ' trivia \u00B7 ' + (r.solved ? formatRaceTime(r.solveMs) : 'not solved') +
+        ' trivia \u00B7 ' + (r.solved ? formatRaceTime(r.solveMs) : 'not solved') + streakTag +
         ' &nbsp;<span class="run-link" id="runShareLink">Share</span>';
       const link = document.getElementById('runShareLink');
       if (link) link.addEventListener('click', shareRunResult);
     } else if (runActive){
-      els.runBanner.innerHTML = '\uD83C\uDFAE Daily Run \u00B7 ' + runScore + ' pts \u00B7 ' + runLetters.length + '/' + RUN_WORD_LENGTH + ' letters';
+      els.runBanner.innerHTML = '\uD83C\uDFAE Daily Run \u00B7 ' + runScore + ' pts \u00B7 ' + runLetters.length + '/' + RUN_WORD_LENGTH + ' letters' + streakTag;
     } else {
-      els.runBanner.innerHTML = '\uD83C\uDFAE Daily Run &nbsp;<span class="run-link" id="runPlayLink">Play</span>';
+      els.runBanner.innerHTML = '\uD83C\uDFAE Daily Run' + streakTag + ' &nbsp;<span class="run-link" id="runPlayLink">Play</span>';
       const link = document.getElementById('runPlayLink');
       if (link) link.addEventListener('click', startDailyRun);
     }
@@ -2175,12 +2281,20 @@
     runTriviaShown = 0;
     runHintsRevealed = 0;
     runPowerupPickOrder = []; runTriviaStreak = 0; riddleTriggeredThisRun = false;
+    runRiddleSolved = false; runMaxCombo = 0; runWildcardCategoryVotes = 0;
+    runSolveWrongGuesses = 0; runLowestPctPicks = 0;
+    runVotesDecided = 0; runVotesAgreed = 0; runDecisionMsTotal = 0; runDecisionCount = 0;
+    runScoreAtHalfway = null;
     runWord = getTodayWord();
     runEndsAt = Date.now() + RUN_DURATION_MS;
     els.runTimerWrap.classList.remove('hidden');
     updateRunTimerBar();
     clearInterval(runTimerInterval);
     runTimerInterval = setInterval(tickRunTimer, 500);
+    // Captures the score at the run's halfway point for the comeback_kid
+    // personality check (first-half vs second-half scoring pace).
+    clearTimeout(halfwayTimeoutId);
+    halfwayTimeoutId = setTimeout(()=>{ if (runActive) runScoreAtHalfway = runScore; }, RUN_DURATION_MS / 2);
     renderRunBanner();
     showToast('\uD83C\uDFAE Daily Run started \u2014 swipe for points!');
     if (unsubscribe){ unsubscribe(); unsubscribe = null; }
@@ -2463,6 +2577,7 @@
     els.riddleInput.blur();
     if (win){
       sfx.correct();
+      runRiddleSolved = true;
       addRunScore(RIDDLE_BONUS_POINTS);
       if (!stats.badges.riddler){ stats.badges.riddler = true; saveStats(); }
       els.riddleResult.textContent = '🧩 Solved! +' + RIDDLE_BONUS_POINTS + ' points — ' + RIDDLE_BADGE + ' unlocked';
@@ -2612,6 +2727,7 @@
       endRun(true);
       return;
     }
+    runSolveWrongGuesses++;
     if (solveGuesses.length >= RUN_MAX_GUESSES){
       clearInterval(solveInterval);
       endRun(false);
@@ -2633,16 +2749,38 @@
     runActive = false;
     clearInterval(runTimerInterval);
     clearInterval(solveInterval);
+    clearTimeout(halfwayTimeoutId);
     els.runTimerWrap.classList.add('hidden');
     els.solveOverlay.classList.add('hidden');
     els.eventOverlay.classList.add('hidden');
     const solveMs = solved ? (RUN_SOLVE_MS - Math.max(0, solveEndsAt - Date.now())) : null;
+    const powerupCounts = { points10:0, slowclock:0, wildcard:0, hint:0 };
+    runPowerupPickOrder.forEach(k=>{ if (powerupCounts[k] != null) powerupCounts[k]++; });
+    const firstHalfScore = runScoreAtHalfway != null ? runScoreAtHalfway : runScore;
+    const avgDecisionMs = runDecisionCount > 0 ? runDecisionMsTotal / runDecisionCount : 0;
+    const personalityStats = {
+      riddleSolved: runRiddleSolved,
+      triviaCorrect: runTriviaCorrect, triviaTotal: runTriviaAttempted,
+      solveWrongGuesses: runSolveWrongGuesses, solved: !!solved,
+      solveTimeRemainingPct: solved ? Math.max(0, Math.min(100, (RUN_SOLVE_MS - solveMs) / RUN_SOLVE_MS * 100)) : 0,
+      wildcardCardsPicked: runWildcardCategoryVotes, maxCombo: runMaxCombo,
+      firstHalfScore: firstHalfScore, secondHalfScore: runScore - firstHalfScore,
+      powerupCounts: powerupCounts,
+      // Normalized against the base 5s decision window - not a true
+      // population percentile, but a self-consistent "how much of the
+      // available window did they use" speed metric.
+      decisionTimePercentile: Math.max(0, Math.min(100, Math.round(avgDecisionMs / 5000 * 100))),
+      avgCrowdAgreementPct: runVotesDecided > 0 ? Math.round(runVotesAgreed / runVotesDecided * 100) : 50,
+      lowestPercentagePicks: runLowestPctPicks,
+    };
+    const personalityType = determinePersonality(personalityStats);
     runResultToday = {
       date: todayStr(), score: runScore, triviaCorrect: runTriviaCorrect,
       triviaTotal: runTriviaAttempted, solved: !!solved, solveMs: solveMs,
-      word: runWord ? runWord.word : null,
+      word: runWord ? runWord.word : null, personalityType: personalityType,
     };
     saveRunResultToday(runResultToday);
+    dailyRunStreak = updateDailyStreak();
     renderRunBanner();
     showRunReadout();
     voted = false; votedSinceTime = null;
@@ -2655,6 +2793,10 @@
     els.readoutTrivia.textContent = r.triviaCorrect + '/' + r.triviaTotal + ' trivia correct';
     els.readoutWord.textContent = r.solved ? ('\u2705 Solved in ' + formatRaceTime(r.solveMs)) : ('\u274C Word not solved (' + (r.word||'') + ')');
     els.readoutVibe.textContent = 'Today you were ' + vibeTierFor(pct).label;
+    const meta = PERSONALITY_META[r.personalityType] || PERSONALITY_META.fence_sitter;
+    els.readoutTypeIcon.textContent = meta.icon;
+    els.readoutTypeName.textContent = meta.name;
+    els.readoutTypeBlurb.textContent = meta.blurb;
     els.readoutOverlay.classList.add('show');
     sfx.personality();
   }
@@ -3065,6 +3207,11 @@
     if (voted || !current) return;
     voted = true;
     votedSinceTime = Date.now();
+    if (runActive){
+      runDecisionMsTotal += votedSinceTime - roundStartedAt;
+      runDecisionCount++;
+      if (current.category === 'wild') runWildcardCategoryVotes++;
+    }
     clearRoundTimer();
     renderSlowdownBtn();
     const points = current.bonusPoints ? 3 : 1;
@@ -3102,8 +3249,14 @@
     stats.decided++;
     if (won) stats.agree++;
     if (stats.decided === 5) showToast('\uD83C\uDFAD Vibe meter unlocked \u2014 see where you land');
+    if (runActive){
+      runVotesDecided++;
+      if (won) runVotesAgreed++;
+      if (myPct <= 30) runLowestPctPicks++;
+    }
 
     comboCount++;
+    if (runActive) runMaxCombo = Math.max(runMaxCombo, comboCount);
     let base = 1;
     if (comboCount % 3 === 0){ base = 2; sfx.combo(); showToast('\uD83D\uDD25 Combo x' + comboCount + '! +2 flipz'); }
 
@@ -3357,17 +3510,30 @@
   // above everything else including the already-running endless game
   // underneath. Enter -> pick a mode -> that overlay hides and either
   // reveals the already-loaded endless board, or kicks off Daily Run.
-  primeMusic('run');
+  // Intro track primes silently on load (not gated on any overlay showing,
+  // so returning players who've already seen the one-time Daily Run
+  // tutorial still briefly hear it on the mode-select screen) and unmutes
+  // on the first tap anywhere, same muted-autoplay pattern as before.
+  primeMusic('intro');
   els.homeEnterBtn.addEventListener('click', ()=>{
     els.homeOverlay.classList.add('hidden');
     els.modeSelectOverlay.classList.remove('hidden');
   });
   els.modeInfinityBtn.addEventListener('click', ()=>{
     els.modeSelectOverlay.classList.add('hidden');
+    document.documentElement.classList.add('mode-infinity');
+    document.documentElement.classList.remove('mode-daily');
+    // Falls back to the single shared gameplay track until Infinity gets
+    // its own distinct one.
     playTrack('run');
   });
   els.modeDailyBtn.addEventListener('click', ()=>{
     els.modeSelectOverlay.classList.add('hidden');
+    document.documentElement.classList.add('mode-daily');
+    document.documentElement.classList.remove('mode-infinity');
+    // Falls back to the single shared gameplay track until Daily gets its
+    // own distinct one.
+    playTrack('run');
     startDailyRun();
   });
 
