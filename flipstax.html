@@ -2153,7 +2153,7 @@
   const CURATED = MATCH.concat(SCENES);
   let masterPool = CURATED.slice();
   let deck = [], idx = 0, current = null, voted = false, votedSinceTime = null;
-  let db = null, dbReady = false, unsubscribe = null;
+  let tallyPollInterval = null;
   let sampleFn = null, sampleReady = false, aiRequested = false;
 
   let stats = loadStats();
@@ -2457,7 +2457,7 @@
     halfwayTimeoutId = setTimeout(()=>{ if (runActive) runScoreAtHalfway = runScore; }, RUN_DURATION_MS / 2);
     renderRunBanner();
     showToast('\uD83C\uDFAE Daily Run started \u2014 swipe for points!');
-    if (unsubscribe){ unsubscribe(); unsubscribe = null; }
+    stopTallyPolling();
     lastWasEvent = true;
     loadNext();
   }
@@ -2522,7 +2522,7 @@
   function runTriviaQuestion(){
     if (!runActive) return;
     runPhase = 'trivia';
-    if (unsubscribe){ unsubscribe(); unsubscribe = null; }
+    stopTallyPolling();
     clearRoundTimer();
     const subject = runSubjectSequence[runTriviaShown] || pick(RUN_CORE_SUBJECTS);
     runTriviaShown++;
@@ -2607,7 +2607,7 @@
 
   function runPowerUpRoundForRun(){
     runPhase = 'powerup';
-    if (unsubscribe){ unsubscribe(); unsubscribe = null; }
+    stopTallyPolling();
     clearRoundTimer();
     els.eventOverlay.classList.remove('hidden');
     els.eventOverlay.classList.add('powerup');
@@ -2690,7 +2690,7 @@
   // multiple choice, and a real reward (badge + points) on solve.
   function startRiddleRound(){
     runPhase = 'riddle';
-    if (unsubscribe){ unsubscribe(); unsubscribe = null; }
+    stopTallyPolling();
     clearRoundTimer();
     currentRiddle = pick(RIDDLES);
     els.riddleQ.textContent = currentRiddle.q;
@@ -3327,7 +3327,7 @@
     }
   }
   function loadNextImpl(){
-    if (unsubscribe){ unsubscribe(); unsubscribe = null; }
+    stopTallyPolling();
     clearRoundTimer();
 
     if (runActive){
@@ -3392,17 +3392,54 @@
     let roundMs = bonusActive ? 3000 : 5000;
     if (slowMoRoundsLeft > 0){ roundMs += 3000; slowMoRoundsLeft--; }
     startRoundTimer(roundMs / DEBUG_TIME_SCALE);
-
-    if (dbReady && db){
-      try{
-        const ref = db.doc('votes/' + current.id);
-        unsubscribe = ref.onSnapshot((snap)=>{ if (voted) reveal(snap.exists ? snap.data() : {a:0,b:0}); }, ()=>{});
-      }catch(e){}
-    }
     maybeRequestMoreWild();
   }
 
-  function reveal(counts){
+  // Stable per-item key for the shared vote counters - e.g. "Kendrick Lamar"
+  // and "kendrick lamar" (or the same name shown in a totally different
+  // matchup elsewhere in the deck) must all resolve to the same slug so
+  // votes for that entity accumulate globally rather than fragmenting.
+  function slugify(text){
+    return String(text).toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'item';
+  }
+  // Real shared vote counts, backed by /api/vote and /api/tallies (Upstash
+  // Redis under the hood) - the client's own tally is never authoritative,
+  // it just optimistically shows something instant while the network call
+  // is in flight and reconciles once the real count comes back.
+  async function castVote(itemId){
+    try{
+      const res = await fetch('/api/vote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ itemId }),
+      });
+      if (!res.ok) console.warn('Vote not recorded server-side:', res.status);
+    }catch(err){ console.warn('Vote request failed:', err); }
+  }
+  async function fetchTallies(itemIds){
+    try{
+      const params = new URLSearchParams({ ids: itemIds.join(',') });
+      const res = await fetch('/api/tallies?' + params);
+      if (!res.ok) return null;
+      return await res.json(); // { counts, percentages, total }
+    }catch(err){ console.warn('Tally fetch failed:', err); return null; }
+  }
+  // Keeps the just-revealed result ticking as other players vote on the same
+  // pairing, instead of freezing the instant you tap. Always stopped before
+  // the next round loads (or the screen changes) - see stopTallyPolling().
+  function startTallyPolling(itemIds, onUpdate){
+    stopTallyPolling();
+    const poll = async ()=>{
+      const data = await fetchTallies(itemIds);
+      if (data) onUpdate(data);
+    };
+    tallyPollInterval = setInterval(poll, 7000);
+  }
+  function stopTallyPolling(){
+    if (tallyPollInterval){ clearInterval(tallyPollInterval); tallyPollInterval = null; }
+  }
+
+  function reveal(counts, isLiveUpdate){
     const a = (counts && counts.a) || 0;
     const b = (counts && counts.b) || 0;
     const total = a + b;
@@ -3412,9 +3449,14 @@
     els.halfA.classList.add('revealed'); els.halfB.classList.add('revealed');
     els.fillA.style.width = pctA + '%'; els.fillB.style.width = pctB + '%';
     animateCount(els.pctA, pctA); animateCount(els.pctB, pctB);
-    els.board.classList.remove('flash');
-    void els.board.offsetWidth;
-    els.board.classList.add('flash');
+    // Skip the reveal flash/sound-adjacent pulse on live poll updates - it's
+    // a one-time "results are in" beat, not something that should re-fire
+    // every few seconds while the player is just looking at the board.
+    if (!isLiveUpdate){
+      els.board.classList.remove('flash');
+      void els.board.offsetWidth;
+      els.board.classList.add('flash');
+    }
     if (total > 0){
       els.votesA.textContent = a.toLocaleString() + (a===1?' person':' people');
       els.votesB.textContent = b.toLocaleString() + (b===1?' person':' people');
@@ -3467,22 +3509,19 @@
     els.roundTimerFill.style.transition = 'none';
     els.roundTimerFill.style.width = '0%';
 
-    let counts = {a:0,b:0};
-    if (dbReady && db){
-      try{
-        const ref = db.doc('votes/' + current.id);
-        const snap = await withTimeout(ref.get(), 2500);
-        if (snap){
-          counts = snap.exists ? Object.assign({a:0,b:0}, snap.data()) : {a:0,b:0};
-          counts[side==='A'?'a':'b'] = (counts[side==='A'?'a':'b'] || 0) + 1;
-          await withTimeout(ref.set(counts), 2500);
-        } else {
-          counts = {a:0,b:0}; // read timed out - fall back to the local percentage
-        }
-      }catch(e){ counts = {a:0,b:0}; }
-    }
+    const slugA = slugify(current.a), slugB = slugify(current.b);
+    await castVote(side === 'A' ? slugA : slugB);
+    const tallyData = await fetchTallies([slugA, slugB]);
+    let counts = tallyData
+      ? { a: tallyData.counts[slugA] || 0, b: tallyData.counts[slugB] || 0 }
+      : { a: 0, b: 0 }; // request failed - reveal() falls back to its own local estimate
 
     const { pctA, pctB } = reveal(counts);
+    // Keep the result ticking live while it's on screen, in case other
+    // players vote on this same pairing in the meantime.
+    startTallyPolling([slugA, slugB], (data)=>{
+      reveal({ a: data.counts[slugA] || 0, b: data.counts[slugB] || 0 }, true);
+    });
     const won = side==='A' ? pctA>=pctB : pctB>=pctA;
     if (won) sfx.revealWin(); else sfx.revealLose();
     els.tagA.textContent = side==='A' ? 'Your pick' : '';
@@ -3813,6 +3852,7 @@
   // left over keeps ticking or firing after we've navigated away, and hides
   // every gameplay overlay so nothing is left showing underneath.
   function returnToModeSelect(){
+    stopTallyPolling();
     clearRoundTimer();
     clearTimeout(eventTimeoutId); eventTimeoutId = null;
     clearInterval(runTimerInterval); runTimerInterval = null;
@@ -3851,7 +3891,6 @@
   });
 
   if (window.claude && typeof window.claude.use === 'function'){
-    window.claude.use('db').then((ns)=>{ if (ns){ db = ns; dbReady = true; } }).catch(()=>{});
     window.claude.use('sample').then((ns)=>{ if (ns){ sampleFn = ns; sampleReady = true; } }).catch(()=>{});
   }
 })();

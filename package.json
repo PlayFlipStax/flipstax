@@ -1,0 +1,10 @@
+{
+  "name": "flipstax",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "FlipStax - Flip, Vote, Jumble & Solve. Static game (flipstax.html) plus Vercel serverless API routes for shared vote counts.",
+  "dependencies": {
+    "@upstash/redis": "^1.39.0"
+  }
+}
