@@ -449,9 +449,13 @@
     align-items:center; justify-content:center; padding:24px; text-align:center;
     /* Flat two-tone wash sampled directly from the logo art's own sky-blue
        backdrop (lighter near its top edge, slightly deeper near its
-       bottom edge) - no separate tiled pattern to mismatch against, so
-       the unresized logo on top has no seam to hide. */
-    background:linear-gradient(180deg,#a4e0fd 0%,#82c9f8 100%);
+       bottom edge), with a subtle drawn doodle pattern tiled on top for a
+       wallpaper feel. The doodle SVG is a procedural line-art tile (not a
+       photo crop), so it repeats seamlessly with no mismatch risk against
+       the unresized logo sitting on top of it. */
+    background-image: url('images/doodle-pattern.svg'), linear-gradient(180deg,#a4e0fd 0%,#82c9f8 100%);
+    background-size: 220px 220px, cover;
+    background-repeat: repeat, no-repeat;
   }
   .home-overlay.hidden{ display:none; }
   .home-logo-img{
@@ -1312,10 +1316,21 @@
   function pairGradients(textA, textB){
     const hueA = hashStr(textA) % 360;
     const hueB = (hueA + 150 + (hashStr(textB) % 60)) % 360;
+    // Saturation/lightness capped well below neon range - still clearly
+    // colorful and distinct per-hue, but no longer eye-piercing at full
+    // screen brightness.
     return [
-      'linear-gradient(165deg, hsl('+hueA+',72%,34%), hsl('+hueA+',88%,48%))',
-      'linear-gradient(165deg, hsl('+hueB+',72%,34%), hsl('+hueB+',88%,48%))'
+      'linear-gradient(165deg, hsl('+hueA+',56%,32%), hsl('+hueA+',64%,46%))',
+      'linear-gradient(165deg, hsl('+hueB+',56%,32%), hsl('+hueB+',64%,46%))'
     ];
+  }
+  // Wraps a background gradient with the shared doodle-pattern texture tile
+  // (dice/star/question-mark line art, low opacity) so cards get the same
+  // "wallpaper" feel as the home screen instead of a flat color fill.
+  function textureLayers(el, gradient){
+    el.style.backgroundImage = "url('images/doodle-pattern.svg'), " + gradient;
+    el.style.backgroundSize = '220px 220px, cover';
+    el.style.backgroundRepeat = 'repeat, no-repeat';
   }
   // For hand-authored scenario gradients: extracts an approximate hue from
   // the first hex color in a gradient string, so we can detect (and correct)
@@ -1344,7 +1359,8 @@
   // muted to match the old theme. Rather than hand-editing every single hex
   // pair, boost each one's saturation/lightness at runtime - same colors,
   // same hue relationships (so the earlier same-hue contrast fix still
-  // applies), just punched up to match the new bright/vivid theme.
+  // applies), just punched up to be colorful without hitting neon-bright
+  // saturation/lightness caps.
   function boostGradient(gradientStr){
     if (!gradientStr) return gradientStr;
     return gradientStr.replace(/#([0-9a-fA-F]{6})/g, function(m, hex){
@@ -1359,8 +1375,8 @@
         else h = (r-g)/d + 4;
         h *= 60; if (h < 0) h += 360;
       }
-      s = Math.min(1, s * 1.55 + 0.18);
-      l = Math.min(0.6, l * 1.65 + 0.1);
+      s = Math.min(0.78, s * 1.2 + 0.12);
+      l = Math.min(0.5, l * 1.35 + 0.08);
       const c = (1 - Math.abs(2*l-1)) * s;
       const x = c * (1 - Math.abs((h/60) % 2 - 1));
       const mm = l - c/2;
@@ -3114,15 +3130,16 @@
 
     if (current.mode === 'match'){
       const grads = pairGradients(current.a, current.b);
-      els.halfA.style.background = grads[0];
-      els.halfB.style.background = grads[1];
+      textureLayers(els.halfA, grads[0]);
+      textureLayers(els.halfB, grads[1]);
       els.halfB.style.filter = '';
       setScene(els.sceneA, null); setScene(els.sceneB, null);
       els.avatarA.style.display = 'flex'; els.avatarB.style.display = 'flex';
       els.avatarA.textContent = current.avatarA; els.avatarB.textContent = current.avatarB;
     } else {
       els.avatarA.style.display = 'none'; els.avatarB.style.display = 'none';
-      els.halfA.style.background = boostGradient(current.gradA); els.halfB.style.background = boostGradient(current.gradB);
+      textureLayers(els.halfA, boostGradient(current.gradA));
+      textureLayers(els.halfB, boostGradient(current.gradB));
       // Safety net for hand-authored scenario gradients that happen to land
       // on similar hues (e.g. two different greens) - nudge side B's hue
       // if the two are too close, otherwise leave the authored colors as-is.

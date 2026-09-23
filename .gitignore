@@ -144,3 +144,4 @@ vite.config.ts.timestamp-*
 
 # Local dev/testing screen recordings (not part of the shipped game)
 recordings/
+screenshots/
