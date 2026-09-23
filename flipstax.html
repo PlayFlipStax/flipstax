@@ -447,14 +447,16 @@
   .home-overlay{
     position:fixed; inset:0; z-index:41; display:flex; flex-direction:column;
     align-items:center; justify-content:center; padding:24px; text-align:center;
-    /* User-supplied doodle wallpaper tile (dice/star/question-mark/VS art on
-       a sky-blue wash already matching the logo's own backdrop color) -
-       tiled directly as the background, logo sits on top of it. */
-    background-image: url('images/doodle-pattern-tile.jpg');
-    background-size: 480px auto;
-    background-repeat: repeat;
+    overflow:hidden;
+    /* Flat two-tone wash matching the logo art's own sky-blue backdrop. The
+       doodle icons are scattered in individually as DOM elements (see
+       renderDoodleScatter) rather than a repeating raster tile, so there's
+       no seam or "stamped rectangle" pattern - just one continuous field. */
+    background:linear-gradient(180deg,#a4e0fd 0%,#82c9f8 100%);
   }
   .home-overlay.hidden{ display:none; }
+  .doodle-scatter{ position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
+  .doodle-scatter svg{ position:absolute; opacity:0.16; }
   .home-logo-img{
     width:100%; max-width:440px; height:auto; margin-bottom:34px;
   }
@@ -1321,16 +1323,46 @@
       'linear-gradient(165deg, hsl('+hueB+',56%,32%), hsl('+hueB+',64%,46%))'
     ];
   }
-  // Wraps a background gradient with the same doodle-pattern tile used on the
-  // home screen, so cards get the same "wallpaper" feel instead of a flat
-  // color fill. The tile is soft-light blended onto the gradient rather than
-  // laid on top at fixed opacity, so it always picks up each card's own hue
-  // instead of staying a fixed blue.
-  function textureLayers(el, gradient){
-    el.style.backgroundImage = "url('images/doodle-pattern-tile.jpg'), " + gradient;
-    el.style.backgroundSize = '480px auto, cover';
-    el.style.backgroundRepeat = 'repeat, no-repeat';
-    el.style.backgroundBlendMode = 'soft-light, normal';
+  // Small line-art icon set (dice/star/question-mark/VS) drawn as inline
+  // SVG so they can be scattered individually - see renderDoodleScatter.
+  const DOODLE_ICON_SVGS = [
+    '<svg viewBox="0 0 40 40" width="100%" height="100%"><path d="M20 3 L25 15 L38 16 L28 25 L31 37 L20 30 L9 37 L12 25 L2 16 L15 15 Z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/></svg>',
+    '<svg viewBox="0 0 40 40" width="100%" height="100%"><rect x="6" y="6" width="28" height="28" rx="6" fill="none" stroke="#fff" stroke-width="2.2"/><circle cx="15" cy="15" r="2.3" fill="#fff"/><circle cx="25" cy="15" r="2.3" fill="#fff"/><circle cx="20" cy="20" r="2.3" fill="#fff"/><circle cx="15" cy="25" r="2.3" fill="#fff"/><circle cx="25" cy="25" r="2.3" fill="#fff"/></svg>',
+    '<svg viewBox="0 0 40 40" width="100%" height="100%"><text x="20" y="30" font-family="Arial,sans-serif" font-size="30" font-weight="900" text-anchor="middle" fill="none" stroke="#fff" stroke-width="1.6">?</text></svg>',
+    '<svg viewBox="0 0 40 40" width="100%" height="100%"><text x="20" y="27" font-family="Arial,sans-serif" font-size="16" font-weight="900" text-anchor="middle" fill="none" stroke="#fff" stroke-width="1.4">VS</text></svg>'
+  ];
+  // Scatters the doodle icons individually across a container at
+  // randomized (jittered-grid) positions/sizes/rotations, instead of
+  // tiling one raster image - so there's no repeat boundary or "stamped
+  // rectangle" look, just one continuous field of icons. Regenerated on
+  // resize since it's laid out in real pixels against the container's
+  // current size.
+  function renderDoodleScatter(container){
+    let layer = container.querySelector(':scope > .doodle-scatter');
+    if (!layer){
+      layer = document.createElement('div');
+      layer.className = 'doodle-scatter';
+      container.insertBefore(layer, container.firstChild);
+    }
+    layer.innerHTML = '';
+    const w = container.clientWidth || 400, h = container.clientHeight || 400;
+    const cell = 92;
+    const cols = Math.ceil(w / cell) + 1, rows = Math.ceil(h / cell) + 1;
+    for (let r = 0; r < rows; r++){
+      for (let c = 0; c < cols; c++){
+        const x = c*cell + (Math.random()-0.5)*cell*0.7;
+        const y = r*cell + (Math.random()-0.5)*cell*0.7;
+        const size = 22 + Math.random()*16;
+        const rot = Math.random()*50 - 25;
+        const wrap = document.createElement('div');
+        wrap.style.left = x+'px'; wrap.style.top = y+'px';
+        wrap.style.width = size+'px'; wrap.style.height = size+'px';
+        wrap.style.position = 'absolute';
+        wrap.style.transform = 'rotate('+rot+'deg)';
+        wrap.innerHTML = DOODLE_ICON_SVGS[Math.floor(Math.random()*DOODLE_ICON_SVGS.length)];
+        layer.appendChild(wrap);
+      }
+    }
   }
   // For hand-authored scenario gradients: extracts an approximate hue from
   // the first hex color in a gradient string, so we can detect (and correct)
@@ -3130,16 +3162,16 @@
 
     if (current.mode === 'match'){
       const grads = pairGradients(current.a, current.b);
-      textureLayers(els.halfA, grads[0]);
-      textureLayers(els.halfB, grads[1]);
+      els.halfA.style.background = grads[0];
+      els.halfB.style.background = grads[1];
       els.halfB.style.filter = '';
       setScene(els.sceneA, null); setScene(els.sceneB, null);
       els.avatarA.style.display = 'flex'; els.avatarB.style.display = 'flex';
       els.avatarA.textContent = current.avatarA; els.avatarB.textContent = current.avatarB;
     } else {
       els.avatarA.style.display = 'none'; els.avatarB.style.display = 'none';
-      textureLayers(els.halfA, boostGradient(current.gradA));
-      textureLayers(els.halfB, boostGradient(current.gradB));
+      els.halfA.style.background = boostGradient(current.gradA);
+      els.halfB.style.background = boostGradient(current.gradB);
       // Safety net for hand-authored scenario gradients that happen to land
       // on similar hues (e.g. two different greens) - nudge side B's hue
       // if the two are too close, otherwise leave the authored colors as-is.
@@ -3532,6 +3564,18 @@
   // tutorial still briefly hear it on the mode-select screen) and unmutes
   // on the first tap anywhere, same muted-autoplay pattern as before.
   primeMusic('intro');
+  renderDoodleScatter(els.homeOverlay);
+  renderDoodleScatter(els.halfA);
+  renderDoodleScatter(els.halfB);
+  let doodleResizeTimer = null;
+  window.addEventListener('resize', ()=>{
+    clearTimeout(doodleResizeTimer);
+    doodleResizeTimer = setTimeout(()=>{
+      renderDoodleScatter(els.homeOverlay);
+      renderDoodleScatter(els.halfA);
+      renderDoodleScatter(els.halfB);
+    }, 200);
+  });
   els.homeEnterBtn.addEventListener('click', ()=>{
     els.homeOverlay.classList.add('hidden');
     els.modeSelectOverlay.classList.remove('hidden');
