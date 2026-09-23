@@ -256,6 +256,124 @@
   .event-overlay.powerup .event-tile:nth-child(3){ animation-delay:0.4s, 0.3s; }
   .event-overlay.powerup .event-tile:nth-child(4){ animation-delay:0.6s, 0.45s; }
   @media (prefers-reduced-motion: reduce){ .event-overlay.powerup .event-tile{ animation:none !important; box-shadow:none !important; } }
+
+  /* Quick, punchy "correct trivia answer" celebration - a confetti burst
+     plus a bold text flash, layered over the trivia overlay for well under
+     a second so it never slows the pace of play. Purely decorative and
+     pointer-events:none so it can never eat a tap. */
+  .trivia-celebrate{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; z-index:6; }
+  .trivia-celebrate.hidden{ display:none; }
+  .tc-text{
+    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:clamp(24px,7vw,40px);
+    color:#fff; text-shadow:0 0 16px rgba(61,199,107,0.95), 0 2px 8px rgba(0,0,0,0.5);
+    letter-spacing:0.5px; animation: tcPop 0.75s cubic-bezier(.34,1.56,.64,1) forwards;
+  }
+  @keyframes tcPop{ 0%{ transform:scale(0.3); opacity:0; } 40%{ transform:scale(1.15); opacity:1; } 75%{ transform:scale(1); opacity:1; } 100%{ transform:scale(1); opacity:0; } }
+  .tc-dot{ position:absolute; width:10px; height:10px; border-radius:3px; top:50%; left:50%; animation: tcFly 0.75s ease-out forwards; }
+  .tc-dot:nth-child(2){ background:#ffd93d; --a:0deg; }
+  .tc-dot:nth-child(3){ background:#ff5f6d; --a:36deg; }
+  .tc-dot:nth-child(4){ background:#3ec76b; --a:72deg; }
+  .tc-dot:nth-child(5){ background:#3e6bc7; --a:108deg; }
+  .tc-dot:nth-child(6){ background:#c73ec7; --a:144deg; }
+  .tc-dot:nth-child(7){ background:#ffd93d; --a:180deg; }
+  .tc-dot:nth-child(8){ background:#ff5f6d; --a:216deg; }
+  .tc-dot:nth-child(9){ background:#3ec76b; --a:252deg; }
+  .tc-dot:nth-child(10){ background:#3e6bc7; --a:288deg; }
+  .tc-dot:nth-child(11){ background:#c73ec7; --a:324deg; }
+  @keyframes tcFly{
+    0%{ transform:translate(-50%,-50%) rotate(var(--a)) translateX(0) rotate(0deg) scale(1); opacity:1; }
+    100%{ transform:translate(-50%,-50%) rotate(var(--a)) translateX(80px) rotate(180deg) scale(0.4); opacity:0; }
+  }
+  @media (prefers-reduced-motion: reduce){ .tc-text, .tc-dot{ animation:none !important; opacity:0 !important; } }
+
+  /* Wild Card trigger: a quick spin+flash burst on the prompt text the
+     instant the round starts, instead of just fading the overlay in. */
+  @keyframes wildcardBurst{
+    0%{ transform:scale(1) rotate(0deg); filter:brightness(1); }
+    25%{ transform:scale(1.22) rotate(-8deg); filter:brightness(1.7) saturate(1.4); }
+    55%{ transform:scale(0.94) rotate(6deg); filter:brightness(1.3); }
+    80%{ transform:scale(1.05) rotate(-2deg); filter:brightness(1.1); }
+    100%{ transform:scale(1) rotate(0deg); filter:brightness(1); }
+  }
+  .event-prompt.wildcard-pop{ animation: wildcardBurst 0.55s cubic-bezier(.36,.07,.19,.97) both; }
+  @media (prefers-reduced-motion: reduce){ .event-prompt.wildcard-pop{ animation:none !important; } }
+
+  /* The riddle round is a rare, secret unlock - it needs to feel like a
+     different, more precious event than an ordinary trivia/power-up
+     screen: a deep cosmic gold-on-violet treatment, drifting starfield,
+     a glowing framed panel that reveals itself with a dramatic pop, and
+     its own urgency timer color - instead of reusing .event-overlay. */
+  .riddle-overlay{
+    position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center;
+    padding:24px; text-align:center; overflow:hidden;
+    background:
+      radial-gradient(circle at 50% 18%, rgba(255,214,110,0.35), transparent 55%),
+      radial-gradient(circle at 20% 80%, rgba(160,90,255,0.4), transparent 55%),
+      radial-gradient(circle at 82% 78%, rgba(255,90,180,0.28), transparent 55%),
+      linear-gradient(160deg, #0a0620, #200a3d 45%, #1a0630 100%);
+    background-size: 220% 220%;
+    animation: riddleBgDrift 8s ease-in-out infinite alternate;
+  }
+  .riddle-overlay.hidden{ display:none; }
+  @keyframes riddleBgDrift{ 0%{ background-position: 0% 0%; } 100%{ background-position: 100% 100%; } }
+  .riddle-stars{ position:absolute; inset:0; pointer-events:none; }
+  .riddle-stars span{
+    position:absolute; width:3px; height:3px; border-radius:50%; background:#ffe9a8;
+    box-shadow:0 0 6px 2px rgba(255,233,168,0.8); animation: riddleTwinkle 2.4s ease-in-out infinite;
+  }
+  .riddle-stars span:nth-child(1){ top:12%; left:15%; animation-delay:0s; }
+  .riddle-stars span:nth-child(2){ top:22%; left:78%; animation-delay:0.3s; }
+  .riddle-stars span:nth-child(3){ top:68%; left:10%; animation-delay:0.6s; }
+  .riddle-stars span:nth-child(4){ top:80%; left:85%; animation-delay:0.9s; }
+  .riddle-stars span:nth-child(5){ top:8%; left:50%; animation-delay:1.2s; }
+  .riddle-stars span:nth-child(6){ top:45%; left:92%; animation-delay:1.5s; }
+  .riddle-stars span:nth-child(7){ top:90%; left:45%; animation-delay:1.8s; }
+  .riddle-stars span:nth-child(8){ top:35%; left:5%; animation-delay:2.1s; }
+  @keyframes riddleTwinkle{ 0%,100%{ opacity:0.15; transform:scale(0.7); } 50%{ opacity:1; transform:scale(1.4); } }
+  .riddle-inner{
+    position:relative; z-index:1; max-width:400px; width:100%;
+    padding:30px 24px 26px; border-radius:22px;
+    background:linear-gradient(160deg, rgba(40,20,70,0.9), rgba(20,8,40,0.92));
+    border:1px solid rgba(255,214,110,0.5);
+    box-shadow:0 0 0 1px rgba(255,214,110,0.15), 0 0 40px 8px rgba(160,90,255,0.35), 0 0 80px 20px rgba(255,214,110,0.12);
+    animation: riddleReveal 0.6s cubic-bezier(.22,1.5,.4,1) both;
+  }
+  @keyframes riddleReveal{
+    0%{ transform:scale(0.5) rotate(-4deg); opacity:0; }
+    60%{ transform:scale(1.06) rotate(1deg); opacity:1; }
+    100%{ transform:scale(1) rotate(0deg); opacity:1; }
+  }
+  .riddle-eyebrow{
+    font-size:13px; font-weight:800; letter-spacing:1px; color:#ffd96e;
+    text-shadow:0 0 12px rgba(255,214,110,0.7); margin-bottom:10px;
+  }
+  .riddle-timer{
+    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:26px;
+    color:#fff; margin-bottom:14px; text-shadow:0 0 10px rgba(160,90,255,0.8);
+  }
+  .riddle-timer.danger{ color:#ff5f6d; animation: runTimerPulse 0.8s ease-in-out infinite; }
+  .riddle-q{
+    font-family:'Big Shoulders Display', sans-serif; font-weight:800; font-size:clamp(18px,5vw,24px);
+    color:#fff; line-height:1.35; margin-bottom:20px; text-shadow:0 2px 8px rgba(0,0,0,0.5);
+  }
+  .riddle-input{
+    width:100%; box-sizing:border-box; padding:13px 16px; border-radius:12px; font-size:16px;
+    text-align:center; font-weight:700; letter-spacing:0.5px; color:#fff;
+    background:rgba(255,255,255,0.08); border:1.5px solid rgba(255,214,110,0.45);
+    margin-bottom:14px; outline:none;
+  }
+  .riddle-input:focus{ border-color:#ffd96e; box-shadow:0 0 0 3px rgba(255,214,110,0.25); }
+  .riddle-input::placeholder{ color:rgba(255,255,255,0.4); font-weight:500; }
+  .riddle-buttons{ display:flex; justify-content:center; }
+  .riddle-submit{ padding:12px 40px; font-size:15px; box-shadow:0 6px 18px rgba(255,214,110,0.35); }
+  .riddle-result{ margin-top:14px; font-weight:800; font-size:15px; }
+  .riddle-result.hidden{ display:none; }
+  .riddle-result.win{ color:#7dffb0; text-shadow:0 0 10px rgba(125,255,176,0.6); }
+  .riddle-result.lose{ color:#ff9a9a; text-shadow:0 0 10px rgba(255,90,90,0.5); }
+  @media (prefers-reduced-motion: reduce){
+    .riddle-overlay, .riddle-stars span, .riddle-inner, .riddle-timer.danger{ animation:none !important; }
+  }
+
   .daily-btn{
     font-size:13px; font-weight:700; padding:9px 16px; border-radius:10px; cursor:pointer;
     background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.25);
@@ -309,10 +427,11 @@
   .home-overlay{
     position:fixed; inset:0; z-index:41; display:flex; flex-direction:column;
     align-items:center; justify-content:center; padding:24px; text-align:center;
-    background-color:#92d1f2;
-    background-image:url('images/pattern-tile.png');
-    background-repeat:repeat;
-    background-size:70px 70px;
+    /* Flat two-tone wash sampled directly from the logo art's own sky-blue
+       backdrop (lighter near its top edge, slightly deeper near its
+       bottom edge) - no separate tiled pattern to mismatch against, so
+       the unresized logo on top has no seam to hide. */
+    background:linear-gradient(180deg,#a4e0fd 0%,#82c9f8 100%);
   }
   .home-overlay.hidden{ display:none; }
   .home-logo-img{
@@ -499,6 +618,11 @@
         <div class="event-tile" data-i="2"></div>
         <div class="event-tile" data-i="3"></div>
       </div>
+      <div class="trivia-celebrate hidden" id="triviaCelebrate">
+        <div class="tc-text">YOU GOT IT!</div>
+        <div class="tc-dot"></div><div class="tc-dot"></div><div class="tc-dot"></div><div class="tc-dot"></div><div class="tc-dot"></div>
+        <div class="tc-dot"></div><div class="tc-dot"></div><div class="tc-dot"></div><div class="tc-dot"></div><div class="tc-dot"></div>
+      </div>
     </div>
   </div>
 
@@ -520,6 +644,21 @@
     <div class="personality-label" id="personalityLabel"></div>
     <div class="personality-blurb" id="personalityBlurb"></div>
     <div class="personality-pct" id="personalityPct"></div>
+  </div>
+</div>
+<div class="riddle-overlay hidden" id="riddleOverlay">
+  <div class="riddle-stars" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+  </div>
+  <div class="riddle-inner">
+    <div class="riddle-eyebrow">✨ A RIDDLE HAS APPEARED ✨</div>
+    <div class="riddle-timer" id="riddleTimer">0:45</div>
+    <div class="riddle-q" id="riddleQ"></div>
+    <input class="riddle-input" id="riddleInput" type="text" autocomplete="off" autocapitalize="characters" placeholder="Type your answer…" maxlength="40">
+    <div class="riddle-buttons">
+      <div class="daily-btn primary riddle-submit" id="riddleSubmit">Submit</div>
+    </div>
+    <div class="riddle-result hidden" id="riddleResult"></div>
   </div>
 </div>
 <div class="home-overlay" id="homeOverlay">
@@ -746,6 +885,14 @@
     { q:'What is the capital of India?', correct:'New Delhi', wrongs:['Mumbai','Bangalore','Kolkata'] },
     { q:'Which country is home to Machu Picchu?', correct:'Peru', wrongs:['Bolivia','Chile','Ecuador'] },
     { q:'What is the tallest mountain in Africa?', correct:'Mount Kilimanjaro', wrongs:['Mount Kenya','Table Mountain','Mount Meru'] },
+    { q:'What is the capital of the United Kingdom?', correct:'London', wrongs:['Manchester','Liverpool','Edinburgh'] },
+    { q:'Which is the longest river in the world?', correct:'The Nile', wrongs:['The Amazon','The Yangtze','The Mississippi'] },
+    { q:'What is the capital of China?', correct:'Beijing', wrongs:['Shanghai','Hong Kong','Guangzhou'] },
+    { q:'Which country has the largest population in the world?', correct:'India', wrongs:['China','United States','Indonesia'] },
+    { q:'What is the smallest US state by area?', correct:'Rhode Island', wrongs:['Delaware','Connecticut','Vermont'] },
+    { q:'Which strait separates Europe and Africa?', correct:'The Strait of Gibraltar', wrongs:['The Bosphorus','The Strait of Hormuz','The English Channel'] },
+    { q:'What is the capital of Argentina?', correct:'Buenos Aires', wrongs:['Rio de Janeiro','Santiago','Montevideo'] },
+    { q:'Which desert covers much of northern China and Mongolia?', correct:'The Gobi Desert', wrongs:['The Sahara','The Kalahari','The Mojave'] },
   ];
   const ENGLISH_SETS = [
     { q:"Which word means 'happy'?", correct:'Joyful', wrongs:['Somber','Irate','Weary'] },
@@ -782,6 +929,14 @@
     { q:"Which word means 'clear and easy to understand'?", correct:'Lucid', wrongs:['Murky','Confusing','Ambiguous'] },
     { q:"What is the past tense of 'begin'?", correct:'Began', wrongs:['Begun','Beginned','Begins'] },
     { q:"Which word means 'to soothe'?", correct:'Placate', wrongs:['Provoke','Agitate','Irritate'] },
+    { q:"Which word means 'to make something worse'?", correct:'Aggravate', wrongs:['Alleviate','Improve','Soothe'] },
+    { q:"What is the plural of 'cactus'?", correct:'Cacti', wrongs:['Cactuses','Cactus','Cactii'] },
+    { q:"Which word means 'talkative'?", correct:'Loquacious', wrongs:['Reticent','Taciturn','Silent'] },
+    { q:"Which word means the opposite of 'transparent'?", correct:'Opaque', wrongs:['Clear','Translucent','Sheer'] },
+    { q:"What is the past tense of 'eat'?", correct:'Ate', wrongs:['Eated','Eaten','Eating'] },
+    { q:"Which word means 'to make up for'?", correct:'Compensate', wrongs:['Neglect','Ignore','Worsen'] },
+    { q:"Which word means 'friendly and approachable'?", correct:'Amiable', wrongs:['Hostile','Aloof','Surly'] },
+    { q:"What is the plural of 'analysis'?", correct:'Analyses', wrongs:['Analysises','Analysis','Analyzes'] },
   ];
   const HISTORY_SETS = [
     { q:'Who was the first President of the United States?', correct:'George Washington', wrongs:['Thomas Jefferson','John Adams','Abraham Lincoln'] },
@@ -818,6 +973,14 @@
     { q:'Which US president appears on the $1 bill?', correct:'George Washington', wrongs:['Abraham Lincoln','Thomas Jefferson','Benjamin Franklin'] },
     { q:'Which European country was divided into East and West during the Cold War?', correct:'Germany', wrongs:['Poland','Austria','Hungary'] },
     { q:'Who was the ancient Greek philosopher who taught Alexander the Great?', correct:'Aristotle', wrongs:['Socrates','Plato','Pythagoras'] },
+    { q:'Which explorer led the first expedition to circumnavigate the globe?', correct:'Ferdinand Magellan', wrongs:['Christopher Columbus','Vasco da Gama','James Cook'] },
+    { q:'In which year did the French Revolution begin?', correct:'1789', wrongs:['1776','1799','1804'] },
+    { q:'Who was the King of England during the American Revolution?', correct:'King George III', wrongs:['King George II','King Henry VIII','King Charles I'] },
+    { q:'Which ancient civilization built Machu Picchu?', correct:'The Inca', wrongs:['The Maya','The Aztec','The Olmec'] },
+    { q:'In which year did India gain independence from Britain?', correct:'1947', wrongs:['1935','1950','1962'] },
+    { q:'Which country launched Sputnik, the first artificial satellite, in 1957?', correct:'The Soviet Union', wrongs:['The United States','China','France'] },
+    { q:'Which ancient Greek king led his army at the Battle of Thermopylae?', correct:'Leonidas', wrongs:['Alexander the Great','Pericles','Xerxes'] },
+    { q:'Which US president led the country through the Great Depression and most of World War II?', correct:'Franklin D. Roosevelt', wrongs:['Herbert Hoover','Harry Truman','Woodrow Wilson'] },
   ];
   const SCIENCE_SETS = [
     { q:'What is the chemical symbol for water?', correct:'H2O', wrongs:['CO2','O2','NaCl'] },
@@ -854,6 +1017,14 @@
     { q:'Which vitamin do we get primarily from sunlight?', correct:'Vitamin D', wrongs:['Vitamin C','Vitamin A','Vitamin B12'] },
     { q:'What type of energy does a moving object have?', correct:'Kinetic energy', wrongs:['Potential energy','Thermal energy','Chemical energy'] },
     { q:'What is the process of a caterpillar becoming a butterfly called?', correct:'Metamorphosis', wrongs:['Photosynthesis','Pollination','Germination'] },
+    { q:'What is the chemical symbol for iron?', correct:'Fe', wrongs:['Ir','In','Fr'] },
+    { q:'How many chromosomes do humans normally have?', correct:'46', wrongs:['23','44','48'] },
+    { q:'Which planet is known as the Red Planet?', correct:'Mars', wrongs:['Venus','Mercury','Jupiter'] },
+    { q:'What do we call animals that generate their own body heat internally?', correct:'Warm-blooded', wrongs:['Cold-blooded','Ectothermic','Poikilothermic'] },
+    { q:'What is the pH of pure water considered to be?', correct:'7 (neutral)', wrongs:['0 (acidic)','14 (basic)','10 (basic)'] },
+    { q:'Which sense organ is responsible for detecting sound?', correct:'The ear', wrongs:['The nose','The tongue','The skin'] },
+    { q:'What do we call an animal that eats both plants and meat?', correct:'Omnivore', wrongs:['Herbivore','Carnivore','Detritivore'] },
+    { q:'What is the study of living organisms called?', correct:'Biology', wrongs:['Geology','Chemistry','Physics'] },
   ];
   // "Elective" subjects for the Daily Run's 6th trivia question - rotates
   // between these three, kept as a genuinely separate pool from the 5 core
@@ -873,6 +1044,12 @@
     { q:'Which famous ceiling did Michelangelo paint?', correct:'The Sistine Chapel', wrongs:['Notre Dame','St. Peter\u2019s Basilica','Westminster Abbey'] },
     { q:'What do we call a painting of an arrangement of objects like fruit or flowers?', correct:'Still life', wrongs:['Landscape','Portrait','Abstract'] },
     { q:'Which artist is famous for his paintings of Campbell\u2019s soup cans?', correct:'Andy Warhol', wrongs:['Jackson Pollock','Roy Lichtenstein','Keith Haring'] },
+    { q:'Which art movement, led by Monet, focused on capturing light and fleeting moments?', correct:'Impressionism', wrongs:['Cubism','Surrealism','Baroque'] },
+    { q:'What do we call an artist\u2019s preliminary drawing or plan for a larger work?', correct:'A sketch', wrongs:['A mural','A fresco','A collage'] },
+    { q:'Which artist painted "American Gothic"?', correct:'Grant Wood', wrongs:['Edward Hopper','Norman Rockwell','Andrew Wyeth'] },
+    { q:'What is the technique of applying paint to wet plaster called?', correct:'Fresco', wrongs:['Tempera','Impasto','Encaustic'] },
+    { q:'Which color results from mixing red and white?', correct:'Pink', wrongs:['Purple','Orange','Brown'] },
+    { q:'Which sculptor created "The Thinker"?', correct:'Auguste Rodin', wrongs:['Michelangelo','Donatello','Gian Lorenzo Bernini'] },
   ];
   const MUSIC_SETS = [
     { q:'How many strings does a standard guitar have?', correct:'6', wrongs:['4','8','12'] },
@@ -889,6 +1066,12 @@
     { q:'Which of these is a woodwind instrument?', correct:'Clarinet', wrongs:['Trumpet','Violin','Drum'] },
     { q:'What do we call a group of singers performing together?', correct:'A choir', wrongs:['A band','An orchestra','A quartet'] },
     { q:'Which decade is disco music most associated with?', correct:'The 1970s', wrongs:['The 1950s','The 1990s','The 2000s'] },
+    { q:'Which composer wrote the "Moonlight Sonata"?', correct:'Ludwig van Beethoven', wrongs:['Wolfgang Amadeus Mozart','Frédéric Chopin','Johannes Brahms'] },
+    { q:'What do we call music written for a single performer, without accompaniment?', correct:'Solo', wrongs:['Duet','Ensemble','Chorus'] },
+    { q:'Which family of instruments does the trumpet belong to?', correct:'Brass', wrongs:['Woodwinds','Strings','Percussion'] },
+    { q:'What does "piano" mean as a musical dynamic marking?', correct:'Soft', wrongs:['Loud','Fast','Slow'] },
+    { q:'Which musical genre originated in New Orleans in the early 20th century?', correct:'Jazz', wrongs:['Blues','Country','Reggae'] },
+    { q:'How many lines are on a standard musical staff?', correct:'5', wrongs:['4','6','7'] },
   ];
   const HEALTH_SETS = [
     { q:'How many minutes of moderate exercise per week do health guidelines generally recommend for adults?', correct:'150 minutes', wrongs:['30 minutes','500 minutes','10 minutes'] },
@@ -905,6 +1088,12 @@
     { q:'What is a commonly recommended way to cool down after exercise?', correct:'Stretching', wrongs:['Sprinting','Lifting heavy weights','Holding your breath'] },
     { q:'Which of these is a well-established benefit of regular physical activity?', correct:'Improved mood', wrongs:['Increased stress','Weaker muscles','Poor sleep'] },
     { q:'How many players are on a standard basketball team on the court at once?', correct:'5', wrongs:['4','6','7'] },
+    { q:'Which nutrient is the body’s primary building block for muscle repair?', correct:'Protein', wrongs:['Fat','Sugar','Fiber'] },
+    { q:'What is the recommended way to stay hydrated during exercise?', correct:'Drink water regularly', wrongs:['Avoid water entirely','Only drink after finishing','Drink only soda'] },
+    { q:'Which of these is an example of a flexibility exercise?', correct:'Yoga', wrongs:['Sprinting','Weightlifting','Cycling'] },
+    { q:'How many players are on the field for one soccer team during a match?', correct:'11', wrongs:['9','10','12'] },
+    { q:'What is the medical term for high blood pressure?', correct:'Hypertension', wrongs:['Hypotension','Tachycardia','Arrhythmia'] },
+    { q:'Which of these is generally considered a good source of lean protein?', correct:'Chicken breast', wrongs:['Butter','Candy','Soda'] },
   ];
   function rand(min,max,rng){ rng = rng || Math.random; return Math.floor(rng()*(max-min+1))+min; }
   function generateMathTrivia(rng){
@@ -995,7 +1184,22 @@
     { key:'points10',  icon:'\u26A1', label:'+10 pts', color:'#c7a63e' },
     { key:'slowclock', icon:'\uD83D\uDC0C', label:'+30s',    color:'#3e6bc7' },
     { key:'wildcard',  icon:'\uD83C\uDF81', label:'Wild Card', color:'#c73e3e' },
-    { key:'extraguess', icon:'\u2795', label:'+1 Guess', color:'#3ec76b' },
+    { key:'hint',      icon:'\uD83D\uDCA1', label:'Free Hint', color:'#3ec76b' },
+  ];
+  // The secret riddle-unlock combo (see checkRiddleUnlock): drawing these 4
+  // power-ups in this exact relative order over the course of a run - plus
+  // landing a 3-answer trivia streak while the vibe meter reads 49% or
+  // lower - triggers a rare bonus riddle round.
+  const RIDDLE_UNLOCK_SEQUENCE = ['wildcard', 'slowclock', 'hint', 'points10'];
+  const RIDDLE_MS = 45000 / DEBUG_TIME_SCALE;
+  const RIDDLE_BONUS_POINTS = 50;
+  const RIDDLE_BADGE = '🧩 Riddler';
+  const RIDDLES = [
+    { q:'The more you take, the more you leave behind. What am I?', a:'FOOTSTEPS' },
+    { q:'I have keys but no locks, space but no room, and you can enter but can’t go outside. What am I?', a:'KEYBOARD' },
+    { q:'What has a face and two hands but no arms or legs?', a:'CLOCK' },
+    { q:'What gets wetter the more it dries?', a:'TOWEL' },
+    { q:'I’m tall when I’m young and short when I’m old. What am I?', a:'CANDLE' },
   ];
   // Daily Run trivia: 5 core subjects (always one each) + 1 rotating elective
   // (always exactly one, randomly chosen each run) = 6 total, matching the
@@ -1333,6 +1537,57 @@
     ['games', 'Halo', 'Gears of War'],
     ['games', 'The Last of Us', 'Resident Evil'],
     ['games', 'Elden Ring', 'Dark Souls'],
+    // --- expansion batch: +50, spread across existing MATCH categories ---
+    ['sports', 'LeBron James', 'Kobe Bryant'],
+    ['sports', 'Cristiano Ronaldo', 'Lionel Messi'],
+    ['sports', 'Usain Bolt', 'Carl Lewis'],
+    ['sports', 'Roger Federer', 'Rafael Nadal'],
+    ['sports', 'Shaquille O’Neal', 'Hakeem Olajuwon'],
+    ['sports', 'Wayne Gretzky', 'Sidney Crosby'],
+    ['sports', 'Babe Ruth', 'Hank Aaron'],
+    ['sports', 'Peyton Manning', 'Aaron Rodgers'],
+    ['sports', 'Venus Williams', 'Serena Williams'],
+    ['sports', 'Michael Phelps', 'Mark Spitz'],
+    ['brands', 'Coca-Cola', 'Pepsi'],
+    ['brands', 'FedEx', 'UPS'],
+    ['brands', 'Airbnb', 'Booking.com'],
+    ['brands', 'PayPal', 'Venmo'],
+    ['brands', 'Zoom', 'Microsoft Teams'],
+    ['brands', 'Adidas', 'Puma'],
+    ['brands', 'Costco', 'Sam’s Club'],
+    ['brands', 'Target', 'Walmart'],
+    ['brands', 'Chevrolet', 'Ford'],
+    ['movies', 'Star Wars', 'Star Trek'],
+    ['movies', 'Marvel', 'DC'],
+    ['movies', 'Harry Potter', 'Lord of the Rings'],
+    ['movies', 'The Office', 'Parks and Recreation'],
+    ['movies', 'Stranger Things', 'The Boys'],
+    ['movies', 'Jurassic Park', 'King Kong'],
+    ['movies', 'Fast & Furious', 'Mission: Impossible'],
+    ['movies', 'The Simpsons', 'Family Guy'],
+    ['movies', 'Squid Game', 'Money Heist'],
+    ['movies', 'Top Gun', 'Iron Man'],
+    ['music', 'Taylor Swift', 'Beyoncé'],
+    ['music', 'Drake', 'Kendrick Lamar'],
+    ['music', 'Ariana Grande', 'Billie Eilish'],
+    ['music', 'The Beatles', 'The Rolling Stones'],
+    ['music', 'Rihanna', 'Nicki Minaj'],
+    ['music', 'Post Malone', 'Travis Scott'],
+    ['music', 'Dua Lipa', 'Olivia Rodrigo'],
+    ['music', 'Eminem', 'Kanye West'],
+    ['food', 'Chipotle', 'Qdoba'],
+    ['food', 'Five Guys', 'Shake Shack'],
+    ['food', 'Taco Bell', 'Del Taco'],
+    ['food', 'Wingstop', 'Buffalo Wild Wings'],
+    ['food', 'Panda Express', 'P.F. Chang’s'],
+    ['food', 'Sonic', 'Whataburger'],
+    ['food', 'Chick-fil-A', 'Popeyes'],
+    ['food', 'Culver’s', 'In-N-Out'],
+    ['games', 'Overwatch', 'Valorant'],
+    ['games', 'Animal Crossing', 'Stardew Valley'],
+    ['games', 'FIFA', 'NBA 2K'],
+    ['games', 'Roblox', 'Minecraft'],
+    ['games', 'Among Us', 'Fall Guys'],
   ];
   const MATCH = MATCH_RAW.map(([cat,a,b],i)=>({
     id:'m-'+i, mode:'match', category:cat, a, b, avatarA:initials(a), avatarB:initials(b)
@@ -1561,6 +1816,107 @@
              'Everyone remembers everything you\u2019ve ever said', '\uD83E\uDDFE', 'linear-gradient(165deg,#1f0f3d,#5a2f8a)'],
     ['wild', 'Live stream your entire day, every day', '\uD83D\uDCF9', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)',
              'Never be recorded on camera again', '\uD83D\uDEAB', 'linear-gradient(165deg,#152e0f,#3a6b1f)'],
+    // --- expansion batch: +50, spread across existing SCENE categories ---
+    ['wild', 'Pause time whenever you want, but you still age while paused', '\u23F8\uFE0F', 'linear-gradient(165deg,#0f1a3d,#2f4a8a)',
+             'Rewind the last 10 seconds, but only once a day', '\u23EA', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
+    ['wild', 'Only speak in movie quotes for a month', '\uD83C\uDFAC', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)',
+             'Only speak in song lyrics for a month', '\uD83C\uDFB6', 'linear-gradient(165deg,#0d3b36,#2f9e8f)'],
+    ['wild', 'Every meal tastes amazing, but it\u2019s all bad for you', '\uD83C\uDF54', 'linear-gradient(165deg,#3d150f,#8a2f1f)',
+             'Every meal is healthy, but it all tastes bland', '\uD83E\uDD57', 'linear-gradient(165deg,#152e0f,#3a6b1f)'],
+    ['wild', 'Know exactly how you\u2019ll die, but never when', '\uD83D\uDC80', 'linear-gradient(165deg,#25252b,#55555f)',
+             'Know exactly when you\u2019ll die, but never how', '\u231B', 'linear-gradient(165deg,#0f2740,#2e7bb5)'],
+    ['wild', 'Teleport anywhere, but only places you\u2019ve already been', '\uD83C\uDF00', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)',
+             'Fly anywhere, but only slower than walking speed', '\uD83D\uDC22', 'linear-gradient(165deg,#152e0f,#3a6b1f)'],
+    ['wild', 'Never be able to lie again, about anything', '\uD83D\uDE07', 'linear-gradient(165deg,#0f2740,#2e7bb5)',
+             'Never be able to tell the truth again, about anything', '\uD83D\uDE08', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
+    ['wild', 'Unlimited vacation days, but half your salary', '\uD83C\uDFD6\uFE0F', 'linear-gradient(165deg,#0d3b36,#2f9e8f)',
+             'Double your salary, but zero vacation days ever again', '\uD83D\uDCBC', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)'],
+    ['wild', 'Always score the best parking spot, but it\u2019s always raining on you', '\u2614', 'linear-gradient(165deg,#1c2733,#3f5b70)',
+             'Never find parking, but the sun always shines on you', '\u2600\uFE0F', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)'],
+    ['wild', 'Sing everything you say, out loud, for a week', '\uD83C\uDFA4', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)',
+             'Rhyme everything you say, out loud, for a month', '\uD83D\uDCDD', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)'],
+    ['wild', 'Skip every Monday for the rest of your life', '\uD83D\uDE0C', 'linear-gradient(165deg,#152e0f,#3a6b1f)',
+             'Get 25 hours in every day, but only on weekends', '\u23F3', 'linear-gradient(165deg,#0f1a3d,#2f4a8a)'],
+    ['wild', 'Live inside your favorite show, as a background character', '\uD83D\uDCFA', 'linear-gradient(165deg,#0f2740,#2e7bb5)',
+             'Live inside your favorite game, as the final boss', '\uD83D\uDC7E', 'linear-gradient(165deg,#152e0f,#3a6b1f)'],
+    ['wild', 'A rewind button for your own life, usable exactly once', '\u23EE\uFE0F', 'linear-gradient(165deg,#0f1a3d,#2f4a8a)',
+             'A fast-forward button for your own life, usable exactly once', '\u23ED\uFE0F', 'linear-gradient(165deg,#3d1a0f,#8a3a1f)'],
+    ['wild', 'Be the funniest person in every room, but never taken seriously', '\uD83E\uDD21', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+             'Be the most respected person in every room, but never laugh again', '\uD83C\uDFA9', 'linear-gradient(165deg,#25252b,#55555f)'],
+    ['wild', 'Have to high-five everyone you meet, forever', '\uD83E\uDD1A', 'linear-gradient(165deg,#152e0f,#3a6b1f)',
+             'Have to bow to everyone you meet, forever', '\uD83D\uDE4F', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)'],
+    ['wild', 'Talk to one dead relative, one time only', '\uD83D\uDD6F\uFE0F', 'linear-gradient(165deg,#25252b,#55555f)',
+             'See exactly one hour into the future, one time only', '\uD83D\uDD2E', 'linear-gradient(165deg,#0f1a3d,#2f4a8a)'],
+    ['style', 'One signature outfit, worn every single day', '\uD83D\uDC54', 'linear-gradient(165deg,#232733,#4a5568)',
+              'A brand-new outfit every day, never repeated', '\uD83D\uDC57', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
+    ['style', 'Bold, statement jewelry, always', '\uD83D\uDC8D', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+              'No jewelry at all, ever', '\u270B', 'linear-gradient(165deg,#25252b,#55555f)'],
+    ['style', 'Sneakers with absolutely everything', '\uD83D\uDC5F', 'linear-gradient(165deg,#0f2740,#2e7bb5)',
+              'Dress shoes with absolutely everything', '\uD83D\uDC5E', 'linear-gradient(165deg,#331a1f,#7a3f4a)'],
+    ['style', 'Bright, loud colors only', '\uD83C\uDF08', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)',
+              'Black, white, and gray only', '\u25AB\uFE0F', 'linear-gradient(165deg,#25252b,#55555f)'],
+    ['style', 'A signature scent people always notice', '\uD83E\uDDF4', 'linear-gradient(165deg,#152e0f,#3a6b1f)',
+              'Completely unscented, always', '\uD83D\uDCA8', 'linear-gradient(165deg,#1c2733,#3f5b70)'],
+    ['fitness', 'Morning workouts, every time', '\uD83C\uDF05', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+                'Night workouts, every time', '\uD83C\uDF19', 'linear-gradient(165deg,#0f1a3d,#2f4a8a)'],
+    ['fitness', 'Working out completely alone', '\uD83C\uDFA7', 'linear-gradient(165deg,#25252b,#55555f)',
+                'Working out in a group', '\uD83D\uDC65', 'linear-gradient(165deg,#152e0f,#3a6b1f)'],
+    ['fitness', 'Cardio, no contest', '\uD83C\uDFC3', 'linear-gradient(165deg,#0f2740,#2e7bb5)',
+                'Strength training, no contest', '\uD83E\uDD1C', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
+    ['fitness', 'A home gym, all to yourself', '\uD83C\uDFE0', 'linear-gradient(165deg,#331a1f,#7a3f4a)',
+                'A gym membership, full of people', '\uD83C\uDFDF\uFE0F', 'linear-gradient(165deg,#0d3b36,#2f9e8f)'],
+    ['fitness', 'Swimming laps', '\uD83C\uDFCA', 'linear-gradient(165deg,#0f2740,#2e7bb5)',
+                'Cycling for miles', '\uD83D\uDEB4', 'linear-gradient(165deg,#152e0f,#3a6b1f)'],
+    ['fitness', 'Stretching every single day', '\uD83E\uDD38', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)',
+                'Never stretching at all', '\uD83D\uDE05', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)'],
+    ['food', 'Breakfast for dinner', '\uD83E\uDD5E', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+             'Dinner for breakfast', '\uD83C\uDF5D', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
+    ['food', 'Spicy food, always', '\uD83C\uDF36\uFE0F', 'linear-gradient(165deg,#3d150f,#8a2f1f)',
+             'Mild food, always', '\uD83E\uDD5B', 'linear-gradient(165deg,#0f2740,#2e7bb5)'],
+    ['food', 'Cooking every meal at home', '\uD83D\uDC68\u200D\uD83C\uDF73', 'linear-gradient(165deg,#152e0f,#3a6b1f)',
+             'Eating out for every meal', '\uD83C\uDF7D\uFE0F', 'linear-gradient(165deg,#331a1f,#7a3f4a)'],
+    ['food', 'A big, indulgent breakfast', '\uD83C\uDF73', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+             'A big, indulgent dinner', '\uD83C\uDF7D\uFE0F', 'linear-gradient(165deg,#1c2733,#3f5b70)'],
+    ['food', 'Coffee, every single morning', '\u2615', 'linear-gradient(165deg,#2b1e12,#6b4a28)',
+             'Tea, every single morning', '\uD83C\uDF75', 'linear-gradient(165deg,#152e0f,#3a6b1f)'],
+    ['food', 'Dessert before the meal', '\uD83C\uDF70', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)',
+             'Dessert after the meal', '\uD83C\uDF6A', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)'],
+    ['geography', 'A road trip across the whole country', '\uD83D\uDE97', 'linear-gradient(165deg,#0f2740,#2e7bb5)',
+                   'A direct flight straight to the destination', '\u2708\uFE0F', 'linear-gradient(165deg,#1c2733,#3f5b70)'],
+    ['geography', 'Living in a big city', '\uD83C\uDFD9\uFE0F', 'linear-gradient(165deg,#25252b,#55555f)',
+                   'Living in a small town', '\uD83C\uDFD8\uFE0F', 'linear-gradient(165deg,#152e0f,#3a6b1f)'],
+    ['geography', 'Hiking the mountains of Europe', '\uD83C\uDFD4\uFE0F', 'linear-gradient(165deg,#1c2733,#3f5b70)',
+                   'Relaxing on the beaches of Southeast Asia', '\uD83C\uDFD6\uFE0F', 'linear-gradient(165deg,#0d3b36,#2f9e8f)'],
+    ['geography', 'A cold, snowy winter every year', '\u2744\uFE0F', 'linear-gradient(165deg,#0f1a3d,#2f4a8a)',
+                   'A hot, humid summer every year', '\u2600\uFE0F', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)'],
+    ['geography', 'Exploring a new country by train', '\uD83D\uDE86', 'linear-gradient(165deg,#331a1f,#7a3f4a)',
+                   'Exploring a new country by boat', '\u26F5', 'linear-gradient(165deg,#0f2740,#2e7bb5)'],
+    ['geography', 'Seeing the Grand Canyon in person', '\uD83C\uDFDE\uFE0F', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+                   'Seeing Niagara Falls in person', '\uD83C\uDF0A', 'linear-gradient(165deg,#0f2740,#2e7bb5)'],
+    ['history', 'Living through the Roaring Twenties', '\uD83C\uDF7E', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+                'Living through the Swinging Sixties', '\u270C\uFE0F', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)'],
+    ['history', 'Exploring ancient Egypt', '\uD83D\uDC2B', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+                'Exploring ancient Rome', '\uD83C\uDFDB\uFE0F', 'linear-gradient(165deg,#331a1f,#7a3f4a)'],
+    ['history', 'The age of pirates on the high seas', '\uD83C\uDFF4\u200D\u2620\uFE0F', 'linear-gradient(165deg,#25252b,#55555f)',
+                'The age of knights and castles', '\u2694\uFE0F', 'linear-gradient(165deg,#1c2733,#3f5b70)'],
+    ['history', 'The early space race era', '\uD83D\uDE80', 'linear-gradient(165deg,#0f1a3d,#2f4a8a)',
+                'The old wild west era', '\uD83D\uDE20', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)'],
+    ['history', 'Renaissance art and big ideas', '\uD83C\uDFA8', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)',
+                'Industrial revolution machines', '\u2699\uFE0F', 'linear-gradient(165deg,#1c2733,#3f5b70)'],
+    ['history', 'The dawn of the internet', '\uD83D\uDCBE', 'linear-gradient(165deg,#0f2740,#2e7bb5)',
+                'The dawn of the smartphone', '\uD83D\uDCF1', 'linear-gradient(165deg,#152e0f,#3a6b1f)'],
+    ['money', 'A steady 9-to-5 paycheck', '\uD83D\uDCBC', 'linear-gradient(165deg,#1c2733,#3f5b70)',
+              'Unpredictable freelance income', '\uD83C\uDFA8', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)'],
+    ['money', 'Renting, with total flexibility', '\uD83D\uDD11', 'linear-gradient(165deg,#0f2740,#2e7bb5)',
+              'Owning, with a 30-year mortgage', '\uD83C\uDFE1', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)'],
+    ['money', 'Splitting every bill evenly, always', '\uD83E\uDD1D', 'linear-gradient(165deg,#152e0f,#3a6b1f)',
+              'Whoever earns more pays more, always', '\u2696\uFE0F', 'linear-gradient(165deg,#331a1f,#7a3f4a)'],
+    ['money', 'Saving aggressively for retirement, starting now', '\uD83D\uDC34', 'linear-gradient(165deg,#152e0f,#3a6b1f)',
+              'Spending on experiences now, worrying later', '\uD83C\uDF89', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
+    ['music', 'Learning an instrument as a kid', '\uD83C\uDFB9', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
+              'Learning to sing as a kid', '\uD83C\uDFA4', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)'],
+    ['music', 'Concerts, as loud as physically possible', '\uD83D\uDD0A', 'linear-gradient(165deg,#3d150f,#8a2f1f)',
+              'Music at a comfortable volume, always', '\uD83D\uDD09', 'linear-gradient(165deg,#0f2740,#2e7bb5)'],
   ];
   const SCENES = SCENE_RAW.map((row,i)=>({
     id:'s-'+i, mode:'scenario', category:row[0],
@@ -1609,9 +1965,13 @@
     eventTimerFill: document.getElementById('eventTimerFill'),
     eventTimerBar: document.getElementById('eventTimerBar'), eventGrid: document.getElementById('eventGrid'),
     eventTiles: Array.from(document.querySelectorAll('.event-tile')),
+    triviaCelebrate: document.getElementById('triviaCelebrate'),
     levelupOverlay: document.getElementById('levelupOverlay'), levelupLabel: document.getElementById('levelupLabel'),
     personalityOverlay: document.getElementById('personalityOverlay'), personalityLabel: document.getElementById('personalityLabel'),
     personalityBlurb: document.getElementById('personalityBlurb'), personalityPct: document.getElementById('personalityPct'),
+    riddleOverlay: document.getElementById('riddleOverlay'), riddleTimer: document.getElementById('riddleTimer'),
+    riddleQ: document.getElementById('riddleQ'), riddleInput: document.getElementById('riddleInput'),
+    riddleSubmit: document.getElementById('riddleSubmit'), riddleResult: document.getElementById('riddleResult'),
     homeOverlay: document.getElementById('homeOverlay'), homeEnterBtn: document.getElementById('homeEnterBtn'),
     modeSelectOverlay: document.getElementById('modeSelectOverlay'), modeDailyBtn: document.getElementById('modeDailyBtn'),
     modeInfinityBtn: document.getElementById('modeInfinityBtn'),
@@ -1758,13 +2118,19 @@
   let runWord = null, runLetters = [], runThresholdsHit = [], runPowerupThresholdsHit = [];
   let runTriviaAttempted = 0, runTriviaCorrect = 0;
   let runSubjectSequence = [], runTriviaShown = 0;
-  let runHintsRevealed = 0, runBonusGuesses = 0;
+  let runHintsRevealed = 0;
   let solveEndsAt = 0, solveInterval = null, solveGuesses = [], solveRack = [], solveCurrentGuess = [];
   let solveCurrentGuessSource = [];
   const KEYBOARD_ROWS = ['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
   let solveLockedLetters = [];
   let runPendingPowerUp = false;
   let rackUsedFlags = [];
+  // Riddle-unlock tracking (see checkRiddleUnlock): the order power-ups are
+  // actually picked in, the current correct-trivia-in-a-row streak, and
+  // whether the riddle has already fired this run (it's a once-per-run
+  // secret, not something to trigger repeatedly).
+  let runPowerupPickOrder = [], runTriviaStreak = 0, riddleTriggeredThisRun = false;
+  let riddleEndsAt = 0, riddleInterval = null, currentRiddle = null;
 
   function renderRunBanner(){
     if (runResultToday){
@@ -1807,7 +2173,8 @@
     runTriviaAttempted = 0; runTriviaCorrect = 0;
     runSubjectSequence = shuffle(RUN_CORE_SUBJECTS.concat([pick(RUN_ELECTIVE_SUBJECTS)]));
     runTriviaShown = 0;
-    runHintsRevealed = 0; runBonusGuesses = 0;
+    runHintsRevealed = 0;
+    runPowerupPickOrder = []; runTriviaStreak = 0; riddleTriggeredThisRun = false;
     runWord = getTodayWord();
     runEndsAt = Date.now() + RUN_DURATION_MS;
     els.runTimerWrap.classList.remove('hidden');
@@ -1886,6 +2253,7 @@
     const subject = runSubjectSequence[runTriviaShown] || pick(RUN_CORE_SUBJECTS);
     runTriviaShown++;
     const q = generateSubjectTrivia(subject);
+    if (DEBUG_FAST) window.__debugLastTriviaQ = q;
     els.eventOverlay.classList.remove('hidden', 'powerup');
     els.powerupIcon.classList.add('hidden');
     renderSlowdownBtn();
@@ -1905,19 +2273,47 @@
     clearTimeout(eventTimeoutId);
     eventTimeoutId = setTimeout(()=> resolveRunTrivia(false), dt(10000));
   }
+  // Riddle-unlock check: were the 4 required power-ups drawn in relative
+  // order (other picks/repeats in between are fine), and is the player's
+  // lifetime "vibe" reading 49% or lower right now? Both must hold at the
+  // exact moment a 3-correct trivia streak lands.
+  function riddleComboDrawn(){
+    let seqIdx = 0;
+    for (const picked of runPowerupPickOrder){
+      if (picked === RIDDLE_UNLOCK_SEQUENCE[seqIdx]){
+        seqIdx++;
+        if (seqIdx >= RIDDLE_UNLOCK_SEQUENCE.length) return true;
+      }
+    }
+    return false;
+  }
+  function checkRiddleUnlock(){
+    if (riddleTriggeredThisRun) return false;
+    if (!riddleComboDrawn()) return false;
+    const vibePct = stats.decided > 0 ? Math.round((stats.agree / stats.decided) * 100) : 50;
+    return vibePct <= 49;
+  }
   function resolveRunTrivia(correct){
     clearTimeout(eventTimeoutId);
     els.eventTiles.forEach(t=> t.onclick = null);
     runTriviaAttempted++;
+    let riddleUnlocked = false;
     if (correct){
       sfx.correct();
       runTriviaCorrect++;
+      runTriviaStreak++;
       const nextLetter = runWord.word[runLetters.length];
       runLetters.push(nextLetter);
       els.eventSubtitle.textContent = '';
       els.eventPrompt.textContent = '\u2705 Correct! Letter earned: ' + nextLetter;
+      celebrateTriviaCorrect();
+      if (runTriviaStreak === 3 && checkRiddleUnlock()){
+        riddleUnlocked = true;
+        riddleTriggeredThisRun = true;
+      }
     } else {
       sfx.wrong();
+      runTriviaStreak = 0;
       runScore -= 5; // trivia carries real stakes too, applied directly since we're deliberately in the 'trivia' phase
       renderRunBanner();
       els.eventSubtitle.textContent = '';
@@ -1926,6 +2322,7 @@
     setTimeout(()=>{
       els.eventOverlay.classList.add('hidden');
       if (!runActive) return;
+      if (riddleUnlocked){ startRiddleRound(); return; }
       // Solve phase opens once every trivia shot has been taken, whether or
       // not all 6 landed - missed letters just mean more blank slots to
       // guess with the keyboard instead of ones you already know.
@@ -1962,6 +2359,7 @@
   function resolveRunPowerUp(key){
     clearTimeout(eventTimeoutId);
     els.eventTiles.forEach(t=> t.onclick = null);
+    if (key !== null) runPowerupPickOrder.push(key);
     els.eventOverlay.classList.remove('powerup');
     els.eventSubtitle.textContent = '';
     if (key === null){
@@ -1980,6 +2378,9 @@
       finishRunPowerUp();
     } else if (key === 'wildcard'){
       let ticks = 0;
+      els.eventPrompt.classList.remove('wildcard-pop');
+      void els.eventPrompt.offsetWidth;
+      els.eventPrompt.classList.add('wildcard-pop');
       const rollInterval = setInterval(()=>{
         sfx.spinTick(ticks);
         els.eventPrompt.textContent = '\uD83C\uDF81 ' + pick(['+25?','\u221225?']);
@@ -1993,10 +2394,10 @@
           finishRunPowerUp();
         }
       }, 90);
-    } else if (key === 'extraguess'){
+    } else if (key === 'hint'){
       sfx.powerUp();
-      runBonusGuesses++;
-      els.eventPrompt.textContent = '\u2795 +1 guess banked for the word solve';
+      runHintsRevealed = Math.min(runHintsRevealed + 1, runWord.hints.length);
+      els.eventPrompt.textContent = '\ud83d\udca1 Free hint banked for the word solve';
       finishRunPowerUp();
     }
   }
@@ -2008,6 +2409,80 @@
       loadNext();
     }, dt(1100));
   }
+
+  // The rare riddle-unlock bonus round (see checkRiddleUnlock). Visually
+  // and mechanically distinct from the regular trivia/power-up overlay -
+  // its own full-screen treatment, a single free-text answer instead of
+  // multiple choice, and a real reward (badge + points) on solve.
+  function startRiddleRound(){
+    runPhase = 'riddle';
+    if (unsubscribe){ unsubscribe(); unsubscribe = null; }
+    clearRoundTimer();
+    currentRiddle = pick(RIDDLES);
+    els.riddleQ.textContent = currentRiddle.q;
+    els.riddleInput.value = '';
+    els.riddleResult.className = 'riddle-result hidden';
+    els.riddleOverlay.classList.remove('hidden');
+    els.slowdownBtn.classList.add('hidden');
+    // Not a normal vote-and-reveal round, so clear stale voted/votedSinceTime
+    // the same way startSolvePhase does - otherwise the stalled-round
+    // watchdog can misread this 45s window as a stuck round.
+    voted = false;
+    votedSinceTime = null;
+    sfx.bonusZone();
+    setTimeout(()=> els.riddleInput.focus(), 50);
+    riddleEndsAt = Date.now() + RIDDLE_MS;
+    clearInterval(riddleInterval);
+    riddleInterval = setInterval(tickRiddleTimer, 200);
+    tickRiddleTimer();
+  }
+  function tickRiddleTimer(){
+    const remain = Math.max(0, riddleEndsAt - Date.now());
+    const totalSec = Math.ceil(remain / 1000);
+    els.riddleTimer.textContent = '0:' + (totalSec < 10 ? '0' : '') + totalSec;
+    els.riddleTimer.classList.toggle('danger', remain <= 10000);
+    if (remain <= 0){
+      clearInterval(riddleInterval);
+      resolveRiddle(false);
+    }
+  }
+  function submitRiddleAnswer(){
+    if (runPhase !== 'riddle' || !currentRiddle) return;
+    const guess = els.riddleInput.value.trim().toUpperCase();
+    resolveRiddle(guess.length > 0 && guess === currentRiddle.a);
+  }
+  function resolveRiddle(win){
+    // Guard against double-resolution (a fast double-submit, or the 45s
+    // timeout firing the same instant as a manual submit) - without this,
+    // addRunScore's +points call below would run twice, since 'riddle'
+    // isn't in addRunScore's normal trivia/solving blocklist, and score
+    // could blow past several thresholds without their trivia ever firing.
+    if (runPhase !== 'riddle') return;
+    runPhase = 'riddle-resolving';
+    clearInterval(riddleInterval);
+    els.riddleInput.blur();
+    if (win){
+      sfx.correct();
+      addRunScore(RIDDLE_BONUS_POINTS);
+      if (!stats.badges.riddler){ stats.badges.riddler = true; saveStats(); }
+      els.riddleResult.textContent = '🧩 Solved! +' + RIDDLE_BONUS_POINTS + ' points — ' + RIDDLE_BADGE + ' unlocked';
+      els.riddleResult.className = 'riddle-result win';
+      showToast(RIDDLE_BADGE + ' unlocked!');
+      renderStats();
+    } else {
+      sfx.wrong();
+      els.riddleResult.textContent = '⏰ Out of time — the answer was ' + currentRiddle.a;
+      els.riddleResult.className = 'riddle-result lose';
+    }
+    setTimeout(()=>{
+      els.riddleOverlay.classList.add('hidden');
+      if (!runActive) return;
+      if (runTriviaAttempted >= RUN_THRESHOLDS.length){ startSolvePhase(); }
+      else { runPhase = 'running'; loadNext(); }
+    }, dt(1800));
+  }
+  els.riddleSubmit.addEventListener('click', submitRiddleAnswer);
+  els.riddleInput.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') submitRiddleAnswer(); });
 
   function buildSolveKeyboard(){
     els.solveKeyboard.innerHTML = '';
@@ -2060,7 +2535,7 @@
     els.solveHint.textContent = runHintsRevealed > 0 ? runWord.hints.slice(0, runHintsRevealed).join(' \u00B7 ') : '';
     els.solveHintBtn.textContent = '\uD83D\uDCA1 Hint (\u22125s)';
     els.solveHintBtn.classList.toggle('disabled', runHintsRevealed >= runWord.hints.length);
-    els.solveAttempts.textContent = (RUN_MAX_GUESSES + runBonusGuesses - solveGuesses.length) + ' guesses left';
+    els.solveAttempts.textContent = (RUN_MAX_GUESSES - solveGuesses.length) + ' guesses left';
     els.solveSlots.innerHTML = '';
     for (let i=0;i<RUN_WORD_LENGTH;i++){
       const filled = solveLockedLetters[i] || solveCurrentGuess[i];
@@ -2137,7 +2612,7 @@
       endRun(true);
       return;
     }
-    if (solveGuesses.length >= RUN_MAX_GUESSES + runBonusGuesses){
+    if (solveGuesses.length >= RUN_MAX_GUESSES){
       clearInterval(solveInterval);
       endRun(false);
       return;
@@ -2218,6 +2693,14 @@
         els.badgesRow.appendChild(pill);
       }
     });
+    // The riddle-unlock badge lives outside the CAT_META category system
+    // (it's not tied to flipping cards in one category), so it gets its
+    // own pill rather than looping through CAT_META.
+    if (stats.badges.riddler){
+      const pill = document.createElement('span');
+      pill.className = 'badge-pill'; pill.textContent = RIDDLE_BADGE;
+      els.badgesRow.appendChild(pill);
+    }
     updateVibeMeter();
   }
   // Second personality axis: which category someone plays the most, reusing
@@ -2635,6 +3118,17 @@
     other.classList.add('tap-dimmed');
     setTimeout(()=>{ chosen.classList.remove('tap-chosen'); other.classList.remove('tap-dimmed'); }, 400);
   }
+  // Quick (<1s) confetti + text-flash celebration for a correct trivia
+  // answer. Restarts its CSS animations from scratch every call (forced
+  // reflow) so back-to-back correct answers each get a fresh burst.
+  function celebrateTriviaCorrect(){
+    const el = els.triviaCelebrate;
+    el.classList.add('hidden');
+    void el.offsetWidth; // force a reflow so display:none->flex restarts the child CSS animations
+    el.classList.remove('hidden');
+    clearTimeout(celebrateTriviaCorrect._t);
+    celebrateTriviaCorrect._t = setTimeout(()=> el.classList.add('hidden'), 800);
+  }
   els.halfA.addEventListener('click', ()=>{ sfx.tap(); playTrack('run'); tapFeedback(els.halfA, els.halfB); vote('A'); });
   els.halfB.addEventListener('click', ()=>{ sfx.tap(); playTrack('run'); tapFeedback(els.halfB, els.halfA); vote('B'); });
   document.addEventListener('keydown', (e)=>{
@@ -2733,6 +3227,9 @@
       finishPowerUp(true);
     } else if (key === 'wildcard'){
       let ticks = 0;
+      els.eventPrompt.classList.remove('wildcard-pop');
+      void els.eventPrompt.offsetWidth;
+      els.eventPrompt.classList.add('wildcard-pop');
       const rollInterval = setInterval(()=>{
         sfx.spinTick(ticks);
         els.eventPrompt.textContent = '\uD83C\uDF81 ' + pick(['+25?','\u221225?']);
@@ -2823,7 +3320,8 @@
       const levelupVisible = els.levelupOverlay.classList.contains('show');
       const solveVisible = !els.solveOverlay.classList.contains('hidden');
       const personalityVisible = els.personalityOverlay.classList.contains('show');
-      if (!overlayVisible && !levelupVisible && !solveVisible && !personalityVisible){
+      const riddleVisible = !els.riddleOverlay.classList.contains('hidden');
+      if (!overlayVisible && !levelupVisible && !solveVisible && !personalityVisible && !riddleVisible){
         console.warn('FlipStax: watchdog recovering a stalled round');
         voted = false;
         votedSinceTime = null;
@@ -2832,6 +3330,28 @@
     }
   }, 2000);
   setInterval(renderStatusBanner, 30000);
+
+  // DEV/TESTING ONLY: exposes internal run state for verification scripts,
+  // gated the same way as the rest of ?debug=fast. Not needed for normal
+  // play - remove alongside the rest of the debug fast-forward before
+  // shipping, or leave gated (off by default) if kept for future testing.
+  if (DEBUG_FAST){
+    window.__debug = {
+      getRunWord: () => runWord,
+      getRunLetters: () => runLetters,
+      getStats: () => stats,
+      getPowerupOrder: () => runPowerupPickOrder,
+      getTriviaStreak: () => runTriviaStreak,
+      getRiddleTriggered: () => riddleTriggeredThisRun,
+      getLastTriviaQ: () => window.__debugLastTriviaQ,
+      forceVibe: (pct) => { stats.decided = 100; stats.agree = pct; saveStats(); updateVibeMeter(); },
+      getRunState: () => ({
+        runScore, runPhase, runTriviaAttempted, runTriviaCorrect,
+        runThresholdsHit: runThresholdsHit.slice(), runPowerupThresholdsHit: runPowerupThresholdsHit.slice(),
+        runPendingTrivia, runPendingPowerUp, runLetters: runLetters.slice(),
+      }),
+    };
+  }
 
   // Real homepage - shown every visit (not a one-time tutorial), sitting
   // above everything else including the already-running endless game
