@@ -447,15 +447,12 @@
   .home-overlay{
     position:fixed; inset:0; z-index:41; display:flex; flex-direction:column;
     align-items:center; justify-content:center; padding:24px; text-align:center;
-    /* Flat two-tone wash sampled directly from the logo art's own sky-blue
-       backdrop (lighter near its top edge, slightly deeper near its
-       bottom edge), with a subtle drawn doodle pattern tiled on top for a
-       wallpaper feel. The doodle SVG is a procedural line-art tile (not a
-       photo crop), so it repeats seamlessly with no mismatch risk against
-       the unresized logo sitting on top of it. */
-    background-image: url('images/doodle-pattern.svg'), linear-gradient(180deg,#a4e0fd 0%,#82c9f8 100%);
-    background-size: 220px 220px, cover;
-    background-repeat: repeat, no-repeat;
+    /* User-supplied doodle wallpaper tile (dice/star/question-mark/VS art on
+       a sky-blue wash already matching the logo's own backdrop color) -
+       tiled directly as the background, logo sits on top of it. */
+    background-image: url('images/doodle-pattern-tile.jpg');
+    background-size: 480px auto;
+    background-repeat: repeat;
   }
   .home-overlay.hidden{ display:none; }
   .home-logo-img{
@@ -1324,13 +1321,16 @@
       'linear-gradient(165deg, hsl('+hueB+',56%,32%), hsl('+hueB+',64%,46%))'
     ];
   }
-  // Wraps a background gradient with the shared doodle-pattern texture tile
-  // (dice/star/question-mark line art, low opacity) so cards get the same
-  // "wallpaper" feel as the home screen instead of a flat color fill.
+  // Wraps a background gradient with the same doodle-pattern tile used on the
+  // home screen, so cards get the same "wallpaper" feel instead of a flat
+  // color fill. The tile is soft-light blended onto the gradient rather than
+  // laid on top at fixed opacity, so it always picks up each card's own hue
+  // instead of staying a fixed blue.
   function textureLayers(el, gradient){
-    el.style.backgroundImage = "url('images/doodle-pattern.svg'), " + gradient;
-    el.style.backgroundSize = '220px 220px, cover';
+    el.style.backgroundImage = "url('images/doodle-pattern-tile.jpg'), " + gradient;
+    el.style.backgroundSize = '480px auto, cover';
     el.style.backgroundRepeat = 'repeat, no-repeat';
+    el.style.backgroundBlendMode = 'soft-light, normal';
   }
   // For hand-authored scenario gradients: extracts an approximate hue from
   // the first hex color in a gradient string, so we can detect (and correct)
