@@ -456,9 +456,16 @@
   }
   .home-overlay.hidden{ display:none; }
   .doodle-scatter{ position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
+  .doodle-scatter-track{ position:absolute; top:0; left:0; }
   .doodle-scatter svg{ position:absolute; opacity:0.16; }
+  @keyframes doodleDrift{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+  /* Background shows first (see renderDoodleScatter call order), then the
+     logo pops in from nothing - delay lets the wallpaper register before
+     the zoom starts. */
+  @keyframes logoZoomIn{ from{ transform:scale(0); opacity:0; } to{ transform:scale(1); opacity:1; } }
   .home-logo-img{
     width:100%; max-width:440px; height:auto; margin-bottom:34px;
+    animation: logoZoomIn 650ms cubic-bezier(.25,.85,.35,1.25) 450ms both;
   }
   .home-enter-btn{ padding:13px 48px; font-size:16px; box-shadow:0 6px 18px rgba(242,84,91,0.4); }
 
@@ -685,7 +692,7 @@
   </div>
 </div>
 <div class="home-overlay" id="homeOverlay">
-  <img class="home-logo-img" src="images/flipstax-logo.jpg" alt="FlipStax - Flip, Vote, Jumble &amp; Solve">
+  <img class="home-logo-img" src="images/flipstax-logo-transparent.png" alt="FlipStax - Flip, Vote, Jumble &amp; Solve">
   <div class="daily-btn primary home-enter-btn" id="homeEnterBtn">Enter</div>
 </div>
 
@@ -1323,31 +1330,55 @@
       'linear-gradient(165deg, hsl('+hueB+',56%,32%), hsl('+hueB+',64%,46%))'
     ];
   }
-  // Small line-art icon set (dice/star/question-mark/VS) drawn as inline
-  // SVG so they can be scattered individually - see renderDoodleScatter.
+  // Small line-art icon set drawn as inline SVG so they can be scattered
+  // individually - see renderDoodleScatter.
   const DOODLE_ICON_SVGS = [
     '<svg viewBox="0 0 40 40" width="100%" height="100%"><path d="M20 3 L25 15 L38 16 L28 25 L31 37 L20 30 L9 37 L12 25 L2 16 L15 15 Z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round"/></svg>',
     '<svg viewBox="0 0 40 40" width="100%" height="100%"><rect x="6" y="6" width="28" height="28" rx="6" fill="none" stroke="#fff" stroke-width="2.2"/><circle cx="15" cy="15" r="2.3" fill="#fff"/><circle cx="25" cy="15" r="2.3" fill="#fff"/><circle cx="20" cy="20" r="2.3" fill="#fff"/><circle cx="15" cy="25" r="2.3" fill="#fff"/><circle cx="25" cy="25" r="2.3" fill="#fff"/></svg>',
     '<svg viewBox="0 0 40 40" width="100%" height="100%"><text x="20" y="30" font-family="Arial,sans-serif" font-size="30" font-weight="900" text-anchor="middle" fill="none" stroke="#fff" stroke-width="1.6">?</text></svg>',
-    '<svg viewBox="0 0 40 40" width="100%" height="100%"><text x="20" y="27" font-family="Arial,sans-serif" font-size="16" font-weight="900" text-anchor="middle" fill="none" stroke="#fff" stroke-width="1.4">VS</text></svg>'
+    '<svg viewBox="0 0 40 40" width="100%" height="100%"><text x="20" y="27" font-family="Arial,sans-serif" font-size="16" font-weight="900" text-anchor="middle" fill="none" stroke="#fff" stroke-width="1.4">VS</text></svg>',
+    '<svg viewBox="0 0 40 40" width="100%" height="100%"><circle cx="20" cy="20" r="15" fill="none" stroke="#fff" stroke-width="2.2"/><path d="M20 11 L20 20 L26 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    '<svg viewBox="0 0 40 40" width="100%" height="100%"><circle cx="20" cy="20" r="15" fill="none" stroke="#fff" stroke-width="2.2"/><ellipse cx="20" cy="20" rx="6.5" ry="15" fill="none" stroke="#fff" stroke-width="1.6"/><line x1="5" y1="20" x2="35" y2="20" stroke="#fff" stroke-width="1.6"/></svg>',
+    '<svg viewBox="0 0 40 40" width="100%" height="100%"><path d="M4 12 C10 8 16 8 20 11 C24 8 30 8 36 12 L36 30 C30 26 24 26 20 29 C16 26 10 26 4 30 Z" fill="none" stroke="#fff" stroke-width="2.1" stroke-linejoin="round"/></svg>',
+    '<svg viewBox="0 0 40 40" width="100%" height="100%"><text x="20" y="29" font-family="Arial,sans-serif" font-size="24" font-weight="900" text-anchor="middle" fill="none" stroke="#fff" stroke-width="1.5">∑</text></svg>',
+    '<svg viewBox="0 0 40 40" width="100%" height="100%"><path d="M12 14 C8 10 14 6 18 8 C20 5 26 5 28 9 C33 9 34 15 31 17 C34 20 32 25 28 25 C27 29 21 30 19 27 C14 29 9 25 11 21 C7 19 8 14 12 14 Z" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><path d="M18 12 Q21 15 18 18 Q22 20 19 23" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/></svg>'
   ];
-  // Scatters the doodle icons individually across a container at
-  // randomized (jittered-grid) positions/sizes/rotations, instead of
-  // tiling one raster image - so there's no repeat boundary or "stamped
-  // rectangle" look, just one continuous field of icons. Regenerated on
-  // resize since it's laid out in real pixels against the container's
-  // current size.
-  function renderDoodleScatter(container){
-    let layer = container.querySelector(':scope > .doodle-scatter');
-    if (!layer){
-      layer = document.createElement('div');
-      layer.className = 'doodle-scatter';
-      container.insertBefore(layer, container.firstChild);
+  // Scatters the doodle icons individually across a track at randomized
+  // (jittered-grid) positions/sizes/rotations, instead of tiling one raster
+  // image - so there's no repeat boundary or "stamped rectangle" look, just
+  // one continuous field of icons.
+  //
+  // opts.direction 'left'/'right' builds the track at double the
+  // container's width and animates it via CSS translateX; since both
+  // halves of that double-wide track are the same generated content, the
+  // loop point at -50% is visually identical to 0%, so it drifts forever
+  // with no seam. Omit direction (or 'none') for a static, single-width
+  // field (used on the home screen).
+  function renderDoodleScatter(container, opts){
+    opts = opts || {};
+    let outer = container.querySelector(':scope > .doodle-scatter');
+    if (!outer){
+      outer = document.createElement('div');
+      outer.className = 'doodle-scatter';
+      container.insertBefore(outer, container.firstChild);
     }
-    layer.innerHTML = '';
-    const w = container.clientWidth || 400, h = container.clientHeight || 400;
+    outer.innerHTML = '';
+    const h = container.clientHeight || 400;
+    const baseW = container.clientWidth || 400;
+    const moving = opts.direction === 'left' || opts.direction === 'right';
+    const trackW = moving ? baseW * 2 : baseW;
+
+    const track = document.createElement('div');
+    track.className = 'doodle-scatter-track';
+    track.style.width = trackW + 'px';
+    track.style.height = h + 'px';
+    if (moving){
+      track.style.animation = 'doodleDrift ' + (50 + Math.random()*20).toFixed(0) + 's linear infinite';
+      if (opts.direction === 'right') track.style.animationDirection = 'reverse';
+    }
+
     const cell = 92;
-    const cols = Math.ceil(w / cell) + 1, rows = Math.ceil(h / cell) + 1;
+    const cols = Math.ceil(trackW / cell) + 1, rows = Math.ceil(h / cell) + 1;
     for (let r = 0; r < rows; r++){
       for (let c = 0; c < cols; c++){
         const x = c*cell + (Math.random()-0.5)*cell*0.7;
@@ -1360,9 +1391,10 @@
         wrap.style.position = 'absolute';
         wrap.style.transform = 'rotate('+rot+'deg)';
         wrap.innerHTML = DOODLE_ICON_SVGS[Math.floor(Math.random()*DOODLE_ICON_SVGS.length)];
-        layer.appendChild(wrap);
+        track.appendChild(wrap);
       }
     }
+    outer.appendChild(track);
   }
   // For hand-authored scenario gradients: extracts an approximate hue from
   // the first hex color in a gradient string, so we can detect (and correct)
@@ -3565,15 +3597,15 @@
   // on the first tap anywhere, same muted-autoplay pattern as before.
   primeMusic('intro');
   renderDoodleScatter(els.homeOverlay);
-  renderDoodleScatter(els.halfA);
-  renderDoodleScatter(els.halfB);
+  renderDoodleScatter(els.halfA, {direction:'right'});
+  renderDoodleScatter(els.halfB, {direction:'left'});
   let doodleResizeTimer = null;
   window.addEventListener('resize', ()=>{
     clearTimeout(doodleResizeTimer);
     doodleResizeTimer = setTimeout(()=>{
       renderDoodleScatter(els.homeOverlay);
-      renderDoodleScatter(els.halfA);
-      renderDoodleScatter(els.halfB);
+      renderDoodleScatter(els.halfA, {direction:'right'});
+      renderDoodleScatter(els.halfB, {direction:'left'});
     }, 200);
   });
   els.homeEnterBtn.addEventListener('click', ()=>{
