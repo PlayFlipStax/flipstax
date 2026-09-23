@@ -468,6 +468,25 @@
     animation: logoZoomIn 650ms cubic-bezier(.25,.85,.35,1.25) 450ms both;
   }
   .home-enter-btn{ padding:13px 48px; font-size:16px; box-shadow:0 6px 18px rgba(242,84,91,0.4); }
+  .home-legal-link{
+    position:relative; z-index:1; margin-top:16px; font-size:11.5px;
+    color:rgba(255,255,255,0.75); text-decoration:underline; cursor:pointer;
+  }
+  .legal-overlay{
+    position:fixed; inset:0; z-index:70; display:flex; align-items:center;
+    justify-content:center; background:rgba(8,10,24,0.82); padding:24px;
+  }
+  .legal-overlay.hidden{ display:none; }
+  .legal-panel{
+    background:var(--bg,#12142b); border-radius:16px; max-width:520px; width:100%;
+    max-height:80vh; overflow-y:auto; padding:24px 22px; box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  }
+  .legal-title{ font-size:18px; font-weight:800; color:#fff; margin-bottom:14px; }
+  .legal-body{ font-size:12.5px; line-height:1.65; color:rgba(255,255,255,0.85); text-align:left; }
+  .legal-body h4{ font-size:13px; margin:16px 0 4px; color:#ffd93d; }
+  .legal-body h4:first-child{ margin-top:0; }
+  .legal-body p{ margin:0 0 4px; }
+  .legal-close{ margin-top:18px; width:100%; text-align:center; }
 
   /* Mode picker, built as a literal split-screen (top/bottom halves +
      center divider) to mirror the VS board itself - the choice between
@@ -694,6 +713,33 @@
 <div class="home-overlay" id="homeOverlay">
   <img class="home-logo-img" src="images/flipstax-logo-transparent.png" alt="FlipStax - Flip, Vote, Jumble &amp; Solve">
   <div class="daily-btn primary home-enter-btn" id="homeEnterBtn">Enter</div>
+  <div class="home-legal-link" id="homeLegalLink">Terms &amp; Disclaimer</div>
+</div>
+<div class="legal-overlay hidden" id="legalOverlay">
+  <div class="legal-panel">
+    <div class="legal-title">Terms &amp; Disclaimer</div>
+    <div class="legal-body">
+      <h4>Entertainment only</h4>
+      <p>FlipStax is a casual entertainment game. Its trivia questions, "would you rather" scenarios, matchups, and word puzzles are intended purely for fun and should not be relied on as factual, professional, educational, or authoritative in any respect.</p>
+      <h4>Opinions, not facts</h4>
+      <p>Vote percentages, "crowd agreement," and similar results reflect the casual opinions of other players choosing between two options in a game - nothing more. They are not surveys, research, rankings, or statements of fact about any person, brand, or topic.</p>
+      <h4>No affiliation or endorsement</h4>
+      <p>FlipStax is an independent, unofficial project. Any names, brands, companies, franchises, or public figures referenced in the game's content are used solely for descriptive, comparative, or commentary purposes as part of casual entertainment content. FlipStax is not affiliated with, sponsored by, endorsed by, or otherwise officially connected with any person, brand, or company mentioned within the game unless explicitly stated.</p>
+      <h4>Trademarks</h4>
+      <p>All product names, logos, brands, and trademarks referenced in FlipStax are the property of their respective owners. Their use here does not imply any endorsement or business relationship.</p>
+      <h4>No warranty</h4>
+      <p>FlipStax is provided "as is" and "as available," without warranties of any kind, express or implied, including as to accuracy, reliability, or fitness for a particular purpose.</p>
+      <h4>Limitation of liability</h4>
+      <p>To the fullest extent permitted by law, FlipStax and its creators are not liable for any direct, indirect, incidental, or consequential damages arising from your use of, or inability to use, this game or its content.</p>
+      <h4>Audience</h4>
+      <p>FlipStax is intended for a general audience and is not directed at children under 13. We do not knowingly collect personal information from children.</p>
+      <h4>Changes</h4>
+      <p>These terms may be updated from time to time as the game evolves. Continued use of FlipStax after changes means you accept the updated terms.</p>
+      <h4>Contact</h4>
+      <p>Questions about these terms: <strong>[add your contact email here]</strong></p>
+    </div>
+    <div class="daily-btn primary legal-close" id="legalCloseBtn">Close</div>
+  </div>
 </div>
 
 <div class="split-select-overlay hidden" id="modeSelectOverlay">
@@ -2124,6 +2170,8 @@
     riddleQ: document.getElementById('riddleQ'), riddleInput: document.getElementById('riddleInput'),
     riddleSubmit: document.getElementById('riddleSubmit'), riddleResult: document.getElementById('riddleResult'),
     homeOverlay: document.getElementById('homeOverlay'), homeEnterBtn: document.getElementById('homeEnterBtn'),
+    homeLegalLink: document.getElementById('homeLegalLink'), legalOverlay: document.getElementById('legalOverlay'),
+    legalCloseBtn: document.getElementById('legalCloseBtn'),
     modeSelectOverlay: document.getElementById('modeSelectOverlay'), modeDailyBtn: document.getElementById('modeDailyBtn'),
     modeInfinityBtn: document.getElementById('modeInfinityBtn'),
     runBanner: document.getElementById('runBanner'),
@@ -3611,6 +3659,13 @@
   els.homeEnterBtn.addEventListener('click', ()=>{
     els.homeOverlay.classList.add('hidden');
     els.modeSelectOverlay.classList.remove('hidden');
+  });
+  els.homeLegalLink.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    els.legalOverlay.classList.remove('hidden');
+  });
+  els.legalCloseBtn.addEventListener('click', ()=>{
+    els.legalOverlay.classList.add('hidden');
   });
   els.modeInfinityBtn.addEventListener('click', ()=>{
     els.modeSelectOverlay.classList.add('hidden');
