@@ -4098,7 +4098,8 @@
     els.modeSelectOverlay.classList.remove('hidden');
   });
   const LEGAL_LAST_UPDATED = 'September 24, 2026';
-  const LEGAL_CONTACT_EMAIL = '[TODO: add a dedicated FlipStax contact email here]';
+  const LEGAL_CONTACT_EMAIL = 'playflipstax@gmail.com';
+  const LEGAL_CONTACT_LINK = '<a href="mailto:' + LEGAL_CONTACT_EMAIL + '">' + LEGAL_CONTACT_EMAIL + '</a>';
   const LEGAL_DOCS = {
     disclaimer: {
       title: 'Disclaimer',
@@ -4121,7 +4122,7 @@
         <h4>Changes</h4>
         <p>These terms may be updated from time to time as the game evolves. Continued use of FlipStax after changes means you accept the updated terms.</p>
         <h4>Contact</h4>
-        <p>Questions about these terms: <strong>${LEGAL_CONTACT_EMAIL}</strong></p>
+        <p>Questions about these terms: ${LEGAL_CONTACT_LINK}</p>
       `,
     },
     tos: {
@@ -4152,7 +4153,7 @@
         <h4>8. Governing Law</h4>
         <p>These Terms are governed by the laws of the State of Maine, without regard to conflict-of-law principles.</p>
         <h4>9. Contact</h4>
-        <p>Questions about these Terms can be sent to <strong>${LEGAL_CONTACT_EMAIL}</strong>.</p>
+        <p>Questions about these Terms can be sent to ${LEGAL_CONTACT_LINK}.</p>
       `,
     },
     privacy: {
@@ -4175,7 +4176,7 @@
         <h4>5. Changes to This Policy</h4>
         <p>We may update this Privacy Policy from time to time. Continued use of the Game after changes are posted constitutes acceptance of the updated policy.</p>
         <h4>6. Contact</h4>
-        <p>Questions about this Privacy Policy can be sent to <strong>${LEGAL_CONTACT_EMAIL}</strong>.</p>
+        <p>Questions about this Privacy Policy can be sent to ${LEGAL_CONTACT_LINK}.</p>
       `,
     },
   };
