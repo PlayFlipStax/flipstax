@@ -535,6 +535,28 @@
   .doodle-scatter-track{ position:absolute; top:0; left:0; }
   .doodle-scatter svg{ position:absolute; opacity:0.16; }
   @keyframes doodleDrift{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+  /* Infinity Flips intensity ramp: --ramp (0..1, set from JS as the run's
+     round count climbs - see applyRampTier) brightens the existing drifting
+     doodle field and fades a teal/violet glow in behind it. Only opacity
+     and one small box-shadow are animated - no filters or blend modes, so
+     it stays cheap on mid-range phones. Sits entirely on top of the
+     existing look: at --ramp:0 every value below equals the original. */
+  :root.mode-infinity .half .doodle-scatter svg{
+    opacity:calc(0.16 + var(--ramp, 0) * 0.22);
+    transition:opacity 3.5s ease;
+  }
+  :root.mode-infinity .half .doodle-scatter::after{
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background:
+      radial-gradient(circle at 18% 14%, rgba(62,194,194,0.6), transparent 55%),
+      radial-gradient(circle at 82% 86%, rgba(122,76,224,0.6), transparent 55%);
+    opacity:calc(var(--ramp, 0) * 0.55);
+    transition:opacity 3.5s ease;
+  }
+  :root.mode-infinity header{
+    box-shadow:0 3px calc(var(--ramp, 0) * 20px) var(--mode-glow, transparent);
+    transition:box-shadow 3.5s ease;
+  }
   /* Background shows first (see renderDoodleScatter call order), then the
      logo pops in from nothing - delay lets the wallpaper register before
      the zoom starts. */
@@ -1526,6 +1548,11 @@
       }
     }
     outer.appendChild(track);
+    if (moving && rampDriftRate !== 1) setTrackDriftRate(track);
+  }
+  function setTrackDriftRate(track){
+    if (!track || !track.getAnimations) return;
+    track.getAnimations().forEach(a=>{ try{ a.updatePlaybackRate(rampDriftRate); }catch(e){} });
   }
   // For hand-authored scenario gradients: extracts an approximate hue from
   // the first hex color in a gradient string, so we can detect (and correct)
@@ -1728,6 +1755,138 @@
       document.removeEventListener('pointerdown', unmute);
     };
     document.addEventListener('pointerdown', unmute, { once:true });
+  }
+
+  // ---- Infinity Flips intensity ramp ----
+  // The longer an Infinity run survives, the more the existing look and
+  // sound build: every RAMP_ROUNDS_PER_TIER rounds bumps a tier (0-4) that
+  // brightens the drifting doodle field, fades in a teal/violet glow,
+  // nudges the drift speed up, and layers two synthesized parts over the
+  // same recorded track. Purely additive and never touches scoring, round
+  // timers, or the track itself - it only writes CSS variables, an
+  // animation playback rate, and its own Web Audio nodes. Resets to tier 0
+  // whenever an Infinity run starts or is left.
+  const RAMP_ROUNDS_PER_TIER = 12;
+  const RAMP_MAX_TIER = 4;
+  const RAMP_DRIFT_RATES = [1, 1.2, 1.4, 1.6, 1.8];
+  const RAMP_HAT_LEVEL   = [0, 0.55, 0.75, 0.9, 1];
+  const RAMP_RISER_LEVEL = [0, 0, 0.6, 0.85, 1];
+  // bonus-stage-anthem.mp3 measured at a steady 110 BPM with its first beat
+  // 52ms in (consistent across the whole 166s file). The layers below are
+  // unpitched (noise hats + a noise riser) so they can lock to that grid
+  // without needing to know the track's key.
+  const RAMP_BEAT = 60 / 110, RAMP_PHASE = 0.052;
+  let rampRounds = 0, rampTier = 0, rampDriftRate = 1;
+  let rampBus = null, rampNoise = null, rampTimer = null;
+  let rampLastTrackT = 0, rampNextHatStep = 0, rampNextPhrase = -1;
+
+  function ensureRampAudio(){
+    if (rampBus) return rampBus;
+    const ctx = getAudioCtx();
+    if (!ctx) return null;
+    try{
+      const len = Math.floor(ctx.sampleRate * 1.2);
+      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i=0;i<len;i++) d[i] = Math.random()*2-1;
+      rampNoise = buf;
+      const hat = ctx.createGain(); hat.gain.value = 0; hat.connect(ctx.destination);
+      const riser = ctx.createGain(); riser.gain.value = 0; riser.connect(ctx.destination);
+      rampBus = { hat, riser };
+    }catch(e){ rampBus = null; }
+    return rampBus;
+  }
+  function setRampAudioLevels(tier, fast){
+    if (!rampBus || !audioCtx) return;
+    const t = audioCtx.currentTime, tc = fast ? 0.12 : 1.4;
+    try{
+      rampBus.hat.gain.setTargetAtTime(RAMP_HAT_LEVEL[tier], t, tc);
+      rampBus.riser.gain.setTargetAtTime(RAMP_RISER_LEVEL[tier], t, tc);
+    }catch(e){}
+  }
+  function rampHat(at, accent){
+    const ctx = audioCtx;
+    const src = ctx.createBufferSource(); src.buffer = rampNoise;
+    const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 7500;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, at);
+    g.gain.linearRampToValueAtTime(accent ? 0.16 : 0.07, at + 0.004);
+    g.gain.exponentialRampToValueAtTime(0.0001, at + (accent ? 0.06 : 0.035));
+    src.connect(hp); hp.connect(g); g.connect(rampBus.hat);
+    src.start(at); src.stop(at + 0.08);
+  }
+  function rampRiser(at, dur){
+    const ctx = audioCtx;
+    const src = ctx.createBufferSource(); src.buffer = rampNoise;
+    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 2.5;
+    bp.frequency.setValueAtTime(500, at);
+    bp.frequency.exponentialRampToValueAtTime(7000, at + dur);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, at);
+    g.gain.linearRampToValueAtTime(0.16, at + dur * 0.96);
+    g.gain.linearRampToValueAtTime(0.0001, at + dur);
+    src.connect(bp); bp.connect(g); g.connect(rampBus.riser);
+    src.start(at); src.stop(at + dur + 0.02);
+  }
+  // Runs ~11x/sec while a ramp tier is active. Reads the music element's
+  // own playback position each time and schedules the next ~300ms of hits
+  // against the audio clock, so it re-syncs to the track continuously
+  // (including across the loop point) instead of free-running and drifting.
+  function rampAudioTick(){
+    const ctx = audioCtx, el = trackEls.run;
+    if (ctx && ctx.state === 'suspended') ctx.resume().catch(()=>{});
+    if (!ctx || !rampBus || !el || !soundOn || currentTrackKey !== 'run' || el.paused || el.muted || ctx.state !== 'running') return;
+    const now = el.currentTime;
+    if (now < rampLastTrackT - 0.5){ rampNextHatStep = 0; rampNextPhrase = -1; }
+    rampLastTrackT = now;
+    const off = ctx.currentTime - now, horizon = now + 0.3;
+    const step = RAMP_BEAT / 4;
+    let i = Math.max(rampNextHatStep, Math.ceil((now - RAMP_PHASE) / step));
+    for (; RAMP_PHASE + i * step < horizon; i++){
+      const p = i % 4, at = RAMP_PHASE + i * step + off;
+      if (p === 2) rampHat(at, true);
+      else if (rampTier >= 3 && (p === 1 || p === 3)) rampHat(at, false);
+    }
+    rampNextHatStep = i;
+    // Riser sweeps through the last two beats of every four-bar phrase.
+    const phraseLen = RAMP_BEAT * 16;
+    let ph = Math.max(rampNextPhrase + 1, Math.ceil((now - RAMP_PHASE - 14 * RAMP_BEAT) / phraseLen));
+    for (;;){
+      const start = RAMP_PHASE + 14 * RAMP_BEAT + ph * phraseLen;
+      if (start >= horizon) break;
+      if (rampTier >= 2) rampRiser(start + off, 2 * RAMP_BEAT);
+      rampNextPhrase = ph; ph++;
+    }
+  }
+  function applyRampTier(tier, fast){
+    rampTier = tier;
+    document.documentElement.style.setProperty('--ramp', String(tier / RAMP_MAX_TIER));
+    let reduced = false;
+    try{ reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }catch(e){}
+    rampDriftRate = reduced ? 1 : RAMP_DRIFT_RATES[tier];
+    [els.halfA, els.halfB].forEach(h=> setTrackDriftRate(h.querySelector('.doodle-scatter-track')));
+    if (tier > 0){
+      if (ensureRampAudio()){
+        setRampAudioLevels(tier, fast);
+        if (!rampTimer) rampTimer = setInterval(rampAudioTick, 90);
+      }
+    } else {
+      setRampAudioLevels(0, true);
+      clearInterval(rampTimer); rampTimer = null;
+      rampNextHatStep = 0; rampNextPhrase = -1;
+    }
+  }
+  function rampOnRound(){
+    try{
+      if (!document.documentElement.classList.contains('mode-infinity')) return;
+      rampRounds++;
+      const tier = Math.min(RAMP_MAX_TIER, Math.floor(rampRounds / RAMP_ROUNDS_PER_TIER));
+      if (tier !== rampTier) applyRampTier(tier, false);
+    }catch(e){}
+  }
+  function resetRamp(){
+    rampRounds = 0;
+    if (rampTier !== 0 || rampDriftRate !== 1){ try{ applyRampTier(0, true); }catch(e){} }
   }
 
 
@@ -3645,6 +3804,7 @@
     if (idx >= deck.length) resetDeck();
     current = deck[idx++];
     current.bonusPoints = Math.random() < 0.2;
+    rampOnRound();
 
     const meta = CAT_META[current.category] || {};
     const icon = (meta.badge || '').split(' ')[0] || '';
@@ -4077,6 +4237,9 @@
       getTriviaStreak: () => runTriviaStreak,
       getRiddleTriggered: () => riddleTriggeredThisRun,
       getLastTriviaQ: () => window.__debugLastTriviaQ,
+      getRamp: () => ({ rampRounds, rampTier, rampDriftRate, audioLayers: !!rampTimer }),
+      getTrackTime: () => trackEls.run ? trackEls.run.currentTime : null,
+      jumpRampToRounds: (n) => { rampRounds = Math.max(0, n - 1); rampOnRound(); },
       forceVibe: (pct) => { stats.decided = 100; stats.agree = pct; saveStats(); updateVibeMeter(); },
       getRunState: () => ({
         runScore, runPhase, runTriviaAttempted, runTriviaCorrect,
@@ -4232,6 +4395,7 @@
     document.documentElement.classList.remove('mode-daily');
     els.backBtn.classList.remove('hidden');
     updatePauseBtnVisibility();
+    resetRamp();
     // Falls back to the single shared gameplay track until Infinity gets
     // its own distinct one.
     playTrack('run');
@@ -4277,6 +4441,7 @@
     els.pauseBtn.classList.add('hidden');
 
     document.documentElement.classList.remove('mode-daily', 'mode-infinity');
+    resetRamp();
     els.backBtn.classList.add('hidden');
     playTrack('intro');
     els.modeSelectOverlay.classList.remove('hidden');
