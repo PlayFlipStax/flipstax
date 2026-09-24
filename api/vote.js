@@ -21,26 +21,51 @@ const redis = new Redis({
 // from hammering the counter in a tight loop.
 const RATE_LIMIT_WINDOW_SECONDS = 2;
 
+// Real itemIds only ever come from the client's slugify() (lowercase,
+// alphanumeric segments joined by single hyphens, "item" as the empty
+// fallback). Longest real slug in the current deck is 65 chars. This
+// rejects anything shaped differently - raw unicode, emoji, oversized
+// strings, or other junk sent straight to the API - before it ever
+// reaches Redis.
+const ITEM_ID_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+const ITEM_ID_MAX_LENGTH = 80;
+
+function getClientIp(req) {
+  // Vercel's edge appends the connecting client's IP as the LAST entry
+  // of X-Forwarded-For; anything before that is whatever the client
+  // itself (or an earlier hop) chose to send, and is trivially spoofable.
+  // Reading [0] instead of the last entry would let a client defeat the
+  // rate limit just by sending its own made-up XFF header.
+  const xff = req.headers['x-forwarded-for'];
+  if (typeof xff === 'string' && xff.trim()) {
+    const parts = xff.split(',').map((s) => s.trim()).filter(Boolean);
+    if (parts.length) return parts[parts.length - 1];
+  }
+  return req.socket?.remoteAddress || 'unknown';
+}
+
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  const { itemId } = req.body || {};
-
-  if (!itemId || typeof itemId !== 'string' || itemId.length > 100) {
-    return res.status(400).json({ error: 'itemId (string) is required' });
-  }
-
-  // Basic per-IP throttle: one vote per RATE_LIMIT_WINDOW_SECONDS.
-  const ip =
-    req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
-    req.socket?.remoteAddress ||
-    'unknown';
-  const rateKey = `ratelimit:vote:${ip}`;
-
   try {
+    if (req.method !== 'POST') {
+      res.setHeader('Allow', 'POST');
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    const body = req.body;
+    const itemId = body && typeof body === 'object' ? body.itemId : undefined;
+
+    if (
+      typeof itemId !== 'string' ||
+      itemId.length === 0 ||
+      itemId.length > ITEM_ID_MAX_LENGTH ||
+      !ITEM_ID_RE.test(itemId)
+    ) {
+      return res.status(400).json({ error: 'itemId must be a slug-shaped string' });
+    }
+
+    const ip = getClientIp(req);
+    const rateKey = `ratelimit:vote:${ip}`;
+
     const alreadyVoted = await redis.set(rateKey, '1', {
       nx: true,
       ex: RATE_LIMIT_WINDOW_SECONDS,

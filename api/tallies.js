@@ -18,29 +18,36 @@ const redis = new Redis({
   token: process.env.KV_REST_API_TOKEN,
 });
 
+// Same shape constraint as vote.js - real ids only ever come from the
+// client's slugify() output. Anything else is dropped rather than sent
+// to Redis, so a crafted ids= list can't be used to read or create
+// arbitrary keys.
+const ITEM_ID_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+const ITEM_ID_MAX_LENGTH = 80;
+
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    res.setHeader('Allow', 'GET');
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  const idsParam = req.query.ids;
-
-  if (!idsParam || typeof idsParam !== 'string') {
-    return res.status(400).json({ error: 'ids query param is required, e.g. ?ids=kendrick,drake' });
-  }
-
-  const ids = idsParam
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .slice(0, 20); // sanity cap
-
-  if (ids.length === 0) {
-    return res.status(400).json({ error: 'No valid ids provided' });
-  }
-
   try {
+    if (req.method !== 'GET') {
+      res.setHeader('Allow', 'GET');
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    const idsParam = req.query.ids;
+
+    if (!idsParam || typeof idsParam !== 'string') {
+      return res.status(400).json({ error: 'ids query param is required, e.g. ?ids=kendrick,drake' });
+    }
+
+    const ids = idsParam
+      .split(',')
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0 && s.length <= ITEM_ID_MAX_LENGTH && ITEM_ID_RE.test(s))
+      .slice(0, 20); // sanity cap
+
+    if (ids.length === 0) {
+      return res.status(400).json({ error: 'No valid ids provided' });
+    }
+
     const keys = ids.map((id) => `votes:${id}`);
     const rawCounts = await redis.mget(...keys);
 
