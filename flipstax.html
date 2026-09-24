@@ -544,10 +544,15 @@
     animation: logoZoomIn 650ms cubic-bezier(.25,.85,.35,1.25) 450ms both;
   }
   .home-enter-btn{ padding:13px 48px; font-size:16px; box-shadow:0 6px 18px rgba(242,84,91,0.4); }
-  .home-legal-link{
-    position:relative; z-index:1; margin-top:16px; font-size:11.5px;
-    color:rgba(255,255,255,0.75); text-decoration:underline; cursor:pointer;
+  .home-legal-links{
+    position:relative; z-index:1; margin-top:16px;
+    display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:2px;
   }
+  .home-legal-link{
+    display:inline-flex; align-items:center; min-height:44px; padding:0 6px;
+    font-size:11.5px; color:rgba(255,255,255,0.75); text-decoration:underline; cursor:pointer;
+  }
+  .home-legal-dot{ color:rgba(255,255,255,0.4); font-size:11.5px; }
   .legal-overlay{
     position:fixed; inset:0; z-index:70; display:flex; align-items:center;
     justify-content:center; background:rgba(8,10,24,0.82); padding:24px;
@@ -557,11 +562,15 @@
     background:var(--bg,#12142b); border-radius:16px; max-width:520px; width:100%;
     max-height:80vh; overflow-y:auto; padding:24px 22px; box-shadow:0 20px 60px rgba(0,0,0,0.5);
   }
-  .legal-title{ font-size:18px; font-weight:800; color:#fff; margin-bottom:14px; }
+  .legal-title{ font-size:18px; font-weight:800; color:#fff; margin-bottom:4px; }
+  .legal-subtitle{ font-size:11px; color:rgba(255,255,255,0.5); margin-bottom:14px; }
   .legal-body{ font-size:12.5px; line-height:1.65; color:rgba(255,255,255,0.85); text-align:left; }
   .legal-body h4{ font-size:13px; margin:16px 0 4px; color:#ffd93d; }
   .legal-body h4:first-child{ margin-top:0; }
   .legal-body p{ margin:0 0 4px; }
+  .legal-body ul{ margin:0 0 8px; padding-left:20px; }
+  .legal-body li{ margin-bottom:4px; }
+  .legal-body a{ color:#ffd93d; text-decoration:underline; cursor:pointer; }
   .legal-close{ margin-top:18px; width:100%; text-align:center; }
 
   /* Mode picker, built as a literal split-screen (top/bottom halves +
@@ -802,31 +811,18 @@
 <div class="home-overlay" id="homeOverlay">
   <img class="home-logo-img" src="images/flipstax-logo-transparent.png" alt="FlipStax - Flip, Vote, Jumble &amp; Solve">
   <div class="daily-btn primary home-enter-btn" id="homeEnterBtn">Enter</div>
-  <div class="home-legal-link" id="homeLegalLink">Terms &amp; Disclaimer</div>
+  <div class="home-legal-links">
+    <span class="home-legal-link" id="homeDisclaimerLink">Disclaimer</span>
+    <span class="home-legal-dot">&middot;</span>
+    <span class="home-legal-link" id="homeTosLink">Terms of Service</span>
+    <span class="home-legal-dot">&middot;</span>
+    <span class="home-legal-link" id="homePrivacyLink">Privacy Policy</span>
+  </div>
 </div>
 <div class="legal-overlay hidden" id="legalOverlay">
   <div class="legal-panel">
-    <div class="legal-title">Terms &amp; Disclaimer</div>
-    <div class="legal-body">
-      <h4>Entertainment only</h4>
-      <p>FlipStax is a casual entertainment game. Its trivia questions, "would you rather" scenarios, matchups, and word puzzles are intended purely for fun and should not be relied on as factual, professional, educational, or authoritative in any respect.</p>
-      <h4>Opinions, not facts</h4>
-      <p>Vote percentages, "crowd agreement," and similar results reflect the casual opinions of other players choosing between two options in a game - nothing more. They are not surveys, research, rankings, or statements of fact about any person, brand, or topic.</p>
-      <h4>No affiliation or endorsement</h4>
-      <p>FlipStax is an independent, unofficial project. Any names, brands, companies, franchises, or public figures referenced in the game's content are used solely for descriptive, comparative, or commentary purposes as part of casual entertainment content. FlipStax is not affiliated with, sponsored by, endorsed by, or otherwise officially connected with any person, brand, or company mentioned within the game unless explicitly stated.</p>
-      <h4>Trademarks</h4>
-      <p>All product names, logos, brands, and trademarks referenced in FlipStax are the property of their respective owners. Their use here does not imply any endorsement or business relationship.</p>
-      <h4>No warranty</h4>
-      <p>FlipStax is provided "as is" and "as available," without warranties of any kind, express or implied, including as to accuracy, reliability, or fitness for a particular purpose.</p>
-      <h4>Limitation of liability</h4>
-      <p>To the fullest extent permitted by law, FlipStax and its creators are not liable for any direct, indirect, incidental, or consequential damages arising from your use of, or inability to use, this game or its content.</p>
-      <h4>Audience</h4>
-      <p>FlipStax is intended for a general audience and is not directed at children under 13. We do not knowingly collect personal information from children.</p>
-      <h4>Changes</h4>
-      <p>These terms may be updated from time to time as the game evolves. Continued use of FlipStax after changes means you accept the updated terms.</p>
-      <h4>Contact</h4>
-      <p>Questions about these terms: <strong>[add your contact email here]</strong></p>
-    </div>
+    <div class="legal-title" id="legalTitle">Disclaimer</div>
+    <div class="legal-body" id="legalBody"></div>
     <div class="daily-btn primary legal-close" id="legalCloseBtn">Close</div>
   </div>
 </div>
@@ -2262,7 +2258,9 @@
     riddleQ: document.getElementById('riddleQ'), riddleInput: document.getElementById('riddleInput'),
     riddleSubmit: document.getElementById('riddleSubmit'), riddleResult: document.getElementById('riddleResult'),
     homeOverlay: document.getElementById('homeOverlay'), homeEnterBtn: document.getElementById('homeEnterBtn'),
-    homeLegalLink: document.getElementById('homeLegalLink'), legalOverlay: document.getElementById('legalOverlay'),
+    homeDisclaimerLink: document.getElementById('homeDisclaimerLink'), legalOverlay: document.getElementById('legalOverlay'),
+    homeTosLink: document.getElementById('homeTosLink'), homePrivacyLink: document.getElementById('homePrivacyLink'),
+    legalTitle: document.getElementById('legalTitle'), legalBody: document.getElementById('legalBody'),
     legalCloseBtn: document.getElementById('legalCloseBtn'),
     modeSelectOverlay: document.getElementById('modeSelectOverlay'), modeDailyBtn: document.getElementById('modeDailyBtn'),
     modeInfinityBtn: document.getElementById('modeInfinityBtn'),
@@ -4099,12 +4097,118 @@
     els.homeOverlay.classList.add('hidden');
     els.modeSelectOverlay.classList.remove('hidden');
   });
-  els.homeLegalLink.addEventListener('click', (e)=>{
-    e.stopPropagation();
+  const LEGAL_LAST_UPDATED = 'September 24, 2026';
+  const LEGAL_CONTACT_EMAIL = '[TODO: add a dedicated FlipStax contact email here]';
+  const LEGAL_DOCS = {
+    disclaimer: {
+      title: 'Disclaimer',
+      subtitle: null,
+      body: `
+        <h4>Entertainment only</h4>
+        <p>FlipStax is a casual entertainment game. Its trivia questions, "would you rather" scenarios, matchups, and word puzzles are intended purely for fun and should not be relied on as factual, professional, educational, or authoritative in any respect.</p>
+        <h4>Opinions, not facts</h4>
+        <p>Vote percentages, "crowd agreement," and similar results reflect the casual opinions of other players choosing between two options in a game - nothing more. They are not surveys, research, rankings, or statements of fact about any person, brand, or topic.</p>
+        <h4>No affiliation or endorsement</h4>
+        <p>FlipStax is an independent, unofficial project. Any names, brands, companies, franchises, or public figures referenced in the game's content are used solely for descriptive, comparative, or commentary purposes as part of casual entertainment content. FlipStax is not affiliated with, sponsored by, endorsed by, or otherwise officially connected with any person, brand, or company mentioned within the game unless explicitly stated.</p>
+        <h4>Trademarks</h4>
+        <p>All product names, logos, brands, and trademarks referenced in FlipStax are the property of their respective owners. Their use here does not imply any endorsement or business relationship.</p>
+        <h4>No warranty</h4>
+        <p>FlipStax is provided "as is" and "as available," without warranties of any kind, express or implied, including as to accuracy, reliability, or fitness for a particular purpose.</p>
+        <h4>Limitation of liability</h4>
+        <p>To the fullest extent permitted by law, FlipStax and its creators are not liable for any direct, indirect, incidental, or consequential damages arising from your use of, or inability to use, this game or its content.</p>
+        <h4>Audience</h4>
+        <p>FlipStax is intended for a general audience and is not directed at children under 13. We do not knowingly collect personal information from children.</p>
+        <h4>Changes</h4>
+        <p>These terms may be updated from time to time as the game evolves. Continued use of FlipStax after changes means you accept the updated terms.</p>
+        <h4>Contact</h4>
+        <p>Questions about these terms: <strong>${LEGAL_CONTACT_EMAIL}</strong></p>
+      `,
+    },
+    tos: {
+      title: 'Terms of Service',
+      subtitle: 'Last updated: ' + LEGAL_LAST_UPDATED,
+      body: `
+        <p>Welcome to FlipStax ("the Game," "we," "us"). By accessing or playing FlipStax at flipstax-one.vercel.app, you agree to these Terms of Service. If you do not agree, please do not use the Game.</p>
+        <h4>1. The Game</h4>
+        <p>FlipStax is a free browser-based game combining opinion-based matchups, trivia challenges, and a word-solving puzzle. It is provided for entertainment purposes only.</p>
+        <h4>2. Eligibility</h4>
+        <p>FlipStax is intended for a general audience. If you are under the age of 13, you may only use FlipStax with the involvement of a parent or guardian. We do not knowingly collect personal information from children under 13.</p>
+        <h4>3. Opinion Content &amp; Matchups</h4>
+        <p>The Game presents "versus" matchups between public figures, brands, foods, media, and other subjects, and displays aggregate voting statistics submitted by all players. These matchups reflect crowd opinion only - they are not factual claims, professional rankings, or endorsements by FlipStax, and any names, likenesses, or trademarks referenced belong to their respective owners. See our <a data-legal-link="disclaimer">Disclaimer</a> for more detail.</p>
+        <h4>4. Acceptable Use</h4>
+        <p>You agree not to:</p>
+        <ul>
+          <li>Use automated scripts, bots, or other means to artificially inflate vote counts or manipulate game statistics</li>
+          <li>Attempt to interfere with, disrupt, or gain unauthorized access to the Game's servers or backend systems</li>
+          <li>Use the Game for any unlawful purpose</li>
+        </ul>
+        <p>We reserve the right to rate-limit, block, or restrict access for anyone we reasonably believe is abusing the Game's systems.</p>
+        <h4>5. No Warranty</h4>
+        <p>FlipStax is provided "as is" and "as available," without warranties of any kind, express or implied. We do not guarantee the Game will be uninterrupted, error-free, or available at all times.</p>
+        <h4>6. Limitation of Liability</h4>
+        <p>To the fullest extent permitted by law, FlipStax and its creator(s) shall not be liable for any indirect, incidental, or consequential damages arising from your use of, or inability to use, the Game.</p>
+        <h4>7. Changes to the Game or Terms</h4>
+        <p>We may update these Terms, or modify, suspend, or discontinue the Game (or any part of it), at any time without prior notice.</p>
+        <h4>8. Governing Law</h4>
+        <p>These Terms are governed by the laws of the State of Maine, without regard to conflict-of-law principles.</p>
+        <h4>9. Contact</h4>
+        <p>Questions about these Terms can be sent to <strong>${LEGAL_CONTACT_EMAIL}</strong>.</p>
+      `,
+    },
+    privacy: {
+      title: 'Privacy Policy',
+      subtitle: 'Last updated: ' + LEGAL_LAST_UPDATED,
+      body: `
+        <p>This Privacy Policy explains what information FlipStax ("we," "us") collects when you play the Game at flipstax-one.vercel.app, and how it's used.</p>
+        <h4>1. Information We Collect</h4>
+        <p><strong>Gameplay data stored on your device.</strong> FlipStax stores your local game progress, stats, and preferences (such as sound settings) directly in your browser's local storage. This data stays on your device and is not sent to us.</p>
+        <p><strong>Anonymous vote counts.</strong> When you vote in a "versus" matchup, we record that vote as an anonymous tally in our database. We do not associate votes with your identity, an account, or a persistent user ID.</p>
+        <p><strong>IP address (transient, for abuse prevention only).</strong> When you vote, your IP address is briefly checked to enforce a short rate limit (currently a few seconds between votes) to prevent automated spam. We do not permanently log or store IP addresses tied to individual votes.</p>
+        <p><strong>Anonymous usage analytics.</strong> We use privacy-friendly analytics (which do not use cookies and do not track you individually) to understand overall traffic to the Game, such as how many people visit and which pages are popular.</p>
+        <p><strong>Advertising data (if/when applicable).</strong> If FlipStax displays advertising through Google AdSense, Google may use cookies or similar technologies to serve ads based on your prior visits to this or other websites. You can learn more and opt out of personalized advertising at google.com/settings/ads. If ads are not yet active on the Game, this section does not currently apply.</p>
+        <h4>2. How We Use Information</h4>
+        <p>We use the information above only to operate core gameplay features (such as live vote percentages), prevent abuse of our voting system, understand overall traffic, and display advertising if and when enabled. We do not sell your information, and we do not build individual profiles of players.</p>
+        <h4>3. Third-Party Services</h4>
+        <p>FlipStax is hosted on Vercel and uses Upstash (a Redis database provider) to store anonymous vote tallies, and Vercel Analytics for anonymous traffic data. These providers may process data as part of delivering the Game to you, under their own privacy policies. If advertising is enabled, Google AdSense is also used as described above.</p>
+        <h4>4. Children's Privacy</h4>
+        <p>FlipStax does not knowingly collect personal information from children under 13. If you believe a child has provided us with personal information, please contact us so we can address it.</p>
+        <h4>5. Changes to This Policy</h4>
+        <p>We may update this Privacy Policy from time to time. Continued use of the Game after changes are posted constitutes acceptance of the updated policy.</p>
+        <h4>6. Contact</h4>
+        <p>Questions about this Privacy Policy can be sent to <strong>${LEGAL_CONTACT_EMAIL}</strong>.</p>
+      `,
+    },
+  };
+  function openLegal(docKey){
+    const doc = LEGAL_DOCS[docKey];
+    if (!doc) return;
+    els.legalTitle.textContent = doc.title;
+    // Always clear any previous doc's subtitle first - switching docs via
+    // the in-body cross-link calls this directly without going through
+    // closeLegal(), so a stale subtitle would otherwise stick around.
+    const oldSub = document.getElementById('legalSubtitle');
+    if (oldSub) oldSub.remove();
+    if (doc.subtitle){
+      els.legalTitle.insertAdjacentHTML('afterend', '<div class="legal-subtitle" id="legalSubtitle">'+doc.subtitle+'</div>');
+    }
+    els.legalBody.innerHTML = doc.body;
+    els.legalBody.scrollTop = 0;
     els.legalOverlay.classList.remove('hidden');
-  });
-  els.legalCloseBtn.addEventListener('click', ()=>{
+  }
+  function closeLegal(){
     els.legalOverlay.classList.add('hidden');
+    const sub = document.getElementById('legalSubtitle');
+    if (sub) sub.remove();
+  }
+  els.homeDisclaimerLink.addEventListener('click', (e)=>{ e.stopPropagation(); openLegal('disclaimer'); });
+  els.homeTosLink.addEventListener('click', (e)=>{ e.stopPropagation(); openLegal('tos'); });
+  els.homePrivacyLink.addEventListener('click', (e)=>{ e.stopPropagation(); openLegal('privacy'); });
+  els.legalCloseBtn.addEventListener('click', closeLegal);
+  // Lets body text (e.g. the ToS's reference to the Disclaimer) link to
+  // another legal doc without leaving the modal.
+  els.legalBody.addEventListener('click', (e)=>{
+    const link = e.target.closest('[data-legal-link]');
+    if (link) openLegal(link.getAttribute('data-legal-link'));
   });
   els.modeInfinityBtn.addEventListener('click', ()=>{
     els.modeSelectOverlay.classList.add('hidden');
