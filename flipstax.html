@@ -557,6 +557,95 @@
     box-shadow:0 3px calc(var(--ramp, 0) * 20px) var(--mode-glow, transparent);
     transition:box-shadow 3.5s ease;
   }
+
+  /* ---- Infinity Flips chrome ----
+     Purely decorative and gated on :root.mode-infinity, so Daily Run's
+     rounded gold-trimmed look is untouched. Cards and buttons get clipped
+     (beveled) corners instead of rounded ones, with a crisp teal->violet
+     edge line and a soft inner glow. Shapes come from clip-path on the
+     element itself and the edge line from a ::after ring clipped to a
+     beveled outline - box size, padding, and border widths are never
+     changed, so layout and the 44px tap targets are exactly as before
+     (the clip only trims a few px off each corner's tap area).
+     Each element sets --b (bevel size) and --bw (its existing border
+     width, so the ring lines up with the outer edge). */
+  :root.mode-infinity :is(
+    .half:not(.revealed):not(.has-glyph) .content, .event-tile, .status-banner,
+    .slowdown-btn, .pause-btn, .daily-btn, .toast
+  ){
+    --ring-w: 1.5px;
+    --bi: calc(var(--b) + var(--ring-w) * 0.414);
+    --bevel-clip: polygon(
+      var(--b) 0, calc(100% - var(--b)) 0, 100% var(--b), 100% calc(100% - var(--b)),
+      calc(100% - var(--b)) 100%, var(--b) 100%, 0 calc(100% - var(--b)), 0 var(--b)
+    );
+    /* Outer bevel outline, a seam down to the inner outline, the inner
+       outline, then back up the same seam - evenodd leaves just the ring. */
+    --ring-clip: polygon(evenodd,
+      50% 0, calc(100% - var(--b)) 0, 100% var(--b), 100% calc(100% - var(--b)),
+      calc(100% - var(--b)) 100%, var(--b) 100%, 0 calc(100% - var(--b)), 0 var(--b), var(--b) 0, 50% 0,
+      50% var(--ring-w),
+      calc(100% - var(--bi)) var(--ring-w), calc(100% - var(--ring-w)) var(--bi),
+      calc(100% - var(--ring-w)) calc(100% - var(--bi)), calc(100% - var(--bi)) calc(100% - var(--ring-w)),
+      var(--bi) calc(100% - var(--ring-w)), var(--ring-w) calc(100% - var(--bi)),
+      var(--ring-w) var(--bi), var(--bi) var(--ring-w), 50% var(--ring-w)
+    );
+    border-radius:0;
+    border-color:transparent;
+    clip-path:var(--bevel-clip);
+    box-shadow:inset 0 0 10px rgba(62,194,194,0.30), inset 0 0 20px rgba(122,76,224,0.18);
+  }
+  :root.mode-infinity :is(
+    .half:not(.revealed):not(.has-glyph) .content, .event-tile, .status-banner,
+    .slowdown-btn, .pause-btn, .daily-btn, .toast
+  )::after{
+    content:''; position:absolute; inset:calc(0px - var(--bw, 0px)); pointer-events:none;
+    background:linear-gradient(135deg, #3ec2c2, #8a5cf0 60%, #3ec2c2);
+    clip-path:var(--ring-clip);
+  }
+  :root.mode-infinity .event-tile, :root.mode-infinity .status-banner, :root.mode-infinity .daily-btn{ position:relative; }
+  :root.mode-infinity .half:not(.revealed):not(.has-glyph) .content{ --b:14px; --bw:1px; }
+  :root.mode-infinity .event-tile{ --b:12px; --bw:2px; }
+  /* overflow:hidden clips at the padding box, so the ring can't extend into
+     the border area here - it sits just inside it instead. */
+  :root.mode-infinity .status-banner{ --b:7px; --bw:0px; }
+  :root.mode-infinity :is(.slowdown-btn, .pause-btn, .daily-btn){ --b:8px; --bw:1px; }
+  :root.mode-infinity .toast{ --b:9px; --bw:1px; }
+  /* Small labels: bevel only, no edge line. */
+  :root.mode-infinity :is(.cat-chip, .you-tag){
+    border-radius:0;
+    clip-path:polygon(5px 0, calc(100% - 5px) 0, 100% 5px, 100% calc(100% - 5px), calc(100% - 5px) 100%, 5px 100%, 0 calc(100% - 5px), 0 5px);
+  }
+  /* Hover/highlight trim was gold - teal/violet here. */
+  :root.mode-infinity .half:hover:not(.revealed){
+    box-shadow:inset 0 0 0 3px #3ec2c2, inset 0 0 55px rgba(122,76,224,0.4);
+  }
+  :root.mode-infinity .event-tile:hover{
+    box-shadow:inset 0 0 0 3px #3ec2c2, inset 0 0 40px rgba(122,76,224,0.45);
+  }
+  /* Power-up tiles' fire pulse used an outer glow, which the bevel clip
+     would cut off - same pulse, drawn inside instead. Only the animation
+     name changes so the existing durations/stagger still apply. */
+  @keyframes infTileFire{
+    0%,100%{ box-shadow:inset 0 0 10px rgba(255,140,0,0.55), inset 0 0 22px rgba(255,60,0,0.3); }
+    50%{ box-shadow:inset 0 0 18px rgba(255,190,0,0.8), inset 0 0 32px rgba(255,90,0,0.45); }
+  }
+  :root.mode-infinity .event-overlay.powerup .event-tile{ animation-name:tilePulse, infTileFire; }
+  /* Slow teal light band sweeping left-to-right across the header. */
+  :root.mode-infinity header{ position:relative; overflow:hidden; }
+  :root.mode-infinity header::before{
+    content:''; position:absolute; top:0; bottom:0; left:0; width:30%; pointer-events:none;
+    background:linear-gradient(90deg, transparent, rgba(62,194,194,0.16), transparent);
+    animation:infHeaderSweep 7s linear infinite;
+  }
+  @keyframes infHeaderSweep{
+    from{ transform:translateX(-120%) skewX(-20deg); }
+    to{ transform:translateX(380%) skewX(-20deg); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    :root.mode-infinity header::before{ animation:none !important; opacity:0; }
+    :root.mode-infinity .event-overlay.powerup .event-tile{ animation:none !important; }
+  }
   /* Background shows first (see renderDoodleScatter call order), then the
      logo pops in from nothing - delay lets the wallpaper register before
      the zoom starts. */
