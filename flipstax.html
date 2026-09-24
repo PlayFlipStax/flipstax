@@ -1585,7 +1585,13 @@
   }
 
   // ---------- sound + haptics (synthesized, no audio files needed) ----------
-  let soundOn = localStorage.getItem('flipstax_sound') !== 'off';
+  // Guarded like every other localStorage access in this file - some
+  // WebViews (notably iOS in-app browsers, which is exactly where a
+  // shared FlipStax link often gets opened) restrict storage access and
+  // throw here. This runs at script init, before any try/catch further
+  // down could help, so an unguarded throw would blank the whole page.
+  let soundOn = true;
+  try{ soundOn = localStorage.getItem('flipstax_sound') !== 'off'; }catch(e){}
   let audioCtx = null;
   function getAudioCtx(){
     if (!audioCtx){
@@ -2665,25 +2671,32 @@
 
     return canvas;
   }
+  function dataUrlToBlob(dataUrl){
+    const [header, base64] = dataUrl.split(',');
+    const mime = (header.match(/:(.*?);/) || [,'image/png'])[1];
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return new Blob([bytes], { type: mime });
+  }
   // navigator.share() with an actual image file works on most mobile
   // browsers (native share sheet); desktop/unsupported browsers fall back
-  // to a plain PNG download via canvas.toDataURL().
-  function exportAndShareCard(canvas, filename, captionText){
-    return new Promise((resolve)=>{
-      canvas.toBlob(async (blob)=>{
-        if (!blob){ resolve(); return; }
-        const file = new File([blob], filename, { type: 'image/png' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })){
-          try{ await navigator.share({ files: [file], text: captionText }); resolve(); return; }
-          catch(e){ /* cancelled or failed - fall through to download */ }
-        }
-        const url = canvas.toDataURL('image/png');
-        const a = document.createElement('a');
-        a.href = url; a.download = filename;
-        document.body.appendChild(a); a.click(); a.remove();
-        resolve();
-      }, 'image/png');
-    });
+  // to a plain PNG download. The blob is built synchronously (toDataURL,
+  // not the async toBlob callback) so there's no gap between the click
+  // that triggered this and the share() call - Safari revokes a share
+  // request's "user activation" if too much async work happens first.
+  async function exportAndShareCard(canvas, filename, captionText){
+    const blob = dataUrlToBlob(canvas.toDataURL('image/png'));
+    const file = new File([blob], filename, { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })){
+      try{ await navigator.share({ files: [file], text: captionText }); return; }
+      catch(e){ /* cancelled or failed - fall through to download */ }
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
   }
   async function shareRunResult(){
     if (!runResultToday) return;
