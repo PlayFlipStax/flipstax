@@ -122,6 +122,7 @@
   }
   .pause-overlay.hidden{ display:none; }
   .pause-title{ font-size:22px; font-weight:800; color:#fff; letter-spacing:0.5px; }
+  .pause-buttons{ display:flex; gap:10px; }
   .run-timer-wrap{ position:absolute; top:16px; bottom:16px; left:8px; width:10px; z-index:6; }
   .run-timer-wrap.hidden{ display:none; }
   .run-timer-track{
@@ -656,7 +657,10 @@
     </div>
     <div class="pause-overlay hidden" id="pauseOverlay">
       <div class="pause-title">⏸️ Paused</div>
-      <div class="daily-btn primary" id="pauseResumeBtn">Resume</div>
+      <div class="pause-buttons">
+        <div class="daily-btn primary" id="pauseResumeBtn">Resume</div>
+        <div class="daily-btn hidden" id="pauseShareBtn">📋 Share</div>
+      </div>
     </div>
 
     <div class="half top" id="halfA">
@@ -2188,7 +2192,7 @@
     statusBanner: document.getElementById('statusBanner'),
     roundTimerFill: document.getElementById('roundTimerFill'), slowdownBtn: document.getElementById('slowdownBtn'),
     pauseBtn: document.getElementById('pauseBtn'), pauseOverlay: document.getElementById('pauseOverlay'),
-    pauseResumeBtn: document.getElementById('pauseResumeBtn'),
+    pauseResumeBtn: document.getElementById('pauseResumeBtn'), pauseShareBtn: document.getElementById('pauseShareBtn'),
     eventOverlay: document.getElementById('eventOverlay'), eventPrompt: document.getElementById('eventPrompt'),
     eventSubtitle: document.getElementById('eventSubtitle'), powerupIcon: document.getElementById('powerupIcon'),
     eventTimerFill: document.getElementById('eventTimerFill'),
@@ -2350,7 +2354,11 @@
   let runActive = false, runPhase = 'idle';
   let runScore = 0, runEndsAt = 0, runTimerInterval = null;
   let runWord = null, runLetters = [], runThresholdsHit = [], runPowerupThresholdsHit = [];
-  let runTriviaAttempted = 0, runTriviaCorrect = 0;
+  let runTriviaAttempted = 0, runTriviaCorrect = 0, runRoundResults = [];
+  // Most recent VS vote (either mode) - {pct, itemA, itemB} - used by the
+  // share card's "you agreed with N% of players on X vs Y" line. A plain
+  // global rather than run-scoped since Infinity Flips has no "run" at all.
+  let lastVoteSummary = null;
   let runSubjectSequence = [], runTriviaShown = 0;
   let runHintsRevealed = 0;
   let solveEndsAt = 0, solveInterval = null, solveGuesses = [], solveRack = [], solveCurrentGuess = [];
@@ -2418,12 +2426,219 @@
     return 'FlipStax Daily Run\n' + r.score + ' pts \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal + ' trivia \u00B7 ' +
       (r.solved ? ('solved in ' + formatRaceTime(r.solveMs)) : 'word not solved');
   }
+
+  // ---------- share card: real canvas rendering, no AI image, no network ----------
+  const SHARE_CARD_W = 1080, SHARE_CARD_H = 1350;
+  // Arbitrary flavor "day number" (Wordle-style) - not tied to any real
+  // launch date, just needs to be stable and consistent for everyone.
+  const SHARE_CARD_EPOCH = new Date(2026, 8, 1);
+  function dayNumberFor(dateStr){
+    const d = new Date(dateStr + 'T00:00:00');
+    return Math.max(1, Math.floor((d - SHARE_CARD_EPOCH) / 86400000) + 1);
+  }
+  function roundRectPath(ctx, x, y, w, h, r){
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.arcTo(x+w, y, x+w, y+h, r);
+    ctx.arcTo(x+w, y+h, x, y+h, r);
+    ctx.arcTo(x, y+h, x, y, r);
+    ctx.arcTo(x, y, x+w, y, r);
+    ctx.closePath();
+  }
+  function wrapCenteredText(ctx, text, cx, y, maxWidth, lineHeight){
+    const words = text.split(' ');
+    let line = '', lines = [];
+    words.forEach(w=>{
+      const test = line ? line+' '+w : w;
+      if (line && ctx.measureText(test).width > maxWidth){ lines.push(line); line = w; }
+      else line = test;
+    });
+    lines.push(line);
+    lines.forEach((l,i)=> ctx.fillText(l, cx, y + i*lineHeight));
+    return lines.length;
+  }
+  // Same "cosmic" family as the riddle overlay (Daily Run) / mode-infinity's
+  // own accent colors (Infinity Flips) - dark base + soft radial color
+  // blobs + a scatter of glowing dots, just drawn to a canvas instead of CSS.
+  function drawShareCardBackground(ctx, mode){
+    const w = SHARE_CARD_W, h = SHARE_CARD_H;
+    const base = ctx.createLinearGradient(0, 0, w*0.35, h);
+    if (mode === 'daily'){
+      base.addColorStop(0, '#0a0620'); base.addColorStop(0.45, '#200a3d'); base.addColorStop(1, '#1a0630');
+    } else {
+      base.addColorStop(0, '#07161c'); base.addColorStop(0.45, '#12233a'); base.addColorStop(1, '#180a30');
+    }
+    ctx.fillStyle = base; ctx.fillRect(0, 0, w, h);
+
+    function blob(cx, cy, r, color){
+      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+      g.addColorStop(0, color); g.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    }
+    if (mode === 'daily'){
+      blob(w*0.5, h*0.14, w*0.6, 'rgba(255,214,110,0.35)');
+      blob(w*0.15, h*0.75, w*0.55, 'rgba(160,90,255,0.4)');
+      blob(w*0.85, h*0.72, w*0.5, 'rgba(255,90,180,0.22)');
+    } else {
+      blob(w*0.5, h*0.14, w*0.6, 'rgba(62,194,194,0.35)');
+      blob(w*0.15, h*0.75, w*0.55, 'rgba(106,62,194,0.42)');
+      blob(w*0.85, h*0.72, w*0.5, 'rgba(62,194,194,0.2)');
+    }
+    const starColor = mode === 'daily' ? '#ffe9a8' : '#8be8e8';
+    const stars = [[0.15,0.08],[0.82,0.15],[0.08,0.5],[0.9,0.46],[0.5,0.05],[0.94,0.3],[0.4,0.94],[0.1,0.9],[0.65,0.22],[0.25,0.38]];
+    stars.forEach(([px,py])=>{
+      ctx.beginPath();
+      ctx.arc(w*px, h*py, 5, 0, Math.PI*2);
+      ctx.fillStyle = starColor; ctx.shadowColor = starColor; ctx.shadowBlur = 16;
+      ctx.fill();
+    });
+    ctx.shadowBlur = 0;
+  }
+  function drawWordmark(ctx, cx, y){
+    ctx.font = '700 46px Arial, sans-serif';
+    ctx.textBaseline = 'alphabetic';
+    const flipW = ctx.measureText('Flip').width;
+    const staxW = ctx.measureText('Stax').width;
+    const startX = cx - (flipW+staxW)/2;
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#ffb833'; ctx.fillText('Flip', startX, y);
+    ctx.fillStyle = '#2dd4c4'; ctx.fillText('Stax', startX+flipW, y);
+    ctx.textAlign = 'center';
+  }
+  function drawLetterTiles(ctx, cx, y, word, accent){
+    const n = word.length, tile = 92, gap = 14;
+    const totalW = n*tile + (n-1)*gap;
+    let x = cx - totalW/2;
+    ctx.font = '800 52px Arial, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (let i=0; i<n; i++){
+      roundRectPath(ctx, x, y, tile, tile, 14);
+      ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.fill();
+      ctx.lineWidth = 3; ctx.strokeStyle = accent; ctx.stroke();
+      ctx.fillStyle = '#fff';
+      ctx.fillText(word[i].toUpperCase(), x+tile/2, y+tile/2+2);
+      x += tile+gap;
+    }
+    ctx.textBaseline = 'alphabetic';
+  }
+  // Tri-state: true = letter earned that round, false = missed, null/undefined
+  // = round never reached (run ended early) - each renders distinctly.
+  function drawProgressGrid(ctx, cx, y, results, accent){
+    const n = 6, size = 66, gap = 16;
+    const totalW = n*size + (n-1)*gap;
+    let x = cx - totalW/2;
+    for (let i=0; i<n; i++){
+      const state = results[i];
+      roundRectPath(ctx, x, y, size, size, 10);
+      if (state === true){ ctx.fillStyle = accent; ctx.fill(); }
+      else if (state === false){
+        ctx.fillStyle = 'rgba(255,255,255,0.08)'; ctx.fill();
+        ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.stroke();
+      } else {
+        ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fill();
+      }
+      x += size+gap;
+    }
+  }
+  function buildDailyShareData(r){
+    const results = (r.roundResults || []).slice(0, 6);
+    while (results.length < 6) results.push(null);
+    return {
+      badge: 'DAILY RUN #' + dayNumberFor(r.date) + ' \u2014 ' + r.date,
+      solved: r.solved, word: r.word || '', lettersEarned: r.triviaCorrect,
+      roundResults: results,
+      statLine: r.solved ? ('Solved in ' + formatRaceTime(r.solveMs)) : (r.triviaCorrect + '/' + r.triviaTotal + ' trivia correct'),
+      voteSummary: r.lastVote || null,
+    };
+  }
+  function buildInfinityShareData(){
+    return {
+      badge: 'INFINITY FLIPS',
+      heroText: (els.tierEl.textContent || 'Unranked').toUpperCase(),
+      statLine: stats.flips.toLocaleString() + ' lifetime flipz \u00B7 ' + (stats.streak||0) + ' day streak',
+      voteSummary: lastVoteSummary || null,
+    };
+  }
+  function renderShareCard(mode, data){
+    const canvas = document.createElement('canvas');
+    canvas.width = SHARE_CARD_W; canvas.height = SHARE_CARD_H;
+    const ctx = canvas.getContext('2d');
+    const accent = mode === 'daily' ? '#ffd66e' : '#3ec2c2';
+    const cx = SHARE_CARD_W/2;
+
+    drawShareCardBackground(ctx, mode);
+    drawWordmark(ctx, cx, 110);
+
+    ctx.textAlign = 'center';
+    ctx.font = '700 30px Arial, sans-serif';
+    ctx.fillStyle = accent;
+    ctx.fillText(data.badge, cx, 185);
+
+    let y = 340;
+    if (mode === 'daily'){
+      if (data.solved){
+        drawLetterTiles(ctx, cx, y, data.word, accent);
+        y += 92 + 80;
+      } else {
+        ctx.font = '800 62px Arial, sans-serif'; ctx.fillStyle = '#fff';
+        ctx.fillText(data.lettersEarned + '/6 LETTERS', cx, y+50);
+        y += 140;
+      }
+      drawProgressGrid(ctx, cx, y, data.roundResults, accent);
+      y += 66 + 76;
+      ctx.font = '600 32px Arial, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.88)';
+      ctx.fillText(data.statLine, cx, y);
+      y += 70;
+    } else {
+      ctx.font = '800 66px Arial, sans-serif'; ctx.fillStyle = '#fff';
+      ctx.fillText(data.heroText, cx, y+50);
+      y += 160;
+      ctx.font = '600 32px Arial, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.88)';
+      ctx.fillText(data.statLine, cx, y);
+      y += 70;
+    }
+
+    if (data.voteSummary){
+      ctx.font = '500 28px Arial, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.82)';
+      const line = 'You agreed with ' + data.voteSummary.pct + '% of players on ' + data.voteSummary.itemA + ' vs ' + data.voteSummary.itemB;
+      wrapCenteredText(ctx, line, cx, y, SHARE_CARD_W - 160, 38);
+    }
+
+    ctx.font = '700 26px Arial, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.fillText('flipstax.app', cx, SHARE_CARD_H - 90);
+    ctx.font = '500 24px Arial, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.fillText("Play today's FlipStax.", cx, SHARE_CARD_H - 55);
+
+    return canvas;
+  }
+  // navigator.share() with an actual image file works on most mobile
+  // browsers (native share sheet); desktop/unsupported browsers fall back
+  // to a plain PNG download via canvas.toDataURL().
+  function exportAndShareCard(canvas, filename, captionText){
+    return new Promise((resolve)=>{
+      canvas.toBlob(async (blob)=>{
+        if (!blob){ resolve(); return; }
+        const file = new File([blob], filename, { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })){
+          try{ await navigator.share({ files: [file], text: captionText }); resolve(); return; }
+          catch(e){ /* cancelled or failed - fall through to download */ }
+        }
+        const url = canvas.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.href = url; a.download = filename;
+        document.body.appendChild(a); a.click(); a.remove();
+        resolve();
+      }, 'image/png');
+    });
+  }
   async function shareRunResult(){
     if (!runResultToday) return;
-    const text = buildRunShareText(runResultToday);
-    if (navigator.share){ try{ await navigator.share({ text }); return; }catch(e){} }
-    try{ await navigator.clipboard.writeText(text); showToast('\uD83D\uDCCB Copied \u2014 paste it anywhere'); }
-    catch(e){ showToast(text); }
+    const canvas = renderShareCard('daily', buildDailyShareData(runResultToday));
+    await exportAndShareCard(canvas, 'flipstax-daily-run.png', buildRunShareText(runResultToday));
+  }
+  async function shareInfinityResult(){
+    const canvas = renderShareCard('infinity', buildInfinityShareData());
+    await exportAndShareCard(canvas, 'flipstax-infinity.png', 'FlipStax Infinity Flips \u2014 ' + (els.tierEl.textContent||''));
   }
 
   function startDailyRun(){
@@ -2436,7 +2651,7 @@
     }catch(e){}
     runActive = true; runPhase = 'running';
     runScore = 0; runLetters = []; runThresholdsHit = []; runPowerupThresholdsHit = [];
-    runTriviaAttempted = 0; runTriviaCorrect = 0;
+    runTriviaAttempted = 0; runTriviaCorrect = 0; runRoundResults = [];
     runSubjectSequence = shuffle(RUN_CORE_SUBJECTS.concat([pick(RUN_ELECTIVE_SUBJECTS)]));
     runTriviaShown = 0;
     runHintsRevealed = 0;
@@ -2571,6 +2786,7 @@
     clearTimeout(eventTimeoutId);
     els.eventTiles.forEach(t=> t.onclick = null);
     runTriviaAttempted++;
+    runRoundResults.push(!!correct);
     let riddleUnlocked = false;
     if (correct){
       sfx.correct();
@@ -2938,6 +3154,8 @@
       date: todayStr(), score: runScore, triviaCorrect: runTriviaCorrect,
       triviaTotal: runTriviaAttempted, solved: !!solved, solveMs: solveMs,
       word: runWord ? runWord.word : null, personalityType: personalityType,
+      roundResults: runRoundResults.slice(),
+      lastVote: lastVoteSummary ? Object.assign({}, lastVoteSummary) : null,
     };
     saveRunResultToday(runResultToday);
     dailyRunStreak = updateDailyStreak();
@@ -3241,6 +3459,10 @@
     }
 
     els.pauseBtn.classList.add('hidden');
+    // Daily Run already has its own dedicated share button on the
+    // run-complete screen; only Infinity Flips needs one here, since
+    // pausing is its only real "checkpoint" moment.
+    els.pauseShareBtn.classList.toggle('hidden', !document.documentElement.classList.contains('mode-infinity'));
     els.pauseOverlay.classList.remove('hidden');
   }
   function resumeGame(){
@@ -3271,6 +3493,7 @@
   }
   els.pauseBtn.addEventListener('click', pauseGame);
   els.pauseResumeBtn.addEventListener('click', resumeGame);
+  els.pauseShareBtn.addEventListener('click', shareInfinityResult);
   // Whenever any gameplay overlay's visibility changes - trivia/power-up
   // opening or closing, puzzle or riddle starting or ending - re-check
   // whether the pause button should be showing, instead of having to thread
@@ -3528,6 +3751,7 @@
     els.tagB.textContent = side==='B' ? 'Your pick' : '';
 
     const myPct = side==='A' ? pctA : pctB;
+    lastVoteSummary = { pct: myPct, itemA: current.a, itemB: current.b };
     if (Math.abs(pctA-pctB) <= 6) els.hint.innerHTML = '\u2696\uFE0F Dead heat \u2014 almost split down the middle';
     else if (myPct <= 20) els.hint.innerHTML = '\uD83D\uDD25 Hot take \u2014 only ' + myPct + '% picked this';
     else if (won) els.hint.innerHTML = "You're with the majority";
