@@ -3528,6 +3528,8 @@
       roundDurationMs = remaining;
       roundStartedAt = Date.now();
       roundTimeoutId = setTimeout(onRoundTimeout, remaining);
+      els.roundTimerFill.style.transition = 'none';
+      els.roundTimerFill.style.width = pausedRoundPct + '%';
       requestAnimationFrame(()=>{
         els.roundTimerFill.style.transition = 'width ' + (remaining/1000) + 's linear';
         els.roundTimerFill.style.width = '0%';
