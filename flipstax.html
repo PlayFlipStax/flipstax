@@ -668,8 +668,27 @@
   .inf-wordmark, .inf-floaters{ display:none; }
   :root.mode-infinity .board{
     padding:38px 10px 10px; gap:8px;
-    background:linear-gradient(180deg,#1a0035 0%,#0a0224 55%,#00182e 100%);
   }
+  /* Gold shell: everything around the panels - page background, the header
+     and logo area, the board frame, the hint bar - goes bright shiny gold
+     in Infinity, so the mode is obvious before you even look at the
+     panels. (Daily's dark navy is untouched: all of this is gated on
+     :root.mode-infinity.) Text that sat on the dark shell flips to dark. */
+  :root.mode-infinity body{
+    background:linear-gradient(135deg,#ffe36a 0%,#ffc400 30%,#fff3a6 48%,#ffb800 66%,#ffd93a 100%);
+  }
+  :root.mode-infinity header{ border-bottom-color:#2b0a4d; }
+  :root.mode-infinity .logo .flip{ color:#2b0a4d; }
+  :root.mode-infinity .logo .stax{ color:#e0208f; }
+  :root.mode-infinity .stat-line{ color:#3d2c00; }
+  :root.mode-infinity .tier{ color:#1a0a2e; }
+  :root.mode-infinity .race-status{ color:#a30037; }
+  :root.mode-infinity .vibe-label{ color:#3d2c00; }
+  :root.mode-infinity .back-btn{ color:#2b0a4d; opacity:1; }
+  :root.mode-infinity .sound-toggle{ opacity:1; filter:brightness(0.28); }   /* the speaker emoji is near-white; darken it for the gold */
+  :root.mode-infinity .hint{ color:#3d2c00; font-weight:600; }
+  :root.mode-infinity .round-timer{ background:rgba(43,10,77,0.22); }
+  :root.mode-infinity #runBanner{ font-weight:900; letter-spacing:1.5px; text-transform:uppercase; font-size:12px; }
   :root.mode-infinity .half{ --b:16px; --bw:0px; clip-path:var(--bevel-clip); }
   :root.mode-infinity .half::after{ z-index:3; }
   :root.mode-infinity .half.top{
@@ -708,13 +727,13 @@
   :root.mode-infinity .inf-wordmark{
     display:block; position:absolute; top:5px; left:50%; transform:translateX(-50%); z-index:5;
     font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:24px;
-    letter-spacing:5px; line-height:1; color:#fff; white-space:nowrap; pointer-events:none;
-    text-shadow:0 0 6px #ff3cac, 0 0 16px #ff3cac, 0 0 28px #ff3cac;
+    letter-spacing:5px; line-height:1; color:#2b0a4d; white-space:nowrap; pointer-events:none;
+    text-shadow:0 0 6px rgba(255,255,255,0.9), 0 0 14px #ff3cac;
     animation:infWordmark 1.8s ease-in-out infinite alternate;
   }
   @keyframes infWordmark{
-    from{ text-shadow:0 0 4px #ff3cac, 0 0 10px #ff3cac, 0 0 18px #19d3ff; }
-    to{ text-shadow:0 0 8px #ff8ad4, 0 0 22px #ff3cac, 0 0 40px #19d3ff; }
+    from{ text-shadow:0 0 4px rgba(255,255,255,0.7), 0 0 8px #ff8ad4; }
+    to{ text-shadow:0 0 10px #fff, 0 0 22px #ff3cac, 0 0 34px rgba(255,255,255,0.9); }
   }
   :root.mode-infinity .inf-floaters{ display:block; position:absolute; inset:0; z-index:3; pointer-events:none; overflow:hidden; }
   .inf-floaters span{
@@ -740,7 +759,7 @@
   :root.mode-infinity header{ position:relative; overflow:hidden; }
   :root.mode-infinity header::before{
     content:''; position:absolute; top:0; bottom:0; left:0; width:30%; pointer-events:none;
-    background:linear-gradient(90deg, transparent, rgba(62,194,194,0.16), transparent);
+    background:linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent);   /* a glint of light across the gold */
     animation:infHeaderSweep 7s linear infinite;
   }
   @keyframes infHeaderSweep{
@@ -2983,11 +3002,18 @@
   dailyRunStreak = peekDailyStreak();
 
   function renderRunBanner(){
+    // This pill is the mode indicator: it used to render Daily Run's status
+    // in every mode, so Infinity Flips showed "Daily Run". Call this
+    // whenever the mode changes (see the mode buttons / returnToModeSelect).
+    if (document.documentElement.classList.contains('mode-infinity')){
+      els.runBanner.innerHTML = '\u267E\uFE0F Infinity Flips';
+      return;
+    }
     const streakTag = dailyRunStreak > 0 ? (' \uD83D\uDD25' + dailyRunStreak) : '';
     if (runResultToday){
       const r = runResultToday;
-      els.runBanner.innerHTML = '\u2705 Today\u2019s Run: ' + r.score + ' pts \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal +
-        ' trivia \u00B7 ' + (r.solved ? formatRaceTime(r.solveMs) : 'not solved') + streakTag +
+      els.runBanner.innerHTML = '\uD83C\uDFAE Daily Run \u00B7 \u2705 ' + r.score + ' pts \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal +
+        ' \u00B7 ' + (r.solved ? formatRaceTime(r.solveMs) : 'not solved') + streakTag +
         ' &nbsp;<span class="run-link" id="runShareLink">Share</span>';
       const link = document.getElementById('runShareLink');
       if (link) link.addEventListener('click', shareRunResult);
@@ -4884,6 +4910,7 @@
     els.backBtn.classList.remove('hidden');
     updatePauseBtnVisibility();
     resetRamp();
+    renderRunBanner();
     playTrack('infinity');
   });
   els.modeDailyBtn.addEventListener('click', ()=>{
@@ -4892,6 +4919,7 @@
     document.documentElement.classList.remove('mode-infinity');
     els.backBtn.classList.remove('hidden');
     playTrack('run');
+    renderRunBanner();
     startDailyRun();
     updatePauseBtnVisibility();
   });
@@ -4926,6 +4954,7 @@
 
     document.documentElement.classList.remove('mode-daily', 'mode-infinity');
     resetRamp();
+    renderRunBanner();
     els.backBtn.classList.add('hidden');
     playTrack('intro');
     els.modeSelectOverlay.classList.remove('hidden');
