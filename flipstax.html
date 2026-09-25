@@ -571,7 +571,7 @@
      Each element sets --b (bevel size) and --bw (its existing border
      width, so the ring lines up with the outer edge). */
   :root.mode-infinity :is(
-    .half:not(.revealed):not(.has-glyph) .content, .event-tile, .status-banner,
+    .half, .half:not(.revealed):not(.has-glyph) .content, .event-tile, .status-banner,
     .slowdown-btn, .pause-btn, .daily-btn, .toast
   ){
     --ring-w: 1.5px;
@@ -621,7 +621,7 @@
   :root.mode-infinity .daily-btn:active{ --btn-fill:rgba(255,255,255,0.25); }
   :root.mode-infinity .daily-btn.primary{ --btn-fill:var(--pulse); }
   :root.mode-infinity :is(
-    .half:not(.revealed):not(.has-glyph) .content, .event-tile, .status-banner,
+    .half, .half:not(.revealed):not(.has-glyph) .content, .event-tile, .status-banner,
     .slowdown-btn, .pause-btn, .daily-btn, .toast
   )::after{
     content:''; position:absolute; inset:calc(0px - var(--bw, 0px)); pointer-events:none;
@@ -695,11 +695,15 @@
      the same game. Rounded rather than beveled: overflow:hidden (already on
      .half) clips the content to the radius, and a thin ring pseudo-element
      draws the edge. --frame-ring is the mode's edge colour. */
-  :root.mode-infinity .half, :root.mode-daily .half{ border-radius:18px; border-color:transparent; }
-  :root.mode-infinity .half::after, :root.mode-daily .half::after{
+  :root.mode-daily .half{ border-radius:18px; border-color:transparent; }
+  :root.mode-daily .half::after{
     content:''; position:absolute; inset:0; z-index:3; pointer-events:none;
     border-radius:inherit; border:2.5px solid var(--frame-ring, rgba(255,255,255,0.9));
   }
+  /* Infinity's boxes stay sharp and angular (beveled corners + an angular
+     ring) - same size and layout as Daily's, only the corner shape differs. */
+  :root.mode-infinity .half{ --b:16px; --bw:0px; clip-path:var(--bevel-clip); }
+  :root.mode-infinity .half::after{ z-index:3; }
   :root.mode-infinity .half.top{
     background:linear-gradient(160deg,#ff4fb8 0%,#e0208f 50%,#a4138f 100%) !important;
     filter:none !important;
@@ -708,8 +712,9 @@
     background:linear-gradient(160deg,#19d3ff 0%,#08a5dc 50%,#0a6fc9 100%) !important;
     filter:none !important;
   }
-  :root.mode-infinity .half.top{ --frame-ring:#ffc2ea; }
-  :root.mode-infinity .half.bottom{ --frame-ring:#b8f3ff; }
+  /* #board so these outrank the shared teal->violet ring rule above. */
+  :root.mode-infinity #board .half.top::after{ background:linear-gradient(135deg,#ffd6f0,#ff5cc0 60%,#ffd6f0); }
+  :root.mode-infinity #board .half.bottom::after{ background:linear-gradient(135deg,#c6f6ff,#3fd8ff 60%,#c6f6ff); }
   /* Light tints so the dark reveal text stays readable on the pink/cyan. */
   :root.mode-infinity .half.top .fill{ background:rgba(255,176,226,0.92); }
   :root.mode-infinity .half.bottom .fill{ background:rgba(140,238,255,0.92); }
@@ -718,10 +723,9 @@
   /* Selection: lime is in neither background family (or Daily's gold). */
   /* Both the thick outline (the ::after ring, widened) and the pulsing inner
      glow (::before) sit above the reveal fill, so nothing can cover them. */
-  :root.mode-infinity .half.top.picked, :root.mode-infinity .half.bottom.picked{ --frame-ring:#c6ff00; }
-  :root.mode-infinity .half.picked::after{ border-width:7px; }
+  :root.mode-infinity #board .half.picked{ --ring-w:7px; }   /* #board: outranks the shared ring-width rule */
+  :root.mode-infinity #board .half.picked::after{ background:#c6ff00; }
   :root.mode-infinity .half.picked::before{
-    border-radius:inherit;
     content:''; position:absolute; inset:0; z-index:3; pointer-events:none;
     box-shadow:inset 0 0 40px 8px rgba(198,255,0,0.7);
     animation:infPick 0.9s ease-in-out infinite alternate;
@@ -734,7 +738,7 @@
   :root.mode-infinity .slowdown-btn{ top:48px; }
   :root.mode-infinity .pause-btn{ top:100px; }
   :root.mode-infinity .inf-wordmark{
-    display:flex; align-items:center; gap:9px;
+    display:flex; align-items:center; gap:9px; height:26px;
     position:absolute; top:6px; left:50%; transform:translateX(-50%); z-index:5;
     font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:24px;
     letter-spacing:5px; line-height:1; color:#2b0a4d; white-space:nowrap; pointer-events:none;
@@ -797,7 +801,9 @@
   :root.mode-daily .hint{ color:#0d2b5e; font-weight:600; }
   :root.mode-daily .round-timer{ background:rgba(13,43,94,0.18); }
   :root.mode-daily .status-banner.daily{ background:rgba(255,255,255,0.85); color:#0d2b5e; border-color:rgba(13,43,94,0.22); }
-  :root.mode-daily .board{ padding:12px; gap:8px; }
+  /* Same board padding/gap as Infinity (including the 38px strip for the
+     wordmark), so the two modes are proportionally identical. */
+  :root.mode-daily .board{ padding:38px 10px 10px; gap:8px; }
   :root.mode-daily .half{
     --frame-ring:#fff;
     box-shadow:0 0 0 3px rgba(255,255,255,0.32), 0 6px 16px rgba(13,43,94,0.28);
@@ -806,9 +812,71 @@
   /* The Daily run clock (the green vertical bar) lives in the frame now, and
      +5s / Pause keep their spot over the top box. */
   :root.mode-daily .run-timer-wrap{ left:2px; width:8px; }
-  :root.mode-daily .slowdown-btn{ top:22px; }
-  :root.mode-daily .pause-btn{ top:74px; }
+  :root.mode-daily .slowdown-btn{ top:48px; }
+  :root.mode-daily .pause-btn{ top:100px; }
+  /* Daily Stax wordmark - identical size and placement to Infinity's, with a
+     small fan of cards between the words where Infinity has its symbol. */
+  .daily-wordmark{ display:none; }
+  :root.mode-daily .daily-wordmark{
+    display:flex; align-items:center; gap:9px; height:26px;
+    position:absolute; top:6px; left:50%; transform:translateX(-50%); z-index:5;
+    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:24px;
+    letter-spacing:5px; line-height:1; color:#0d2b5e; white-space:nowrap; pointer-events:none;
+    text-shadow:0 0 6px rgba(255,255,255,0.95), 0 0 14px rgba(255,255,255,0.9);
+    animation:dailyWordmark 2.4s ease-in-out infinite alternate;
+  }
+  :root.mode-daily .daily-sym{ flex:0 0 auto; filter:drop-shadow(0 1px 2px rgba(13,43,94,0.35)); }
+  @keyframes dailyWordmark{
+    from{ text-shadow:0 0 4px rgba(255,255,255,0.8), 0 0 8px rgba(255,255,255,0.6); }
+    to{ text-shadow:0 0 8px #fff, 0 0 18px rgba(255,255,255,0.95), 0 0 26px rgba(255,190,90,0.8); }
+  }
+  @media (prefers-reduced-motion: reduce){ :root.mode-daily .daily-wordmark{ animation:none !important; } }
   @media (prefers-reduced-motion: reduce){ :root.mode-daily body::before{ animation:none; } }
+  /* ---- Contrast, both modes ----
+     Audit over sampled rounds of the game's own per-matchup colours found
+     the category tag under 4.5:1 in ~30% of halves (worst 3.8), white names
+     down to 2.8:1, and - worst - the dark result text landing on an
+     unfilled dark background after a vote (under 4.5:1 in ~2/3 of halves,
+     worst 1.5:1). None of it depends on which colours a matchup happens to
+     get, so the fixes don't either: a solid dark tag, a ringed avatar, a
+     darker panel/scrim behind names, and a light card behind the results. */
+  :root.mode-daily .cat-chip, :root.mode-infinity .cat-chip{ background:rgba(0,0,0,0.62); color:#fff; font-weight:700; }
+  :root.mode-daily .avatar, :root.mode-infinity .avatar{ border:3px solid #fff; box-shadow:0 0 0 1.5px rgba(0,0,0,0.4); }
+  :root.mode-daily .half:not(.revealed) .content, :root.mode-infinity .half:not(.revealed) .content{ background:rgba(0,0,0,0.5); }
+  :root.mode-daily .half.has-glyph:not(.revealed) .content, :root.mode-infinity .half.has-glyph:not(.revealed) .content{
+    background:rgba(0,0,0,0.42); border-radius:12px;
+  }
+  :root.mode-daily .half:not(.revealed) .take{ text-shadow:0 0 5px rgba(0,0,0,0.75), 0 2px 10px rgba(0,0,0,0.6); }
+  :root.mode-daily .half.revealed .content, :root.mode-infinity .half.revealed .content{
+    background:rgba(255,255,255,0.86); border-radius:18px; padding:16px 20px;
+  }
+  :root.mode-daily .half.has-glyph.revealed .content, :root.mode-infinity .half.has-glyph.revealed .content{ padding:8px 20px; }
+  /* The result card appears instantly, so the name must switch to its dark
+     colour instantly too (it used to fade over 0.4s - white on a white card
+     for a moment). */
+  :root.mode-daily .take, :root.mode-infinity .take{ transition:none; }
+  :root.mode-infinity .half.revealed .content{
+    border-radius:0;
+    clip-path:polygon(10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px), 0 10px);
+  }
+  /* ---- Infinity: drifting sparkle + slow shine across the gold ----
+     The same spirit as Daily's clouds: ambient motion behind everything.
+     Sparkles rise slowly (one layer, transform-only, exactly one screen
+     height per loop so it never seams); a soft white band sweeps across
+     every ~10s with a long rest. Both sit at z-index:-1, non-interactive. */
+  :root.mode-infinity body::before{
+    content:''; position:fixed; top:0; left:0; width:100vw; height:200dvh; z-index:-1; pointer-events:none;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800' preserveAspectRatio='xMidYMid slice'%3E%3Cg fill='%23fffdf0'%3E%3Cpath id='s' d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(60,90) scale(14)' fill-opacity='.95'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(300,40) scale(9)' fill-opacity='.8'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(180,170) scale(18)' fill-opacity='.9'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(340,260) scale(12)' fill-opacity='.7'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(40,340) scale(10)' fill-opacity='.8'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(250,380) scale(20)' fill-opacity='.95'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(120,470) scale(9)' fill-opacity='.7'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(330,520) scale(15)' fill-opacity='.9'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(70,600) scale(19)' fill-opacity='.9'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(230,660) scale(10)' fill-opacity='.8'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(350,730) scale(13)' fill-opacity='.85'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(150,770) scale(8)' fill-opacity='.7'/%3E%3Ccircle cx='110' cy='20' r='2.4' fill-opacity='.8'/%3E%3Ccircle cx='210' cy='300' r='2.4' fill-opacity='.8'/%3E%3Ccircle cx='20' cy='470' r='2.4' fill-opacity='.8'/%3E%3Ccircle cx='290' cy='610' r='2.4' fill-opacity='.8'/%3E%3Ccircle cx='380' cy='400' r='2.4' fill-opacity='.8'/%3E%3Ccircle cx='180' cy='560' r='2.4' fill-opacity='.8'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 100vw 100dvh repeat-y;
+    will-change:transform; animation:goldRise 70s linear infinite;
+  }
+  @keyframes goldRise{ from{ transform:translateY(0); } to{ transform:translateY(-100dvh); } }
+  :root.mode-infinity body::after{
+    content:''; position:fixed; top:-10dvh; bottom:-10dvh; left:0; width:55vw; z-index:-1; pointer-events:none;
+    background:linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%);
+    transform:translateX(-120%) skewX(-18deg); will-change:transform; animation:goldSweep 10s ease-in-out infinite;
+  }
+  @keyframes goldSweep{ 0%{ transform:translateX(-120%) skewX(-18deg); } 55%, 100%{ transform:translateX(260%) skewX(-18deg); } }
+  @media (prefers-reduced-motion: reduce){ :root.mode-infinity body::before, :root.mode-infinity body::after{ animation:none; } }
   /* Slow teal light band sweeping left-to-right across the header. */
   :root.mode-infinity header{ position:relative; overflow:hidden; }
   :root.mode-infinity header::before{
@@ -1004,6 +1072,19 @@
 
   <div class="board" id="board">
     <div class="round-timer"><div class="round-timer-fill" id="roundTimerFill"></div></div>
+    <!-- Daily Stax only (hidden in every other mode): wordmark with a small fan of cards between the words. -->
+    <div class="daily-wordmark" aria-hidden="true">
+      <span>DAILY</span>
+      <svg class="daily-sym" viewBox="0 0 48 34" width="37" height="26" aria-hidden="true">
+        <g stroke="#0d2b5e" stroke-width="2" stroke-linejoin="round">
+          <rect x="7" y="6" width="17" height="24" rx="3" fill="#ff7a59" transform="rotate(-18 15.5 18)"/>
+          <rect x="24" y="6" width="17" height="24" rx="3" fill="#2dd4c4" transform="rotate(18 32.5 18)"/>
+          <rect x="15.5" y="3" width="17" height="24" rx="3" fill="#ffd93d"/>
+        </g>
+        <path d="M24 9.5 l1.9 4.2 4.6.5-3.4 3.1 1 4.5-4.1-2.4-4.1 2.4 1-4.5-3.4-3.1 4.6-.5z" fill="#fff" stroke="#0d2b5e" stroke-width="0.8" stroke-linejoin="round"/>
+      </svg>
+      <span>STAX</span>
+    </div>
     <!-- Infinity Flips only (hidden in every other mode): wordmark + drifting badges. -->
     <div class="inf-wordmark" aria-hidden="true">
       <span>INFINITY</span>
