@@ -1187,12 +1187,80 @@
   // Trivia subject banks - one question, one guaranteed-correct answer.
   // Kept to well-established, uncontested facts on purpose.
   const GEOGRAPHY_SETS = [
-    { q:'What is the capital of France?', correct:'Paris', wrongs:['Lyon','Marseille','Nice'] },
+    // Capitals - the less obvious ones (the "everyone knows Paris" tier was pruned).
+    { q:'What is the capital of Turkey?', correct:'Ankara', wrongs:['Istanbul','Izmir','Bursa'] },
+    { q:'What is the capital of Switzerland?', correct:'Bern', wrongs:['Zurich','Geneva','Basel'] },
+    { q:'What is the capital of New Zealand?', correct:'Wellington', wrongs:['Auckland','Christchurch','Queenstown'] },
+    { q:'What is the capital of Nigeria?', correct:'Abuja', wrongs:['Lagos','Kano','Ibadan'] },
+    { q:'What is the capital of Kenya?', correct:'Nairobi', wrongs:['Mombasa','Kisumu','Nakuru'] },
+    { q:'What is the capital of Vietnam?', correct:'Hanoi', wrongs:['Ho Chi Minh City','Da Nang','Hue'] },
+    { q:'What is the capital of Thailand?', correct:'Bangkok', wrongs:['Chiang Mai','Phuket','Pattaya'] },
+    { q:'What is the capital of Poland?', correct:'Warsaw', wrongs:['Krakow','Gdansk','Wroclaw'] },
+    { q:'What is the capital of Sweden?', correct:'Stockholm', wrongs:['Gothenburg','Malmö','Uppsala'] },
+    { q:'What is the capital of Norway?', correct:'Oslo', wrongs:['Bergen','Trondheim','Stavanger'] },
+    { q:'What is the capital of Portugal?', correct:'Lisbon', wrongs:['Porto','Faro','Coimbra'] },
+    { q:'What is the capital of Greece?', correct:'Athens', wrongs:['Thessaloniki','Patras','Sparta'] },
+    { q:'What is the capital of Colombia?', correct:'Bogotá', wrongs:['Medellín','Cali','Cartagena'] },
+    { q:'What is the capital of Chile?', correct:'Santiago', wrongs:['Valparaíso','Concepción','Lima'] },
+    { q:'What is the capital of Peru?', correct:'Lima', wrongs:['Cusco','Arequipa','Quito'] },
+    { q:'What is the capital of Morocco?', correct:'Rabat', wrongs:['Casablanca','Marrakech','Fez'] },
+    { q:'What is the capital of Pakistan?', correct:'Islamabad', wrongs:['Karachi','Lahore','Rawalpindi'] },
+    { q:'What is the capital of Ireland?', correct:'Dublin', wrongs:['Cork','Galway','Belfast'] },
+    { q:'What is the capital of Austria?', correct:'Vienna', wrongs:['Salzburg','Graz','Innsbruck'] },
+    { q:'What is the capital of Ukraine?', correct:'Kyiv', wrongs:['Kharkiv','Odesa','Lviv'] },
+    { q:'What is the capital of Saudi Arabia?', correct:'Riyadh', wrongs:['Jeddah','Mecca','Dammam'] },
+    { q:'What is the capital of the Philippines?', correct:'Manila', wrongs:['Cebu City','Davao','Quezon City'] },
+    { q:'What is the capital of Ethiopia?', correct:'Addis Ababa', wrongs:['Nairobi','Khartoum','Lagos'] },
+    { q:'What is the capital of Cuba?', correct:'Havana', wrongs:['Santiago de Cuba','Varadero','Kingston'] },
+    { q:'What is the capital of Iceland?', correct:'Reykjavík', wrongs:['Akureyri','Keflavík','Oslo'] },
+    { q:'What is the capital of Finland?', correct:'Helsinki', wrongs:['Espoo','Tampere','Oulu'] },
+    { q:'What is the capital of Denmark?', correct:'Copenhagen', wrongs:['Aarhus','Odense','Malmö'] },
+    { q:'What is the capital of Kazakhstan?', correct:'Astana', wrongs:['Almaty','Shymkent','Tashkent'] },
+    // US state capitals - the classic "it's not the biggest city" trap.
+    { q:'What is the capital of Texas?', correct:'Austin', wrongs:['Houston','Dallas','San Antonio'] },
+    { q:'What is the capital of California?', correct:'Sacramento', wrongs:['Los Angeles','San Francisco','San Diego'] },
+    { q:'What is the capital of New York State?', correct:'Albany', wrongs:['New York City','Buffalo','Rochester'] },
+    { q:'What is the capital of Florida?', correct:'Tallahassee', wrongs:['Miami','Orlando','Tampa'] },
+    { q:'What is the capital of Illinois?', correct:'Springfield', wrongs:['Chicago','Peoria','Rockford'] },
+    { q:'What is the capital of Pennsylvania?', correct:'Harrisburg', wrongs:['Philadelphia','Pittsburgh','Scranton'] },
+    { q:'What is the capital of Washington State?', correct:'Olympia', wrongs:['Seattle','Spokane','Tacoma'] },
+    { q:'What is the capital of Nevada?', correct:'Carson City', wrongs:['Las Vegas','Reno','Henderson'] },
+    { q:'What is the capital of Michigan?', correct:'Lansing', wrongs:['Detroit','Grand Rapids','Ann Arbor'] },
+    { q:'What is the capital of Alaska?', correct:'Juneau', wrongs:['Anchorage','Fairbanks','Sitka'] },
+    // Places and physical geography.
+    { q:'Which city sits on both the European and Asian continents?', correct:'Istanbul', wrongs:['Ankara','Moscow','Cairo'] },
+    { q:'Which country has the third-largest population in the world?', correct:'United States', wrongs:['Indonesia','Pakistan','Brazil'] },
+    { q:'Which African country has the largest population?', correct:'Nigeria', wrongs:['Ethiopia','Egypt','South Africa'] },
+    { q:'The United States shares its longest international border with which country?', correct:'Canada', wrongs:['Mexico','Cuba','Russia'] },
+    { q:'Which country contains the largest share of the Amazon rainforest?', correct:'Brazil', wrongs:['Peru','Colombia','Bolivia'] },
+    { q:'Which river flows through Baghdad?', correct:'The Tigris', wrongs:['The Euphrates','The Nile','The Jordan'] },
+    { q:'Timbuktu is a historic city in which country?', correct:'Mali', wrongs:['Niger','Chad','Sudan'] },
+    { q:'Which South American desert is one of the driest places on Earth?', correct:'The Atacama', wrongs:['The Patagonian','The Sahara','The Mojave'] },
+    { q:'Lake Victoria is bordered by Uganda, Kenya, and which other country?', correct:'Tanzania', wrongs:['Rwanda','Ethiopia','Zambia'] },
+    { q:'The Serengeti plains are located mainly in which country?', correct:'Tanzania', wrongs:['Kenya','South Africa','Botswana'] },
+    // Who leads what - current as of early 2026. Leadership changes: re-check
+    // this block periodically and pull or update anything that has changed.
+    { q:'Who is the President of the United States?', correct:'Donald Trump', wrongs:['Joe Biden','Barack Obama','Kamala Harris'] },
+    { q:'Who is the President of France?', correct:'Emmanuel Macron', wrongs:['Nicolas Sarkozy','François Hollande','Marine Le Pen'] },
+    { q:'Who is the Chancellor of Germany?', correct:'Friedrich Merz', wrongs:['Olaf Scholz','Angela Merkel','Robert Habeck'] },
+    { q:'Who is the Prime Minister of Canada?', correct:'Mark Carney', wrongs:['Justin Trudeau','Pierre Poilievre','Jagmeet Singh'] },
+    { q:'Who is the Prime Minister of India?', correct:'Narendra Modi', wrongs:['Rahul Gandhi','Manmohan Singh','Amit Shah'] },
+    { q:'Who is the President of Russia?', correct:'Vladimir Putin', wrongs:['Dmitry Medvedev','Boris Yeltsin','Sergei Lavrov'] },
+    { q:'Who is the President of China?', correct:'Xi Jinping', wrongs:['Hu Jintao','Jiang Zemin','Li Qiang'] },
+    { q:'Who is the President of Brazil?', correct:'Luiz Inácio Lula da Silva', wrongs:['Jair Bolsonaro','Dilma Rousseff','Michel Temer'] },
+    { q:'Who is the Prime Minister of Australia?', correct:'Anthony Albanese', wrongs:['Scott Morrison','Malcolm Turnbull','Peter Dutton'] },
+    { q:'Who is the President of Mexico?', correct:'Claudia Sheinbaum', wrongs:['Andrés Manuel López Obrador','Enrique Peña Nieto','Felipe Calderón'] },
+    { q:'Who is the Prime Minister of Italy?', correct:'Giorgia Meloni', wrongs:['Mario Draghi','Matteo Salvini','Silvio Berlusconi'] },
+    { q:'Who is the President of South Korea?', correct:'Lee Jae-myung', wrongs:['Yoon Suk Yeol','Moon Jae-in','Park Geun-hye'] },
+    { q:'Who is the President of Turkey?', correct:'Recep Tayyip Erdoğan', wrongs:['Ahmet Davutoğlu','Abdullah Gül','Kemal Kılıçdaroğlu'] },
+    { q:'Who is the President of Argentina?', correct:'Javier Milei', wrongs:['Alberto Fernández','Mauricio Macri','Cristina Kirchner'] },
+    { q:'Who is the President of South Africa?', correct:'Cyril Ramaphosa', wrongs:['Jacob Zuma','Thabo Mbeki','Nelson Mandela'] },
+    { q:'Who is the President of Ukraine?', correct:'Volodymyr Zelenskyy', wrongs:['Petro Poroshenko','Viktor Yanukovych','Viktor Yushchenko'] },
+    { q:'Who is the head of the Catholic Church, based in Vatican City?', correct:'Pope Leo XIV', wrongs:['Pope Francis','Pope Benedict XVI','Pope John Paul II'] },
+    { q:'Who is the reigning monarch of the United Kingdom?', correct:'King Charles III', wrongs:['Prince William','Prince Harry','Queen Camilla'] },
     { q:'What is the largest ocean on Earth?', correct:'Pacific Ocean', wrongs:['Atlantic Ocean','Indian Ocean','Arctic Ocean'] },
-    { q:'Which continent is Egypt located on?', correct:'Africa', wrongs:['Asia','Europe','South America'] },
     { q:'What is the smallest country in the world by area?', correct:'Vatican City', wrongs:['Monaco','San Marino','Liechtenstein'] },
     { q:'Mount Everest is part of which mountain range?', correct:'The Himalayas', wrongs:['The Andes','The Rockies','The Alps'] },
-    { q:'What is the capital of Japan?', correct:'Tokyo', wrongs:['Osaka','Kyoto','Yokohama'] },
     { q:'Which is the largest hot desert in the world?', correct:'The Sahara', wrongs:['The Gobi','The Kalahari','The Mojave'] },
     { q:'What is the capital of Australia?', correct:'Canberra', wrongs:['Sydney','Melbourne','Perth'] },
     { q:'Which country is home to the Great Barrier Reef?', correct:'Australia', wrongs:['Indonesia','Philippines','New Zealand'] },
@@ -1202,27 +1270,16 @@
     { q:'Which sea is famous for being extremely salty?', correct:'The Dead Sea', wrongs:['The Red Sea','The Caspian Sea','The Mediterranean'] },
     { q:'Which country has the most time zones?', correct:'France', wrongs:['Russia','United States','China'] },
     { q:'What is the longest river in Africa?', correct:'The Nile', wrongs:['The Congo','The Niger','The Zambezi'] },
-    { q:'What is the capital of Italy?', correct:'Rome', wrongs:['Milan','Venice','Naples'] },
-    { q:'What is the capital of Germany?', correct:'Berlin', wrongs:['Munich','Frankfurt','Hamburg'] },
-    { q:'Which country is shaped like a boot?', correct:'Italy', wrongs:['Greece','Spain','Portugal'] },
     { q:'What is the largest country in the world by area?', correct:'Russia', wrongs:['Canada','China','United States'] },
     { q:'Which US state is the largest by area?', correct:'Alaska', wrongs:['Texas','California','Montana'] },
-    { q:'What is the capital of Egypt?', correct:'Cairo', wrongs:['Alexandria','Giza','Luxor'] },
     { q:'Which mountain range separates Europe and Asia?', correct:'The Urals', wrongs:['The Alps','The Carpathians','The Pyrenees'] },
     { q:'What is the smallest continent by land area?', correct:'Australia', wrongs:['Europe','Antarctica','South America'] },
     { q:'Which country has the most natural lakes?', correct:'Canada', wrongs:['United States','Russia','Finland'] },
-    { q:'What is the capital of Spain?', correct:'Madrid', wrongs:['Barcelona','Seville','Valencia'] },
-    { q:'What is the capital of Russia?', correct:'Moscow', wrongs:['St. Petersburg','Kiev','Minsk'] },
     { q:'Which river flows through Paris?', correct:'The Seine', wrongs:['The Rhine','The Thames','The Loire'] },
-    { q:'What is the capital of South Korea?', correct:'Seoul', wrongs:['Busan','Incheon','Tokyo'] },
-    { q:'Which US state is known as the Sunshine State?', correct:'Florida', wrongs:['California','Arizona','Texas'] },
     { q:'What is the capital of Mexico?', correct:'Mexico City', wrongs:['Guadalajara','Cancun','Tijuana'] },
     { q:'What is the capital of India?', correct:'New Delhi', wrongs:['Mumbai','Bangalore','Kolkata'] },
     { q:'Which country is home to Machu Picchu?', correct:'Peru', wrongs:['Bolivia','Chile','Ecuador'] },
     { q:'What is the tallest mountain in Africa?', correct:'Mount Kilimanjaro', wrongs:['Mount Kenya','Table Mountain','Mount Meru'] },
-    { q:'What is the capital of the United Kingdom?', correct:'London', wrongs:['Manchester','Liverpool','Edinburgh'] },
-    { q:'Which is the longest river in the world?', correct:'The Nile', wrongs:['The Amazon','The Yangtze','The Mississippi'] },
-    { q:'What is the capital of China?', correct:'Beijing', wrongs:['Shanghai','Hong Kong','Guangzhou'] },
     { q:'Which country has the largest population in the world?', correct:'India', wrongs:['China','United States','Indonesia'] },
     { q:'What is the smallest US state by area?', correct:'Rhode Island', wrongs:['Delaware','Connecticut','Vermont'] },
     { q:'Which strait separates Europe and Africa?', correct:'The Strait of Gibraltar', wrongs:['The Bosphorus','The Strait of Hormuz','The English Channel'] },
@@ -1274,20 +1331,48 @@
     { q:"What is the plural of 'analysis'?", correct:'Analyses', wrongs:['Analysises','Analysis','Analyzes'] },
   ];
   const HISTORY_SETS = [
-    { q:'Who was the first President of the United States?', correct:'George Washington', wrongs:['Thomas Jefferson','John Adams','Abraham Lincoln'] },
+    // "Who was President when..." - light, famous events.
+    { q:'Who was the U.S. President during the Cuban Missile Crisis in 1962?', correct:'John F. Kennedy', wrongs:['Lyndon B. Johnson','Dwight D. Eisenhower','Richard Nixon'] },
+    { q:'Who was the U.S. President when Apollo 11 landed on the Moon in 1969?', correct:'Richard Nixon', wrongs:['Lyndon B. Johnson','John F. Kennedy','Gerald Ford'] },
+    { q:'Who was the U.S. President on September 11, 2001?', correct:'George W. Bush', wrongs:['Bill Clinton','Al Gore','George H. W. Bush'] },
+    { q:'Who was the U.S. President when the stock market crashed in 1929?', correct:'Herbert Hoover', wrongs:['Calvin Coolidge','Franklin D. Roosevelt','Woodrow Wilson'] },
+    { q:'Who was the U.S. President when World War I began in 1914?', correct:'Woodrow Wilson', wrongs:['Theodore Roosevelt','William Howard Taft','Warren G. Harding'] },
+    { q:'Who was the U.S. President when the Louisiana Purchase was made in 1803?', correct:'Thomas Jefferson', wrongs:['James Madison','John Adams','James Monroe'] },
+    { q:'Who was the U.S. President when the Berlin Wall fell in 1989?', correct:'George H. W. Bush', wrongs:['Ronald Reagan','Bill Clinton','Jimmy Carter'] },
+    { q:'Who was the U.S. President when the atomic bombs were dropped on Japan in 1945?', correct:'Harry S. Truman', wrongs:['Franklin D. Roosevelt','Dwight D. Eisenhower','Herbert Hoover'] },
+    { q:'In what year was Barack Obama first elected President?', correct:'2008', wrongs:['2004','2010','2012'] },
+    { q:'Which U.S. President is carved into Mount Rushmore?', correct:'Theodore Roosevelt', wrongs:['Franklin D. Roosevelt','Ulysses S. Grant','John F. Kennedy'] },
+    { q:'Who was the British Prime Minister for most of World War II?', correct:'Winston Churchill', wrongs:['Neville Chamberlain','Clement Attlee','Margaret Thatcher'] },
+    // "Who is known for..." - plausible wrong answers, including famous names from the wrong field.
+    { q:'Who are credited with the first powered airplane flight in 1903?', correct:'The Wright Brothers', wrongs:['Nikola Tesla','Albert Einstein','Samuel Kessler'] },
+    { q:'Who is famous for developing the theory of relativity?', correct:'Albert Einstein', wrongs:['Isaac Newton','Galileo Galilei','Stephen Hawking'] },
+    { q:'Who discovered penicillin in 1928?', correct:'Alexander Fleming', wrongs:['Louis Pasteur','Marie Curie','Joseph Lister'] },
+    { q:'Who is commonly credited with inventing the practical electric light bulb?', correct:'Thomas Edison', wrongs:['Nikola Tesla','Alexander Graham Bell','Benjamin Franklin'] },
+    { q:'Who was the first woman to win a Nobel Prize?', correct:'Marie Curie', wrongs:['Rosalind Franklin','Florence Nightingale','Ada Lovelace'] },
+    { q:'Who led India’s nonviolent movement for independence from Britain?', correct:'Mahatma Gandhi', wrongs:['Jawaharlal Nehru','Subhas Chandra Bose','Muhammad Ali Jinnah'] },
+    { q:'Who delivered the famous “I Have a Dream” speech in 1963?', correct:'Martin Luther King Jr.', wrongs:['Malcolm X','Frederick Douglass','Jesse Jackson'] },
+    { q:'Who became the first President of South Africa after apartheid ended?', correct:'Nelson Mandela', wrongs:['F. W. de Klerk','Desmond Tutu','Thabo Mbeki'] },
+    { q:'Who was the first Prime Minister of independent India?', correct:'Jawaharlal Nehru', wrongs:['Mahatma Gandhi','Indira Gandhi','Sardar Patel'] },
+    { q:'Who led the Soviet Union through most of World War II?', correct:'Joseph Stalin', wrongs:['Vladimir Lenin','Nikita Khrushchev','Leon Trotsky'] },
+    { q:'Which Egyptian pharaoh’s nearly intact tomb was discovered in 1922?', correct:'Tutankhamun', wrongs:['Ramses II','Khufu','Akhenaten'] },
+    { q:'Which Roman emperor is said to have played music while Rome burned?', correct:'Nero', wrongs:['Caligula','Augustus','Constantine'] },
+    { q:'Which queen ruled Britain from 1837 to 1901?', correct:'Queen Victoria', wrongs:['Queen Elizabeth I','Queen Anne','Queen Elizabeth II'] },
+    { q:'Who was the first European to reach India by sea?', correct:'Vasco da Gama', wrongs:['Christopher Columbus','Ferdinand Magellan','Bartolomeu Dias'] },
+    { q:'Which empire was built by Genghis Khan?', correct:'The Mongol Empire', wrongs:['The Ottoman Empire','The Persian Empire','The Byzantine Empire'] },
+    // Dates and events.
+    { q:'In what year did humans first land on the Moon?', correct:'1969', wrongs:['1965','1971','1973'] },
+    { q:'In what year did the Soviet Union dissolve?', correct:'1991', wrongs:['1985','1989','1993'] },
+    { q:'In what year was the U.S. Constitution signed?', correct:'1787', wrongs:['1776','1791','1801'] },
+    { q:'Which event took place on December 7, 1941?', correct:'The attack on Pearl Harbor', wrongs:['D-Day','The Battle of Midway','The Battle of the Bulge'] },
+    { q:'Which battle in 1815 ended Napoleon’s rule as Emperor of France?', correct:'Waterloo', wrongs:['Trafalgar','Austerlitz','Borodino'] },
+    { q:'In which country did the Renaissance begin?', correct:'Italy', wrongs:['France','Spain','England'] },
     { q:'In which year did World War II end?', correct:'1945', wrongs:['1943','1944','1946'] },
-    { q:'Which ancient civilization built the pyramids of Giza?', correct:'The Egyptians', wrongs:['The Romans','The Greeks','The Mayans'] },
-    { q:'Who painted the Mona Lisa?', correct:'Leonardo da Vinci', wrongs:['Michelangelo','Raphael','Donatello'] },
-    { q:'Julius Caesar was a leader of which ancient civilization?', correct:'Rome', wrongs:['Greece','Egypt','Persia'] },
     { q:'In which year did the Titanic sink?', correct:'1912', wrongs:['1905','1920','1898'] },
-    { q:'Who was the first person to walk on the Moon?', correct:'Neil Armstrong', wrongs:['Buzz Aldrin','Yuri Gagarin','John Glenn'] },
-    { q:'Which wall divided a European city during the Cold War?', correct:'The Berlin Wall', wrongs:['The Great Wall','Hadrian\u2019s Wall','The Vienna Wall'] },
     { q:'Who was the primary author of the Declaration of Independence?', correct:'Thomas Jefferson', wrongs:['George Washington','Benjamin Franklin','John Adams'] },
     { q:'Which country gifted the Statue of Liberty to the United States?', correct:'France', wrongs:['England','Spain','Italy'] },
     { q:'In which century did the Renaissance begin?', correct:'The 14th century', wrongs:['The 10th century','The 18th century','The 20th century'] },
     { q:'Which Egyptian queen was famously linked to Julius Caesar and Mark Antony?', correct:'Cleopatra', wrongs:['Nefertiti','Hatshepsut','Isis'] },
     { q:'Which country was the first to grant women the right to vote nationally?', correct:'New Zealand', wrongs:['United States','United Kingdom','France'] },
-    { q:'The Great Wall was built to protect which ancient country?', correct:'China', wrongs:['Japan','Mongolia','Korea'] },
     { q:'Who was the first woman to fly solo across the Atlantic?', correct:'Amelia Earhart', wrongs:['Bessie Coleman','Harriet Quimby','Jacqueline Cochran'] },
     { q:'Which country was first to reach the South Pole?', correct:'Norway', wrongs:['United Kingdom','United States','France'] },
     { q:'What ancient wonder stood in Alexandria, Egypt?', correct:'The Lighthouse', wrongs:['The Hanging Gardens','The Colossus','The Great Pyramid'] },
@@ -1300,12 +1385,9 @@
     { q:'Who was the first Chancellor of a unified Germany, in 1871?', correct:'Otto von Bismarck', wrongs:['Kaiser Wilhelm','Otto von Habsburg','Klemens von Metternich'] },
     { q:'Who was President of the United States during the Civil War?', correct:'Abraham Lincoln', wrongs:['Andrew Johnson','Ulysses S. Grant','James Buchanan'] },
     { q:'In which year did the American Civil War begin?', correct:'1861', wrongs:['1850','1865','1870'] },
-    { q:'Which ancient civilization built the Great Pyramid of Giza?', correct:'The Egyptians', wrongs:['The Sumerians','The Babylonians','The Phoenicians'] },
     { q:'Who was the first female Prime Minister of the United Kingdom?', correct:'Margaret Thatcher', wrongs:['Theresa May','Indira Gandhi','Golda Meir'] },
     { q:'Which explorer is credited with reaching the Americas in 1492?', correct:'Christopher Columbus', wrongs:['Ferdinand Magellan','Vasco da Gama','Marco Polo'] },
     { q:'In which year did World War I begin?', correct:'1914', wrongs:['1910','1918','1920'] },
-    { q:'Which ancient civilization used hieroglyphics?', correct:'The Egyptians', wrongs:['The Aztecs','The Vikings','The Romans'] },
-    { q:'Which US president appears on the $1 bill?', correct:'George Washington', wrongs:['Abraham Lincoln','Thomas Jefferson','Benjamin Franklin'] },
     { q:'Which European country was divided into East and West during the Cold War?', correct:'Germany', wrongs:['Poland','Austria','Hungary'] },
     { q:'Who was the ancient Greek philosopher who taught Alexander the Great?', correct:'Aristotle', wrongs:['Socrates','Plato','Pythagoras'] },
     { q:'Which explorer led the first expedition to circumnavigate the globe?', correct:'Ferdinand Magellan', wrongs:['Christopher Columbus','Vasco da Gama','James Cook'] },
@@ -1318,16 +1400,43 @@
     { q:'Which US president led the country through the Great Depression and most of World War II?', correct:'Franklin D. Roosevelt', wrongs:['Herbert Hoover','Harry Truman','Woodrow Wilson'] },
   ];
   const SCIENCE_SETS = [
-    { q:'What is the chemical symbol for water?', correct:'H2O', wrongs:['CO2','O2','NaCl'] },
-    { q:'How many planets are in our solar system?', correct:'8', wrongs:['7','9','10'] },
+    // Simple identification - the kind of thing you know if you paid a little attention.
+    { q:'What does H2O commonly refer to?', correct:'Water', wrongs:['Plastic','Aluminum','Fire'] },
+    { q:'What is the chemical symbol for sodium?', correct:'Na', wrongs:['So','Sd','S'] },
+    { q:'What is the chemical symbol for potassium?', correct:'K', wrongs:['P','Po','Pt'] },
+    { q:'What is the chemical symbol for silver?', correct:'Ag', wrongs:['Si','Sv','Au'] },
+    { q:'Which gas do humans breathe out?', correct:'Carbon dioxide', wrongs:['Oxygen','Helium','Methane'] },
+    { q:'What is the center of an atom called?', correct:'The nucleus', wrongs:['The electron','The orbit','The cell wall'] },
+    { q:'Which planet is closest to Earth in size?', correct:'Venus', wrongs:['Mars','Mercury','Neptune'] },
+    { q:'What is the name of the galaxy our solar system is in?', correct:'The Milky Way', wrongs:['Andromeda','The Whirlpool','Triangulum'] },
+    { q:'What is a baby kangaroo called?', correct:'A joey', wrongs:['A cub','A pup','A kit'] },
+    { q:'What is it called when liquid water turns into vapor?', correct:'Evaporation', wrongs:['Condensation','Precipitation','Sublimation'] },
+    { q:'What type of rock forms from cooled lava?', correct:'Igneous', wrongs:['Sedimentary','Metamorphic','Fossil'] },
+    { q:'Which layer of the Earth do we live on?', correct:'The crust', wrongs:['The mantle','The outer core','The inner core'] },
+    { q:'What do we call a scientist who studies rocks and the Earth’s structure?', correct:'A geologist', wrongs:['A biologist','A meteorologist','An astronomer'] },
+    { q:'Which organs filter waste from the blood to make urine?', correct:'The kidneys', wrongs:['The liver','The lungs','The stomach'] },
+    { q:'Which vitamin is found in citrus fruits like oranges?', correct:'Vitamin C', wrongs:['Vitamin D','Vitamin K','Vitamin B12'] },
+    { q:'What do we call animals that have a backbone?', correct:'Vertebrates', wrongs:['Invertebrates','Arthropods','Mollusks'] },
+    { q:'Which planet has a giant storm known as the Great Red Spot?', correct:'Jupiter', wrongs:['Mars','Saturn','Neptune'] },
+    { q:'What is the hardest substance in the human body?', correct:'Tooth enamel', wrongs:['Bone','Fingernails','The skull'] },
+    { q:'What is the study of stars and planets called?', correct:'Astronomy', wrongs:['Astrology','Geology','Meteorology'] },
+    { q:'Who proposed the theory of evolution by natural selection?', correct:'Charles Darwin', wrongs:['Gregor Mendel','Louis Pasteur','Isaac Newton'] },
+    { q:'What is the largest mammal on Earth?', correct:'The blue whale', wrongs:['The African elephant','The giraffe','The polar bear'] },
+    { q:'Which gas is used to make party balloons float?', correct:'Helium', wrongs:['Oxygen','Carbon dioxide','Nitrogen'] },
+    { q:'What mainly causes ocean tides?', correct:'The Moon’s gravity', wrongs:['Strong winds','Ocean currents','The Sun’s heat'] },
+    { q:'Which planet is famous for spinning tilted on its side?', correct:'Uranus', wrongs:['Neptune','Saturn','Venus'] },
+    { q:'Which blood cells carry oxygen around the body?', correct:'Red blood cells', wrongs:['White blood cells','Platelets','Plasma'] },
+    { q:'What is glass mainly made from?', correct:'Sand', wrongs:['Clay','Salt','Wood pulp'] },
+    { q:'What do we call animals that are active mainly at night?', correct:'Nocturnal', wrongs:['Diurnal','Migratory','Hibernating'] },
+    { q:'Which metal is liquid at room temperature?', correct:'Mercury', wrongs:['Lead','Aluminum','Tin'] },
+    { q:'What is it called when a solid turns directly into a gas?', correct:'Sublimation', wrongs:['Evaporation','Condensation','Melting'] },
+    { q:'What is the fastest land animal?', correct:'The cheetah', wrongs:['The lion','The pronghorn','The greyhound'] },
+    { q:'Which part of an animal cell holds most of its DNA?', correct:'The nucleus', wrongs:['The membrane','The ribosome','The cytoplasm'] },
+    { q:'What is the chemical symbol for helium?', correct:'He', wrongs:['H','Hl','Hm'] },
     { q:'What gas do plants absorb from the atmosphere?', correct:'Carbon dioxide', wrongs:['Oxygen','Nitrogen','Hydrogen'] },
     { q:'What is often called the powerhouse of the cell?', correct:'Mitochondria', wrongs:['Nucleus','Ribosome','Golgi apparatus'] },
-    { q:'What force pulls objects toward the Earth?', correct:'Gravity', wrongs:['Magnetism','Friction','Inertia'] },
-    { q:'What is the closest planet to the Sun?', correct:'Mercury', wrongs:['Venus','Earth','Mars'] },
     { q:'What is the hardest natural substance on Earth?', correct:'Diamond', wrongs:['Gold','Quartz','Iron'] },
     { q:'How many bones are in the adult human body?', correct:'206', wrongs:['150','180','300'] },
-    { q:'What is the boiling point of water at sea level, in Celsius?', correct:'100', wrongs:['90','80','120'] },
-    { q:'Which organ pumps blood through the body?', correct:'The heart', wrongs:['The liver','The lungs','The kidneys'] },
     { q:'What is the chemical symbol for gold?', correct:'Au', wrongs:['Ag','Gd','Go'] },
     { q:'What type of animal is a dolphin?', correct:'Mammal', wrongs:['Fish','Reptile','Amphibian'] },
     { q:'Roughly how fast does light travel, per second?', correct:'300,000 km', wrongs:['150,000 km','3,000 km','1,000,000 km'] },
@@ -1338,7 +1447,6 @@
     { q:'What is the chemical formula for table salt?', correct:'NaCl', wrongs:['KCl','CaCl2','NaOH'] },
     { q:'What force keeps planets in orbit around the Sun?', correct:'Gravity', wrongs:['Magnetism','Friction','Inertia'] },
     { q:'What is the study of weather called?', correct:'Meteorology', wrongs:['Astrology','Geology','Seismology'] },
-    { q:'How many legs does an insect have?', correct:'6', wrongs:['4','8','10'] },
     { q:'What part of the eye controls how much light enters?', correct:'The pupil', wrongs:['The retina','The cornea','The lens'] },
     { q:'What is the freezing point of water, in Fahrenheit?', correct:'32', wrongs:['0','100','212'] },
     { q:'Which planet is known for its prominent rings?', correct:'Saturn', wrongs:['Jupiter','Uranus','Neptune'] },
@@ -1346,20 +1454,15 @@
     { q:'What is the smallest unit of matter?', correct:'The atom', wrongs:['The molecule','The cell','The electron'] },
     { q:'Which blood type is known as the universal donor?', correct:'O negative', wrongs:['AB positive','A positive','B negative'] },
     { q:'What is the main gas found in the Sun?', correct:'Hydrogen', wrongs:['Helium','Oxygen','Nitrogen'] },
-    { q:'What is the largest planet in our solar system?', correct:'Jupiter', wrongs:['Saturn','Neptune','Earth'] },
-    { q:'What do bees produce that humans eat?', correct:'Honey', wrongs:['Nectar','Pollen','Wax'] },
     { q:'What is the human body\u2019s largest internal organ?', correct:'The liver', wrongs:['The stomach','The kidney','The pancreas'] },
     { q:'Which vitamin do we get primarily from sunlight?', correct:'Vitamin D', wrongs:['Vitamin C','Vitamin A','Vitamin B12'] },
     { q:'What type of energy does a moving object have?', correct:'Kinetic energy', wrongs:['Potential energy','Thermal energy','Chemical energy'] },
     { q:'What is the process of a caterpillar becoming a butterfly called?', correct:'Metamorphosis', wrongs:['Photosynthesis','Pollination','Germination'] },
     { q:'What is the chemical symbol for iron?', correct:'Fe', wrongs:['Ir','In','Fr'] },
     { q:'How many chromosomes do humans normally have?', correct:'46', wrongs:['23','44','48'] },
-    { q:'Which planet is known as the Red Planet?', correct:'Mars', wrongs:['Venus','Mercury','Jupiter'] },
     { q:'What do we call animals that generate their own body heat internally?', correct:'Warm-blooded', wrongs:['Cold-blooded','Ectothermic','Poikilothermic'] },
     { q:'What is the pH of pure water considered to be?', correct:'7 (neutral)', wrongs:['0 (acidic)','14 (basic)','10 (basic)'] },
-    { q:'Which sense organ is responsible for detecting sound?', correct:'The ear', wrongs:['The nose','The tongue','The skin'] },
     { q:'What do we call an animal that eats both plants and meat?', correct:'Omnivore', wrongs:['Herbivore','Carnivore','Detritivore'] },
-    { q:'What is the study of living organisms called?', correct:'Biology', wrongs:['Geology','Chemistry','Physics'] },
   ];
   // "Elective" subjects for the Daily Run's 6th trivia question - rotates
   // between these three, kept as a genuinely separate pool from the 5 core
@@ -1433,17 +1536,46 @@
   function rand(min,max,rng){ rng = rng || Math.random; return Math.floor(rng()*(max-min+1))+min; }
   function generateMathTrivia(rng){
     rng = rng || Math.random;
+    // Snappy-but-not-trivial mental arithmetic: 3-digit addition/subtraction
+    // that always forces a carry/borrow (137 + 48, 203 - 76), and two-digit
+    // by two-digit multiplication (11 x 18). No algebra, no word problems.
     const op = pick(['+','\u2212','\u00D7'], rng);
-    let a, b, correct;
-    if (op === '+'){ a = rand(4,40,rng); b = rand(4,40,rng); correct = a+b; }
-    else if (op === '\u2212'){ a = rand(15,50,rng); b = rand(1,a-1,rng); correct = a-b; }
-    else { a = rand(2,12,rng); b = rand(2,12,rng); correct = a*b; }
+    let a, b, correct, likelyMistakes;
+    if (op === '+'){
+      let guard = 0;
+      do {
+        a = rand(101, 499, rng);
+        b = rng() < 0.6 ? rand(26, 98, rng) : rand(101, 399, rng);
+        guard++;
+      } while (guard < 50 && !((a % 10) + (b % 10) >= 10 || (Math.floor(a/10) % 10) + (Math.floor(b/10) % 10) >= 10));
+      correct = a + b;
+      likelyMistakes = [10, -10, 100, -100, 1, -1, 20, -20];   // forgot/doubled a carry, off by one
+    } else if (op === '\u2212'){
+      let guard = 0;
+      do {
+        a = rand(150, 780, rng);
+        b = rand(28, Math.min(a - 25, 490), rng);
+        guard++;
+      } while (guard < 50 && !((a % 10) < (b % 10) || (a % 100) < (b % 100)));
+      correct = a - b;
+      likelyMistakes = [10, -10, 100, -100, 1, -1, 20, -20];   // botched borrow, off by one
+    } else {
+      let guard = 0;
+      do { a = rand(11, 24, rng); b = rand(11, 24, rng); guard++; } while (guard < 50 && (a === 20 || b === 20));
+      correct = a * b;
+      likelyMistakes = [a, -a, b, -b, 10, -10, 1, -1, 20, -20];   // one multiple too many/few, slipped a ten
+    }
+    // Wrong answers are the errors people actually make, not random noise.
     const wrongs = new Set();
-    let guard = 0;
-    while (wrongs.size < 3 && guard < 50){
-      guard++;
-      const w = correct + rand(1,9,rng) * (rng()<0.5 ? -1 : 1);
-      if (w !== correct && w >= 0 && !wrongs.has(w)) wrongs.add(w);
+    shuffle(likelyMistakes, rng).forEach(d=>{
+      const w = correct + d;
+      if (wrongs.size < 3 && w > 0 && w !== correct) wrongs.add(w);
+    });
+    let fill = 0;
+    while (wrongs.size < 3 && fill < 50){
+      fill++;
+      const w = correct + rand(1, 30, rng) * (rng() < 0.5 ? -1 : 1);
+      if (w > 0 && w !== correct) wrongs.add(w);
     }
     const opts = shuffle([correct, ...Array.from(wrongs)], rng);
     return { question: a+' '+op+' '+b+' = ?', opts: opts.map(String), correctIdx: opts.indexOf(correct) };
@@ -1525,8 +1657,14 @@
   // rounds, and trivia misses/wildcard losses can claw back real progress)
   // - the first pass (max 220) was still too high. These leave real margin
   // under that observed ceiling.
-  const RUN_THRESHOLDS = [15, 35, 55, 75, 95, 115]; // 6 trivia milestones, one per letter
-  const RUN_POWERUP_THRESHOLDS = [8, 25, 45, 65, 85]; // 5 total, interleaved between trivia milestones
+  // Tightened a third time: the old spacing (15..115, every 20) needed ~82
+  // votes to finish, so most players ran out of clock with letters still
+  // unearned and the first trivia didn't show up for ~35s. Every 10 points
+  // roughly halves the voting between checkpoints - a full run now reaches
+  // the solve screen in about 3.5-4 minutes, leaving the 6-minute clock as
+  // pure safety margin.
+  const RUN_THRESHOLDS = [8, 18, 28, 38, 48, 58]; // 6 trivia milestones, one per letter
+  const RUN_POWERUP_THRESHOLDS = [4, 13, 23, 33, 43]; // 5 total, interleaved between trivia milestones
   const RUN_POWERUPS = [
     { key:'points10',  icon:'\u26A1', label:'+10 pts', color:'#c7a63e' },
     { key:'slowclock', icon:'\uD83D\uDC0C', label:'+30s',    color:'#3e6bc7' },
@@ -2710,6 +2848,7 @@
   let lastVoteSummary = null;
   let runSubjectSequence = [], runTriviaShown = 0;
   let runHintsRevealed = 0;
+  let solveFreeHints = 0, solveBonusNote = '';
   let solveEndsAt = 0, solveInterval = null, solveGuesses = [], solveRack = [], solveCurrentGuess = [];
   let solveCurrentGuessSource = [];
   const KEYBOARD_ROWS = ['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
@@ -3158,7 +3297,13 @@
       runTriviaStreak++;
       const nextLetter = runWord.word[runLetters.length];
       runLetters.push(nextLetter);
-      els.eventSubtitle.textContent = '';
+      // Accuracy bonus: points (never letters) for back-to-back correct
+      // answers - +2, then +4, then +6 from the 4th in a row on. Added
+      // directly like the wrong-answer penalty below, so it can't fire a
+      // trivia mid-question; the next vote's threshold check picks it up.
+      const streakBonus = runTriviaStreak >= 2 ? Math.min(runTriviaStreak - 1, 3) * 2 : 0;
+      if (streakBonus){ runScore += streakBonus; renderRunBanner(); }
+      els.eventSubtitle.textContent = streakBonus ? '\ud83d\udd25 ' + runTriviaStreak + ' in a row \u00b7 +' + streakBonus + ' pts' : '';
       els.eventPrompt.textContent = '\u2705 Correct! Letter earned: ' + nextLetter;
       celebrateTriviaCorrect();
       if (runTriviaStreak === 3 && checkRiddleUnlock()){
@@ -3372,6 +3517,16 @@
     solveCurrentGuess = [];
     solveCurrentGuessSource = [];
     solveLockedLetters = new Array(RUN_WORD_LENGTH).fill(null);
+    // Zero letters earned (all trivia missed, or the clock ran out first):
+    // don't hand the player a blind 6-letter guess - lock in the first
+    // letter for free and make the first hint cost no solve time.
+    solveFreeHints = 0;
+    solveBonusNote = '';
+    if (runLetters.length === 0){
+      solveLockedLetters[0] = runWord.word[0];
+      solveFreeHints = 1;
+      solveBonusNote = '🎁 No letters earned — first letter revealed, plus one free hint';
+    }
     solveRack = shuffle(runLetters.slice());
     rackUsedFlags = [];
     buildSolveKeyboard();
@@ -3398,7 +3553,7 @@
   }
   function renderSolveUI(){
     els.solveHint.textContent = runHintsRevealed > 0 ? runWord.hints.slice(0, runHintsRevealed).join(' \u00B7 ') : '';
-    els.solveHintBtn.textContent = '\uD83D\uDCA1 Hint (\u22125s)';
+    els.solveHintBtn.textContent = solveFreeHints > 0 ? '\uD83D\uDCA1 Hint (free)' : '\uD83D\uDCA1 Hint (\u22125s)';
     els.solveHintBtn.classList.toggle('disabled', runHintsRevealed >= runWord.hints.length);
     els.solveAttempts.textContent = (RUN_MAX_GUESSES - solveGuesses.length) + ' guesses left';
     els.solveSlots.innerHTML = '';
@@ -3410,7 +3565,8 @@
       if (!solveLockedLetters[i]) div.onclick = ()=> removeFromGuess(i);
       els.solveSlots.appendChild(div);
     }
-    els.solveRackLabel.classList.toggle('hidden', solveRack.length === 0);
+    els.solveRackLabel.textContent = solveRack.length > 0 ? 'Your letters' : solveBonusNote;
+    els.solveRackLabel.classList.toggle('hidden', solveRack.length === 0 && !solveBonusNote);
     els.solveRack.innerHTML = '';
     solveRack.forEach((letter,i)=>{
       const isLocked = solveLockedLetters.indexOf(letter) !== -1;
@@ -3489,7 +3645,8 @@
   function useSolveHint(){
     if (runHintsRevealed >= runWord.hints.length) return;
     runHintsRevealed++;
-    solveEndsAt -= RUN_HINT_TIME_COST_MS;
+    if (solveFreeHints > 0) solveFreeHints--;
+    else solveEndsAt -= RUN_HINT_TIME_COST_MS;
     tickSolveTimer();
     sfx.combo();
     renderSolveUI();
