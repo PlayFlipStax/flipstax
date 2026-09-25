@@ -1676,6 +1676,7 @@
   // landing a 3-answer trivia streak while the vibe meter reads 49% or
   // lower - triggers a rare bonus riddle round.
   const RIDDLE_UNLOCK_SEQUENCE = ['wildcard', 'slowclock', 'hint', 'points10'];
+  const PERFECT_RUN_BONUS = 15;   // points for landing all 6 trivia (nothing left for Second Chance to recover)
   const RIDDLE_MS = 45000 / DEBUG_TIME_SCALE;
   const RIDDLE_BONUS_POINTS = 50;
   const RIDDLE_BADGE = '🧩 Riddler';
@@ -2847,6 +2848,9 @@
   // global rather than run-scoped since Infinity Flips has no "run" at all.
   let lastVoteSummary = null;
   let runSubjectSequence = [], runTriviaShown = 0;
+  // Second Chance (see startSecondChance): one recovery question after
+  // trivia #6 if any letter was missed; a flat bonus instead if none were.
+  let runSecondChanceUsed = false, runSecondChanceOutcome = null, runPerfect = false, runAskedQuestions = [];
   let runHintsRevealed = 0;
   let solveFreeHints = 0, solveBonusNote = '';
   let solveEndsAt = 0, solveInterval = null, solveGuesses = [], solveRack = [], solveCurrentGuess = [];
@@ -3149,6 +3153,7 @@
     runTriviaAttempted = 0; runTriviaCorrect = 0; runRoundResults = [];
     runSubjectSequence = shuffle(RUN_CORE_SUBJECTS.concat([pick(RUN_ELECTIVE_SUBJECTS)]));
     runTriviaShown = 0;
+    runSecondChanceUsed = false; runSecondChanceOutcome = null; runPerfect = false; runAskedQuestions = [];
     runHintsRevealed = 0;
     runPowerupPickOrder = []; runTriviaStreak = 0; riddleTriggeredThisRun = false;
     runRiddleSolved = false; runMaxCombo = 0; runWildcardCategoryVotes = 0;
@@ -3214,7 +3219,7 @@
   let runPendingTrivia = false;
   function addRunScore(delta){
     if (!runActive) return;
-    if (runPhase === 'trivia' || runPhase === 'solving') return;
+    if (runPhase === 'trivia' || runPhase === 'secondchance' || runPhase === 'solving') return;
     runScore += delta;
     let triviaTriggered = false;
     for (const t of RUN_THRESHOLDS){
@@ -3245,6 +3250,7 @@
     const subject = runSubjectSequence[runTriviaShown] || pick(RUN_CORE_SUBJECTS);
     runTriviaShown++;
     const q = generateSubjectTrivia(subject);
+    runAskedQuestions.push(q.question);
     if (DEBUG_FAST) window.__debugLastTriviaQ = q;
     els.eventOverlay.classList.remove('hidden', 'powerup');
     els.powerupIcon.classList.add('hidden');
@@ -3303,7 +3309,15 @@
       // trivia mid-question; the next vote's threshold check picks it up.
       const streakBonus = runTriviaStreak >= 2 ? Math.min(runTriviaStreak - 1, 3) * 2 : 0;
       if (streakBonus){ runScore += streakBonus; renderRunBanner(); }
-      els.eventSubtitle.textContent = streakBonus ? '\ud83d\udd25 ' + runTriviaStreak + ' in a row \u00b7 +' + streakBonus + ' pts' : '';
+      const bannerParts = [];
+      if (streakBonus) bannerParts.push('\ud83d\udd25 ' + runTriviaStreak + ' in a row \u00b7 +' + streakBonus + ' pts');
+      // All six landed: no letter left to recover, so the reward is points.
+      if (runTriviaAttempted >= RUN_THRESHOLDS.length && runLetters.length >= RUN_WORD_LENGTH){
+        runPerfect = true;
+        runScore += PERFECT_RUN_BONUS; renderRunBanner();
+        bannerParts.push('\ud83c\udfc6 PERFECT RUN +' + PERFECT_RUN_BONUS + ' pts');
+      }
+      els.eventSubtitle.textContent = bannerParts.join(' \u00b7 ');
       els.eventPrompt.textContent = '\u2705 Correct! Letter earned: ' + nextLetter;
       celebrateTriviaCorrect();
       if (runTriviaStreak === 3 && checkRiddleUnlock()){
@@ -3322,11 +3336,84 @@
       els.eventOverlay.classList.add('hidden');
       if (!runActive) return;
       if (riddleUnlocked){ startRiddleRound(); return; }
-      // Solve phase opens once every trivia shot has been taken, whether or
-      // not all 6 landed - missed letters just mean more blank slots to
-      // guess with the keyboard instead of ones you already know.
-      if (runTriviaAttempted >= RUN_THRESHOLDS.length || runClockExpired()){ startSolvePhase(); }
-      else { runPhase = 'running'; loadNext(); }
+      advanceAfterTrivia();
+    }, dt(runPerfect ? 1900 : 1100));   // a little longer so the Perfect Run banner can be read
+  }
+  // Where the run goes after a trivia (or the riddle that can follow one).
+  // Once all six trivia shots have been taken the solve phase is next -
+  // missed letters just mean more blank slots to guess - except that a
+  // player who missed at least one first gets a single Second Chance
+  // question. This deliberately keys off "all six attempted", not the clock,
+  // so everyone who reaches the end of trivia gets it.
+  function advanceAfterTrivia(){
+    if (runTriviaAttempted >= RUN_THRESHOLDS.length){
+      if (runLetters.length < RUN_WORD_LENGTH && !runSecondChanceUsed){ startSecondChance(); return; }
+      startSolvePhase();
+      return;
+    }
+    if (runClockExpired()){ startSolvePhase(); return; }
+    runPhase = 'running';
+    loadNext();
+  }
+  // Second Chance: one question, from the same subject as the player's first
+  // miss, worth exactly one letter - the next one in word order (letters are
+  // always earned in order, so "a missed letter" is just a shorter word).
+  // No penalty for missing, and deliberately no streak bonus: it's a
+  // recovery, and shouldn't pay as well as getting it right the first time.
+  function startSecondChance(){
+    runSecondChanceUsed = true;
+    runPhase = 'secondchance';
+    stopTallyPolling();
+    clearRoundTimer();
+    const missIdx = runRoundResults.indexOf(false);
+    const subject = runSubjectSequence[missIdx] || pick(RUN_CORE_SUBJECTS);
+    let q, tries = 0;
+    do { q = generateSubjectTrivia(subject); tries++; }
+    while (runAskedQuestions.indexOf(q.question) !== -1 && tries < 10);
+    runAskedQuestions.push(q.question);
+    if (DEBUG_FAST) window.__debugLastTriviaQ = q;
+    els.eventOverlay.classList.remove('hidden', 'powerup');
+    els.powerupIcon.classList.add('hidden');
+    renderSlowdownBtn();
+    els.eventSubtitle.textContent = '🔁 SECOND CHANCE · answer right, recover a letter';
+    els.eventPrompt.textContent = q.question;
+    els.eventTiles.forEach((tileEl,i)=>{
+      tileEl.textContent = q.opts[i];
+      tileEl.style.background = TILE_COLORS[i];
+      tileEl.onclick = ()=> resolveSecondChance(i === q.correctIdx);
+    });
+    els.eventTimerFill.style.transition = 'none';
+    els.eventTimerFill.style.width = '100%';
+    requestAnimationFrame(()=>{
+      els.eventTimerFill.style.transition = 'width 10s linear';
+      els.eventTimerFill.style.width = '0%';
+    });
+    clearTimeout(eventTimeoutId);
+    eventTimeoutId = setTimeout(()=> resolveSecondChance(false), dt(10000));
+    sfx.bonusZone();
+  }
+  function resolveSecondChance(correct){
+    if (runPhase !== 'secondchance') return;
+    runPhase = 'secondchance-resolving';
+    clearTimeout(eventTimeoutId);
+    els.eventTiles.forEach(t=> t.onclick = null);
+    els.eventSubtitle.textContent = '';
+    if (correct){
+      sfx.correct();
+      const nextLetter = runWord.word[runLetters.length];
+      runLetters.push(nextLetter);
+      runSecondChanceOutcome = 'recovered';
+      els.eventPrompt.textContent = '✅ Second chance! Letter recovered: ' + nextLetter;
+      celebrateTriviaCorrect();
+    } else {
+      sfx.wrong();
+      runSecondChanceOutcome = 'missed';
+      els.eventPrompt.textContent = '❌ Not this time — no letter recovered';
+    }
+    setTimeout(()=>{
+      els.eventOverlay.classList.add('hidden');
+      if (!runActive) return;
+      startSolvePhase();
     }, dt(1100));
   }
 
@@ -3478,8 +3565,7 @@
     setTimeout(()=>{
       els.riddleOverlay.classList.add('hidden');
       if (!runActive) return;
-      if (runTriviaAttempted >= RUN_THRESHOLDS.length || runClockExpired()){ startSolvePhase(); }
-      else { runPhase = 'running'; loadNext(); }
+      advanceAfterTrivia();
     }, dt(1800));
   }
   els.riddleSubmit.addEventListener('click', submitRiddleAnswer);
@@ -3685,6 +3771,7 @@
       date: todayStr(), score: runScore, triviaCorrect: runTriviaCorrect,
       triviaTotal: runTriviaAttempted, solved: !!solved, solveMs: solveMs,
       word: runWord ? runWord.word : null, personalityType: personalityType,
+      secondChance: runSecondChanceOutcome, perfect: runPerfect,
       roundResults: runRoundResults.slice(),
       lastVote: lastVoteSummary ? Object.assign({}, lastVoteSummary) : null,
     };
@@ -3699,7 +3786,9 @@
     const r = runResultToday;
     const pct = stats.decided > 0 ? Math.round((stats.agree/stats.decided)*100) : 50;
     els.readoutScore.textContent = r.score + ' pts';
-    els.readoutTrivia.textContent = r.triviaCorrect + '/' + r.triviaTotal + ' trivia correct';
+    els.readoutTrivia.textContent = r.triviaCorrect + '/' + r.triviaTotal + ' trivia correct'
+      + (r.perfect ? ' · 🏆 Perfect Run' : '')
+      + (r.secondChance === 'recovered' ? ' · 🔁 +1 letter recovered' : '');
     els.readoutWord.textContent = r.solved ? ('\u2705 Solved in ' + formatRaceTime(r.solveMs)) : ('\u274C Word not solved (' + (r.word||'') + ')');
     els.readoutVibe.textContent = 'Today you were ' + vibeTierFor(pct).label;
     const meta = PERSONALITY_META[r.personalityType] || PERSONALITY_META.fence_sitter;
