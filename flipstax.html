@@ -571,7 +571,7 @@
      Each element sets --b (bevel size) and --bw (its existing border
      width, so the ring lines up with the outer edge). */
   :root.mode-infinity :is(
-    .half:not(.revealed):not(.has-glyph) .content, .event-tile, .status-banner,
+    .half, .half:not(.revealed):not(.has-glyph) .content, .event-tile, .status-banner,
     .slowdown-btn, .pause-btn, .daily-btn, .toast
   ){
     --ring-w: 1.5px;
@@ -621,7 +621,7 @@
   :root.mode-infinity .daily-btn:active{ --btn-fill:rgba(255,255,255,0.25); }
   :root.mode-infinity .daily-btn.primary{ --btn-fill:var(--pulse); }
   :root.mode-infinity :is(
-    .half:not(.revealed):not(.has-glyph) .content, .event-tile, .status-banner,
+    .half, .half:not(.revealed):not(.has-glyph) .content, .event-tile, .status-banner,
     .slowdown-btn, .pause-btn, .daily-btn, .toast
   )::after{
     content:''; position:absolute; inset:calc(0px - var(--bw, 0px)); pointer-events:none;
@@ -656,6 +656,86 @@
     50%{ box-shadow:inset 0 0 18px rgba(255,190,0,0.8), inset 0 0 32px rgba(255,90,0,0.45); }
   }
   :root.mode-infinity .event-overlay.powerup .event-tile{ animation-name:tilePulse, infTileFire; }
+  /* ---- Infinity Flips: bold "arcade" treatment ----
+     Meant to read as a different mode at a one-second glance: its own
+     hot-pink / electric-cyan split (nothing warm, so it can't be confused
+     with Daily's gold), a framed board with beveled panels and a gap
+     between them, an INFINITY FLIPS wordmark, drifting badge icons, and a
+     lime selection outline that's impossible to miss. Colour, border and
+     decoration only - the halves stay the same big tap targets (only their
+     far corners are trimmed, and a tap there lands on the frame, not on
+     anything else). */
+  .inf-wordmark, .inf-floaters{ display:none; }
+  :root.mode-infinity .board{
+    padding:38px 10px 10px; gap:8px;
+    background:linear-gradient(180deg,#1a0035 0%,#0a0224 55%,#00182e 100%);
+  }
+  :root.mode-infinity .half{ --b:16px; --bw:0px; clip-path:var(--bevel-clip); }
+  :root.mode-infinity .half::after{ z-index:3; }
+  :root.mode-infinity .half.top{
+    background:linear-gradient(160deg,#ff4fb8 0%,#e0208f 50%,#a4138f 100%) !important;
+    filter:none !important;
+  }
+  :root.mode-infinity .half.bottom{
+    background:linear-gradient(160deg,#19d3ff 0%,#08a5dc 50%,#0a6fc9 100%) !important;
+    filter:none !important;
+  }
+  /* #board so these outrank the shared teal->violet ring rule above. */
+  :root.mode-infinity #board .half.top::after{ background:linear-gradient(135deg,#ffd6f0,#ff5cc0 60%,#ffd6f0); }
+  :root.mode-infinity #board .half.bottom::after{ background:linear-gradient(135deg,#c6f6ff,#3fd8ff 60%,#c6f6ff); }
+  /* Light tints so the dark reveal text stays readable on the pink/cyan. */
+  :root.mode-infinity .half.top .fill{ background:rgba(255,176,226,0.92); }
+  :root.mode-infinity .half.bottom .fill{ background:rgba(140,238,255,0.92); }
+  /* The names sit straight on saturated colour, so give them an outline. */
+  :root.mode-infinity .half:not(.revealed) .take{ text-shadow:0 0 5px rgba(0,0,0,0.75), 0 2px 10px rgba(0,0,0,0.6); }
+  /* Selection: lime is in neither background family (or Daily's gold). */
+  /* Both the thick outline (the ::after ring, widened) and the pulsing inner
+     glow (::before) sit above the reveal fill, so nothing can cover them. */
+  :root.mode-infinity #board .half.picked{ --ring-w:7px; }   /* #board: outranks the shared ring-width rule above */
+  :root.mode-infinity #board .half.picked::after{ background:#c6ff00; }
+  :root.mode-infinity .half.picked::before{
+    content:''; position:absolute; inset:0; z-index:3; pointer-events:none;
+    box-shadow:inset 0 0 40px 8px rgba(198,255,0,0.7);
+    animation:infPick 0.9s ease-in-out infinite alternate;
+  }
+  @keyframes infPick{
+    from{ box-shadow:inset 0 0 28px 4px rgba(198,255,0,0.5); }
+    to{ box-shadow:inset 0 0 54px 12px rgba(198,255,0,0.9); }
+  }
+  /* +5s / Pause sit over the top half, which now starts 38px lower. */
+  :root.mode-infinity .slowdown-btn{ top:48px; }
+  :root.mode-infinity .pause-btn{ top:100px; }
+  :root.mode-infinity .inf-wordmark{
+    display:block; position:absolute; top:5px; left:50%; transform:translateX(-50%); z-index:5;
+    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:24px;
+    letter-spacing:5px; line-height:1; color:#fff; white-space:nowrap; pointer-events:none;
+    text-shadow:0 0 6px #ff3cac, 0 0 16px #ff3cac, 0 0 28px #ff3cac;
+    animation:infWordmark 1.8s ease-in-out infinite alternate;
+  }
+  @keyframes infWordmark{
+    from{ text-shadow:0 0 4px #ff3cac, 0 0 10px #ff3cac, 0 0 18px #19d3ff; }
+    to{ text-shadow:0 0 8px #ff8ad4, 0 0 22px #ff3cac, 0 0 40px #19d3ff; }
+  }
+  :root.mode-infinity .inf-floaters{ display:block; position:absolute; inset:0; z-index:3; pointer-events:none; overflow:hidden; }
+  .inf-floaters span{
+    position:absolute; font-size:18px; opacity:0.85; line-height:1;
+    animation:infFloat 9s ease-in-out infinite alternate;
+  }
+  .inf-floaters span:nth-child(1){ left:3px;  top:14%; animation-duration:8s; }
+  .inf-floaters span:nth-child(2){ right:3px; top:24%; animation-duration:11s; animation-delay:-3s; }
+  .inf-floaters span:nth-child(3){ left:2px;  top:38%; animation-duration:10s; animation-delay:-5s; }
+  .inf-floaters span:nth-child(4){ right:2px; top:48%; animation-duration:7s;  animation-delay:-2s; }
+  .inf-floaters span:nth-child(5){ left:3px;  top:60%; animation-duration:12s; animation-delay:-7s; }
+  .inf-floaters span:nth-child(6){ right:3px; top:70%; animation-duration:9s;  animation-delay:-4s; }
+  .inf-floaters span:nth-child(7){ left:2px;  top:80%; animation-duration:10s; animation-delay:-1s; }
+  .inf-floaters span:nth-child(8){ right:2px; top:88%; animation-duration:8s;  animation-delay:-6s; }
+  @keyframes infFloat{
+    from{ transform:translateY(-14px) rotate(-10deg); }
+    to{ transform:translateY(14px) rotate(10deg); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    :root.mode-infinity .inf-wordmark, .inf-floaters span, :root.mode-infinity .half.picked::before{ animation:none !important; }
+  }
   /* Slow teal light band sweeping left-to-right across the header. */
   :root.mode-infinity header{ position:relative; overflow:hidden; }
   :root.mode-infinity header::before{
@@ -851,6 +931,11 @@
 
   <div class="board" id="board">
     <div class="round-timer"><div class="round-timer-fill" id="roundTimerFill"></div></div>
+    <!-- Infinity Flips only (hidden in every other mode): wordmark + drifting badges. -->
+    <div class="inf-wordmark" aria-hidden="true">INFINITY FLIPS</div>
+    <div class="inf-floaters" aria-hidden="true">
+      <span>⭐</span><span>🔥</span><span>🏆</span><span>⚡</span><span>💎</span><span>🎯</span><span>🚀</span><span>✨</span>
+    </div>
     <div class="slowdown-btn" id="slowdownBtn">⏱️ +5s</div>
     <div class="pause-btn hidden" id="pauseBtn">⏸️ Pause</div>
     <div class="run-timer-wrap hidden" id="runTimerWrap">
@@ -3965,7 +4050,7 @@
   }
 
   function renderUnvoted(){
-    els.halfA.classList.remove('revealed'); els.halfB.classList.remove('revealed');
+    els.halfA.classList.remove('revealed', 'picked'); els.halfB.classList.remove('revealed', 'picked');
     els.fillA.style.width = '0%'; els.fillB.style.width = '0%';
     els.pctA.textContent=''; els.pctB.textContent='';
     els.votesA.textContent=''; els.votesB.textContent='';
@@ -4351,6 +4436,10 @@
     }
     clearRoundTimer();
     renderSlowdownBtn();
+    // Marks the chosen side immediately (before the network round-trip) so
+    // the Infinity selection outline appears the instant of the tap.
+    els.halfA.classList.toggle('picked', side === 'A');
+    els.halfB.classList.toggle('picked', side === 'B');
     const points = current.bonusPoints ? 3 : 1;
     if (runActive) addRunScore(points); else addRacePoints(points);
     els.roundTimerFill.style.transition = 'none';
