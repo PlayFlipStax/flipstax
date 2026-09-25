@@ -571,7 +571,7 @@
      Each element sets --b (bevel size) and --bw (its existing border
      width, so the ring lines up with the outer edge). */
   :root.mode-infinity :is(
-    .half, .half:not(.revealed):not(.has-glyph) .content, .event-tile, .status-banner,
+    .half:not(.revealed):not(.has-glyph) .content, .event-tile, .status-banner,
     .slowdown-btn, .pause-btn, .daily-btn, .toast
   ){
     --ring-w: 1.5px;
@@ -621,7 +621,7 @@
   :root.mode-infinity .daily-btn:active{ --btn-fill:rgba(255,255,255,0.25); }
   :root.mode-infinity .daily-btn.primary{ --btn-fill:var(--pulse); }
   :root.mode-infinity :is(
-    .half, .half:not(.revealed):not(.has-glyph) .content, .event-tile, .status-banner,
+    .half:not(.revealed):not(.has-glyph) .content, .event-tile, .status-banner,
     .slowdown-btn, .pause-btn, .daily-btn, .toast
   )::after{
     content:''; position:absolute; inset:calc(0px - var(--bw, 0px)); pointer-events:none;
@@ -688,9 +688,18 @@
   :root.mode-infinity .sound-toggle{ opacity:1; filter:brightness(0.28); }   /* the speaker emoji is near-white; darken it for the gold */
   :root.mode-infinity .hint{ color:#3d2c00; font-weight:600; }
   :root.mode-infinity .round-timer{ background:rgba(43,10,77,0.22); }
-  :root.mode-infinity #runBanner{ font-weight:900; letter-spacing:1.5px; text-transform:uppercase; font-size:12px; }
-  :root.mode-infinity .half{ --b:16px; --bw:0px; clip-path:var(--bevel-clip); }
-  :root.mode-infinity .half::after{ z-index:3; }
+  /* Mode name in the pill - same bold caps treatment in both modes so the
+     two labels are visually parallel ("Infinity Flips" / "Daily Stax"). */
+  .mode-label{ font-weight:900; letter-spacing:1.5px; text-transform:uppercase; font-size:12px; }
+  /* Framed, slightly rounded VS boxes - shared by BOTH modes so they read as
+     the same game. Rounded rather than beveled: overflow:hidden (already on
+     .half) clips the content to the radius, and a thin ring pseudo-element
+     draws the edge. --frame-ring is the mode's edge colour. */
+  :root.mode-infinity .half, :root.mode-daily .half{ border-radius:18px; border-color:transparent; }
+  :root.mode-infinity .half::after, :root.mode-daily .half::after{
+    content:''; position:absolute; inset:0; z-index:3; pointer-events:none;
+    border-radius:inherit; border:2.5px solid var(--frame-ring, rgba(255,255,255,0.9));
+  }
   :root.mode-infinity .half.top{
     background:linear-gradient(160deg,#ff4fb8 0%,#e0208f 50%,#a4138f 100%) !important;
     filter:none !important;
@@ -699,9 +708,8 @@
     background:linear-gradient(160deg,#19d3ff 0%,#08a5dc 50%,#0a6fc9 100%) !important;
     filter:none !important;
   }
-  /* #board so these outrank the shared teal->violet ring rule above. */
-  :root.mode-infinity #board .half.top::after{ background:linear-gradient(135deg,#ffd6f0,#ff5cc0 60%,#ffd6f0); }
-  :root.mode-infinity #board .half.bottom::after{ background:linear-gradient(135deg,#c6f6ff,#3fd8ff 60%,#c6f6ff); }
+  :root.mode-infinity .half.top{ --frame-ring:#ffc2ea; }
+  :root.mode-infinity .half.bottom{ --frame-ring:#b8f3ff; }
   /* Light tints so the dark reveal text stays readable on the pink/cyan. */
   :root.mode-infinity .half.top .fill{ background:rgba(255,176,226,0.92); }
   :root.mode-infinity .half.bottom .fill{ background:rgba(140,238,255,0.92); }
@@ -710,9 +718,10 @@
   /* Selection: lime is in neither background family (or Daily's gold). */
   /* Both the thick outline (the ::after ring, widened) and the pulsing inner
      glow (::before) sit above the reveal fill, so nothing can cover them. */
-  :root.mode-infinity #board .half.picked{ --ring-w:7px; }   /* #board: outranks the shared ring-width rule above */
-  :root.mode-infinity #board .half.picked::after{ background:#c6ff00; }
+  :root.mode-infinity .half.top.picked, :root.mode-infinity .half.bottom.picked{ --frame-ring:#c6ff00; }
+  :root.mode-infinity .half.picked::after{ border-width:7px; }
   :root.mode-infinity .half.picked::before{
+    border-radius:inherit;
     content:''; position:absolute; inset:0; z-index:3; pointer-events:none;
     box-shadow:inset 0 0 40px 8px rgba(198,255,0,0.7);
     animation:infPick 0.9s ease-in-out infinite alternate;
@@ -725,7 +734,8 @@
   :root.mode-infinity .slowdown-btn{ top:48px; }
   :root.mode-infinity .pause-btn{ top:100px; }
   :root.mode-infinity .inf-wordmark{
-    display:block; position:absolute; top:5px; left:50%; transform:translateX(-50%); z-index:5;
+    display:flex; align-items:center; gap:9px;
+    position:absolute; top:6px; left:50%; transform:translateX(-50%); z-index:5;
     font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:24px;
     letter-spacing:5px; line-height:1; color:#2b0a4d; white-space:nowrap; pointer-events:none;
     text-shadow:0 0 6px rgba(255,255,255,0.9), 0 0 14px #ff3cac;
@@ -734,6 +744,12 @@
   @keyframes infWordmark{
     from{ text-shadow:0 0 4px rgba(255,255,255,0.7), 0 0 8px #ff8ad4; }
     to{ text-shadow:0 0 10px #fff, 0 0 22px #ff3cac, 0 0 34px rgba(255,255,255,0.9); }
+  }
+  /* The infinity symbol sits between the two words and pulses with them. */
+  :root.mode-infinity .inf-sym{ flex:0 0 auto; animation:infSymGlow 1.8s ease-in-out infinite alternate; }
+  @keyframes infSymGlow{
+    from{ filter:drop-shadow(0 0 2px rgba(255,255,255,0.8)) drop-shadow(0 0 4px #ff8ad4); }
+    to{ filter:drop-shadow(0 0 5px #fff) drop-shadow(0 0 12px #ff3cac); }
   }
   :root.mode-infinity .inf-floaters{ display:block; position:absolute; inset:0; z-index:3; pointer-events:none; overflow:hidden; }
   .inf-floaters span{
@@ -753,8 +769,46 @@
     to{ transform:translateY(14px) rotate(10deg); }
   }
   @media (prefers-reduced-motion: reduce){
-    :root.mode-infinity .inf-wordmark, .inf-floaters span, :root.mode-infinity .half.picked::before{ animation:none !important; }
+    :root.mode-infinity .inf-wordmark, :root.mode-infinity .inf-sym, .inf-floaters span, :root.mode-infinity .half.picked::before{ animation:none !important; }
   }
+  /* ---- Daily Stax: sky & clouds ----
+     Daily's own identity, taken from the intro screen's sky-blue: a sky
+     gradient shell with slowly drifting clouds, white-ringed rounded VS boxes
+     in a frame (same structure as Infinity's, different palette). Gated on
+     :root.mode-daily. The cloud layer is a single body::before at z-index:-1
+     (behind everything, no stacking context created on .app - the back
+     button relies on its own z-index above the overlays), animated with a
+     transform only and one tile-width per loop so it never seams. */
+  :root.mode-daily body{ background:linear-gradient(180deg,#a4e0fd 0%,#82c9f8 100%); --cw:50dvh; }
+  :root.mode-daily body::before{
+    content:''; position:fixed; top:0; left:0; height:100dvh; width:calc(var(--cw) * 8); z-index:-1; pointer-events:none;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800'%3E%3Cg fill='white' fill-opacity='.85'%3E%3Cg transform='translate(95,60) scale(1.15)'%3E%3Ccircle cx='-30' cy='0' r='24'/%3E%3Ccircle cx='0' cy='-14' r='32'/%3E%3Ccircle cx='32' cy='0' r='26'/%3E%3Cellipse cx='0' cy='14' rx='62' ry='16'/%3E%3C/g%3E%3Cg transform='translate(310,135) scale(.9)'%3E%3Ccircle cx='-30' cy='0' r='24'/%3E%3Ccircle cx='0' cy='-14' r='32'/%3E%3Ccircle cx='32' cy='0' r='26'/%3E%3Cellipse cx='0' cy='14' rx='62' ry='16'/%3E%3C/g%3E%3Cg transform='translate(120,772) scale(1.2)'%3E%3Ccircle cx='-30' cy='0' r='24'/%3E%3Ccircle cx='0' cy='-14' r='32'/%3E%3Ccircle cx='32' cy='0' r='26'/%3E%3Cellipse cx='0' cy='14' rx='62' ry='16'/%3E%3C/g%3E%3Cg transform='translate(330,745) scale(.85)'%3E%3Ccircle cx='-30' cy='0' r='24'/%3E%3Ccircle cx='0' cy='-14' r='32'/%3E%3Ccircle cx='32' cy='0' r='26'/%3E%3Cellipse cx='0' cy='14' rx='62' ry='16'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") 0 0 / var(--cw) 100% repeat-x;
+    will-change:transform; animation:dailyClouds 110s linear infinite;
+  }
+  @keyframes dailyClouds{ from{ transform:translateX(0); } to{ transform:translateX(calc(var(--cw) * -4)); } }
+  :root.mode-daily .logo .flip{ color:#0d2b5e; }
+  :root.mode-daily .logo .stax{ color:#e8590c; }
+  :root.mode-daily .stat-line{ color:#0d2b5e; }
+  :root.mode-daily .tier{ color:#08183a; }
+  :root.mode-daily .race-status{ color:#c2410c; }
+  :root.mode-daily .vibe-label{ color:#0d2b5e; }
+  :root.mode-daily .back-btn{ color:#0d2b5e; opacity:1; }
+  :root.mode-daily .sound-toggle{ opacity:1; filter:brightness(0.28); }
+  :root.mode-daily .hint{ color:#0d2b5e; font-weight:600; }
+  :root.mode-daily .round-timer{ background:rgba(13,43,94,0.18); }
+  :root.mode-daily .status-banner.daily{ background:rgba(255,255,255,0.85); color:#0d2b5e; border-color:rgba(13,43,94,0.22); }
+  :root.mode-daily .board{ padding:12px; gap:8px; }
+  :root.mode-daily .half{
+    --frame-ring:#fff;
+    box-shadow:0 0 0 3px rgba(255,255,255,0.32), 0 6px 16px rgba(13,43,94,0.28);
+  }
+  :root.mode-daily .half:hover:not(.revealed){ box-shadow:inset 0 0 0 4px #ffd93d, inset 0 0 55px rgba(255,217,61,0.4); }
+  /* The Daily run clock (the green vertical bar) lives in the frame now, and
+     +5s / Pause keep their spot over the top box. */
+  :root.mode-daily .run-timer-wrap{ left:2px; width:8px; }
+  :root.mode-daily .slowdown-btn{ top:22px; }
+  :root.mode-daily .pause-btn{ top:74px; }
+  @media (prefers-reduced-motion: reduce){ :root.mode-daily body::before{ animation:none; } }
   /* Slow teal light band sweeping left-to-right across the header. */
   :root.mode-infinity header{ position:relative; overflow:hidden; }
   :root.mode-infinity header::before{
@@ -951,7 +1005,14 @@
   <div class="board" id="board">
     <div class="round-timer"><div class="round-timer-fill" id="roundTimerFill"></div></div>
     <!-- Infinity Flips only (hidden in every other mode): wordmark + drifting badges. -->
-    <div class="inf-wordmark" aria-hidden="true">INFINITY FLIPS</div>
+    <div class="inf-wordmark" aria-hidden="true">
+      <span>INFINITY</span>
+      <svg class="inf-sym" viewBox="0 0 64 32" width="46" height="23" aria-hidden="true">
+        <defs><linearGradient id="infSymGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ff2f9e"/><stop offset="1" stop-color="#19b6e6"/></linearGradient></defs>
+        <path d="M32 16 C26 7 18 5 12 8 C4 12 4 20 12 24 C18 27 26 25 32 16 C38 7 46 5 52 8 C60 12 60 20 52 24 C46 27 38 25 32 16 Z" fill="none" stroke="url(#infSymGrad)" stroke-width="5.5" stroke-linejoin="round"/>
+      </svg>
+      <span>FLIPS</span>
+    </div>
     <div class="inf-floaters" aria-hidden="true">
       <span>⭐</span><span>🔥</span><span>🏆</span><span>⚡</span><span>💎</span><span>🎯</span><span>🚀</span><span>✨</span>
     </div>
@@ -1075,7 +1136,7 @@
   <div class="split-halves">
     <div class="split-half split-top" id="modeDailyBtn">
       <div class="split-icon">🗓️</div>
-      <div class="split-title">Daily FlipStax</div>
+      <div class="split-title">Daily Stax</div>
       <div class="split-desc">
         One run, once a day. Swipe for points, answer trivia,
         collect letters, and solve today's hidden word before time runs out.
@@ -1132,7 +1193,7 @@
 <div class="personality-overlay" id="readoutOverlay">
   <div class="personality-inner">
     <div class="personality-mask">🏁</div>
-    <div class="personality-eyebrow">DAILY RUN COMPLETE</div>
+    <div class="personality-eyebrow">DAILY STAX COMPLETE</div>
     <div class="personality-label" id="readoutScore"></div>
     <div class="personality-blurb" id="readoutTrivia"></div>
     <div class="personality-blurb" id="readoutWord"></div>
@@ -2075,6 +2136,10 @@
       a.loop = true;
       a.preload = 'auto';
       a.volume = 0.55;
+      // Safety net: whatever queued or started this element (a play() that
+      // was waiting on a user gesture, a stale handler), if it starts
+      // playing while a different track is the current one, stop it.
+      a.addEventListener('playing', ()=>{ if (currentTrackKey !== key){ try{ a.pause(); }catch(e){} } });
       trackEls[key] = a;
     }
     return trackEls[key];
@@ -2092,9 +2157,15 @@
   // so now it's skipped entirely once the right track is already
   // audibly playing, instead of just skipping the currentTime reset.
   function playTrack(key){
+    // "Already playing" only counts if it was already THE current track -
+    // an element left audible by anything else must be restarted from the
+    // top, not adopted mid-song.
+    const wasCurrent = currentTrackKey === key;
     currentTrackKey = key;
     if (!soundOn) return;
-    const already = trackEls[key] && !trackEls[key].paused && !trackEls[key].muted;
+    const already = wasCurrent && trackEls[key] && !trackEls[key].paused && !trackEls[key].muted;
+    // Every other track is stopped outright first - a hard stop, never a
+    // fade or an overlap.
     Object.keys(trackEls).forEach(k=>{ if (k !== key) try{ trackEls[k].pause(); }catch(e){} });
     if (already) return;
     const el = getTrackEl(key);
@@ -2110,11 +2181,19 @@
   function primeMusic(key){
     currentTrackKey = key;
     if (!soundOn) return;
+    // Nothing else may be playing while the intro is primed.
+    Object.keys(trackEls).forEach(k=>{ if (k !== key) try{ trackEls[k].pause(); }catch(e){} });
     const el = getTrackEl(key);
     el.muted = true;
     el.play().catch(()=>{});
     const unmute = ()=>{
-      if (soundOn && currentTrackKey === key){ el.muted = false; el.play().catch(()=>{}); }
+      if (soundOn && currentTrackKey === key){
+        // It has been running silently since launch (browsers won't allow
+        // audible sound before a tap); restart so the theme is heard from
+        // its beginning rather than joined somewhere in the middle.
+        try{ el.currentTime = 0; }catch(e){}
+        el.muted = false; el.play().catch(()=>{});
+      }
       document.removeEventListener('pointerdown', unmute);
     };
     document.addEventListener('pointerdown', unmute, { once:true });
@@ -3006,27 +3085,27 @@
     // in every mode, so Infinity Flips showed "Daily Run". Call this
     // whenever the mode changes (see the mode buttons / returnToModeSelect).
     if (document.documentElement.classList.contains('mode-infinity')){
-      els.runBanner.innerHTML = '\u267E\uFE0F Infinity Flips';
+      els.runBanner.innerHTML = '<span class="mode-label">\u267E\uFE0F Infinity Flips</span>';
       return;
     }
     const streakTag = dailyRunStreak > 0 ? (' \uD83D\uDD25' + dailyRunStreak) : '';
     if (runResultToday){
       const r = runResultToday;
-      els.runBanner.innerHTML = '\uD83C\uDFAE Daily Run \u00B7 \u2705 ' + r.score + ' pts \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal +
+      els.runBanner.innerHTML = '<span class="mode-label">\uD83C\uDFAE Daily Stax</span> \u00B7 \u2705 ' + r.score + ' pts \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal +
         ' \u00B7 ' + (r.solved ? formatRaceTime(r.solveMs) : 'not solved') + streakTag +
         ' &nbsp;<span class="run-link" id="runShareLink">Share</span>';
       const link = document.getElementById('runShareLink');
       if (link) link.addEventListener('click', shareRunResult);
     } else if (runActive){
-      els.runBanner.innerHTML = '\uD83C\uDFAE Daily Run \u00B7 ' + runScore + ' pts \u00B7 ' + runLetters.length + '/' + RUN_WORD_LENGTH + ' letters' + streakTag;
+      els.runBanner.innerHTML = '<span class="mode-label">\uD83C\uDFAE Daily Stax</span> \u00B7 ' + runScore + ' pts \u00B7 ' + runLetters.length + '/' + RUN_WORD_LENGTH + ' letters' + streakTag;
     } else {
-      els.runBanner.innerHTML = '\uD83C\uDFAE Daily Run' + streakTag + ' &nbsp;<span class="run-link" id="runPlayLink">Play</span>';
+      els.runBanner.innerHTML = '<span class="mode-label">\uD83C\uDFAE Daily Stax</span>' + streakTag + ' &nbsp;<span class="run-link" id="runPlayLink">Play</span>';
       const link = document.getElementById('runPlayLink');
       if (link) link.addEventListener('click', startDailyRun);
     }
   }
   function buildRunShareText(r){
-    return 'FlipStax Daily Run\n' + r.score + ' pts \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal + ' trivia \u00B7 ' +
+    return 'FlipStax Daily Stax\n' + r.score + ' pts \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal + ' trivia \u00B7 ' +
       (r.solved ? ('solved in ' + formatRaceTime(r.solveMs)) : 'word not solved');
   }
 
@@ -3147,7 +3226,7 @@
     const results = (r.roundResults || []).slice(0, 6);
     while (results.length < 6) results.push(null);
     return {
-      badge: 'DAILY RUN #' + dayNumberFor(r.date) + ' \u2014 ' + r.date,
+      badge: 'DAILY STAX #' + dayNumberFor(r.date) + ' \u2014 ' + r.date,
       solved: r.solved, word: r.word || '', lettersEarned: r.triviaCorrect,
       roundResults: results,
       statLine: r.solved ? ('Solved in ' + formatRaceTime(r.solveMs)) : (r.triviaCorrect + '/' + r.triviaTotal + ' trivia correct'),
@@ -3282,7 +3361,7 @@
     clearTimeout(halfwayTimeoutId);
     halfwayTimeoutId = setTimeout(()=>{ if (runActive) runScoreAtHalfway = runScore; }, RUN_DURATION_MS / 2);
     renderRunBanner();
-    showToast('\uD83C\uDFAE Daily Run started \u2014 swipe for points!');
+    showToast('\uD83C\uDFAE Daily Stax started \u2014 swipe for points!');
     stopTallyPolling();
     lastWasEvent = true;
     loadNext();
@@ -4696,7 +4775,11 @@
   refreshSlowdownCharges();
   loadNext();
   renderStats();
-  setSoundOn(soundOn); // sync the 🔊/🔇 icon to whatever was saved from last time
+  // Sync the 🔊/🔇 icon to whatever was saved from last time. This must ONLY
+  // touch the icon: it used to call setSoundOn(), which also plays a track -
+  // so Daily's theme started at launch (unmuted, where autoplay is allowed),
+  // ran underneath the intro, and was never stopped.
+  els.soundToggle.textContent = soundOn ? '🔊' : '🔇';
   renderStatusBanner();
   renderRaceStatus();
   renderRunBanner();
