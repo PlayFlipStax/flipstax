@@ -809,6 +809,31 @@
     box-shadow:0 0 0 3px rgba(255,255,255,0.32), 0 6px 16px rgba(13,43,94,0.28);
   }
   :root.mode-daily .half:hover:not(.revealed){ box-shadow:inset 0 0 0 4px #ffd93d, inset 0 0 55px rgba(255,217,61,0.4); }
+  /* Selection halo: the same punch as Infinity's lime outline, in the sky
+     palette - a thick white outline, a pulsing white inner glow, and a
+     saturated sky-blue glow radiating out past the box (Daily's boxes aren't
+     clipped, so the outer glow is visible). Lifted above its neighbour so the
+     glow isn't painted over at the seam. #board outranks the hover rule. */
+  :root.mode-daily #board .half.picked{
+    z-index:2;
+    box-shadow:0 0 0 4px #fff, 0 0 26px 8px rgba(0,190,255,0.9), 0 0 56px 16px rgba(0,190,255,0.5);
+    animation:dailyPickOuter 0.9s ease-in-out infinite alternate;
+  }
+  :root.mode-daily .half.picked::after{ border-width:7px; border-color:#fff; }
+  :root.mode-daily .half.picked::before{
+    content:''; position:absolute; inset:0; z-index:3; pointer-events:none; border-radius:inherit;
+    box-shadow:inset 0 0 40px 8px rgba(255,255,255,0.75);
+    animation:dailyPickInner 0.9s ease-in-out infinite alternate;
+  }
+  @keyframes dailyPickOuter{
+    from{ box-shadow:0 0 0 4px #fff, 0 0 20px 6px rgba(0,190,255,0.75), 0 0 44px 12px rgba(0,190,255,0.4); }
+    to{ box-shadow:0 0 0 4px #fff, 0 0 32px 12px rgba(0,190,255,1), 0 0 68px 22px rgba(0,190,255,0.6); }
+  }
+  @keyframes dailyPickInner{
+    from{ box-shadow:inset 0 0 28px 4px rgba(255,255,255,0.55); }
+    to{ box-shadow:inset 0 0 54px 12px rgba(255,255,255,0.95); }
+  }
+  @media (prefers-reduced-motion: reduce){ :root.mode-daily #board .half.picked, :root.mode-daily .half.picked::before{ animation:none !important; } }
   /* The Daily run clock (the green vertical bar) lives in the frame now, and
      +5s / Pause keep their spot over the top box. */
   :root.mode-daily .run-timer-wrap{ left:2px; width:8px; }
