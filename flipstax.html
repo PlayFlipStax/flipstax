@@ -2151,29 +2151,65 @@
   // A short, filtered burst of noise - reads as a natural tactile "click"
   // rather than a synthesized beep. This is what most native UI tap sounds
   // actually are under the hood.
-  function playClick(vol){
+  //
+  // Vote-tap tones. Same 28ms burst, same decay and same overall level as the
+  // original click - only the colour changes, so you can tell the mode by ear
+  // without the click getting any more prominent (it fires on every vote):
+  //  - Daily Stax: soft and rounded - band-limited around 1.9kHz with a 3ms
+  //    attack instead of a hard edge, plus a very soft sine "tock" under it
+  //    (sky theme).
+  //  - Infinity Flips: brighter and synthier - a band around 5.6kHz plus a
+  //    tiny triangle blip that dips in pitch across the burst (gold/energy
+  //    theme).
+  // `gain` is calibrated so each variant's A-weighted energy matches the
+  // original click's. The top box sounds a touch higher and the bottom a
+  // touch lower (+/-5%, under a semitone each) so which side you tapped is
+  // felt as well as seen.
+  const TAP_TONES = {
+    daily:    { f:1900, q:0.8, attack:0.003, gain:1.53, blip:900,  blipType:'sine',     blipDrop:1,   blipGain:0.77 },
+    infinity: { f:5600, q:1.8, attack:0,     gain:1.41, blip:1500, blipType:'triangle', blipDrop:0.7, blipGain:0.7 },
+  };
+  const TAP_SIDE_PITCH = { top:1.05, bottom:0.95 };
+  function playClick(vol, tone, side){
     if (!soundOn) return;
     const ctx = getAudioCtx();
     if (!ctx) return;
     try{
       const dur = 0.028;
+      const pitch = tone ? (TAP_SIDE_PITCH[side] || 1) : 1;
       const bufferSize = Math.floor(ctx.sampleRate * dur);
+      const attackN = tone ? Math.floor(ctx.sampleRate * (tone.attack || 0)) : 0;
       const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
       const data = buffer.getChannelData(0);
-      for (let i=0;i<bufferSize;i++){ data[i] = (Math.random()*2-1) * Math.pow(1 - i/bufferSize, 2); }
+      for (let i=0;i<bufferSize;i++){
+        const attack = (attackN && i < attackN) ? i / attackN : 1;
+        data[i] = (Math.random()*2-1) * Math.pow(1 - i/bufferSize, 2) * attack;
+      }
       const noise = ctx.createBufferSource();
       noise.buffer = buffer;
       const filter = ctx.createBiquadFilter();
-      filter.type = 'highpass';
-      filter.frequency.value = 3200;
+      if (tone){ filter.type = 'bandpass'; filter.frequency.value = tone.f * pitch; filter.Q.value = tone.q; }
+      else { filter.type = 'highpass'; filter.frequency.value = 3200; }
       const gain = ctx.createGain();
-      gain.gain.value = vol || 0.22;
+      gain.gain.value = (vol || 0.22) * (tone ? tone.gain : 1);
       noise.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
-      noise.start();
+      const t0 = ctx.currentTime;
+      noise.start(t0);
+      if (tone && tone.blip){
+        const osc = ctx.createOscillator();
+        osc.type = tone.blipType || 'triangle';
+        osc.frequency.setValueAtTime(tone.blip * pitch, t0);
+        if (tone.blipDrop && tone.blipDrop !== 1) osc.frequency.exponentialRampToValueAtTime(tone.blip * pitch * tone.blipDrop, t0 + dur);
+        const bg = ctx.createGain();
+        bg.gain.setValueAtTime((vol || 0.22) * tone.blipGain, t0);
+        bg.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        osc.connect(bg); bg.connect(ctx.destination);
+        osc.start(t0); osc.stop(t0 + dur + 0.005);
+      }
     }catch(e){}
   }
   const sfx = {
-    tap: ()=>{ playClick(0.2); haptic(8); },
+    tap: (side)=>{ playClick(0.2, document.documentElement.classList.contains('mode-infinity') ? TAP_TONES.infinity : TAP_TONES.daily, side); haptic(8); },
     revealWin: ()=>{ playTone(660,0,0.09,'sine',0.1); playTone(880,0.08,0.14,'sine',0.1); },
     revealLose: ()=>{ playTone(320,0,0.15,'sine',0.07); },
     combo: ()=>{ playTone(784,0,0.06,'triangle',0.09); playTone(988,0.05,0.08,'triangle',0.09); haptic(12); },
@@ -4692,8 +4728,8 @@
     clearTimeout(celebrateTriviaCorrect._t);
     celebrateTriviaCorrect._t = setTimeout(()=> el.classList.add('hidden'), 800);
   }
-  els.halfA.addEventListener('click', ()=>{ sfx.tap(); playTrack(gameTrackKey()); tapFeedback(els.halfA, els.halfB); vote('A'); });
-  els.halfB.addEventListener('click', ()=>{ sfx.tap(); playTrack(gameTrackKey()); tapFeedback(els.halfB, els.halfA); vote('B'); });
+  els.halfA.addEventListener('click', ()=>{ sfx.tap('top'); playTrack(gameTrackKey()); tapFeedback(els.halfA, els.halfB); vote('A'); });
+  els.halfB.addEventListener('click', ()=>{ sfx.tap('bottom'); playTrack(gameTrackKey()); tapFeedback(els.halfB, els.halfA); vote('B'); });
   document.addEventListener('keydown', (e)=>{
     if (e.key==='ArrowUp' || e.key==='1') vote('A');
     if (e.key==='ArrowDown' || e.key==='2') vote('B');
