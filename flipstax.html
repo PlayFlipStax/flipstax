@@ -565,8 +565,9 @@
      edge line and a soft inner glow. Shapes come from clip-path on the
      element itself and the edge line from a ::after ring clipped to a
      beveled outline - box size, padding, and border widths are never
-     changed, so layout and the 44px tap targets are exactly as before
-     (the clip only trims a few px off each corner's tap area).
+     changed, so layout and the 44px tap targets are exactly as before.
+     (Tap areas: clip-path removes clipped corners from hit-testing, so the
+     tappable buttons below deliberately don't use it directly.)
      Each element sets --b (bevel size) and --bw (its existing border
      width, so the ring lines up with the outer edge). */
   :root.mode-infinity :is(
@@ -592,9 +593,33 @@
     );
     border-radius:0;
     border-color:transparent;
+  }
+  /* Panels, tiles, banner, toast: the element itself is clipped. */
+  :root.mode-infinity :is(
+    .half:not(.revealed):not(.has-glyph) .content, .event-tile, .status-banner, .toast
+  ){
     clip-path:var(--bevel-clip);
     box-shadow:inset 0 0 10px rgba(62,194,194,0.30), inset 0 0 20px rgba(122,76,224,0.18);
   }
+  /* Buttons are NOT clipped themselves: clip-path also removes the clipped
+     corners from hit-testing, and a tap in the corner of +5s / Pause would
+     fall through to the half underneath and register as a vote. Instead
+     the element stays a full transparent rectangle (same tap area as
+     before the redesign) and its beveled fill + glow live on ::before. */
+  :root.mode-infinity :is(.slowdown-btn, .pause-btn, .daily-btn){
+    isolation:isolate; background:transparent; box-shadow:none;
+  }
+  :root.mode-infinity :is(.slowdown-btn, .pause-btn, .daily-btn)::before{
+    content:''; position:absolute; inset:calc(0px - var(--bw, 0px)); z-index:-1; pointer-events:none;
+    clip-path:var(--bevel-clip);
+    background:var(--btn-fill, rgba(20,24,31,0.75));
+    box-shadow:inset 0 0 10px rgba(62,194,194,0.30), inset 0 0 20px rgba(122,76,224,0.18);
+  }
+  :root.mode-infinity :is(.slowdown-btn, .pause-btn){ --btn-fill:rgba(20,24,31,0.75); }
+  :root.mode-infinity :is(.slowdown-btn, .pause-btn):active{ --btn-fill:rgba(255,255,255,0.2); }
+  :root.mode-infinity .daily-btn{ --btn-fill:rgba(255,255,255,0.12); }
+  :root.mode-infinity .daily-btn:active{ --btn-fill:rgba(255,255,255,0.25); }
+  :root.mode-infinity .daily-btn.primary{ --btn-fill:var(--pulse); }
   :root.mode-infinity :is(
     .half:not(.revealed):not(.has-glyph) .content, .event-tile, .status-banner,
     .slowdown-btn, .pause-btn, .daily-btn, .toast
@@ -1782,17 +1807,23 @@
     if (on) playTrack(currentTrackKey || 'run'); else pauseAllTracks();
   }
 
-  // ---- Real recorded music, two tracks for two phases of the game: "run"
-  // (Bonus Stage Anthem) for everything except the word-solve phase
-  // (including the intro screen - there's no separate intro track), and
-  // "solve" (The Final Buzzer) for the word-solve phase itself. Plain
-  // <audio> elements with native looping - simpler and better-sounding
-  // than synthesizing notes, now that we have real tracks to work with.
+  // ---- Real recorded music, one track per part of the game: "intro"
+  // (mode select), "run" (Bonus Stage Anthem) for Daily Run's voting/trivia
+  // phase, "infinity" (High Score Strut) for Infinity Flips, and "solve"
+  // (The Final Buzzer) for the word-solve phase. Plain <audio> elements
+  // with native looping - simpler and better-sounding than synthesizing
+  // notes, now that we have real tracks to work with.
   const TRACK_SRC = {
-    intro: 'audio/grand-flipstax-party.mp3',
-    run:   'audio/bonus-stage-anthem.mp3',
-    solve: 'audio/final-buzzer.mp3',
+    intro:    'audio/grand-flipstax-party.mp3',
+    run:      'audio/bonus-stage-anthem.mp3',
+    infinity: 'audio/high-score-strut.mp3',
+    solve:    'audio/final-buzzer.mp3',
   };
+  // Which gameplay track fits the current mode - Infinity has its own,
+  // everything else that used to hardcode 'run' goes through this.
+  function gameTrackKey(){
+    return document.documentElement.classList.contains('mode-infinity') ? 'infinity' : 'run';
+  }
   const trackEls = {};
   let currentTrackKey = null;
   function getTrackEl(key){
@@ -1860,14 +1891,16 @@
   const RAMP_DRIFT_RATES = [1, 1.2, 1.4, 1.6, 1.8];
   const RAMP_HAT_LEVEL   = [0, 0.55, 0.75, 0.9, 1];
   const RAMP_RISER_LEVEL = [0, 0, 0.6, 0.85, 1];
-  // bonus-stage-anthem.mp3 measured at a steady 110 BPM with its first beat
-  // 52ms in (consistent across the whole 166s file). The layers below are
-  // unpitched (noise hats + a noise riser) so they can lock to that grid
-  // without needing to know the track's key.
-  const RAMP_BEAT = 60 / 110, RAMP_PHASE = 0.052;
+  // high-score-strut.mp3 (Infinity's track) measured at a steady 120.00 BPM
+  // with its first beat 48ms in, locked to the same grid across the whole
+  // 182s file (straight 8ths, not swung). The layers below are unpitched
+  // (noise hats + a noise riser) so they can lock to that grid without
+  // needing to know the track's key. If the track is ever swapped again,
+  // re-measure these two numbers or the layers will drift off the beat.
+  const RAMP_BEAT = 60 / 120, RAMP_PHASE = 0.048;
   let rampRounds = 0, rampTier = 0, rampDriftRate = 1;
   let rampBus = null, rampNoise = null, rampTimer = null;
-  let rampLastTrackT = 0, rampNextHatStep = 0, rampNextPhrase = -1;
+  let rampLastTrackT = 0, rampNextHatStep = 0, rampNextPhrase = -1, rampOff = null;
 
   function ensureRampAudio(){
     if (rampBus) return rampBus;
@@ -1922,13 +1955,21 @@
   // against the audio clock, so it re-syncs to the track continuously
   // (including across the loop point) instead of free-running and drifting.
   function rampAudioTick(){
-    const ctx = audioCtx, el = trackEls.run;
+    const ctx = audioCtx, el = trackEls.infinity;
     if (ctx && ctx.state === 'suspended') ctx.resume().catch(()=>{});
-    if (!ctx || !rampBus || !el || !soundOn || currentTrackKey !== 'run' || el.paused || el.muted || ctx.state !== 'running') return;
+    if (!ctx || !rampBus || !el || !soundOn || currentTrackKey !== 'infinity' || el.paused || el.muted || ctx.state !== 'running') return;
     const now = el.currentTime;
-    if (now < rampLastTrackT - 0.5){ rampNextHatStep = 0; rampNextPhrase = -1; }
+    if (now < rampLastTrackT - 0.5){ rampNextHatStep = 0; rampNextPhrase = -1; rampOff = null; }
     rampLastTrackT = now;
-    const off = ctx.currentTime - now, horizon = now + 0.3;
+    // The media element's currentTime updates in coarse steps, so a raw
+    // (audio clock - track position) offset jitters ~10ms tick to tick.
+    // Smooth it so hits stay evenly spaced; a big jump (loop/seek) resets.
+    const rawOff = ctx.currentTime - now;
+    if (rampOff === null || Math.abs(rawOff - rampOff) > 0.05) rampOff = rawOff;
+    else rampOff += (rawOff - rampOff) * 0.12;
+    // Never schedule past the end of the file: the track wraps to 0 there,
+    // so hits computed beyond it would land off the restarted beat grid.
+    const off = rampOff, horizon = Math.min(now + 0.3, isFinite(el.duration) ? el.duration : Infinity);
     const step = RAMP_BEAT / 4;
     let i = Math.max(rampNextHatStep, Math.ceil((now - RAMP_PHASE) / step));
     for (; RAMP_PHASE + i * step < horizon; i++){
@@ -1962,7 +2003,7 @@
     } else {
       setRampAudioLevels(0, true);
       clearInterval(rampTimer); rampTimer = null;
-      rampNextHatStep = 0; rampNextPhrase = -1;
+      rampNextHatStep = 0; rampNextPhrase = -1; rampOff = null;
     }
   }
   function rampOnRound(){
@@ -2996,11 +3037,19 @@
     const remain = runEndsAt - Date.now();
     if (remain <= 0){
       updateRunTimerBar();
-      if (runPhase === 'running') endRun(false);
+      // Out of voting/trivia time: the run isn't over, the word solve is
+      // next - with whatever letters were earned (missed ones are just
+      // blank slots, same as after a wrong trivia answer). This used to
+      // call endRun(false), which skipped the solve screen entirely for
+      // anyone who hadn't hit all 6 trivia milestones inside the clock.
+      // If a trivia/power-up/riddle is on screen, wait: the next tick
+      // after it resolves lands here again with runPhase back to 'running'.
+      if (runPhase === 'running') startSolvePhase();
       return;
     }
     updateRunTimerBar();
   }
+  function runClockExpired(){ return runEndsAt - Date.now() <= 0; }
   // Smoothly blends from green (plenty of time) through yellow/orange to red
   // (running out), instead of jumping between three flat colors at fixed
   // thresholds - reads as a continuous countdown, not a sudden warning.
@@ -3131,7 +3180,7 @@
       // Solve phase opens once every trivia shot has been taken, whether or
       // not all 6 landed - missed letters just mean more blank slots to
       // guess with the keyboard instead of ones you already know.
-      if (runTriviaAttempted >= RUN_THRESHOLDS.length){ startSolvePhase(); }
+      if (runTriviaAttempted >= RUN_THRESHOLDS.length || runClockExpired()){ startSolvePhase(); }
       else { runPhase = 'running'; loadNext(); }
     }, dt(1100));
   }
@@ -3210,6 +3259,7 @@
     setTimeout(()=>{
       els.eventOverlay.classList.add('hidden');
       if (!runActive) return;
+      if (runClockExpired()){ startSolvePhase(); return; }
       runPhase = 'running';
       loadNext();
     }, dt(1100));
@@ -3283,7 +3333,7 @@
     setTimeout(()=>{
       els.riddleOverlay.classList.add('hidden');
       if (!runActive) return;
-      if (runTriviaAttempted >= RUN_THRESHOLDS.length){ startSolvePhase(); }
+      if (runTriviaAttempted >= RUN_THRESHOLDS.length || runClockExpired()){ startSolvePhase(); }
       else { runPhase = 'running'; loadNext(); }
     }, dt(1800));
   }
@@ -3307,6 +3357,15 @@
   }
   function startSolvePhase(){
     runPhase = 'solving';
+    // Can now be entered from the middle of a VS round (run clock expiry),
+    // not just from a resolved trivia/riddle: cancel that round's timer and
+    // tally polling, and drop any trivia/power-up that was queued behind it.
+    // (loadNextImpl also refuses to run while solving, for a round-advance
+    // already scheduled by a vote.)
+    stopTallyPolling();
+    clearRoundTimer();
+    runPendingTrivia = false;
+    runPendingPowerUp = false;
     els.eventOverlay.classList.add('hidden');
     els.runTimerWrap.classList.add('hidden');
     solveGuesses = [];
@@ -3867,6 +3926,7 @@
     }
   }
   function loadNextImpl(){
+    if (runActive && runPhase === 'solving') return;
     stopTallyPolling();
     clearRoundTimer();
 
@@ -4111,8 +4171,8 @@
     clearTimeout(celebrateTriviaCorrect._t);
     celebrateTriviaCorrect._t = setTimeout(()=> el.classList.add('hidden'), 800);
   }
-  els.halfA.addEventListener('click', ()=>{ sfx.tap(); playTrack('run'); tapFeedback(els.halfA, els.halfB); vote('A'); });
-  els.halfB.addEventListener('click', ()=>{ sfx.tap(); playTrack('run'); tapFeedback(els.halfB, els.halfA); vote('B'); });
+  els.halfA.addEventListener('click', ()=>{ sfx.tap(); playTrack(gameTrackKey()); tapFeedback(els.halfA, els.halfB); vote('A'); });
+  els.halfB.addEventListener('click', ()=>{ sfx.tap(); playTrack(gameTrackKey()); tapFeedback(els.halfB, els.halfA); vote('B'); });
   document.addEventListener('keydown', (e)=>{
     if (e.key==='ArrowUp' || e.key==='1') vote('A');
     if (e.key==='ArrowDown' || e.key==='2') vote('B');
@@ -4327,7 +4387,11 @@
       getRiddleTriggered: () => riddleTriggeredThisRun,
       getLastTriviaQ: () => window.__debugLastTriviaQ,
       getRamp: () => ({ rampRounds, rampTier, rampDriftRate, audioLayers: !!rampTimer }),
-      getTrackTime: () => trackEls.run ? trackEls.run.currentTime : null,
+      getTrackTime: () => trackEls.infinity ? trackEls.infinity.currentTime : null,
+      seekInfinityTrack: (t) => { if (trackEls.infinity) trackEls.infinity.currentTime = t; },
+      getCurrentTrack: () => ({ key: currentTrackKey, paused: trackEls[currentTrackKey] ? trackEls[currentTrackKey].paused : null, src: trackEls[currentTrackKey] ? trackEls[currentTrackKey].src.split('/').pop() : null }),
+      setRunClockMs: (ms) => { runEndsAt = Date.now() + ms; },
+      getSolveState: () => ({ solveOpen: !els.solveOverlay.classList.contains('hidden'), readoutOpen: els.readoutOverlay.classList.contains('show'), runActive, runPhase }),
       jumpRampToRounds: (n) => { rampRounds = Math.max(0, n - 1); rampOnRound(); },
       forceVibe: (pct) => { stats.decided = 100; stats.agree = pct; saveStats(); updateVibeMeter(); },
       getRunState: () => ({
@@ -4485,17 +4549,13 @@
     els.backBtn.classList.remove('hidden');
     updatePauseBtnVisibility();
     resetRamp();
-    // Falls back to the single shared gameplay track until Infinity gets
-    // its own distinct one.
-    playTrack('run');
+    playTrack('infinity');
   });
   els.modeDailyBtn.addEventListener('click', ()=>{
     els.modeSelectOverlay.classList.add('hidden');
     document.documentElement.classList.add('mode-daily');
     document.documentElement.classList.remove('mode-infinity');
     els.backBtn.classList.remove('hidden');
-    // Falls back to the single shared gameplay track until Daily gets its
-    // own distinct one.
     playTrack('run');
     startDailyRun();
     updatePauseBtnVisibility();
