@@ -955,39 +955,120 @@
   .legal-body a{ color:#ffd93d; text-decoration:underline; cursor:pointer; }
   .legal-close{ margin-top:18px; width:100%; text-align:center; }
 
-  /* Mode picker, built as a literal split-screen (top/bottom halves +
-     center divider) to mirror the VS board itself - the choice between
-     modes gets the same visual language as the choice between cards. */
+  /* Mode picker: the front door to both games. One screen, two worlds - Daily's
+     sky (drifting clouds) above, Infinity's gold (rising sparkle + a slow shine)
+     below - divided by a horizon that teeters like a see-saw. The sky is a
+     full-screen layer clipped by an animated polygon; because clip-path also
+     clips hit-testing, a tap lands on whichever world is visibly under the
+     finger, even mid-teeter. The gold layer underneath takes every other tap.
+     --sy is the horizon's resting height; the edges swing +/-30px around it. */
   .split-select-overlay{
-    position:fixed; inset:0; z-index:40; display:flex; flex-direction:column; background:var(--bg);
+    position:fixed; inset:0; z-index:40; overflow:hidden; --sy:52%;
+    background:#ffc400; font-family:'Inter', system-ui, sans-serif;
   }
   .split-select-overlay.hidden{ display:none; }
-  .split-select-header{ flex-shrink:0; padding:calc(16px + env(safe-area-inset-top)) 16px 6px; text-align:center; }
-  .split-select-header .logo{ font-size:22px; margin-bottom:6px; }
-  .split-select-title{
-    color:var(--dim); font-size:11.5px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase;
+  .ms-gold, .ms-sky{ position:absolute; inset:0; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+  .ms-gold{
+    background:linear-gradient(135deg,#ffe36a 0%,#ffc400 30%,#fff3a6 48%,#ffb800 66%,#ffd93a 100%);
   }
-  .split-halves{ flex:1; display:flex; flex-direction:column; position:relative; min-height:0; }
-  .split-half{
-    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    padding:20px 28px; cursor:pointer; text-align:center;
-    transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease;
+  .ms-sky{
+    background:linear-gradient(180deg,#8fd6fc 0%,#a4e0fd 45%,#c9ecfe 100%);
+    --off:0px; clip-path:polygon(0 0,100% 0,100% calc(var(--sy) - 30px + var(--off)),0 calc(var(--sy) + 30px + var(--off)));
+    animation:msTeeter 6.5s ease-in-out infinite alternate;
   }
-  .split-half:active{ transform:scale(0.98); filter:brightness(1.08); }
-  .split-half:hover{ box-shadow: inset 0 0 0 5px #ffd93d, inset 0 0 70px rgba(255,217,61,0.4); }
-  .split-top{ background: linear-gradient(165deg, #f0b955, #d68a1f); }
-  .split-bottom{ background: linear-gradient(195deg, #58c2c1, #268584); }
-  .split-icon{ font-size:42px; margin-bottom:8px; }
-  .split-title{
-    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:25px;
-    color:#fff; text-shadow:0 2px 8px rgba(0,0,0,0.3); margin-bottom:8px;
+  @keyframes msTeeter{
+    from{ clip-path:polygon(0 0,100% 0,100% calc(var(--sy) - 30px + var(--off)),0 calc(var(--sy) + 30px + var(--off))); }
+    to{   clip-path:polygon(0 0,100% 0,100% calc(var(--sy) + 30px + var(--off)),0 calc(var(--sy) - 30px + var(--off))); }
   }
-  .split-desc{ font-size:13px; color:rgba(255,255,255,0.95); line-height:1.5; max-width:280px; }
+  /* White edge + soft glow along the horizon: the same polygon, a few px lower,
+     sitting between the gold and the sky. Not tappable. */
+  .ms-seam{
+    position:absolute; inset:0; pointer-events:none; --off:0px;
+    clip-path:polygon(0 0,100% 0,100% calc(var(--sy) - 30px + var(--off)),0 calc(var(--sy) + 30px + var(--off)));
+    animation:msTeeter 6.5s ease-in-out infinite alternate;
+  }
+  .ms-seam-glow{ --off:20px; background:rgba(255,255,255,0.3); }
+  .ms-seam-line{ --off:7px; background:#fff; }
+  .ms-bg{ position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+  /* Clouds: same art and one-tile-per-loop drift as Daily itself, banded across
+     the top ~54% so a bank of them sits along the horizon. */
+  .ms-sky .ms-bg::before{
+    content:''; position:absolute; top:0; left:0; height:54dvh; width:calc(27dvh * 8);
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800'%3E%3Cg fill='white' fill-opacity='.85'%3E%3Cg transform='translate(95,60) scale(1.15)'%3E%3Ccircle cx='-30' cy='0' r='24'/%3E%3Ccircle cx='0' cy='-14' r='32'/%3E%3Ccircle cx='32' cy='0' r='26'/%3E%3Cellipse cx='0' cy='14' rx='62' ry='16'/%3E%3C/g%3E%3Cg transform='translate(310,135) scale(.9)'%3E%3Ccircle cx='-30' cy='0' r='24'/%3E%3Ccircle cx='0' cy='-14' r='32'/%3E%3Ccircle cx='32' cy='0' r='26'/%3E%3Cellipse cx='0' cy='14' rx='62' ry='16'/%3E%3C/g%3E%3Cg transform='translate(120,772) scale(1.2)'%3E%3Ccircle cx='-30' cy='0' r='24'/%3E%3Ccircle cx='0' cy='-14' r='32'/%3E%3Ccircle cx='32' cy='0' r='26'/%3E%3Cellipse cx='0' cy='14' rx='62' ry='16'/%3E%3C/g%3E%3Cg transform='translate(330,745) scale(.85)'%3E%3Ccircle cx='-30' cy='0' r='24'/%3E%3Ccircle cx='0' cy='-14' r='32'/%3E%3Ccircle cx='32' cy='0' r='26'/%3E%3Cellipse cx='0' cy='14' rx='62' ry='16'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") 0 0 / 27dvh 100% repeat-x;
+    will-change:transform; animation:msClouds 110s linear infinite;
+  }
+  @keyframes msClouds{ from{ transform:translateX(0); } to{ transform:translateX(calc(27dvh * -4)); } }
+  /* Sparkles rise and a shine sweeps, as in Infinity. */
+  .ms-gold .ms-bg::before{
+    content:''; position:absolute; top:0; left:0; width:100%; height:200%;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800' preserveAspectRatio='xMidYMid slice'%3E%3Cg fill='%23fffdf0'%3E%3Cpath id='s' d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(60,90) scale(14)' fill-opacity='.95'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(300,40) scale(9)' fill-opacity='.8'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(180,170) scale(18)' fill-opacity='.9'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(340,260) scale(12)' fill-opacity='.7'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(40,340) scale(10)' fill-opacity='.8'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(250,380) scale(20)' fill-opacity='.95'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(120,470) scale(9)' fill-opacity='.7'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(330,520) scale(15)' fill-opacity='.9'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(70,600) scale(19)' fill-opacity='.9'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(230,660) scale(10)' fill-opacity='.8'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(350,730) scale(13)' fill-opacity='.85'/%3E%3Cpath d='M0-1Q.09-.09 1 0Q.09.09 0 1Q-.09.09-1 0Q-.09-.09 0-1Z' transform='translate(150,770) scale(8)' fill-opacity='.7'/%3E%3Ccircle cx='110' cy='20' r='2.4' fill-opacity='.8'/%3E%3Ccircle cx='210' cy='300' r='2.4' fill-opacity='.8'/%3E%3Ccircle cx='20' cy='470' r='2.4' fill-opacity='.8'/%3E%3Ccircle cx='290' cy='610' r='2.4' fill-opacity='.8'/%3E%3Ccircle cx='380' cy='400' r='2.4' fill-opacity='.8'/%3E%3Ccircle cx='180' cy='560' r='2.4' fill-opacity='.8'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 100% 50% repeat-y;
+    will-change:transform; animation:msRise 70s linear infinite;
+  }
+  @keyframes msRise{ from{ transform:translateY(0); } to{ transform:translateY(-50%); } }
+  .ms-gold .ms-bg::after{
+    content:''; position:absolute; top:-10%; bottom:-10%; left:0; width:55%;
+    background:linear-gradient(100deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%);
+    transform:translateX(-120%) skewX(-18deg); will-change:transform; animation:msSweep 8s ease-in-out infinite;
+  }
+  @keyframes msSweep{ 0%{ transform:translateX(-120%) skewX(-18deg); } 55%,100%{ transform:translateX(260%) skewX(-18deg); } }
+  /* Copy blocks: Daily's sits above the horizon, Infinity's below it, each
+     clear of the +/-30px swing. */
+  .ms-body{
+    position:absolute; left:0; right:0; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; text-align:center; padding:0 14px; pointer-events:none;
+  }
+  .ms-body-daily{ top:calc(56px + env(safe-area-inset-top)); bottom:calc(100% - var(--sy) + 44px); }
+  .ms-body-inf{ top:calc(var(--sy) + 52px); bottom:24px; }
+  .ms-wm{
+    display:flex; align-items:center; gap:8px; height:34px; white-space:nowrap;
+    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:27px; letter-spacing:4px; line-height:1;
+  }
+  .ms-body-daily .ms-wm{ color:#0d2b5e; text-shadow:0 0 8px rgba(255,255,255,0.95), 0 0 18px rgba(255,255,255,0.9); animation:msDailyGlow 2.4s ease-in-out infinite alternate; }
+  .ms-body-daily .ms-wm svg{ filter:drop-shadow(0 1px 2px rgba(13,43,94,0.35)); }
+  @keyframes msDailyGlow{
+    from{ text-shadow:0 0 5px rgba(255,255,255,0.8), 0 0 10px rgba(255,255,255,0.6); }
+    to{ text-shadow:0 0 10px #fff, 0 0 22px rgba(255,255,255,0.95), 0 0 32px rgba(255,190,90,0.8); }
+  }
+  .ms-body-inf .ms-wm{ color:#2b0a4d; text-shadow:0 0 8px rgba(255,255,255,0.9), 0 0 16px #ff3cac; animation:msInfGlow 1.8s ease-in-out infinite alternate; }
+  @keyframes msInfGlow{
+    from{ text-shadow:0 0 5px rgba(255,255,255,0.7), 0 0 9px #ff8ad4; }
+    to{ text-shadow:0 0 12px #fff, 0 0 26px #ff3cac, 0 0 38px rgba(255,255,255,0.9); }
+  }
+  .ms-tag{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:19px; letter-spacing:3px; text-transform:uppercase; margin-top:10px; }
+  .ms-body-daily .ms-tag{ color:#c2410c; text-shadow:0 0 6px rgba(255,255,255,0.9); }
+  .ms-body-inf .ms-tag{ color:#a30037; text-shadow:0 0 6px rgba(255,255,255,0.7); }
+  .ms-desc{ font-size:13px; line-height:1.5; max-width:290px; margin-top:8px; font-weight:600; }
+  .ms-body-daily .ms-desc{ color:#0d2b5e; }
+  .ms-body-inf .ms-desc{ color:#3d2c00; }
+  .ms-cta{
+    margin-top:16px; font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:21px; letter-spacing:2.5px;
+    padding:12px 30px; min-height:48px; display:inline-flex; align-items:center; gap:8px; transition:transform 0.15s ease;
+  }
+  .ms-body-daily .ms-cta{ background:#fff; color:#0d2b5e; border-radius:999px; box-shadow:0 4px 0 rgba(13,43,94,0.28), 0 0 0 3px rgba(255,255,255,0.5), 0 0 22px rgba(0,190,255,0.6); }
+  .ms-body-inf .ms-cta{
+    color:#fff; background:linear-gradient(135deg,#ff2f9e,#a4138f); text-shadow:0 1px 0 rgba(0,0,0,0.3);
+    clip-path:polygon(12px 0,calc(100% - 12px) 0,100% 12px,100% calc(100% - 12px),calc(100% - 12px) 100%,12px 100%,0 calc(100% - 12px),0 12px);
+  }
+  .ms-gold:active .ms-cta, .ms-sky:active .ms-cta{ transform:scale(0.96); }
+  .split-select-header{
+    position:absolute; top:0; left:0; right:0; z-index:6; text-align:center; pointer-events:none;
+    padding:calc(16px + env(safe-area-inset-top)) 16px 0;
+  }
+  .split-select-header .logo{ font-size:26px; letter-spacing:0.3px; }
+  .split-select-header .logo .flip{ color:#0d2b5e; }
+  .split-select-header .logo .stax{ color:#e8590c; }
+  .split-select-title{ color:#0d2b5e; font-size:11px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; opacity:0.85; }
   .split-divider{
-    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:4;
-    width:44px; height:44px; border-radius:50%; background:var(--bg); border:3px solid var(--divider);
+    position:absolute; top:var(--sy); left:50%; transform:translate(-50%,-50%); z-index:7;
+    width:52px; height:52px; border-radius:50%; background:#1a1442; border:3px solid #fff;
     display:flex; align-items:center; justify-content:center; pointer-events:none;
-    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:12px; color:var(--dim);
+    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:15px; letter-spacing:1px; color:#fff;
+    box-shadow:0 0 0 3px rgba(26,20,66,0.5), 0 4px 14px rgba(0,0,0,0.35);
+  }
+  /* Short phones: drop the blurb so nothing crowds the horizon. */
+  @media (max-height:640px){ .ms-desc{ display:none; } }
+  @media (prefers-reduced-motion: reduce){
+    .ms-sky, .ms-seam, .ms-sky .ms-bg::before, .ms-gold .ms-bg::before, .ms-gold .ms-bg::after, .ms-wm{ animation:none !important; }
   }
 
   .solve-overlay{
@@ -1235,29 +1316,41 @@
 </div>
 
 <div class="split-select-overlay hidden" id="modeSelectOverlay">
+  <!-- Infinity: the gold world underneath; takes every tap the sky doesn't. -->
+  <div class="ms-gold" id="modeInfinityBtn" role="button" aria-label="Play Infinity Flips">
+    <div class="ms-bg"></div>
+    <div class="ms-body ms-body-inf">
+      <div class="ms-wm" aria-hidden="true">
+        <span>INFINITY</span>
+        <svg viewBox="0 0 64 32" width="44" height="22"><defs><linearGradient id="msInfGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ff2f9e"/><stop offset="1" stop-color="#19b6e6"/></linearGradient></defs><path d="M32 16 C26 7 18 5 12 8 C4 12 4 20 12 24 C18 27 26 25 32 16 C38 7 46 5 52 8 C60 12 60 20 52 24 C46 27 38 25 32 16 Z" fill="none" stroke="url(#msInfGrad)" stroke-width="5.5" stroke-linejoin="round"/></svg>
+        <span>FLIPS</span>
+      </div>
+      <div class="ms-tag">No clock. No limit.</div>
+      <div class="ms-desc">Endless swiping. Vote on opinions forever, climb the tiers, and chase streaks and bonus rounds.</div>
+      <div class="ms-cta">START FLIPPING &#9654;</div>
+    </div>
+  </div>
+  <div class="ms-seam ms-seam-glow"></div>
+  <div class="ms-seam ms-seam-line"></div>
+  <!-- Daily: the sky, clipped by the teetering horizon (which also clips its hit area). -->
+  <div class="ms-sky" id="modeDailyBtn" role="button" aria-label="Play Daily Stax">
+    <div class="ms-bg"></div>
+    <div class="ms-body ms-body-daily">
+      <div class="ms-wm" aria-hidden="true">
+        <span>DAILY</span>
+        <svg viewBox="0 0 48 34" width="40" height="28"><g stroke="#0d2b5e" stroke-width="2" stroke-linejoin="round"><rect x="7" y="6" width="17" height="24" rx="3" fill="#ff7a59" transform="rotate(-18 15.5 18)"/><rect x="24" y="6" width="17" height="24" rx="3" fill="#2dd4c4" transform="rotate(18 32.5 18)"/><rect x="15.5" y="3" width="17" height="24" rx="3" fill="#ffd93d"/></g><path d="M24 9.5 l1.9 4.2 4.6.5-3.4 3.1 1 4.5-4.1-2.4-4.1 2.4 1-4.5-3.4-3.1 4.6-.5z" fill="#fff" stroke="#0d2b5e" stroke-width="0.8" stroke-linejoin="round"/></svg>
+        <span>STAX</span>
+      </div>
+      <div class="ms-tag">One run. Once a day.</div>
+      <div class="ms-desc">Swipe for points, answer trivia, collect letters, and solve today's hidden word before time runs out.</div>
+      <div class="ms-cta">PLAY TODAY &#9654;</div>
+    </div>
+  </div>
   <div class="split-select-header">
     <div class="logo"><span class="flip">Flip</span><span class="stax">Stax</span></div>
     <div class="split-select-title">Choose your mode</div>
   </div>
-  <div class="split-halves">
-    <div class="split-half split-top" id="modeDailyBtn">
-      <div class="split-icon">🗓️</div>
-      <div class="split-title">Daily Stax</div>
-      <div class="split-desc">
-        One run, once a day. Swipe for points, answer trivia,
-        collect letters, and solve today's hidden word before time runs out.
-      </div>
-    </div>
-    <div class="split-divider">OR</div>
-    <div class="split-half split-bottom" id="modeInfinityBtn">
-      <div class="split-icon">♾️</div>
-      <div class="split-title">Infinity Flips</div>
-      <div class="split-desc">
-        Endless swiping. Vote on opinions forever, climb the tiers, and
-        chase streaks and bonus rounds - no clock, no limit.
-      </div>
-    </div>
-  </div>
+  <div class="split-divider">OR</div>
 </div>
 
 <div class="intro-overlay hidden" id="runIntroOverlay">
