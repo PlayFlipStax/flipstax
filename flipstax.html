@@ -1340,11 +1340,35 @@
      logo pops in from nothing - delay lets the wallpaper register before
      the zoom starts. */
   @keyframes logoZoomIn{ from{ transform:scale(0); opacity:0; } to{ transform:scale(1); opacity:1; } }
+  /* The zoom-in is a one-shot entrance (both = hold its end state); logoFloat
+     is a second, separately-timed animation on the same element that starts
+     right as the zoom finishes (450ms delay + 650ms duration = 1100ms) and
+     runs forever after, so the logo doesn't just freeze once it lands - its
+     0% matches the zoom's end state exactly, so there's no hand-off jump. */
+  @keyframes logoFloat{ 0%,100%{ transform:translateY(0) scale(1); } 50%{ transform:translateY(-5px) scale(1.012); } }
   .home-logo-img{
     width:100%; max-width:440px; height:auto; margin-bottom:34px;
-    animation: logoZoomIn 650ms cubic-bezier(.25,.85,.35,1.25) 450ms both;
+    animation: logoZoomIn 650ms cubic-bezier(.25,.85,.35,1.25) 450ms both,
+               logoFloat 4s ease-in-out infinite 1100ms;
   }
-  .home-enter-btn{ padding:13px 48px; font-size:16px; box-shadow:0 6px 18px rgba(242,84,91,0.4); }
+  /* Ambient twinkle across the whole landing screen - the same .col-spark/
+     colRise particle system as mode-select's gold half and the Collection
+     reveal (see fillSparkField), just recoloured for this screen's light
+     sky-blue backdrop instead of dark or gold. */
+  .home-sparks{ position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
+  .home-enter-btn{
+    padding:13px 48px; font-size:16px; box-shadow:0 6px 18px rgba(242,84,91,0.4);
+    animation: homeEnterPulse 2.8s ease-in-out infinite;
+  }
+  @keyframes homeEnterPulse{
+    0%,100%{ box-shadow:0 6px 18px rgba(242,84,91,0.4); }
+    50%{ box-shadow:0 6px 27px rgba(242,84,91,0.75), 0 0 20px rgba(242,84,91,0.5); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .home-logo-img{ animation:none !important; }
+    .home-enter-btn{ animation:none !important; }
+    .home-overlay .doodle-scatter-track{ animation:none !important; }
+  }
   .home-legal-links{
     position:relative; z-index:1; margin-top:16px;
     display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:2px;
@@ -1832,6 +1856,7 @@
   </div>
 </div>
 <div class="home-overlay" id="homeOverlay">
+  <div class="home-sparks" id="homeSparks" aria-hidden="true"></div>
   <img class="home-logo-img" src="images/flipstax-logo-transparent.png" alt="FlipStax - Flip, Vote, Jumble &amp; Solve">
   <div class="daily-btn primary home-enter-btn" id="homeEnterBtn">Enter</div>
   <div class="home-legal-links">
@@ -4515,7 +4540,7 @@
     collectionCount: document.getElementById('collectionCount'), collectionBar: document.getElementById('collectionBar'),
     collectionBack: document.getElementById('collectionBack'), collectionScroll: document.getElementById('collectionScroll'),
     colSparks: document.getElementById('colSparks'), cardZoom: document.getElementById('cardZoom'),
-    msGoldSparks: document.getElementById('msGoldSparks'),
+    msGoldSparks: document.getElementById('msGoldSparks'), homeSparks: document.getElementById('homeSparks'),
     colTabs: Array.from(document.querySelectorAll('.col-tab')), badgeList: document.getElementById('badgeList'), colHint: document.getElementById('colHint'),
     badgeBanner: document.getElementById('badgeBanner'), badgeBannerIcon: document.getElementById('badgeBannerIcon'), badgeBannerName: document.getElementById('badgeBannerName'),
     cardZoomSlot: document.getElementById('cardZoomSlot'), cardZoomName: document.getElementById('cardZoomName'), cardZoomMeta: document.getElementById('cardZoomMeta'),
@@ -5968,6 +5993,13 @@
     fillSparkField(els.msGoldSparks, 12,
       ['✦','✧','★','●'], ['#fff6a8','#ffffff','#ffe066','#ff8ad4','#7df9ff'],
       [5,11], [0.22,0.5], [10,20]);
+  }
+  // Landing screen: same idea, recoloured for the light sky-blue backdrop
+  // (white/pale-yellow/pink/cyan instead of the gold half's warm palette).
+  function buildHomeSparks(){
+    fillSparkField(els.homeSparks, 14,
+      ['✦','✧','★','●'], ['#ffffff','#fff6a8','#ff8ad4','#7df9ff'],
+      [5,10], [0.25,0.5], [10,20]);
   }
   let collectionRevealing = false;
   async function openCollection(){
@@ -7478,14 +7510,18 @@
   // on the first tap anywhere, same muted-autoplay pattern as before.
   primeMusic('intro');
   updatePauseBtnVisibility();
-  renderDoodleScatter(els.homeOverlay);
+  // The landing screen's doodle field used to be the one static background
+  // in the whole game (moving:false skipped doodleDrift entirely) - give it
+  // the same slow drift as the VS card halves, reusing that system as-is.
+  renderDoodleScatter(els.homeOverlay, {direction:'left'});
   renderDoodleScatter(els.halfA, {direction:'right'});
   renderDoodleScatter(els.halfB, {direction:'left'});
+  buildHomeSparks();
   let doodleResizeTimer = null;
   window.addEventListener('resize', ()=>{
     clearTimeout(doodleResizeTimer);
     doodleResizeTimer = setTimeout(()=>{
-      renderDoodleScatter(els.homeOverlay);
+      renderDoodleScatter(els.homeOverlay, {direction:'left'});
       renderDoodleScatter(els.halfA, {direction:'right'});
       renderDoodleScatter(els.halfB, {direction:'left'});
     }, 200);
