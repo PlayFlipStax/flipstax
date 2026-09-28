@@ -5043,6 +5043,10 @@
     showToast('\uD83C\uDFAE Daily Stax started \u2014 swipe for points!');
     stopTallyPolling();
     lastWasEvent = true;
+    // Fresh shuffle of the whole Daily pool (330 cards) for every run, so no
+    // matchup can repeat within a run: even a max-speed run is ~155 rounds.
+    // (The deck used to carry over, and could run out mid-run.)
+    resetDeck('daily');
     loadNext();
   }
   function tickRunTimer(){
