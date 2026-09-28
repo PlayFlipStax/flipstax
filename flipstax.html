@@ -122,6 +122,9 @@
   .status-banner.noon{ background:linear-gradient(90deg,#5b3ec7,#3e6bc7); color:#fff; }
   .status-banner.hidden{ display:none; }
   .status-banner.solo{ flex:1 1 100%; }
+  /* Sharing the row with a 2x Flip Zone / Noon Rush pill: the mode pill
+     drops its name and keeps the icon + progress so neither gets cut off. */
+  #runBanner:not(.solo) .ml-text{ display:none; }
   .run-link{ color:var(--pulse); font-weight:700; cursor:pointer; padding:2px 6px; }
   .vibe-wrap{ display:none; margin-top:5px; }
   .vibe-track{ position:relative; height:5px; border-radius:6px; background:linear-gradient(90deg, var(--b), var(--divider) 50%, var(--a)); }
@@ -799,6 +802,50 @@
     100%{ opacity:0; transform:rotate(var(--a)) translateX(var(--r)) scale(0.3); }
   }
   @keyframes ccNewPop{ 0%{ transform:scale(0) rotate(-20deg); } 100%{ transform:scale(1) rotate(0); } }
+
+  /* Cards | Badges tabs */
+  .col-tabs{ display:flex; justify-content:center; gap:8px; margin-top:10px; }
+  .col-tab{
+    padding:7px 16px; border-radius:99px; font-size:13px; font-weight:800; cursor:pointer;
+    background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.3); color:rgba(255,255,255,0.8);
+  }
+  .col-tab.active{ background:#fff; color:#3d0f5e; border-color:#fff; box-shadow:0 0 14px rgba(255,255,255,0.45); }
+  .col-grid.hidden, .bd-list.hidden{ display:none; }
+  /* Badges: every badge listed with its name and how to earn it; locked
+     ones greyed out (unlike the cards, nothing here is secret). */
+  .bd-list{ display:grid; grid-template-columns:1fr; gap:10px; max-width:560px; margin:0 auto; }
+  @media (min-width:560px){ .bd-list{ grid-template-columns:1fr 1fr; } }
+  .bd-item{
+    display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:16px;
+    background:rgba(20,6,40,0.55); border:1px solid rgba(255,255,255,0.16);
+  }
+  .bd-item.earned{ background:linear-gradient(135deg, rgba(255,60,172,0.35), rgba(255,184,0,0.3)); border-color:rgba(255,224,102,0.8); box-shadow:0 0 14px rgba(255,224,102,0.3); }
+  .bd-icon{
+    flex-shrink:0; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:24px; background:rgba(255,255,255,0.14);
+  }
+  .bd-item.earned .bd-icon{ background:#fff; box-shadow:0 0 12px rgba(255,255,255,0.7); }
+  .bd-item.locked .bd-icon{ filter:grayscale(1); opacity:0.45; }
+  .bd-text{ min-width:0; }
+  .bd-name{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:18px; letter-spacing:0.5px; }
+  .bd-desc{ font-size:12.5px; line-height:1.35; opacity:0.85; }
+  .bd-when{ font-size:11px; font-weight:800; margin-top:3px; color:#ffe066; }
+  .bd-item.locked .bd-name, .bd-item.locked .bd-desc{ opacity:0.55; }
+  .bd-item.locked .bd-when{ color:rgba(255,255,255,0.45); }
+  /* New-badge banner: slides down from the top for ~2.6s, above everything. */
+  .badge-banner{
+    position:fixed; left:50%; top:calc(10px + env(safe-area-inset-top)); z-index:80; pointer-events:none;
+    display:flex; align-items:center; gap:10px; padding:8px 16px 8px 10px; border-radius:99px;
+    background:linear-gradient(135deg,#ff3cac,#7b2ff7); color:#fff; border:2px solid #fff;
+    box-shadow:0 8px 24px rgba(43,10,77,0.45), 0 0 18px rgba(255,60,172,0.55);
+    transform:translate(-50%, -140%); opacity:0; transition:transform 0.45s cubic-bezier(.3,1.5,.5,1), opacity 0.3s ease;
+    max-width:90vw;
+  }
+  .badge-banner.show{ transform:translate(-50%, 0); opacity:1; }
+  .bb-icon{ width:34px; height:34px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+  .bb-text{ display:flex; flex-direction:column; line-height:1.15; white-space:nowrap; }
+  .bb-text b{ font-size:10px; letter-spacing:1.5px; color:#ffe066; }
+  .bb-text span{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:19px; letter-spacing:0.5px; }
 
   /* Tap an unlocked card to see it big. */
   .cc-zoom{
@@ -1763,12 +1810,18 @@
     <div class="col-title">MY COLLECTION</div>
     <div class="col-count" id="collectionCount">0 / 16 collected</div>
     <div class="col-bar"><i id="collectionBar" style="width:0%"></i></div>
+    <div class="col-tabs" role="tablist">
+      <div class="col-tab active" data-tab="cards" role="tab">🃏 Cards</div>
+      <div class="col-tab" data-tab="badges" role="tab">🏅 Badges</div>
+    </div>
   </div>
   <div class="col-scroll" id="collectionScroll">
     <div class="col-grid" id="collectionGrid"></div>
-    <div class="col-hint">Finish a Daily Stax run to earn its personality card.</div>
+    <div class="bd-list hidden" id="badgeList"></div>
+    <div class="col-hint" id="colHint">Finish a Daily Stax run to earn its personality card.</div>
   </div>
 </div>
+<div class="badge-banner" id="badgeBanner" aria-live="polite"><span class="bb-icon" id="badgeBannerIcon"></span><span class="bb-text"><b>BADGE EARNED</b><span id="badgeBannerName"></span></span></div>
 <div class="cc-zoom hidden" id="cardZoom" role="dialog" aria-label="Card">
   <div id="cardZoomSlot"></div>
   <div class="cc-zoom-name" id="cardZoomName"></div>
@@ -4328,6 +4381,8 @@
     collectionCount: document.getElementById('collectionCount'), collectionBar: document.getElementById('collectionBar'),
     collectionBack: document.getElementById('collectionBack'), collectionScroll: document.getElementById('collectionScroll'),
     colSparks: document.getElementById('colSparks'), cardZoom: document.getElementById('cardZoom'),
+    colTabs: Array.from(document.querySelectorAll('.col-tab')), badgeList: document.getElementById('badgeList'), colHint: document.getElementById('colHint'),
+    badgeBanner: document.getElementById('badgeBanner'), badgeBannerIcon: document.getElementById('badgeBannerIcon'), badgeBannerName: document.getElementById('badgeBannerName'),
     cardZoomSlot: document.getElementById('cardZoomSlot'), cardZoomName: document.getElementById('cardZoomName'), cardZoomMeta: document.getElementById('cardZoomMeta'),
     readoutTypeName: document.getElementById('readoutTypeName'), readoutTypeBlurb: document.getElementById('readoutTypeBlurb'),
     readoutShare: document.getElementById('readoutShare'),
@@ -4421,7 +4476,13 @@
     }
   }
   function addRacePoints(delta){
-    if (inInfinity()){ infBlock.points += delta; saveInfBlock(); }
+    if (inInfinity()){
+      infBlock.points += delta; saveInfBlock();
+      const ss = infSession; ss.score += delta;
+      // A real hole, not one missed round at the start: 10+ points below zero.
+      if (ss.score <= -10) ss.wentNegative = true;
+      if (ss.score > ss.high){ if (ss.wentNegative) awardBadge('comeback'); ss.high = ss.score; }
+    }
     ensureRaceToday();
     if (raceState.completed) { renderRaceStatus(); return; }
     if (raceState.startedAt == null) raceState.startedAt = Date.now();
@@ -4506,6 +4567,61 @@
   }
   function saveInfBlock(){ try{ localStorage.setItem(INF_BLOCK_KEY, JSON.stringify(infBlock)); }catch(e){} }
   let infBlock = loadInfBlock();
+
+  // ---------- Infinity badges ----------
+  // A second collectible layer: badges track specific behaviours and
+  // milestones (cards track personality). Earned badges get a quick banner,
+  // not the card reveal. Stored per device in flipstax_badges_v1:
+  // { earned: { <id>: 'YYYY-MM-DD' }, voted: [<card key>, ...] } - `voted`
+  // is every Infinity card ever voted on, for the category-completion badges.
+  // A "session" runs from entering Infinity until leaving it or reloading.
+  const BADGES = [
+    { id:'on_fire',      icon:'🔥', name:'On Fire',        desc:'20 votes in a row, each within 3 seconds' },
+    { id:'marathoner',   icon:'🌊', name:'Marathoner',     desc:'250 votes in one Infinity session' },
+    { id:'night_owl',    icon:'🌙', name:'Night Owl',      desc:'Played Infinity between midnight and 4am' },
+    { id:'long_hauler',  icon:'⏰', name:'Long Hauler',    desc:'One Infinity session lasting 30+ minutes' },
+    { id:'in_sync',      icon:'🤝', name:'In Sync',        desc:'Sided with the crowd 20 times in a row' },
+    { id:'lone_wolf',    icon:'🦄', name:'Lone Wolf',      desc:'Went against the crowd 20 times in a row' },
+    { id:'coin_flip',    icon:'⚖️', name:'Coin Flip',      desc:'Exactly 50% with the crowd over a 50-vote stretch' },
+    { id:'know_it_all',  icon:'🧠', name:'Know-It-All',    desc:'15 trivia questions right in one session' },
+    { id:'riddle_solver',icon:'🧩', name:'Riddle Solver',  desc:'Solved 5 Riddle Rounds (all-time)' },
+    { id:'quick_draw',   icon:'⚡', name:'Quick Draw',     desc:'Solved a Riddle Round in under 5 seconds' },
+    { id:'high_roller',  icon:'🎲', name:'High Roller',    desc:'Picked Wild Card 10 times in one session' },
+    { id:'comeback',     icon:'💥', name:'Comeback Story', desc:'Fell to −10 or lower in a session, then beat that session’s high' },
+    { id:'foodie',       icon:'🍕', name:'Foodie',         desc:'Voted on every Food matchup in Infinity' },
+    { id:'cinephile',    icon:'🎬', name:'Cinephile',      desc:'Voted on every Movies & TV matchup in Infinity' },
+    { id:'completionist',icon:'🏆', name:'Completionist',  desc:'Voted on every matchup in Infinity at least once' },
+    // The existing category badge, kept as part of this set. It's earned the
+    // same way as before (10 votes on Wild Card-category cards, either mode)
+    // and its state lives in stats.badges.wild.
+    { id:'weird_one',    icon:'🌀', name:'Weird One',      desc:'Voted on 10 Wild Card matchups' },
+  ];
+  const BADGE_KEY = 'flipstax_badges_v1';
+  function loadBadges(){
+    try{
+      const raw = localStorage.getItem(BADGE_KEY);
+      if (raw){ const b = JSON.parse(raw); if (b && b.earned && Array.isArray(b.voted)) return b; }
+    }catch(e){}
+    return { v:1, earned:{}, voted:[] };
+  }
+  let badgeStore = loadBadges();
+  let badgeVoted = new Set(badgeStore.voted);
+  function saveBadges(){ badgeStore.voted = Array.from(badgeVoted); try{ localStorage.setItem(BADGE_KEY, JSON.stringify(badgeStore)); }catch(e){} }
+  function badgeEarned(id){ return id === 'weird_one' ? !!(stats.badges && stats.badges.wild) : !!badgeStore.earned[id]; }
+  function earnedBadgeCount(){ return BADGES.filter(b=> badgeEarned(b.id)).length; }
+  function awardBadge(id){
+    if (badgeEarned(id)) return;
+    badgeStore.earned[id] = todayStr(); saveBadges();
+    const b = BADGES.find(x=> x.id === id);
+    if (b) queueBadgeBanner(b);
+  }
+  function freshInfSession(){
+    return { start: Date.now(), votes:0, triviaCorrect:0, wildcards:0, score:0, high:0, wentNegative:false, fire:0, sync:0, wolf:0 };
+  }
+  let infSession = freshInfSession();
+  // Anyone who already has 5 riddles before badges existed.
+  if ((stats.riddlesSolved || 0) >= 5 && !badgeStore.earned.riddle_solver){ badgeStore.earned.riddle_solver = todayStr(); saveBadges(); }
+  if (stats.badges && stats.badges.wild && !badgeStore.earned.weird_one){ badgeStore.earned.weird_one = 'earlier'; saveBadges(); }
   function inInfinity(){ return document.documentElement.classList.contains('mode-infinity'); }
   // The block's stats in the shape personalityScores() expects. Infinity
   // has no word solve and no secret riddle, so those fields stay empty (the
@@ -4607,22 +4723,22 @@
     // in every mode, so Infinity Flips showed "Daily Run". Call this
     // whenever the mode changes (see the mode buttons / returnToModeSelect).
     if (document.documentElement.classList.contains('mode-infinity')){
-      els.runBanner.innerHTML = '<span class="mode-label">\u267E\uFE0F Infinity Flips</span> \u00B7 \uD83C\uDCCF ' +
+      els.runBanner.innerHTML = '<span class="mode-label">\u267E\uFE0F <span class="ml-text">Infinity Flips</span></span> \u00B7 \uD83C\uDCCF ' +
         Math.min(infBlock.votes, INF_AWARD_VOTES) + '/' + INF_AWARD_VOTES;
       return;
     }
     const streakTag = dailyRunStreak > 0 ? (' \uD83D\uDD25' + dailyRunStreak) : '';
     if (runResultToday){
       const r = runResultToday;
-      els.runBanner.innerHTML = '<span class="mode-label">\uD83C\uDFAE Daily Stax</span> \u00B7 \u2705 ' + shownScore(r.score) + ' pts \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal +
+      els.runBanner.innerHTML = '<span class="mode-label">\uD83C\uDFAE <span class="ml-text">Daily Stax</span></span> \u00B7 \u2705 ' + shownScore(r.score) + ' pts \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal +
         ' \u00B7 ' + (r.solved ? formatRaceTime(r.solveMs) : 'not solved') + streakTag +
         ' &nbsp;<span class="run-link" id="runShareLink">Share</span>';
       const link = document.getElementById('runShareLink');
       if (link) link.addEventListener('click', shareRunResult);
     } else if (runActive){
-      els.runBanner.innerHTML = '<span class="mode-label">\uD83C\uDFAE Daily Stax</span> \u00B7 ' + shownScore(runScore) + ' pts \u00B7 ' + runLetters.length + '/' + RUN_WORD_LENGTH + ' letters' + streakTag;
+      els.runBanner.innerHTML = '<span class="mode-label">\uD83C\uDFAE <span class="ml-text">Daily Stax</span></span> \u00B7 ' + shownScore(runScore) + ' pts \u00B7 ' + runLetters.length + '/' + RUN_WORD_LENGTH + ' letters' + streakTag;
     } else {
-      els.runBanner.innerHTML = '<span class="mode-label">\uD83C\uDFAE Daily Stax</span>' + streakTag + ' &nbsp;<span class="run-link" id="runPlayLink">Play</span>';
+      els.runBanner.innerHTML = '<span class="mode-label">\uD83C\uDFAE <span class="ml-text">Daily Stax</span></span>' + streakTag + ' &nbsp;<span class="run-link" id="runPlayLink">Play</span>';
       const link = document.getElementById('runPlayLink');
       if (link) link.addEventListener('click', startDailyRun);
     }
@@ -5331,7 +5447,7 @@
   // session, at least 18 flips apart, then an 8% chance per round - roughly
   // one every 25-30 flips. One answer per riddle, 30s on the clock.
   let infRiddle = null, infRiddleState = 'idle', infRiddleEndsAt = 0, infRiddleInterval = null;
-  let infRiddleCloseTimer = null, lastInfRiddleFlip = -100, infRiddleBag = [];
+  let infRiddleCloseTimer = null, lastInfRiddleFlip = -100, infRiddleBag = [], infRiddleShownAt = 0;
   function shouldStartInfRiddle(){
     return document.documentElement.classList.contains('mode-infinity') &&
       sessionFlips >= 12 && sessionFlips - lastInfRiddleFlip >= 18 && Math.random() < 0.08;
@@ -5381,6 +5497,7 @@
     sfx.riddleAppear();
     setTimeout(()=>{ if (infRiddleState === 'asking') try{ els.irInput.focus({ preventScroll:true }); }catch(e){} }, 400);
     infRiddleEndsAt = Date.now() + dt(INF_RIDDLE_MS);
+    infRiddleShownAt = Date.now();
     clearInterval(infRiddleInterval);
     infRiddleInterval = setInterval(tickInfRiddle, 200);
     tickInfRiddle();
@@ -5412,6 +5529,9 @@
       sfx.riddleWin();
       addRacePoints(INF_RIDDLE_POINTS);
       stats.riddlesSolved = (stats.riddlesSolved || 0) + 1; saveStats();
+      if (stats.riddlesSolved >= 5) awardBadge('riddle_solver');
+      // Real seconds from the question appearing, whatever the debug speed.
+      if (Date.now() - infRiddleShownAt < 5000) awardBadge('quick_draw');
       if (!reduced){
         const box = { left: innerWidth / 2 - 60, top: innerHeight * 0.45, width: 120, height: 0 };
         const burst = (n, spread)=> confettiBurst(els.irConfetti, box, { burst:n, spread:spread, speed:11, rain:90, life:3000,
@@ -5542,6 +5662,7 @@
       els.collectionGrid.appendChild(card);
     });
     els.collectionScroll.scrollTop = 0;
+    setCollectionTab('cards'); els.collectionBar.style.width = '0%';
     els.collectionOverlay.classList.remove('hidden');
     requestAnimationFrame(()=> requestAnimationFrame(()=>{ els.collectionBar.style.width = (100 * n / total) + '%'; }));
     // Anything earned but not yet revealed gets its moment now, one at a time.
@@ -5591,6 +5712,7 @@
     stopTallyPolling(); clearRoundTimer();
     voted = false; votedSinceTime = null;
     const b = infBlock;
+    if (b.votes === INF_AWARD_VOTES && b.agree * 2 === b.votes) awardBadge('coin_flip');
     const type = determinePersonality(infBlockPersonalityStats(b));
     unlockPersonality(type);
     const owned = collection.cards[type];
@@ -5621,6 +5743,87 @@
     if (wasOpen && inInfinity()) scheduleNext(0);
   }
   els.infAwardContinue.addEventListener('click', closeInfAward);
+
+  // ---------- badges: checks on every Infinity vote ----------
+  let infCategoryKeys = null;   // built once: Infinity pool card keys by category
+  function infinityKeysBy(cat){
+    if (!infCategoryKeys){
+      infCategoryKeys = { all: [] };
+      CARD_POOLS.infinity.forEach(c=>{
+        if (!/^i/.test(c.id)) return;   // curated Infinity cards only
+        const k = cardKey(c);
+        infCategoryKeys.all.push(k);
+        (infCategoryKeys[c.category] = infCategoryKeys[c.category] || []).push(k);
+      });
+    }
+    return infCategoryKeys[cat] || [];
+  }
+  function badgesOnInfinityVote(won, decisionMs){
+    const ss = infSession;
+    ss.votes++;
+    ss.fire = decisionMs <= 3000 ? ss.fire + 1 : 0;
+    ss.sync = won ? ss.sync + 1 : 0;
+    ss.wolf = won ? 0 : ss.wolf + 1;
+    if (ss.fire >= 20) awardBadge('on_fire');
+    if (ss.sync >= 20) awardBadge('in_sync');
+    if (ss.wolf >= 20) awardBadge('lone_wolf');
+    if (ss.votes >= 250) awardBadge('marathoner');
+    if (Date.now() - ss.start >= 30 * 60 * 1000) awardBadge('long_hauler');
+    const h = new Date().getHours();
+    if (h >= 0 && h < 4) awardBadge('night_owl');
+    if (current && /^i/.test(current.id)){
+      const k = cardKey(current);
+      if (!badgeVoted.has(k)){
+        badgeVoted.add(k); saveBadges();
+        const done = keys=> keys.length > 0 && keys.every(x=> badgeVoted.has(x));
+        if (current.category === 'food' && done(infinityKeysBy('food'))) awardBadge('foodie');
+        if (current.category === 'movies' && done(infinityKeysBy('movies'))) awardBadge('cinephile');
+        if (done(infinityKeysBy('all'))) awardBadge('completionist');
+      }
+    }
+  }
+  // Quick top banner for a new badge - queued, so two at once both show.
+  const badgeBannerQueue = [];
+  let badgeBannerBusy = false;
+  function queueBadgeBanner(b){ badgeBannerQueue.push(b); if (!badgeBannerBusy) nextBadgeBanner(); }
+  function nextBadgeBanner(){
+    const b = badgeBannerQueue.shift();
+    if (!b){ badgeBannerBusy = false; return; }
+    badgeBannerBusy = true;
+    els.badgeBannerIcon.textContent = b.icon;
+    els.badgeBannerName.textContent = b.name;
+    els.badgeBanner.classList.remove('show'); void els.badgeBanner.offsetWidth;
+    els.badgeBanner.classList.add('show');
+    sfx.combo(); haptic([12,30,12]);
+    renderCollectionBtn();
+    setTimeout(()=>{ els.badgeBanner.classList.remove('show'); setTimeout(nextBadgeBanner, 350); }, 2600);
+  }
+  function renderBadgeList(){
+    els.badgeList.innerHTML = '';
+    BADGES.forEach(b=>{
+      const earned = badgeEarned(b.id), when = badgeStore.earned[b.id];
+      const row = document.createElement('div');
+      row.className = 'bd-item' + (earned ? ' earned' : ' locked');
+      row.innerHTML = '<div class="bd-icon"></div><div class="bd-text"><div class="bd-name"></div><div class="bd-desc"></div><div class="bd-when"></div></div>';
+      row.querySelector('.bd-icon').textContent = b.icon;
+      row.querySelector('.bd-name').textContent = b.name;
+      row.querySelector('.bd-desc').textContent = b.desc;
+      row.querySelector('.bd-when').textContent = earned ? ('✔ Earned' + (when && when !== 'earlier' ? ' ' + when : '')) : '🔒 Not yet';
+      els.badgeList.appendChild(row);
+    });
+  }
+  function setCollectionTab(tab){
+    const badges = tab === 'badges';
+    els.colTabs.forEach(t=> t.classList.toggle('active', t.dataset.tab === tab));
+    els.collectionGrid.classList.toggle('hidden', badges);
+    els.badgeList.classList.toggle('hidden', !badges);
+    els.colHint.textContent = badges ? 'Badges are earned in Infinity Flips.' : 'Finish a Daily Stax run, or every 50 votes in Infinity Flips, to earn a personality card.';
+    const n = badges ? earnedBadgeCount() : collectedCount(), total = badges ? BADGES.length : PERSONALITY_ORDER.length;
+    els.collectionCount.textContent = n + ' / ' + total + (badges ? ' earned' : ' collected');
+    els.collectionBar.style.width = (100 * n / total) + '%';
+    if (badges) renderBadgeList();
+  }
+  els.colTabs.forEach(t=> t.addEventListener('click', ()=>{ if (!collectionRevealing) setCollectionTab(t.dataset.tab); }));
 
   function buildSolveKeyboard(){
     els.solveKeyboard.innerHTML = '';
@@ -5937,11 +6140,15 @@
       const remain = Math.max(0, Math.ceil((bonusEndsAt - Date.now())/1000));
       els.statusBanner.className = 'status-banner bonus';
       els.statusBanner.textContent = '\u26A1 2x FLIP ZONE \u00B7 ' + remain + 's';
+      // The mode pill must give up half the row whenever this one shows (it
+      // used to keep 'solo' and squeeze this down to a sliver).
+      els.runBanner.classList.remove('solo');
       return;
     }
     if (isNoonRush()){
       els.statusBanner.className = 'status-banner noon';
       els.statusBanner.textContent = '\uD83D\uDD14 NOON RUSH \u2014 bonus rounds supercharged';
+      els.runBanner.classList.remove('solo');
       return;
     }
     // Nothing else to show right now - collapse this pill so Daily Run's
@@ -6053,6 +6260,7 @@
     if (newTier !== prevTier){ sfx.levelUp(); showLevelUp(newTier); }
     if (!stats.badges[category] && stats.byCat[category] >= BADGE_THRESHOLD && CAT_META[category]){
       stats.badges[category] = true;
+      if (category === 'wild' && !badgeStore.earned.weird_one){ badgeStore.earned.weird_one = todayStr(); saveBadges(); }
       showToast(CAT_META[category].badge + ' unlocked!');
     }
     const newMilestone = Math.floor(stats.flips / 100);
@@ -6158,6 +6366,7 @@
     voted = true;
     votedSinceTime = Date.now();
     comboCount = 0;
+    if (!runActive && inInfinity()) infSession.fire = 0;   // a missed round breaks On Fire
     const penalty = current.bonusPoints ? 3 : 1;
     if (runActive) addRunScore(-penalty); else addRacePoints(-penalty);
     showToast('\u23F1\uFE0F Too slow \u2014 \u2212' + penalty + ' point' + (penalty>1?'s':''));
@@ -6549,6 +6758,7 @@
       if (current.category === 'wild') b.wildCat++;
       if (b.votes === Math.floor(INF_AWARD_VOTES / 2)) b.firstHalfPoints = b.points;
       saveInfBlock(); renderRunBanner();
+      badgesOnInfinityVote(won, votedSinceTime - roundStartedAt);
     }
     let base = 1;
     if (comboCount % 3 === 0){ base = 2; sfx.combo(); showToast('\uD83D\uDD25 Combo x' + comboCount + '! +2 flipz'); }
@@ -6588,6 +6798,7 @@
   function runWildEvent(forceSubject){
     const subject = forceSubject || pick(DAILY_SUBJECTS);
     const trivia = generateSubjectTrivia(subject, contentPoolKey());
+    if (DEBUG_FAST) window.__debugLastTriviaQ = trivia;
     els.powerupIcon.classList.add('hidden');
     els.eventSubtitle.textContent = pick(FLAVOR_INTROS);
     els.eventPrompt.textContent = trivia.question;
@@ -6609,7 +6820,10 @@
   }
   function resolveEvent(wasCorrect){
     clearTimeout(eventTimeoutId);
-    if (inInfinity()){ infBlock.trivia++; if (wasCorrect === true) infBlock.triviaCorrect++; saveInfBlock(); }
+    if (inInfinity()){
+      infBlock.trivia++; if (wasCorrect === true) infBlock.triviaCorrect++; saveInfBlock();
+      if (wasCorrect === true && ++infSession.triviaCorrect >= 15) awardBadge('know_it_all');
+    }
     els.eventTiles.forEach(t=> t.onclick = null);
     if (wasCorrect === true){
       sfx.correct();
@@ -6654,6 +6868,7 @@
   function resolvePowerUp(key){
     clearTimeout(eventTimeoutId);
     if (inInfinity() && key && infBlock.pu[key] != null){ infBlock.pu[key]++; saveInfBlock(); }
+    if (inInfinity() && key === 'wildcard' && ++infSession.wildcards >= 10) awardBadge('high_roller');
     els.eventTiles.forEach(t=> t.onclick = null);
     els.eventOverlay.classList.remove('powerup');
     els.eventSubtitle.textContent = '';
@@ -6807,6 +7022,11 @@
       getCurrentCard: () => current,
       getCollection: () => collection,
       getInfBlock: () => infBlock,
+      getBadges: () => ({ earned: badgeStore.earned, voted: badgeVoted.size, session: infSession, infFood: infinityKeysBy('food').length, infMovies: infinityKeysBy('movies').length, infAll: infinityKeysBy('all').length }),
+      awardBadge: (id) => awardBadge(id),
+      forceBonusZone: () => { bonusActive = true; bonusEndsAt = Date.now() + 30000; renderStatusBanner(); },
+      markInfinityVotedExceptCurrent: (cat) => { const k = current ? cardKey(current) : null; infinityKeysBy(cat || 'all').forEach(x=>{ if (x !== k) badgeVoted.add(x); }); badgeVoted.delete(k); saveBadges(); return current && current.category; },
+      markAllVotedExcept: (n) => { const all = infinityKeysBy('all'); all.slice(0, all.length - n).forEach(k=> badgeVoted.add(k)); saveBadges(); return all.slice(all.length - n); },
       setInfBlockVotes: (n) => { infBlock.votes = n; saveInfBlock(); renderRunBanner(); },
       setCollection: (c) => { collection = c; saveCollection(); renderCollectionBtn(); },
       openCollection: () => openCollection(),
@@ -6994,6 +7214,7 @@
     resetRamp();
     renderRunBanner();
     playTrack('infinity');
+    infSession = freshInfSession();   // a new Infinity session for the badges
     // Coming back after a finished Daily run: that halted the board, so
     // deal a fresh round.
     if (sessionHalted){ sessionHalted = false; voted = false; votedSinceTime = null; loadNext(); }
