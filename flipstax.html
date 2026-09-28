@@ -1555,12 +1555,17 @@
   .solve-section-label{ color:var(--dim); font-size:11px; font-weight:600; letter-spacing:0.3px; margin-bottom:8px; text-transform:uppercase; }
   .solve-section-label.hidden{ display:none; }
   .solve-keyboard{ display:flex; flex-direction:column; gap:6px; align-items:center; margin-bottom:18px; }
-  .solve-kb-row{ display:flex; gap:4px; justify-content:center; }
+  .solve-kb-row{ display:flex; gap:3px; justify-content:center; }
+  /* Sized to fill the 10-key QWERTYUIOP row across the .solve-inner width
+     (440px max, 24px overlay padding each side, 3px key gaps): the width
+     term is that exact-fill math as a function of viewport width, so keys
+     grow toward a 44px tap target on wider phones without ever overflowing
+     the row, down to a ~24px floor on the smallest supported screens. */
   .solve-kb-key{
-    width:clamp(23px,7.2vw,32px); height:clamp(32px,9vw,40px); border-radius:6px;
+    width:clamp(24px, calc(10vw - 7.5px), 40px); height:clamp(32px, 10vw, 48px); border-radius:8px;
     background:var(--panel); border:1px solid var(--divider); color:var(--ink);
     display:flex; align-items:center; justify-content:center; cursor:pointer;
-    font-family:'Big Shoulders Display', sans-serif; font-weight:700; font-size:clamp(12px,3.4vw,15px);
+    font-family:'Big Shoulders Display', sans-serif; font-weight:700; font-size:clamp(13px,3.6vw,17px);
     transition: transform 0.12s ease, background 0.12s ease;
   }
   .solve-kb-key:active{ transform:scale(0.88); background:rgba(255,255,255,0.16); }
@@ -3644,7 +3649,7 @@
              'Live inside your favorite game, as the final boss', '\uD83D\uDC7E', 'linear-gradient(165deg,#152e0f,#3a6b1f)'],
     ['wild', 'Be the funniest person in every room, but never taken seriously', '\uD83E\uDD21', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
              'Be the most respected person in every room, but never laugh again', '\uD83C\uDFA9', 'linear-gradient(165deg,#25252b,#55555f)'],
-    ['wild', 'Talk to one dead relative, one time only', '\uD83D\uDD6F\uFE0F', 'linear-gradient(165deg,#25252b,#55555f)',
+    ['wild', 'Relive your favorite day, exactly as it happened, one time only', '\uD83C\uDF9E\uFE0F', 'linear-gradient(165deg,#25252b,#55555f)',
              'See exactly one hour into the future, one time only', '\uD83D\uDD2E', 'linear-gradient(165deg,#0f1a3d,#2f4a8a)'],
     // food
     ['food', 'Sweet, always', '🍩', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
@@ -3792,8 +3797,8 @@
              'Never be recorded on camera again', '\uD83D\uDEAB', 'linear-gradient(165deg,#152e0f,#3a6b1f)'],
     ['wild', 'Only speak in movie quotes for a month', '\uD83C\uDFAC', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)',
              'Only speak in song lyrics for a month', '\uD83C\uDFB6', 'linear-gradient(165deg,#0d3b36,#2f9e8f)'],
-    ['wild', 'Know exactly how you\u2019ll die, but never when', '\uD83D\uDC80', 'linear-gradient(165deg,#25252b,#55555f)',
-             'Know exactly when you\u2019ll die, but never how', '\u231B', 'linear-gradient(165deg,#0f2740,#2e7bb5)'],
+    ['wild', 'Always guess the right password on the first try', '\uD83D\uDD10', 'linear-gradient(165deg,#25252b,#55555f)',
+             'Always guess the perfect gift for anyone', '\uD83C\uDF80', 'linear-gradient(165deg,#0f2740,#2e7bb5)'],
     ['wild', 'Never be able to lie again, about anything', '\uD83D\uDE07', 'linear-gradient(165deg,#0f2740,#2e7bb5)',
              'Never be able to tell the truth again, about anything', '\uD83D\uDE08', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
     ['wild', 'Always score the best parking spot, but it\u2019s always raining on you', '\u2614', 'linear-gradient(165deg,#1c2733,#3f5b70)',
@@ -3998,7 +4003,6 @@
     ['life', 'Saving Money', 'Spending Money', 'pick'],
     ['life', 'Early Mornings', 'Late Nights', 'pick'],
     ['life', 'Cleaning', 'Organizing', 'pick'],
-    ['life', 'Remote Work', 'In-Person Work', 'pick'],
     ['life', 'Parties', 'Small Gatherings', 'pick'],
     ['life', 'Routine', 'Spontaneity', 'pick'],
     ['life', 'Christmas', 'Halloween', 'pick'],
@@ -4101,7 +4105,7 @@
     ['drinks', 'Energy Drinks', 'Coffee', 'pick'],
     ['drinks', 'Iced Coffee', 'Hot Coffee', 'pick'],
     ['drinks', 'Root Beer', 'Cola', 'pick'],
-    ['drinks', 'Fruit Punch', 'Hawaiian Punch', 'pick'],
+    ['drinks', 'Kool-Aid', 'Capri Sun', 'pick'],
     ['drinks', 'Milk', 'Orange Juice', 'pick'],
     // movies
     ['movies', 'Sitcoms', 'Dramas', 'pick'],
@@ -4256,7 +4260,7 @@
     ['wild', 'Super Strength', 'Super Speed', 'pick'],
     ['wild', 'Living Underwater', 'Living in Space', 'pick'],
     ['wild', 'A Personal Chef', 'A Personal Chauffeur', 'pick'],
-    ['wild', 'Knowing How You\'ll Die', 'Knowing When You\'ll Die', 'pick'],
+    ['wild', 'A Mute Button for Everyone Else', 'A Mute Button for Yourself', 'pick'],
     ['wild', 'A Do-Over Button', 'A Skip Button', 'pick'],
     ['wild', 'Losing Your Sense of Smell', 'Losing Your Sense of Taste', 'pick'],
     ['wild', 'Being the Funniest Person in the Room', 'Being the Smartest Person in the Room', 'pick'],
