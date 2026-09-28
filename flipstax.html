@@ -1414,7 +1414,7 @@
   .ms-sky .ms-bg::before{
     content:''; position:absolute; top:0; left:0; height:54dvh; width:calc(27dvh * 8);
     background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 800'%3E%3Cg fill='white' fill-opacity='.85'%3E%3Cg transform='translate(95,60) scale(1.15)'%3E%3Ccircle cx='-30' cy='0' r='24'/%3E%3Ccircle cx='0' cy='-14' r='32'/%3E%3Ccircle cx='32' cy='0' r='26'/%3E%3Cellipse cx='0' cy='14' rx='62' ry='16'/%3E%3C/g%3E%3Cg transform='translate(310,135) scale(.9)'%3E%3Ccircle cx='-30' cy='0' r='24'/%3E%3Ccircle cx='0' cy='-14' r='32'/%3E%3Ccircle cx='32' cy='0' r='26'/%3E%3Cellipse cx='0' cy='14' rx='62' ry='16'/%3E%3C/g%3E%3Cg transform='translate(120,772) scale(1.2)'%3E%3Ccircle cx='-30' cy='0' r='24'/%3E%3Ccircle cx='0' cy='-14' r='32'/%3E%3Ccircle cx='32' cy='0' r='26'/%3E%3Cellipse cx='0' cy='14' rx='62' ry='16'/%3E%3C/g%3E%3Cg transform='translate(330,745) scale(.85)'%3E%3Ccircle cx='-30' cy='0' r='24'/%3E%3Ccircle cx='0' cy='-14' r='32'/%3E%3Ccircle cx='32' cy='0' r='26'/%3E%3Cellipse cx='0' cy='14' rx='62' ry='16'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") 0 0 / 27dvh 100% repeat-x;
-    will-change:transform; animation:msClouds 110s linear infinite;
+    will-change:transform; animation:msClouds 55s linear infinite;
   }
   @keyframes msClouds{ from{ transform:translateX(0); } to{ transform:translateX(calc(27dvh * -4)); } }
   /* Sparkles rise and a shine sweeps, as in Infinity. */
@@ -1430,6 +1430,13 @@
     transform:translateX(-120%) skewX(-18deg); will-change:transform; animation:msSweep 8s ease-in-out infinite;
   }
   @keyframes msSweep{ 0%{ transform:translateX(-120%) skewX(-18deg); } 55%,100%{ transform:translateX(260%) skewX(-18deg); } }
+  /* Ambient twinkle on the gold half: the same .col-spark/colRise particle
+     system built for the Collection card-unlock reveal, reused here (not
+     rebuilt) - just a smaller, dimmer batch scattered inside the gold pane's
+     own .ms-bg (already overflow:hidden, so they rise and fade within it).
+     Reduced motion settles them as static faint dots via the shared
+     .col-spark rule below, same as Collection's own sparks. */
+  #msGoldSparks{ z-index:0; }
   /* Copy blocks: Daily's sits above the horizon, Infinity's below it, each
      clear of the +/-30px swing. */
   .ms-body{
@@ -1463,10 +1470,25 @@
     margin-top:16px; font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:21px; letter-spacing:2.5px;
     padding:12px 30px; min-height:48px; display:inline-flex; align-items:center; gap:8px; transition:transform 0.15s ease;
   }
-  .ms-body-daily .ms-cta{ background:#fff; color:#0d2b5e; border-radius:999px; box-shadow:0 4px 0 rgba(13,43,94,0.28), 0 0 0 3px rgba(255,255,255,0.5), 0 0 22px rgba(0,190,255,0.6); }
+  .ms-body-daily .ms-cta{
+    background:#fff; color:#0d2b5e; border-radius:999px; box-shadow:0 4px 0 rgba(13,43,94,0.28), 0 0 0 3px rgba(255,255,255,0.5), 0 0 22px rgba(0,190,255,0.6);
+    animation:msCtaPulseDaily 2.8s ease-in-out infinite;
+  }
   .ms-body-inf .ms-cta{
     color:#fff; background:linear-gradient(135deg,#ff2f9e,#a4138f); text-shadow:0 1px 0 rgba(0,0,0,0.3);
     clip-path:polygon(12px 0,calc(100% - 12px) 0,100% 12px,100% calc(100% - 12px),calc(100% - 12px) 100%,12px 100%,0 calc(100% - 12px),0 12px);
+    animation:msCtaPulseInf 2.8s ease-in-out infinite;
+  }
+  /* Idle glow, not a bounce: box-shadow for Daily's plain pill, filter for
+     Infinity's clipped angular button (a box-shadow would just get clipped
+     away along with the corners, same reason its other glows use filter). */
+  @keyframes msCtaPulseDaily{
+    0%,100%{ box-shadow:0 4px 0 rgba(13,43,94,0.28), 0 0 0 3px rgba(255,255,255,0.5), 0 0 18px rgba(0,190,255,0.5); }
+    50%{ box-shadow:0 4px 0 rgba(13,43,94,0.28), 0 0 0 3px rgba(255,255,255,0.5), 0 0 32px rgba(0,190,255,0.85); }
+  }
+  @keyframes msCtaPulseInf{
+    0%,100%{ filter:drop-shadow(0 0 7px rgba(255,45,158,0.45)); }
+    50%{ filter:drop-shadow(0 0 15px rgba(255,45,158,0.85)); }
   }
   .ms-gold:active .ms-cta, .ms-sky:active .ms-cta{ transform:scale(0.96); }
   .split-select-header{
@@ -1483,11 +1505,33 @@
     display:flex; align-items:center; justify-content:center; pointer-events:none;
     font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:15px; letter-spacing:1px; color:#fff;
     box-shadow:0 0 0 3px rgba(26,20,66,0.5), 0 4px 14px rgba(0,0,0,0.35);
+    animation:msDividerGlow 2.6s ease-in-out infinite;
   }
+  @keyframes msDividerGlow{
+    0%,100%{ box-shadow:0 0 0 3px rgba(26,20,66,0.5), 0 4px 14px rgba(0,0,0,0.35), 0 0 0 rgba(255,224,102,0); }
+    50%{ box-shadow:0 0 0 3px rgba(26,20,66,0.5), 0 4px 14px rgba(0,0,0,0.35), 0 0 16px 4px rgba(255,224,102,0.65); }
+  }
+  /* Four small dots orbiting the OR badge, slowly - the ring itself spins,
+     each dot sits at a fixed radius so it reads as accents circling, not a
+     bounce. Sized well clear of the badge so they don't crowd its border. */
+  .ms-divider-ring{
+    position:absolute; top:var(--sy); left:50%; z-index:6; width:80px; height:80px; pointer-events:none;
+    transform:translate(-50%,-50%); animation:msDividerSpin 22s linear infinite;
+  }
+  .ms-divider-ring span{
+    position:absolute; top:50%; left:50%; width:5px; height:5px; margin:-2.5px; border-radius:50%;
+    background:#ffe066; box-shadow:0 0 6px 2px rgba(255,224,102,0.75);
+  }
+  .ms-divider-ring span:nth-child(1){ transform:translateY(-38px); }
+  .ms-divider-ring span:nth-child(2){ transform:translateX(38px); }
+  .ms-divider-ring span:nth-child(3){ transform:translateY(38px); }
+  .ms-divider-ring span:nth-child(4){ transform:translateX(-38px); }
+  @keyframes msDividerSpin{ from{ transform:translate(-50%,-50%) rotate(0deg); } to{ transform:translate(-50%,-50%) rotate(360deg); } }
   /* Short phones: drop the blurb so nothing crowds the horizon. */
   @media (max-height:640px){ .ms-desc{ display:none; } }
   @media (prefers-reduced-motion: reduce){
-    .ms-sky, .ms-seam, .ms-sky .ms-bg::before, .ms-gold .ms-bg::before, .ms-gold .ms-bg::after, .ms-wm{ animation:none !important; }
+    .ms-sky, .ms-seam, .ms-sky .ms-bg::before, .ms-gold .ms-bg::before, .ms-gold .ms-bg::after, .ms-wm,
+    .ms-cta, .split-divider, .ms-divider-ring{ animation:none !important; }
   }
 
   .solve-overlay{
@@ -1809,7 +1853,7 @@
 <div class="split-select-overlay hidden" id="modeSelectOverlay">
   <!-- Infinity: the gold world underneath; takes every tap the sky doesn't. -->
   <div class="ms-gold" id="modeInfinityBtn" role="button" aria-label="Play Infinity Flips">
-    <div class="ms-bg"></div>
+    <div class="ms-bg" id="msGoldSparks"></div>
     <div class="ms-body ms-body-inf">
       <div class="ms-wm" aria-hidden="true">
         <span>INFINITY</span>
@@ -1841,6 +1885,7 @@
     <div class="logo"><span class="flip">Flip</span><span class="stax">Stax</span></div>
     <div class="split-select-title">Choose your mode</div>
   </div>
+  <div class="ms-divider-ring" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
   <div class="split-divider">OR</div>
   <div class="ms-collection-btn" id="collectionBtn" role="button" aria-label="My Collection">
     <span class="mcb-icon">🃏</span><span class="mcb-count" id="collectionBtnCount">0/16</span><span class="mcb-label">CARDS</span>
@@ -4470,6 +4515,7 @@
     collectionCount: document.getElementById('collectionCount'), collectionBar: document.getElementById('collectionBar'),
     collectionBack: document.getElementById('collectionBack'), collectionScroll: document.getElementById('collectionScroll'),
     colSparks: document.getElementById('colSparks'), cardZoom: document.getElementById('cardZoom'),
+    msGoldSparks: document.getElementById('msGoldSparks'),
     colTabs: Array.from(document.querySelectorAll('.col-tab')), badgeList: document.getElementById('badgeList'), colHint: document.getElementById('colHint'),
     badgeBanner: document.getElementById('badgeBanner'), badgeBannerIcon: document.getElementById('badgeBannerIcon'), badgeBannerName: document.getElementById('badgeBannerName'),
     cardZoomSlot: document.getElementById('cardZoomSlot'), cardZoomName: document.getElementById('cardZoomName'), cardZoomMeta: document.getElementById('cardZoomMeta'),
@@ -5892,19 +5938,36 @@
     els.collectionBtnCount.textContent = n + '/' + PERSONALITY_ORDER.length;
     els.collectionBtn.classList.toggle('has-new', PERSONALITY_ORDER.some(k=> collection.cards[k] && !collection.cards[k].revealed));
   }
-  function buildCollectionSparks(){
-    if (els.colSparks.childElementCount) return;
-    const glyphs = ['✦','✧','★','●','◆','✦','❋','•'], cols = ['#fff6a8','#ffffff','#ff8ad4','#7df9ff','#ffd166','#c9ff7a','#b98bf0'];
-    for (let i = 0; i < 30; i++){
+  // Shared by the Collection card-unlock reveal and the mode-select gold
+  // half: same .col-spark markup and colRise keyframe (see CSS), just a
+  // different container/count/palette/size so each spot gets its own feel.
+  function fillSparkField(container, count, glyphs, cols, sizeRange, opacityRange, durRange){
+    if (!container || container.childElementCount) return;
+    for (let i = 0; i < count; i++){
       const sp = document.createElement('span'); sp.className = 'col-spark';
       sp.textContent = glyphs[i % glyphs.length];
       const st = sp.style;
       st.setProperty('--x', (Math.random() * 100) + '%'); st.setProperty('--y', (Math.random() * 100) + '%');
-      st.setProperty('--s', Math.round(9 + Math.random() * 18) + 'px'); st.setProperty('--c', cols[i % cols.length]);
-      st.setProperty('--o', (0.45 + Math.random() * 0.5).toFixed(2)); st.setProperty('--sw', Math.round(Math.random() * 80 - 40) + 'px');
-      st.setProperty('--d', (9 + Math.random() * 9).toFixed(1) + 's'); st.setProperty('--dl', (-Math.random() * 16).toFixed(1) + 's');
-      els.colSparks.appendChild(sp);
+      st.setProperty('--s', Math.round(sizeRange[0] + Math.random() * (sizeRange[1] - sizeRange[0])) + 'px');
+      st.setProperty('--c', cols[i % cols.length]);
+      st.setProperty('--o', (opacityRange[0] + Math.random() * (opacityRange[1] - opacityRange[0])).toFixed(2));
+      st.setProperty('--sw', Math.round(Math.random() * 80 - 40) + 'px');
+      st.setProperty('--d', (durRange[0] + Math.random() * (durRange[1] - durRange[0])).toFixed(1) + 's');
+      st.setProperty('--dl', (-Math.random() * durRange[1]).toFixed(1) + 's');
+      container.appendChild(sp);
     }
+  }
+  function buildCollectionSparks(){
+    fillSparkField(els.colSparks, 30,
+      ['✦','✧','★','●','◆','✦','❋','•'], ['#fff6a8','#ffffff','#ff8ad4','#7df9ff','#ffd166','#c9ff7a','#b98bf0'],
+      [9,27], [0.45,0.95], [9,18]);
+  }
+  // Mode select's gold half: fewer, smaller, dimmer sparks than the full
+  // celebration - an ambient accent behind readable text, not the main event.
+  function buildModeSelectSparks(){
+    fillSparkField(els.msGoldSparks, 12,
+      ['✦','✧','★','●'], ['#fff6a8','#ffffff','#ffe066','#ff8ad4','#7df9ff'],
+      [5,11], [0.22,0.5], [10,20]);
   }
   let collectionRevealing = false;
   async function openCollection(){
@@ -5965,6 +6028,7 @@
   els.collectionBack.addEventListener('click', closeCollection);
   els.cardZoom.addEventListener('click', ()=> els.cardZoom.classList.add('hidden'));
   renderCollectionBtn();
+  buildModeSelectSparks();
 
   // Infinity: after every INF_AWARD_VOTES votes, between rounds. The block
   // is scored, its card unlocked (with the reveal the first time), and a
