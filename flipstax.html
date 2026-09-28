@@ -85,7 +85,13 @@
   .logo{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:clamp(18px,5.5vw,23px); letter-spacing:0.3px; white-space:nowrap; }
   .logo .flip{ color:var(--a); }
   .logo .stax{ color:var(--b); }
-  .stat-line{ display:flex; align-items:center; gap:5px; font-size:clamp(10px,3vw,12px); color:var(--dim); font-variant-numeric: tabular-nums; white-space:nowrap; }
+  /* Wraps rather than overflows: a long tier name ("GOAT GOD FLIPSTAX") used
+     to push this past the screen edge, cutting it off and letting the whole
+     page scroll sideways on a phone. Now the tier drops to a second line. */
+  .top-row{ gap:8px; }
+  .left-group{ flex-shrink:0; }
+  .stat-line{ display:flex; align-items:center; flex-wrap:wrap; justify-content:flex-end; column-gap:5px; row-gap:1px; min-width:0; font-size:clamp(10px,3vw,12px); color:var(--dim); font-variant-numeric: tabular-nums; }
+  .stat-line > span{ white-space:nowrap; }
   .tier{ color:var(--ink); font-weight:700; }
   .race-status{ color:var(--pulse); font-weight:700; }
   /* Header is only ever visible during gameplay, and the fixed back
@@ -806,7 +812,8 @@
   /* Cards | Badges tabs */
   .col-tabs{ display:flex; justify-content:center; gap:8px; margin-top:10px; }
   .col-tab{
-    padding:7px 16px; border-radius:99px; font-size:13px; font-weight:800; cursor:pointer;
+    padding:11px 18px; min-height:42px; box-sizing:border-box; display:flex; align-items:center;
+    border-radius:99px; font-size:13px; font-weight:800; cursor:pointer;   /* 42px: a comfortable tap */
     background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.3); color:rgba(255,255,255,0.8);
   }
   .col-tab.active{ background:#fff; color:#3d0f5e; border-color:#fff; box-shadow:0 0 14px rgba(255,255,255,0.45); }
@@ -6272,7 +6279,9 @@
   // when the next round loads" freeze.
   function scheduleNext(delay){
     setTimeout(function tick(){
-      if (levelUpActive || personalityActive){ setTimeout(tick, 150); return; }
+      // Paused mid-reveal: hold the next round until Resume (it used to be
+      // dealt behind the pause screen and time out, costing points).
+      if (levelUpActive || personalityActive || isPaused){ setTimeout(tick, 150); return; }
       loadNext();
     }, delay);
   }
@@ -6466,6 +6475,35 @@
     els.pauseShareBtn.classList.toggle('hidden', !document.documentElement.classList.contains('mode-infinity'));
     els.pauseOverlay.classList.remove('hidden');
   }
+  // The player can't play right now - the app went to the background, or the
+  // phone turned to landscape (the rotate screen covers the board). Pause the
+  // same way the Pause button does, wherever Pause is available (the VS
+  // board); they come back to the Paused screen and tap Resume. Trivia, the
+  // word solve and riddles have no pause by design, so they carry on.
+  function autoPauseIfPlaying(){
+    if (isPaused || !isOnVsScreen()) return;
+    if (!(runActive || document.documentElement.classList.contains('mode-infinity'))) return;
+    pauseGame();
+  }
+  let musicPausedByBackground = null;
+  document.addEventListener('visibilitychange', ()=>{
+    if (document.hidden){
+      autoPauseIfPlaying();
+      // Music stops while the game isn't on screen, and picks up where it
+      // left off when it's back.
+      const el = currentTrackKey && trackEls[currentTrackKey];
+      musicPausedByBackground = (el && !el.paused) ? el : null;
+      pauseAllTracks();
+    } else if (musicPausedByBackground){
+      const el = musicPausedByBackground; musicPausedByBackground = null;
+      if (soundOn && currentTrackKey && trackEls[currentTrackKey] === el) el.play().catch(()=>{});
+    }
+  });
+  try{
+    const landscapeLock = matchMedia('(orientation:landscape) and (max-height:500px)');
+    const onRotate = ()=>{ if (landscapeLock.matches) autoPauseIfPlaying(); };
+    if (landscapeLock.addEventListener) landscapeLock.addEventListener('change', onRotate); else landscapeLock.addListener(onRotate);
+  }catch(e){}
   function resumeGame(){
     if (!isPaused) return;
     isPaused = false;
@@ -6559,6 +6597,7 @@
     if (sessionHalted) return;
     if (infRiddleState !== 'idle') return;
     if (!els.infAwardOverlay.classList.contains('hidden')) return;
+    if (isPaused) return;   // e.g. the stalled-round watchdog; scheduleNext deals it on Resume
     stopTallyPolling();
     clearRoundTimer();
 
