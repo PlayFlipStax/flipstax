@@ -626,6 +626,14 @@
   /* Daily Stax results get a solid screen of their own - the board used to
      show through the translucent overlay behind the text. */
   #readoutOverlay{ background: radial-gradient(circle at 50% 28%, #3a1f6e, #150f2b 62%, #0b0917); padding-bottom:44px; }
+  /* Infinity's every-50-votes personality award: same look as the Daily
+     results personality panel, on Infinity's own solid screen. */
+  .inf-award-overlay{
+    position:fixed; inset:0; z-index:22; display:flex; align-items:center; justify-content:center; padding:24px;
+    background: radial-gradient(circle at 50% 28%, #6b1f6e, #2b0a4d 60%, #140726); text-align:center;
+  }
+  .inf-award-overlay.hidden{ display:none; }
+  .inf-award-overlay .personality-inner{ animation: popIn 0.5s cubic-bezier(.2,1.4,.4,1); }
   /* Small contact line pinned to the bottom of mode select and the Daily
      results. The address is filled in by JS (see CONTACT_EMAIL). */
   .contact-footer{
@@ -1830,6 +1838,24 @@
     </div>
   </div>
   <div class="contact-footer" data-contact-footer></div>
+</div>
+
+<div class="inf-award-overlay hidden" id="infAwardOverlay" role="dialog" aria-label="Personality earned">
+  <div class="personality-inner">
+    <div class="personality-mask">♾️</div>
+    <div class="personality-eyebrow" id="infAwardEyebrow">YOUR LAST 50 FLIPS</div>
+    <div class="readout-type" id="infAwardType">
+      <div class="readout-type-eyebrow">YOUR PERSONALITY</div>
+      <div class="readout-new">✨ NEW CARD UNLOCKED ✨</div>
+      <div class="readout-card" id="infAwardCard"></div>
+      <div class="readout-type-name" id="infAwardName"></div>
+      <div class="readout-type-blurb" id="infAwardBlurb"></div>
+    </div>
+    <div class="personality-blurb" id="infAwardStats"></div>
+    <div class="solve-buttons" style="margin-top:14px;">
+      <div class="daily-btn primary" id="infAwardContinue">Keep flipping ▶</div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -4293,6 +4319,10 @@
     readoutTrivia: document.getElementById('readoutTrivia'), readoutWord: document.getElementById('readoutWord'),
     readoutDone: document.getElementById('readoutDone'),
     readoutType: document.getElementById('readoutType'), readoutCard: document.getElementById('readoutCard'),
+    infAwardOverlay: document.getElementById('infAwardOverlay'), infAwardType: document.getElementById('infAwardType'),
+    infAwardCard: document.getElementById('infAwardCard'), infAwardName: document.getElementById('infAwardName'),
+    infAwardBlurb: document.getElementById('infAwardBlurb'), infAwardStats: document.getElementById('infAwardStats'),
+    infAwardContinue: document.getElementById('infAwardContinue'), infAwardEyebrow: document.getElementById('infAwardEyebrow'),
     collectionBtn: document.getElementById('collectionBtn'), collectionBtnCount: document.getElementById('collectionBtnCount'),
     collectionOverlay: document.getElementById('collectionOverlay'), collectionGrid: document.getElementById('collectionGrid'),
     collectionCount: document.getElementById('collectionCount'), collectionBar: document.getElementById('collectionBar'),
@@ -4391,6 +4421,7 @@
     }
   }
   function addRacePoints(delta){
+    if (inInfinity()){ infBlock.points += delta; saveInfBlock(); }
     ensureRaceToday();
     if (raceState.completed) { renderRaceStatus(); return; }
     if (raceState.startedAt == null) raceState.startedAt = Date.now();
@@ -4454,6 +4485,48 @@
   }
   function saveCollection(){ try{ localStorage.setItem(COLLECTION_KEY, JSON.stringify(collection)); }catch(e){} }
   let collection = loadCollection();
+
+  // ---------- Infinity personality awards ----------
+  // Every INF_AWARD_VOTES decided votes in Infinity earn a personality, scored
+  // by the same personalityScores() as a Daily run, from what happened in
+  // those votes. Progress is kept per device (flipstax_inf_block_v1), so a
+  // block can span several sessions.
+  const INF_AWARD_VOTES = 50;
+  const INF_BLOCK_KEY = 'flipstax_inf_block_v1';
+  function freshInfBlock(){
+    return { votes:0, agree:0, low:0, decisionMs:0, maxCombo:0, points:0, firstHalfPoints:null,
+      trivia:0, triviaCorrect:0, wildCat:0, pu:{ flips10:0, slowmo:0, wildcard:0 } };
+  }
+  function loadInfBlock(){
+    try{
+      const raw = localStorage.getItem(INF_BLOCK_KEY);
+      if (raw){ const b = JSON.parse(raw); if (b && typeof b.votes === 'number' && b.pu) return Object.assign(freshInfBlock(), b); }
+    }catch(e){}
+    return freshInfBlock();
+  }
+  function saveInfBlock(){ try{ localStorage.setItem(INF_BLOCK_KEY, JSON.stringify(infBlock)); }catch(e){} }
+  let infBlock = loadInfBlock();
+  function inInfinity(){ return document.documentElement.classList.contains('mode-infinity'); }
+  // The block's stats in the shape personalityScores() expects. Infinity
+  // has no word solve and no secret riddle, so those fields stay empty (the
+  // types that need them can't come up here). Trivia is Infinity's wild
+  // trivia rounds, scaled onto Daily's 6-question basis when there were more.
+  function infBlockPersonalityStats(b){
+    const n = b.trivia, c = b.triviaCorrect;
+    const total = n > 6 ? 6 : n, correct = n > 6 ? Math.round(6 * c / n) : c;
+    const first = b.firstHalfPoints != null ? b.firstHalfPoints : b.points;
+    const votes = Math.max(1, b.votes);
+    return {
+      riddleSolved:false, triviaCorrect:correct, triviaTotal:total,
+      solveWrongGuesses:0, solved:false, solveTimeRemainingPct:0,
+      wildcardCardsPicked:b.wildCat, maxCombo:b.maxCombo,
+      firstHalfScore:first, secondHalfScore:b.points - first,
+      powerupCounts:{ points10:b.pu.flips10, slowclock:b.pu.slowmo, wildcard:b.pu.wildcard, hint:0 },
+      decisionTimePercentile: Math.max(0, Math.min(100, Math.round(b.decisionMs / votes / 5000 * 100))),
+      avgCrowdAgreementPct: b.votes > 0 ? Math.round(b.agree / b.votes * 100) : 50,
+      lowestPercentagePicks:b.low, votes:b.votes,
+    };
+  }
   function collectedCount(){ return PERSONALITY_ORDER.filter(k=> collection.cards[k]).length; }
   // Called whenever a run awards a personality. Returns true the first time.
   function unlockPersonality(type){
@@ -4534,7 +4607,8 @@
     // in every mode, so Infinity Flips showed "Daily Run". Call this
     // whenever the mode changes (see the mode buttons / returnToModeSelect).
     if (document.documentElement.classList.contains('mode-infinity')){
-      els.runBanner.innerHTML = '<span class="mode-label">\u267E\uFE0F Infinity Flips</span>';
+      els.runBanner.innerHTML = '<span class="mode-label">\u267E\uFE0F Infinity Flips</span> \u00B7 \uD83C\uDCCF ' +
+        Math.min(infBlock.votes, INF_AWARD_VOTES) + '/' + INF_AWARD_VOTES;
       return;
     }
     const streakTag = dailyRunStreak > 0 ? (' \uD83D\uDD25' + dailyRunStreak) : '';
@@ -5510,6 +5584,44 @@
   els.cardZoom.addEventListener('click', ()=> els.cardZoom.classList.add('hidden'));
   renderCollectionBtn();
 
+  // Infinity: after every INF_AWARD_VOTES votes, between rounds. The block
+  // is scored, its card unlocked (with the reveal the first time), and a
+  // fresh block starts straight away so a reload can't award it twice.
+  function showInfAward(){
+    stopTallyPolling(); clearRoundTimer();
+    voted = false; votedSinceTime = null;
+    const b = infBlock;
+    const type = determinePersonality(infBlockPersonalityStats(b));
+    unlockPersonality(type);
+    const owned = collection.cards[type];
+    const isNew = !!(owned && !owned.revealed);
+    const meta = PERSONALITY_META[type];
+    els.infAwardEyebrow.textContent = 'YOUR LAST ' + INF_AWARD_VOTES + ' FLIPS';
+    els.infAwardName.textContent = meta.name;
+    els.infAwardBlurb.textContent = meta.blurb;
+    const bits = [(b.votes > 0 ? Math.round(b.agree / b.votes * 100) : 50) + '% with the crowd'];
+    if (b.trivia) bits.push(b.triviaCorrect + '/' + b.trivia + ' trivia');
+    bits.push('best streak ' + b.maxCombo);
+    els.infAwardStats.textContent = bits.join(' · ');
+    els.infAwardCard.innerHTML = '';
+    const card = makeCollectionCard(type, !isNew);
+    els.infAwardCard.appendChild(card);
+    els.infAwardType.classList.toggle('has-new', isNew);
+    if (isNew){ owned.revealed = true; saveCollection(); setTimeout(()=> revealCollectionCard(card), 650); }
+    infBlock = freshInfBlock(); saveInfBlock();
+    renderRunBanner(); renderCollectionBtn();
+    els.slowdownBtn.classList.add('hidden');
+    els.infAwardOverlay.classList.remove('hidden');
+    updatePauseBtnVisibility();
+    sfx.personality();
+  }
+  function closeInfAward(){
+    const wasOpen = !els.infAwardOverlay.classList.contains('hidden');
+    els.infAwardOverlay.classList.add('hidden');
+    if (wasOpen && inInfinity()) scheduleNext(0);
+  }
+  els.infAwardContinue.addEventListener('click', closeInfAward);
+
   function buildSolveKeyboard(){
     els.solveKeyboard.innerHTML = '';
     KEYBOARD_ROWS.forEach(row=>{
@@ -6063,6 +6175,7 @@
            els.solveOverlay.classList.contains('hidden') &&
            els.riddleOverlay.classList.contains('hidden') &&
            els.irOverlay.classList.contains('hidden') &&
+           els.infAwardOverlay.classList.contains('hidden') &&
            els.runIntroOverlay.classList.contains('hidden') &&
            els.modeSelectOverlay.classList.contains('hidden') &&
            !els.readoutOverlay.classList.contains('show');
@@ -6200,6 +6313,7 @@
     // timer, watchdog or tap may start a round behind the results screen.
     if (sessionHalted) return;
     if (infRiddleState !== 'idle') return;
+    if (!els.infAwardOverlay.classList.contains('hidden')) return;
     stopTallyPolling();
     clearRoundTimer();
 
@@ -6209,6 +6323,7 @@
     } else {
       renderStatusBanner();
       maybeTriggerBonusZone();
+      if (inInfinity() && infBlock.votes >= INF_AWARD_VOTES){ showInfAward(); return; }
       if (!lastWasEvent && shouldStartInfRiddle()){ lastWasEvent = true; startInfRiddle(); return; }
       if (!lastWasEvent && sessionFlips >= 4){
         const boost = isNoonRush() ? 2.5 : 1;
@@ -6426,6 +6541,15 @@
 
     comboCount++;
     if (runActive) runMaxCombo = Math.max(runMaxCombo, comboCount);
+    if (!runActive && inInfinity()){
+      const b = infBlock;
+      b.votes++; if (won) b.agree++; if (myPct <= 30) b.low++;
+      b.decisionMs += Math.max(0, votedSinceTime - roundStartedAt);
+      b.maxCombo = Math.max(b.maxCombo, comboCount);
+      if (current.category === 'wild') b.wildCat++;
+      if (b.votes === Math.floor(INF_AWARD_VOTES / 2)) b.firstHalfPoints = b.points;
+      saveInfBlock(); renderRunBanner();
+    }
     let base = 1;
     if (comboCount % 3 === 0){ base = 2; sfx.combo(); showToast('\uD83D\uDD25 Combo x' + comboCount + '! +2 flipz'); }
 
@@ -6485,6 +6609,7 @@
   }
   function resolveEvent(wasCorrect){
     clearTimeout(eventTimeoutId);
+    if (inInfinity()){ infBlock.trivia++; if (wasCorrect === true) infBlock.triviaCorrect++; saveInfBlock(); }
     els.eventTiles.forEach(t=> t.onclick = null);
     if (wasCorrect === true){
       sfx.correct();
@@ -6528,6 +6653,7 @@
   }
   function resolvePowerUp(key){
     clearTimeout(eventTimeoutId);
+    if (inInfinity() && key && infBlock.pu[key] != null){ infBlock.pu[key]++; saveInfBlock(); }
     els.eventTiles.forEach(t=> t.onclick = null);
     els.eventOverlay.classList.remove('powerup');
     els.eventSubtitle.textContent = '';
@@ -6680,6 +6806,8 @@
       getContentPools: () => ({ cards: CARD_POOLS, cardKey, trivia: { geography: GEOGRAPHY_SETS, english: ENGLISH_SETS, history: HISTORY_SETS, science: SCIENCE_SETS, art: ART_SETS, music: MUSIC_SETS, health: HEALTH_SETS }, gen: generateSubjectTrivia, poolKey: contentPoolKey }),
       getCurrentCard: () => current,
       getCollection: () => collection,
+      getInfBlock: () => infBlock,
+      setInfBlockVotes: (n) => { infBlock.votes = n; saveInfBlock(); renderRunBanner(); },
       setCollection: (c) => { collection = c; saveCollection(); renderCollectionBtn(); },
       openCollection: () => openCollection(),
       startDailyRiddle: () => startRiddleRound(),
@@ -6911,6 +7039,7 @@
     els.runIntroOverlay.classList.add('hidden');
     infRiddleState = 'idle'; clearInterval(infRiddleInterval); clearTimeout(infRiddleCloseTimer);
     els.irOverlay.classList.add('hidden'); els.irOverlay.classList.remove('win', 'lose');
+    els.infAwardOverlay.classList.add('hidden');
     els.levelupOverlay.classList.remove('show');
     els.personalityOverlay.classList.remove('show');
     els.readoutOverlay.classList.remove('show');
