@@ -6367,9 +6367,15 @@
     votedSinceTime = Date.now();
     comboCount = 0;
     if (!runActive && inInfinity()) infSession.fire = 0;   // a missed round breaks On Fire
-    const penalty = current.bonusPoints ? 3 : 1;
-    if (runActive) addRunScore(-penalty); else addRacePoints(-penalty);
-    showToast('\u23F1\uFE0F Too slow \u2014 \u2212' + penalty + ' point' + (penalty>1?'s':''));
+    // Only a round the player is actually in costs points. The board keeps
+    // dealing behind the home and mode-select screens, and those timeouts
+    // used to drain the Race to 250 score before anyone had played.
+    const inRound = runActive || (inInfinity() && isOnVsScreen());
+    if (inRound){
+      const penalty = current.bonusPoints ? 3 : 1;
+      if (runActive) addRunScore(-penalty); else addRacePoints(-penalty);
+      showToast('\u23F1\uFE0F Too slow \u2014 \u2212' + penalty + ' point' + (penalty>1?'s':''));
+    }
     scheduleNext(dt(900));
   }
 
