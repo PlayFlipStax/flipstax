@@ -1623,7 +1623,10 @@
     brands: { label:'Brands', badge:'🏷️ Brand Loyalist' },
     money:  { label:'Money',  badge:'💰 Money Mind' },
     style:  { label:'Style',  badge:'👕 Style Icon' },
-    wild:   { label:'Wild Card', badge:'🌀 Wildcard Menace' },
+    // Was also 'Wildcard Menace' - renamed so it can't be confused with the
+    // run personality of that name. Earned badges are keyed by category, so
+    // anyone who already has it keeps it under the new name.
+    wild:   { label:'Wild Card', badge:'🌀 Weird One' },
     food:   { label:'Food', badge:'🍔 Food Head' },
     fitness:{ label:'Fitness', badge:'💪 Fitness Head' },
     geography: { label:'Geography', badge:'🌍 Globetrotter' },
@@ -6252,6 +6255,7 @@
       seekInfinityTrack: (t) => { if (trackEls.infinity) trackEls.infinity.currentTime = t; },
       getContentPools: () => ({ cards: CARD_POOLS, cardKey, trivia: { geography: GEOGRAPHY_SETS, english: ENGLISH_SETS, history: HISTORY_SETS, science: SCIENCE_SETS, art: ART_SETS, music: MUSIC_SETS, health: HEALTH_SETS }, gen: generateSubjectTrivia, poolKey: contentPoolKey }),
       getCurrentCard: () => current,
+      startDailyRiddle: () => startRiddleRound(),
       startInfRiddle: (i) => startInfRiddle(i),
       getInfRiddle: () => ({ state: infRiddleState, riddle: infRiddle, lastFlip: lastInfRiddleFlip }),
       closeInfRiddle: () => closeInfRiddle(),
