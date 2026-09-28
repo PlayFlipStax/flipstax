@@ -4706,9 +4706,25 @@
   // 7:15 baseline, 8:00 if the riddle fires) - swipe for points,
   // hit thresholds to unlock trivia, answer correctly to collect a letter of
   // today's word, then solve it Wordle-style. One per day. ----------
+  // Shuffled-deck cycling, not an independent daily draw: every calendar day
+  // maps to a fixed position in a deterministic shuffle of the whole list
+  // (cycle = which lap through the list, position = where in that lap), so
+  // every player gets the same word from the same math with no server and
+  // no stored state, and no word can repeat until every other word in the
+  // list has come up once. A new cycle gets its own fresh deterministic
+  // shuffle (seeded by the cycle number), same as reshuffling a deck once
+  // you've dealt through it - the one edge case a real shuffled deck has
+  // too is that the last card of one lap and the first of the next could
+  // coincidentally match; with a list this size that's roughly a
+  // once-in-tens-of-thousands-of-years coincidence, not worth guarding.
+  function daysSinceEpoch(){ return Math.floor(Date.parse(todayStr() + 'T00:00:00Z') / 86400000); }
   function getTodayWord(){
-    const rng = mulberry32(hashStr('flipstax-word-' + todayStr()));
-    return RUN_WORDS[Math.floor(rng() * RUN_WORDS.length)];
+    const n = RUN_WORDS.length;
+    const day = daysSinceEpoch();
+    const cycle = Math.floor(day / n), posInCycle = day % n;
+    const rng = mulberry32(hashStr('flipstax-word-cycle-' + cycle));
+    const order = shuffle(RUN_WORDS.map((_, i) => i), rng);
+    return RUN_WORDS[order[posInCycle]];
   }
   function loadRunResult(){
     try{
@@ -5297,7 +5313,7 @@
     showToast('\uD83C\uDFAE Daily Stax started \u2014 swipe for points!');
     stopTallyPolling();
     lastWasEvent = true;
-    // Fresh shuffle of the whole Daily pool (330 cards) for every run, so no
+    // Fresh shuffle of the whole Daily pool (329 cards) for every run, so no
     // matchup can repeat within a run: even a max-speed run is ~155 rounds.
     // (The deck used to carry over, and could run out mid-run.)
     resetDeck('daily');
