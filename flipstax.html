@@ -462,6 +462,122 @@
     .riddle-overlay, .riddle-stars span, .riddle-inner, .riddle-timer.danger{ animation:none !important; }
   }
 
+  /* Infinity Flips riddle round - its own screen, nothing like the Daily
+     riddle: a deep green field with big "?" marks drifting slowly about.
+     Three endings: .win (the "?"s snap to "!" and burst outward, white
+     flash, shockwave rings, screen shake, confetti, a slammed-in GENIUS! -
+     deliberately bigger than the word-solve's SOLVED!), and .lose - wrong
+     answer or time out - where the colour drains, the "?"s droop and fall,
+     and the panel shudders. */
+  .ir-overlay{
+    /* Bleeds 30px past the screen so the win shake never shows an edge. */
+    position:fixed; inset:-30px; z-index:60; overflow:hidden; display:flex; align-items:center; justify-content:center;
+    padding:54px; text-align:center; font-family:'Inter', system-ui, sans-serif;
+    background: radial-gradient(circle at 50% 32%, #43e28c 0%, #17a34a 30%, #0b5d2b 68%, #05351a 100%);
+    transition: filter 0.6s ease;
+  }
+  .ir-overlay.hidden{ display:none; }
+  .ir-field{ position:absolute; inset:0; pointer-events:none; }
+  .ir-mark{
+    position:absolute; left:var(--x); top:var(--y); font-family:'Big Shoulders Display', sans-serif; font-weight:900;
+    font-size:var(--s); line-height:1; color:rgba(226,255,190,var(--o)); text-shadow:0 0 18px rgba(184,255,92,0.45);
+    transform:translate(-50%,-50%) rotate(var(--r)); animation: irDrift var(--d) ease-in-out var(--dl) infinite alternate;
+    transition: transform 1.1s cubic-bezier(.2,.9,.3,1), opacity 1.1s ease, color 0.3s ease;
+  }
+  @keyframes irDrift{
+    0%{ transform:translate(-50%,-50%) translate(0,0) rotate(var(--r)); }
+    50%{ transform:translate(-50%,-50%) translate(var(--mx), calc(var(--my) * -0.6)) rotate(calc(var(--r) + 10deg)); }
+    100%{ transform:translate(-50%,-50%) translate(calc(var(--mx) * -0.7), var(--my)) rotate(calc(var(--r) - 8deg)); }
+  }
+  .ir-panel{
+    position:relative; z-index:2; width:100%; max-width:360px; padding:22px 18px 20px; border-radius:22px;
+    background:rgba(3,38,18,0.62); border:2px solid rgba(184,255,92,0.55);
+    box-shadow:0 18px 50px rgba(0,30,10,0.55), 0 0 30px rgba(184,255,92,0.25) inset;
+    animation: irPanelIn 0.6s cubic-bezier(.22,1.5,.4,1) both;
+  }
+  @keyframes irPanelIn{ 0%{ transform:scale(0.6) rotate(-4deg); opacity:0; } 100%{ transform:none; opacity:1; } }
+  .ir-eyebrow{ color:#c9ff7a; font-size:12px; font-weight:900; letter-spacing:2px; }
+  .ir-timer{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:30px; color:#fff; margin:6px 0 4px; }
+  .ir-timer.danger{ color:#ffe066; animation: runTimerPulse 0.8s ease-in-out infinite; }
+  .ir-q{ color:#fff; font-size:18px; font-weight:800; line-height:1.4; margin:4px 0 8px; }
+  .ir-len{ color:#c9ff7a; font-size:12px; font-weight:700; letter-spacing:1px; margin-bottom:12px; }
+  .ir-input{
+    width:100%; box-sizing:border-box; padding:13px 14px; border-radius:12px; border:2px solid rgba(201,255,122,0.5);
+    background:rgba(0,20,8,0.55); color:#fff; font-size:17px; font-weight:800; letter-spacing:1px; text-align:center;
+    text-transform:uppercase; outline:none; margin-bottom:12px;
+  }
+  .ir-input:focus{ border-color:#c9ff7a; box-shadow:0 0 0 3px rgba(201,255,122,0.25); }
+  .ir-input::placeholder{ color:rgba(255,255,255,0.45); font-weight:600; text-transform:none; letter-spacing:0; }
+  .ir-submit{ display:inline-block; padding:12px 44px; font-size:15px; }
+  :root .ir-overlay .daily-btn.primary.ir-submit{ --btn-fill:#c9ff7a; background-color:#c9ff7a; color:#073016; }
+  :root.mode-infinity .ir-overlay .daily-btn.primary.ir-submit{ background-color:transparent; }
+  .ir-flash{ position:absolute; inset:0; z-index:4; pointer-events:none; background:#fff; opacity:0; }
+  .ir-rings{ position:absolute; left:50%; top:45%; z-index:3; pointer-events:none; }
+  .ir-rings i{
+    position:absolute; left:0; top:0; width:40px; height:40px; margin:-20px 0 0 -20px; border-radius:50%;
+    border:6px solid #fff6a8; opacity:0; box-shadow:0 0 30px rgba(255,246,168,0.9);
+  }
+  .ir-overlay canvas{ position:absolute; inset:0; width:100%; height:100%; z-index:5; pointer-events:none; }
+  .ir-verdict{
+    position:absolute; left:0; right:0; top:50%; z-index:6; transform:translateY(-50%); pointer-events:none;
+    display:none; flex-direction:column; align-items:center; gap:10px; padding:0 16px;
+  }
+  .ir-verdict-big{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; line-height:0.95; letter-spacing:3px; }
+  .ir-verdict-sub{ font-size:17px; font-weight:800; color:#fff; text-shadow:0 2px 8px rgba(0,0,0,0.5); }
+
+  /* WIN */
+  .ir-overlay.win{ animation: irShake 0.55s cubic-bezier(.36,.07,.19,.97) 0.12s both; }
+  .ir-overlay.win .ir-flash{ animation: irFlash 0.9s ease-out both; }
+  .ir-overlay.win .ir-rings i{ animation: irRing 1.3s cubic-bezier(.1,.8,.3,1) both; }
+  .ir-overlay.win .ir-rings i:nth-child(2){ animation-delay:0.14s; }
+  .ir-overlay.win .ir-rings i:nth-child(3){ animation-delay:0.28s; }
+  .ir-overlay.win .ir-panel{ animation: irPanelOut 0.5s ease-in both; }
+  .ir-overlay.win .ir-mark{
+    animation:none; color:#fff6a8; opacity:0; text-shadow:0 0 22px rgba(255,236,120,0.95);
+    transform:translate(-50%,-50%) translate(var(--bx), var(--by)) rotate(calc(var(--r) * 3)) scale(1.8);
+  }
+  .ir-overlay.win .ir-verdict{ display:flex; }
+  .ir-overlay.win .ir-verdict-big{
+    font-size:clamp(70px,24vw,128px); color:#fff;
+    text-shadow:0 0 20px #fff6a8, 0 0 50px rgba(255,210,60,0.95), 0 0 90px rgba(120,255,120,0.8), 0 6px 0 #0b5d2b;
+    animation: irSlam 0.75s cubic-bezier(.2,1.6,.35,1) 0.2s both, irGlow 1.1s ease-in-out 1s infinite alternate;
+  }
+  .ir-overlay.win .ir-verdict-sub{ color:#fff6a8; animation: irFadeUp 0.5s ease-out 0.75s both; }
+  @keyframes irFlash{ 0%{ opacity:0.95; } 100%{ opacity:0; } }
+  @keyframes irRing{ 0%{ transform:scale(0.2); opacity:1; } 100%{ transform:scale(22); opacity:0; border-width:1px; } }
+  @keyframes irPanelOut{ 0%{ transform:scale(1); opacity:1; } 40%{ transform:scale(1.08); opacity:1; } 100%{ transform:scale(0.7); opacity:0; } }
+  /* No CSS filters on the text: WebKit clips its big glow to a visible box. */
+  @keyframes irSlam{ 0%{ transform:scale(3.2) rotate(-6deg); opacity:0; } 60%{ transform:scale(0.92) rotate(1deg); opacity:1; } 100%{ transform:scale(1) rotate(0); opacity:1; } }
+  @keyframes irGlow{
+    0%{ text-shadow:0 0 20px #fff6a8, 0 0 50px rgba(255,210,60,0.95), 0 0 90px rgba(120,255,120,0.8), 0 6px 0 #0b5d2b; }
+    100%{ text-shadow:0 0 28px #fff, 0 0 70px rgba(255,220,80,1), 0 0 120px rgba(140,255,140,0.95), 0 6px 0 #0b5d2b; }
+  }
+  @keyframes irFadeUp{ 0%{ transform:translateY(14px); opacity:0; } 100%{ transform:none; opacity:1; } }
+  @keyframes irShake{
+    0%,100%{ transform:none; } 15%{ transform:translate(-9px,5px) rotate(-0.6deg); } 30%{ transform:translate(8px,-6px) rotate(0.5deg); }
+    45%{ transform:translate(-6px,4px); } 60%{ transform:translate(5px,-3px); } 80%{ transform:translate(-2px,1px); }
+  }
+
+  /* LOSE (wrong answer or time out) */
+  .ir-overlay.lose{ filter:saturate(0.18) brightness(0.72); }
+  .ir-overlay.lose .ir-panel{ animation: irShudder 0.5s ease both; }
+  .ir-overlay.lose .ir-mark{
+    animation:none; opacity:0; color:rgba(200,210,200,0.5);
+    transform:translate(-50%,-50%) translate(0, 70vh) rotate(calc(var(--r) + 50deg));
+    transition: transform 1.6s cubic-bezier(.5,0,.9,.6), opacity 1.6s ease;
+  }
+  .ir-overlay.lose .ir-panel .ir-input, .ir-overlay.lose .ir-panel .ir-buttons, .ir-overlay.lose .ir-panel .ir-len{ display:none; }
+  .ir-lose-box{ display:none; }
+  .ir-overlay.lose .ir-lose-box{ display:block; margin-top:12px; }
+  .ir-lose-title{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:40px; letter-spacing:2px; color:#e8ece8; }
+  .ir-lose-answer{ margin-top:6px; color:#dfe7df; font-size:15px; font-weight:700; }
+  .ir-lose-answer b{ color:#fff; font-size:20px; letter-spacing:2px; }
+  @keyframes irShudder{ 0%,100%{ transform:none; } 20%{ transform:translateX(-10px); } 40%{ transform:translateX(9px); } 60%{ transform:translateX(-6px); } 80%{ transform:translateX(4px); } }
+  @media (prefers-reduced-motion: reduce){
+    .ir-mark, .ir-panel, .ir-overlay.win, .ir-overlay.win .ir-verdict-big, .ir-overlay.win .ir-rings i, .ir-overlay.lose .ir-panel{ animation:none !important; }
+    .ir-mark{ transition:none !important; }
+  }
+
   .daily-btn{
     font-size:13px; font-weight:700; padding:9px 16px; border-radius:10px; cursor:pointer;
     background:rgba(255,255,255,0.12); color:#fff; border:1px solid rgba(255,255,255,0.25);
@@ -671,7 +787,7 @@
      anything else). */
   .inf-wordmark, .inf-floaters{ display:none; }
   :root.mode-infinity .board{
-    padding:38px 10px 10px; gap:8px;
+    padding:50px 10px 10px; gap:8px;   /* 38px wordmark strip + 12px for the round timer under it */
   }
   /* Gold shell: everything around the panels - page background, the header
      and logo area, the board frame, the hint bar - goes bright shiny gold
@@ -691,7 +807,17 @@
   :root.mode-infinity .back-btn{ color:#2b0a4d; opacity:1; }
   :root.mode-infinity .sound-toggle{ opacity:1; filter:brightness(0.28); }   /* the speaker emoji is near-white; darken it for the gold */
   :root.mode-infinity .hint{ color:#3d2c00; font-weight:600; }
-  :root.mode-infinity .round-timer{ background:rgba(43,10,77,0.22); }
+  /* Round timer on the gold shell: the 4px pink-on-faint-purple bar all but
+     vanished there. Infinity gets a thicker bar on a deep purple track with a
+     white rim, and a hot-pink fill with its own glow. */
+  :root.mode-infinity .round-timer{
+    top:36px; left:12px; right:12px; height:8px; border-radius:99px;
+    background:#2b0a4d; box-shadow:0 0 0 2px #fff, 0 2px 8px rgba(43,10,77,0.45);
+  }
+  :root.mode-infinity .round-timer-fill{
+    border-radius:99px; background:linear-gradient(90deg,#ff2f9e,#ff7a3d);
+    box-shadow:0 0 10px rgba(255,47,158,0.9), inset 0 1px 0 rgba(255,255,255,0.55);
+  }
   /* Mode name in the pill - same bold caps treatment in both modes so the
      two labels are visually parallel ("Infinity Flips" / "Daily Stax"). */
   .mode-label{ font-weight:900; letter-spacing:1.5px; text-transform:uppercase; font-size:12px; }
@@ -806,7 +932,7 @@
   :root.mode-daily .round-timer{ background:rgba(13,43,94,0.18); }
   :root.mode-daily .status-banner.daily{ background:rgba(255,255,255,0.85); color:#0d2b5e; border-color:rgba(13,43,94,0.22); }
   /* Same board padding/gap as Infinity (including the 38px strip for the
-     wordmark), so the two modes are proportionally identical. */
+     wordmark); Infinity adds 12px under its wordmark for its round timer. */
   :root.mode-daily .board{ padding:38px 10px 10px; gap:8px; }
   :root.mode-daily .half{
     --frame-ring:#fff;
@@ -1328,6 +1454,28 @@
     <div class="personality-label" id="personalityLabel"></div>
     <div class="personality-blurb" id="personalityBlurb"></div>
     <div class="personality-pct" id="personalityPct"></div>
+  </div>
+</div>
+<div class="ir-overlay hidden" id="irOverlay" role="dialog" aria-label="Riddle round">
+  <div class="ir-field" id="irField" aria-hidden="true"></div>
+  <div class="ir-flash" aria-hidden="true"></div>
+  <div class="ir-rings" aria-hidden="true"><i></i><i></i><i></i></div>
+  <canvas id="irConfetti" aria-hidden="true"></canvas>
+  <div class="ir-panel" id="irPanel">
+    <div class="ir-eyebrow">❓ RIDDLE ROUND ❓</div>
+    <div class="ir-timer" id="irTimer">0:30</div>
+    <div class="ir-q" id="irQ"></div>
+    <div class="ir-len" id="irLen"></div>
+    <input class="ir-input" id="irInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="Type your answer…" maxlength="30">
+    <div class="ir-buttons"><div class="daily-btn primary ir-submit" id="irSubmit">Answer</div></div>
+    <div class="ir-lose-box" aria-live="polite">
+      <div class="ir-lose-title" id="irLoseTitle"></div>
+      <div class="ir-lose-answer" id="irLoseAnswer"></div>
+    </div>
+  </div>
+  <div class="ir-verdict" aria-live="polite">
+    <div class="ir-verdict-big">GENIUS!</div>
+    <div class="ir-verdict-sub" id="irVerdictSub"></div>
   </div>
 </div>
 <div class="riddle-overlay hidden" id="riddleOverlay">
@@ -2180,6 +2328,36 @@
     { q:'The more you feed me, the bigger I grow — but give me water and I die. What am I?', a:'FIRE' },
     { q:'I’m tall when I’m young and short when I’m old. What am I?', a:'CANDLE' },
   ];
+  // Infinity Flips' own riddle pool - never shared with Daily's RIDDLES above
+  // (same content rule as the VS cards and trivia). Classic folk riddles.
+  // `alts` are other answers accepted as correct; matching ignores case,
+  // spaces, punctuation, a leading "a/an/the/your" and a trailing plural s.
+  const INFINITY_RIDDLES = [
+    { q:'What has to be broken before you can use it?', a:'EGG' },
+    { q:'What gets wetter the more it dries?', a:'TOWEL' },
+    { q:'What has hands but can’t clap?', a:'CLOCK', alts:['WATCH'] },
+    { q:'What has a neck but no head?', a:'BOTTLE' },
+    { q:'What can travel around the world while staying in a corner?', a:'STAMP' },
+    { q:'What has lots of teeth but can’t bite?', a:'COMB', alts:['ZIPPER','SAW'] },
+    { q:'What goes up but never comes down?', a:'AGE' },
+    { q:'What has an eye but can’t see?', a:'NEEDLE', alts:['HURRICANE','STORM'] },
+    { q:'What can you catch but not throw?', a:'COLD' },
+    { q:'What runs but never walks, and has a mouth but never talks?', a:'RIVER' },
+    { q:'What has words but never speaks?', a:'BOOK' },
+    { q:'What is full of holes but still holds water?', a:'SPONGE' },
+    { q:'What building has the most stories?', a:'LIBRARY' },
+    { q:'What has one head, one foot and four legs?', a:'BED' },
+    { q:'What can fill a room but takes up no space?', a:'LIGHT', alts:['AIR','SOUND'] },
+    { q:'What belongs to you, but other people use it more than you do?', a:'NAME' },
+    { q:'What has cities but no houses, forests but no trees, and water but no fish?', a:'MAP' },
+    { q:'What kind of band never plays music?', a:'RUBBER BAND', alts:['RUBBERBAND','HAIR BAND','HAIRBAND'] },
+    { q:'What has a thumb and four fingers but isn’t alive?', a:'GLOVE', alts:['MITTEN'] },
+    { q:'What goes through towns and over hills but never moves?', a:'ROAD', alts:['STREET','PATH'] },
+    { q:'What can you hold in your right hand but never in your left?', a:'LEFT HAND', alts:['LEFTHAND','YOUR LEFT HAND','LEFT ELBOW'] },
+    { q:'What has a head and a tail but no body?', a:'COIN' },
+  ];
+  const INF_RIDDLE_MS = 30000;
+  const INF_RIDDLE_POINTS = 25;
   // Daily Run trivia: 5 core subjects (always one each) + 1 rotating elective
   // (always exactly one, randomly chosen each run) = 6 total, matching the
   // 6-letter word. Kept separate from DAILY_SUBJECTS above, which is used
@@ -2468,6 +2646,27 @@
       }
     }catch(e){}
   }
+  // A short cinematic impact: sine sweep 140->36Hz plus a low-passed noise hit.
+  function playBoom(vol){
+    if (!soundOn) return;
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    try{
+      const t0 = ctx.currentTime;
+      const o = ctx.createOscillator(); o.type = 'sine';
+      o.frequency.setValueAtTime(140, t0); o.frequency.exponentialRampToValueAtTime(36, t0 + 0.55);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.75);
+      o.connect(g); g.connect(ctx.destination); o.start(t0); o.stop(t0 + 0.8);
+      const len = Math.floor(ctx.sampleRate * 0.45), buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.5);
+      const n = ctx.createBufferSource(); n.buffer = buf;
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass';
+      lp.frequency.setValueAtTime(1800, t0); lp.frequency.exponentialRampToValueAtTime(160, t0 + 0.4);
+      const ng = ctx.createGain(); ng.gain.value = vol * 0.8;
+      n.connect(lp); lp.connect(ng); ng.connect(ctx.destination); n.start(t0);
+    }catch(e){}
+  }
   const sfx = {
     tap: (side)=>{ playClick(0.2, document.documentElement.classList.contains('mode-infinity') ? TAP_TONES.infinity : TAP_TONES.daily, side); haptic(8); },
     revealWin: ()=>{ playTone(660,0,0.09,'sine',0.1); playTone(880,0.08,0.14,'sine',0.1); },
@@ -2480,6 +2679,16 @@
     spinTick: (i)=>{ playTone(280 + i*35, 0, 0.05, 'square', 0.05); },
     bonusZone: ()=>{ playTone(500,0,0.1,'sine',0.08); playTone(700,0.09,0.14,'sine',0.08); },
     solveWin: ()=>{ [523,659,784,1047].forEach((f,i)=> playTone(f, i*0.09, 0.16, 'triangle', 0.13)); playTone(1319,0.4,0.5,'triangle',0.12); playTone(1568,0.4,0.5,'sine',0.08); haptic([20,40,20,40,60]); },
+    riddleAppear: ()=>{ playTone(392,0,0.2,'sine',0.08); playTone(466,0.16,0.2,'sine',0.08); playTone(587,0.32,0.22,'sine',0.08); playTone(740,0.5,0.5,'triangle',0.07); },
+    // The big one: a sub drop + noise boom, a bright major chord on top, then
+    // a sparkle run and a held high note - clearly louder and longer than
+    // the word-solve fanfare.
+    riddleWin: ()=>{ playBoom(0.55);
+      [523.25,659.25,783.99,1046.5].forEach(f=> playTone(f, 0.1, 1.1, 'triangle', 0.1)); playTone(261.63, 0.1, 0.8, 'square', 0.045);
+      [1046.5,1318.5,1568,2093,2637].forEach((f,i)=> playTone(f, 0.55 + i*0.07, 0.16, 'sine', 0.08));
+      playTone(2093, 0.95, 0.9, 'triangle', 0.07); playTone(1568, 0.95, 0.9, 'sine', 0.06); haptic([40,30,40,30,180]); },
+    riddleWrong: ()=>{ [392,370,349].forEach((f,i)=> playTone(f, i*0.3, 0.3, 'sawtooth', 0.055)); playTone(330, 0.9, 0.75, 'sawtooth', 0.055); haptic([60,40,60]); },
+    riddleTimeout: ()=>{ playTone(110,0,0.6,'square',0.07); playTone(116.5,0,0.6,'square',0.05); playTone(98,0.62,0.5,'square',0.06); haptic([120,60,120]); },
     personality: ()=>{ playTone(392,0,0.14,'sine',0.1); playTone(494,0.12,0.14,'sine',0.1); playTone(587,0.24,0.14,'sine',0.1); playTone(784,0.36,0.32,'sine',0.12); haptic([15,30,15,30,25]); },
   };
   function setSoundOn(on){
@@ -3833,6 +4042,10 @@
     personalityOverlay: document.getElementById('personalityOverlay'), personalityLabel: document.getElementById('personalityLabel'),
     personalityBlurb: document.getElementById('personalityBlurb'), personalityPct: document.getElementById('personalityPct'),
     riddleOverlay: document.getElementById('riddleOverlay'), riddleTimer: document.getElementById('riddleTimer'),
+    irOverlay: document.getElementById('irOverlay'), irField: document.getElementById('irField'), irConfetti: document.getElementById('irConfetti'),
+    irQ: document.getElementById('irQ'), irLen: document.getElementById('irLen'), irTimer: document.getElementById('irTimer'), irInput: document.getElementById('irInput'),
+    irSubmit: document.getElementById('irSubmit'), irVerdictSub: document.getElementById('irVerdictSub'),
+    irLoseTitle: document.getElementById('irLoseTitle'), irLoseAnswer: document.getElementById('irLoseAnswer'),
     riddleQ: document.getElementById('riddleQ'), riddleInput: document.getElementById('riddleInput'),
     riddleSubmit: document.getElementById('riddleSubmit'), riddleResult: document.getElementById('riddleResult'),
     homeOverlay: document.getElementById('homeOverlay'), homeEnterBtn: document.getElementById('homeEnterBtn'),
@@ -4656,9 +4869,18 @@
         if (ticks >= 6){
           clearInterval(rollInterval);
           const win = Math.random() < 0.5;
-          addRunScore(win ? 25 : -25);
-          if (win){ sfx.correct(); els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: +25 points!'; }
-          else{ sfx.wrong(); els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: \u221225 points'; }
+          if (win){ addRunScore(25); sfx.correct(); els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: +25 points!'; }
+          else{
+            // A loss can't drop the score below the last trivia milestone
+            // reached (a full -25 used to open ~2.5-minute gaps before the
+            // next trivia). Already below it (a missed trivia) = no loss.
+            const floor = runThresholdsHit.length ? Math.max.apply(null, runThresholdsHit) : 0;
+            const loss = Math.max(0, Math.min(25, runScore - floor));
+            addRunScore(-loss);
+            sfx.wrong();
+            els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: ' + (loss === 25 ? '\u221225 points'
+              : loss > 0 ? ('\u2212' + loss + ' points (floored at ' + floor + ')') : 'no points lost \u2014 your milestone is safe');
+          }
           finishRunPowerUp();
         }
       }, 90);
@@ -4752,6 +4974,123 @@
   }
   els.riddleSubmit.addEventListener('click', submitRiddleAnswer);
   els.riddleInput.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') submitRiddleAnswer(); });
+
+  // ---------- Infinity Flips riddle round ----------
+  // Pops up now and then in Infinity (never Daily): not before 12 flips in a
+  // session, at least 18 flips apart, then an 8% chance per round - roughly
+  // one every 25-30 flips. One answer per riddle, 30s on the clock.
+  let infRiddle = null, infRiddleState = 'idle', infRiddleEndsAt = 0, infRiddleInterval = null;
+  let infRiddleCloseTimer = null, lastInfRiddleFlip = -100, infRiddleBag = [];
+  function shouldStartInfRiddle(){
+    return document.documentElement.classList.contains('mode-infinity') &&
+      sessionFlips >= 12 && sessionFlips - lastInfRiddleFlip >= 18 && Math.random() < 0.08;
+  }
+  function normRiddleAnswer(t){
+    return String(t || '').toUpperCase().replace(/[^A-Z0-9 ]+/g, ' ').replace(/^\s*(A|AN|THE|YOUR)\s+/, '').replace(/\s+/g, '');
+  }
+  function riddleAnswerMatches(guess, r){
+    const g = normRiddleAnswer(guess);
+    if (!g) return false;
+    return [r.a].concat(r.alts || []).some(ans=>{ const a = normRiddleAnswer(ans); return g === a || g === a + 'S' || g + 'S' === a || g === a + 'ES'; });
+  }
+  function buildRiddleField(){
+    const field = els.irField; field.innerHTML = '';
+    for (let i = 0; i < 16; i++){
+      const m = document.createElement('span');
+      m.className = 'ir-mark'; m.textContent = '?';
+      const ang = Math.random() * Math.PI * 2, dist = 260 + Math.random() * 420;
+      const st = m.style;
+      st.setProperty('--x', (4 + Math.random() * 92) + '%'); st.setProperty('--y', (4 + Math.random() * 92) + '%');
+      st.setProperty('--s', Math.round(34 + Math.random() * 90) + 'px'); st.setProperty('--o', (0.16 + Math.random() * 0.3).toFixed(2));
+      st.setProperty('--r', Math.round(Math.random() * 50 - 25) + 'deg');
+      st.setProperty('--mx', Math.round(Math.random() * 80 - 40) + 'px'); st.setProperty('--my', Math.round(Math.random() * 80 - 40) + 'px');
+      st.setProperty('--d', (9 + Math.random() * 10).toFixed(1) + 's'); st.setProperty('--dl', (-Math.random() * 10).toFixed(1) + 's');
+      st.setProperty('--bx', Math.round(Math.cos(ang) * dist) + 'px'); st.setProperty('--by', Math.round(Math.sin(ang) * dist) + 'px');
+      field.appendChild(m);
+    }
+  }
+  function startInfRiddle(forceIdx){
+    if (infRiddleState !== 'idle') return;
+    if (!infRiddleBag.length) infRiddleBag = shuffle(INFINITY_RIDDLES.map((_, i)=> i));
+    infRiddle = INFINITY_RIDDLES[typeof forceIdx === 'number' ? forceIdx : infRiddleBag.pop()];
+    infRiddleState = 'asking';
+    lastInfRiddleFlip = sessionFlips;
+    stopTallyPolling(); clearRoundTimer();
+    // Not a vote round - keep the stalled-round watchdog out of it.
+    voted = false; votedSinceTime = null;
+    els.irOverlay.classList.remove('win', 'lose');
+    buildRiddleField();
+    els.irQ.textContent = infRiddle.q;
+    els.irLen.textContent = infRiddle.a.replace(/[^A-Z ]/g, '').split(' ').map(w=> w.length + ' letters').join(' + ');
+    els.irInput.value = '';
+    els.irLoseTitle.textContent = ''; els.irLoseAnswer.textContent = '';
+    els.irOverlay.classList.remove('hidden');
+    els.slowdownBtn.classList.add('hidden');
+    updatePauseBtnVisibility();
+    sfx.riddleAppear();
+    setTimeout(()=>{ if (infRiddleState === 'asking') try{ els.irInput.focus({ preventScroll:true }); }catch(e){} }, 400);
+    infRiddleEndsAt = Date.now() + dt(INF_RIDDLE_MS);
+    clearInterval(infRiddleInterval);
+    infRiddleInterval = setInterval(tickInfRiddle, 200);
+    tickInfRiddle();
+  }
+  function tickInfRiddle(){
+    const remain = Math.max(0, infRiddleEndsAt - Date.now());
+    const sec = Math.ceil(remain / 1000);
+    els.irTimer.textContent = '0:' + (sec < 10 ? '0' : '') + sec;
+    els.irTimer.classList.toggle('danger', remain <= dt(8000));
+    if (remain <= 0) resolveInfRiddle('timeout');
+  }
+  function submitInfRiddle(){
+    if (infRiddleState !== 'asking') return;
+    if (!normRiddleAnswer(els.irInput.value)) return;   // empty - keep waiting
+    resolveInfRiddle(riddleAnswerMatches(els.irInput.value, infRiddle) ? 'win' : 'wrong');
+  }
+  function resolveInfRiddle(result){
+    if (infRiddleState !== 'asking') return;   // a submit racing the timeout
+    infRiddleState = 'resolving';
+    clearInterval(infRiddleInterval); infRiddleInterval = null;
+    try{ els.irInput.blur(); }catch(e){}
+    let reduced = false;
+    try{ reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }catch(e){}
+    if (result === 'win'){
+      els.irVerdictSub.textContent = infRiddle.a + ' · +' + INF_RIDDLE_POINTS + ' points';
+      els.irField.querySelectorAll('.ir-mark').forEach(m=> m.textContent = '!');
+      void els.irOverlay.offsetWidth;
+      els.irOverlay.classList.add('win');
+      sfx.riddleWin();
+      addRacePoints(INF_RIDDLE_POINTS);
+      stats.riddlesSolved = (stats.riddlesSolved || 0) + 1; saveStats();
+      if (!reduced){
+        const box = { left: innerWidth / 2 - 60, top: innerHeight * 0.45, width: 120, height: 0 };
+        const burst = (n, spread)=> confettiBurst(els.irConfetti, box, { burst:n, spread:spread, speed:11, rain:90, life:3000,
+          colors:['#fff6a8','#c9ff7a','#ffffff','#ffd93d','#43e28c','#ff9f1c','#7df9ff'] });
+        setTimeout(()=> burst(200, 2), 120);
+        setTimeout(()=> burst(140, 1.4), 700);
+      }
+    } else {
+      els.irLoseTitle.textContent = result === 'timeout' ? '⏰ TIME’S UP' : '❌ NOT QUITE';
+      els.irLoseAnswer.innerHTML = 'The answer was <b></b>';
+      els.irLoseAnswer.querySelector('b').textContent = infRiddle.a;
+      els.irOverlay.classList.add('lose');
+      if (result === 'timeout') sfx.riddleTimeout(); else sfx.riddleWrong();
+    }
+    clearTimeout(infRiddleCloseTimer);
+    infRiddleCloseTimer = setTimeout(closeInfRiddle, result === 'win' ? (reduced ? 1800 : 3400) : 2800);
+  }
+  function closeInfRiddle(){
+    clearTimeout(infRiddleCloseTimer); infRiddleCloseTimer = null;
+    clearInterval(infRiddleInterval); infRiddleInterval = null;
+    const wasOpen = infRiddleState !== 'idle';
+    infRiddleState = 'idle';
+    els.irOverlay.classList.add('hidden');
+    els.irOverlay.classList.remove('win', 'lose');
+    const c = els.irConfetti.getContext && els.irConfetti.getContext('2d');
+    if (c) c.clearRect(0, 0, els.irConfetti.width, els.irConfetti.height);
+    if (wasOpen && document.documentElement.classList.contains('mode-infinity')) scheduleNext(0);
+  }
+  els.irSubmit.addEventListener('click', submitInfRiddle);
+  els.irInput.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') submitInfRiddle(); });
 
   function buildSolveKeyboard(){
     els.solveKeyboard.innerHTML = '';
@@ -4943,32 +5282,33 @@
       done();
     }, reduced ? 1400 : 2600);
   }
-  // Confetti on a canvas: one burst fanning up and out of the word, then a
-  // lighter shower from the top. Stops itself after ~2.4s.
-  function solveConfettiBurst(){
-    const canvas = els.solveConfetti, ctx = canvas.getContext('2d');
+  // Confetti on a canvas: one burst fanning up and out of `box` (a screen
+  // rect), then a lighter shower from the top. Stops itself after `life` ms.
+  function solveConfettiBurst(){ confettiBurst(els.solveConfetti, els.solveSlots.getBoundingClientRect()); }
+  function confettiBurst(canvas, slots, opts){
+    opts = opts || {};
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
     const dpr = Math.min(2, window.devicePixelRatio || 1);
     const W = window.innerWidth, H = window.innerHeight;
     canvas.width = W * dpr; canvas.height = H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const colors = ['#ffd93d','#ff5f6d','#3ec76b','#19b6e6','#c73ec7','#ffffff','#ff9f1c'];
-    const slots = els.solveSlots.getBoundingClientRect();
+    const colors = opts.colors || ['#ffd93d','#ff5f6d','#3ec76b','#19b6e6','#c73ec7','#ffffff','#ff9f1c'];
     const ox = slots.left + slots.width / 2, oy = slots.top + slots.height / 2;
     const bits = [];
-    for (let i = 0; i < 150; i++){
-      const a = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.25;
-      const v = 7 + Math.random() * 10;
+    for (let i = 0; i < (opts.burst || 150); i++){
+      const a = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * (opts.spread || 1.25);
+      const v = (opts.speed || 7) + Math.random() * 10;
       bits.push({ x: ox + (Math.random() - 0.5) * slots.width, y: oy, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 2,
         w: 6 + Math.random() * 6, h: 4 + Math.random() * 5, r: Math.random() * 6.3, vr: (Math.random() - 0.5) * 0.4,
         c: colors[i % colors.length], delay: 0 });
     }
-    for (let i = 0; i < 70; i++){
+    for (let i = 0; i < (opts.rain || 70); i++){
       bits.push({ x: Math.random() * W, y: -20 - Math.random() * 60, vx: (Math.random() - 0.5) * 2, vy: 2 + Math.random() * 3,
         w: 6 + Math.random() * 5, h: 4 + Math.random() * 4, r: Math.random() * 6.3, vr: (Math.random() - 0.5) * 0.3,
         c: colors[i % colors.length], delay: 350 + Math.random() * 500 });
     }
-    const start = performance.now(), life = 2400;
+    const start = performance.now(), life = opts.life || 2400;
     (function frame(now){
       const t = now - start;
       ctx.clearRect(0, 0, W, H);
@@ -5295,6 +5635,7 @@
     return els.eventOverlay.classList.contains('hidden') &&
            els.solveOverlay.classList.contains('hidden') &&
            els.riddleOverlay.classList.contains('hidden') &&
+           els.irOverlay.classList.contains('hidden') &&
            els.runIntroOverlay.classList.contains('hidden') &&
            els.modeSelectOverlay.classList.contains('hidden') &&
            !els.readoutOverlay.classList.contains('show');
@@ -5431,6 +5772,7 @@
     // A finished Daily run is over until a mode is picked again - no stray
     // timer, watchdog or tap may start a round behind the results screen.
     if (sessionHalted) return;
+    if (infRiddleState !== 'idle') return;
     stopTallyPolling();
     clearRoundTimer();
 
@@ -5440,6 +5782,7 @@
     } else {
       renderStatusBanner();
       maybeTriggerBonusZone();
+      if (!lastWasEvent && shouldStartInfRiddle()){ lastWasEvent = true; startInfRiddle(); return; }
       if (!lastWasEvent && sessionFlips >= 4){
         const boost = isNoonRush() ? 2.5 : 1;
         const roll = Math.random();
@@ -5684,6 +6027,8 @@
   els.halfA.addEventListener('click', ()=>{ sfx.tap('top'); playTrack(gameTrackKey()); tapFeedback(els.halfA, els.halfB); vote('A'); });
   els.halfB.addEventListener('click', ()=>{ sfx.tap('bottom'); playTrack(gameTrackKey()); tapFeedback(els.halfB, els.halfA); vote('B'); });
   document.addEventListener('keydown', (e)=>{
+    // Typing "1"/"2" into a riddle answer box is not a vote.
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
     if (e.key==='ArrowUp' || e.key==='1') vote('A');
     if (e.key==='ArrowDown' || e.key==='2') vote('B');
   });
@@ -5907,6 +6252,10 @@
       seekInfinityTrack: (t) => { if (trackEls.infinity) trackEls.infinity.currentTime = t; },
       getContentPools: () => ({ cards: CARD_POOLS, cardKey, trivia: { geography: GEOGRAPHY_SETS, english: ENGLISH_SETS, history: HISTORY_SETS, science: SCIENCE_SETS, art: ART_SETS, music: MUSIC_SETS, health: HEALTH_SETS }, gen: generateSubjectTrivia, poolKey: contentPoolKey }),
       getCurrentCard: () => current,
+      startInfRiddle: (i) => startInfRiddle(i),
+      getInfRiddle: () => ({ state: infRiddleState, riddle: infRiddle, lastFlip: lastInfRiddleFlip }),
+      closeInfRiddle: () => closeInfRiddle(),
+      setInfRiddleRemainingMs: (ms) => { infRiddleEndsAt = Date.now() + ms; tickInfRiddle(); },
       showPersonalityReveal: () => showPersonalityReveal(),
       determinePersonality: (st) => determinePersonality(st),
       shareCardDataUrl: (kind) => renderShareCard(kind, kind === 'daily' ? buildDailyShareData(runResultToday) : buildInfinityShareData()).toDataURL('image/png'),
@@ -6116,6 +6465,8 @@
     els.solveCelebrate.classList.add('hidden');
     els.riddleOverlay.classList.add('hidden');
     els.runIntroOverlay.classList.add('hidden');
+    infRiddleState = 'idle'; clearInterval(infRiddleInterval); clearTimeout(infRiddleCloseTimer);
+    els.irOverlay.classList.add('hidden'); els.irOverlay.classList.remove('win', 'lose');
     els.levelupOverlay.classList.remove('show');
     els.personalityOverlay.classList.remove('show');
     els.readoutOverlay.classList.remove('show');
