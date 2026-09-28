@@ -506,6 +506,10 @@
   .readout-type-icon{ font-size:30px; margin-bottom:4px; }
   .readout-type-name{ font-family:'Big Shoulders Display', sans-serif; font-weight:800; font-size:19px; color:#fff; }
   .readout-type-blurb{ color:var(--dim); font-size:12.5px; margin-top:4px; line-height:1.35; }
+  .readout-type-eyebrow{ color:#b98bf0; font-size:10.5px; font-weight:800; letter-spacing:1px; margin-bottom:6px; }
+  /* Daily Stax results get a solid screen of their own - the board used to
+     show through the translucent overlay behind the text. */
+  #readoutOverlay{ background: radial-gradient(circle at 50% 28%, #3a1f6e, #150f2b 62%, #0b0917); }
   .intro-overlay{
     position:fixed; inset:0; z-index:30; background:var(--bg); display:flex;
     align-items:center; justify-content:center; padding:24px; text-align:center;
@@ -1448,8 +1452,8 @@
     <div class="personality-label" id="readoutScore"></div>
     <div class="personality-blurb" id="readoutTrivia"></div>
     <div class="personality-blurb" id="readoutWord"></div>
-    <div class="personality-pct" id="readoutVibe"></div>
     <div class="readout-type" id="readoutType">
+      <div class="readout-type-eyebrow">TODAY'S PERSONALITY</div>
       <div class="readout-type-icon" id="readoutTypeIcon"></div>
       <div class="readout-type-name" id="readoutTypeName"></div>
       <div class="readout-type-blurb" id="readoutTypeBlurb"></div>
@@ -1522,24 +1526,46 @@
   // distinct axis from the lifetime vibe tier above: this reads THIS run's
   // playstyle (speed, streaks, risk-taking, comeback shape), not a
   // lifetime crowd-agreement average.
+  // One personality per Daily run. Every type scores how strongly this run
+  // fits it (0 = not at all) and the strongest fit wins, so a specific,
+  // hard-earned match beats a broad one. (This used to be a first-match
+  // chain, where "3+ votes on Wild Card-category cards" came early - nearly
+  // every run sees that many, so ~99% of players got Wildcard Menace and
+  // most other types were unreachable.) Declaration order breaks exact ties.
+  // Scores were tuned against 20,000 simulated runs across a spread of play
+  // styles: all 16 types turn up and none is more than ~15% of runs.
+  function personalityScores(s){
+    const c01 = v => Math.max(0, Math.min(1, v));
+    const votes = Math.max(1, s.votes || 0);
+    const pu = s.powerupCounts;
+    const first = Math.max(1, s.firstHalfScore), second = s.secondHalfScore;
+    return {
+      riddler:           s.riddleSolved ? 1 : 0,
+      trivia_titan:      s.triviaTotal >= 6 && s.triviaCorrect === 6 ? 0.95 : 0,
+      last_second_hero:  s.solved && s.solveTimeRemainingPct < 12 ? 0.7 + 0.2 * c01((12 - s.solveTimeRemainingPct) / 12) : 0,
+      // First-guess solve with half the word or less to go on.
+      perfectionist:     s.solved && s.solveWrongGuesses === 0 && s.triviaCorrect <= 3 ? 0.62 + 0.06 * (3 - s.triviaCorrect) : 0,
+      trivia_trainwreck: s.triviaTotal >= 3 && s.triviaCorrect <= 1 ? (s.triviaCorrect === 0 ? 0.85 : 0.6) : 0,
+      // Chose the coin-flip power-up more than once.
+      wildcard_menace:   pu.wildcard >= 2 ? 0.55 + 0.1 * (pu.wildcard - 2) : 0,
+      gambler:           pu.points10 >= 3 ? 0.5 + 0.1 * (pu.points10 - 3) : 0,
+      comeback_kid:      second >= 12 && second >= first * 1.8 ? 0.45 + c01((second / first - 1.8) / 3) * 0.4 : 0,
+      speed_demon:       s.decisionTimePercentile <= 28 ? 0.4 + c01((28 - s.decisionTimePercentile) / 18) * 0.45 : 0,
+      overthinker:       s.decisionTimePercentile >= 68 || pu.slowclock >= 3 ? 0.4 + c01((s.decisionTimePercentile - 68) / 20) * 0.45 : 0,
+      contrarian:        s.avgCrowdAgreementPct <= 38 ? 0.4 + c01((38 - s.avgCrowdAgreementPct) / 20) * 0.45 : 0,
+      crowd_pleaser:     s.avgCrowdAgreementPct >= 70 ? 0.4 + c01((s.avgCrowdAgreementPct - 70) / 20) * 0.45 : 0,
+      chaos_agent:       s.lowestPercentagePicks / votes >= 0.24 ? 0.4 + c01((s.lowestPercentagePicks / votes - 0.24) / 0.2) * 0.4 : 0,
+      combo_king_queen:  s.maxCombo >= 40 ? 0.4 + c01((s.maxCombo - 40) / 20) * 0.3 : 0,
+      // 5 of 6 trivia and a clean solve (6/6 is Trivia Titan).
+      silent_assassin:   s.triviaCorrect === 5 && s.solved && s.solveWrongGuesses <= 1 ? 0.5 : 0,
+      fence_sitter:      0.3,
+    };
+  }
   function determinePersonality(stats){
-    if (stats.riddleSolved) return 'riddler';
-    if (stats.triviaTotal >= 6 && stats.triviaCorrect === 6) return 'trivia_titan';
-    if (stats.triviaCorrect <= 1) return 'trivia_trainwreck';
-    if (stats.solved && stats.solveWrongGuesses === 0) return 'perfectionist';
-    if (stats.solved && stats.solveTimeRemainingPct < 10) return 'last_second_hero';
-    if (stats.wildcardCardsPicked >= 3) return 'wildcard_menace';
-    if (stats.maxCombo >= 20) return 'combo_king_queen';
-    if (stats.firstHalfScore < stats.secondHalfScore * 0.6) return 'comeback_kid';
-    if (stats.powerupCounts.points10 >= 3) return 'gambler';
-    if (stats.decisionTimePercentile <= 25) return 'speed_demon';
-    if (stats.decisionTimePercentile >= 75 || stats.powerupCounts.slowclock >= 3) return 'overthinker';
-    if (stats.avgCrowdAgreementPct < 35) return 'contrarian';
-    if (stats.avgCrowdAgreementPct > 70) return 'crowd_pleaser';
-    const totalPowerups = stats.powerupCounts.points10 + stats.powerupCounts.slowclock + stats.powerupCounts.wildcard + stats.powerupCounts.hint;
-    if (stats.triviaCorrect >= 4 && stats.maxCombo < 8 && totalPowerups <= 1) return 'silent_assassin';
-    if (stats.lowestPercentagePicks >= 3) return 'chaos_agent';
-    return 'fence_sitter';
+    const scores = personalityScores(stats);
+    let best = 'fence_sitter', bestScore = -1;
+    for (const k of Object.keys(scores)){ if (scores[k] > bestScore){ best = k; bestScore = scores[k]; } }
+    return best;
   }
   const PERSONALITY_META = {
     riddler: { name: 'The Riddler', icon: '🎭', blurb: 'Cracked the impossible.' },
@@ -2128,7 +2154,10 @@
   // the solve screen in about 3.5-4 minutes, leaving the 6-minute clock as
   // pure safety margin.
   const RUN_THRESHOLDS = [8, 18, 28, 38, 48, 58]; // 6 trivia milestones, one per letter
-  const RUN_POWERUP_THRESHOLDS = [4, 13, 23, 33, 43]; // 5 total, interleaved between trivia milestones
+  // Power-ups start only after the first trivia (8). The first one used to
+  // drop at 4 points, and a lost Wild Card there (-25) sent the score to
+  // -21 - some players then waited ~2-3 minutes for their first trivia.
+  const RUN_POWERUP_THRESHOLDS = [13, 23, 33, 43, 53]; // 5 total, one between each pair of trivia milestones
   const RUN_POWERUPS = [
     { key:'points10',  icon:'\u26A1', label:'+10 pts', color:'#c7a63e' },
     { key:'slowclock', icon:'\uD83D\uDC0C', label:'+30s',    color:'#3e6bc7' },
@@ -3826,7 +3855,7 @@
     solveSubmit: document.getElementById('solveSubmit'), solveHistory: document.getElementById('solveHistory'),
     readoutOverlay: document.getElementById('readoutOverlay'), readoutScore: document.getElementById('readoutScore'),
     readoutTrivia: document.getElementById('readoutTrivia'), readoutWord: document.getElementById('readoutWord'),
-    readoutVibe: document.getElementById('readoutVibe'), readoutDone: document.getElementById('readoutDone'),
+    readoutDone: document.getElementById('readoutDone'),
     readoutType: document.getElementById('readoutType'), readoutTypeIcon: document.getElementById('readoutTypeIcon'),
     readoutTypeName: document.getElementById('readoutTypeName'), readoutTypeBlurb: document.getElementById('readoutTypeBlurb'),
     readoutShare: document.getElementById('readoutShare'),
@@ -4039,7 +4068,8 @@
     }
   }
   function buildRunShareText(r){
-    return 'FlipStax Daily Stax\n' + r.score + ' pts \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal + ' trivia \u00B7 ' +
+    const p = PERSONALITY_META[r.personalityType] || PERSONALITY_META.fence_sitter;
+    return 'FlipStax Daily Stax\n' + r.score + ' pts \u00B7 ' + p.icon + ' ' + p.name + ' \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal + ' trivia \u00B7 ' +
       (r.solved ? ('solved in ' + formatRaceTime(r.solveMs)) : 'word not solved');
   }
 
@@ -4164,6 +4194,8 @@
       solved: r.solved, word: r.word || '', lettersEarned: r.triviaCorrect,
       roundResults: results,
       statLine: r.solved ? ('Solved in ' + formatRaceTime(r.solveMs)) : (r.triviaCorrect + '/' + r.triviaTotal + ' trivia correct'),
+      score: r.score,
+      personality: PERSONALITY_META[r.personalityType] || PERSONALITY_META.fence_sitter,
       voteSummary: r.lastVote || null,
     };
   }
@@ -4192,19 +4224,39 @@
 
     let y = 340;
     if (mode === 'daily'){
+      // The score, big - the headline of the card.
+      ctx.font = '900 118px Arial, sans-serif'; ctx.fillStyle = '#fff';
+      ctx.shadowColor = 'rgba(255,214,110,0.55)'; ctx.shadowBlur = 30;
+      ctx.fillText(data.score + ' PTS', cx, 322);
+      ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
+      y = 378;
       if (data.solved){
         drawLetterTiles(ctx, cx, y, data.word, accent);
-        y += 92 + 80;
+        y += 92 + 36;
       } else {
-        ctx.font = '800 62px Arial, sans-serif'; ctx.fillStyle = '#fff';
+        ctx.font = '800 56px Arial, sans-serif'; ctx.fillStyle = '#fff';
         ctx.fillText(data.lettersEarned + '/6 LETTERS', cx, y+50);
-        y += 140;
+        y += 100;
       }
       drawProgressGrid(ctx, cx, y, data.roundResults, accent);
-      y += 66 + 76;
+      y += 66 + 62;
       ctx.font = '600 32px Arial, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.88)';
       ctx.fillText(data.statLine, cx, y);
-      y += 70;
+      y += 44;
+      // Today's personality, in its own panel.
+      const p = data.personality, pw = 760, ph = 250, px = cx - pw/2;
+      roundRectPath(ctx, px, y, pw, ph, 28);
+      ctx.fillStyle = 'rgba(255,255,255,0.07)'; ctx.fill();
+      ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,214,110,0.55)'; ctx.stroke();
+      ctx.font = '800 24px Arial, sans-serif'; ctx.fillStyle = accent;
+      ctx.fillText("TODAY'S PERSONALITY", cx, y + 50);
+      ctx.font = '76px Arial, sans-serif'; ctx.fillStyle = '#fff';
+      ctx.fillText(p.icon, cx, y + 132);
+      ctx.font = '900 52px Arial, sans-serif';
+      ctx.fillText(p.name, cx, y + 192);
+      ctx.font = '500 28px Arial, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.78)';
+      ctx.fillText(p.blurb, cx, y + 232);
+      y += ph + 64;
     } else {
       ctx.font = '800 66px Arial, sans-serif'; ctx.fillStyle = '#fff';
       ctx.fillText(data.heroText, cx, y+50);
@@ -4965,6 +5017,7 @@
       decisionTimePercentile: Math.max(0, Math.min(100, Math.round(avgDecisionMs / 5000 * 100))),
       avgCrowdAgreementPct: runVotesDecided > 0 ? Math.round(runVotesAgreed / runVotesDecided * 100) : 50,
       lowestPercentagePicks: runLowestPctPicks,
+      votes: runVotesDecided,
     };
     const personalityType = determinePersonality(personalityStats);
     runResultToday = {
@@ -4984,13 +5037,11 @@
   }
   function showRunReadout(){
     const r = runResultToday;
-    const pct = stats.decided > 0 ? Math.round((stats.agree/stats.decided)*100) : 50;
     els.readoutScore.textContent = r.score + ' pts';
     els.readoutTrivia.textContent = r.triviaCorrect + '/' + r.triviaTotal + ' trivia correct'
       + (r.perfect ? ' · 🏆 Perfect Run' : '')
       + (r.secondChance === 'recovered' ? ' · 🔁 +1 letter recovered' : '');
     els.readoutWord.textContent = r.solved ? ('\u2705 Solved in ' + formatRaceTime(r.solveMs)) : ('\u274C Word not solved (' + (r.word||'') + ')');
-    els.readoutVibe.textContent = 'Today you were ' + vibeTierFor(pct).label;
     const meta = PERSONALITY_META[r.personalityType] || PERSONALITY_META.fence_sitter;
     els.readoutTypeIcon.textContent = meta.icon;
     els.readoutTypeName.textContent = meta.name;
@@ -5126,7 +5177,9 @@
       showToast(CAT_META[category].badge + ' unlocked!');
     }
     const newMilestone = Math.floor(stats.flips / 100);
-    if (newMilestone > stats.personalityMilestone && stats.decided >= 5){
+    // Never mid-Daily-run: the run gets exactly one personality, on its
+    // results screen. The lifetime vibe reveal waits for the next flip after.
+    if (newMilestone > stats.personalityMilestone && stats.decided >= 5 && !runActive){
       stats.personalityMilestone = newMilestone;
       showPersonalityReveal();
     }
@@ -5855,6 +5908,7 @@
       getContentPools: () => ({ cards: CARD_POOLS, cardKey, trivia: { geography: GEOGRAPHY_SETS, english: ENGLISH_SETS, history: HISTORY_SETS, science: SCIENCE_SETS, art: ART_SETS, music: MUSIC_SETS, health: HEALTH_SETS }, gen: generateSubjectTrivia, poolKey: contentPoolKey }),
       getCurrentCard: () => current,
       showPersonalityReveal: () => showPersonalityReveal(),
+      determinePersonality: (st) => determinePersonality(st),
       shareCardDataUrl: (kind) => renderShareCard(kind, kind === 'daily' ? buildDailyShareData(runResultToday) : buildInfinityShareData()).toDataURL('image/png'),
       getInfinityPlaylist: () => ({ idx: infIdx, els: infEls.slice(), songs: INFINITY_PLAYLIST, lead: INFINITY_LEAD, cutAt: infCutAt(infIdx), startAt: infStartAt(infIdx) }),
       getCurrentTrack: () => ({ key: currentTrackKey, paused: trackEls[currentTrackKey] ? trackEls[currentTrackKey].paused : null, src: trackEls[currentTrackKey] ? trackEls[currentTrackKey].src.split('/').pop() : null }),
