@@ -4708,6 +4708,62 @@
   let runSolveWrongGuesses = 0, runLowestPctPicks = 0;
   let runVotesDecided = 0, runVotesAgreed = 0, runDecisionMsTotal = 0, runDecisionCount = 0;
   let runScoreAtHalfway = null, halfwayTimeoutId = null;
+  // What's on screen right now, so a refresh can put it back exactly:
+  // the trivia/Second Chance question and its deadline, whether the
+  // power-up on screen has been picked, and a Wild Card result that has
+  // been rolled but not yet shown.
+  let runPendingQ = null, runPendingQEndsAt = 0;
+  let runPowerupEndsAt = 0, runPowerupDone = false, runWildcardDelta = null;
+
+  // ---------- Daily run persistence ----------
+  // An in-progress run is saved on every change (and when the page hides),
+  // so a refresh or leaving the run picks it back up instead of throwing it
+  // away - it used to be memory-only, which let a bad run be refreshed away
+  // and replayed the same day. The 6-minute run clock is frozen while away,
+  // same as Pause; the timed screens that have no pause (trivia, Second
+  // Chance, power-up pick, riddle, word solve) keep their real deadlines,
+  // so time away still counts against them. Cleared when the run ends
+  // (the finished result lives in flipstax_run_v1). Yesterday's
+  // unfinished run is dropped.
+  const RUN_LIVE_KEY = 'flipstax_run_live_v1';
+  function saveRunSnapshot(){
+    if (!runActive || !runWord) return;
+    const deck = decks.daily;
+    const snap = {
+      date: runStartDate, phase: runPhase,
+      remainMs: pausedRunRemainingMs != null ? pausedRunRemainingMs : Math.max(0, runEndsAt - Date.now()),
+      clockAdded: runClockAddedMs,
+      score: runScore, letters: runLetters, thresholdsHit: runThresholdsHit, puThresholdsHit: runPowerupThresholdsHit,
+      pendingTrivia: runPendingTrivia, pendingPowerUp: runPendingPowerUp,
+      triviaAttempted: runTriviaAttempted, triviaCorrect: runTriviaCorrect, roundResults: runRoundResults,
+      subjects: runSubjectSequence, triviaShown: runTriviaShown,
+      scUsed: runSecondChanceUsed, scOutcome: runSecondChanceOutcome, perfect: runPerfect, asked: runAskedQuestions,
+      hints: runHintsRevealed, puOrder: runPowerupPickOrder, triviaStreak: runTriviaStreak,
+      riddleTriggered: riddleTriggeredThisRun, riddleSolved: runRiddleSolved, maxCombo: runMaxCombo,
+      wildcardVotes: runWildcardCategoryVotes, solveWrong: runSolveWrongGuesses, lowestPct: runLowestPctPicks,
+      votesDecided: runVotesDecided, votesAgreed: runVotesAgreed, decisionMs: runDecisionMsTotal, decisions: runDecisionCount,
+      halfway: runScoreAtHalfway, lastVote: lastVoteSummary,
+      q: runPendingQ, qEndsAt: runPendingQEndsAt,
+      puEndsAt: runPowerupEndsAt, puDone: runPowerupDone, wildDelta: runWildcardDelta,
+      riddle: currentRiddle ? RIDDLES.indexOf(currentRiddle) : -1, riddleEndsAt: riddleEndsAt,
+      solve: runPhase === 'solving' ? { endsAt: solveEndsAt, guesses: solveGuesses, locked: solveLockedLetters,
+        rack: solveRack, freeHints: solveFreeHints, note: solveBonusNote, solvedAt: runSolvedAt } : null,
+      deck: deck.cards.slice(deck.next).map(c=> c.id),
+    };
+    try{ localStorage.setItem(RUN_LIVE_KEY, JSON.stringify(snap)); }catch(e){}
+  }
+  function clearRunSnapshot(){ try{ localStorage.removeItem(RUN_LIVE_KEY); }catch(e){} }
+  function loadRunSnapshot(){
+    try{
+      const snap = JSON.parse(localStorage.getItem(RUN_LIVE_KEY) || 'null');
+      if (snap && snap.date === todayStr() && Array.isArray(snap.letters)) return snap;
+      if (snap) clearRunSnapshot();
+    }catch(e){ clearRunSnapshot(); }
+    return null;
+  }
+  let runStartDate = null, runSolvedAt = null;
+  window.addEventListener('pagehide', saveRunSnapshot);
+  document.addEventListener('visibilitychange', ()=>{ if (document.hidden) saveRunSnapshot(); });
 
   // Day streak for completing a Daily Run specifically - a narrower, separate
   // metric from the general "played at all" streak already shown in the
@@ -5017,6 +5073,8 @@
 
   function startDailyRun(){
     if (runResultToday || runActive || levelUpActive || personalityActive) return;
+    const saved = loadRunSnapshot();
+    if (saved){ resumeDailyRun(saved); return; }
     try{
       if (localStorage.getItem('flipstax_seen_run_intro') !== '1'){
         els.runIntroOverlay.classList.remove('hidden');
@@ -5035,6 +5093,9 @@
     runSolveWrongGuesses = 0; runLowestPctPicks = 0;
     runVotesDecided = 0; runVotesAgreed = 0; runDecisionMsTotal = 0; runDecisionCount = 0;
     runScoreAtHalfway = null;
+    runPendingQ = null; runPowerupDone = false; runWildcardDelta = null; runSolvedAt = null; currentRiddle = null;
+    runPendingTrivia = false; runPendingPowerUp = false;
+    runStartDate = todayStr();
     runWord = getTodayWord();
     runEndsAt = Date.now() + RUN_DURATION_MS;
     runClockAddedMs = 0;
@@ -5055,9 +5116,78 @@
     // (The deck used to carry over, and could run out mid-run.)
     resetDeck('daily');
     loadNext();
+    saveRunSnapshot();
+  }
+  // Puts a saved run (see saveRunSnapshot) back exactly where it was.
+  function resumeDailyRun(snap){
+    runActive = true; runPhase = snap.phase;
+    runStartDate = snap.date;
+    runWord = getTodayWord();
+    runScore = snap.score; runLetters = snap.letters; runThresholdsHit = snap.thresholdsHit; runPowerupThresholdsHit = snap.puThresholdsHit;
+    runPendingTrivia = !!snap.pendingTrivia; runPendingPowerUp = !!snap.pendingPowerUp;
+    runTriviaAttempted = snap.triviaAttempted; runTriviaCorrect = snap.triviaCorrect; runRoundResults = snap.roundResults;
+    runSubjectSequence = snap.subjects; runTriviaShown = snap.triviaShown;
+    runSecondChanceUsed = snap.scUsed; runSecondChanceOutcome = snap.scOutcome; runPerfect = snap.perfect; runAskedQuestions = snap.asked;
+    runHintsRevealed = snap.hints; runPowerupPickOrder = snap.puOrder; runTriviaStreak = snap.triviaStreak;
+    riddleTriggeredThisRun = snap.riddleTriggered; runRiddleSolved = snap.riddleSolved; runMaxCombo = snap.maxCombo;
+    runWildcardCategoryVotes = snap.wildcardVotes; runSolveWrongGuesses = snap.solveWrong; runLowestPctPicks = snap.lowestPct;
+    runVotesDecided = snap.votesDecided; runVotesAgreed = snap.votesAgreed; runDecisionMsTotal = snap.decisionMs; runDecisionCount = snap.decisions;
+    runScoreAtHalfway = snap.halfway;
+    if (snap.lastVote) lastVoteSummary = snap.lastVote;
+    runPendingQ = snap.q; runPendingQEndsAt = snap.qEndsAt;
+    runPowerupEndsAt = snap.puEndsAt; runPowerupDone = !!snap.puDone; runWildcardDelta = snap.wildDelta;
+    currentRiddle = snap.riddle >= 0 ? RIDDLES[snap.riddle] : null; riddleEndsAt = snap.riddleEndsAt;
+    runSolvedAt = null;
+    runClockAddedMs = snap.clockAdded || 0;
+    runEndsAt = Date.now() + snap.remainMs;
+    // The rest of this run's deck, in the same order - no repeats.
+    const byId = {};
+    CARD_POOLS.daily.forEach(c=>{ byId[c.id] = c; });
+    const rest = (snap.deck || []).map(id=> byId[id]).filter(Boolean);
+    if (rest.length){ decks.daily.cards = rest; decks.daily.next = 0; } else resetDeck('daily');
+    // A Wild Card rolled but not yet shown still counts.
+    if (runWildcardDelta != null){ const d = runWildcardDelta; runWildcardDelta = null; addRunScore(d); }
+    if (runScoreAtHalfway == null){
+      clearTimeout(halfwayTimeoutId);
+      halfwayTimeoutId = setTimeout(()=>{ if (runActive) runScoreAtHalfway = runScore; }, Math.max(0, RUN_DURATION_MS / 2 - runElapsedMs()));
+    }
+    isPaused = false; pausedRoundRemainingMs = null; pausedRunRemainingMs = null;
+    sessionHalted = false;
+    stopTallyPolling();
+    lastWasEvent = true;
+    renderRunBanner();
+    if (runPhase === 'solving' && snap.solve){ resumeSolvePhase(snap.solve); saveRunSnapshot(); return; }
+    els.runTimerWrap.classList.remove('hidden');
+    updateRunTimerBar();
+    clearInterval(runTimerInterval);
+    runTimerInterval = setInterval(tickRunTimer, 500);
+    showToast('\uD83C\uDFAE Daily Stax resumed \u2014 right where you left off');
+    const ph = runPhase;
+    if ((ph === 'trivia' || ph === 'secondchance') && runPendingQ){
+      runTriviaQuestion(runPendingQ, runPendingQEndsAt);   // same question, same deadline
+    } else if (ph === 'trivia' || ph === 'riddle-resolving'){
+      // Answered (or timed out) already - carry on from after it.
+      if (ph === 'trivia' && riddleTriggeredThisRun && !runRiddleSolved && !currentRiddle){ startRiddleRound(); }
+      else advanceAfterTrivia();
+    } else if (ph === 'secondchance' || ph === 'secondchance-resolving'){
+      startSolvePhase();
+    } else if (ph === 'powerup' && !runPowerupDone){
+      runPowerUpRoundForRun(runPowerupEndsAt);
+    } else if (ph === 'riddle' && currentRiddle){
+      startRiddleRound(currentRiddle, riddleEndsAt);
+    } else {
+      // The VS board (or a power-up already picked): deal the next round
+      // and hold it on the Paused screen until they're ready.
+      runPhase = 'running';
+      if (runClockExpired()){ startSolvePhase(); saveRunSnapshot(); return; }
+      loadNext();
+      if (runPhase === 'running') pauseGame();
+    }
+    saveRunSnapshot();
   }
   function tickRunTimer(){
     if (!runActive) return;
+    saveRunSnapshot();
     const remain = runEndsAt - Date.now();
     if (remain <= 0){
       updateRunTimerBar();
@@ -5106,6 +5236,7 @@
     runScore += delta;
     checkRunMilestones();
     renderRunBanner();
+    saveRunSnapshot();
   }
   // Run time so far: the clock's full length (plus any +30s power-ups) minus
   // what's left. Pausing resets runEndsAt on resume, so paused time doesn't
@@ -5140,34 +5271,52 @@
     }
   }
 
-  function runTriviaQuestion(){
+  // The 10s answer bar, started (or, after a refresh, picked up) with
+  // `remainMs` of `totalMs` left.
+  function startEventTimerBar(remainMs, totalMs){
+    els.eventTimerFill.style.transition = 'none';
+    els.eventTimerFill.style.width = (100 * remainMs / totalMs) + '%';
+    requestAnimationFrame(()=>{
+      els.eventTimerFill.style.transition = 'width ' + (remainMs / 1000) + 's linear';
+      els.eventTimerFill.style.width = '0%';
+    });
+  }
+  // `resumeQ`/`resumeEndsAt`: a refresh during this question - show the
+  // same one again with whatever time it had left (see resumeDailyRun).
+  // Also used for Second Chance's resume (runPhase says which).
+  function runTriviaQuestion(resumeQ, resumeEndsAt){
     if (!runActive) return;
-    runPhase = 'trivia';
+    const second = !!resumeQ && runPhase === 'secondchance';
+    if (!second) runPhase = 'trivia';
     stopTallyPolling();
     clearRoundTimer();
-    const subject = runSubjectSequence[runTriviaShown] || pick(RUN_CORE_SUBJECTS);
-    runTriviaShown++;
-    const q = generateSubjectTrivia(subject, 'daily');
-    runAskedQuestions.push(q.question);
+    let q = resumeQ;
+    if (!q){
+      const subject = runSubjectSequence[runTriviaShown] || pick(RUN_CORE_SUBJECTS);
+      runTriviaShown++;
+      q = generateSubjectTrivia(subject, 'daily');
+      runAskedQuestions.push(q.question);
+    }
+    const resolve = second ? resolveSecondChance : resolveRunTrivia;
+    runPendingQ = { question: q.question, opts: q.opts, correctIdx: q.correctIdx };
+    runPendingQEndsAt = resumeEndsAt || (Date.now() + dt(10000));
+    const remain = Math.max(0, runPendingQEndsAt - Date.now());
     if (DEBUG_FAST) window.__debugLastTriviaQ = q;
     els.eventOverlay.classList.remove('hidden', 'powerup');
     els.powerupIcon.classList.add('hidden');
     renderSlowdownBtn();
-    els.eventSubtitle.textContent = '\uD83C\uDFAE RUN TRIVIA \u00B7 answer right, earn a letter';
+    els.eventSubtitle.textContent = second ? '🔁 SECOND CHANCE · answer right, recover a letter'
+      : '\uD83C\uDFAE RUN TRIVIA \u00B7 answer right, earn a letter';
     els.eventPrompt.textContent = q.question;
     els.eventTiles.forEach((tileEl,i)=>{
       tileEl.textContent = q.opts[i];
       tileEl.style.background = TILE_COLORS[i];
-      tileEl.onclick = ()=> resolveRunTrivia(i === q.correctIdx);
+      tileEl.onclick = ()=> resolve(i === q.correctIdx);
     });
-    els.eventTimerFill.style.transition = 'none';
-    els.eventTimerFill.style.width = '100%';
-    requestAnimationFrame(()=>{
-      els.eventTimerFill.style.transition = 'width 10s linear';
-      els.eventTimerFill.style.width = '0%';
-    });
+    startEventTimerBar(remain, dt(10000));
     clearTimeout(eventTimeoutId);
-    eventTimeoutId = setTimeout(()=> resolveRunTrivia(false), dt(10000));
+    eventTimeoutId = setTimeout(()=> resolve(false), remain);
+    saveRunSnapshot();
   }
   // Riddle-unlock check: were the 4 required power-ups drawn in relative
   // order (other picks/repeats in between are fine), and is the player's
@@ -5190,6 +5339,8 @@
     return vibePct <= 49;
   }
   function resolveRunTrivia(correct){
+    if (runPhase !== 'trivia' || !runPendingQ) return;
+    runPendingQ = null;
     clearTimeout(eventTimeoutId);
     els.eventTiles.forEach(t=> t.onclick = null);
     runTriviaAttempted++;
@@ -5230,6 +5381,7 @@
       els.eventSubtitle.textContent = '';
       els.eventPrompt.textContent = '\u274C Not quite \u2014 \u22125 points, no letter this time';
     }
+    saveRunSnapshot();
     setTimeout(()=>{
       els.eventOverlay.classList.add('hidden');
       if (!runActive) return;
@@ -5269,30 +5421,13 @@
     do { q = generateSubjectTrivia(subject, 'daily'); tries++; }
     while (runAskedQuestions.indexOf(q.question) !== -1 && tries < 10);
     runAskedQuestions.push(q.question);
-    if (DEBUG_FAST) window.__debugLastTriviaQ = q;
-    els.eventOverlay.classList.remove('hidden', 'powerup');
-    els.powerupIcon.classList.add('hidden');
-    renderSlowdownBtn();
-    els.eventSubtitle.textContent = '🔁 SECOND CHANCE · answer right, recover a letter';
-    els.eventPrompt.textContent = q.question;
-    els.eventTiles.forEach((tileEl,i)=>{
-      tileEl.textContent = q.opts[i];
-      tileEl.style.background = TILE_COLORS[i];
-      tileEl.onclick = ()=> resolveSecondChance(i === q.correctIdx);
-    });
-    els.eventTimerFill.style.transition = 'none';
-    els.eventTimerFill.style.width = '100%';
-    requestAnimationFrame(()=>{
-      els.eventTimerFill.style.transition = 'width 10s linear';
-      els.eventTimerFill.style.width = '0%';
-    });
-    clearTimeout(eventTimeoutId);
-    eventTimeoutId = setTimeout(()=> resolveSecondChance(false), dt(10000));
+    runTriviaQuestion(q);   // runPhase 'secondchance': shows it as the Second Chance
     sfx.bonusZone();
   }
   function resolveSecondChance(correct){
     if (runPhase !== 'secondchance') return;
     runPhase = 'secondchance-resolving';
+    runPendingQ = null;
     clearTimeout(eventTimeoutId);
     els.eventTiles.forEach(t=> t.onclick = null);
     els.eventSubtitle.textContent = '';
@@ -5308,6 +5443,7 @@
       runSecondChanceOutcome = 'missed';
       els.eventPrompt.textContent = '❌ Not this time — no letter recovered';
     }
+    saveRunSnapshot();
     setTimeout(()=>{
       els.eventOverlay.classList.add('hidden');
       if (!runActive) return;
@@ -5315,8 +5451,11 @@
     }, dt(1100));
   }
 
-  function runPowerUpRoundForRun(){
+  function runPowerUpRoundForRun(resumeEndsAt){
     runPhase = 'powerup';
+    runPowerupDone = false;
+    runPowerupEndsAt = resumeEndsAt || (Date.now() + dt(5000));
+    const remain = Math.max(0, runPowerupEndsAt - Date.now());
     stopTallyPolling();
     clearRoundTimer();
     els.eventOverlay.classList.remove('hidden');
@@ -5331,19 +5470,25 @@
       tileEl.style.background = pu.color;
       tileEl.onclick = ()=> resolveRunPowerUp(pu.key);
     });
-    els.eventTimerFill.style.transition = 'none';
-    els.eventTimerFill.style.width = '100%';
-    requestAnimationFrame(()=>{
-      els.eventTimerFill.style.transition = 'width 5s linear';
-      els.eventTimerFill.style.width = '0%';
-    });
+    startEventTimerBar(remain, dt(5000));
     clearTimeout(eventTimeoutId);
-    eventTimeoutId = setTimeout(()=> resolveRunPowerUp(null), dt(5000));
+    eventTimeoutId = setTimeout(()=> resolveRunPowerUp(null), remain);
+    saveRunSnapshot();
   }
   function resolveRunPowerUp(key){
+    if (runPhase !== 'powerup' || runPowerupDone) return;
+    runPowerupDone = true;
     clearTimeout(eventTimeoutId);
     els.eventTiles.forEach(t=> t.onclick = null);
     if (key !== null) runPowerupPickOrder.push(key);
+    // Wild Card: decided now (and saved) so a refresh mid-spin can't re-roll it.
+    let wildWin = false;
+    if (key === 'wildcard'){
+      wildWin = Math.random() < 0.5;
+      const floor = runThresholdsHit.length ? Math.max.apply(null, runThresholdsHit) : 0;
+      runWildcardDelta = wildWin ? 25 : -Math.max(0, Math.min(25, runScore - floor));
+    }
+    saveRunSnapshot();
     els.eventOverlay.classList.remove('powerup');
     els.eventSubtitle.textContent = '';
     if (key === null){
@@ -5359,6 +5504,7 @@
       runEndsAt += 30000 / DEBUG_RUN_SCALE;
       runClockAddedMs += 30000 / DEBUG_RUN_SCALE;
       updateRunTimerBar();
+      saveRunSnapshot();
       els.eventPrompt.textContent = '\uD83D\uDC0C +30 seconds on the clock';
       finishRunPowerUp();
     } else if (key === 'wildcard'){
@@ -5372,14 +5518,15 @@
         ticks++;
         if (ticks >= 6){
           clearInterval(rollInterval);
-          const win = Math.random() < 0.5;
-          if (win){ addRunScore(25); sfx.correct(); els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: +25 points!'; }
+          if (runWildcardDelta == null) return;   // run left mid-spin; resume applies it
+          const delta = runWildcardDelta; runWildcardDelta = null;
+          if (wildWin){ addRunScore(delta); sfx.correct(); els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: +25 points!'; }
           else{
             // A loss can't drop the score below the last trivia milestone
             // reached (a full -25 used to open ~2.5-minute gaps before the
             // next trivia). Already below it (a missed trivia) = no loss.
             const floor = runThresholdsHit.length ? Math.max.apply(null, runThresholdsHit) : 0;
-            const loss = Math.max(0, Math.min(25, runScore - floor));
+            const loss = -delta;
             addRunScore(-loss);
             sfx.wrong();
             els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: ' + (loss === 25 ? '\u221225 points'
@@ -5391,6 +5538,7 @@
     } else if (key === 'hint'){
       sfx.powerUp();
       runHintsRevealed = Math.min(runHintsRevealed + 1, runWord.hints.length);
+      saveRunSnapshot();
       els.eventPrompt.textContent = '\ud83d\udca1 Free hint banked for the word solve';
       finishRunPowerUp();
     }
@@ -5409,11 +5557,11 @@
   // and mechanically distinct from the regular trivia/power-up overlay -
   // its own full-screen treatment, a single free-text answer instead of
   // multiple choice, and a real reward (badge + points) on solve.
-  function startRiddleRound(){
+  function startRiddleRound(resumeRiddle, resumeEndsAt){
     runPhase = 'riddle';
     stopTallyPolling();
     clearRoundTimer();
-    currentRiddle = pick(RIDDLES);
+    currentRiddle = resumeRiddle || pick(RIDDLES);
     els.riddleQ.textContent = currentRiddle.q;
     els.riddleInput.value = '';
     els.riddleResult.className = 'riddle-result hidden';
@@ -5426,7 +5574,8 @@
     votedSinceTime = null;
     sfx.bonusZone();
     setTimeout(()=> els.riddleInput.focus(), 50);
-    riddleEndsAt = Date.now() + RIDDLE_MS;
+    riddleEndsAt = resumeEndsAt || (Date.now() + RIDDLE_MS);
+    saveRunSnapshot();
     clearInterval(riddleInterval);
     riddleInterval = setInterval(tickRiddleTimer, 200);
     tickRiddleTimer();
@@ -5470,6 +5619,7 @@
       els.riddleResult.textContent = '⏰ Out of time — the answer was ' + currentRiddle.a;
       els.riddleResult.className = 'riddle-result lose';
     }
+    saveRunSnapshot();
     setTimeout(()=>{
       els.riddleOverlay.classList.add('hidden');
       if (!runActive) return;
@@ -5920,6 +6070,34 @@
     clearInterval(solveInterval);
     solveInterval = setInterval(tickSolveTimer, 500);
     sfx.bonusZone();
+    saveRunSnapshot();
+  }
+  // The word solve after a refresh: same letters, guesses and hints, and
+  // its real deadline (no pause here, so time away counts).
+  function resumeSolvePhase(sv){
+    runPhase = 'solving';
+    stopTallyPolling();
+    clearRoundTimer();
+    runPendingTrivia = false; runPendingPowerUp = false;
+    els.eventOverlay.classList.add('hidden');
+    els.runTimerWrap.classList.add('hidden');
+    solveGuesses = sv.guesses || [];
+    solveCurrentGuess = []; solveCurrentGuessSource = []; rackUsedFlags = [];
+    solveLockedLetters = sv.locked || new Array(RUN_WORD_LENGTH).fill(null);
+    solveRack = sv.rack || [];
+    solveFreeHints = sv.freeHints || 0; solveBonusNote = sv.note || '';
+    solveEndsAt = sv.endsAt;
+    voted = false; votedSinceTime = null;
+    const last = solveGuesses[solveGuesses.length - 1];
+    if (last && last.join('') === runWord.word){ endRun(true, sv.solvedAt || Date.now()); return; }
+    if (solveGuesses.length >= RUN_MAX_GUESSES || Date.now() >= solveEndsAt){ endRun(false); return; }
+    buildSolveKeyboard();
+    playTrack('solve');
+    renderSolveUI();
+    els.solveOverlay.classList.remove('hidden');
+    clearInterval(solveInterval);
+    solveInterval = setInterval(tickSolveTimer, 500);
+    tickSolveTimer();
   }
   function tickSolveTimer(){
     const remain = Math.max(0, solveEndsAt - Date.now());
@@ -6008,10 +6186,13 @@
     if (allCorrect){
       clearInterval(solveInterval);
       const solvedAt = Date.now();
+      runSolvedAt = solvedAt;
+      saveRunSnapshot();
       celebrateSolve(solvedAt, ()=>{ if (runActive) endRun(true, solvedAt); });
       return;
     }
     runSolveWrongGuesses++;
+    saveRunSnapshot();
     if (solveGuesses.length >= RUN_MAX_GUESSES){
       clearInterval(solveInterval);
       endRun(false);
@@ -6025,6 +6206,7 @@
     runHintsRevealed++;
     if (solveFreeHints > 0) solveFreeHints--;
     else solveEndsAt -= RUN_HINT_TIME_COST_MS;
+    saveRunSnapshot();
     tickSolveTimer();
     sfx.combo();
     renderSolveUI();
@@ -6098,6 +6280,7 @@
 
   function endRun(solved, solvedAt){
     runActive = false;
+    clearRunSnapshot();
     sessionHalted = true;
     stopTallyPolling();
     clearRoundTimer();
@@ -6467,6 +6650,7 @@
     } else {
       pausedRunRemainingMs = null;
     }
+    saveRunSnapshot();
 
     els.pauseBtn.classList.add('hidden');
     // Daily Run already has its own dedicated share button on the
@@ -7119,6 +7303,7 @@
       getInfinityPlaylist: () => ({ idx: infIdx, els: infEls.slice(), songs: INFINITY_PLAYLIST, lead: INFINITY_LEAD, cutAt: infCutAt(infIdx), startAt: infStartAt(infIdx) }),
       getCurrentTrack: () => ({ key: currentTrackKey, paused: trackEls[currentTrackKey] ? trackEls[currentTrackKey].paused : null, src: trackEls[currentTrackKey] ? trackEls[currentTrackKey].src.split('/').pop() : null }),
       setRunClockMs: (ms) => { runEndsAt = Date.now() + ms; },
+      extendPendingDeadlines: (ms) => { if (runPendingQ){ runPendingQEndsAt = Date.now() + ms; clearTimeout(eventTimeoutId); eventTimeoutId = setTimeout(()=> (runPhase === 'secondchance' ? resolveSecondChance : resolveRunTrivia)(false), ms); } if (runPhase === 'solving') solveEndsAt = Date.now() + ms; },
       getRunElapsedMs: () => runElapsedMs(),
       getRunGatesMs: () => RUN_TRIVIA_GATES_MS,
       getSolveState: () => ({ solveOpen: !els.solveOverlay.classList.contains('hidden'), readoutOpen: els.readoutOverlay.classList.contains('show'), runActive, runPhase }),
@@ -7363,11 +7548,10 @@
     returnToModeSelect({ silent:true });
   }
   els.backBtn.addEventListener('click', ()=>{
-    // Only Daily Run's in-progress score/letters/trivia progress is ever at
-    // risk - it's only written to localStorage when a run actually ends, so
-    // backing out mid-run forfeits it. Infinity Flips (and an idle Daily
-    // screen) already have everything persisted, so no confirm needed there.
-    if (runActive && !confirm('Leave run? Progress will be lost.')) return;
+    // A Daily run in progress is saved (see saveRunSnapshot), clock frozen:
+    // picking Daily Stax again today carries on where it left off.
+    if (runActive && !confirm('Leave your run? It\u2019s saved \u2014 pick Daily Stax again today to pick up where you left off.')) return;
+    saveRunSnapshot();
     returnToModeSelect();
   });
 
