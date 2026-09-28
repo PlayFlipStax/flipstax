@@ -682,6 +682,37 @@
     background:#ffe066; color:#5a1a00; font-size:10px; letter-spacing:0.5px; border:2px solid #fff;
   }
   @keyframes msCollBob{ 0%,100%{ transform:translateY(0) rotate(-3deg); } 50%{ transform:translateY(-3px) rotate(3deg); } }
+  /* Ko-fi entry point on mode select: top-right, mirroring the Cards badge's
+     top-left corner so the two don't compete. Round (not the badge's rounded
+     square) and in Ko-fi's own warm cream/gold so it reads as a distinct,
+     lower-key action - a real link, not another game button. The "Donations"
+     caption sits below it, and the whole thing gives an idle wiggle every
+     ~4.5s (mostly still, brief motion) rather than the Cards badge's
+     continuous bob, so it catches the eye without nagging during play. */
+  .ms-coffee-wrap{
+    position:absolute; z-index:9; top:calc(12px + env(safe-area-inset-top)); right:12px;
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+  }
+  .ms-coffee-btn{
+    display:flex; align-items:center; justify-content:center;
+    width:46px; height:46px; border-radius:50%; cursor:pointer; -webkit-tap-highlight-color:transparent;
+    background:linear-gradient(145deg,#fff3d6,#e8a33d); border:2px solid #fff;
+    box-shadow:0 4px 0 rgba(90,52,16,0.35), 0 0 14px rgba(232,163,61,0.55);
+    text-decoration:none; animation:msCoffeeIdle 4.5s ease-in-out infinite;
+  }
+  .ms-coffee-btn svg{ filter:drop-shadow(0 1px 1.5px rgba(90,52,16,0.45)); }
+  .ms-coffee-btn:active{ transform:scale(0.88); }
+  .ms-coffee-label{
+    font-family:'Big Shoulders Display', sans-serif; font-weight:800; font-size:9.5px;
+    letter-spacing:1px; text-transform:uppercase; color:#0d2b5e; opacity:0.8;
+    text-shadow:0 1px 3px rgba(255,255,255,0.7); pointer-events:none;
+  }
+  @keyframes msCoffeeIdle{
+    0%, 78%, 100%{ transform:scale(1) rotate(0deg); }
+    84%{ transform:scale(1.1) rotate(-8deg); }
+    89%{ transform:scale(1.05) rotate(7deg); }
+    94%{ transform:scale(1.02) rotate(-3deg); }
+  }
 
   .collection-overlay{
     position:fixed; inset:0; z-index:45; overflow:hidden; display:flex; flex-direction:column;
@@ -879,7 +910,7 @@
   .readout-type.has-new .readout-new{ display:block; animation: ccNewPop 0.5s cubic-bezier(.3,1.8,.5,1) 1.45s both; }
 
   @media (prefers-reduced-motion: reduce){
-    .ms-collection-btn, .col-blob, .col-sweep, .col-spark{ animation:none !important; }
+    .ms-collection-btn, .ms-coffee-btn, .col-blob, .col-sweep, .col-spark{ animation:none !important; }
     .col-spark{ opacity:0.5; bottom:auto; top:var(--y); }
     .cc-card.revealing .cc-inner{ animation:none !important; transform:rotateY(180deg); }
     .cc-card.revealing .cc-back, .cc-card.revealing .cc-rays, .cc-card.revealing .cc-sparks b{ animation:none !important; }
@@ -1813,6 +1844,33 @@
   <div class="split-divider">OR</div>
   <div class="ms-collection-btn" id="collectionBtn" role="button" aria-label="My Collection">
     <span class="mcb-icon">🃏</span><span class="mcb-count" id="collectionBtnCount">0/16</span><span class="mcb-label">CARDS</span>
+  </div>
+  <div class="ms-coffee-wrap">
+    <a class="ms-coffee-btn" id="coffeeBtn" href="https://ko-fi.com/flipstax" target="_blank" rel="noopener noreferrer" aria-label="Support FlipStax on Ko-fi">
+      <svg viewBox="0 0 32 32" width="26" height="26" aria-hidden="true">
+        <defs>
+          <linearGradient id="coffeeCupBody" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#fff8ec"/>
+            <stop offset="0.5" stop-color="#f3d9a4"/>
+            <stop offset="1" stop-color="#c8863f"/>
+          </linearGradient>
+          <linearGradient id="coffeeCupHandle" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#f3d9a4"/>
+            <stop offset="1" stop-color="#b8752f"/>
+          </linearGradient>
+          <radialGradient id="coffeeCupLiquid" cx="0.35" cy="0.3" r="0.75">
+            <stop offset="0" stop-color="#8a5a2e"/>
+            <stop offset="1" stop-color="#3d2712"/>
+          </radialGradient>
+        </defs>
+        <path d="M23 12h2.5a3.5 3.5 0 0 1 0 7H23" fill="none" stroke="url(#coffeeCupHandle)" stroke-width="2.6" stroke-linecap="round"/>
+        <path d="M6 11h17v9a5 5 0 0 1-5 5h-7a5 5 0 0 1-5-5z" fill="url(#coffeeCupBody)"/>
+        <path d="M18 11h5v9a5 5 0 0 1-5 5h-1a5 5 0 0 0 4-5v-9z" fill="#000" opacity="0.12"/>
+        <ellipse cx="14.5" cy="11" rx="8.5" ry="2.2" fill="url(#coffeeCupLiquid)"/>
+        <path d="M8 10.3c2-1 4.5-1 6-0.2" stroke="#fff" stroke-width="0.8" stroke-linecap="round" opacity="0.45" fill="none"/>
+      </svg>
+    </a>
+    <span class="ms-coffee-label" aria-hidden="true">Donations</span>
   </div>
   <div class="contact-footer" data-contact-footer></div>
 </div>
@@ -4407,6 +4465,7 @@
     infAwardBlurb: document.getElementById('infAwardBlurb'), infAwardStats: document.getElementById('infAwardStats'),
     infAwardContinue: document.getElementById('infAwardContinue'), infAwardEyebrow: document.getElementById('infAwardEyebrow'),
     collectionBtn: document.getElementById('collectionBtn'), collectionBtnCount: document.getElementById('collectionBtnCount'),
+    coffeeBtn: document.getElementById('coffeeBtn'),
     collectionOverlay: document.getElementById('collectionOverlay'), collectionGrid: document.getElementById('collectionGrid'),
     collectionCount: document.getElementById('collectionCount'), collectionBar: document.getElementById('collectionBar'),
     collectionBack: document.getElementById('collectionBack'), collectionScroll: document.getElementById('collectionScroll'),
@@ -5902,6 +5961,7 @@
     els.cardZoom.classList.remove('hidden');
   }
   els.collectionBtn.addEventListener('click', (e)=>{ e.stopPropagation(); openCollection(); });
+  els.coffeeBtn.addEventListener('click', e=> e.stopPropagation());
   els.collectionBack.addEventListener('click', closeCollection);
   els.cardZoom.addEventListener('click', ()=> els.cardZoom.classList.add('hidden'));
   renderCollectionBtn();
@@ -7376,7 +7436,6 @@
   const CONTACT_EMAIL = ['moc.liamg', 'xatspilfyalp'].map(p=> p.split('').reverse().join('')).reverse().join('@');
   const LEGAL_CONTACT_EMAIL = CONTACT_EMAIL;
   const LEGAL_CONTACT_LINK = '<a href="mailto:' + LEGAL_CONTACT_EMAIL + '">' + LEGAL_CONTACT_EMAIL + '</a>';
-  // Ko-fi page. Empty string would hide the link rather than shipping a dead one.
   const COFFEE_URL = 'https://ko-fi.com/flipstax';
   document.querySelectorAll('[data-contact-footer]').forEach(el=>{
     el.textContent = 'Questions or feedback? ';
@@ -7385,7 +7444,9 @@
     // Mode select is one big tap target: a tap on the link must not start a mode.
     a.addEventListener('click', e=> e.stopPropagation());
     el.appendChild(a);
-    if (COFFEE_URL) {
+    // Mode select already has the floating .ms-coffee-btn for this - only
+    // the Daily results footer (outside modeSelectOverlay) gets the text link.
+    if (!el.closest('#modeSelectOverlay')) {
       el.appendChild(document.createTextNode(' · '));
       const c = document.createElement('a');
       c.href = COFFEE_URL; c.target = '_blank'; c.rel = 'noopener noreferrer';
