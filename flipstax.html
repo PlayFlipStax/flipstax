@@ -4546,16 +4546,16 @@
       const link = document.getElementById('runShareLink');
       if (link) link.addEventListener('click', shareRunResult);
     } else if (runActive){
-      els.runBanner.innerHTML = '<span class="mode-label">\uD83C\uDFAE Daily Stax</span> \u00B7 ' + runScore + ' pts \u00B7 ' + runLetters.length + '/' + RUN_WORD_LENGTH + ' letters' + streakTag;
+      els.runBanner.innerHTML = '<span class="mode-label">\uD83C\uDFAE Daily Stax</span> \u00B7 ' + shownScore(runScore) + ' pts \u00B7 ' + runLetters.length + '/' + RUN_WORD_LENGTH + ' letters' + streakTag;
     } else {
       els.runBanner.innerHTML = '<span class="mode-label">\uD83C\uDFAE Daily Stax</span>' + streakTag + ' &nbsp;<span class="run-link" id="runPlayLink">Play</span>';
       const link = document.getElementById('runPlayLink');
       if (link) link.addEventListener('click', startDailyRun);
     }
   }
-  // A finished run's score as the player sees it: never below 0. (The run
-  // itself can dip negative - idle rounds and missed trivia cost points -
-  // and the stored result keeps the real number.)
+  // A Daily score as the player sees it, mid-run or finished: never below 0.
+  // (The run itself can dip negative - idle rounds and missed trivia cost
+  // points - and the game and the stored result keep the real number.)
   function shownScore(n){ return Math.max(0, Math.round(n || 0)); }
   function buildRunShareText(r){
     const p = PERSONALITY_META[r.personalityType] || PERSONALITY_META.fence_sitter;
