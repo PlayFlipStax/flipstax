@@ -16,10 +16,24 @@ const redis = new Redis({
   token: process.env.KV_REST_API_TOKEN,
 });
 
-// Very light rate limiting per IP to blunt trivial spam-refresh abuse.
-// Not bulletproof (no auth on this endpoint), but stops a single browser
-// from hammering the counter in a tight loop.
-const RATE_LIMIT_WINDOW_SECONDS = 2;
+// Light rate limiting to blunt trivial spam. Not bulletproof (no auth on
+// this endpoint). It used to be one vote per 2 seconds per IP, which
+// silently dropped real votes: a quick player taps faster than that, and
+// many players can share one IP (mobile carriers, schools, offices). Now
+// it's two fixed-window counters:
+//   - per play session (a random id the page makes on each load and keeps
+//     in memory only - see castVote in flipstax.html): generous for any
+//     human pace, stops a single tab from hammering the counter;
+//   - per IP: a much higher ceiling, so a shared IP still has room for
+//     lots of players at once, but a script rotating fake session ids
+//     can't go unbounded.
+// Requests from an older cached page (no session id) share their IP's
+// "no session" bucket at the per-session limit.
+const SESSION_WINDOW_SECONDS = 10;
+const SESSION_MAX_VOTES = 12;      // more than one a second, sustained
+const IP_WINDOW_SECONDS = 60;
+const IP_MAX_VOTES = 300;
+const SESSION_ID_RE = /^[a-z0-9]{12,40}$/;
 
 // Real itemIds only ever come from the client's slugify() (lowercase,
 // alphanumeric segments joined by single hyphens, "item" as the empty
@@ -64,15 +78,18 @@ export default async function handler(req, res) {
     }
 
     const ip = getClientIp(req);
-    const rateKey = `ratelimit:vote:${ip}`;
+    const sid = body && typeof body.sid === 'string' && SESSION_ID_RE.test(body.sid) ? body.sid : 'nosid';
+    const now = Math.floor(Date.now() / 1000);
+    // The window number is part of each key, so every key simply expires
+    // on its own shortly after its window ends.
+    const sessionKey = `ratelimit:vote:s:${ip}:${sid}:${Math.floor(now / SESSION_WINDOW_SECONDS)}`;
+    const ipKey = `ratelimit:vote:ip:${ip}:${Math.floor(now / IP_WINDOW_SECONDS)}`;
+    const [sessionCount, , ipCount] = await redis.multi()
+      .incr(sessionKey).expire(sessionKey, SESSION_WINDOW_SECONDS * 2)
+      .incr(ipKey).expire(ipKey, IP_WINDOW_SECONDS * 2)
+      .exec();
 
-    const alreadyVoted = await redis.set(rateKey, '1', {
-      nx: true,
-      ex: RATE_LIMIT_WINDOW_SECONDS,
-    });
-
-    if (alreadyVoted === null) {
-      // Key already existed — this IP voted too recently.
+    if (sessionCount > SESSION_MAX_VOTES || ipCount > IP_MAX_VOTES) {
       return res.status(429).json({ error: 'Too many votes, slow down' });
     }
 

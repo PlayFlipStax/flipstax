@@ -6867,12 +6867,19 @@
   // Redis under the hood) - the client's own tally is never authoritative,
   // it just optimistically shows something instant while the network call
   // is in flight and reconciles once the real count comes back.
+  // A random id for this page load only - never stored - sent with each
+  // vote so the server can rate-limit per play session rather than per IP
+  // (many players can share one IP). See api/vote.js.
+  const VOTE_SESSION_ID = (()=>{
+    try{ const a = new Uint32Array(3); crypto.getRandomValues(a); return Array.from(a, n=> n.toString(36).padStart(7, '0')).join(''); }
+    catch(e){ return Math.random().toString(36).slice(2).padEnd(12, '0') + Date.now().toString(36); }
+  })();
   async function castVote(itemId){
     try{
       const res = await fetch('/api/vote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ itemId }),
+        body: JSON.stringify({ itemId, sid: VOTE_SESSION_ID }),
       });
       if (!res.ok) console.warn('Vote not recorded server-side:', res.status);
     }catch(err){ console.warn('Vote request failed:', err); }
