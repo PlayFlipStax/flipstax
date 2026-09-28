@@ -2295,7 +2295,7 @@
       { q:'Who was the U.S. President when the atomic bombs were dropped on Japan in 1945?', correct:'Harry S. Truman', wrongs:['Franklin D. Roosevelt','Dwight D. Eisenhower','Herbert Hoover'] },
       { q:'Which U.S. President is carved into Mount Rushmore?', correct:'Theodore Roosevelt', wrongs:['Franklin D. Roosevelt','Ulysses S. Grant','John F. Kennedy'] },
       // "Who is known for..." - plausible wrong answers, including famous names from the wrong field.
-      { q:'Who are credited with the first powered airplane flight in 1903?', correct:'The Wright Brothers', wrongs:['Nikola Tesla','Albert Einstein','Samuel Kessler'] },
+      { q:'Who are credited with the first powered airplane flight in 1903?', correct:'The Wright Brothers', wrongs:['Nikola Tesla','Albert Einstein','Samuel Langley'] },
       { q:'Who discovered penicillin in 1928?', correct:'Alexander Fleming', wrongs:['Louis Pasteur','Marie Curie','Joseph Lister'] },
       { q:'Who was the first woman to win a Nobel Prize?', correct:'Marie Curie', wrongs:['Rosalind Franklin','Florence Nightingale','Ada Lovelace'] },
       { q:'Who delivered the famous “I Have a Dream” speech in 1963?', correct:'Martin Luther King Jr.', wrongs:['Malcolm X','Frederick Douglass','Jesse Jackson'] },
@@ -3901,7 +3901,7 @@
     ['movies', 'Zendaya', 'Margot Robbie', 'who'],
     ['movies', 'Scarlett Johansson', 'Gal Gadot', 'who'],
     ['movies', 'Angelina Jolie', 'Jennifer Aniston', 'who'],
-    ['movies', 'Timothee Chalamet', 'Tom Holland', 'who'],
+    ['movies', 'Timothée Chalamet', 'Tom Holland', 'who'],
     ['movies', 'Jim Carrey', 'Adam Sandler', 'who'],
     ['movies', 'Zendaya', 'Sydney Sweeney', 'who'],
     ['movies', 'Glen Powell', 'Austin Butler', 'who'],
@@ -4003,7 +4003,6 @@
     // pets
     ['pets', 'Big Dogs', 'Small Dogs', 'pick'],
     ['pets', 'Adopting a Pet', 'Buying a Pet', 'pick'],
-    ['pets', 'Dinosaurs', 'Dragons', 'pick'],
     ['pets', 'Reptiles', 'Amphibians', 'pick'],
     ['pets', 'Horses', 'Elephants', 'pick'],
     // nostalgia
@@ -4032,6 +4031,7 @@
     ['books', 'Highlighting While Reading', 'Keeping Books Pristine', 'pick'],
     ['books', 'Slow Burn Stories', 'Fast-Paced Thrillers', 'pick'],
     // wild
+    ['wild', 'Dinosaurs', 'Dragons', 'pick'],   // was under Pets & Animals
     ['wild', 'Reading Minds', 'Turning Invisible', 'pick'],
     ['wild', 'Being 10 Feet Tall', 'Being the Size of a Mouse', 'pick'],
     ['wild', 'Talking to Animals', 'Speaking Every Language', 'pick'],
@@ -4158,9 +4158,9 @@
     ['sports', 'Pickup Games', 'Organized Leagues', 'pick'],
     ['sports', 'Underdogs', 'Favorites', 'pick'],
     ['sports', 'Trash Talk', 'Good Sportsmanship', 'pick'],
-    ['sports', 'Luka Doncic', 'Cooper Flagg', 'who'],
-    ['sports', 'Victor Wembanyama', 'Luka Doncic', 'who'],
-    ['sports', 'Stephen Curry', 'Luka Doncic', 'who'],
+    ['sports', 'Luka Dončić', 'Cooper Flagg', 'who'],
+    ['sports', 'Victor Wembanyama', 'Luka Dončić', 'who'],
+    ['sports', 'Stephen Curry', 'Luka Dončić', 'who'],
     // games
     ['games', 'Single-Player', 'Multiplayer', 'pick'],
     ['games', 'Racing Games', 'Fighting Games', 'pick'],
@@ -4168,7 +4168,7 @@
     ['games', 'Board Games', 'Video Games', 'pick'],
     ['games', 'Local Co-op', 'Online Multiplayer', 'pick'],
     ['games', 'Easy Mode', 'Hard Mode', 'pick'],
-    ['games', 'Pokemon', 'Digimon', 'who'],
+    ['games', 'Pokémon', 'Digimon', 'who'],
     ['games', 'Charizard', 'Blastoise', 'who'],
     ['games', 'Squirtle', 'Bulbasaur', 'who'],
     ['games', 'Gengar', 'Snorlax', 'who'],
@@ -6860,7 +6860,13 @@
   // and "kendrick lamar" (or the same name shown in a totally different
   // matchup elsewhere in the deck) must all resolve to the same slug so
   // votes for that entity accumulate globally rather than fragmenting.
+  // Names whose accents were added after launch keep the vote key (and
+  // badge key) they already had. Not a general accent-strip: names that
+  // always had accents (Pelé, Beyoncé, Häagen-Dazs) already have live keys
+  // without the accented letter, and changing slugify would split them.
   function slugify(text){
+    const alias = { 'Luka Dončić':'luka-doncic', 'Timothée Chalamet':'timothee-chalamet', 'Pokémon':'pokemon' }[text];
+    if (alias) return alias;
     return String(text).toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'item';
   }
   // Real shared vote counts, backed by /api/vote and /api/tallies (Upstash
@@ -7350,7 +7356,7 @@
     els.homeOverlay.classList.add('hidden');
     els.modeSelectOverlay.classList.remove('hidden');
   });
-  const LEGAL_LAST_UPDATED = 'September 24, 2026';
+  const LEGAL_LAST_UPDATED = 'September 28, 2026';
   // The contact address never appears whole in the page source (scrapers
   // harvest those): it's stored reversed and assembled here at runtime.
   const CONTACT_EMAIL = ['moc.liamg', 'xatspilfyalp'].map(p=> p.split('').reverse().join('')).reverse().join('@');
@@ -7397,7 +7403,7 @@
         <h4>1. The Game</h4>
         <p>FlipStax is a free browser-based game combining opinion-based matchups, trivia challenges, and a word-solving puzzle. It is provided for entertainment purposes only.</p>
         <h4>2. Eligibility</h4>
-        <p>FlipStax is intended for a general audience. If you are under the age of 13, you may only use FlipStax with the involvement of a parent or guardian. We do not knowingly collect personal information from children under 13.</p>
+        <p>FlipStax is intended for a general audience. We do not knowingly collect personal information from children under 13.</p>
         <h4>3. Opinion Content &amp; Matchups</h4>
         <p>The Game presents "versus" matchups between public figures, brands, foods, media, and other subjects, and displays aggregate voting statistics submitted by all players. These matchups reflect crowd opinion only - they are not factual claims, professional rankings, or endorsements by FlipStax, and any names, likenesses, or trademarks referenced belong to their respective owners. See our <a data-legal-link="disclaimer">Disclaimer</a> for more detail.</p>
         <h4>4. Acceptable Use</h4>
@@ -7426,9 +7432,9 @@
       body: `
         <p>This Privacy Policy explains what information FlipStax ("we," "us") collects when you play the Game at flipstax-one.vercel.app, and how it's used.</p>
         <h4>1. Information We Collect</h4>
-        <p><strong>Gameplay data stored on your device.</strong> FlipStax stores your local game progress, stats, and preferences (such as sound settings) directly in your browser's local storage. This data stays on your device and is not sent to us.</p>
+        <p><strong>Gameplay data stored on your device.</strong> FlipStax stores your game progress and preferences directly in your browser's local storage: your stats and sound setting, today's Daily Stax run (including one still in progress) and your day streak, your My Collection personality cards, your Infinity badges and progress toward your next Infinity personality, and a list of the Infinity matchups you've already voted on (used for badges). This data stays on your device and is not sent to us. It isn't linked to an account, so it doesn't carry over to other devices and is erased if you clear your browser data.</p>
         <p><strong>Anonymous vote counts.</strong> When you vote in a "versus" matchup, we record that vote as an anonymous tally in our database. We do not associate votes with your identity, an account, or a persistent user ID.</p>
-        <p><strong>IP address (transient, for abuse prevention only).</strong> When you vote, your IP address is briefly checked to enforce a short rate limit (currently a few seconds between votes) to prevent automated spam. We do not permanently log or store IP addresses tied to individual votes.</p>
+        <p><strong>IP address and session code (transient, for abuse prevention only).</strong> When you vote, your IP address and a random session code (made fresh each time the page loads, never saved on your device, and not linked to you) are used to enforce rate limits that prevent automated spam. These rate-limit counters expire automatically within about two minutes. We do not permanently log or store IP addresses tied to individual votes.</p>
         <p><strong>Anonymous usage analytics.</strong> We use privacy-friendly analytics (which do not use cookies and do not track you individually) to understand overall traffic to the Game, such as how many people visit and which pages are popular.</p>
         <p><strong>Advertising data (if/when applicable).</strong> If FlipStax displays advertising through Google AdSense, Google may use cookies or similar technologies to serve ads based on your prior visits to this or other websites. You can learn more and opt out of personalized advertising at google.com/settings/ads. If ads are not yet active on the Game, this section does not currently apply.</p>
         <h4>2. How We Use Information</h4>
