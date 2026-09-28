@@ -2599,14 +2599,23 @@
   // Tightened a third time: the old spacing (15..115, every 20) needed ~82
   // votes to finish, so most players ran out of clock with letters still
   // unearned and the first trivia didn't show up for ~35s. Every 10 points
-  // roughly halves the voting between checkpoints - a full run now reaches
-  // the solve screen in about 3.5-4 minutes, leaving the 6-minute clock as
-  // pure safety margin.
+  // roughly halves the voting between checkpoints, so reaching the points is
+  // no longer the bottleneck for most players; the time gates below
+  // (RUN_TRIVIA_GATES_MS) now set the pace so a run uses its ~6 minutes.
   const RUN_THRESHOLDS = [8, 18, 28, 38, 48, 58]; // 6 trivia milestones, one per letter
   // Power-ups start only after the first trivia (8). The first one used to
   // drop at 4 points, and a lost Wild Card there (-25) sent the score to
   // -21 - some players then waited ~2-3 minutes for their first trivia.
   const RUN_POWERUP_THRESHOLDS = [13, 23, 33, 43, 53]; // 5 total, one between each pair of trivia milestones
+  // Time gates: trivia question k can't come before RUN_TRIVIA_GATES_MS[k]
+  // of run time, even with its points in hand. Points alone used to finish
+  // all six by ~3:15 for a typical player (2:45 for a fast one), and the run
+  // went to the word jumble with half the 6-minute clock unused. Gated, Q6
+  // lands ~5:30-5:40 and the jumble starts ~5:40 for fast and typical
+  // players alike (simulated: 20,000 runs each). Slow players are still
+  // paced by points, so for them little changes.
+  const RUN_TRIVIA_GATES_MS = [55, 110, 165, 220, 275, 330].map(s=> s * 1000 / DEBUG_RUN_SCALE);
+  let runClockAddedMs = 0;
   const RUN_POWERUPS = [
     { key:'points10',  icon:'\u26A1', label:'+10 pts', color:'#c7a63e' },
     { key:'slowclock', icon:'\uD83D\uDC0C', label:'+30s',    color:'#3e6bc7' },
@@ -5021,6 +5030,7 @@
     runScoreAtHalfway = null;
     runWord = getTodayWord();
     runEndsAt = Date.now() + RUN_DURATION_MS;
+    runClockAddedMs = 0;
     els.runTimerWrap.classList.remove('hidden');
     updateRunTimerBar();
     clearInterval(runTimerInterval);
@@ -5083,25 +5093,40 @@
     if (!runActive) return;
     if (runPhase === 'trivia' || runPhase === 'secondchance' || runPhase === 'solving') return;
     runScore += delta;
-    let triviaTriggered = false;
-    for (const t of RUN_THRESHOLDS){
-      if (runScore >= t && runThresholdsHit.indexOf(t) === -1 && runLetters.length < RUN_WORD_LENGTH){
-        runThresholdsHit.push(t);
-        runPendingTrivia = true; // deferred - see loadNextImpl - never fire mid-vote
-        triviaTriggered = true;
-        break;
-      }
-    }
-    if (!triviaTriggered){
-      for (const t of RUN_POWERUP_THRESHOLDS){
-        if (runScore >= t && runPowerupThresholdsHit.indexOf(t) === -1){
-          runPowerupThresholdsHit.push(t);
-          runPendingPowerUp = true; // deferred, same reasoning
-          break;
-        }
-      }
-    }
+    checkRunMilestones();
     renderRunBanner();
+  }
+  // Run time so far: the clock's full length (plus any +30s power-ups) minus
+  // what's left. Pausing resets runEndsAt on resume, so paused time doesn't
+  // count.
+  function runElapsedMs(){ return RUN_DURATION_MS + runClockAddedMs - (runEndsAt - Date.now()); }
+  // Queues the next trivia or power-up when it's due. Both are deferred to
+  // loadNextImpl, never fired mid-vote. Trivia k needs its points threshold
+  // AND its time gate; power-up k needs its threshold AND trivia k to have
+  // come first, so they stay interleaved (T1, P1, T2, P2, ...). Called after
+  // every score change and before every round, since a gate can open while
+  // the score stands still.
+  function checkRunMilestones(){
+    if (!runActive || runPendingTrivia || runPendingPowerUp) return;
+    for (let i = 0; i < RUN_THRESHOLDS.length; i++){
+      const t = RUN_THRESHOLDS[i];
+      if (runThresholdsHit.indexOf(t) !== -1) continue;
+      if (runScore >= t && runLetters.length < RUN_WORD_LENGTH && runElapsedMs() >= RUN_TRIVIA_GATES_MS[i]){
+        runThresholdsHit.push(t);
+        runPendingTrivia = true;
+        return;
+      }
+      break;   // milestones go in order
+    }
+    for (let k = 0; k < RUN_POWERUP_THRESHOLDS.length; k++){
+      const t = RUN_POWERUP_THRESHOLDS[k];
+      if (runPowerupThresholdsHit.indexOf(t) !== -1) continue;
+      if (runScore >= t && runThresholdsHit.length >= k + 1){
+        runPowerupThresholdsHit.push(t);
+        runPendingPowerUp = true;
+      }
+      break;
+    }
   }
 
   function runTriviaQuestion(){
@@ -5321,6 +5346,7 @@
     } else if (key === 'slowclock'){
       sfx.powerUp();
       runEndsAt += 30000 / DEBUG_RUN_SCALE;
+      runClockAddedMs += 30000 / DEBUG_RUN_SCALE;
       updateRunTimerBar();
       els.eventPrompt.textContent = '\uD83D\uDC0C +30 seconds on the clock';
       finishRunPowerUp();
@@ -6533,6 +6559,7 @@
     clearRoundTimer();
 
     if (runActive){
+      checkRunMilestones();   // a time gate may have opened since the last score change
       if (runPendingTrivia){ runPendingTrivia = false; runTriviaQuestion(); return; }
       if (runPendingPowerUp){ runPendingPowerUp = false; runPowerUpRoundForRun(); return; }
     } else {
@@ -7049,6 +7076,8 @@
       getInfinityPlaylist: () => ({ idx: infIdx, els: infEls.slice(), songs: INFINITY_PLAYLIST, lead: INFINITY_LEAD, cutAt: infCutAt(infIdx), startAt: infStartAt(infIdx) }),
       getCurrentTrack: () => ({ key: currentTrackKey, paused: trackEls[currentTrackKey] ? trackEls[currentTrackKey].paused : null, src: trackEls[currentTrackKey] ? trackEls[currentTrackKey].src.split('/').pop() : null }),
       setRunClockMs: (ms) => { runEndsAt = Date.now() + ms; },
+      getRunElapsedMs: () => runElapsedMs(),
+      getRunGatesMs: () => RUN_TRIVIA_GATES_MS,
       getSolveState: () => ({ solveOpen: !els.solveOverlay.classList.contains('hidden'), readoutOpen: els.readoutOverlay.classList.contains('show'), runActive, runPhase }),
       jumpRampToRounds: (n) => { rampRounds = Math.max(0, n - 1); rampOnRound(); },
       forceVibe: (pct) => { stats.decided = 100; stats.agree = pct; saveStats(); updateVibeMeter(); },
