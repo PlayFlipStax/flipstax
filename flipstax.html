@@ -625,7 +625,17 @@
   .readout-type-eyebrow{ color:#b98bf0; font-size:10.5px; font-weight:800; letter-spacing:1px; margin-bottom:6px; }
   /* Daily Stax results get a solid screen of their own - the board used to
      show through the translucent overlay behind the text. */
-  #readoutOverlay{ background: radial-gradient(circle at 50% 28%, #3a1f6e, #150f2b 62%, #0b0917); }
+  #readoutOverlay{ background: radial-gradient(circle at 50% 28%, #3a1f6e, #150f2b 62%, #0b0917); padding-bottom:44px; }
+  /* Small contact line pinned to the bottom of mode select and the Daily
+     results. The address is filled in by JS (see CONTACT_EMAIL). */
+  .contact-footer{
+    position:absolute; left:0; right:0; bottom:calc(8px + env(safe-area-inset-bottom)); z-index:8;
+    text-align:center; font-size:11px; line-height:1.3; padding:0 16px; pointer-events:none;
+    color:rgba(255,255,255,0.55);
+  }
+  .contact-footer a{ pointer-events:auto; color:#b98bf0; text-decoration:underline; }
+  .split-select-overlay .contact-footer{ color:rgba(61,44,0,0.72); }
+  .split-select-overlay .contact-footer a{ color:#6a1b9a; }
   .intro-overlay{
     position:fixed; inset:0; z-index:30; background:var(--bg); display:flex;
     align-items:center; justify-content:center; padding:24px; text-align:center;
@@ -1148,7 +1158,7 @@
     justify-content:center; text-align:center; padding:0 14px; pointer-events:none;
   }
   .ms-body-daily{ top:calc(56px + env(safe-area-inset-top)); bottom:calc(100% - var(--sy) + 44px); }
-  .ms-body-inf{ top:calc(var(--sy) + 52px); bottom:24px; }
+  .ms-body-inf{ top:calc(var(--sy) + 52px); bottom:calc(30px + env(safe-area-inset-bottom)); }
   .ms-wm{
     display:flex; align-items:center; gap:8px; height:34px; white-space:nowrap;
     font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:27px; letter-spacing:4px; line-height:1;
@@ -1548,6 +1558,7 @@
     <div class="split-select-title">Choose your mode</div>
   </div>
   <div class="split-divider">OR</div>
+  <div class="contact-footer" data-contact-footer></div>
 </div>
 
 <div class="intro-overlay hidden" id="runIntroOverlay">
@@ -1611,6 +1622,7 @@
       <div class="daily-btn primary" id="readoutShare">📋 Share</div>
     </div>
   </div>
+  <div class="contact-footer" data-contact-footer></div>
 </div>
 
 <script>
@@ -6304,8 +6316,19 @@
     els.modeSelectOverlay.classList.remove('hidden');
   });
   const LEGAL_LAST_UPDATED = 'September 24, 2026';
-  const LEGAL_CONTACT_EMAIL = 'playflipstax@gmail.com';
+  // The contact address never appears whole in the page source (scrapers
+  // harvest those): it's stored reversed and assembled here at runtime.
+  const CONTACT_EMAIL = ['moc.liamg', 'xatspilfyalp'].map(p=> p.split('').reverse().join('')).reverse().join('@');
+  const LEGAL_CONTACT_EMAIL = CONTACT_EMAIL;
   const LEGAL_CONTACT_LINK = '<a href="mailto:' + LEGAL_CONTACT_EMAIL + '">' + LEGAL_CONTACT_EMAIL + '</a>';
+  document.querySelectorAll('[data-contact-footer]').forEach(el=>{
+    el.textContent = 'Questions or feedback? ';
+    const a = document.createElement('a');
+    a.href = 'mailto:' + CONTACT_EMAIL; a.textContent = CONTACT_EMAIL;
+    // Mode select is one big tap target: a tap on the link must not start a mode.
+    a.addEventListener('click', e=> e.stopPropagation());
+    el.appendChild(a);
+  });
   const LEGAL_DOCS = {
     disclaimer: {
       title: 'Disclaimer',
