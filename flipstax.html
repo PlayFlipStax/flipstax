@@ -7372,6 +7372,9 @@
   const CONTACT_EMAIL = ['moc.liamg', 'xatspilfyalp'].map(p=> p.split('').reverse().join('')).reverse().join('@');
   const LEGAL_CONTACT_EMAIL = CONTACT_EMAIL;
   const LEGAL_CONTACT_LINK = '<a href="mailto:' + LEGAL_CONTACT_EMAIL + '">' + LEGAL_CONTACT_EMAIL + '</a>';
+  // Ko-fi / Buy Me a Coffee page, once one exists - set to '' hides the link
+  // rather than shipping a dead one. Fill in and push once the account is live.
+  const COFFEE_URL = '';
   document.querySelectorAll('[data-contact-footer]').forEach(el=>{
     el.textContent = 'Questions or feedback? ';
     const a = document.createElement('a');
@@ -7379,6 +7382,14 @@
     // Mode select is one big tap target: a tap on the link must not start a mode.
     a.addEventListener('click', e=> e.stopPropagation());
     el.appendChild(a);
+    if (COFFEE_URL) {
+      el.appendChild(document.createTextNode(' · '));
+      const c = document.createElement('a');
+      c.href = COFFEE_URL; c.target = '_blank'; c.rel = 'noopener noreferrer';
+      c.textContent = 'Buy me a coffee ☕';
+      c.addEventListener('click', e=> e.stopPropagation());
+      el.appendChild(c);
+    }
   });
   const LEGAL_DOCS = {
     disclaimer: {
