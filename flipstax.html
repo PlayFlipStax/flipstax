@@ -4540,7 +4540,7 @@
     const streakTag = dailyRunStreak > 0 ? (' \uD83D\uDD25' + dailyRunStreak) : '';
     if (runResultToday){
       const r = runResultToday;
-      els.runBanner.innerHTML = '<span class="mode-label">\uD83C\uDFAE Daily Stax</span> \u00B7 \u2705 ' + r.score + ' pts \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal +
+      els.runBanner.innerHTML = '<span class="mode-label">\uD83C\uDFAE Daily Stax</span> \u00B7 \u2705 ' + shownScore(r.score) + ' pts \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal +
         ' \u00B7 ' + (r.solved ? formatRaceTime(r.solveMs) : 'not solved') + streakTag +
         ' &nbsp;<span class="run-link" id="runShareLink">Share</span>';
       const link = document.getElementById('runShareLink');
@@ -4553,9 +4553,13 @@
       if (link) link.addEventListener('click', startDailyRun);
     }
   }
+  // A finished run's score as the player sees it: never below 0. (The run
+  // itself can dip negative - idle rounds and missed trivia cost points -
+  // and the stored result keeps the real number.)
+  function shownScore(n){ return Math.max(0, Math.round(n || 0)); }
   function buildRunShareText(r){
     const p = PERSONALITY_META[r.personalityType] || PERSONALITY_META.fence_sitter;
-    return 'FlipStax Daily Stax\n' + r.score + ' pts \u00B7 ' + p.icon + ' ' + p.name + ' \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal + ' trivia \u00B7 ' +
+    return 'FlipStax Daily Stax\n' + shownScore(r.score) + ' pts \u00B7 ' + p.icon + ' ' + p.name + ' \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal + ' trivia \u00B7 ' +
       (r.solved ? ('solved in ' + formatRaceTime(r.solveMs)) : 'word not solved');
   }
 
@@ -4680,7 +4684,7 @@
       solved: r.solved, word: r.word || '', lettersEarned: r.triviaCorrect,
       roundResults: results,
       statLine: r.solved ? ('Solved in ' + formatRaceTime(r.solveMs)) : (r.triviaCorrect + '/' + r.triviaTotal + ' trivia correct'),
-      score: r.score,
+      score: shownScore(r.score),
       personality: PERSONALITY_META[r.personalityType] || PERSONALITY_META.fence_sitter,
       voteSummary: r.lastVote || null,
     };
@@ -5792,7 +5796,7 @@
   }
   function showRunReadout(){
     const r = runResultToday;
-    els.readoutScore.textContent = r.score + ' pts';
+    els.readoutScore.textContent = shownScore(r.score) + ' pts';
     els.readoutTrivia.textContent = r.triviaCorrect + '/' + r.triviaTotal + ' trivia correct'
       + (r.perfect ? ' · 🏆 Perfect Run' : '')
       + (r.secondChance === 'recovered' ? ' · 🔁 +1 letter recovered' : '');
@@ -6685,6 +6689,8 @@
       setInfRiddleRemainingMs: (ms) => { infRiddleEndsAt = Date.now() + ms; tickInfRiddle(); },
       showPersonalityReveal: () => showPersonalityReveal(),
       determinePersonality: (st) => determinePersonality(st),
+      shareText: () => buildRunShareText(runResultToday),
+      shareCardScore: () => buildDailyShareData(runResultToday).score,
       shareCardDataUrl: (kind) => renderShareCard(kind, kind === 'daily' ? buildDailyShareData(runResultToday) : buildInfinityShareData()).toDataURL('image/png'),
       getInfinityPlaylist: () => ({ idx: infIdx, els: infEls.slice(), songs: INFINITY_PLAYLIST, lead: INFINITY_LEAD, cutAt: infCutAt(infIdx), startAt: infStartAt(infIdx) }),
       getCurrentTrack: () => ({ key: currentTrackKey, paused: trackEls[currentTrackKey] ? trackEls[currentTrackKey].paused : null, src: trackEls[currentTrackKey] ? trackEls[currentTrackKey].src.split('/').pop() : null }),
