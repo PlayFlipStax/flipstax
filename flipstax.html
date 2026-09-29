@@ -952,12 +952,17 @@
      where "textured" stops and "plain gradient" starts. Drifts extremely
      slowly - just enough that it isn't perfectly static, not fast enough to
      read as its own effect. */
+  /* Kept light: at full density (11 squares per 50px, 55% white) and
+     drifting down-right it read as falling snow across the whole screen.
+     Now 6 squares per 90px tile at 35% white, drifting sideways only (no
+     falling), so it still carries the logo's texture past its edge without
+     becoming its own effect. */
   .home-overlay::before{
     content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
-    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3E%3Cg fill='white' fill-opacity='.55'%3E%3Crect x='4' y='6' width='3' height='3'/%3E%3Crect x='22' y='3' width='2' height='2'/%3E%3Crect x='38' y='9' width='3' height='3'/%3E%3Crect x='9' y='20' width='2' height='2'/%3E%3Crect x='30' y='24' width='4' height='4'/%3E%3Crect x='44' y='30' width='2' height='2'/%3E%3Crect x='14' y='34' width='3' height='3'/%3E%3Crect x='26' y='42' width='2' height='2'/%3E%3Crect x='2' y='44' width='3' height='3'/%3E%3Crect x='47' y='16' width='2' height='2'/%3E%3Crect x='17' y='11' width='2' height='2'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 50px 50px repeat;
-    animation: homeTextureDrift 140s linear infinite;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 90 90'%3E%3Cg fill='white' fill-opacity='.35'%3E%3Crect x='6' y='10' width='3' height='3'/%3E%3Crect x='52' y='6' width='2' height='2'/%3E%3Crect x='30' y='38' width='3' height='3'/%3E%3Crect x='74' y='44' width='2' height='2'/%3E%3Crect x='14' y='68' width='2' height='2'/%3E%3Crect x='58' y='76' width='3' height='3'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 90px 90px repeat;
+    animation: homeTextureDrift 200s linear infinite;
   }
-  @keyframes homeTextureDrift{ from{ background-position:0 0; } to{ background-position:50px 50px; } }
+  @keyframes homeTextureDrift{ from{ background-position:0 0; } to{ background-position:90px 0; } }
   @media (prefers-reduced-motion: reduce){ .home-overlay::before{ animation:none; } }
   .doodle-scatter{ position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
   .doodle-scatter-track{ position:absolute; top:0; left:0; }
@@ -1385,7 +1390,23 @@
      colRise particle system as mode-select's gold half and the Collection
      reveal (see fillSparkField), just recoloured for this screen's light
      sky-blue backdrop instead of dark or gold. */
+  /* Light ambient touch, not a snowfall: a handful of sparks that twinkle
+     in place (no falling or rising), kept to the screen's outer edges away
+     from the logo and Enter button, and always behind them. */
   .home-sparks{ position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0; }
+  .home-sparks *{ pointer-events:none; }
+  .home-spark{
+    position:absolute; left:var(--x); top:var(--y); font-size:var(--s); color:var(--c); line-height:1;
+    text-shadow:0 0 8px var(--c); opacity:0; animation: homeTwinkle var(--d) ease-in-out var(--dl) infinite;
+  }
+  @keyframes homeTwinkle{
+    0%,100%{ opacity:0; transform:scale(0.6) rotate(0deg); }
+    50%{ opacity:var(--o); transform:scale(1) rotate(45deg); }
+  }
+  /* The logo and Enter button are in normal flow, and an unpositioned
+     element always paints under absolutely-positioned siblings - that's
+     what put the sparks (and doodles) in front of the button. */
+  .home-logo-img, .home-enter-btn{ position:relative; z-index:2; }
   .home-enter-btn{
     padding:13px 48px; font-size:16px; box-shadow:0 6px 18px rgba(242,84,91,0.4);
     animation: homeEnterPulse 2.8s ease-in-out infinite;
@@ -1398,6 +1419,7 @@
     .home-logo-img{ animation:none !important; }
     .home-enter-btn{ animation:none !important; }
     .home-overlay .doodle-scatter-track{ animation:none !important; }
+    .home-spark{ animation:none !important; opacity:calc(var(--o) * 0.7); }
   }
   .home-legal-links{
     position:relative; z-index:1; margin-top:16px;
@@ -3198,7 +3220,9 @@
     soundOn = on;
     try{ localStorage.setItem('flipstax_sound', on ? 'on' : 'off'); }catch(e){}
     els.soundToggle.textContent = on ? '\uD83D\uDD0A' : '\uD83D\uDD07';
-    if (on) playTrack(currentTrackKey || 'run'); else pauseAllTracks();
+    // The fanfare is only ever the page's opening sound - sound switched on
+    // later gets the intro theme instead of a replay.
+    if (on) playTrack(currentTrackKey === 'fanfare' ? 'intro' : (currentTrackKey || 'run')); else pauseAllTracks();
   }
 
   // ---- Real recorded music, one track per part of the game: "intro"
@@ -3209,6 +3233,11 @@
   // better-sounding than synthesizing notes, now that we have real tracks
   // to work with.
   const TRACK_SRC = {
+    // Home/Enter screen: a 12s fanfare, played once per page load (not
+    // looped) - see primeMusic and the 'ended' handler in getTrackEl, which
+    // hands over to the intro theme. Measured -11.8 LUFS vs the intro's
+    // -11.7, so no gain trim needed.
+    fanfare:  'audio/enter-fanfare-faded.mp3',
     intro:    'audio/grand-flipstax-party.mp3',
     run:      'audio/bonus-stage-anthem.mp3',
     solve:    'audio/final-buzzer.mp3',
@@ -3248,13 +3277,20 @@
     if (key === 'infinity') return (trackEls.infinity = infinityEl(infIdx));
     if (!trackEls[key]){
       const a = new Audio(TRACK_SRC[key]);
-      a.loop = true;
+      a.loop = key !== 'fanfare';
       a.preload = 'auto';
       a.volume = MUSIC_VOLUME;
       // Safety net: whatever queued or started this element (a play() that
       // was waiting on a user gesture, a stale handler), if it starts
       // playing while a different track is the current one, stop it.
       a.addEventListener('playing', ()=>{ if (currentTrackKey !== key){ try{ a.pause(); }catch(e){} } });
+      // The fanfare plays once, then the intro theme carries on (on Home or
+      // mode select). Only once it was actually heard: while it's still
+      // primed silently (no tap yet) it can run out muted, and the first tap
+      // must still start it from the top.
+      if (key === 'fanfare') a.addEventListener('ended', ()=>{
+        if (currentTrackKey === 'fanfare' && !a.muted) playTrack('intro');
+      });
       trackEls[key] = a;
     }
     return trackEls[key];
@@ -6054,10 +6090,28 @@
   }
   // Landing screen: same idea, recoloured for the light sky-blue backdrop
   // (white/pale-yellow/pink/cyan instead of the gold half's warm palette).
+  // Landing screen: 8 twinkles that stay put (see .home-spark), in the
+  // outer strips either side of the logo/button column, spread top to
+  // bottom so they don't cluster.
   function buildHomeSparks(){
-    fillSparkField(els.homeSparks, 22,
-      ['✦','✧','★','●'], ['#ffffff','#fff6a8','#ff8ad4','#7df9ff','#ffd166'],
-      [5,10], [0.25,0.5], [10,20]);
+    const box = els.homeSparks;
+    if (!box || box.childElementCount) return;
+    const glyphs = ['✦','✧','✦','✧'], cols = ['#ffffff','#fff6a8','#ffffff','#7df9ff'];
+    const n = 8;
+    for (let i = 0; i < n; i++){
+      const sp = document.createElement('span'); sp.className = 'home-spark';
+      sp.textContent = glyphs[i % glyphs.length];
+      const left = i % 2 === 0;
+      const st = sp.style;
+      st.setProperty('--x', (left ? 3 + Math.random() * 14 : 81 + Math.random() * 14) + '%');
+      st.setProperty('--y', (4 + (i / n) * 88 + Math.random() * 6) + '%');
+      st.setProperty('--s', Math.round(8 + Math.random() * 6) + 'px');
+      st.setProperty('--c', cols[i % cols.length]);
+      st.setProperty('--o', (0.45 + Math.random() * 0.3).toFixed(2));
+      st.setProperty('--d', (3.5 + Math.random() * 3).toFixed(1) + 's');
+      st.setProperty('--dl', (-Math.random() * 6).toFixed(1) + 's');
+      box.appendChild(sp);
+    }
   }
   let collectionRevealing = false;
   async function openCollection(){
@@ -7542,6 +7596,7 @@
       shareCardScore: () => buildDailyShareData(runResultToday).score,
       shareCardDataUrl: (kind) => renderShareCard(kind, kind === 'daily' ? buildDailyShareData(runResultToday) : buildInfinityShareData()).toDataURL('image/png'),
       getInfinityPlaylist: () => ({ idx: infIdx, els: infEls.slice(), songs: INFINITY_PLAYLIST, lead: INFINITY_LEAD, cutAt: infCutAt(infIdx), startAt: infStartAt(infIdx) }),
+      getTrackEl: (k) => getTrackEl(k),
       getCurrentTrack: () => ({ key: currentTrackKey, paused: trackEls[currentTrackKey] ? trackEls[currentTrackKey].paused : null, src: trackEls[currentTrackKey] ? trackEls[currentTrackKey].src.split('/').pop() : null }),
       setRunClockMs: (ms) => { runEndsAt = Date.now() + ms; },
       extendPendingDeadlines: (ms) => { if (runPendingQ){ runPendingQEndsAt = Date.now() + ms; clearTimeout(eventTimeoutId); eventTimeoutId = setTimeout(()=> (runPhase === 'secondchance' ? resolveSecondChance : resolveRunTrivia)(false), ms); } if (runPhase === 'solving') solveEndsAt = Date.now() + ms; },
@@ -7562,11 +7617,11 @@
   // above everything else including the already-running endless game
   // underneath. Enter -> pick a mode -> that overlay hides and either
   // reveals the already-loaded endless board, or kicks off Daily Run.
-  // Intro track primes silently on load (not gated on any overlay showing,
-  // so returning players who've already seen the one-time Daily Run
-  // tutorial still briefly hear it on the mode-select screen) and unmutes
-  // on the first tap anywhere, same muted-autoplay pattern as before.
-  primeMusic('intro');
+  // The Enter fanfare primes silently on load and is heard from its start
+  // on the first tap anywhere (browsers allow no audible sound before one),
+  // same muted-autoplay pattern as before; it plays once, then the intro
+  // theme takes over. Sound off = nothing plays.
+  primeMusic('fanfare');
   updatePauseBtnVisibility();
   // The landing screen's doodle field used to be the one static background
   // in the whole game (moving:false skipped doodleDrift entirely) - give it
