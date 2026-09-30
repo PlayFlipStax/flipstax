@@ -2786,6 +2786,78 @@
     { word:'PENCIL', hints:['Eraser','Sharpen','Write'] },
     { word:'BASKET', hints:['Weave','Picnic','Hoop'] },
     { word:'VIOLET', hints:['Purple','Flower','Shy'] },
+    // Added 30 Sep 2026 - in the schedule from 1 Oct 2026 (see WORDS_V2_FROM_DAY).
+    // Keep appending: the first 20 above must stay first and in this order.
+    { word:'FRIEND', hints:['Trust','Support','Companion'] },
+    { word:'CLOUDY', hints:['Sky','Overcast','Gray'] },
+    { word:'DRAGON', hints:['Myth','Fire-breathing','Scales'] },
+    { word:'SPRING', hints:['Bloom','Season','Renewal'] },
+    { word:'JUNGLE', hints:['Vines','Tropical','Wild'] },
+    { word:'STORMY', hints:['Weather','Turbulent','Rain'] },
+    { word:'CLOUDS', hints:['Sky','Puffy','White'] },
+    { word:'BUCKET', hints:['Pail','Carry','Water'] },
+    { word:'SHRIMP', hints:['Ocean','Small','Pink'] },
+    { word:'ORANGE', hints:['Fruit','Citrus','Color'] },
+    { word:'YOGURT', hints:['Dairy','Creamy','Breakfast'] },
+    { word:'FLOWER', hints:['Petals','Bloom','Garden'] },
+    { word:'BRANCH', hints:['Tree','Limb','Bank'] },
+    { word:'PETALS', hints:['Flower','Soft','Colorful'] },
+    { word:'SPROUT', hints:['Seedling','Grow','New'] },
+    { word:'DANCER', hints:['Ballet','Rhythm','Stage'] },
+    { word:'SINGER', hints:['Voice','Music','Stage'] },
+    { word:'PLAYER', hints:['Game','Team','Sport'] },
+    { word:'SPRINT', hints:['Race','Fast','Short'] },
+    { word:'HURDLE', hints:['Obstacle','Jump','Track'] },
+    { word:'SHIELD', hints:['Armor','Protect','Knight'] },
+    { word:'KNIGHT', hints:['Armor','Medieval','Sword'] },
+    { word:'WIZARD', hints:['Magic','Spell','Wand'] },
+    { word:'MAGNET', hints:['Attract','Metal','Pull'] },
+    { word:'ROCKET', hints:['Space','Launch','Fuel'] },
+    { word:'PLANES', hints:['Sky','Fly','Wings'] },
+    { word:'TRAINS', hints:['Track','Locomotive','Cars'] },
+    { word:'SUBWAY', hints:['Underground','Train','City'] },
+    { word:'SAILOR', hints:['Sea','Ship','Navy'] },
+    { word:'PIRATE', hints:['Ship','Treasure','Sea'] },
+    { word:'OYSTER', hints:['Shell','Pearl','Ocean'] },
+    { word:'WALRUS', hints:['Tusks','Arctic','Ocean'] },
+    { word:'TIGERS', hints:['Stripes','Jungle','Roar'] },
+    { word:'ZEBRAS', hints:['Stripes','Africa','Herd'] },
+    { word:'WOLVES', hints:['Pack','Howl','Wild'] },
+    { word:'LIZARD', hints:['Reptile','Scales','Tail'] },
+    { word:'GOBLIN', hints:['Myth','Mischief','Small'] },
+    { word:'ZOMBIE', hints:['Undead','Horror','Shuffle'] },
+    { word:'CLOSET', hints:['Storage','Clothes','Door'] },
+    { word:'SHOWER', hints:['Rain','Bathroom','Wash'] },
+    { word:'FAUCET', hints:['Water','Sink','Handle'] },
+    { word:'KNIVES', hints:['Sharp','Kitchen','Cut'] },
+    { word:'PLATES', hints:['Dinner','Round','Set'] },
+    { word:'NUMBER', hints:['Count','Digit','Math'] },
+    { word:'ANSWER', hints:['Question','Response','Solve'] },
+    { word:'QUOTES', hints:['Sayings','Speech','Marks'] },
+    { word:'PHRASE', hints:['Words','Sentence','Saying'] },
+    { word:'SYMBOL', hints:['Icon','Sign','Represent'] },
+    { word:'FORMAT', hints:['Layout','Style','Structure'] },
+    { word:'BUDGET', hints:['Money','Plan','Spending'] },
+    { word:'INCOME', hints:['Money','Earnings','Salary'] },
+    { word:'INVEST', hints:['Money','Stocks','Grow'] },
+    { word:'PROFIT', hints:['Money','Gain','Earnings'] },
+    { word:'CAMPUS', hints:['School','College','Grounds'] },
+    { word:'FOLDER', hints:['Files','Organize','Paper'] },
+    { word:'BINDER', hints:['Papers','Organize','Rings'] },
+    { word:'CRAYON', hints:['Color','Draw','Wax'] },
+    { word:'HOCKEY', hints:['Ice','Puck','Stick'] },
+    { word:'BOXING', hints:['Ring','Gloves','Punch'] },
+    { word:'GOLFER', hints:['Club','Course','Swing'] },
+    { word:'BOWLER', hints:['Pins','Lane','Ball'] },
+    { word:'SKATER', hints:['Ice','Blades','Rink'] },
+    { word:'JUMPER', hints:['Leap','Athlete','Sweater'] },
+    { word:'MEDALS', hints:['Award','Olympics','Ribbon'] },
+    { word:'TROPHY', hints:['Award','Winner','Shiny'] },
+    { word:'UMPIRE', hints:['Referee','Baseball','Call'] },
+    { word:'FROSTY', hints:['Cold','Ice','Winter'] },
+    { word:'COMETS', hints:['Space','Tail','Orbit'] },
+    { word:'SATURN', hints:['Rings','Planet','Space'] },
+    { word:'NEBULA', hints:['Space','Gas','Stars'] },
   ];
   // DEV/TESTING ONLY: ?debug=fast speeds up run/solve timers so a full
   // playthrough - trivia, power-ups, solve phase - can be tested without
@@ -4792,15 +4864,33 @@
   // to local time: players in different time zones would then be on
   // different words at the same moment.
   function daysSinceEpoch(){ return Math.floor(Date.parse(todayStr() + 'T00:00:00Z') / 86400000); }
-  function getTodayWord(){
-    const n = RUN_WORDS.length;
-    const day = daysSinceEpoch();
-    const cycle = Math.floor(day / n), posInCycle = day % n;
-    const lapOrder = c => shuffle(RUN_WORDS.map((_, i) => i), mulberry32(hashStr('flipstax-word-cycle-' + c)));
-    const order = lapOrder(cycle);
-    if (n > 2 && order[0] === lapOrder(cycle - 1)[n - 1]){ const t = order[0]; order[0] = order[1]; order[1] = t; }
-    return RUN_WORDS[order[posInCycle]];
+  // The list grew from 20 to 90 words on 30 Sep 2026. The schedule depends
+  // on the list's length, so a longer list would have changed the word of
+  // a day already in progress (a player who'd already solved it, or a run
+  // mid-way with letters from the old word). Days before
+  // WORDS_V2_FROM_DAY keep the original 20-word schedule exactly as it
+  // was; from that day on, laps go through the whole list, with their own
+  // shuffle seeds. The lap-boundary repeat guard also covers the handover.
+  // To add words later without moving today's word, do the same again:
+  // append, and start a new schedule from the next UTC day.
+  const WORDS_V1_COUNT = 20;
+  const WORDS_V2_FROM_DAY = Date.UTC(2026, 9, 1) / 86400000;   // 1 Oct 2026, 00:00 UTC
+  function wordLapOrder(n, salt, cycle){ return shuffle(RUN_WORDS.slice(0, n).map((_, i) => i), mulberry32(hashStr(salt + cycle))); }
+  function wordIndexForDay(day){
+    const v2 = day >= WORDS_V2_FROM_DAY;
+    const n = v2 ? RUN_WORDS.length : WORDS_V1_COUNT;
+    const d = v2 ? day - WORDS_V2_FROM_DAY : day;
+    const salt = v2 ? 'flipstax-word-v2-cycle-' : 'flipstax-word-cycle-';
+    const cycle = Math.floor(d / n), posInCycle = d % n;
+    const order = wordLapOrder(n, salt, cycle);
+    if (n > 2 && posInCycle <= 1){
+      // The word of the day before this lap began.
+      const prev = (v2 && cycle === 0) ? wordIndexForDay(day - posInCycle - 1) : wordLapOrder(n, salt, cycle - 1)[n - 1];
+      if (order[0] === prev){ const t = order[0]; order[0] = order[1]; order[1] = t; }
+    }
+    return order[posInCycle];
   }
+  function getTodayWord(){ return RUN_WORDS[wordIndexForDay(daysSinceEpoch())]; }
   function loadRunResult(){
     try{
       const raw = localStorage.getItem('flipstax_run_v1');
@@ -5007,7 +5097,7 @@
     if (!runActive || !runWord) return;
     const deck = decks.daily;
     const snap = {
-      date: runStartDate, phase: runPhase,
+      date: runStartDate, phase: runPhase, word: runWord.word,
       remainMs: pausedRunRemainingMs != null ? pausedRunRemainingMs : Math.max(0, runEndsAt - Date.now()),
       clockAdded: runClockAddedMs,
       score: runScore, letters: runLetters, thresholdsHit: runThresholdsHit, puThresholdsHit: runPowerupThresholdsHit,
@@ -5399,7 +5489,8 @@
   function resumeDailyRun(snap){
     runActive = true; runPhase = snap.phase;
     runStartDate = snap.date;
-    runWord = getTodayWord();
+    // The run's own word, not a fresh lookup - the letters were earned for it.
+    runWord = RUN_WORDS.find(w=> w.word === snap.word) || getTodayWord();
     runScore = snap.score; runLetters = snap.letters; runThresholdsHit = snap.thresholdsHit; runPowerupThresholdsHit = snap.puThresholdsHit;
     runPendingTrivia = !!snap.pendingTrivia; runPendingPowerUp = !!snap.pendingPowerUp;
     runTriviaAttempted = snap.triviaAttempted; runTriviaCorrect = snap.triviaCorrect; runRoundResults = snap.roundResults;
