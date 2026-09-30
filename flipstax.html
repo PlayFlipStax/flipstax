@@ -223,6 +223,7 @@
   .half.has-glyph{ flex-direction:column; align-items:center; justify-content:center; gap:2px; }
   .half.has-glyph .scene{ position:relative; inset:auto; flex:0 0 auto; }
   .half.has-glyph .scene .glyph{ font-size:min(13vh,88px); opacity:0.85; transform:none; }
+  .half.has-glyph .scene .glyph.vs-twin{ display:inline-block; transform:scaleX(-1); filter:hue-rotate(150deg) saturate(1.15); }
   .half.has-glyph:not(.revealed) .content{ background:none; backdrop-filter:none; -webkit-backdrop-filter:none; border:none; padding:2px 20px; }
 
   .fill{ position:absolute; inset:0; width:0%; z-index:1; transition: width 0.75s cubic-bezier(.2,.8,.2,1); }
@@ -4591,8 +4592,157 @@
     ['fitness', 'Protein Shakes', 'Whole Food Meals', 'pick'],
   ];
 
+  // Every non-scenario card shows an emoji per side, like the scenario
+  // cards do (those carry their own). One entry per item name, shared by
+  // both pools and every card that names it. Real people get a generic icon
+  // for what they do (their sport, a mic or guitar, 🎭 for actors) - never
+  // anything depicting the person. A name missing here falls back to its
+  // category's icon (see cardGlyph), so no card is ever left bare - but
+  // new cards should get an entry. Unicode 13 or older only, so older
+  // phones don't show an empty box.
+  const ITEM_GLYPHS = {
+    'Pizza':'🍕', 'Burgers':'🍔', 'Pancakes':'🥞', 'Waffles':'🧇', 'Cake':'🎂', 'Pie':'🥧', 'Ice Cream':'🍨', 'Frozen Yogurt':'🍦', 'Sushi':'🍣', 'Pasta':'🍝',
+    'Peanut Butter':'🥜', 'Nutella':'🍫', 'Garlic Bread':'🧄', 'Breadsticks':'🥖', 'Soup':'🍲', 'Salad':'🥗', 'Hot Dogs':'🌭', 'Mac and Cheese':'🧀',
+    'Grilled Cheese':'🥪', 'Chocolate Cake':'🍫', 'Cheesecake':'🍰', 'Guacamole':'🥑', 'Salsa':'🍅', 'Pancake Syrup':'🍁', 'Honey':'🍯', 'Tacos':'🌮',
+    'Burritos':'🌯', 'French Fries':'🍟', 'Onion Rings':'🧅', 'Cookies':'🍪', 'Brownies':'🟫', 'Ketchup':'🍅', 'Ranch':'🥗', 'Donuts':'🍩', 'Muffins':'🧁',
+    'Nachos':'🌶️', 'Mozzarella Sticks':'🧀', 'Spicy Wings':'🌶️', 'Chicken Nuggets':'🍗', 'Cereal':'🥣', 'Toast':'🍞', 'Cheese Pizza':'🍕',
+    'Pepperoni Pizza':'🍕', 'Popcorn':'🍿', 'Pretzels':'🥨', 'Fried Chicken':'🍗', 'Rotisserie Chicken':'🐔', 'Bacon':'🥓', 'Sausage':'🌭', 'Soda':'🥤',
+    'Juice':'🧃', 'Milkshakes':'🥤', 'Smoothies':'🍓', 'Sparkling Water':'💦', 'Still Water':'💧', 'Orange Juice':'🍊', 'Apple Juice':'🍎',
+    'Chocolate Milk':'🍫', 'Regular Milk':'🥛', 'Sweet Tea':'🍯', 'Unsweet Tea':'🍋', 'Coconut Water':'🥥', 'Sports Drinks':'⚡', 'Coffee':'☕', 'Tea':'🍵',
+    'Lemonade':'🍋', 'Iced Tea':'🧊', 'Hot Chocolate':'☕', 'Apple Cider':'🍏', 'Energy Drinks':'⚡', 'Iced Coffee':'🧊', 'Hot Coffee':'☕', 'Root Beer':'🥤',
+    'Cola':'🥤', 'Kool-Aid':'🍹', 'Capri Sun':'🧃', 'Milk':'🥛', 'Comedies':'😂', 'Horror Movies':'👻', 'Reality TV':'📺', 'Scripted Shows':'📝',
+    'Sequels':'🔁', 'Original Movies':'🎬', 'Documentaries':'🎥', 'Binge-Watching':'🛋️', 'One Episode a Week':'📅', 'Jump Scares':'😱',
+    'Slow-Burn Horror':'🕯️', 'Friends':'☕', 'Seinfeld':'🥨', 'Spider-Man':'🕷️', 'Iron Man':'🦾', 'Rom-Coms':'💕', 'Action Movies':'💥', 'Anchorman':'📰',
+    'Step Brothers':'👬', 'Home Alone':'🏠', 'Elf':'🎄', 'Zoolander':'🕶️', 'Napoleon Dynamite':'🦙', 'Happy Gilmore':'🏌️', 'Billy Madison':'🏫',
+    'Airplane':'✈️', 'The Naked Gun':'🕵️', 'Ferris Bueller\'s Day Off':'🚗', 'Ace Ventura':'🐾', 'Sitcoms':'📺', 'Dramas':'🎭', 'Cartoons':'🖍️',
+    'Anime':'🍥', 'Subtitles':'💬', 'Dubbing':'🎙️', 'Movie Theaters':'🍿', 'Streaming at Home':'🛋️', 'Animated Movies':'🖍️', 'Live-Action Movies':'🎬',
+    'Plot Twists':'🌀', 'Happy Endings':'🌈', 'Batman':'🦇', 'Superman':'🦸', 'Godzilla':'🦖', 'King Kong':'🦍', 'Dumb and Dumber':'🤪', 'Superbad':'🥳',
+    'Grown Ups':'🧔', 'The Hangover':'🥴', 'Bridesmaids':'👰', 'Mean Girls':'💅', 'Pop':'🎤', 'Country':'🤠', 'Concerts':'🎟️', 'Music Festivals':'🎪',
+    'Old Music':'📻', 'New Music':'🎧', 'Studio Albums':'💿', 'Live Albums':'🎙️', 'Karaoke':'🎤', 'Air Guitar':'🎸', 'Country Music':'🤠', 'Rock Music':'🎸',
+    'Guitar':'🎸', 'Piano':'🎹', 'Music Videos':'📹', 'Lyric Videos':'📝', 'Rap':'🎤', 'Rock':'🤘', 'Vinyl':'💿', 'Streaming':'📱', 'Solo Artists':'🎤',
+    'Bands':'🥁', 'Lyrics':'📝', 'Beat':'🥁', 'Headphones':'🎧', 'Speakers':'🔊', 'EDM':'🎛️', 'Hip-Hop':'🎤', 'Singing in the Shower':'🚿',
+    'Singing in the Car':'🚗', '80s Music':'📼', '90s Music':'💿', 'Football':'🏈', 'Basketball':'🏀', 'Soccer':'⚽', 'American Football':'🏈', 'Boxing':'🥊',
+    'Mixed Martial Arts':'🥋', 'Playing Sports':'🏃', 'Watching Sports':'📺', 'Home Games':'🏟️', 'Away Games':'🚌', 'Swimming':'🏊', 'Running':'🏃',
+    'Bowling':'🎳', 'Mini Golf':'⛳', 'Cheering from the Stands':'📣', 'Watching on TV':'📺', 'Overtime':'⏱️', 'A Clean Finish':'🏁', 'Baseball':'⚾',
+    'Hockey':'🏒', 'Tennis':'🎾', 'Golf':'⛳', 'Individual Sports':'🧍', 'Team Sports':'👥', 'Offense':'⚔️', 'Defense':'🛡️', 'Olympics':'🏅',
+    'World Cup':'🏆', 'Skateboarding':'🛹', 'Surfing':'🏄', 'Pickup Games':'🏀', 'Organized Leagues':'🏆', 'Underdogs':'🐕', 'Favorites':'⭐',
+    'Trash Talk':'🗣️', 'Good Sportsmanship':'🤝', 'Console':'🎮', 'PC Gaming':'🖥️', 'Mobile Games':'📱', 'Console Games':'🎮', 'Strategy Games':'♟️',
+    'Adventure Games':'🗺️', 'Call of Duty':'🎖️', 'Halo':'🛸', 'Speedrunning':'⏱️', '100 Percent Completion':'💯', 'Open World Games':'🗺️',
+    'Linear Story Games':'📖', 'Arcade Games':'🕹️', 'Home Consoles':'🎮', 'Single-Player':'👤', 'Multiplayer':'👥', 'Racing Games':'🏎️',
+    'Fighting Games':'🥊', 'Retro Games':'👾', 'Modern Games':'🎮', 'Board Games':'🎲', 'Video Games':'🎮', 'Local Co-op':'🛋️', 'Online Multiplayer':'🌐',
+    'Easy Mode':'😌', 'Hard Mode':'💀', 'Laptop':'💻', 'Tablet':'📱', 'Wired Earbuds':'🔌', 'Wireless Earbuds':'📶', 'Texting':'💬', 'Calling':'📞',
+    'New Technology':'🚀', 'Older Reliable Technology':'📟', 'Social Media':'📱', 'Podcasts':'🎙️', 'Audiobooks':'🎧', 'Mac':'💻', 'PC':'🖥️',
+    'Dark Mode':'🌙', 'Light Mode':'☀️', 'Smartwatch':'⌚', 'Traditional Watch':'🕰️', 'Video Calls':'📹', 'Phone Calls':'📞', 'Physical Buttons':'🔘',
+    'Touchscreens':'👆', 'YouTube':'▶️', 'Netflix':'🍿', 'Voice Assistants':'🗣️', 'Typing It Yourself':'⌨️', 'Beach Vacations':'🏖️',
+    'Mountain Vacations':'🏔️', 'Road Trips':'🚗', 'Flying':'✈️', 'Camping':'🏕️', 'Staying in Hotels':'🏨', 'Traveling Alone':'🧳',
+    'Traveling with Friends':'👯', 'Museums':'🏛️', 'Zoos':'🦁', 'Window Seat':'🪟', 'Aisle Seat':'💺', 'National Parks':'🌲', 'Big Cities':'🏙️',
+    'Passport Stamps':'🛂', 'Souvenirs':'🎁', 'Hotels':'🏨', 'Vacation Rentals':'🏡', 'Backpacking':'🎒', 'Luxury Travel':'💎', 'Exploring Cities':'🏙️',
+    'Exploring Nature':'🌿', 'Theme Parks':'🎢', 'Water Parks':'🌊', 'Cruises':'🛳️', 'Planning Every Detail':'📋', 'Winging It':'🤷',
+    'Summer Vacation':'☀️', 'Winter Vacation':'⛷️', 'Working from Home':'🏠', 'Working in an Office':'🏢', 'Naps':'😴', 'Sleeping In':'🛌', 'Showers':'🚿',
+    'Baths':'🛁', 'Saving Money':'🐷', 'Spending Money':'💸', 'Early Mornings':'🌅', 'Late Nights':'🌙', 'Cleaning':'🧽', 'Organizing':'🗂️', 'Parties':'🎉',
+    'Small Gatherings':'🕯️', 'Routine':'🔁', 'Spontaneity':'🎲', 'Christmas':'🎄', 'Halloween':'🎃', 'Birthdays':'🎂', 'Anniversaries':'💍',
+    'Snow Days':'❄️', 'Beach Days':'🏖️', 'Mornings':'🌄', 'Nights':'🌃', 'City Living':'🏙️', 'Countryside Living':'🌾', 'Silence':'🤫',
+    'Background Noise':'📻', 'Cash':'💵', 'Cards':'💳', 'Planning Ahead':'🗓️', 'Being Spontaneous':'🎲', 'Staying In':'🛋️', 'Going Out':'🥳',
+    'Group Projects':'👥', 'Working Solo':'👤', 'Dating Apps':'📱', 'Meeting in Person':'☕', 'Introverts':'📚', 'Extroverts':'🎤', 'Logic':'🧠',
+    'Emotion':'❤️', 'Summer':'☀️', 'Winter':'❄️', 'New Year\'s Eve':'🎆', 'Fourth of July':'🎇', 'Casual Style':'👕', 'Formal Style':'👔', 'Jeans':'👖',
+    'Sweatpants':'🩳', 'Tattoos':'🖋️', 'Piercings':'💎', 'Sneakers':'👟', 'Sandals':'👡', 'Name Brands':'🏷️', 'Thrifted Finds':'♻️', 'Boots':'🥾',
+    'Vintage Fashion':'👒', 'Modern Fashion':'🕶️', 'Gold Jewelry':'💛', 'Silver Jewelry':'🤍', 'Hoodies':'🧥', 'Jackets':'🧥', 'Bold Prints':'🐆',
+    'Solid Colors':'🟦', 'Big Dogs':'🐕', 'Small Dogs':'🐩', 'Adopting a Pet':'🏠', 'Buying a Pet':'🛒', 'Reptiles':'🦎', 'Amphibians':'🐸', 'Horses':'🐎',
+    'Elephants':'🐘', 'Dogs':'🐶', 'Cats':'🐱', 'Birds':'🐦', 'Fish':'🐠', 'Ocean Animals':'🐬', 'Jungle Animals':'🐒', 'Wolves':'🐺', 'Big Cats':'🐅',
+    'Farm Animals':'🐄', 'Zoo Animals':'🦒', 'Old Cartoons':'📺', 'New Cartoons':'📱', 'Flip Phones':'📟', 'Smartphones':'📱', 'Arcades':'🕹️',
+    'Home Gaming':'🎮', 'Disposable Cameras':'📷', 'Phone Cameras':'🤳', '80s':'📼', '90s':'💿', 'Classic Movies':'🎞️', 'New Releases':'🎬', 'Mixtapes':'📼',
+    'Playlists':'🎧', 'Saturday Morning Cartoons':'🥣', 'Streaming Anytime':'📺', 'Board Game Nights':'🎲', 'Screen Time':'📱', 'Heroes':'🦸',
+    'Villains':'🦹', 'Money':'💰', 'Free Time':'⏳', 'Intelligence':'🧠', 'Creativity':'🎨', 'Freedom':'🕊️', 'Security':'🔒', 'Being Right':'✅',
+    'Being Liked':'👍', 'Following Your Heart':'❤️', 'Following Your Head':'🧠', 'Honesty':'😇', 'Loyalty':'🤝', 'The Past':'📜', 'The Future':'🚀',
+    'Fame':'🌟', 'Privacy':'🔒', 'Talent':'✨', 'Hard Work':'💪', 'Luck':'🍀', 'Skill':'🎯', 'Popularity':'👑', 'Respect':'🏅', 'Taking Risks':'🎲',
+    'Playing It Safe':'🦺', 'Adventure':'🧭', 'Comfort':'🛋️', 'Confidence':'😎', 'Kindness':'💝', 'Of Mice and Men':'🐭', 'The Catcher in the Rye':'🌾',
+    'The Hunger Games':'🏹', 'Divergent':'🧩', 'Physical Books':'📖', 'E-Books':'📱', 'Stephen King':'📚', 'Dean Koontz':'📚', '1984':'👁️',
+    'Brave New World':'🧪', 'Agatha Christie':'🕵️', 'Arthur Conan Doyle':'🔍', 'Series':'📚', 'Standalone Books':'📕', 'Judging a Book by Its Cover':'👀',
+    'Reading the Summary First':'📝', 'Highlighting While Reading':'🖍️', 'Keeping Books Pristine':'✨', 'Slow Burn Stories':'🕯️',
+    'Fast-Paced Thrillers':'⚡', 'Edgar Allan Poe':'🖋️', 'J.K. Rowling':'⚡', 'Suzanne Collins':'🏹', 'Harry Potter':'⚡', 'Percy Jackson':'🔱',
+    'To Kill a Mockingbird':'🐦', 'The Great Gatsby':'🥂', 'Fantasy Novels':'🐉', 'Science Fiction Novels':'🚀', 'Short Stories':'📄', 'Novels':'📖',
+    'Reading Before Bed':'🌙', 'Reading in the Morning':'☕', 'Bookstores':'🏪', 'Libraries':'🏛️', 'Plot-Driven Books':'🗺️',
+    'Character-Driven Books':'🎭', 'Chest Day':'🏋️', 'Leg Day':'🦵', 'Push Day':'💪', 'Pull Day':'🧗', 'Free Weights':'🏋️', 'Machines':'⚙️',
+    'CrossFit':'🔥', 'Powerlifting':'🏋️', 'Gym Workouts':'🏋️', 'Home Workouts':'🏠', 'Morning Gym Session':'🌅', 'Night Gym Session':'🌙', 'Cardio':'🏃',
+    'Weightlifting':'🏋️', 'Arm Day':'💪', 'Ab Day':'🍫', 'Yoga':'🧘', 'Pilates':'🤸', 'Rest Day':'😴', 'Extra Workout Day':'💪', 'Protein Shakes':'🥤',
+    'Whole Food Meals':'🥦', 'Dinosaurs':'🦕', 'Dragons':'🐉', 'Reading Minds':'🧠', 'Turning Invisible':'👻', 'Being 10 Feet Tall':'🦒',
+    'Being the Size of a Mouse':'🐭', 'Talking to Animals':'🐾', 'Speaking Every Language':'🗣️', 'A Time Machine':'⏳', 'A Cloning Machine':'👯',
+    'Freezing Time':'🧊', 'Rewinding Time':'⏪', 'Winning the Lottery':'🎰', 'Getting Your Dream Job':'💼', 'A House That Cleans Itself':'🧹',
+    'A Car That Drives Itself':'🚘', 'Being Famous for a Week':'🌟', 'Being Rich for a Week':'💰', 'Living Without Music':'🙉',
+    'Living Without Movies':'🙈', 'A Never-Ending Vacation':'🏝️', 'A Never-Ending Payday':'💸', 'Fighting One Horse-Sized Duck':'🦆',
+    'Fighting 100 Duck-Sized Horses':'🐴', 'Explaining Memes to Your Grandparents':'👵', 'Explaining TikTok to Your Boss':'👔',
+    'Being Able to Pause Real Life':'⏸️', 'Being Able to Fast-Forward Meetings':'⏩', 'Getting Stuck in an Elevator':'🛗',
+    'Getting Stuck in Traffic':'🚗', 'Autocorrect Fails':'🤦', 'Butt Dials':'📞', 'Forgetting Someone\'s Name':'🏷️',
+    'Forgetting Someone\'s Birthday':'🎂', 'A Bad Haircut':'💇', 'A Bad Sunburn':'🥵', 'A Song Stuck in Your Head':'🎶', 'An Itch You Can\'t Reach':'😖',
+    'A Typo in a Text':'⌨️', 'Sending It to the Wrong Person':'📤', 'A Slow Walker in Front of You':'🐢', 'A Loud Chewer Next to You':'😬',
+    'A Shirt Soaked in Maple Syrup All Day':'🍁', 'A Shirt Soaked in Ranch Dressing All Day':'🥗', 'Spaghetti for Hair':'🍝',
+    'Twizzlers for Fingers':'🍬', 'Sneezing Confetti':'🎊', 'Sneezing Glitter':'✨', 'A Nose That Honks Like a Horn':'📯',
+    'Ears That Ring Like a Bell':'🔔', 'A Permanent Wet Sock Feeling':'🧦', 'A Permanent Sand-in-Your-Shoes Feeling':'🏖️',
+    'A Tail That Wags When You\'re Happy':'🐕', 'Ears That Perk Up When You\'re Curious':'🐰', 'A Static Shock Every Doorknob':'⚡',
+    'A Wet Willy Every Handshake':'👂', 'A Permanent Hiccup':'😮', 'A Permanent Itchy Nose':'👃', 'A Voice That Echoes Everywhere':'🔊',
+    'A Shadow That\'s Always Late':'👤', 'A Permanent Wedgie':'🩲', 'A Permanent Bad Hair Day':'🤯', 'A Rewind Button for Your Life':'⏪',
+    'A Fast-Forward Button for Your Life':'⏩', 'Teleporting':'🌀', 'Never Needing Sleep':'👀', 'Never Needing Food':'🍽️', 'Unlimited Money':'💰',
+    'Unlimited Time':'⏳', 'Super Strength':'💪', 'Super Speed':'⚡', 'Living Underwater':'🐠', 'Living in Space':'🚀', 'A Personal Chef':'🧑‍🍳',
+    'A Personal Chauffeur':'🚘', 'A Mute Button for Everyone Else':'🔇', 'A Mute Button for Yourself':'🤐', 'A Do-Over Button':'🔄', 'A Skip Button':'⏭️',
+    'Losing Your Sense of Smell':'👃', 'Losing Your Sense of Taste':'👅', 'Being the Funniest Person in the Room':'😂',
+    'Being the Smartest Person in the Room':'🧠', 'Only Being Able to Whisper':'🤫', 'Only Being Able to Shout':'📢',
+    'A Vending Machine That\'s Always Free':'🥤', 'A Fridge That\'s Always Full':'🍱', 'Waking Up as a Cat':'🐱', 'Waking Up as a Dog':'🐶',
+    'A Group Chat That Never Stops':'💬', 'A Group Chat That Never Starts':'🦗', 'Losing Your Phone':'📱', 'Losing Your Wallet':'👛',
+    'Awkward Silence':'😶', 'Talking Over Each Other':'🗣️', 'Stepping on a Lego':'🧱', 'Stubbing Your Toe':'🦶', 'Being Put on Hold':'☎️',
+    'Waiting in a Long Line':'🚶', 'Running Out of Snacks':'🍿', 'Running Out of Wi-Fi':'📶', 'Your Alarm Not Going Off':'😱',
+    'Your Alarm Going Off Too Early':'⏰', 'A Sock Full of Pudding':'🍮', 'A Shoe Full of Jell-O':'👟', 'A Permanent Kazoo Voice':'🎺',
+    'A Permanent Whisper Voice':'🤫', 'Farting Bubbles':'💨', 'Burping Sparkles':'✨', 'Walking Backwards Forever':'🔙', 'Talking Backwards Forever':'🔁',
+    'Only Eating Room Temperature Food':'🌡️', 'Only Eating Ice Cold Food':'🧊', 'Hiccups That Sound Like a Duck':'🦆',
+    'A Laugh That Sounds Like a Seal':'🦭', 'A Cloud of Gnats Following You':'🦟', 'A Cloud of Confetti Following You':'🎊',
+    'Shoes That Squeak With Every Step':'👟', 'A Chair That Squeaks Every Time You Move':'🪑', 'Eating a Popsicle in Winter':'🍧',
+    'Eating Soup in Summer':'🍲', 'Autotune Voice Forever':'🤖', 'Elevator Music Following You Everywhere':'🎵', 'LeBron James':'🏀',
+    'Michael Jordan':'🏀', 'Steph Curry':'🏀', 'Stephen Curry':'🏀', 'Kevin Durant':'🏀', 'Kobe Bryant':'🏀', 'Shaquille O’Neal':'🏀',
+    'Hakeem Olajuwon':'🏀', 'Caitlin Clark':'🏀', 'Angel Reese':'🏀', 'Giannis Antetokounmpo':'🏀', 'Joel Embiid':'🏀', 'Luka Dončić':'🏀',
+    'Cooper Flagg':'🏀', 'Victor Wembanyama':'🏀', 'Muhammad Ali':'🥊', 'Mike Tyson':'🥊', 'Floyd Mayweather':'🥊', 'Tiger Woods':'⛳', 'Rory McIlroy':'⛳',
+    'Jack Nicklaus':'⛳', 'Usain Bolt':'🏃', 'Carl Lewis':'🏃', 'Michael Phelps':'🏊', 'Mark Spitz':'🏊', 'Novak Djokovic':'🎾', 'Roger Federer':'🎾',
+    'Serena Williams':'🎾', 'Venus Williams':'🎾', 'Naomi Osaka':'🎾', 'Rafael Nadal':'🎾', 'Lionel Messi':'⚽', 'Messi':'⚽', 'Pelé':'⚽',
+    'Cristiano Ronaldo':'⚽', 'Peyton Manning':'🏈', 'Aaron Rodgers':'🏈', 'Tom Brady':'🏈', 'Patrick Mahomes':'🏈', 'Joe Montana':'🏈',
+    'Wayne Gretzky':'🏒', 'Sidney Crosby':'🏒', 'Babe Ruth':'⚾', 'Hank Aaron':'⚾', 'Simone Biles':'🤸', 'Nadia Comaneci':'🤸', 'Queen':'🎸',
+    'Led Zeppelin':'🎸', 'Metallica':'🎸', 'Iron Maiden':'🎸', 'Rolling Stones':'🎸', 'Fleetwood Mac':'🎸', 'The Eagles':'🎸', 'Pink Floyd':'🎸',
+    'Bob Dylan':'🎸', 'Neil Young':'🎸', 'David Bowie':'🎸', 'Freddie Mercury':'🎸', 'The Beatles':'🎸', 'Nirvana':'🎸', 'Pearl Jam':'🎸', 'Coldplay':'🎸',
+    'Imagine Dragons':'🎸', 'Mick Jagger':'🎸', 'Robert Plant':'🎸', 'Eric Clapton':'🎸', 'Jimi Hendrix':'🎸', 'Elvis Presley':'🎸', 'Johnny Cash':'🎸',
+    'AC/DC':'🎸', 'Guns N\' Roses':'🎸', 'The Beach Boys':'🎸', 'Ed Sheeran':'🎸', 'Morgan Wallen':'🤠', 'Kendrick Lamar':'🎤', 'Drake':'🎤',
+    'Taylor Swift':'🎤', 'Beyoncé':'🎤', 'Bruno Mars':'🎤', 'The Weeknd':'🎤', 'Kanye West':'🎤', 'Jay-Z':'🎤', 'Michael Jackson':'🎤', 'Prince':'🎤',
+    'Ariana Grande':'🎤', 'Billie Eilish':'🎤', 'Post Malone':'🎤', 'Travis Scott':'🎤', 'Eminem':'🎤', 'Olivia Rodrigo':'🎤', 'Bad Bunny':'🎤',
+    'Playboi Carti':'🎤', 'Ice Spice':'🎤', 'Latto':'🎤', 'SZA':'🎤', 'Summer Walker':'🎤', 'Chappell Roan':'🎤', 'Sabrina Carpenter':'🎤', 'Dua Lipa':'🎤',
+    'Adele':'🎤', 'Whitney Houston':'🎤', 'Rihanna':'🎤', 'Nicki Minaj':'🎤', 'Selena Gomez':'🎤', 'Doja Cat':'🎤', 'J Balvin':'🎤', 'J. Cole':'🎤',
+    'Leonardo DiCaprio':'🎭', 'Brad Pitt':'🎭', 'Tom Hanks':'🎭', 'Denzel Washington':'🎭', 'Dwayne Johnson':'🎭', 'Chris Hemsworth':'🎭', 'Zendaya':'🎭',
+    'Margot Robbie':'🎭', 'Scarlett Johansson':'🎭', 'Gal Gadot':'🎭', 'Angelina Jolie':'🎭', 'Jennifer Aniston':'🎭', 'Timothée Chalamet':'🎭',
+    'Tom Holland':'🎭', 'Jim Carrey':'🎭', 'Adam Sandler':'🎭', 'Sydney Sweeney':'🎭', 'Glen Powell':'🎭', 'Austin Butler':'🎭', 'Sandra Bullock':'🎭',
+    'Charlize Theron':'🎭', 'Meryl Streep':'🎭', 'Viola Davis':'🎭', 'Ryan Reynolds':'🎭', 'Ryan Gosling':'🎭', 'Jennifer Lawrence':'🎭', 'Emma Stone':'🎭',
+    'Keanu Reeves':'🎭', 'Tom Cruise':'🎭', 'Chris Evans':'🎭', 'Chris Pratt':'🎭', 'Morgan Freeman':'🎭', 'Samuel L. Jackson':'🎭', 'Will Ferrell':'🎭',
+    'Steve Carell':'🎭', 'Florence Pugh':'🎭', 'Anya Taylor-Joy':'🎭', 'Will Smith':'🎭', 'Quentin Tarantino':'🎬', 'Christopher Nolan':'🎬',
+    'The Matrix':'💊', 'Star Wars':'🌌', 'Lord of the Rings':'💍', 'The Godfather':'🌹', 'Goodfellas':'💼', 'James Bond':'🍸', 'Jason Bourne':'🕵️',
+    'Jurassic Park':'🦖', 'Jaws':'🦈', 'Toy Story':'🤠', 'Shrek':'👹', 'The Dark Knight':'🦇', 'Game of Thrones':'🐉', 'The Office':'📎',
+    'Parks and Recreation':'🌳', 'The Simpsons':'🍩', 'Family Guy':'📺', 'Top Gun':'✈️', 'Wolverine':'🦡', 'Deadpool':'⚔️', 'Thor':'🔨', 'Hulk':'💚',
+    'The Hulk':'💚', 'Joker':'🃏', 'Thanos':'🧤', 'Venom':'🖤', 'Carnage':'❤️', 'Green Lantern':'💍', 'Black Panther':'🐆', 'Marvel Villains':'🦹',
+    'DC Villains':'🦹', 'Marvel':'🦸', 'DC':'🦸', 'Star Trek':'🖖', 'Pixar':'💡', 'DreamWorks':'🌙', 'Breaking Bad':'🧪', 'The Sopranos':'🍝',
+    'The Avengers':'🦸', 'Justice League':'🦸', 'Avengers':'🦸', 'X-Men':'✖️', 'Titanic':'🚢', 'Avatar':'💙', 'The Lion King':'🦁', 'Aladdin':'🧞',
+    'Inception':'🌀', 'Stranger Things':'🔦', 'The Boys':'💥', 'Fast & Furious':'🏎️', 'Mission: Impossible':'🕶️', 'Squid Game':'🦑', 'Money Heist':'💰',
+    'Wonder Woman':'👸', 'Captain Marvel':'✴️', 'Goku':'🐉', 'The Flash':'⚡', 'Quicksilver':'💨', 'Harley Quinn':'🃏', 'Captain America':'🛡️', 'Xbox':'🎮',
+    'PlayStation':'🎮', 'New Balance':'👟', 'Nike':'👟', 'Adidas':'👟', 'Puma':'👟', 'Under Armour':'👟', 'Amazon':'📦', 'Walmart':'🛒', 'Target':'🎯',
+    'Costco':'🛒', 'Sam’s Club':'🛒', 'HBO Max':'📺', 'Instagram':'📸', 'TikTok':'🎵', 'Google':'🔍', 'Microsoft':'💻', 'Samsung':'📱', 'Apple':'🍎',
+    'DoorDash':'🛵', 'Uber Eats':'🛵', 'FedEx':'📦', 'UPS':'📦', 'PayPal':'💳', 'Venmo':'💸', 'Chevrolet':'🚙', 'Ford':'🚗', 'iPhone':'📱', 'Android':'🤖',
+    'Coke':'🥤', 'Coca-Cola':'🥤', 'Pepsi':'🥤', 'Tesla':'⚡', 'Toyota':'🚗', 'Spotify':'🎧', 'Apple Music':'🎵', 'Twitch':'🎮', 'Uber':'🚕', 'Lyft':'🚗',
+    'Airbnb':'🏡', 'Booking.com':'🏨', 'Zoom':'📹', 'Microsoft Teams':'💼', 'Chick-fil-A':'🐔', 'Popeyes':'🍗', 'Shake Shack':'🍔', 'In-N-Out':'🍔',
+    'Whataburger':'🍔', 'Five Guys':'🍔', 'Culver’s':'🍔', 'McDonald’s':'🍟', 'Burger King':'👑', 'Wendy’s':'🍔', 'Domino’s':'🍕', 'Papa John’s':'🍕',
+    'Pizza Hut':'🍕', 'Panera':'🥖', 'Subway':'🥪', 'Wingstop':'🍗', 'Buffalo Wild Wings':'🍗', 'Sonic':'🥤', 'Chipotle':'🌯', 'Taco Bell':'🌮', 'Qdoba':'🌯',
+    'Del Taco':'🌮', 'Dunkin’':'🍩', 'Starbucks':'☕', 'Krispy Kreme':'🍩', 'Ben & Jerry’s':'🍨', 'Häagen-Dazs':'🍦', 'Olive Garden':'🍝', 'Applebee’s':'🍽️',
+    'Panda Express':'🥡', 'P.F. Chang’s':'🥢', 'Grand Theft Auto':'🚗', 'GTA V':'🚗', 'Red Dead Redemption':'🤠', 'Minecraft':'⛏️', 'Fortnite':'🪂',
+    'Battlefield':'💥', 'PlayStation 5':'🎮', 'Xbox Series X':'🎮', 'The Last of Us':'🧟', 'Resident Evil':'☣️', 'Overwatch':'🛡️', 'Valorant':'🎯',
+    'FIFA':'⚽', 'NBA 2K':'🏀', 'Among Us':'🚀', 'Fall Guys':'🤸', 'Pikachu':'⚡', 'Charizard':'🔥', 'Eevee':'🦊', 'Ash Ketchum':'🧢', 'Red':'🧢',
+    'Mewtwo':'🧬', 'Mew':'💗', 'The Legend of Zelda':'🗡️', 'Super Mario':'🍄', 'League of Legends':'⚔️', 'Dota 2':'🛡️', 'Gears of War':'⚙️',
+    'Elden Ring':'💍', 'Dark Souls':'🔥', 'Animal Crossing':'🍃', 'Stardew Valley':'🌻', 'Roblox':'🧱', 'Pokémon':'⚡', 'Digimon':'👾', 'Blastoise':'💧',
+    'Squirtle':'💧', 'Bulbasaur':'🌱', 'Gengar':'👻', 'Snorlax':'😴',
+  };
+  function cardGlyph(name, cat){ return ITEM_GLYPHS[name] || ((CAT_META[cat] || {}).badge || '').split(' ')[0] || '\u2728'; }
   function matchCards(raw, p){
-    return raw.map(([cat,a,b],i)=>({ id:p+'m-'+i, mode:'match', category:cat, a, b, avatarA:initials(a), avatarB:initials(b) }));
+    return raw.map(([cat,a,b],i)=>({ id:p+'m-'+i, mode:'match', category:cat, a, b, glyphA:cardGlyph(a, cat), glyphB:cardGlyph(b, cat) }));
   }
   function sceneCards(raw, p){
     return raw.map((row,i)=>({
@@ -4602,7 +4752,7 @@
     }));
   }
   function pairCards(raw, p){
-    return raw.map(([cat,a,b,kind],i)=>({ id:p+'p-'+i, mode:'match', pick: kind === 'pick', category:cat, a, b, avatarA:initials(a), avatarB:initials(b) }));
+    return raw.map(([cat,a,b,kind],i)=>({ id:p+'p-'+i, mode:'match', pick: kind === 'pick', category:cat, a, b, glyphA:cardGlyph(a, cat), glyphB:cardGlyph(b, cat) }));
   }
   function cardKey(c){ return [slugify(c.a), slugify(c.b)].sort().join('|'); }
   function buildCardPools(){
@@ -6933,6 +7083,9 @@
   function resetDeck(p){ p = p || contentPoolKey(); decks[p].cards = smartShuffle(CARD_POOLS[p]); decks[p].next = 0; }
   function setScene(el, glyph){
     el.innerHTML = glyph ? '<span class="glyph">'+glyph+'</span>' : '';
+    // Same icon on both sides (🏀 vs 🏀, 🎸 vs 🎸): the bottom one faces the
+    // other way in another colour, so it still reads as a matchup.
+    if (el === els.sceneB && glyph && current && current.glyphA === glyph) el.firstChild.classList.add('vs-twin');
     const half = el.closest('.half');
     if (half) half.classList.toggle('has-glyph', !!glyph);
   }
@@ -7234,10 +7387,9 @@
       els.halfA.style.background = grads[0];
       els.halfB.style.background = grads[1];
       els.halfB.style.filter = '';
-      setScene(els.sceneA, null); setScene(els.sceneB, null);
-      const avatars = current.pick ? 'none' : 'flex';
-      els.avatarA.style.display = avatars; els.avatarB.style.display = avatars;
-      els.avatarA.textContent = current.avatarA; els.avatarB.textContent = current.avatarB;
+      // An icon per side (see ITEM_GLYPHS) in place of the old initials.
+      els.avatarA.style.display = 'none'; els.avatarB.style.display = 'none';
+      setScene(els.sceneA, current.glyphA); setScene(els.sceneB, current.glyphB);
     } else {
       els.avatarA.style.display = 'none'; els.avatarB.style.display = 'none';
       els.halfA.style.background = boostGradient(current.gradA);
@@ -7703,6 +7855,7 @@
       seekInfinityTrack: (t) => { if (trackEls.infinity) trackEls.infinity.currentTime = t; },
       getContentPools: () => ({ cards: CARD_POOLS, cardKey, trivia: { geography: GEOGRAPHY_SETS, english: ENGLISH_SETS, history: HISTORY_SETS, science: SCIENCE_SETS, art: ART_SETS, music: MUSIC_SETS, health: HEALTH_SETS }, gen: generateSubjectTrivia, poolKey: contentPoolKey }),
       getCurrentCard: () => current,
+      showCard: (c) => { const d = decks[contentPoolKey()]; d.cards.splice(d.next, 0, c); lastWasEvent = true; loadNext(); clearRoundTimer(); },
       getCollection: () => collection,
       getInfBlock: () => infBlock,
       getBadges: () => ({ earned: badgeStore.earned, voted: badgeVoted.size, session: infSession, infFood: infinityKeysBy('food').length, infMovies: infinityKeysBy('movies').length, infAll: infinityKeysBy('all').length }),
