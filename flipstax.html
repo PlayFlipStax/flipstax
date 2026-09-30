@@ -4652,6 +4652,10 @@
   };
 
   // ---------- personal stats (this device, permanent - never wiped) ----------
+  // Today's date in UTC, not the device's local date - intentional. Every
+  // "today" in the game (the Daily word, one Daily run per day, the run
+  // streak, daily stats) turns over for everyone at the same moment,
+  // 00:00 UTC, so the Daily word is shared globally. See daysSinceEpoch.
   function todayStr(){ return new Date().toISOString().slice(0,10); }
   function loadStats(){
     const blank = { flips:0, lastDate:null, streak:0, byCat:{}, badges:{}, agree:0, decided:0, personalityMilestone:0, freezeAvailable:false, slowdownCharges:3, slowdownDate:null };
@@ -4774,11 +4778,19 @@
   // shuffle (seeded by the cycle number), same as reshuffling a deck once
   // you've dealt through it - the one edge case a real shuffled deck has
   // too is that the last card of one lap and the first of the next could
-  // match. That's a 1-in-n chance at every lap boundary (with 20 words,
-  // about once a year - a 1,100-day simulation hit it 4 times), so it IS
+  // match. That's a 1-in-n chance at every lap boundary, and a boundary
+  // comes every n days - so on average once every n x n days (20 words:
+  // about once a year, and a 1,100-day simulation hit it 4 times; 250
+  // words: about once every 170 years). Cheap to rule out, so it IS
   // guarded: if a lap would open on the word the last lap ended on, its
   // first two days swap. Only the lap's last position is ever compared, and
   // the swap never touches it, so the check doesn't chain between laps.
+  // The day number comes from todayStr(), which is the UTC date - on
+  // purpose. The Daily word is shared globally: every player everywhere has
+  // the same word at the same moment, and it changes for everyone at once
+  // (00:00 UTC = 8pm US Eastern in summer, 7pm in winter). Don't "fix" this
+  // to local time: players in different time zones would then be on
+  // different words at the same moment.
   function daysSinceEpoch(){ return Math.floor(Date.parse(todayStr() + 'T00:00:00Z') / 86400000); }
   function getTodayWord(){
     const n = RUN_WORDS.length;
@@ -7038,8 +7050,8 @@
   new MutationObserver(updatePauseBtnVisibility).observe(els.runIntroOverlay, { attributes:true, attributeFilter:['class'] });
 
   // Noon Rush: a per-timezone local event, not a global one - every player's
-  // OWN device clock decides their own noon, same trick Daily Run uses for
-  // "today". No server coordination needed.
+  // OWN device clock decides their own noon. No server coordination needed.
+  // (Unlike the Daily day, which is deliberately UTC - see todayStr.)
   function isNoonRush(){ return new Date().getHours() === 12; }
 
   function maybeTriggerBonusZone(){
