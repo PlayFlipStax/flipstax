@@ -4774,15 +4774,19 @@
   // shuffle (seeded by the cycle number), same as reshuffling a deck once
   // you've dealt through it - the one edge case a real shuffled deck has
   // too is that the last card of one lap and the first of the next could
-  // coincidentally match; with a list this size that's roughly a
-  // once-in-tens-of-thousands-of-years coincidence, not worth guarding.
+  // match. That's a 1-in-n chance at every lap boundary (with 20 words,
+  // about once a year - a 1,100-day simulation hit it 4 times), so it IS
+  // guarded: if a lap would open on the word the last lap ended on, its
+  // first two days swap. Only the lap's last position is ever compared, and
+  // the swap never touches it, so the check doesn't chain between laps.
   function daysSinceEpoch(){ return Math.floor(Date.parse(todayStr() + 'T00:00:00Z') / 86400000); }
   function getTodayWord(){
     const n = RUN_WORDS.length;
     const day = daysSinceEpoch();
     const cycle = Math.floor(day / n), posInCycle = day % n;
-    const rng = mulberry32(hashStr('flipstax-word-cycle-' + cycle));
-    const order = shuffle(RUN_WORDS.map((_, i) => i), rng);
+    const lapOrder = c => shuffle(RUN_WORDS.map((_, i) => i), mulberry32(hashStr('flipstax-word-cycle-' + c)));
+    const order = lapOrder(cycle);
+    if (n > 2 && order[0] === lapOrder(cycle - 1)[n - 1]){ const t = order[0]; order[0] = order[1]; order[1] = t; }
     return RUN_WORDS[order[posInCycle]];
   }
   function loadRunResult(){
@@ -7620,6 +7624,7 @@
       shareCardDataUrl: (kind) => renderShareCard(kind, kind === 'daily' ? buildDailyShareData(runResultToday) : buildInfinityShareData()).toDataURL('image/png'),
       getInfinityPlaylist: () => ({ idx: infIdx, els: infEls.slice(), songs: INFINITY_PLAYLIST, lead: INFINITY_LEAD, cutAt: infCutAt(infIdx), startAt: infStartAt(infIdx) }),
       getTrackEl: (k) => getTrackEl(k),
+      todayWord: () => getTodayWord(),
       getCurrentTrack: () => ({ key: currentTrackKey, paused: trackEls[currentTrackKey] ? trackEls[currentTrackKey].paused : null, src: trackEls[currentTrackKey] ? trackEls[currentTrackKey].src.split('/').pop() : null }),
       setRunClockMs: (ms) => { runEndsAt = Date.now() + ms; },
       extendPendingDeadlines: (ms) => { if (runPendingQ){ runPendingQEndsAt = Date.now() + ms; clearTimeout(eventTimeoutId); eventTimeoutId = setTimeout(()=> (runPhase === 'secondchance' ? resolveSecondChance : resolveRunTrivia)(false), ms); } if (runPhase === 'solving') solveEndsAt = Date.now() + ms; },
