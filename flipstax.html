@@ -3320,8 +3320,8 @@
   }
 
   // ---- Real recorded music, one track per part of the game: "intro"
-  // (mode select), "run" (Bonus Stage Anthem) for Daily Run's voting/trivia
-  // phase, "infinity" (a three-song playlist, below) for Infinity Flips, and
+  // (mode select), "run" (Top Score Carousel) for Daily Run's voting/trivia
+  // phase, "infinity" (a four-song playlist, below) for Infinity Flips, and
   // "solve" (The Final Buzzer) for the word-solve phase. Plain <audio>
   // elements (natively looping, apart from the playlist) - simpler and
   // better-sounding than synthesizing notes, now that we have real tracks
@@ -3333,29 +3333,35 @@
     // -11.7, so no gain trim needed.
     fanfare:  'audio/enter-fanfare-faded.mp3',
     intro:    'audio/grand-flipstax-party.mp3',
-    run:      'audio/bonus-stage-anthem.mp3',
+    // Daily Stax: loops from the top every time it ends, for the whole run
+    // (~2:57; the file's tail silence is trimmed to ~0.65s so the loop
+    // doesn't leave a gap). -11.9 LUFS, in line with the intro.
+    run:      'audio/top-score-carousel-trimmed.mp3',
     solve:    'audio/final-buzzer.mp3',
   };
-  // Infinity rotates High Score Strut -> Sunday Morning Swipe -> The Winning
-  // Swipe -> back to High Score Strut, so a long session doesn't loop one
-  // song. All three are 96kbps and measured at a steady 120.00 BPM (drift
-  // under 1.5ms across each file), with the kick - the real beat - landing
-  // at `beat1` + n x 0.5s. Every file opens with ~0.3s of silence and closes
-  // with 1.5-2.3s of decay and silence, so the handoff doesn't wait for
-  // 'ended' (that left a ~2.5s hole): each song is cut at `out` - LEAD, just
-  // past the point its tail falls below -60dBFS, and the next one starts
-  // LEAD seconds before its own first downbeat. That downbeat therefore
-  // lands exactly on `out`, the next beat of the outgoing song's grid, so
-  // the pulse carries straight through the change and the ramp's hats stay
-  // on the beat across it. Loudness is matched to -12.88 LUFS integrated:
-  // The Winning Swipe's file was encoded 0.96dB down to get there (iOS
-  // ignores element volume, so it has to be in the file), and High Score
-  // Strut, which predates this and would lose quality to a re-encode, is
-  // trimmed 0.51dB here via `gain`. Re-measure all of this if a file changes.
+  // Infinity plays a continuous playlist: Pacific Drive -> Palm Tree Pivot
+  // -> High Noon Parade -> Victory Lap -> back to Pacific Drive, round and
+  // round for as long as the player stays in Infinity Flips, so a long
+  // session never loops one song. Measured from the files: Pacific Drive,
+  // High Noon Parade and Victory Lap are a steady 120.00 BPM and Palm Tree
+  // Pivot is 122.00 (drift a few ms at most; Victory Lap's kick sits ~25ms
+  // later in its last third - an arrangement change, not tempo drift). The
+  // kick - the real beat - lands at `beat1` + n x (60/bpm) s. The handoff
+  // doesn't wait for 'ended' (that left a ~2.5s hole with the old files):
+  // each song is cut on its own beat grid just past the point its tail
+  // falls below -60dBFS (`out`), and the next one starts just before its
+  // own first kick so that kick lands exactly on `out` - the pulse carries
+  // straight through the change, and the ramp's hats (which follow each
+  // song's own bpm) stay on the beat across it. The files are the originals
+  // cut ~0.3s after `out` (stream-copied, no re-encode). Loudness: -11.3 to
+  // -11.6 LUFS integrated, evened out to -11.6 via `gain` (a 0.3dB trim at
+  // most; iOS ignores element volume, and that small a difference doesn't
+  // need a re-encode). Re-measure all of this if a file changes.
   const INFINITY_PLAYLIST = [
-    { src:'audio/high-score-strut.mp3',     beat1:0.294, out:179.794, gain:0.943 },
-    { src:'audio/sunday-morning-swipe.mp3', beat1:0.297, out:178.797, gain:1 },
-    { src:'audio/the-winning-swipe.mp3',    beat1:0.294, out:167.794, gain:1 },
+    { src:'audio/pacific-drive-trimmed.mp3',    bpm:120,    beat1:0.074, out:177.074, gain:0.989 },
+    { src:'audio/palm-tree-pivot-trimmed.mp3',  bpm:122.005, beat1:0.073, out:174.656, gain:1 },
+    { src:'audio/high-noon-parade-trimmed.mp3', bpm:120,    beat1:0.068, out:176.568, gain:0.966 },
+    { src:'audio/victory-lap-trimmed.mp3',      bpm:120,    beat1:0.071, out:177.071, gain:0.989 },
   ];
   const INFINITY_LEAD = 0.15;
   const MUSIC_VOLUME = 0.55;
@@ -3417,8 +3423,13 @@
     }
     return infEls[i];
   }
-  function infStartAt(i){ return INFINITY_PLAYLIST[i].beat1 - INFINITY_LEAD; }
-  function infCutAt(i){ return INFINITY_PLAYLIST[i].out - INFINITY_LEAD; }
+  // The next song starts this far ahead of its first kick: INFINITY_LEAD,
+  // or less when the kick comes sooner than that (these files open with
+  // their first kick ~0.07s in) - so the handoff happens that much before
+  // the outgoing song's `out`.
+  function infLead(i){ return Math.min(INFINITY_LEAD, INFINITY_PLAYLIST[i].beat1); }
+  function infStartAt(i){ return INFINITY_PLAYLIST[i].beat1 - infLead(i); }
+  function infCutAt(i){ return INFINITY_PLAYLIST[i].out - infLead((i + 1) % INFINITY_PLAYLIST.length); }
   // Called on every timeupdate (~4x/sec) of the active song. Starts
   // buffering the next song half a minute out, and inside the last half
   // second arms a timer for the exact cut point - timeupdate alone is far
@@ -3569,14 +3580,14 @@
   const RAMP_DRIFT_RATES = [1, 1.2, 1.4, 1.6, 1.8];
   const RAMP_HAT_LEVEL   = [0, 0.55, 0.75, 0.9, 1];
   const RAMP_RISER_LEVEL = [0, 0, 0.6, 0.85, 1];
-  // Every Infinity song is a steady 120 BPM (straight 8ths, not swung); the
-  // grid's phase is each song's `beat1` in INFINITY_PLAYLIST, read per tick
-  // so the layers follow the rotation. (High Score Strut's grid used to be
+  // Each Infinity song has a steady tempo (straight 8ths, not swung); the
+  // grid's beat length (60/bpm) and phase (`beat1`) come from the current
+  // song's INFINITY_PLAYLIST entry, read per tick so the layers follow the
+  // rotation - Palm Tree Pivot is 122 BPM, the rest 120. (High Score Strut's grid used to be
   // set at 48ms - that's its off-beat hi-hat, not the kick at 294ms, which
   // put the "off-beat" hats on the kick and ended each riser on an off-beat.)
   // The layers are unpitched (noise hats + a noise riser) so they can lock to
   // the grid without needing to know a song's key.
-  const RAMP_BEAT = 60 / 120;
   let rampRounds = 0, rampTier = 0, rampDriftRate = 1;
   let rampBus = null, rampNoise = null, rampTimer = null;
   let rampLastTrackT = 0, rampNextHatStep = 0, rampNextPhrase = -1, rampOff = null, rampSettle = 0;
@@ -3650,7 +3661,7 @@
     else rampOff += (rawOff - rampOff) * (rampSettle++ < 11 ? 0.5 : 0.12);
     // Never schedule past this song's cut point: the next song takes over
     // there and its own grid is picked up on the next tick.
-    const RAMP_PHASE = INFINITY_PLAYLIST[infIdx].beat1;
+    const RAMP_PHASE = INFINITY_PLAYLIST[infIdx].beat1, RAMP_BEAT = 60 / (INFINITY_PLAYLIST[infIdx].bpm || 120);
     const off = rampOff, horizon = Math.min(now + 0.3, infCutAt(infIdx));
     const step = RAMP_BEAT / 4;
     let i = Math.max(rampNextHatStep, Math.ceil((now - RAMP_PHASE) / step));
