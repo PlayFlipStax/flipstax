@@ -696,20 +696,29 @@
     position:absolute; z-index:9; top:calc(12px + env(safe-area-inset-top)); right:12px;
     display:flex; flex-direction:column; align-items:center; gap:3px;
   }
+  /* Was a 46px pale-cream circle on the sky-blue corner (often over a
+     cloud) with faint 9.5px text - easy to miss. Now a saturated warm
+     orange, a touch bigger (still smaller than the 61px Cards badge) with a
+     bigger cup, and the caption on a solid pill so it reads on any
+     background. Same button on the Daily results screen (see readout). */
   .ms-coffee-btn{
     display:flex; align-items:center; justify-content:center;
-    width:46px; height:46px; border-radius:50%; cursor:pointer; -webkit-tap-highlight-color:transparent;
-    background:linear-gradient(145deg,#fff3d6,#e8a33d); border:2px solid #fff;
-    box-shadow:0 4px 0 rgba(90,52,16,0.35), 0 0 14px rgba(232,163,61,0.55);
+    width:54px; height:54px; border-radius:50%; cursor:pointer; -webkit-tap-highlight-color:transparent;
+    background:linear-gradient(145deg,#ffc94d 0%,#ff9a2e 55%,#f26b1d 100%); border:2.5px solid #fff;
+    box-shadow:0 4px 0 rgba(140,60,10,0.4), 0 0 18px rgba(255,140,40,0.7);
     text-decoration:none; animation:msCoffeeIdle 4.5s ease-in-out infinite;
   }
-  .ms-coffee-btn svg{ filter:drop-shadow(0 1px 1.5px rgba(90,52,16,0.45)); }
+  .ms-coffee-btn svg{ width:32px; height:32px; filter:drop-shadow(0 1.5px 1.5px rgba(90,40,8,0.5)); }
   .ms-coffee-btn:active{ transform:scale(0.88); }
   .ms-coffee-label{
-    font-family:'Big Shoulders Display', sans-serif; font-weight:800; font-size:9.5px;
-    letter-spacing:1px; text-transform:uppercase; color:#0d2b5e; opacity:0.8;
-    text-shadow:0 1px 3px rgba(255,255,255,0.7); pointer-events:none;
+    font-family:'Big Shoulders Display', sans-serif; font-weight:800; font-size:10.5px;
+    letter-spacing:1px; text-transform:uppercase; color:#a1440b; line-height:1;
+    background:#fff; padding:3px 7px 2px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.25);
+    pointer-events:none;
   }
+  /* Daily results: the overlay is a centred flex column, so pin the copy to
+     the top-right corner like on mode select. */
+  .readout-coffee{ position:absolute; top:calc(12px + env(safe-area-inset-top)); right:12px; }
   @keyframes msCoffeeIdle{
     0%, 78%, 100%{ transform:scale(1) rotate(0deg); }
     84%{ transform:scale(1.1) rotate(-8deg); }
@@ -7988,7 +7997,19 @@
   const CONTACT_EMAIL = ['moc.liamg', 'xatspilfyalp'].map(p=> p.split('').reverse().join('')).reverse().join('@');
   const LEGAL_CONTACT_EMAIL = CONTACT_EMAIL;
   const LEGAL_CONTACT_LINK = '<a href="mailto:' + LEGAL_CONTACT_EMAIL + '">' + LEGAL_CONTACT_EMAIL + '</a>';
-  const COFFEE_URL = 'https://ko-fi.com/flipstax';
+  // The Daily results screen gets the same floating Donations button as mode
+  // select (top-right) - a natural pause point. Cloned with its own SVG
+  // gradient ids: gradients inside the hidden mode-select overlay don't
+  // render for a copy that points at them.
+  (function(){
+    const wrap = document.querySelector('#modeSelectOverlay .ms-coffee-wrap');
+    if (!wrap || !els.readoutOverlay) return;
+    const copy = document.createElement('div');
+    copy.innerHTML = wrap.outerHTML.replace(/coffeeCup/g, 'coffeeCupR').replace('id="coffeeBtn"', 'id="coffeeBtnResults"');
+    const w = copy.firstElementChild; w.classList.add('readout-coffee');
+    w.querySelector('a').addEventListener('click', e=> e.stopPropagation());
+    els.readoutOverlay.appendChild(w);
+  })();
   document.querySelectorAll('[data-contact-footer]').forEach(el=>{
     el.textContent = 'Questions or feedback? ';
     const a = document.createElement('a');
@@ -7996,16 +8017,8 @@
     // Mode select is one big tap target: a tap on the link must not start a mode.
     a.addEventListener('click', e=> e.stopPropagation());
     el.appendChild(a);
-    // Mode select already has the floating .ms-coffee-btn for this - only
-    // the Daily results footer (outside modeSelectOverlay) gets the text link.
-    if (!el.closest('#modeSelectOverlay')) {
-      el.appendChild(document.createTextNode(' · '));
-      const c = document.createElement('a');
-      c.href = COFFEE_URL; c.target = '_blank'; c.rel = 'noopener noreferrer';
-      c.textContent = 'Support FlipStax ☕';
-      c.addEventListener('click', e=> e.stopPropagation());
-      el.appendChild(c);
-    }
+    // (Ko-fi: mode select and the Daily results screen both have the
+    // floating Donations button, so no text link here.)
   });
   const LEGAL_DOCS = {
     disclaimer: {
