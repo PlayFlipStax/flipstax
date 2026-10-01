@@ -404,25 +404,47 @@
   .event-prompt.wildcard-pop{ animation: wildcardBurst 0.55s cubic-bezier(.36,.07,.19,.97) both; }
   @media (prefers-reduced-motion: reduce){ .event-prompt.wildcard-pop{ animation:none !important; } }
 
-  /* The riddle round is a rare, secret unlock - it needs to feel like a
-     different, more precious event than an ordinary trivia/power-up
-     screen: a deep cosmic gold-on-violet treatment, drifting starfield,
-     a glowing framed panel that reveals itself with a dramatic pop, and
-     its own urgency timer color - instead of reusing .event-overlay. */
+  /* The Super Secret Hidden Riddle: Daily Stax's rare power-up-order unlock
+     (see checkSecretUnlock in the JS - "riddle" in these class names is the
+     original, unrenamed internal name; nothing here is shared with or
+     visible from Infinity's own, separately-pooled Riddle Round). It needs
+     to feel like a different, more precious event than an ordinary
+     trivia/power-up screen, and distinct from Infinity's green "?"-field
+     riddle screen too: a deep-space purple/magenta nebula instead of either
+     one, drifting cloud-like colour blobs behind a bigger starfield, a
+     glowing framed panel that reveals itself with a dramatic pop, and its
+     own urgency timer colour - instead of reusing .event-overlay. */
   .riddle-overlay{
     position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center;
     padding:24px; text-align:center; overflow:hidden;
     background:
-      radial-gradient(circle at 50% 18%, rgba(255,214,110,0.35), transparent 55%),
-      radial-gradient(circle at 20% 80%, rgba(160,90,255,0.4), transparent 55%),
-      radial-gradient(circle at 82% 78%, rgba(255,90,180,0.28), transparent 55%),
-      linear-gradient(160deg, #0a0620, #200a3d 45%, #1a0630 100%);
+      radial-gradient(circle at 50% 15%, rgba(255,214,110,0.22), transparent 50%),
+      radial-gradient(circle at 15% 25%, rgba(130,60,255,0.45), transparent 55%),
+      radial-gradient(circle at 85% 75%, rgba(220,50,220,0.35), transparent 55%),
+      radial-gradient(circle at 25% 85%, rgba(60,30,200,0.4), transparent 50%),
+      linear-gradient(160deg, #060212, #190735 45%, #0e0428 100%);
     background-size: 220% 220%;
-    animation: riddleBgDrift 8s ease-in-out infinite alternate;
+    animation: riddleBgDrift 10s ease-in-out infinite alternate;
   }
   .riddle-overlay.hidden{ display:none; }
   @keyframes riddleBgDrift{ 0%{ background-position: 0% 0%; } 100%{ background-position: 100% 100%; } }
-  .riddle-stars{ position:absolute; inset:0; pointer-events:none; }
+  /* Two big, softly-blurred colour blobs drifting slowly past each other -
+     the "nebula" part - sitting behind the stars and well behind the panel. */
+  .riddle-nebula{ position:absolute; inset:-15%; pointer-events:none; z-index:0; overflow:hidden; filter:blur(50px); opacity:0.65; }
+  .riddle-nebula::before, .riddle-nebula::after{
+    content:''; position:absolute; width:65vmax; height:65vmax; border-radius:50%; mix-blend-mode:screen;
+  }
+  .riddle-nebula::before{
+    background:radial-gradient(circle, rgba(170,70,255,0.8), transparent 65%);
+    left:-15vmax; top:-10vmax; animation: riddleNebula1 16s ease-in-out infinite alternate;
+  }
+  .riddle-nebula::after{
+    background:radial-gradient(circle, rgba(255,70,210,0.65), transparent 65%);
+    right:-20vmax; bottom:-15vmax; animation: riddleNebula2 19s ease-in-out infinite alternate;
+  }
+  @keyframes riddleNebula1{ to{ transform:translate(12vmax, 8vmax) scale(1.15); } }
+  @keyframes riddleNebula2{ to{ transform:translate(-10vmax, -10vmax) scale(1.1); } }
+  .riddle-stars{ position:absolute; inset:0; pointer-events:none; z-index:1; }
   .riddle-stars span{
     position:absolute; width:3px; height:3px; border-radius:50%; background:#ffe9a8;
     box-shadow:0 0 6px 2px rgba(255,233,168,0.8); animation: riddleTwinkle 2.4s ease-in-out infinite;
@@ -435,13 +457,21 @@
   .riddle-stars span:nth-child(6){ top:45%; left:92%; animation-delay:1.5s; }
   .riddle-stars span:nth-child(7){ top:90%; left:45%; animation-delay:1.8s; }
   .riddle-stars span:nth-child(8){ top:35%; left:5%; animation-delay:2.1s; }
+  .riddle-stars span:nth-child(9){ top:5%; left:25%; animation-delay:0.45s; background:#d8b8ff; box-shadow:0 0 6px 2px rgba(216,184,255,0.8); }
+  .riddle-stars span:nth-child(10){ top:58%; left:60%; animation-delay:1.05s; background:#d8b8ff; box-shadow:0 0 6px 2px rgba(216,184,255,0.8); }
+  .riddle-stars span:nth-child(11){ top:30%; left:40%; animation-delay:1.65s; }
+  .riddle-stars span:nth-child(12){ top:75%; left:28%; animation-delay:0.15s; background:#d8b8ff; box-shadow:0 0 6px 2px rgba(216,184,255,0.8); }
+  .riddle-stars span:nth-child(13){ top:15%; left:65%; animation-delay:0.75s; }
+  .riddle-stars span:nth-child(14){ top:50%; left:8%; animation-delay:1.35s; background:#d8b8ff; box-shadow:0 0 6px 2px rgba(216,184,255,0.8); }
+  .riddle-stars span:nth-child(15){ top:85%; left:65%; animation-delay:1.95s; }
+  .riddle-stars span:nth-child(16){ top:40%; left:72%; animation-delay:2.25s; }
   @keyframes riddleTwinkle{ 0%,100%{ opacity:0.15; transform:scale(0.7); } 50%{ opacity:1; transform:scale(1.4); } }
   .riddle-inner{
-    position:relative; z-index:1; max-width:400px; width:100%;
+    position:relative; z-index:2; max-width:400px; width:100%;
     padding:30px 24px 26px; border-radius:22px;
-    background:linear-gradient(160deg, rgba(40,20,70,0.9), rgba(20,8,40,0.92));
-    border:1px solid rgba(255,214,110,0.5);
-    box-shadow:0 0 0 1px rgba(255,214,110,0.15), 0 0 40px 8px rgba(160,90,255,0.35), 0 0 80px 20px rgba(255,214,110,0.12);
+    background:linear-gradient(160deg, rgba(50,16,90,0.9), rgba(16,6,36,0.93));
+    border:1px solid rgba(200,120,255,0.55);
+    box-shadow:0 0 0 1px rgba(255,214,110,0.12), 0 0 44px 8px rgba(170,70,255,0.4), 0 0 90px 24px rgba(220,50,220,0.18);
     animation: riddleReveal 0.6s cubic-bezier(.22,1.5,.4,1) both;
   }
   @keyframes riddleReveal{
@@ -450,8 +480,8 @@
     100%{ transform:scale(1) rotate(0deg); opacity:1; }
   }
   .riddle-eyebrow{
-    font-size:13px; font-weight:800; letter-spacing:1px; color:#ffd96e;
-    text-shadow:0 0 12px rgba(255,214,110,0.7); margin-bottom:10px;
+    font-size:13px; font-weight:800; letter-spacing:1px; color:#e0bbff;
+    text-shadow:0 0 12px rgba(200,120,255,0.8); margin-bottom:10px;
   }
   .riddle-timer{
     font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:26px;
@@ -477,7 +507,8 @@
   .riddle-result.win{ color:#7dffb0; text-shadow:0 0 10px rgba(125,255,176,0.6); }
   .riddle-result.lose{ color:#ff9a9a; text-shadow:0 0 10px rgba(255,90,90,0.5); }
   @media (prefers-reduced-motion: reduce){
-    .riddle-overlay, .riddle-stars span, .riddle-inner, .riddle-timer.danger{ animation:none !important; }
+    .riddle-overlay, .riddle-stars span, .riddle-inner, .riddle-timer.danger,
+    .riddle-nebula::before, .riddle-nebula::after{ animation:none !important; }
   }
 
   /* Infinity Flips riddle round - its own screen, nothing like the Daily
@@ -1910,9 +1941,11 @@
 <div class="riddle-overlay hidden" id="riddleOverlay">
   <div class="riddle-stars" aria-hidden="true">
     <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
   </div>
+  <div class="riddle-nebula" aria-hidden="true"></div>
   <div class="riddle-inner">
-    <div class="riddle-eyebrow">✨ A RIDDLE HAS APPEARED ✨</div>
+    <div class="riddle-eyebrow">🌌 THE SUPER SECRET HIDDEN RIDDLE 🌌</div>
     <div class="riddle-timer" id="riddleTimer">0:45</div>
     <div class="riddle-q" id="riddleQ"></div>
     <input class="riddle-input" id="riddleInput" type="text" autocomplete="off" autocapitalize="characters" placeholder="Type your answer…" maxlength="40">
@@ -2230,7 +2263,7 @@
     return best;
   }
   const PERSONALITY_META = {
-    riddler: { name: 'The Riddler', icon: '🎭', blurb: 'Cracked the impossible.' },
+    riddler: { name: 'The Secret Riddler', icon: '🪐', blurb: 'Found the Super Secret Hidden Riddle.' },
     trivia_titan: { name: 'Trivia Titan', icon: '🧠', blurb: 'Perfect trivia run.' },
     trivia_trainwreck: { name: 'Trivia Trainwreck', icon: '💥', blurb: 'Came for the vibes, not the answers.' },
     perfectionist: { name: 'The Perfectionist', icon: '✨', blurb: 'Zero wrong guesses.' },
@@ -2932,15 +2965,22 @@
     { key:'wildcard',  icon:'\uD83C\uDF81', label:'Wild Card', color:'#c73e3e' },
     { key:'hint',      icon:'\uD83D\uDCA1', label:'Free Hint', color:'#3ec76b' },
   ];
-  // The secret riddle-unlock combo (see checkRiddleUnlock): drawing these 4
-  // power-ups in this exact relative order over the course of a run - plus
-  // landing a 3-answer trivia streak while the vibe meter reads 49% or
-  // lower - triggers a rare bonus riddle round.
-  const RIDDLE_UNLOCK_SEQUENCE = ['wildcard', 'slowclock', 'hint', 'points10'];
+  // The Super Secret Hidden Riddle's unlock combo (see checkSecretUnlock):
+  // drawing these 5 power-ups in this exact relative order over the course
+  // of a run - other picks or repeats of the same type elsewhere in the
+  // list don't break it, but every one of a run's 5 power-up rounds has to
+  // land on the right step, since there are exactly 5 rounds and 5 steps.
+  // No trivia streak, no "vibe" stat condition - just the order. (This used
+  // to be a 4-step sequence that only completed on a 3-answer trivia streak
+  // while the player's lifetime vibe read <=49%; both the trivia tie-in and
+  // the vibe condition are gone.)
+  const SECRET_UNLOCK_SEQUENCE = ['slowclock', 'slowclock', 'points10', 'wildcard', 'hint'];
   const PERFECT_RUN_BONUS = 15;   // points for landing all 6 trivia (nothing left for Second Chance to recover)
   const RIDDLE_MS = 45000 / DEBUG_TIME_SCALE;
   const RIDDLE_BONUS_POINTS = 50;
-  const RIDDLE_BADGE = '🧩 Riddler';
+  // Short label for the toast/in-run badge text; "THE SUPER SECRET HIDDEN
+  // RIDDLE" (the full name) is reserved for the overlay's own headline.
+  const RIDDLE_BADGE = '🪐 Secret Riddle';
   const RIDDLES = [
     { q:'The more you take, the more you leave behind. What am I?', a:'FOOTSTEPS' },
     { q:'I have keys but no locks, space but no room, and you can enter but can’t go outside. What am I?', a:'KEYBOARD' },
@@ -5259,10 +5299,11 @@
   let solveLockedLetters = [];
   let runPendingPowerUp = false;
   let rackUsedFlags = [];
-  // Riddle-unlock tracking (see checkRiddleUnlock): the order power-ups are
-  // actually picked in, the current correct-trivia-in-a-row streak, and
-  // whether the riddle has already fired this run (it's a once-per-run
-  // secret, not something to trigger repeatedly).
+  // Secret-unlock tracking (see checkSecretUnlock): the order power-ups are
+  // actually picked in, and whether it's already fired this run (it's a
+  // once-per-run secret, not something to trigger repeatedly). The trivia
+  // streak counter below is unrelated now - kept only for its own point
+  // bonus, not as part of the secret's trigger condition anymore.
   let runPowerupPickOrder = [], runTriviaStreak = 0, riddleTriggeredThisRun = false;
   let riddleEndsAt = 0, riddleInterval = null, currentRiddle = null;
   // Personality-system tracking (see determinePersonality) - all reset at
@@ -5882,25 +5923,23 @@
     eventTimeoutId = setTimeout(()=> resolve(false), remain);
     saveRunSnapshot();
   }
-  // Riddle-unlock check: were the 4 required power-ups drawn in relative
-  // order (other picks/repeats in between are fine), and is the player's
-  // lifetime "vibe" reading 49% or lower right now? Both must hold at the
-  // exact moment a 3-correct trivia streak lands.
-  function riddleComboDrawn(){
+  // Were the 5 required power-ups drawn in relative order? (Other picks in
+  // between would be fine, but there's no room for any here - 5 steps, 5
+  // power-up rounds in a run - so every single round has to land on the
+  // right one.) Checked right after each power-up resolves (see
+  // finishRunPowerUp), not tied to trivia in any way.
+  function secretComboDrawn(){
     let seqIdx = 0;
     for (const picked of runPowerupPickOrder){
-      if (picked === RIDDLE_UNLOCK_SEQUENCE[seqIdx]){
+      if (picked === SECRET_UNLOCK_SEQUENCE[seqIdx]){
         seqIdx++;
-        if (seqIdx >= RIDDLE_UNLOCK_SEQUENCE.length) return true;
+        if (seqIdx >= SECRET_UNLOCK_SEQUENCE.length) return true;
       }
     }
     return false;
   }
-  function checkRiddleUnlock(){
-    if (riddleTriggeredThisRun) return false;
-    if (!riddleComboDrawn()) return false;
-    const vibePct = stats.decided > 0 ? Math.round((stats.agree / stats.decided) * 100) : 50;
-    return vibePct <= 49;
+  function checkSecretUnlock(){
+    return !riddleTriggeredThisRun && secretComboDrawn();
   }
   function resolveRunTrivia(correct){
     if (runPhase !== 'trivia' || !runPendingQ) return;
@@ -5909,7 +5948,6 @@
     els.eventTiles.forEach(t=> t.onclick = null);
     runTriviaAttempted++;
     runRoundResults.push(!!correct);
-    let riddleUnlocked = false;
     if (correct){
       sfx.correct();
       runTriviaCorrect++;
@@ -5933,10 +5971,6 @@
       els.eventSubtitle.textContent = bannerParts.join(' \u00b7 ');
       els.eventPrompt.textContent = '\u2705 Correct! Letter earned: ' + nextLetter;
       celebrateTriviaCorrect();
-      if (runTriviaStreak === 3 && checkRiddleUnlock()){
-        riddleUnlocked = true;
-        riddleTriggeredThisRun = true;
-      }
     } else {
       sfx.wrong();
       runTriviaStreak = 0;
@@ -5949,7 +5983,6 @@
     setTimeout(()=>{
       els.eventOverlay.classList.add('hidden');
       if (!runActive) return;
-      if (riddleUnlocked){ startRiddleRound(); return; }
       advanceAfterTrivia();
     }, dt(runPerfect ? 1900 : 1100));   // a little longer so the Perfect Run banner can be read
   }
@@ -6111,13 +6144,21 @@
     setTimeout(()=>{
       els.eventOverlay.classList.add('hidden');
       if (!runActive) return;
+      // The secret's trigger lives here now, not in trivia: check right
+      // after every power-up resolves, since that's the only place the
+      // required 5-step order can ever actually complete.
+      if (checkSecretUnlock()){
+        riddleTriggeredThisRun = true;
+        startRiddleRound();
+        return;
+      }
       if (runClockExpired()){ startSolvePhase(); return; }
       runPhase = 'running';
       loadNext();
     }, dt(1100));
   }
 
-  // The rare riddle-unlock bonus round (see checkRiddleUnlock). Visually
+  // The Super Secret Hidden Riddle (see checkSecretUnlock). Visually
   // and mechanically distinct from the regular trivia/power-up overlay -
   // its own full-screen treatment, a single free-text answer instead of
   // multiple choice, and a real reward (badge + points) on solve.
@@ -6174,7 +6215,7 @@
       runRiddleSolved = true;
       addRunScore(RIDDLE_BONUS_POINTS);
       if (!stats.badges.riddler){ stats.badges.riddler = true; saveStats(); }
-      els.riddleResult.textContent = '🧩 Solved! +' + RIDDLE_BONUS_POINTS + ' points — ' + RIDDLE_BADGE + ' unlocked';
+      els.riddleResult.textContent = '🪐 Solved! +' + RIDDLE_BONUS_POINTS + ' points — ' + RIDDLE_BADGE + ' unlocked';
       els.riddleResult.className = 'riddle-result win';
       showToast(RIDDLE_BADGE + ' unlocked!');
       renderStats();
