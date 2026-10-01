@@ -223,7 +223,9 @@
   .half.has-glyph{ flex-direction:column; align-items:center; justify-content:center; gap:2px; }
   .half.has-glyph .scene{ position:relative; inset:auto; flex:0 0 auto; }
   .half.has-glyph .scene .glyph{ font-size:min(13vh,88px); opacity:0.85; transform:none; }
-  .half.has-glyph .scene .glyph.vs-twin{ display:inline-block; transform:scaleX(-1); filter:hue-rotate(150deg) saturate(1.15); }
+  /* Mirrored only - no colour shift: a hue-rotated emoji reads as broken
+     (a blue burger), and the two halves' backgrounds already tell them apart. */
+  .half.has-glyph .scene .glyph.vs-twin{ display:inline-block; transform:scaleX(-1); }
   .half.has-glyph:not(.revealed) .content{ background:none; backdrop-filter:none; -webkit-backdrop-filter:none; border:none; padding:2px 20px; }
 
   .fill{ position:absolute; inset:0; width:0%; z-index:1; transition: width 0.75s cubic-bezier(.2,.8,.2,1); }
@@ -3127,6 +3129,24 @@
       h *= 60;
     }
     return h;
+  }
+  // Turns every #rrggbb colour in a gradient `deg` degrees round the colour
+  // wheel - the background only, unlike a CSS hue-rotate filter, which also
+  // recoloured the emoji and the category chip on that half.
+  function rotateGradientHue(gradientStr, deg){
+    if (!gradientStr) return gradientStr;
+    return gradientStr.replace(/#([0-9a-fA-F]{6})/g, function(m, hex){
+      const r = parseInt(hex.substr(0,2),16)/255, g = parseInt(hex.substr(2,2),16)/255, b = parseInt(hex.substr(4,2),16)/255;
+      const max = Math.max(r,g,b), min = Math.min(r,g,b), d = max - min, l = (max + min) / 2;
+      const sat = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+      let h = 0;
+      if (d){ h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; }
+      h = ((h + deg) % 360 + 360) % 360;
+      const c = (1 - Math.abs(2 * l - 1)) * sat, x = c * (1 - Math.abs((h / 60) % 2 - 1)), mm = l - c / 2;
+      const [r1, g1, b1] = h < 60 ? [c,x,0] : h < 120 ? [x,c,0] : h < 180 ? [0,c,x] : h < 240 ? [0,x,c] : h < 300 ? [x,0,c] : [c,0,x];
+      const to = v => Math.round((v + mm) * 255).toString(16).padStart(2, '0');
+      return '#' + to(r1) + to(g1) + to(b1);
+    });
   }
   function hueDistance(h1,h2){
     const d = Math.abs(h1-h2) % 360;
@@ -7100,7 +7120,7 @@
   function setScene(el, glyph){
     el.innerHTML = glyph ? '<span class="glyph">'+glyph+'</span>' : '';
     // Same icon on both sides (🏀 vs 🏀, 🎸 vs 🎸): the bottom one faces the
-    // other way in another colour, so it still reads as a matchup.
+    // other way, so it still reads as a matchup.
     if (el === els.sceneB && glyph && current && current.glyphA === glyph) el.firstChild.classList.add('vs-twin');
     const half = el.closest('.half');
     if (half) half.classList.toggle('has-glyph', !!glyph);
@@ -7423,12 +7443,16 @@
     } else {
       els.avatarA.style.display = 'none'; els.avatarB.style.display = 'none';
       els.halfA.style.background = boostGradient(current.gradA);
-      els.halfB.style.background = boostGradient(current.gradB);
       // Safety net for hand-authored scenario gradients that happen to land
-      // on similar hues (e.g. two different greens) - nudge side B's hue
-      // if the two are too close, otherwise leave the authored colors as-is.
+      // on similar hues (e.g. two different greens) - nudge side B's
+      // background round the colour wheel if the two are too close,
+      // otherwise leave the authored colors as-is. (This used to be a
+      // hue-rotate filter on the whole half, which also turned its emoji
+      // the wrong colour - blue spaghetti.)
       const hueA = approxHue(current.gradA), hueB = approxHue(current.gradB);
-      els.halfB.style.filter = hueDistance(hueA, hueB) < 45 ? 'hue-rotate(150deg)' : '';
+      const tooClose = hueDistance(hueA, hueB) < 45;
+      els.halfB.style.background = boostGradient(tooClose ? rotateGradientHue(current.gradB, 150) : current.gradB);
+      els.halfB.style.filter = '';
       setScene(els.sceneA, current.glyphA); setScene(els.sceneB, current.glyphB);
     }
     els.takeA.textContent = current.a; els.takeB.textContent = current.b;
