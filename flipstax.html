@@ -719,6 +719,9 @@
   /* Daily results: the overlay is a centred flex column, so pin the copy to
      the top-right corner like on mode select. */
   .readout-coffee{ position:absolute; top:calc(12px + env(safe-area-inset-top)); right:12px; }
+  /* Infinity's Pause screen (inside the board, so no safe-area offset). */
+  .pause-coffee{ position:absolute; top:12px; right:12px; }
+  :root:not(.mode-infinity) .pause-coffee{ display:none; }
   @keyframes msCoffeeIdle{
     0%, 78%, 100%{ transform:scale(1) rotate(0deg); }
     84%{ transform:scale(1.1) rotate(-8deg); }
@@ -8009,6 +8012,13 @@
     const w = copy.firstElementChild; w.classList.add('readout-coffee');
     w.querySelector('a').addEventListener('click', e=> e.stopPropagation());
     els.readoutOverlay.appendChild(w);
+    // And on Infinity's Pause screen - Infinity has no end-of-session screen,
+    // so pausing is its natural checkpoint. Hidden in Daily (see CSS).
+    const pc = document.createElement('div');
+    pc.innerHTML = wrap.outerHTML.replace(/coffeeCup/g, 'coffeeCupP').replace('id="coffeeBtn"', 'id="coffeeBtnPause"');
+    const pw = pc.firstElementChild; pw.classList.add('pause-coffee');
+    pw.querySelector('a').addEventListener('click', e=> e.stopPropagation());
+    els.pauseOverlay.appendChild(pw);
   })();
   document.querySelectorAll('[data-contact-footer]').forEach(el=>{
     el.textContent = 'Questions or feedback? ';
