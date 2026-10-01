@@ -3316,6 +3316,8 @@
     els.soundToggle.textContent = on ? '\uD83D\uDD0A' : '\uD83D\uDD07';
     // The fanfare is only ever the page's opening sound - sound switched on
     // later gets the intro theme instead of a replay.
+    // While paused, only remember the choice - Resume starts the music.
+    if (isPaused) return;
     if (on) playTrack(currentTrackKey === 'fanfare' ? 'intro' : (currentTrackKey || 'run')); else pauseAllTracks();
   }
 
@@ -4801,6 +4803,9 @@
   let roundTimeoutId = null;
   let roundDurationMs = 0, roundStartedAt = 0;
   let isPaused = false, pausedRoundRemainingMs = null, pausedRoundPct = 0, pausedRunRemainingMs = null;
+  // The song that was playing when Pause was pressed - Resume picks it up
+  // from the same spot (see pauseGame / resumeGame).
+  let musicPausedByPause = null;
   let eventTimeoutId = null;
 
   const els = {
@@ -7226,6 +7231,12 @@
     }
     saveRunSnapshot();
 
+    // The music stops with the game (Infinity's playlist too - its pending
+    // song handoff is cancelled, and re-armed after Resume).
+    const playingEl = currentTrackKey && trackEls[currentTrackKey];
+    musicPausedByPause = (playingEl && !playingEl.paused) ? playingEl : null;
+    pauseAllTracks();
+
     els.pauseBtn.classList.add('hidden');
     // Daily Run already has its own dedicated share button on the
     // run-complete screen; only Infinity Flips needs one here, since
@@ -7285,6 +7296,14 @@
       clearInterval(runTimerInterval);
       runTimerInterval = setInterval(tickRunTimer, 500);
       pausedRunRemainingMs = null;
+    }
+
+    // Music picks up where it stopped. If sound was switched on while
+    // paused (nothing was playing), the mode's track starts instead.
+    const wasPlaying = musicPausedByPause; musicPausedByPause = null;
+    if (soundOn && currentTrackKey){
+      if (wasPlaying && trackEls[currentTrackKey] === wasPlaying) wasPlaying.play().catch(()=>{});
+      else playTrack(currentTrackKey);
     }
 
     els.pauseOverlay.classList.add('hidden');
@@ -8120,7 +8139,7 @@
     runActive = false; runPhase = 'idle';
     voted = false; votedSinceTime = null;
     bonusActive = false;
-    isPaused = false; pausedRoundRemainingMs = null; pausedRunRemainingMs = null;
+    isPaused = false; pausedRoundRemainingMs = null; pausedRunRemainingMs = null; musicPausedByPause = null;
 
     els.eventOverlay.classList.add('hidden');
     els.solveOverlay.classList.add('hidden');
