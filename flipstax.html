@@ -137,10 +137,11 @@
   .run-link{ color:var(--pulse); font-weight:700; cursor:pointer; padding:2px 6px; }
   .vibe-wrap{ display:none; margin-top:5px; }
   .vibe-track{ position:relative; height:5px; border-radius:6px; background:linear-gradient(90deg, var(--b), var(--divider) 50%, var(--a)); }
+  .vibe-dot.pending{ opacity:0.35; }
   .vibe-dot{
     position:absolute; top:50%; left:50%; width:13px; height:13px; border-radius:50%;
     background:#fff; border:2px solid var(--bg); transform:translate(-50%,-50%);
-    transition:left 0.4s ease; box-shadow:0 0 6px rgba(0,0,0,0.4);
+    transition:left 0.4s ease, opacity 0.3s ease; box-shadow:0 0 6px rgba(0,0,0,0.4);
   }
   .vibe-label{ font-size:10px; color:var(--dim); margin-top:3px; text-align:center; }
 
@@ -5394,13 +5395,24 @@
   const INF_AWARD_VOTES = 50;
   const INF_BLOCK_KEY = 'flipstax_inf_block_v1';
   function freshInfBlock(){
-    return { votes:0, agree:0, low:0, decisionMs:0, maxCombo:0, points:0, firstHalfPoints:null,
+    // votes: every vote (the block is 50 of them); crowd: the ones that
+    // counted toward crowd agreement (see crowdVerdict); agree / low are out
+    // of crowd.
+    return { votes:0, crowd:0, agree:0, low:0, decisionMs:0, maxCombo:0, points:0, firstHalfPoints:null,
       trivia:0, triviaCorrect:0, wildCat:0, pu:{ flips10:0, slowmo:0, wildcard:0 } };
   }
   function loadInfBlock(){
     try{
       const raw = localStorage.getItem(INF_BLOCK_KEY);
-      if (raw){ const b = JSON.parse(raw); if (b && typeof b.votes === 'number' && b.pu) return Object.assign(freshInfBlock(), b); }
+      if (raw){
+        const b = JSON.parse(raw);
+        if (b && typeof b.votes === 'number' && b.pu){
+          // From before crowdVerdict: agree / low were counted the old way
+          // (own vote included), so start them fresh.
+          if (typeof b.crowd !== 'number'){ b.crowd = 0; b.agree = 0; b.low = 0; }
+          return Object.assign(freshInfBlock(), b);
+        }
+      }
     }catch(e){}
     return freshInfBlock();
   }
@@ -5478,8 +5490,8 @@
       firstHalfScore:first, secondHalfScore:b.points - first,
       powerupCounts:{ points10:b.pu.flips10, slowclock:b.pu.slowmo, wildcard:b.pu.wildcard, hint:0 },
       decisionTimePercentile: Math.max(0, Math.min(100, Math.round(b.decisionMs / votes / 5000 * 100))),
-      avgCrowdAgreementPct: b.votes > 0 ? Math.round(b.agree / b.votes * 100) : 50,
-      lowestPercentagePicks:b.low, votes:b.votes,
+      avgCrowdAgreementPct: b.crowd > 0 ? Math.round(b.agree / b.crowd * 100) : 50,
+      lowestPercentagePicks:b.low, votes:b.crowd,
     };
   }
   function collectedCount(){ return PERSONALITY_ORDER.filter(k=> collection.cards[k]).length; }
@@ -5618,6 +5630,8 @@
     // This pill is the mode indicator: it used to render Daily Run's status
     // in every mode, so Infinity Flips showed "Daily Run". Call this
     // whenever the mode changes (see the mode buttons / returnToModeSelect).
+    // The crowd meter is per run / per Infinity block, so it follows along.
+    updateVibeMeter();
     if (document.documentElement.classList.contains('mode-infinity')){
       els.runBanner.innerHTML = '<span class="mode-label">\u267E\uFE0F <span class="ml-text">Infinity Flips</span></span> \u00B7 \uD83C\uDCCF ' +
         Math.min(infBlock.votes, INF_AWARD_VOTES) + '/' + INF_AWARD_VOTES;
@@ -6888,8 +6902,12 @@
     const ss = infSession;
     ss.votes++;
     ss.fire = decisionMs <= 3000 ? ss.fire + 1 : 0;
-    ss.sync = won ? ss.sync + 1 : 0;
-    ss.wolf = won ? 0 : ss.wolf + 1;
+    // won: true / false, or null for a card that didn't count (too few other
+    // votes, or tied) - that leaves both streaks as they were.
+    if (won !== null){
+      ss.sync = won ? ss.sync + 1 : 0;
+      ss.wolf = won ? 0 : ss.wolf + 1;
+    }
     if (ss.fire >= 20) awardBadge('on_fire');
     if (ss.sync >= 20) awardBadge('in_sync');
     if (ss.wolf >= 20) awardBadge('lone_wolf');
@@ -7360,14 +7378,29 @@
     if (stats.byCat[top] < 8) return null;
     return (CAT_META[top] || {}).badge || null;
   }
+  // The meter shows the CURRENT run (Daily) or Infinity's current 50-vote
+  // block - the same numbers the personality for that run / block is
+  // scored from - and moves after every vote that counts (see
+  // crowdVerdict). The lifetime figure (stats.agree / stats.decided) is
+  // still kept, for the vibe reveal.
+  function crowdNow(){
+    if (runActive) return { agree: runVotesAgreed, n: runVotesDecided, scope: 'this run' };
+    if (inInfinity()) return { agree: infBlock.agree, n: infBlock.crowd, scope: 'these ' + infBlock.votes + ' flips' };
+    return null;
+  }
   function updateVibeMeter(){
-    if (stats.decided < 5){ els.vibeWrap.style.display = 'none'; return; }
-    const pct = Math.round((stats.agree / stats.decided) * 100);
-    const tier = vibeTierFor(pct);
-    const specialist = topCategorySpecialist();
+    const c = crowdNow();
+    if (!c){ els.vibeWrap.style.display = 'none'; return; }
     els.vibeWrap.style.display = 'block';
+    if (!c.n){
+      els.vibeDot.style.left = '50%'; els.vibeDot.classList.add('pending');
+      els.vibeLabel.textContent = 'With the crowd \u00B7 waiting on cards with enough votes';
+      return;
+    }
+    const pct = Math.round((c.agree / c.n) * 100);
+    els.vibeDot.classList.remove('pending');
     els.vibeDot.style.left = pct + '%';
-    els.vibeLabel.textContent = pct + '% with the crowd \u00B7 ' + tier.label + (specialist ? ' \u00B7 ' + specialist : '');
+    els.vibeLabel.textContent = pct + '% with the crowd \u00B7 ' + c.scope + ' \u00B7 ' + vibeTierFor(pct).label;
   }
   let levelUpActive = false;
   function showLevelUp(label){
@@ -7848,6 +7881,9 @@
     try{ const a = new Uint32Array(3); crypto.getRandomValues(a); return Array.from(a, n=> n.toString(36).padStart(7, '0')).join(''); }
     catch(e){ return Math.random().toString(36).slice(2).padEnd(12, '0') + Date.now().toString(36); }
   })();
+  // Returns { ok, count }: whether the server recorded the vote and the
+  // item's new total (used to take the player's own vote back out when
+  // judging the crowd - see crowdVerdict).
   async function castVote(itemId){
     try{
       const res = await fetch('/api/vote', {
@@ -7855,8 +7891,35 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ itemId, sid: VOTE_SESSION_ID }),
       });
-      if (!res.ok) console.warn('Vote not recorded server-side:', res.status);
-    }catch(err){ console.warn('Vote request failed:', err); }
+      if (!res.ok){ console.warn('Vote not recorded server-side:', res.status); return { ok:false }; }
+      let data = null; try{ data = await res.json(); }catch(e){}
+      return { ok:true, count: data && typeof data.count === 'number' ? data.count : null };
+    }catch(err){ console.warn('Vote request failed:', err); return { ok:false }; }
+  }
+  // Was this pick with the crowd? Judged on everyone else's votes only - the
+  // player's own vote is taken back out (it used to be counted, so a card
+  // nobody else had voted on came out 100% "with the crowd", and a 1-1 tie
+  // counted as agreeing too). A card only counts with CROWD_MIN_OTHERS or
+  // more other votes, and an exact tie counts as neither; otherwise the card
+  // is skipped (counted: false) rather than letting near-zero data decide.
+  // There's no fallback estimate: the percentages shown on unvoted cards
+  // (mockPercentA) are a placeholder made from the card's name, not a
+  // prediction. Every crowd stat reads this: the meter, the run / Infinity
+  // personality inputs, the In Sync / Lone Wolf streaks and the lifetime
+  // figure.
+  const CROWD_MIN_OTHERS = 5;
+  function crowdVerdict(side, counts, myVote){
+    let a = counts.a, b = counts.b;
+    if (myVote && myVote.ok){
+      // The server's own reply has the picked item's count including this
+      // vote (the tally read can be ~2s stale from edge caching).
+      if (side === 'A') a = myVote.count != null ? myVote.count : a;
+      else b = myVote.count != null ? myVote.count : b;
+      if (side === 'A') a = Math.max(0, a - 1); else b = Math.max(0, b - 1);
+    }
+    const pick = side === 'A' ? a : b, other = side === 'A' ? b : a, total = a + b;
+    if (total < CROWD_MIN_OTHERS || pick === other) return { counted:false, others: total, pickPct: total ? Math.round(pick / total * 100) : null };
+    return { counted:true, withCrowd: pick > other, others: total, pickPct: Math.round(pick / total * 100) };
   }
   async function fetchTallies(itemIds){
     try{
@@ -7956,7 +8019,7 @@
     els.roundTimerFill.style.width = '0%';
 
     const slugA = slugify(current.a), slugB = slugify(current.b);
-    await castVote(side === 'A' ? slugA : slugB);
+    const myVote = await castVote(side === 'A' ? slugA : slugB);
     const tallyData = await fetchTallies([slugA, slugB]);
     let counts = tallyData
       ? { a: tallyData.counts[slugA] || 0, b: tallyData.counts[slugB] || 0 }
@@ -7975,37 +8038,46 @@
 
     const myPct = side==='A' ? pctA : pctB;
     lastVoteSummary = { pct: myPct, itemA: current.a, itemB: current.b };
-    if (Math.abs(pctA-pctB) <= 6) els.hint.innerHTML = '\u2696\uFE0F Dead heat \u2014 almost split down the middle';
-    else if (myPct <= 20) els.hint.innerHTML = '\uD83D\uDD25 Hot take \u2014 only ' + myPct + '% picked this';
-    else if (won) els.hint.innerHTML = "You're with the majority";
+    // With the crowd or not - other players' votes only (see crowdVerdict).
+    const cv = crowdVerdict(side, counts, myVote);
+    const underdog = cv.counted && cv.pickPct <= 30;
+    if (!cv.counted) els.hint.innerHTML = cv.others === 0 ? '\uD83C\uDF31 First vote on this one \u2014 no crowd yet'
+      : cv.others < CROWD_MIN_OTHERS ? '\u23F3 Too few votes yet to call the crowd'
+      : '\u2696\uFE0F Dead heat \u2014 split right down the middle';
+    else if (Math.abs(cv.pickPct - 50) <= 3) els.hint.innerHTML = '\u2696\uFE0F Dead heat \u2014 almost split down the middle';
+    else if (cv.pickPct <= 20) els.hint.innerHTML = '\uD83D\uDD25 Hot take \u2014 only ' + cv.pickPct + '% picked this';
+    else if (cv.withCrowd) els.hint.innerHTML = "You're with the majority";
     else els.hint.innerHTML = "You're in the minority on this one";
 
-    stats.decided++;
-    if (won) stats.agree++;
-    if (stats.decided === 5) showToast('\uD83C\uDFAD Vibe meter unlocked \u2014 see where you land');
-    if (runActive){
+    if (cv.counted){
+      stats.decided++;
+      if (cv.withCrowd) stats.agree++;
+    }
+    if (runActive && cv.counted){
       runVotesDecided++;
-      if (won) runVotesAgreed++;
-      if (myPct <= 30) runLowestPctPicks++;
+      if (cv.withCrowd) runVotesAgreed++;
+      if (underdog) runLowestPctPicks++;
     }
 
     comboCount++;
     if (runActive) runMaxCombo = Math.max(runMaxCombo, comboCount);
     if (!runActive && inInfinity()){
       const b = infBlock;
-      b.votes++; if (won) b.agree++; if (myPct <= 30) b.low++;
+      b.votes++;
+      if (cv.counted){ b.crowd++; if (cv.withCrowd) b.agree++; if (underdog) b.low++; }
       b.decisionMs += Math.max(0, votedSinceTime - roundStartedAt);
       b.maxCombo = Math.max(b.maxCombo, comboCount);
       if (current.category === 'wild') b.wildCat++;
       if (b.votes === Math.floor(INF_AWARD_VOTES / 2)) b.firstHalfPoints = b.points;
       saveInfBlock(); renderRunBanner();
-      badgesOnInfinityVote(won, votedSinceTime - roundStartedAt);
+      badgesOnInfinityVote(cv.counted ? cv.withCrowd : null, votedSinceTime - roundStartedAt);
     }
     let base = 1;
     if (comboCount % 3 === 0){ base = 2; sfx.combo(); showToast('\uD83D\uDD25 Combo x' + comboCount + '! +2 flipz'); }
 
     sessionFlips++;
     recordFlip(current.category, base);
+    updateVibeMeter();
 
     scheduleNext(dt(1650));
   }
