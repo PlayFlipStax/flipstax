@@ -5543,7 +5543,7 @@
   let runRiddleSolved = false, runMaxCombo = 0, runWildcardCategoryVotes = 0;
   let runSolveWrongGuesses = 0, runLowestPctPicks = 0;
   let runVotesDecided = 0, runVotesAgreed = 0, runDecisionMsTotal = 0, runDecisionCount = 0;
-  let runScoreAtHalfway = null, halfwayTimeoutId = null;
+  let runScoreAtHalfway = null;
   // What's on screen right now, so a refresh can put it back exactly:
   // the trivia/Second Chance question and its deadline, whether the
   // power-up on screen has been picked, and a Wild Card result that has
@@ -5960,10 +5960,9 @@
     updateRunTimerBar();
     clearInterval(runTimerInterval);
     runTimerInterval = setInterval(tickRunTimer, 500);
-    // Captures the score at the run's halfway point for the comeback_kid
-    // personality check (first-half vs second-half scoring pace).
-    clearTimeout(halfwayTimeoutId);
-    halfwayTimeoutId = setTimeout(()=>{ if (runActive) runScoreAtHalfway = runScore; }, RUN_DURATION_MS / 2);
+    // The combo is per run: one carried over from earlier play (Infinity, a
+    // previous run) mustn't count toward this run's best.
+    comboCount = 0;
     renderRunBanner();
     showToast('\uD83C\uDFAE Daily Stax started \u2014 swipe for points!');
     stopTallyPolling();
@@ -6005,10 +6004,6 @@
     if (rest.length){ decks.daily.cards = rest; decks.daily.next = 0; } else resetDeck('daily');
     // A Wild Card rolled but not yet shown still counts.
     if (runWildcardDelta != null){ const d = runWildcardDelta; runWildcardDelta = null; addRunScore(d); }
-    if (runScoreAtHalfway == null){
-      clearTimeout(halfwayTimeoutId);
-      halfwayTimeoutId = setTimeout(()=>{ if (runActive) runScoreAtHalfway = runScore; }, Math.max(0, RUN_DURATION_MS / 2 - runElapsedMs()));
-    }
     isPaused = false; pausedRoundRemainingMs = null; pausedRunRemainingMs = null;
     sessionHalted = false;
     stopTallyPolling();
@@ -6051,6 +6046,11 @@
   }
   function tickRunTimer(){
     if (!runActive) return;
+    // The score at the run's halfway point, for the comeback_kid check
+    // (first-half vs second-half scoring pace). Read off the run clock, so
+    // paused time doesn't count - this used to be a real-time timer, which
+    // fired early whenever the run was paused.
+    if (runScoreAtHalfway == null && runElapsedMs() >= RUN_DURATION_MS / 2) runScoreAtHalfway = runScore;
     saveRunSnapshot();
     const remain = runEndsAt - Date.now();
     if (remain <= 0){
@@ -7244,7 +7244,6 @@
     clearTimeout(eventTimeoutId); eventTimeoutId = null;
     clearInterval(runTimerInterval);
     clearInterval(solveInterval);
-    clearTimeout(halfwayTimeoutId);
     els.runTimerWrap.classList.add('hidden');
     els.solveOverlay.classList.add('hidden');
     els.eventOverlay.classList.add('hidden');
@@ -8036,10 +8035,13 @@
     els.tagA.textContent = side==='A' ? 'Your pick' : '';
     els.tagB.textContent = side==='B' ? 'Your pick' : '';
 
-    const myPct = side==='A' ? pctA : pctB;
-    lastVoteSummary = { pct: myPct, itemA: current.a, itemB: current.b };
     // With the crowd or not - other players' votes only (see crowdVerdict).
     const cv = crowdVerdict(side, counts, myVote);
+    // For the share card's "You agreed with N% of players on X vs Y": other
+    // players only (it used to include the player's own vote, so a card
+    // nobody else had voted on said 100%). Kept from the latest vote that
+    // anyone else had voted on.
+    if (cv.others > 0) lastVoteSummary = { pct: cv.pickPct, itemA: current.a, itemB: current.b };
     const underdog = cv.counted && cv.pickPct <= 30;
     if (!cv.counted) els.hint.innerHTML = cv.others === 0 ? '\uD83C\uDF31 First vote on this one \u2014 no crowd yet'
       : cv.others < CROWD_MIN_OTHERS ? '\u23F3 Too few votes yet to call the crowd'
@@ -8565,6 +8567,7 @@
     renderRunBanner();
     playTrack('infinity');
     infSession = freshInfSession();   // a new Infinity session for the badges
+    comboCount = 0;                   // and a fresh combo (not one carried over from a Daily run)
     // Coming back after a finished Daily run: that halted the board, so
     // deal a fresh round.
     if (sessionHalted){ sessionHalted = false; voted = false; votedSinceTime = null; loadNext(); }
@@ -8596,7 +8599,6 @@
     clearInterval(solveInterval); solveInterval = null;
     clearInterval(riddleInterval); riddleInterval = null;
     clearInterval(bonusInterval); bonusInterval = null;
-    clearTimeout(halfwayTimeoutId); halfwayTimeoutId = null;
     runActive = false; runPhase = 'idle';
     voted = false; votedSinceTime = null;
     bonusActive = false;
