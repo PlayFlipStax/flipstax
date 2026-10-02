@@ -7267,7 +7267,9 @@
     renderRunBanner();
     showRunReadout();
     voted = false; votedSinceTime = null;
-    playRunEndMusic(!!solved);
+    // The Daily theme carries on behind the results until the end-of-run
+    // fanfare/sting files arrive; then this becomes playRunEndMusic(!!solved).
+    playTrack('run');
   }
   function showRunReadout(){
     const r = runResultToday;
