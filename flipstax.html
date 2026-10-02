@@ -503,6 +503,31 @@
   .riddle-buttons{ display:flex; justify-content:center; }
   .riddle-submit{ padding:12px 40px; font-size:15px; box-shadow:0 6px 18px rgba(255,214,110,0.35); }
   .riddle-result{ margin-top:14px; font-weight:800; font-size:15px; }
+  /* Solve celebration: laser beams sweeping up from the bottom corners plus
+     fireworks on a canvas, both above the starfield and behind the panel's
+     result text. Shown only while .celebrating is on (see
+     celebrateSecretSolve); skipped with reduced motion. */
+  .riddle-fireworks{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:3; }
+  .riddle-lasers{ position:absolute; inset:0; pointer-events:none; z-index:1; overflow:hidden; opacity:0; }
+  .riddle-overlay.celebrating .riddle-lasers{ opacity:1; transition:opacity 0.2s; }
+  .riddle-lasers i{
+    position:absolute; bottom:-10%; width:7px; height:140vh; border-radius:4px; transform-origin:50% 100%;
+    background:linear-gradient(to top, rgba(255,255,255,0.95), var(--c) 25%, transparent 95%);
+    box-shadow:0 0 18px 4px var(--c); mix-blend-mode:screen; opacity:0.85;
+  }
+  .riddle-lasers i:nth-child(odd){ left:6%; } .riddle-lasers i:nth-child(even){ right:6%; }
+  .riddle-lasers i:nth-child(1){ --c:#ff3cac; } .riddle-lasers i:nth-child(2){ --c:#19e0ff; }
+  .riddle-lasers i:nth-child(3){ --c:#ffd96e; } .riddle-lasers i:nth-child(4){ --c:#b26bff; }
+  .riddle-lasers i:nth-child(5){ --c:#7dffb0; } .riddle-lasers i:nth-child(6){ --c:#ff9a3d; }
+  .riddle-overlay.celebrating .riddle-lasers i:nth-child(odd){ animation: laserSweepL 1.1s ease-in-out infinite alternate; }
+  .riddle-overlay.celebrating .riddle-lasers i:nth-child(even){ animation: laserSweepR 1.1s ease-in-out infinite alternate; }
+  .riddle-lasers i:nth-child(3), .riddle-lasers i:nth-child(4){ animation-delay:-0.35s !important; }
+  .riddle-lasers i:nth-child(5), .riddle-lasers i:nth-child(6){ animation-delay:-0.7s !important; }
+  @keyframes laserSweepL{ from{ transform:rotate(8deg); } to{ transform:rotate(58deg); } }
+  @keyframes laserSweepR{ from{ transform:rotate(-8deg); } to{ transform:rotate(-58deg); } }
+  .riddle-overlay.celebrating .riddle-result.win{ font-size:18px; animation: secretWinPulse 0.7s ease-in-out infinite alternate; }
+  @keyframes secretWinPulse{ from{ text-shadow:0 0 10px rgba(125,255,176,0.6); transform:scale(1); } to{ text-shadow:0 0 22px rgba(125,255,176,1), 0 0 40px rgba(255,214,110,0.6); transform:scale(1.06); } }
+  @media (prefers-reduced-motion: reduce){ .riddle-lasers{ display:none; } .riddle-overlay.celebrating .riddle-result.win{ animation:none; } }
   .riddle-result.hidden{ display:none; }
   .riddle-result.win{ color:#7dffb0; text-shadow:0 0 10px rgba(125,255,176,0.6); }
   .riddle-result.lose{ color:#ff9a9a; text-shadow:0 0 10px rgba(255,90,90,0.5); }
@@ -672,6 +697,20 @@
   .readout-type-name{ font-family:'Big Shoulders Display', sans-serif; font-weight:800; font-size:19px; color:#fff; }
   .readout-type-blurb{ color:var(--dim); font-size:12.5px; margin-top:4px; line-height:1.35; }
   .readout-type-eyebrow{ color:#b98bf0; font-size:10.5px; font-weight:800; letter-spacing:1px; margin-bottom:6px; }
+  .readout-secret{
+    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:clamp(24px,7.4vw,34px);
+    line-height:1.08; letter-spacing:0.5px; margin:0 auto 14px; max-width:340px;
+    background:linear-gradient(90deg,#ffd96e,#ff8ad4,#b26bff,#19e0ff,#ffd96e); background-size:300% 100%;
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    filter:drop-shadow(0 0 10px rgba(178,107,255,0.75)) drop-shadow(0 0 22px rgba(255,138,212,0.45));
+    animation: secretHeadShift 3s linear infinite, secretHeadPulse 1.1s ease-in-out infinite alternate;
+  }
+  .readout-secret.hidden, .personality-mask.hidden{ display:none; }
+  /* Keeps the headline clear of the Donations button on short screens. */
+  #readoutOverlay.has-secret{ padding-top:calc(92px + env(safe-area-inset-top)); }
+  @keyframes secretHeadShift{ to{ background-position:300% 0; } }
+  @keyframes secretHeadPulse{ from{ transform:scale(1); } to{ transform:scale(1.05); } }
+  @media (prefers-reduced-motion: reduce){ .readout-secret{ animation:none; } }
   /* Daily Stax results get a solid screen of their own - the board used to
      show through the translucent overlay behind the text. */
   #readoutOverlay{ background: radial-gradient(circle at 50% 28%, #3a1f6e, #150f2b 62%, #0b0917); padding-bottom:44px; }
@@ -1946,11 +1985,13 @@
     <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
   </div>
   <div class="riddle-nebula" aria-hidden="true"></div>
+  <div class="riddle-lasers" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <canvas class="riddle-fireworks" id="riddleFireworks" aria-hidden="true"></canvas>
   <div class="riddle-inner">
     <div class="riddle-eyebrow">🌌 THE SUPER SECRET HIDDEN RIDDLE 🌌</div>
-    <div class="riddle-timer" id="riddleTimer">0:45</div>
+    <div class="riddle-timer" id="riddleTimer">0:30</div>
     <div class="riddle-q" id="riddleQ"></div>
-    <input class="riddle-input" id="riddleInput" type="text" autocomplete="off" autocapitalize="characters" placeholder="Type your answer…" maxlength="40">
+    <input class="riddle-input" id="riddleInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="Type your answer…" maxlength="40">
     <div class="riddle-buttons">
       <div class="daily-btn primary riddle-submit" id="riddleSubmit">Submit</div>
     </div>
@@ -2121,7 +2162,8 @@
 
 <div class="personality-overlay" id="readoutOverlay">
   <div class="personality-inner">
-    <div class="personality-mask">🏁</div>
+    <div class="readout-secret hidden" id="readoutSecret">YOU DISCOVERED THE SUPER SECRET RIDDLE!!!</div>
+    <div class="personality-mask" id="readoutMask">🏁</div>
     <div class="personality-eyebrow">DAILY STAX COMPLETE</div>
     <div class="personality-label" id="readoutScore"></div>
     <div class="personality-blurb" id="readoutTrivia"></div>
@@ -2984,17 +3026,28 @@
   // the vibe condition are gone.)
   const SECRET_UNLOCK_SEQUENCE = ['slowclock', 'slowclock', 'points10', 'wildcard', 'hint'];
   const PERFECT_RUN_BONUS = 15;   // points for landing all 6 trivia (nothing left for Second Chance to recover)
-  const RIDDLE_MS = 45000 / DEBUG_TIME_SCALE;
+  // 30s default - set to the secret-riddle music track's length once it lands.
+  const RIDDLE_MS = 30000 / DEBUG_TIME_SCALE;
   const RIDDLE_BONUS_POINTS = 50;
   // Short label for the toast/in-run badge text; "THE SUPER SECRET HIDDEN
   // RIDDLE" (the full name) is reserved for the overlay's own headline.
   const RIDDLE_BADGE = '🪐 Secret Riddle';
+  // Daily Stax's Super Secret Hidden Riddle pool. Never shared with
+  // INFINITY_RIDDLES (checked at startup, below). Answers are matched the
+  // forgiving way (riddleAnswerMatches: case, spaces, punctuation, a leading
+  // "a/an/the/your" and a trailing plural s don't matter); `alts` are other
+  // accepted answers, `say` is how the answer is shown when it's missed.
+  // Each device works through the whole pool before any riddle comes back
+  // (see pickSecretRiddle).
   const RIDDLES = [
     { q:'The more you take, the more you leave behind. What am I?', a:'FOOTSTEPS' },
-    { q:'I have keys but no locks, space but no room, and you can enter but can’t go outside. What am I?', a:'KEYBOARD' },
-    { q:'What has a heart that doesn’t beat?', a:'ARTICHOKE' },
-    { q:'The more you feed me, the bigger I grow — but give me water and I die. What am I?', a:'FIRE' },
-    { q:'I’m tall when I’m young and short when I’m old. What am I?', a:'CANDLE' },
+    { q:'I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?', a:'ECHO' },
+    { q:'The more of me there is, the less you can see. What am I?', a:'DARKNESS' },
+    { q:'What has keys but can\u2019t open a single lock?', a:'PIANO' },
+    { q:'What question can you never truthfully answer yes to?', a:'ARE YOU ASLEEP', say:'\u201cAre you asleep?\u201d' },
+    { q:'I\u2019m always hungry and must always be fed. The finger I touch will soon turn red. What am I?', a:'FIRE' },
+    { q:'I\u2019m light as a feather, yet even the strongest person can\u2019t hold me for more than a few minutes. What am I?', a:'BREATH' },
+    { q:'The person who makes it, sells it. The person who buys it never uses it. The person who uses it never knows they\u2019re using it. What am I?', a:'COFFIN', alts:['CASKET'] },
   ];
   // Infinity Flips' own riddle pool - never shared with Daily's RIDDLES above
   // (same content rule as the VS cards and trivia). Classic folk riddles.
@@ -3024,6 +3077,32 @@
     { q:'What can you hold in your right hand but never in your left?', a:'LEFT HAND', alts:['LEFTHAND','YOUR LEFT HAND','LEFT ELBOW'] },
     { q:'What has a head and a tail but no body?', a:'COIN' },
   ];
+  // Content rule: Daily's secret riddles and Infinity's riddles never share
+  // an answer (same check the VS card pools get at startup).
+  (function(){
+    const norm = t=> String(t).toUpperCase().replace(/[^A-Z0-9]+/g, '');
+    const inf = new Set(); INFINITY_RIDDLES.forEach(r=> [r.a].concat(r.alts || []).forEach(a=> inf.add(norm(a))));
+    RIDDLES.forEach(r=> [r.a].concat(r.alts || []).forEach(a=>{ if (inf.has(norm(a))) console.error('FlipStax: Daily secret riddle shares an answer with Infinity:', a); }));
+  })();
+  // Which secret riddles this device has had, so the same player works
+  // through the whole pool before any repeats, and a new round of the pool
+  // never opens with the riddle they just had. Saved per device (the riddle
+  // is rare - it can be days between discoveries).
+  const SECRET_RIDDLE_KEY = 'flipstax_secret_riddles_v1';
+  function pickSecretRiddle(){
+    let st = null;
+    try{ st = JSON.parse(localStorage.getItem(SECRET_RIDDLE_KEY) || 'null'); }catch(e){}
+    const n = RIDDLES.length;
+    let bag = (st && st.n === n && Array.isArray(st.bag)) ? st.bag.filter(i=> i >= 0 && i < n) : [];
+    const last = st && typeof st.last === 'number' ? st.last : -1;
+    if (!bag.length){
+      bag = shuffle(RIDDLES.map((_, i)=> i));
+      if (n > 1 && bag[bag.length - 1] === last){ const t = bag[0]; bag[0] = bag[bag.length - 1]; bag[bag.length - 1] = t; }
+    }
+    const idx = bag.pop();
+    try{ localStorage.setItem(SECRET_RIDDLE_KEY, JSON.stringify({ n, bag, last: idx })); }catch(e){}
+    return RIDDLES[idx];
+  }
   const INF_RIDDLE_MS = 30000;
   const INF_RIDDLE_POINTS = 25;
   // Daily Run trivia: 5 core subjects (always one each) + 1 rotating elective
@@ -3365,7 +3444,47 @@
       n.connect(lp); lp.connect(ng); ng.connect(ctx.destination); n.start(t0);
     }catch(e){}
   }
+  // The secret riddle solve - the rarest moment in the game, so its own
+  // sound: three laser sweeps, firework pops with crackle, and a rising
+  // fanfare into a held chord (~2.6s).
+  function playSecretSolveSound(){
+    if (!soundOn) return;
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    try{
+      const t = ctx.currentTime + 0.02, out = ctx.createGain();
+      out.gain.value = 0.9; out.connect(ctx.destination);
+      const sweep = (at, f0, f1, dur, vol)=>{
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = 'sawtooth'; o.frequency.setValueAtTime(f0, at); o.frequency.exponentialRampToValueAtTime(f1, at + dur);
+        g.gain.setValueAtTime(0.0001, at); g.gain.linearRampToValueAtTime(vol, at + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+        o.connect(g); g.connect(out); o.start(at); o.stop(at + dur + 0.05);
+      };
+      const noise = ctx.createBuffer(1, ctx.sampleRate * 0.5, ctx.sampleRate), nd = noise.getChannelData(0);
+      for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+      const pop = (at, freq, vol)=>{
+        const src = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+        src.buffer = noise; f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = 0.9;
+        g.gain.setValueAtTime(vol, at); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.45);
+        src.connect(f); f.connect(g); g.connect(out); src.start(at); src.stop(at + 0.5);
+      };
+      const tone = (at, freq, dur, type, vol)=>{
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = type; o.frequency.setValueAtTime(freq, at);
+        g.gain.setValueAtTime(0.0001, at); g.gain.linearRampToValueAtTime(vol, at + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+        o.connect(g); g.connect(out); o.start(at); o.stop(at + dur + 0.05);
+      };
+      sweep(t, 2600, 260, 0.32, 0.05); sweep(t + 0.16, 3200, 300, 0.32, 0.045); sweep(t + 0.32, 2200, 220, 0.36, 0.05);
+      [0.55, 0.8, 1.05, 1.4, 1.62].forEach((d, i)=> pop(t + d, [900, 1600, 700, 2200, 1200][i], 0.35));
+      [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i)=> tone(t + 0.6 + i * 0.09, f, 0.32, 'triangle', 0.09));
+      [523.25, 659.25, 783.99, 1046.5].forEach(f=> tone(t + 1.15, f, 1.4, 'sine', 0.07));
+      tone(t + 1.15, 261.63, 1.4, 'square', 0.03);
+      [2093, 2637, 3136, 2637, 3520].forEach((f, i)=> tone(t + 1.3 + i * 0.12, f, 0.16, 'sine', 0.05));
+    }catch(e){}
+    haptic([30, 40, 30, 40, 60, 60, 200]);
+  }
   const sfx = {
+    secretSolve: ()=> playSecretSolveSound(),
     tap: (side)=>{ playClick(0.2, document.documentElement.classList.contains('mode-infinity') ? TAP_TONES.infinity : TAP_TONES.daily, side); haptic(8); },
     revealWin: ()=>{ playTone(660,0,0.09,'sine',0.1); playTone(880,0.08,0.14,'sine',0.1); },
     revealLose: ()=>{ playTone(320,0,0.15,'sine',0.07); },
@@ -3398,6 +3517,9 @@
     // later gets the intro theme instead of a replay.
     // While paused, only remember the choice - Resume starts the music.
     if (isPaused) return;
+    // The Daily results screen is silent after its fanfare/sting: sound
+    // switched on there doesn't start anything.
+    if (on && (currentTrackKey === 'win' || currentTrackKey === 'lose')) return;
     if (on) playTrack(currentTrackKey === 'fanfare' ? 'intro' : (currentTrackKey || 'run')); else pauseAllTracks();
   }
 
@@ -3420,7 +3542,13 @@
     // doesn't leave a gap). -11.9 LUFS, in line with the intro.
     run:      'audio/top-score-carousel-trimmed.mp3',
     solve:    'audio/final-buzzer.mp3',
+    // Waiting on files - each stays silent until its path is set here:
+    secret:   null,   // the Super Secret Hidden Riddle (~30s; RIDDLE_MS should match it)
+    win:      null,   // short fanfare when a Daily run ends with the word solved
+    lose:     null,   // short sting when it ends unsolved
   };
+  // Played once, never looped.
+  const ONE_SHOT_TRACKS = ['fanfare', 'secret', 'win', 'lose'];
   // Infinity plays a continuous playlist: Pacific Drive -> Palm Tree Pivot
   // -> High Noon Parade -> Victory Lap -> back to Pacific Drive, round and
   // round for as long as the player stays in Infinity Flips, so a long
@@ -3459,7 +3587,7 @@
     if (key === 'infinity') return (trackEls.infinity = infinityEl(infIdx));
     if (!trackEls[key]){
       const a = new Audio(TRACK_SRC[key]);
-      a.loop = key !== 'fanfare';
+      a.loop = ONE_SHOT_TRACKS.indexOf(key) === -1;
       a.preload = 'auto';
       a.volume = MUSIC_VOLUME;
       // Safety net: whatever queued or started this element (a play() that
@@ -3619,6 +3747,38 @@
     const el = getTrackEl(key);
     el.muted = false;
     try{ el.currentTime = key === 'infinity' ? infStartAt(0) : 0; }catch(e){}
+    el.play().catch(()=>{});
+  }
+  // The secret riddle has its own track: the Daily theme stops (keeping its
+  // place) while the riddle is up and carries on from there afterwards,
+  // like Pause / Resume. Until the track's file is in TRACK_SRC, the theme
+  // just keeps playing.
+  function startSecretMusic(){
+    if (!TRACK_SRC.secret || currentTrackKey !== 'run') return;
+    playTrack('secret');   // pauses the theme where it is
+  }
+  function stopSecretMusic(){
+    if (currentTrackKey === 'secret' && trackEls.secret) try{ trackEls.secret.pause(); }catch(e){}
+  }
+  function resumeThemeAfterSecret(){
+    if (currentTrackKey !== 'secret') return;
+    stopSecretMusic();
+    currentTrackKey = 'run';
+    if (!soundOn) return;
+    const el = getTrackEl('run');
+    el.muted = false; el.play().catch(()=>{});
+  }
+  // End of a Daily run: a short fanfare (word solved) or sting (not solved),
+  // played once, then the results screen stays silent. Until those files
+  // are in TRACK_SRC it's silent straight away.
+  function playRunEndMusic(solved){
+    pauseAllTracks();
+    const key = solved ? 'win' : 'lose';
+    currentTrackKey = key;
+    if (!TRACK_SRC[key] || !soundOn) return;
+    const el = getTrackEl(key);
+    el.muted = false;
+    try{ el.currentTime = 0; }catch(e){}
     el.play().catch(()=>{});
   }
   // Browsers block audio.play() before any user gesture on the page, but
@@ -5568,6 +5728,7 @@
       score: shownScore(r.score),
       personality: PERSONALITY_META[r.personalityType] || PERSONALITY_META.fence_sitter,
       voteSummary: r.lastVote || null,
+      secret: !!r.secretRiddle,
     };
   }
   function buildInfinityShareData(){
@@ -5594,6 +5755,22 @@
     ctx.fillText(data.badge, cx, 185);
 
     let y = 340;
+    // A solved secret riddle tops the card: a glowing banner under the date,
+    // and everything below it moves down to make room (the footer stays put).
+    const SECRET_H = mode === 'daily' && data.secret ? 160 : 0;
+    if (SECRET_H){
+      const bw = 940, bx = cx - bw/2, by = 214;
+      roundRectPath(ctx, bx, by, bw, 140, 30);
+      const g = ctx.createLinearGradient(bx, by, bx + bw, by + 140);
+      g.addColorStop(0, '#3a0d6e'); g.addColorStop(0.5, '#7a1a8c'); g.addColorStop(1, '#1d2a8a');
+      ctx.fillStyle = g; ctx.fill();
+      ctx.lineWidth = 4; ctx.strokeStyle = '#ffd96e'; ctx.stroke();
+      ctx.shadowColor = 'rgba(255,138,212,0.95)'; ctx.shadowBlur = 28; ctx.fillStyle = '#fff';
+      ctx.font = '900 50px Arial, sans-serif'; ctx.fillText('YOU DISCOVERED THE', cx, by + 60);
+      ctx.fillStyle = '#ffd96e'; ctx.font = '900 56px Arial, sans-serif'; ctx.fillText('SUPER SECRET RIDDLE!!!', cx, by + 118);
+      ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
+    }
+    ctx.save(); ctx.translate(0, SECRET_H);
     if (mode === 'daily'){
       // The score, big - the headline of the card.
       ctx.font = '900 118px Arial, sans-serif'; ctx.fillStyle = '#fff';
@@ -5642,6 +5819,7 @@
       const line = 'You agreed with ' + data.voteSummary.pct + '% of players on ' + data.voteSummary.itemA + ' vs ' + data.voteSummary.itemB;
       wrapCenteredText(ctx, line, cx, y, SHARE_CARD_W - 160, 38);
     }
+    ctx.restore();
 
     ctx.font = '700 26px Arial, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.55)';
     ctx.fillText('flipstax-one.vercel.app', cx, SHARE_CARD_H - 90);
@@ -6187,7 +6365,8 @@
     runPhase = 'riddle';
     stopTallyPolling();
     clearRoundTimer();
-    currentRiddle = resumeRiddle || pick(RIDDLES);
+    currentRiddle = resumeRiddle || pickSecretRiddle();
+    startSecretMusic();
     els.riddleQ.textContent = currentRiddle.q;
     els.riddleInput.value = '';
     els.riddleResult.className = 'riddle-result hidden';
@@ -6195,7 +6374,7 @@
     els.slowdownBtn.classList.add('hidden');
     // Not a normal vote-and-reveal round, so clear stale voted/votedSinceTime
     // the same way startSolvePhase does - otherwise the stalled-round
-    // watchdog can misread this 45s window as a stuck round.
+    // watchdog can misread this riddle window as a stuck round.
     voted = false;
     votedSinceTime = null;
     sfx.bonusZone();
@@ -6213,15 +6392,16 @@
     els.riddleTimer.classList.toggle('danger', remain <= 10000);
     if (remain <= 0){
       clearInterval(riddleInterval);
-      resolveRiddle(false);
+      resolveRiddle(false, 'time');
     }
   }
   function submitRiddleAnswer(){
     if (runPhase !== 'riddle' || !currentRiddle) return;
-    const guess = els.riddleInput.value.trim().toUpperCase();
-    resolveRiddle(guess.length > 0 && guess === currentRiddle.a);
+    // Same forgiving check as Infinity's Riddle Round (see riddleAnswerMatches).
+    const guess = els.riddleInput.value.trim();
+    resolveRiddle(guess.length > 0 && riddleAnswerMatches(guess, currentRiddle), guess.length > 0 ? 'wrong' : 'time');
   }
-  function resolveRiddle(win){
+  function resolveRiddle(win, why){
     // Guard against double-resolution (a fast double-submit, or the 45s
     // timeout firing the same instant as a manual submit) - without this,
     // addRunScore's +points call below would run twice, since 'riddle'
@@ -6231,8 +6411,10 @@
     runPhase = 'riddle-resolving';
     clearInterval(riddleInterval);
     els.riddleInput.blur();
+    stopSecretMusic();
     if (win){
-      sfx.correct();
+      sfx.secretSolve();
+      celebrateSecretSolve();
       runRiddleSolved = true;
       addRunScore(RIDDLE_BONUS_POINTS);
       if (!stats.badges.riddler){ stats.badges.riddler = true; saveStats(); }
@@ -6242,15 +6424,56 @@
       renderStats();
     } else {
       sfx.wrong();
-      els.riddleResult.textContent = '⏰ Out of time — the answer was ' + currentRiddle.a;
+      // (Was "Out of time" even when an answer had been submitted.)
+      els.riddleResult.textContent = (why === 'wrong' ? '❌ Not quite — the answer was ' : '⏰ Out of time — the answer was ') + (currentRiddle.say || currentRiddle.a);
       els.riddleResult.className = 'riddle-result lose';
     }
     saveRunSnapshot();
+    // A solve holds a little longer so the fireworks can play out.
     setTimeout(()=>{
       els.riddleOverlay.classList.add('hidden');
+      els.riddleOverlay.classList.remove('celebrating');
       if (!runActive) return;
+      resumeThemeAfterSecret();
       advanceAfterTrivia();
-    }, dt(1800));
+    }, win ? 3200 : dt(1800));
+  }
+  // Fireworks for the secret solve: shells burst one after another across
+  // the top of the screen, sparks falling with trails (~2.8s).
+  function celebrateSecretSolve(){
+    let reduced = false;
+    try{ reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }catch(e){}
+    els.riddleOverlay.classList.add('celebrating');
+    if (reduced) return;
+    const canvas = document.getElementById('riddleFireworks'), ctx = canvas && canvas.getContext('2d');
+    if (!ctx) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1), W = window.innerWidth, H = window.innerHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const cols = ['#ff3cac','#19e0ff','#ffd96e','#b26bff','#7dffb0','#ffffff','#ff9a3d'];
+    const sparks = [], start = performance.now(), life = 2800;
+    const shells = [0, 260, 520, 800, 1050, 1350, 1650].map((at, i)=> ({ at, x: W * (0.15 + Math.random() * 0.7), y: H * (0.12 + Math.random() * 0.38), c: cols[i % cols.length], done:false }));
+    (function frame(now){
+      const t = now - start;
+      ctx.globalCompositeOperation = 'destination-out'; ctx.fillStyle = 'rgba(0,0,0,0.22)'; ctx.fillRect(0, 0, W, H);
+      ctx.globalCompositeOperation = 'lighter';
+      for (const s of shells){
+        if (s.done || t < s.at) continue;
+        s.done = true;
+        for (let k = 0; k < 70; k++){
+          const a = Math.random() * Math.PI * 2, v = 2 + Math.random() * 4.5;
+          sparks.push({ x: s.x, y: s.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, c: Math.random() < 0.25 ? '#ffffff' : s.c, born: t });
+        }
+      }
+      for (const p of sparks){
+        const age = t - p.born; if (age > 1300) continue;
+        p.vy += 0.06; p.vx *= 0.985; p.vy *= 0.985; p.x += p.vx; p.y += p.vy;
+        ctx.globalAlpha = Math.max(0, 1 - age / 1300); ctx.fillStyle = p.c;
+        ctx.beginPath(); ctx.arc(p.x, p.y, 2.2, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+      if (t < life) requestAnimationFrame(frame);
+      else { ctx.globalCompositeOperation = 'source-over'; ctx.clearRect(0, 0, W, H); }
+    })(start);
   }
   els.riddleSubmit.addEventListener('click', submitRiddleAnswer);
   els.riddleInput.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') submitRiddleAnswer(); });
@@ -6990,6 +7213,7 @@
       secondChance: runSecondChanceOutcome, perfect: runPerfect,
       roundResults: runRoundResults.slice(),
       lastVote: lastVoteSummary ? Object.assign({}, lastVoteSummary) : null,
+      secretRiddle: !!runRiddleSolved,
     };
     saveRunResultToday(runResultToday);
     unlockPersonality(personalityType);
@@ -6997,7 +7221,7 @@
     renderRunBanner();
     showRunReadout();
     voted = false; votedSinceTime = null;
-    playTrack('run');
+    playRunEndMusic(!!solved);
   }
   function showRunReadout(){
     const r = runResultToday;
@@ -7016,6 +7240,12 @@
     els.readoutCard.appendChild(card);
     els.readoutType.classList.toggle('has-new', isNew);
     if (isNew){ owned.revealed = true; saveCollection(); renderCollectionBtn(); setTimeout(()=> revealCollectionCard(card), 650); }
+    // A solved secret riddle is the headline of the results (it replaces the
+    // flag to keep the screen from growing).
+    const secret = !!r.secretRiddle;
+    document.getElementById('readoutSecret').classList.toggle('hidden', !secret);
+    document.getElementById('readoutMask').classList.toggle('hidden', secret);
+    els.readoutOverlay.classList.toggle('has-secret', secret);
     els.readoutTypeName.textContent = meta.name;
     els.readoutTypeBlurb.textContent = meta.blurb;
     els.readoutOverlay.classList.add('show');
@@ -7995,6 +8225,8 @@
       setCollection: (c) => { collection = c; saveCollection(); renderCollectionBtn(); },
       openCollection: () => openCollection(),
       startDailyRiddle: () => startRiddleRound(),
+      riddleMatches: (guess, i) => riddleAnswerMatches(guess, RIDDLES[i]),
+      currentRiddle: () => currentRiddle,
       startInfRiddle: (i) => startInfRiddle(i),
       getInfRiddle: () => ({ state: infRiddleState, riddle: infRiddle, lastFlip: lastInfRiddleFlip }),
       closeInfRiddle: () => closeInfRiddle(),
@@ -8056,7 +8288,7 @@
     els.homeOverlay.classList.add('hidden');
     els.modeSelectOverlay.classList.remove('hidden');
   });
-  const LEGAL_LAST_UPDATED = 'September 28, 2026';
+  const LEGAL_LAST_UPDATED = 'October 1, 2026';
   // The contact address never appears whole in the page source (scrapers
   // harvest those): it's stored reversed and assembled here at runtime.
   const CONTACT_EMAIL = ['moc.liamg', 'xatspilfyalp'].map(p=> p.split('').reverse().join('')).reverse().join('@');
@@ -8154,7 +8386,7 @@
       body: `
         <p>This Privacy Policy explains what information FlipStax ("we," "us") collects when you play the Game at flipstax-one.vercel.app, and how it's used.</p>
         <h4>1. Information We Collect</h4>
-        <p><strong>Gameplay data stored on your device.</strong> FlipStax stores your game progress and preferences directly in your browser's local storage: your stats and sound setting, today's Daily Stax run (including one still in progress) and your day streak, your My Collection personality cards, your Infinity badges and progress toward your next Infinity personality, and a list of the Infinity matchups you've already voted on (used for badges). This data stays on your device and is not sent to us. It isn't linked to an account, so it doesn't carry over to other devices and is erased if you clear your browser data.</p>
+        <p><strong>Gameplay data stored on your device.</strong> FlipStax stores your game progress and preferences directly in your browser's local storage: your stats and sound setting, today's Daily Stax run (including one still in progress) and your day streak, your My Collection personality cards, your Infinity badges and progress toward your next Infinity personality, a list of the Infinity matchups you've already voted on (used for badges), and which Daily Stax secret riddles you've already seen (so they don't repeat). This data stays on your device and is not sent to us. It isn't linked to an account, so it doesn't carry over to other devices and is erased if you clear your browser data.</p>
         <p><strong>Anonymous vote counts.</strong> When you vote in a "versus" matchup, we record that vote as an anonymous tally in our database. We do not associate votes with your identity, an account, or a persistent user ID.</p>
         <p><strong>IP address and session code (transient, for abuse prevention only).</strong> When you vote, your IP address and a random session code (made fresh each time the page loads, never saved on your device, and not linked to you) are used to enforce rate limits that prevent automated spam. These rate-limit counters expire automatically within about two minutes. We do not permanently log or store IP addresses tied to individual votes.</p>
         <p><strong>Anonymous usage analytics.</strong> We use privacy-friendly analytics (which do not use cookies and do not track you individually) to understand overall traffic to the Game, such as how many people visit and which pages are popular.</p>
