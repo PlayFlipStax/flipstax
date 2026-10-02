@@ -3547,9 +3547,6 @@
     // later gets the intro theme instead of a replay.
     // While paused, only remember the choice - Resume starts the music.
     if (isPaused) return;
-    // The Daily results screen is silent after its fanfare/sting: sound
-    // switched on there doesn't start anything.
-    if (on && (currentTrackKey === 'win' || currentTrackKey === 'lose')) return;
     if (on) playTrack(currentTrackKey === 'fanfare' ? 'intro' : (currentTrackKey || 'run')); else pauseAllTracks();
   }
 
@@ -3572,16 +3569,19 @@
     // doesn't leave a gap). -11.9 LUFS, in line with the intro.
     run:      'audio/top-score-carousel-trimmed.mp3',
     solve:    'audio/final-buzzer.mp3',
-    // Waiting on files - each stays silent until its path is set here:
+    // Daily results screen, looping until Done: one for a solved word, one
+    // for an unsolved one (59.4s / 58.3s; -10.9 / -11.4 LUFS, near the
+    // Daily theme). Each opens with ~0.5-0.9s of quiet, so there's that
+    // small gap at every loop, like the Daily theme's own.
     // The Super Secret Hidden Riddle: Velvet Curtain Call, 30.04s (RIDDLE_MS
     // matches it). Starts straight in, ends with ~1.3s of silence; -12.1
     // LUFS, matched to the Daily theme (-11.9).
     secret:   'audio/velvet-curtain-call-trimmed.mp3',
-    win:      null,   // short fanfare when a Daily run ends with the word solved
-    lose:     null,   // short sting when it ends unsolved
+    win:      'audio/victory-lap-results-trimmed.mp3',
+    lose:     'audio/better-luck-next-time-trimmed.mp3',
   };
   // Played once, never looped.
-  const ONE_SHOT_TRACKS = ['fanfare', 'secret', 'win', 'lose'];
+  const ONE_SHOT_TRACKS = ['fanfare', 'secret'];
   // Infinity plays a continuous playlist: Pacific Drive -> Palm Tree Pivot
   // -> High Noon Parade -> Victory Lap -> back to Pacific Drive, round and
   // round for as long as the player stays in Infinity Flips, so a long
@@ -3801,9 +3801,9 @@
     const el = getTrackEl('run');
     el.muted = false; el.play().catch(()=>{});
   }
-  // End of a Daily run: a short fanfare (word solved) or sting (not solved),
-  // played once, then the results screen stays silent. Until those files
-  // are in TRACK_SRC it's silent straight away.
+  // End of a Daily run: the Daily theme stops and the results screen gets its
+  // own track - Victory Lap Results if the word was solved, Better Luck Next
+  // Time if not - looping until the player taps Done.
   function playRunEndMusic(solved){
     pauseAllTracks();
     const key = solved ? 'win' : 'lose';
@@ -7267,9 +7267,7 @@
     renderRunBanner();
     showRunReadout();
     voted = false; votedSinceTime = null;
-    // The Daily theme carries on behind the results until the end-of-run
-    // fanfare/sting files arrive; then this becomes playRunEndMusic(!!solved).
-    playTrack('run');
+    playRunEndMusic(!!solved);
   }
   function showRunReadout(){
     const r = runResultToday;
