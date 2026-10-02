@@ -5780,6 +5780,12 @@
       runPowerUpRoundForRun(runPowerupEndsAt);
     } else if (ph === 'riddle' && currentRiddle){
       startRiddleRound(currentRiddle, riddleEndsAt);
+    } else if (ph === 'powerup' && runPowerupDone && checkSecretUnlock()){
+      // Refreshed in the 1.1s after a power-up resolved, before
+      // finishRunPowerUp ran its secret check: run it here instead, so the
+      // order the player picked still unlocks the riddle.
+      riddleTriggeredThisRun = true;
+      startRiddleRound();
     } else {
       // The VS board (or a power-up already picked): deal the next round
       // and hold it on the Paused screen until they're ready.
