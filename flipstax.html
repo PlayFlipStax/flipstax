@@ -3051,7 +3051,7 @@
   // the vibe condition are gone.)
   const SECRET_UNLOCK_SEQUENCE = ['slowclock', 'slowclock', 'points10', 'wildcard', 'hint'];
   const PERFECT_RUN_BONUS = 15;   // points for landing all 6 trivia (nothing left for Second Chance to recover)
-  // 30s default - set to the secret-riddle music track's length once it lands.
+  // The secret-riddle track's length (Velvet Curtain Call, 30.04s).
   const RIDDLE_MS = 30000 / DEBUG_TIME_SCALE;
   const RIDDLE_BONUS_POINTS = 50;
   // Short label for the toast/in-run badge text; "THE SUPER SECRET HIDDEN
@@ -3573,7 +3573,10 @@
     run:      'audio/top-score-carousel-trimmed.mp3',
     solve:    'audio/final-buzzer.mp3',
     // Waiting on files - each stays silent until its path is set here:
-    secret:   null,   // the Super Secret Hidden Riddle (~30s; RIDDLE_MS should match it)
+    // The Super Secret Hidden Riddle: Velvet Curtain Call, 30.04s (RIDDLE_MS
+    // matches it). Opens with ~1.3s of silence; -15.1 LUFS, ~3dB under the
+    // Daily theme.
+    secret:   'audio/velvet-curtain-call-trimmed.mp3',
     win:      null,   // short fanfare when a Daily run ends with the word solved
     lose:     null,   // short sting when it ends unsolved
   };
