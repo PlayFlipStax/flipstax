@@ -705,9 +705,28 @@
     filter:drop-shadow(0 0 10px rgba(178,107,255,0.75)) drop-shadow(0 0 22px rgba(255,138,212,0.45));
     animation: secretHeadShift 3s linear infinite, secretHeadPulse 1.1s ease-in-out infinite alternate;
   }
-  .readout-secret.hidden, .personality-mask.hidden{ display:none; }
+  .readout-secret.hidden, .personality-mask.hidden, .readout-riddler.hidden, .readout-type.hidden{ display:none; }
+  /* The secret riddle's own reward, drawn (no art yet): a small galaxy card
+     beside its name - deliberately not one of the 16 collection cards. */
+  .readout-riddler{ display:flex; align-items:center; gap:12px; margin:0 auto 10px; padding:8px 12px; max-width:330px; text-align:left;
+    border-radius:14px; background:rgba(178,107,255,0.12); border:1px solid rgba(255,214,110,0.45); }
+  .rr-card{ flex:0 0 auto; width:44px; height:60px; border-radius:7px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+    background:radial-gradient(circle at 50% 30%, #7a1a8c, #2a0b55 70%, #120530); border:2px solid #ffd96e; box-shadow:0 0 12px rgba(178,107,255,0.6); }
+  .rr-planet{ font-size:20px; line-height:1; }
+  .rr-label{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:7.5px; line-height:1.05; letter-spacing:0.4px; color:#ffd96e; text-align:center; }
+  .rr-text{ display:flex; flex-direction:column; gap:2px; }
+  .rr-name{ font-family:'Big Shoulders Display', sans-serif; font-weight:800; font-size:18px; color:#fff; }
+  .rr-sub{ font-size:11.5px; color:#d8c4ff; line-height:1.3; }
   /* Keeps the headline clear of the Donations button on short screens. */
-  #readoutOverlay.has-secret{ padding-top:calc(92px + env(safe-area-inset-top)); }
+  /* With the secret headline and Secret Riddler panel the results run taller:
+     start below the Donations button (not centred, which pushed the top up
+     under it), tighten things up, and scroll rather than overlap the footer
+     on the shortest phones. */
+  #readoutOverlay.has-secret{ padding-top:calc(92px + env(safe-area-inset-top)); justify-content:flex-start; overflow-y:auto; }
+  #readoutOverlay.has-secret .readout-secret{ font-size:clamp(22px,6.6vw,30px); margin-bottom:10px; }
+  #readoutOverlay.has-secret .readout-card{ width:68px; margin:6px auto 4px; }
+  #readoutOverlay.has-secret .readout-type{ margin-top:10px; padding:10px 12px; }
+  #readoutOverlay.has-secret .solve-buttons{ margin-top:10px !important; }
   @keyframes secretHeadShift{ to{ background-position:300% 0; } }
   @keyframes secretHeadPulse{ from{ transform:scale(1); } to{ transform:scale(1.05); } }
   @media (prefers-reduced-motion: reduce){ .readout-secret{ animation:none; } }
@@ -2163,6 +2182,10 @@
 <div class="personality-overlay" id="readoutOverlay">
   <div class="personality-inner">
     <div class="readout-secret hidden" id="readoutSecret">YOU DISCOVERED THE SUPER SECRET RIDDLE!!!</div>
+    <div class="readout-riddler hidden" id="readoutRiddler" aria-label="The Secret Riddler">
+      <div class="rr-card" aria-hidden="true"><span class="rr-planet">🪐</span><span class="rr-label">SECRET<br>RIDDLER</span></div>
+      <div class="rr-text"><span class="rr-name">The Secret Riddler</span><span class="rr-sub">Found the Super Secret Hidden Riddle · 🪐 badge earned</span></div>
+    </div>
     <div class="personality-mask" id="readoutMask">🏁</div>
     <div class="personality-eyebrow">DAILY STAX COMPLETE</div>
     <div class="personality-label" id="readoutScore"></div>
@@ -2278,8 +2301,10 @@
     const votes = Math.max(1, s.votes || 0);
     const pu = s.powerupCounts;
     const first = Math.max(1, s.firstHalfScore), second = s.secondHalfScore;
+    // The secret riddle is its own reward (The Secret Riddler + the 🪐 badge,
+    // see SECRET_RIDDLER) - it never decides which of these 16 a run gets.
     return {
-      riddler:           s.riddleSolved ? 1 : 0,
+      skeptic:           0,   // unlock criteria to come
       trivia_titan:      s.triviaTotal >= 6 && s.triviaCorrect === 6 ? 0.95 : 0,
       last_second_hero:  s.solved && s.solveTimeRemainingPct < 12 ? 0.7 + 0.2 * c01((12 - s.solveTimeRemainingPct) / 12) : 0,
       // First-guess solve with half the word or less to go on.
@@ -2309,11 +2334,11 @@
   const PERSONALITY_META = {
     // Display names match the card art (Oct 2026 set). The keys are what the
     // unlock logic awards and what players' saved collections store, so they
-    // stay as they were for now - four of them carry new names until the new
-    // unlock criteria land: riddler = The Skeptic, trivia_titan = The
-    // Maverick, speed_demon = The Swing Voter, trivia_trainwreck = The
-    // Bandwagoner (their blurbs still describe the current unlock).
-    riddler: { name: 'The Skeptic', icon: '🎱', blurb: 'Found the Super Secret Hidden Riddle.' },
+    // stay as they were for now - three carry new names until the new unlock
+    // criteria land: trivia_titan = The Maverick, speed_demon = The Swing
+    // Voter, trivia_trainwreck = The Bandwagoner (their blurbs still describe
+    // the current unlock). The Skeptic has no unlock yet.
+    skeptic: { name: 'The Skeptic', icon: '🎱', blurb: 'Doesn\u2019t take the crowd\u2019s word for it.' },
     trivia_titan: { name: 'The Maverick', icon: '🤠', blurb: 'Perfect trivia run.' },
     trivia_trainwreck: { name: 'The Bandwagoner', icon: '🚩', blurb: 'Came for the vibes, not the answers.' },
     perfectionist: { name: 'The Perfectionist', icon: '✨', blurb: 'Zero wrong guesses.' },
@@ -3032,6 +3057,9 @@
   // Short label for the toast/in-run badge text; "THE SUPER SECRET HIDDEN
   // RIDDLE" (the full name) is reserved for the overlay's own headline.
   const RIDDLE_BADGE = '🪐 Secret Riddle';
+  // Solving the secret riddle earns this - its own reward, separate from the
+  // 16-card Personality Collection (and the 🪐 badge in the header).
+  const SECRET_RIDDLER = { name:'The Secret Riddler', icon:'🪐', blurb:'Found the Super Secret Hidden Riddle.' };
   // Daily Stax's Super Secret Hidden Riddle pool. Never shared with
   // INFINITY_RIDDLES (checked at startup, below). Answers are matched the
   // forgiving way (riddleAnswerMatches: case, spaces, punctuation, a leading
@@ -5302,6 +5330,9 @@
       const raw = localStorage.getItem('flipstax_run_v1');
       if (!raw) return null;
       const parsed = JSON.parse(raw);
+      // From before the riddle was decoupled: a solve picked 'riddler' as the
+      // run's personality. Show it as the standalone reward instead.
+      if (parsed && parsed.personalityType === 'riddler'){ parsed.secretRiddle = true; parsed.personalityType = null; }
       return parsed && parsed.date === todayStr() ? parsed : null;
     }catch(e){ return null; }
   }
@@ -5319,7 +5350,7 @@
   // A type with no art gets a drawn stand-in card.
   const PERSONALITY_CARD_ART = {
     contrarian:'the_contrarian.jpg', wildcard_menace:'wildcard_menace.jpg', chaos_agent:'chaos_agent.jpg', silent_assassin:'silent_assassin.jpg',
-    perfectionist:'the_perfectionist.jpg', overthinker:'the_overthinker.jpg', trivia_titan:'the_maverick.jpg', riddler:'the_skeptic.jpg',
+    perfectionist:'the_perfectionist.jpg', overthinker:'the_overthinker.jpg', trivia_titan:'the_maverick.jpg', skeptic:'the_skeptic.jpg',
     fence_sitter:'the_fence_sitter.jpg', gambler:'the_gambler.jpg', comeback_kid:'comeback_kid.jpg', speed_demon:'the_swing_voter.jpg',
     trivia_trainwreck:'the_bandwagoner.jpg', combo_king_queen:'the_combo_royalty.jpg', last_second_hero:'last_second_hero.jpg', crowd_pleaser:'crowd_pleaser.jpg',
   };
@@ -5329,14 +5360,23 @@
   // reads this.
   const PERSONALITY_ORDER = [
     'contrarian', 'wildcard_menace', 'chaos_agent', 'silent_assassin',
-    'perfectionist', 'overthinker', 'trivia_titan', 'riddler',
+    'perfectionist', 'overthinker', 'trivia_titan', 'skeptic',
     'fence_sitter', 'gambler', 'comeback_kid', 'speed_demon',
     'trivia_trainwreck', 'combo_king_queen', 'last_second_hero', 'crowd_pleaser',
   ];
   function loadCollection(){
     try{
       const raw = localStorage.getItem(COLLECTION_KEY);
-      if (raw){ const parsed = JSON.parse(raw); if (parsed && parsed.cards && typeof parsed.cards === 'object') return parsed; }
+      if (raw){
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed.cards && typeof parsed.cards === 'object'){
+          // 'riddler' used to be a collection card awarded for solving the
+          // secret riddle. That's its own reward now (the 🪐 badge, kept in
+          // stats), so it's no longer one of the 16.
+          if (parsed.cards.riddler){ delete parsed.cards.riddler; try{ localStorage.setItem(COLLECTION_KEY, JSON.stringify(parsed)); }catch(e){} }
+          return parsed;
+        }
+      }
     }catch(e){}
     return { v:1, cards:{} };
   }
@@ -5601,8 +5641,8 @@
   // points - and the game and the stored result keep the real number.)
   function shownScore(n){ return Math.max(0, Math.round(n || 0)); }
   function buildRunShareText(r){
-    const p = PERSONALITY_META[r.personalityType] || PERSONALITY_META.fence_sitter;
-    return 'FlipStax Daily Stax\n' + shownScore(r.score) + ' pts \u00B7 ' + p.icon + ' ' + p.name + ' \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal + ' trivia \u00B7 ' +
+    const p = PERSONALITY_META[r.personalityType];
+    return 'FlipStax Daily Stax\n' + shownScore(r.score) + ' pts \u00B7 ' + (p ? p.icon + ' ' + p.name + ' \u00B7 ' : '') + r.triviaCorrect + '/' + r.triviaTotal + ' trivia \u00B7 ' +
       (r.solved ? ('solved in ' + formatRaceTime(r.solveMs)) : 'word not solved') +
       (r.secretRiddle ? '\n...and cracked the Super Secret Riddle \uD83C\uDF0C' : '');
   }
@@ -5729,7 +5769,7 @@
       roundResults: results,
       statLine: r.solved ? ('Solved in ' + formatRaceTime(r.solveMs)) : (r.triviaCorrect + '/' + r.triviaTotal + ' trivia correct'),
       score: shownScore(r.score),
-      personality: PERSONALITY_META[r.personalityType] || PERSONALITY_META.fence_sitter,
+      personality: PERSONALITY_META[r.personalityType] || null,
       voteSummary: r.lastVote || null,
       secret: !!r.secretRiddle,
     };
@@ -5795,7 +5835,7 @@
       ctx.fillText(data.statLine, cx, y);
       y += 44;
       // Today's personality, in its own panel.
-      const p = data.personality, pw = 760, ph = 250, px = cx - pw/2;
+      const p = data.personality || { icon:SECRET_RIDDLER.icon, name:SECRET_RIDDLER.name, blurb:SECRET_RIDDLER.blurb }, pw = 760, ph = 250, px = cx - pw/2;
       roundRectPath(ctx, px, y, pw, ph, 28);
       ctx.fillStyle = 'rgba(255,255,255,0.07)'; ctx.fill();
       ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,214,110,0.55)'; ctx.stroke();
@@ -7234,12 +7274,13 @@
       + (r.secondChance === 'recovered' ? ' · 🔁 +1 letter recovered' : '');
     els.readoutWord.textContent = r.solved ? ('\u2705 Solved in ' + formatRaceTime(r.solveMs)) : ('\u274C Word not solved (' + (r.word||'') + ')');
     const meta = PERSONALITY_META[r.personalityType] || PERSONALITY_META.fence_sitter;
+    els.readoutType.classList.toggle('hidden', !PERSONALITY_META[r.personalityType]);
     // Today's personality as its collectible card - with the unlock reveal
     // the first time it's earned.
-    const owned = collection.cards[r.personalityType];
+    const owned = PERSONALITY_META[r.personalityType] && collection.cards[r.personalityType];
     const isNew = !!(owned && !owned.revealed);
     els.readoutCard.innerHTML = '';
-    const card = makeCollectionCard(r.personalityType, !isNew);
+    const card = makeCollectionCard(PERSONALITY_META[r.personalityType] ? r.personalityType : 'fence_sitter', !isNew);
     els.readoutCard.appendChild(card);
     els.readoutType.classList.toggle('has-new', isNew);
     if (isNew){ owned.revealed = true; saveCollection(); renderCollectionBtn(); setTimeout(()=> revealCollectionCard(card), 650); }
@@ -7247,6 +7288,7 @@
     // flag to keep the screen from growing).
     const secret = !!r.secretRiddle;
     document.getElementById('readoutSecret').classList.toggle('hidden', !secret);
+    document.getElementById('readoutRiddler').classList.toggle('hidden', !secret);
     document.getElementById('readoutMask').classList.toggle('hidden', secret);
     els.readoutOverlay.classList.toggle('has-secret', secret);
     els.readoutTypeName.textContent = meta.name;
