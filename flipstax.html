@@ -2303,52 +2303,41 @@
   ];
   function vibeTierFor(pct){ for (const t of VIBE_TIERS){ if (pct <= t.max) return t; } return VIBE_TIERS[VIBE_TIERS.length-1]; }
 
-  // Per-run personality type (16 types, one result per Daily Run) - a
-  // distinct axis from the lifetime vibe tier above: this reads THIS run's
-  // playstyle (speed, streaks, risk-taking, comeback shape), not a
-  // lifetime crowd-agreement average.
-  // One personality per Daily run. Every type scores how strongly this run
-  // fits it (0 = not at all) and the strongest fit wins, so a specific,
-  // hard-earned match beats a broad one. (This used to be a first-match
-  // chain, where "3+ votes on Wild Card-category cards" came early - nearly
-  // every run sees that many, so ~99% of players got Wildcard Menace and
-  // most other types were unreachable.) Declaration order breaks exact ties.
-  // Scores were tuned against 20,000 simulated runs across a spread of play
-  // styles: all 16 types turn up and none is more than ~15% of runs.
-  function personalityScores(s){
-    const c01 = v => Math.max(0, Math.min(1, v));
-    const votes = Math.max(1, s.votes || 0);
-    const pu = s.powerupCounts;
-    const first = Math.max(1, s.firstHalfScore), second = s.secondHalfScore;
-    // The secret riddle is its own reward (The Secret Riddler + the 🪐 badge,
-    // see SECRET_RIDDLER) - it never decides which of these 16 a run gets.
-    return {
-      skeptic:           0,   // unlock criteria to come
-      trivia_titan:      s.triviaTotal >= 6 && s.triviaCorrect === 6 ? 0.95 : 0,
-      last_second_hero:  s.solved && s.solveTimeRemainingPct < 12 ? 0.7 + 0.2 * c01((12 - s.solveTimeRemainingPct) / 12) : 0,
-      // First-guess solve with half the word or less to go on.
-      perfectionist:     s.solved && s.solveWrongGuesses === 0 && s.triviaCorrect <= 3 ? 0.62 + 0.06 * (3 - s.triviaCorrect) : 0,
-      trivia_trainwreck: s.triviaTotal >= 3 && s.triviaCorrect <= 1 ? (s.triviaCorrect === 0 ? 0.85 : 0.6) : 0,
-      // Chose the coin-flip power-up more than once.
-      wildcard_menace:   pu.wildcard >= 2 ? 0.55 + 0.1 * (pu.wildcard - 2) : 0,
-      gambler:           pu.points10 >= 3 ? 0.5 + 0.1 * (pu.points10 - 3) : 0,
-      comeback_kid:      second >= 12 && second >= first * 1.8 ? 0.45 + c01((second / first - 1.8) / 3) * 0.4 : 0,
-      speed_demon:       s.decisionTimePercentile <= 28 ? 0.4 + c01((28 - s.decisionTimePercentile) / 18) * 0.45 : 0,
-      overthinker:       s.decisionTimePercentile >= 68 || pu.slowclock >= 3 ? 0.4 + c01((s.decisionTimePercentile - 68) / 20) * 0.45 : 0,
-      contrarian:        s.avgCrowdAgreementPct <= 38 ? 0.4 + c01((38 - s.avgCrowdAgreementPct) / 20) * 0.45 : 0,
-      crowd_pleaser:     s.avgCrowdAgreementPct >= 70 ? 0.4 + c01((s.avgCrowdAgreementPct - 70) / 20) * 0.45 : 0,
-      chaos_agent:       s.lowestPercentagePicks / votes >= 0.24 ? 0.4 + c01((s.lowestPercentagePicks / votes - 0.24) / 0.2) * 0.4 : 0,
-      combo_king_queen:  s.maxCombo >= 40 ? 0.4 + c01((s.maxCombo - 40) / 20) * 0.3 : 0,
-      // 5 of 6 trivia and a clean solve (6/6 is Trivia Titan).
-      silent_assassin:   s.triviaCorrect === 5 && s.solved && s.solveWrongGuesses <= 1 ? 0.5 : 0,
-      fence_sitter:      0.3,
-    };
-  }
-  function determinePersonality(stats){
-    const scores = personalityScores(stats);
-    let best = 'fence_sitter', bestScore = -1;
-    for (const k of Object.keys(scores)){ if (scores[k] > bestScore){ best = k; bestScore = scores[k]; } }
-    return best;
+  // "Today's personality": a label for one Daily run or one Infinity 50-vote
+  // block (not collectable - the cards unlock by UNLOCK_RULES). It uses the
+  // same 16 meanings as the cards, judged on just that run with run-sized
+  // thresholds, so the name and blurb shown always match what the card
+  // stands for. Several can fit at once: the rarest wins, in this order.
+  // Nothing fits = The Fence Sitter with its own note.
+  //   s: { crowdN, crowdPct (null under RUN_CROWD_MIN counted picks),
+  //        switches, maxWith, maxAgainst, triviaN, triviaCorrect, perfect,
+  //        allPowerups, wildcardPicked, comeback, maxCombo, solveLeftMs,
+  //        avgDecisionMs, decisionN, swingHistory }
+  const RUN_CROWD_MIN = 5;
+  const RUN_LABEL_ORDER = [
+    ['last_second_hero',  s=> s.solveLeftMs != null && s.solveLeftMs <= 10000 / DEBUG_TIME_SCALE],
+    ['perfectionist',     s=> !!s.perfect],
+    ['combo_king_queen',  s=> s.maxCombo >= 40],
+    ['gambler',           s=> !!s.allPowerups],
+    ['comeback_kid',      s=> !!s.comeback],
+    ['silent_assassin',   s=> s.crowdPct !== null && s.crowdPct <= 35 && s.triviaN >= 5 && s.triviaCorrect / s.triviaN >= 0.9],
+    ['chaos_agent',       s=> s.crowdN >= RUN_CROWD_MIN + 1 && s.switches / (s.crowdN - 1) >= 0.6],
+    ['skeptic',           s=> s.maxAgainst >= 5],
+    ['trivia_trainwreck', s=> s.maxWith >= 5],                                    // The Bandwagoner
+    ['speed_demon',       s=> s.crowdPct !== null && s.swingHistory.length >= 3 &&   // The Swing Voter
+                              Math.abs(s.crowdPct - s.swingHistory.reduce((a, b)=> a + b, 0) / s.swingHistory.length) >= 25],
+    ['contrarian',        s=> s.crowdPct !== null && s.crowdPct <= 20],
+    ['crowd_pleaser',     s=> s.crowdPct !== null && s.crowdPct >= 80],
+    ['trivia_titan',      s=> s.crowdPct !== null && s.crowdPct > 20 && s.crowdPct < 40],   // The Maverick
+    ['fence_sitter',      s=> s.crowdPct !== null && s.crowdPct >= 40 && s.crowdPct <= 60],
+    ['overthinker',       s=> s.decisionN >= 10 && s.avgDecisionMs >= 3500 / DEBUG_TIME_SCALE],
+    ['wildcard_menace',   s=> !!s.wildcardPicked],
+  ];
+  const RUN_LABEL_FALLBACK_NOTE = 'Nothing tipped the scales this run.';
+  // Returns { type, note }: note is only set for the fallback.
+  function determinePersonality(s){
+    for (const [type, fits] of RUN_LABEL_ORDER){ if (fits(s)) return { type, note:null }; }
+    return { type:'fence_sitter', note: RUN_LABEL_FALLBACK_NOTE };
   }
   const PERSONALITY_META = {
     // Display names match the card art (Oct 2026 set). The keys are what the
@@ -2357,22 +2346,22 @@
     // criteria land: trivia_titan = The Maverick, speed_demon = The Swing
     // Voter, trivia_trainwreck = The Bandwagoner (their blurbs still describe
     // the current unlock). The Skeptic has no unlock yet.
-    skeptic: { name: 'The Skeptic', icon: '🎱', blurb: 'Doesn\u2019t take the crowd\u2019s word for it.' },
-    trivia_titan: { name: 'The Maverick', icon: '🤠', blurb: 'Perfect trivia run.' },
-    trivia_trainwreck: { name: 'The Bandwagoner', icon: '🚩', blurb: 'Came for the vibes, not the answers.' },
-    perfectionist: { name: 'The Perfectionist', icon: '✨', blurb: 'Zero wrong guesses.' },
-    last_second_hero: { name: 'Last Second Hero', icon: '⏱️', blurb: 'Solved with the clock nearly out.' },
-    wildcard_menace: { name: 'Wildcard Menace', icon: '🌀', blurb: 'Chaos incarnate.' },
-    combo_king_queen: { name: 'The Combo Royalty', icon: '🔥', blurb: 'Unstoppable streak.' },
+    skeptic: { name: 'The Skeptic', icon: '🎱', blurb: 'Kept doubting the crowd, pick after pick.' },
+    trivia_titan: { name: 'The Maverick', icon: '🤠', blurb: 'Mostly went their own way.' },
+    trivia_trainwreck: { name: 'The Bandwagoner', icon: '🚩', blurb: 'Rode the crowd\u2019s wave, pick after pick.' },
+    perfectionist: { name: 'The Perfectionist', icon: '✨', blurb: 'Six trivia questions, six right answers.' },
+    last_second_hero: { name: 'Last Second Hero', icon: '⏱️', blurb: 'Solved it with the clock nearly out.' },
+    wildcard_menace: { name: 'Wildcard Menace', icon: '🌀', blurb: 'Couldn\u2019t resist the Wild Card.' },
+    combo_king_queen: { name: 'The Combo Royalty', icon: '🔥', blurb: 'An unstoppable combo.' },
     comeback_kid: { name: 'Comeback Kid', icon: '📈', blurb: 'Slow start, big finish.' },
-    gambler: { name: 'The Gambler', icon: '🎲', blurb: 'Always chasing the big score.' },
-    speed_demon: { name: 'The Swing Voter', icon: '⚖️', blurb: 'Fastest fingers in the game.' },
-    overthinker: { name: 'The Overthinker', icon: '🐌', blurb: 'Took their sweet time.' },
-    contrarian: { name: 'The Contrarian', icon: '😈', blurb: 'Against the grain, on principle.' },
-    crowd_pleaser: { name: 'Crowd Pleaser', icon: '🤝', blurb: 'Rolled with the majority.' },
-    silent_assassin: { name: 'Silent Assassin', icon: '🥷', blurb: 'Quiet, efficient, deadly accurate.' },
-    chaos_agent: { name: 'Chaos Agent', icon: '🎪', blurb: 'Picked the underdog every time.' },
-    fence_sitter: { name: 'The Fence Sitter', icon: '🪑', blurb: 'Never quite committed.' },
+    gambler: { name: 'The Gambler', icon: '🎲', blurb: 'Tried every power-up in the box.' },
+    speed_demon: { name: 'The Swing Voter', icon: '⚖️', blurb: 'Way off their usual with the crowd.' },
+    overthinker: { name: 'The Overthinker', icon: '🐌', blurb: 'Took their time on every call.' },
+    contrarian: { name: 'The Contrarian', icon: '😈', blurb: 'Went against the crowd on almost every pick.' },
+    crowd_pleaser: { name: 'Crowd Pleaser', icon: '🤝', blurb: 'With the crowd on almost every pick.' },
+    silent_assassin: { name: 'Silent Assassin', icon: '🥷', blurb: 'Against the grain, and barely missed a trivia question.' },
+    chaos_agent: { name: 'Chaos Agent', icon: '🎪', blurb: 'Flip-flopped between the crowd and the contrarians.' },
+    fence_sitter: { name: 'The Fence Sitter', icon: '🪑', blurb: 'Split right down the middle with the crowd.' },
   };
 
   const TILE_COLORS = ['#c73e3e','#3e6bc7','#3ec76b','#c7a63e'];
@@ -5406,9 +5395,8 @@
   let collection = loadCollection();
 
   // ---------- Infinity personality awards ----------
-  // Every INF_AWARD_VOTES decided votes in Infinity earn a personality, scored
-  // by the same personalityScores() as a Daily run, from what happened in
-  // those votes. Progress is kept per device (flipstax_inf_block_v1), so a
+  // Every INF_AWARD_VOTES votes in Infinity get a personality label, judged
+  // the same way as a Daily run's (determinePersonality), from that block. Progress is kept per device (flipstax_inf_block_v1), so a
   // block can span several sessions.
   const INF_AWARD_VOTES = 50;
   const INF_BLOCK_KEY = 'flipstax_inf_block_v1';
@@ -5417,7 +5405,8 @@
     // counted toward crowd agreement (see crowdVerdict); agree / low are out
     // of crowd.
     return { votes:0, crowd:0, agree:0, low:0, decisionMs:0, maxCombo:0, points:0, firstHalfPoints:null,
-      trivia:0, triviaCorrect:0, wildCat:0, pu:{ flips10:0, slowmo:0, wildcard:0 } };
+      trivia:0, triviaCorrect:0, wildCat:0, pu:{ flips10:0, slowmo:0, skip:0, wildcard:0 },
+      shape: freshRunCrowd() };
   }
   function loadInfBlock(){
     try{
@@ -5428,6 +5417,8 @@
           // From before crowdVerdict: agree / low were counted the old way
           // (own vote included), so start them fresh.
           if (typeof b.crowd !== 'number'){ b.crowd = 0; b.agree = 0; b.low = 0; }
+          if (!b.shape) b.shape = freshRunCrowd();
+          if (b.pu.skip == null) b.pu.skip = 0;
           return Object.assign(freshInfBlock(), b);
         }
       }
@@ -5492,24 +5483,18 @@
   if ((stats.riddlesSolved || 0) >= 5 && !badgeStore.earned.riddle_solver){ badgeStore.earned.riddle_solver = todayStr(); saveBadges(); }
   if (stats.badges && stats.badges.wild && !badgeStore.earned.weird_one){ badgeStore.earned.weird_one = 'earlier'; saveBadges(); }
   function inInfinity(){ return document.documentElement.classList.contains('mode-infinity'); }
-  // The block's stats in the shape personalityScores() expects. Infinity
-  // has no word solve and no secret riddle, so those fields stay empty (the
-  // types that need them can't come up here). Trivia is Infinity's wild
-  // trivia rounds, scaled onto Daily's 6-question basis when there were more.
+  // The block's stats in the shape determinePersonality() expects. Infinity
+  // has no word solve, so Last Second Hero can't come up here; its trivia is
+  // the wild trivia rounds, and its power-ups are its own four types.
   function infBlockPersonalityStats(b){
-    const n = b.trivia, c = b.triviaCorrect;
-    const total = n > 6 ? 6 : n, correct = n > 6 ? Math.round(6 * c / n) : c;
-    const first = b.firstHalfPoints != null ? b.firstHalfPoints : b.points;
-    const votes = Math.max(1, b.votes);
+    const first = b.firstHalfPoints != null ? b.firstHalfPoints : b.points, second = b.points - first;
     return {
-      riddleSolved:false, triviaCorrect:correct, triviaTotal:total,
-      solveWrongGuesses:0, solved:false, solveTimeRemainingPct:0,
-      wildcardCardsPicked:b.wildCat, maxCombo:b.maxCombo,
-      firstHalfScore:first, secondHalfScore:b.points - first,
-      powerupCounts:{ points10:b.pu.flips10, slowclock:b.pu.slowmo, wildcard:b.pu.wildcard, hint:0 },
-      decisionTimePercentile: Math.max(0, Math.min(100, Math.round(b.decisionMs / votes / 5000 * 100))),
-      avgCrowdAgreementPct: b.crowd > 0 ? Math.round(b.agree / b.crowd * 100) : 50,
-      lowestPercentagePicks:b.low, votes:b.crowd,
+      crowdN: b.crowd, crowdPct: b.crowd >= RUN_CROWD_MIN ? b.agree / b.crowd * 100 : null,
+      switches: b.shape.switches, maxWith: b.shape.maxWith, maxAgainst: b.shape.maxAgainst,
+      triviaN: b.trivia, triviaCorrect: b.triviaCorrect, perfect: b.trivia >= 6 && b.triviaCorrect === b.trivia,
+      allPowerups: ['flips10', 'slowmo', 'skip', 'wildcard'].every(k=> b.pu[k] > 0), wildcardPicked: b.pu.wildcard > 0,
+      comeback: second >= 12 && second >= Math.max(1, first) * 1.8, maxCombo: b.maxCombo, solveLeftMs: null,
+      avgDecisionMs: b.votes ? b.decisionMs / b.votes : 0, decisionN: b.votes, swingHistory: progress.swing.slice(),
     };
   }
   function collectedCount(){ return PERSONALITY_ORDER.filter(k=> collection.cards[k]).length; }
@@ -5649,6 +5634,16 @@
   let runSolveWrongGuesses = 0, runLowestPctPicks = 0;
   let runVotesDecided = 0, runVotesAgreed = 0, runDecisionMsTotal = 0, runDecisionCount = 0;
   let runScoreAtHalfway = null;
+  // Per-run crowd shape for today's personality: flip-flops between
+  // consecutive counted picks, and the longest with / against runs.
+  let runCrowd = { switches:0, last:null, withRun:0, againstRun:0, maxWith:0, maxAgainst:0 };
+  function freshRunCrowd(){ return { switches:0, last:null, withRun:0, againstRun:0, maxWith:0, maxAgainst:0 }; }
+  function trackCrowdShape(t, withCrowd){
+    if (t.last !== null && t.last !== withCrowd) t.switches++;
+    t.last = withCrowd;
+    if (withCrowd){ t.withRun++; t.againstRun = 0; t.maxWith = Math.max(t.maxWith, t.withRun); }
+    else { t.againstRun++; t.withRun = 0; t.maxAgainst = Math.max(t.maxAgainst, t.againstRun); }
+  }
   // What's on screen right now, so a refresh can put it back exactly:
   // the trivia/Second Chance question and its deadline, whether the
   // power-up on screen has been picked, and a Wild Card result that has
@@ -5681,7 +5676,7 @@
       scUsed: runSecondChanceUsed, scOutcome: runSecondChanceOutcome, perfect: runPerfect, asked: runAskedQuestions,
       hints: runHintsRevealed, puOrder: runPowerupPickOrder, triviaStreak: runTriviaStreak,
       riddleTriggered: riddleTriggeredThisRun, riddleSolved: runRiddleSolved, maxCombo: runMaxCombo,
-      wildcardVotes: runWildcardCategoryVotes, solveWrong: runSolveWrongGuesses, lowestPct: runLowestPctPicks,
+      wildcardVotes: runWildcardCategoryVotes, solveWrong: runSolveWrongGuesses, lowestPct: runLowestPctPicks, crowdShape: runCrowd,
       votesDecided: runVotesDecided, votesAgreed: runVotesAgreed, decisionMs: runDecisionMsTotal, decisions: runDecisionCount,
       halfway: runScoreAtHalfway, lastVote: lastVoteSummary,
       q: runPendingQ, qEndsAt: runPendingQEndsAt,
@@ -5891,7 +5886,7 @@
       roundResults: results,
       statLine: r.solved ? ('Solved in ' + formatRaceTime(r.solveMs)) : (r.triviaCorrect + '/' + r.triviaTotal + ' trivia correct'),
       score: shownScore(r.score),
-      personality: PERSONALITY_META[r.personalityType] || null,
+      personality: PERSONALITY_META[r.personalityType] ? Object.assign({}, PERSONALITY_META[r.personalityType], r.personalityNote ? { blurb: r.personalityNote } : {}) : null,
       voteSummary: r.lastVote || null,
       secret: !!r.secretRiddle,
     };
@@ -6052,7 +6047,7 @@
     runHintsRevealed = 0;
     runPowerupPickOrder = []; runTriviaStreak = 0; riddleTriggeredThisRun = false;
     runRiddleSolved = false; runMaxCombo = 0; runWildcardCategoryVotes = 0;
-    runSolveWrongGuesses = 0; runLowestPctPicks = 0;
+    runSolveWrongGuesses = 0; runLowestPctPicks = 0; runCrowd = freshRunCrowd();
     runVotesDecided = 0; runVotesAgreed = 0; runDecisionMsTotal = 0; runDecisionCount = 0;
     runScoreAtHalfway = null;
     runPendingQ = null; runPowerupDone = false; runWildcardDelta = null; runSolvedAt = null; currentRiddle = null;
@@ -6093,6 +6088,7 @@
     runHintsRevealed = snap.hints; runPowerupPickOrder = snap.puOrder; runTriviaStreak = snap.triviaStreak;
     riddleTriggeredThisRun = snap.riddleTriggered; runRiddleSolved = snap.riddleSolved; runMaxCombo = snap.maxCombo;
     runWildcardCategoryVotes = snap.wildcardVotes; runSolveWrongGuesses = snap.solveWrong; runLowestPctPicks = snap.lowestPct;
+    runCrowd = Object.assign(freshRunCrowd(), snap.crowdShape || {});
     runVotesDecided = snap.votesDecided; runVotesAgreed = snap.votesAgreed; runDecisionMsTotal = snap.decisionMs; runDecisionCount = snap.decisions;
     runScoreAtHalfway = snap.halfway;
     if (snap.lastVote) lastVoteSummary = snap.lastVote;
@@ -6964,14 +6960,14 @@
     // of them so it isn't just 1 of 2. (Compared against all 50 votes it
     // couldn't happen any more, since only counted picks add to agree.)
     if (b.votes === INF_AWARD_VOTES && b.crowd >= 10 && b.agree * 2 === b.crowd) awardBadge('coin_flip');
-    const type = determinePersonality(infBlockPersonalityStats(b));
-    const meta = PERSONALITY_META[type];
+    const personality = determinePersonality(infBlockPersonalityStats(b));
+    const type = personality.type, meta = PERSONALITY_META[type];
     if (b.crowd) recordSwing(b.agree, b.crowd);
     const fresh = checkUnlocks({});
     els.infAwardEyebrow.textContent = 'YOUR LAST ' + INF_AWARD_VOTES + ' FLIPS';
     document.getElementById('infAwardIcon').textContent = meta.icon;
     els.infAwardName.textContent = meta.name;
-    els.infAwardBlurb.textContent = meta.blurb;
+    els.infAwardBlurb.textContent = personality.note || meta.blurb;
     const bits = [b.crowd > 0 ? Math.round(b.agree / b.crowd * 100) + '% with the crowd' : 'not enough crowd votes yet'];
     if (b.trivia) bits.push(b.triviaCorrect + '/' + b.trivia + ' trivia');
     bits.push('best streak ' + b.maxCombo);
@@ -7357,25 +7353,18 @@
     const solveMs = solved ? (RUN_SOLVE_MS - Math.max(0, solveEndsAt - (solvedAt || Date.now()))) : null;
     const powerupCounts = { points10:0, slowclock:0, wildcard:0, hint:0 };
     runPowerupPickOrder.forEach(k=>{ if (powerupCounts[k] != null) powerupCounts[k]++; });
-    const firstHalfScore = runScoreAtHalfway != null ? runScoreAtHalfway : runScore;
-    const avgDecisionMs = runDecisionCount > 0 ? runDecisionMsTotal / runDecisionCount : 0;
-    const personalityStats = {
-      riddleSolved: runRiddleSolved,
-      triviaCorrect: runTriviaCorrect, triviaTotal: runTriviaAttempted,
-      solveWrongGuesses: runSolveWrongGuesses, solved: !!solved,
-      solveTimeRemainingPct: solved ? Math.max(0, Math.min(100, (RUN_SOLVE_MS - solveMs) / RUN_SOLVE_MS * 100)) : 0,
-      wildcardCardsPicked: runWildcardCategoryVotes, maxCombo: runMaxCombo,
-      firstHalfScore: firstHalfScore, secondHalfScore: runScore - firstHalfScore,
-      powerupCounts: powerupCounts,
-      // Normalized against the base 5s decision window - not a true
-      // population percentile, but a self-consistent "how much of the
-      // available window did they use" speed metric.
-      decisionTimePercentile: Math.max(0, Math.min(100, Math.round(avgDecisionMs / 5000 * 100))),
-      avgCrowdAgreementPct: runVotesDecided > 0 ? Math.round(runVotesAgreed / runVotesDecided * 100) : 50,
-      lowestPercentagePicks: runLowestPctPicks,
-      votes: runVotesDecided,
-    };
-    const personalityType = determinePersonality(personalityStats);
+    const runFirstHalf = runScoreAtHalfway != null ? runScoreAtHalfway : runScore, runSecondHalf = runScore - runFirstHalf;
+    const personality = determinePersonality({
+      crowdN: runVotesDecided, crowdPct: runVotesDecided >= RUN_CROWD_MIN ? runVotesAgreed / runVotesDecided * 100 : null,
+      switches: runCrowd.switches, maxWith: runCrowd.maxWith, maxAgainst: runCrowd.maxAgainst,
+      triviaN: runTriviaAttempted, triviaCorrect: runTriviaCorrect, perfect: !!runPerfect,
+      allPowerups: ['points10', 'slowclock', 'wildcard', 'hint'].every(k=> powerupCounts[k] > 0), wildcardPicked: powerupCounts.wildcard > 0,
+      comeback: runSecondHalf >= 12 && runSecondHalf >= Math.max(1, runFirstHalf) * 1.8, maxCombo: runMaxCombo,
+      solveLeftMs: solved ? Math.max(0, RUN_SOLVE_MS - solveMs) : null,
+      avgDecisionMs: runDecisionCount > 0 ? runDecisionMsTotal / runDecisionCount : 0, decisionN: runDecisionCount,
+      swingHistory: progress.swing.slice(),
+    });
+    const personalityType = personality.type;
     runResultToday = {
       date: todayStr(), score: runScore, triviaCorrect: runTriviaCorrect,
       triviaTotal: runTriviaAttempted, solved: !!solved, solveMs: solveMs,
@@ -7384,15 +7373,15 @@
       roundResults: runRoundResults.slice(),
       lastVote: lastVoteSummary ? Object.assign({}, lastVoteSummary) : null,
       secretRiddle: !!runRiddleSolved,
+      personalityNote: personality.note,
     };
     // Collection unlocks for this checkpoint (today's personality above is
     // just a label - it isn't collected).
     if (runVotesDecided) recordSwing(runVotesAgreed, runVotesDecided);
-    const firstHalf = runScoreAtHalfway != null ? runScoreAtHalfway : runScore, secondHalf = runScore - firstHalf;
     runResultToday.unlocked = checkUnlocks({ run: {
       perfect: !!runPerfect,
       allFourPowerups: ['points10', 'slowclock', 'wildcard', 'hint'].every(k=> runPowerupPickOrder.indexOf(k) !== -1),
-      comeback: secondHalf >= 12 && secondHalf >= Math.max(1, firstHalf) * 1.8,
+      comeback: runSecondHalf >= 12 && runSecondHalf >= Math.max(1, runFirstHalf) * 1.8,
       maxCombo: runMaxCombo,
       solveLeftMs: solved ? Math.max(0, RUN_SOLVE_MS - solveMs) : null,
     } });
@@ -7424,7 +7413,7 @@
     els.readoutOverlay.classList.toggle('has-secret', secret);
     document.getElementById('readoutTypeIcon').textContent = meta.icon;
     els.readoutTypeName.textContent = meta.name;
-    els.readoutTypeBlurb.textContent = meta.blurb;
+    els.readoutTypeBlurb.textContent = r.personalityNote || meta.blurb;
     els.readoutOverlay.classList.add('show');
     updatePauseBtnVisibility();
     sfx.personality();
@@ -8177,6 +8166,7 @@
       runVotesDecided++;
       if (cv.withCrowd) runVotesAgreed++;
       if (underdog) runLowestPctPicks++;
+      trackCrowdShape(runCrowd, cv.withCrowd);
     }
 
     comboCount++;
@@ -8184,7 +8174,7 @@
     if (!runActive && inInfinity()){
       const b = infBlock;
       b.votes++;
-      if (cv.counted){ b.crowd++; if (cv.withCrowd) b.agree++; if (underdog) b.low++; }
+      if (cv.counted){ b.crowd++; if (cv.withCrowd) b.agree++; if (underdog) b.low++; trackCrowdShape(b.shape, cv.withCrowd); }
       b.decisionMs += Math.max(0, votedSinceTime - roundStartedAt);
       b.maxCombo = Math.max(b.maxCombo, comboCount);
       if (current.category === 'wild') b.wildCat++;
@@ -8475,6 +8465,7 @@
       setInfRiddleRemainingMs: (ms) => { infRiddleEndsAt = Date.now() + ms; tickInfRiddle(); },
       showPersonalityReveal: () => showPersonalityReveal(),
       determinePersonality: (st) => determinePersonality(st),
+      runLabelOrder: () => RUN_LABEL_ORDER.map(x=> x[0]),
       shareText: () => buildRunShareText(runResultToday),
       shareCardScore: () => buildDailyShareData(runResultToday).score,
       shareCardDataUrl: (kind) => renderShareCard(kind, kind === 'daily' ? buildDailyShareData(runResultToday) : buildInfinityShareData()).toDataURL('image/png'),
