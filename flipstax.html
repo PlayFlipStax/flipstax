@@ -723,9 +723,14 @@
      start below the Donations button (not centred, which pushed the top up
      under it), tighten things up, and scroll rather than overlap the footer
      on the shortest phones. */
-  #readoutOverlay.has-secret{ padding-top:calc(92px + env(safe-area-inset-top)); justify-content:flex-start; overflow-y:auto; }
+  /* (The overlay lays its content out in a row, so the vertical alignment
+     is align-items.) The footer follows the content instead of sitting over
+     the buttons, and the personality label drops its big emoji. */
+  #readoutOverlay.has-secret{ padding-top:calc(92px + env(safe-area-inset-top)); align-items:flex-start; overflow-y:auto; flex-wrap:wrap; align-content:flex-start; }
+  #readoutOverlay.has-secret .contact-footer{ position:static; width:100%; margin-top:14px; }
+  #readoutOverlay.has-secret .readout-type-icon{ display:none; }
   #readoutOverlay.has-secret .readout-secret{ font-size:clamp(22px,6.6vw,30px); margin-bottom:10px; }
-  #readoutOverlay.has-secret .readout-card{ width:68px; margin:6px auto 4px; }
+  #readoutOverlay.has-secret .ru-cell{ width:62px; }
   #readoutOverlay.has-secret .readout-type{ margin-top:10px; padding:10px 12px; }
   #readoutOverlay.has-secret .solve-buttons{ margin-top:10px !important; }
   @keyframes secretHeadShift{ to{ background-position:300% 0; } }
@@ -1013,6 +1018,13 @@
 
   /* Results screen: today's personality shown as its card. */
   .readout-card{ width:92px; margin:10px auto 8px; }
+  /* Newly unlocked collection cards on the results / Infinity award screen. */
+  .readout-unlocks{ margin-top:12px; }
+  .readout-unlocks.hidden{ display:none; }
+  .readout-unlocks .readout-new{ display:block; animation: ccNewPop 0.5s cubic-bezier(.3,1.8,.5,1) 0.3s both; }
+  .ru-cards{ display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
+  .ru-cell{ width:76px; }
+  .ru-name{ font-family:'Big Shoulders Display', sans-serif; font-weight:800; font-size:13px; color:#fff; margin-top:5px; line-height:1.1; }
   .readout-new{ display:none; margin-bottom:4px; font-size:11px; font-weight:900; letter-spacing:1px; color:#ffe066; text-shadow:0 0 10px rgba(255,224,102,0.7); }
   .readout-type.has-new .readout-new{ display:block; animation: ccNewPop 0.5s cubic-bezier(.3,1.8,.5,1) 1.45s both; }
 
@@ -2127,7 +2139,7 @@
   <div class="col-scroll" id="collectionScroll">
     <div class="col-grid" id="collectionGrid"></div>
     <div class="bd-list hidden" id="badgeList"></div>
-    <div class="col-hint" id="colHint">Finish a Daily Stax run to earn its personality card.</div>
+    <div class="col-hint" id="colHint">Each card unlocks from how you play.</div>
   </div>
 </div>
 <div class="badge-banner" id="badgeBanner" aria-live="polite"><span class="bb-icon" id="badgeBannerIcon"></span><span class="bb-text"><b>BADGE EARNED</b><span id="badgeBannerName"></span></span></div>
@@ -2194,10 +2206,13 @@
     <div class="personality-blurb" id="readoutWord"></div>
     <div class="readout-type" id="readoutType">
       <div class="readout-type-eyebrow">TODAY'S PERSONALITY</div>
-      <div class="readout-new">✨ NEW CARD UNLOCKED ✨</div>
-      <div class="readout-card" id="readoutCard"></div>
+      <div class="readout-type-icon" id="readoutTypeIcon"></div>
       <div class="readout-type-name" id="readoutTypeName"></div>
       <div class="readout-type-blurb" id="readoutTypeBlurb"></div>
+    </div>
+    <div class="readout-unlocks hidden" id="readoutUnlocks">
+      <div class="readout-new">✨ NEW CARD UNLOCKED ✨</div>
+      <div class="ru-cards" id="readoutCard"></div>
     </div>
     <div class="solve-buttons" style="margin-top:14px;">
       <div class="daily-btn" id="readoutDone">Done</div>
@@ -2213,10 +2228,13 @@
     <div class="personality-eyebrow" id="infAwardEyebrow">YOUR LAST 50 FLIPS</div>
     <div class="readout-type" id="infAwardType">
       <div class="readout-type-eyebrow">YOUR PERSONALITY</div>
-      <div class="readout-new">✨ NEW CARD UNLOCKED ✨</div>
-      <div class="readout-card" id="infAwardCard"></div>
+      <div class="readout-type-icon" id="infAwardIcon"></div>
       <div class="readout-type-name" id="infAwardName"></div>
       <div class="readout-type-blurb" id="infAwardBlurb"></div>
+    </div>
+    <div class="readout-unlocks hidden" id="infAwardUnlocks">
+      <div class="readout-new">✨ NEW CARD UNLOCKED ✨</div>
+      <div class="ru-cards" id="infAwardCard"></div>
     </div>
     <div class="personality-blurb" id="infAwardStats"></div>
     <div class="solve-buttons" style="margin-top:14px;">
@@ -5496,19 +5514,106 @@
   }
   function collectedCount(){ return PERSONALITY_ORDER.filter(k=> collection.cards[k]).length; }
   // Called whenever a run awards a personality. Returns true the first time.
-  function unlockPersonality(type){
-    if (!PERSONALITY_META[type]) return false;
-    const c = collection.cards[type];
-    if (c){ c.count = (c.count || 1) + 1; saveCollection(); return false; }
-    collection.cards[type] = { first: todayStr(), count: 1, revealed: false };
-    saveCollection();
-    return true;
+  // ---------- Personality Collection unlocks ----------
+  // The 16 cards are a cumulative collection, separate from "today's
+  // personality" (the per-run / per-Infinity-block label, which isn't
+  // collectable). Each card has its own unlock rule below, checked at two
+  // checkpoints - the end of every Daily run and every Infinity 50-vote award
+  // - so new cards always appear on those screens. Cards collected under the
+  // old one-per-run system are kept.
+  //
+  // Lifetime progress for the rules, per device. Started fresh on 2 Oct 2026
+  // when the crowd-agreement fix shipped: earlier crowd data (which counted
+  // the player's own vote) doesn't count.
+  const PROGRESS_KEY = 'flipstax_progress_v1';
+  const CROWD_FIX_DATE = '2026-10-02';
+  function freshProgress(){
+    return { v:1, since: todayStr(),
+      crowdN:0, crowdAgree:0, crowdSwitches:0, lastVerdict:null,   // counted picks only (see crowdVerdict)
+      triviaN:0, triviaCorrect:0,                                   // Daily + Infinity trivia
+      decisionMs:0, decisionN:0,                                    // every VS vote, both modes
+      wildRuns:0,                                                   // Daily runs / Infinity sessions with a Wild Card pick
+      swing:[] };                                                   // last 10 qualifying runs' with-the-crowd %
   }
-  // Players who already finished today's run before this shipped: that run's
-  // personality is the only one on record (earlier ones were never stored).
-  if (runResultToday && runResultToday.personalityType && PERSONALITY_META[runResultToday.personalityType] && !collection.cards[runResultToday.personalityType]){
-    collection.cards[runResultToday.personalityType] = { first: runResultToday.date || todayStr(), count: 1, revealed: false };
-    saveCollection();
+  function loadProgress(){
+    try{ const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || 'null'); if (p && p.v === 1) return Object.assign(freshProgress(), p); }catch(e){}
+    return freshProgress();
+  }
+  function saveProgress(){ try{ localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress)); }catch(e){} }
+  let progress = loadProgress();
+  const UNLOCK = {
+    CROWD_MIN_PICKS: 50,        // counted picks before any crowd-agreement card can unlock
+    TRIVIA_MIN: 20,             // trivia answers before Silent Assassin's accuracy counts
+    DECISION_MIN_VOTES: 50,
+    OVERTHINKER_MS: 3500,       // average decision time, out of the 5s round
+    CHAOS_SWITCH_RATE: 0.6,     // share of consecutive counted picks that flip with <-> against
+    SWING_RUN_MIN_PICKS: 10,    // a run's figure only joins the Swing Voter history with 10+ counted picks
+    SWING_MIN_RUNS: 5, SWING_MIN_SD: 20,   // spread (standard deviation, in points) across those runs
+    COMBO_ROYALTY: 40,          // best combo in one Daily run
+    LAST_SECOND_MS: 10000,      // word solved with this little left
+  };
+  function crowdPct(){ return progress.crowdN >= UNLOCK.CROWD_MIN_PICKS ? progress.crowdAgree / progress.crowdN * 100 : null; }
+  function swingSd(){
+    const xs = progress.swing; if (xs.length < UNLOCK.SWING_MIN_RUNS) return 0;
+    const m = xs.reduce((a, b)=> a + b, 0) / xs.length;
+    return Math.sqrt(xs.reduce((a, b)=> a + (b - m) * (b - m), 0) / xs.length);
+  }
+  // A streak badge earned before the crowd fix was judged the old way, so it doesn't count.
+  function badgeSinceFix(id){ const d = badgeStore.earned[id]; return !!d && d !== 'earlier' && d >= CROWD_FIX_DATE; }
+  // ctx.run: the Daily run that just ended (absent at an Infinity award).
+  const UNLOCK_RULES = {
+    contrarian:        { how:'With the crowd 20% of the time or less, lifetime', test: ()=> crowdPct() !== null && crowdPct() <= 20 },
+    wildcard_menace:   { how:'Picked the Wild Card power-up in 10 different runs or Infinity sessions', test: ()=> progress.wildRuns >= 10 },
+    chaos_agent:       { how:'Flip-flopped between with and against the crowd on 60%+ of your picks, lifetime',
+                         test: ()=> progress.crowdN >= UNLOCK.CROWD_MIN_PICKS && progress.crowdSwitches / (progress.crowdN - 1) >= UNLOCK.CHAOS_SWITCH_RATE },
+    silent_assassin:   { how:'With the crowd 35% or less AND 90%+ trivia accuracy, lifetime',
+                         test: ()=> crowdPct() !== null && crowdPct() <= 35 && progress.triviaN >= UNLOCK.TRIVIA_MIN && progress.triviaCorrect / progress.triviaN >= 0.9 },
+    perfectionist:     { how:'6/6 trivia in a Daily run', test: c=> !!(c.run && c.run.perfect) },
+    overthinker:       { how:'Average 3.5 seconds or more to decide on a VS card, lifetime',
+                         test: ()=> progress.decisionN >= UNLOCK.DECISION_MIN_VOTES && progress.decisionMs / progress.decisionN >= UNLOCK.OVERTHINKER_MS / DEBUG_TIME_SCALE },
+    trivia_titan:      { how:'With the crowd 20-40% of the time, lifetime', test: ()=> crowdPct() !== null && crowdPct() > 20 && crowdPct() < 40 },   // The Maverick
+    skeptic:           { how:'Earned the Lone Wolf badge', test: ()=> badgeSinceFix('lone_wolf') },
+    fence_sitter:      { how:'With the crowd 40-60% of the time, lifetime', test: ()=> crowdPct() !== null && crowdPct() >= 40 && crowdPct() <= 60 },
+    gambler:           { how:'Picked all 4 power-up types in one Daily run', test: c=> !!(c.run && c.run.allFourPowerups) },
+    comeback_kid:      { how:'Scored 1.8x more in the second half of a Daily run than the first', test: c=> !!(c.run && c.run.comeback) },
+    speed_demon:       { how:'Your with-the-crowd % swung widely across your recent runs', test: ()=> swingSd() >= UNLOCK.SWING_MIN_SD },   // The Swing Voter
+    trivia_trainwreck: { how:'Earned the In Sync badge', test: ()=> badgeSinceFix('in_sync') },   // The Bandwagoner
+    combo_king_queen:  { how:'A 40-vote combo in one Daily run', test: c=> !!(c.run && c.run.maxCombo >= UNLOCK.COMBO_ROYALTY) },
+    last_second_hero:  { how:'Solved the word with 10 seconds or less left', test: c=> !!(c.run && c.run.solveLeftMs != null && c.run.solveLeftMs <= UNLOCK.LAST_SECOND_MS / DEBUG_TIME_SCALE) },
+    crowd_pleaser:     { how:'With the crowd 80% of the time or more, lifetime', test: ()=> crowdPct() !== null && crowdPct() >= 80 },
+  };
+  // Runs every rule for cards not yet collected; returns the newly unlocked ones.
+  function checkUnlocks(ctx){
+    ctx = ctx || {};
+    const fresh = PERSONALITY_ORDER.filter(k=> !collection.cards[k] && UNLOCK_RULES[k] && UNLOCK_RULES[k].test(ctx));
+    fresh.forEach(k=>{ collection.cards[k] = { first: todayStr(), count: 1, revealed: false }; });
+    if (fresh.length) saveCollection();
+    return fresh;
+  }
+  // Swing Voter: a run (or Infinity block) joins the history only with
+  // enough counted picks for its figure to mean something.
+  function recordSwing(agree, n){
+    if (n < UNLOCK.SWING_RUN_MIN_PICKS) return;
+    progress.swing.push(Math.round(agree / n * 100));
+    if (progress.swing.length > 10) progress.swing = progress.swing.slice(-10);
+    saveProgress();
+  }
+  // Shows newly unlocked cards (with the reveal) in a results/award screen's
+  // unlock section; `reveal` false = already seen (results reopened later).
+  function showUnlockCards(wrap, slot, keys, reveal){
+    slot.innerHTML = '';
+    wrap.classList.toggle('hidden', !keys.length);
+    wrap.querySelector('.readout-new').textContent = keys.length > 1 ? '✨ ' + keys.length + ' NEW CARDS UNLOCKED ✨' : '✨ NEW CARD UNLOCKED ✨';
+    keys.forEach((k, i)=>{
+      const owned = collection.cards[k]; if (!owned) return;
+      const isNew = reveal && !owned.revealed;
+      const cell = document.createElement('div'); cell.className = 'ru-cell';
+      const card = makeCollectionCard(k, !isNew);
+      const name = document.createElement('div'); name.className = 'ru-name'; name.textContent = PERSONALITY_META[k].name;
+      cell.appendChild(card); cell.appendChild(name); slot.appendChild(cell);
+      if (isNew){ owned.revealed = true; setTimeout(()=> revealCollectionCard(card), 650 + i * 900); }
+    });
+    if (keys.length){ saveCollection(); renderCollectionBtn(); }
   }
 
   let runActive = false, runPhase = 'idle';
@@ -6207,6 +6312,7 @@
     els.eventTiles.forEach(t=> t.onclick = null);
     runTriviaAttempted++;
     runRoundResults.push(!!correct);
+    progress.triviaN++; if (correct) progress.triviaCorrect++; saveProgress();
     if (correct){
       sfx.correct();
       runTriviaCorrect++;
@@ -6283,6 +6389,7 @@
   function resolveSecondChance(correct){
     if (runPhase !== 'secondchance') return;
     runPhase = 'secondchance-resolving';
+    progress.triviaN++; if (correct) progress.triviaCorrect++; saveProgress();
     runPendingQ = null;
     clearTimeout(eventTimeoutId);
     els.eventTiles.forEach(t=> t.onclick = null);
@@ -6337,6 +6444,7 @@
     clearTimeout(eventTimeoutId);
     els.eventTiles.forEach(t=> t.onclick = null);
     if (key !== null) runPowerupPickOrder.push(key);
+    if (key === 'wildcard' && runPowerupPickOrder.filter(k=> k === 'wildcard').length === 1){ progress.wildRuns++; saveProgress(); }
     // Wild Card: decided now (and saved) so a refresh mid-spin can't re-roll it.
     let wildWin = false;
     if (key === 'wildcard'){
@@ -6834,7 +6942,7 @@
     els.cardZoomSlot.innerHTML = '';
     els.cardZoomSlot.appendChild(makeCollectionCard(type, true));
     els.cardZoomName.textContent = meta.icon + ' ' + meta.name;
-    els.cardZoomMeta.textContent = meta.blurb + '\nEarned ' + owned.count + (owned.count === 1 ? ' time' : ' times') + ' · first on ' + owned.first;
+    els.cardZoomMeta.textContent = (UNLOCK_RULES[type] ? UNLOCK_RULES[type].how : meta.blurb) + '\nUnlocked ' + owned.first;
     els.cardZoomMeta.style.whiteSpace = 'pre-line';
     els.cardZoom.classList.remove('hidden');
   }
@@ -6852,24 +6960,23 @@
     stopTallyPolling(); clearRoundTimer();
     voted = false; votedSinceTime = null;
     const b = infBlock;
-    if (b.votes === INF_AWARD_VOTES && b.agree * 2 === b.votes) awardBadge('coin_flip');
+    // Exactly 50% over the block's counted picks (crowdVerdict); needs 10+
+    // of them so it isn't just 1 of 2. (Compared against all 50 votes it
+    // couldn't happen any more, since only counted picks add to agree.)
+    if (b.votes === INF_AWARD_VOTES && b.crowd >= 10 && b.agree * 2 === b.crowd) awardBadge('coin_flip');
     const type = determinePersonality(infBlockPersonalityStats(b));
-    unlockPersonality(type);
-    const owned = collection.cards[type];
-    const isNew = !!(owned && !owned.revealed);
     const meta = PERSONALITY_META[type];
+    if (b.crowd) recordSwing(b.agree, b.crowd);
+    const fresh = checkUnlocks({});
     els.infAwardEyebrow.textContent = 'YOUR LAST ' + INF_AWARD_VOTES + ' FLIPS';
+    document.getElementById('infAwardIcon').textContent = meta.icon;
     els.infAwardName.textContent = meta.name;
     els.infAwardBlurb.textContent = meta.blurb;
-    const bits = [(b.votes > 0 ? Math.round(b.agree / b.votes * 100) : 50) + '% with the crowd'];
+    const bits = [b.crowd > 0 ? Math.round(b.agree / b.crowd * 100) + '% with the crowd' : 'not enough crowd votes yet'];
     if (b.trivia) bits.push(b.triviaCorrect + '/' + b.trivia + ' trivia');
     bits.push('best streak ' + b.maxCombo);
     els.infAwardStats.textContent = bits.join(' · ');
-    els.infAwardCard.innerHTML = '';
-    const card = makeCollectionCard(type, !isNew);
-    els.infAwardCard.appendChild(card);
-    els.infAwardType.classList.toggle('has-new', isNew);
-    if (isNew){ owned.revealed = true; saveCollection(); setTimeout(()=> revealCollectionCard(card), 650); }
+    showUnlockCards(document.getElementById('infAwardUnlocks'), els.infAwardCard, fresh, true);
     infBlock = freshInfBlock(); saveInfBlock();
     renderRunBanner(); renderCollectionBtn();
     els.slowdownBtn.classList.add('hidden');
@@ -6961,7 +7068,7 @@
     els.colTabs.forEach(t=> t.classList.toggle('active', t.dataset.tab === tab));
     els.collectionGrid.classList.toggle('hidden', badges);
     els.badgeList.classList.toggle('hidden', !badges);
-    els.colHint.textContent = badges ? 'Badges are earned in Infinity Flips.' : 'Finish a Daily Stax run, or every 50 votes in Infinity Flips, to earn a personality card.';
+    els.colHint.textContent = badges ? 'Badges are earned in Infinity Flips.' : 'Each card unlocks from how you play - checked at the end of every Daily Stax run and every 50 votes in Infinity Flips.';
     const n = badges ? earnedBadgeCount() : collectedCount(), total = badges ? BADGES.length : PERSONALITY_ORDER.length;
     els.collectionCount.textContent = n + ' / ' + total + (badges ? ' earned' : ' collected');
     els.collectionBar.style.width = (100 * n / total) + '%';
@@ -7278,8 +7385,18 @@
       lastVote: lastVoteSummary ? Object.assign({}, lastVoteSummary) : null,
       secretRiddle: !!runRiddleSolved,
     };
+    // Collection unlocks for this checkpoint (today's personality above is
+    // just a label - it isn't collected).
+    if (runVotesDecided) recordSwing(runVotesAgreed, runVotesDecided);
+    const firstHalf = runScoreAtHalfway != null ? runScoreAtHalfway : runScore, secondHalf = runScore - firstHalf;
+    runResultToday.unlocked = checkUnlocks({ run: {
+      perfect: !!runPerfect,
+      allFourPowerups: ['points10', 'slowclock', 'wildcard', 'hint'].every(k=> runPowerupPickOrder.indexOf(k) !== -1),
+      comeback: secondHalf >= 12 && secondHalf >= Math.max(1, firstHalf) * 1.8,
+      maxCombo: runMaxCombo,
+      solveLeftMs: solved ? Math.max(0, RUN_SOLVE_MS - solveMs) : null,
+    } });
     saveRunResultToday(runResultToday);
-    unlockPersonality(personalityType);
     dailyRunStreak = updateDailyStreak();
     renderRunBanner();
     showRunReadout();
@@ -7295,15 +7412,9 @@
     els.readoutWord.textContent = r.solved ? ('\u2705 Solved in ' + formatRaceTime(r.solveMs)) : ('\u274C Word not solved (' + (r.word||'') + ')');
     const meta = PERSONALITY_META[r.personalityType] || PERSONALITY_META.fence_sitter;
     els.readoutType.classList.toggle('hidden', !PERSONALITY_META[r.personalityType]);
-    // Today's personality as its collectible card - with the unlock reveal
-    // the first time it's earned.
-    const owned = PERSONALITY_META[r.personalityType] && collection.cards[r.personalityType];
-    const isNew = !!(owned && !owned.revealed);
-    els.readoutCard.innerHTML = '';
-    const card = makeCollectionCard(PERSONALITY_META[r.personalityType] ? r.personalityType : 'fence_sitter', !isNew);
-    els.readoutCard.appendChild(card);
-    els.readoutType.classList.toggle('has-new', isNew);
-    if (isNew){ owned.revealed = true; saveCollection(); renderCollectionBtn(); setTimeout(()=> revealCollectionCard(card), 650); }
+    // Today's personality is a label; cards unlocked at this checkpoint get
+    // their own section (with the reveal the first time it's shown).
+    showUnlockCards(document.getElementById('readoutUnlocks'), els.readoutCard, r.unlocked || [], true);
     // A solved secret riddle is the headline of the results (it replaces the
     // flag to keep the screen from growing).
     const secret = !!r.secretRiddle;
@@ -7311,6 +7422,7 @@
     document.getElementById('readoutRiddler').classList.toggle('hidden', !secret);
     document.getElementById('readoutMask').classList.toggle('hidden', secret);
     els.readoutOverlay.classList.toggle('has-secret', secret);
+    document.getElementById('readoutTypeIcon').textContent = meta.icon;
     els.readoutTypeName.textContent = meta.name;
     els.readoutTypeBlurb.textContent = meta.blurb;
     els.readoutOverlay.classList.add('show');
@@ -8054,7 +8166,13 @@
     if (cv.counted){
       stats.decided++;
       if (cv.withCrowd) stats.agree++;
+      progress.crowdN++;
+      if (cv.withCrowd) progress.crowdAgree++;
+      if (progress.lastVerdict !== null && progress.lastVerdict !== cv.withCrowd) progress.crowdSwitches++;
+      progress.lastVerdict = cv.withCrowd;
     }
+    progress.decisionMs += Math.max(0, votedSinceTime - roundStartedAt); progress.decisionN++;
+    saveProgress();
     if (runActive && cv.counted){
       runVotesDecided++;
       if (cv.withCrowd) runVotesAgreed++;
@@ -8137,6 +8255,7 @@
     clearTimeout(eventTimeoutId);
     if (inInfinity()){
       infBlock.trivia++; if (wasCorrect === true) infBlock.triviaCorrect++; saveInfBlock();
+      progress.triviaN++; if (wasCorrect === true) progress.triviaCorrect++; saveProgress();
       if (wasCorrect === true && ++infSession.triviaCorrect >= 15) awardBadge('know_it_all');
     }
     els.eventTiles.forEach(t=> t.onclick = null);
@@ -8184,6 +8303,7 @@
     clearTimeout(eventTimeoutId);
     if (inInfinity() && key && infBlock.pu[key] != null){ infBlock.pu[key]++; saveInfBlock(); }
     if (inInfinity() && key === 'wildcard' && ++infSession.wildcards >= 10) awardBadge('high_roller');
+    if (inInfinity() && key === 'wildcard' && infSession.wildcards === 1){ progress.wildRuns++; saveProgress(); }
     els.eventTiles.forEach(t=> t.onclick = null);
     els.eventOverlay.classList.remove('powerup');
     els.eventSubtitle.textContent = '';
@@ -8360,6 +8480,10 @@
       shareCardDataUrl: (kind) => renderShareCard(kind, kind === 'daily' ? buildDailyShareData(runResultToday) : buildInfinityShareData()).toDataURL('image/png'),
       getInfinityPlaylist: () => ({ idx: infIdx, els: infEls.slice(), songs: INFINITY_PLAYLIST, lead: INFINITY_LEAD, cutAt: infCutAt(infIdx), startAt: infStartAt(infIdx) }),
       getTrackEl: (k) => getTrackEl(k),
+      getProgress: () => progress,
+      setProgress: (p) => { progress = Object.assign(freshProgress(), p); saveProgress(); },
+      checkUnlocks: (ctx) => checkUnlocks(ctx),
+      setBadgeEarned: (id, date) => { badgeStore.earned[id] = date; saveBadges(); },
       todayWord: () => getTodayWord(),
       getCurrentTrack: () => ({ key: currentTrackKey, paused: trackEls[currentTrackKey] ? trackEls[currentTrackKey].paused : null, src: trackEls[currentTrackKey] ? trackEls[currentTrackKey].src.split('/').pop() : null }),
       setRunClockMs: (ms) => { runEndsAt = Date.now() + ms; },
