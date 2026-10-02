@@ -812,13 +812,15 @@
   .col-bar{ margin:8px auto 0; max-width:260px; height:8px; border-radius:99px; background:rgba(255,255,255,0.18); overflow:hidden; }
   .col-bar i{ display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,#ff3cac,#ffb800,#2dd4c4); box-shadow:0 0 10px rgba(255,224,102,0.8); transition:width 0.8s ease; }
   .col-scroll{ position:relative; z-index:2; flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:6px 14px calc(24px + env(safe-area-inset-bottom)); }
-  .col-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:14px 12px; max-width:560px; margin:0 auto; }
-  @media (min-width:480px){ .col-grid{ grid-template-columns:repeat(4, 1fr); } }
+  /* Four across on every screen: the 16 cards are four groups of four
+     (Lone Wolves, Independents, Middle Ground, Crowd Followers - see
+     PERSONALITY_ORDER), so each row is one group. Tap a card for full size. */
+  .col-grid{ display:grid; grid-template-columns:repeat(4, 1fr); gap:12px 9px; max-width:560px; margin:0 auto; }
   .col-hint{ text-align:center; font-size:12px; opacity:0.75; margin:14px 0 0; }
   .collection-overlay.revealing .cc-card:not(.revealing){ opacity:0.3; filter:saturate(0.5); transition:opacity 0.4s ease, filter 0.4s ease; }
 
   /* A card: 3D flip between the locked back and the art. */
-  .cc-card{ position:relative; aspect-ratio:227/248; perspective:700px; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:opacity 0.4s ease; }
+  .cc-card{ position:relative; aspect-ratio:360/492; perspective:700px; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:opacity 0.4s ease; }
   .cc-inner{ position:absolute; inset:0; transform-style:preserve-3d; transition:transform 0.6s cubic-bezier(.3,1.4,.5,1); }
   .cc-card.unlocked .cc-inner{ transform:rotateY(180deg); }
   .cc-face{ position:absolute; inset:0; border-radius:12px; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
@@ -2263,21 +2265,27 @@
     return best;
   }
   const PERSONALITY_META = {
-    riddler: { name: 'The Secret Riddler', icon: '🪐', blurb: 'Found the Super Secret Hidden Riddle.' },
-    trivia_titan: { name: 'Trivia Titan', icon: '🧠', blurb: 'Perfect trivia run.' },
-    trivia_trainwreck: { name: 'Trivia Trainwreck', icon: '💥', blurb: 'Came for the vibes, not the answers.' },
+    // Display names match the card art (Oct 2026 set). The keys are what the
+    // unlock logic awards and what players' saved collections store, so they
+    // stay as they were for now - four of them carry new names until the new
+    // unlock criteria land: riddler = The Skeptic, trivia_titan = The
+    // Maverick, speed_demon = The Swing Voter, trivia_trainwreck = The
+    // Bandwagoner (their blurbs still describe the current unlock).
+    riddler: { name: 'The Skeptic', icon: '🎱', blurb: 'Found the Super Secret Hidden Riddle.' },
+    trivia_titan: { name: 'The Maverick', icon: '🤠', blurb: 'Perfect trivia run.' },
+    trivia_trainwreck: { name: 'The Bandwagoner', icon: '🚩', blurb: 'Came for the vibes, not the answers.' },
     perfectionist: { name: 'The Perfectionist', icon: '✨', blurb: 'Zero wrong guesses.' },
     last_second_hero: { name: 'Last Second Hero', icon: '⏱️', blurb: 'Solved with the clock nearly out.' },
     wildcard_menace: { name: 'Wildcard Menace', icon: '🌀', blurb: 'Chaos incarnate.' },
     combo_king_queen: { name: 'The Combo Royalty', icon: '🔥', blurb: 'Unstoppable streak.' },
     comeback_kid: { name: 'Comeback Kid', icon: '📈', blurb: 'Slow start, big finish.' },
     gambler: { name: 'The Gambler', icon: '🎲', blurb: 'Always chasing the big score.' },
-    speed_demon: { name: 'Speed Demon', icon: '⚡', blurb: 'Fastest fingers in the game.' },
+    speed_demon: { name: 'The Swing Voter', icon: '⚖️', blurb: 'Fastest fingers in the game.' },
     overthinker: { name: 'The Overthinker', icon: '🐌', blurb: 'Took their sweet time.' },
     contrarian: { name: 'The Contrarian', icon: '😈', blurb: 'Against the grain, on principle.' },
-    crowd_pleaser: { name: 'The Crowd Pleaser', icon: '🤝', blurb: 'Rolled with the majority.' },
+    crowd_pleaser: { name: 'Crowd Pleaser', icon: '🤝', blurb: 'Rolled with the majority.' },
     silent_assassin: { name: 'Silent Assassin', icon: '🥷', blurb: 'Quiet, efficient, deadly accurate.' },
-    chaos_agent: { name: 'The Chaos Agent', icon: '🎪', blurb: 'Picked the underdog every time.' },
+    chaos_agent: { name: 'Chaos Agent', icon: '🎪', blurb: 'Picked the underdog every time.' },
     fence_sitter: { name: 'The Fence Sitter', icon: '🪑', blurb: 'Never quite committed.' },
   };
 
@@ -5145,17 +5153,24 @@
   // data is cleared. { cards: { <type>: { first:'YYYY-MM-DD', count, revealed } } }
   // `revealed` = the unlock animation has played (results screen or Collection).
   const COLLECTION_KEY = 'flipstax_collection_v1';
-  // Placeholder art (images/personality-cards/). Crowd Pleaser has none yet:
-  // it gets a drawn stand-in card.
+  // Card art (images/personality-cards/, 360x492, trimmed to the card edge).
+  // A type with no art gets a drawn stand-in card.
   const PERSONALITY_CARD_ART = {
-    riddler:'riddler.png', trivia_titan:'trivia_titan.png', last_second_hero:'last_second_hero.png',
-    perfectionist:'the_perfectionist.png', trivia_trainwreck:'trivia_trainwreck.png', wildcard_menace:'wildcard_menace.png',
-    gambler:'the_gambler.png', comeback_kid:'comeback_kid.png', speed_demon:'speed_demon.png',
-    overthinker:'the_overthinker.png', contrarian:'the_contrarian.png', crowd_pleaser:null,
-    chaos_agent:'chaos_agent.png', combo_king_queen:'the_combo_royalty.png', silent_assassin:'silent_assassin.png',
-    fence_sitter:'the_fence_sitter.png',
+    contrarian:'the_contrarian.jpg', wildcard_menace:'wildcard_menace.jpg', chaos_agent:'chaos_agent.jpg', silent_assassin:'silent_assassin.jpg',
+    perfectionist:'the_perfectionist.jpg', overthinker:'the_overthinker.jpg', trivia_titan:'the_maverick.jpg', riddler:'the_skeptic.jpg',
+    fence_sitter:'the_fence_sitter.jpg', gambler:'the_gambler.jpg', comeback_kid:'comeback_kid.jpg', speed_demon:'the_swing_voter.jpg',
+    trivia_trainwreck:'the_bandwagoner.jpg', combo_king_queen:'the_combo_royalty.jpg', last_second_hero:'last_second_hero.jpg', crowd_pleaser:'crowd_pleaser.jpg',
   };
-  const PERSONALITY_ORDER = Object.keys(PERSONALITY_META);
+  // Collection order (and card numbers #01-#16): the lone-wolf to
+  // crowd-pleaser spectrum, four groups of four - Lone Wolves, Independents,
+  // Middle Ground, Crowd Followers. Display only; the unlock logic never
+  // reads this.
+  const PERSONALITY_ORDER = [
+    'contrarian', 'wildcard_menace', 'chaos_agent', 'silent_assassin',
+    'perfectionist', 'overthinker', 'trivia_titan', 'riddler',
+    'fence_sitter', 'gambler', 'comeback_kid', 'speed_demon',
+    'trivia_trainwreck', 'combo_king_queen', 'last_second_hero', 'crowd_pleaser',
+  ];
   function loadCollection(){
     try{
       const raw = localStorage.getItem(COLLECTION_KEY);
