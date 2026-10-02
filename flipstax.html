@@ -3043,8 +3043,8 @@
     { q:'The more you take, the more you leave behind. What am I?', a:'FOOTSTEPS' },
     { q:'I speak without a mouth and hear without ears. I have no body, but I come alive with the wind. What am I?', a:'ECHO' },
     { q:'The more of me there is, the less you can see. What am I?', a:'DARKNESS' },
-    { q:'What has keys but can\u2019t open a single lock?', a:'PIANO' },
-    { q:'What question can you never truthfully answer yes to?', a:'ARE YOU ASLEEP', say:'\u201cAre you asleep?\u201d' },
+    { q:'What has keys but can\u2019t open a single lock?', a:'PIANO', alts:['KEYBOARD'] },
+    { q:'What question can you never truthfully answer yes to?', a:'ARE YOU ASLEEP', alts:['ARE YOU SLEEPING'], say:'\u201cAre you asleep?\u201d' },
     { q:'I\u2019m always hungry and must always be fed. The finger I touch will soon turn red. What am I?', a:'FIRE' },
     { q:'I\u2019m light as a feather, yet even the strongest person can\u2019t hold me for more than a few minutes. What am I?', a:'BREATH' },
     { q:'The person who makes it, sells it. The person who buys it never uses it. The person who uses it never knows they\u2019re using it. What am I?', a:'COFFIN', alts:['CASKET'] },
@@ -5601,7 +5601,8 @@
   function buildRunShareText(r){
     const p = PERSONALITY_META[r.personalityType] || PERSONALITY_META.fence_sitter;
     return 'FlipStax Daily Stax\n' + shownScore(r.score) + ' pts \u00B7 ' + p.icon + ' ' + p.name + ' \u00B7 ' + r.triviaCorrect + '/' + r.triviaTotal + ' trivia \u00B7 ' +
-      (r.solved ? ('solved in ' + formatRaceTime(r.solveMs)) : 'word not solved');
+      (r.solved ? ('solved in ' + formatRaceTime(r.solveMs)) : 'word not solved') +
+      (r.secretRiddle ? '\n...and cracked the Super Secret Riddle \uD83C\uDF0C' : '');
   }
 
   // ---------- share card: real canvas rendering, no AI image, no network ----------
