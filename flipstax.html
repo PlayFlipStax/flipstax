@@ -811,6 +811,8 @@
     content:'NEW'; position:absolute; top:-8px; right:-12px; padding:2px 5px; border-radius:8px;
     background:#ffe066; color:#5a1a00; font-size:10px; letter-spacing:0.5px; border:2px solid #fff;
   }
+  /* Master Collector (all 16 cards): the Cards button turns gold with a crown. */
+  .ms-collection-btn.master{ background:linear-gradient(145deg,#ffe27a,#ffb800 55%,#ff8a00); color:#5a1a00; box-shadow:0 4px 0 rgba(90,26,0,0.35), 0 0 22px rgba(255,214,110,0.85); }
   @keyframes msCollBob{ 0%,100%{ transform:translateY(0) rotate(-3deg); } 50%{ transform:translateY(-3px) rotate(3deg); } }
   /* Ko-fi entry point on mode select: top-right, mirroring the Cards badge's
      top-left corner so the two don't compete. Round (not the badge's rounded
@@ -856,6 +858,31 @@
     94%{ transform:scale(1.02) rotate(-3deg); }
   }
 
+  /* COLLECTION COMPLETE: the 16 cards fly in, fan out, then settle into the set. */
+  .cmc-overlay{ position:fixed; inset:0; z-index:60; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; overflow:hidden;
+    padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); text-align:center; color:#fff; font-family:'Inter', system-ui, sans-serif;
+    background:radial-gradient(circle at 50% 40%, #5a2a8f, #1d1038 58%, #0b0917); }
+  .cmc-overlay.hidden{ display:none; }
+  .cmc-rays{ position:absolute; left:50%; top:45%; width:180vmax; height:180vmax; margin:-90vmax 0 0 -90vmax; pointer-events:none; opacity:0; transition:opacity 1s ease;
+    background:repeating-conic-gradient(from 0deg, rgba(255,214,110,0.16) 0deg 9deg, rgba(255,214,110,0) 9deg 22deg); animation: cmcSpin 30s linear infinite; }
+  .cmc-overlay.settled .cmc-rays{ opacity:1; }
+  @keyframes cmcSpin{ to{ transform:rotate(360deg); } }
+  .cmc-sparks{ position:absolute; inset:0; pointer-events:none; }
+  .cmc-head{ position:relative; z-index:2; font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:clamp(34px,11vw,54px); line-height:0.95; letter-spacing:2px;
+    background:linear-gradient(90deg,#ffe27a,#fff6c8,#ffb800,#ffe27a); background-size:200% 100%; -webkit-background-clip:text; background-clip:text; color:transparent;
+    filter:drop-shadow(0 0 14px rgba(255,214,110,0.75)); animation: cmcShine 2.5s linear infinite; opacity:0; transform:scale(0.6); transition:opacity 0.4s ease, transform 0.6s cubic-bezier(.3,1.8,.5,1); }
+  .cmc-sub{ position:relative; z-index:2; font-size:14px; color:#e8dcff; opacity:0; transition:opacity 0.5s ease 0.3s; }
+  .cmc-title{ position:relative; z-index:2; margin-top:2px; }
+  .cmc-title .col-master{ font-size:16px; opacity:0; transform:scale(0.5); transition:opacity 0.3s ease 0.6s, transform 0.5s cubic-bezier(.3,1.8,.5,1) 0.6s; }
+  .cmc-overlay.settled .cmc-head{ opacity:1; transform:none; }
+  .cmc-overlay.settled .cmc-sub, .cmc-overlay.settled .cmc-title .col-master{ opacity:1; transform:none; }
+  .cmc-stage{ position:relative; z-index:1; width:100%; flex:0 0 auto; }
+  .cmc-card{ position:absolute; left:50%; top:50%; transition:transform 0.9s cubic-bezier(.2,.9,.3,1.05); will-change:transform; }
+  .cmc-card .cc-card{ width:100%; cursor:default; }
+  .cmc-card.last .cc-front{ box-shadow:0 0 0 3px #ffd96e, 0 0 22px rgba(255,214,110,0.95); }
+  .cmc-continue{ position:relative; z-index:2; margin-top:6px; padding:12px 30px; font-size:15px; animation: ccNewPop 0.45s cubic-bezier(.3,1.8,.5,1) both; }
+  .cmc-continue.hidden{ display:none; }
+  @media (prefers-reduced-motion: reduce){ .cmc-rays{ animation:none; } .cmc-head{ animation:none; } .cmc-card{ transition:none; } }
   .collection-overlay{
     position:fixed; inset:0; z-index:45; overflow:hidden; display:flex; flex-direction:column;
     font-family:'Inter', system-ui, sans-serif; color:#fff;
@@ -904,6 +931,12 @@
     font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:clamp(24px,7.4vw,30px); letter-spacing:3px;
     text-shadow:0 0 14px rgba(255,60,172,0.8), 0 3px 0 rgba(0,0,0,0.25);
   }
+  /* Master Collector: a gold title under the count, gold-framed cards. */
+  .col-master{ display:inline-block; margin-top:6px; padding:3px 12px; border-radius:99px; font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:14px; letter-spacing:1.5px;
+    color:#5a1a00; background:linear-gradient(90deg,#ffe27a,#ffb800,#ffe27a); background-size:200% 100%; box-shadow:0 0 14px rgba(255,214,110,0.8); animation: cmcShine 3s linear infinite; }
+  .col-master.hidden{ display:none; }
+  .collection-overlay.master .cc-card.unlocked .cc-front{ box-shadow:0 0 0 2px #ffd96e, 0 0 14px rgba(255,214,110,0.55), 0 6px 16px rgba(0,0,0,0.45); }
+  @keyframes cmcShine{ from{ background-position:0% 0; } to{ background-position:200% 0; } }
   .col-count{ margin-top:4px; font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:20px; letter-spacing:1.5px; color:#ffe066; }
   .col-bar{ margin:8px auto 0; max-width:260px; height:8px; border-radius:99px; background:rgba(255,255,255,0.18); overflow:hidden; }
   .col-bar i{ display:block; height:100%; border-radius:inherit; background:linear-gradient(90deg,#ff3cac,#ffb800,#2dd4c4); box-shadow:0 0 10px rgba(255,224,102,0.8); transition:width 0.8s ease; }
@@ -1094,9 +1127,32 @@
        doodle icons are scattered in individually as DOM elements (see
        renderDoodleScatter) rather than a repeating raster tile, so there's
        no seam or "stamped rectangle" pattern - just one continuous field. */
-    background:linear-gradient(180deg,#a4e0fd 0%,#82c9f8 100%);
+    background:#5cc4ff;
   }
   .home-overlay.hidden{ display:none; }
+  /* The landing sky, all drawn in code: a bright sunrise from the game's sky
+     blue down through a pink haze into Infinity Flips' gold, a slow gold
+     sunburst and glow behind the logo, and gold waves along the bottom.
+     z-index -1 keeps every layer under the doodles, sparks, logo and Enter. */
+  .home-sky{ position:absolute; inset:0; z-index:-1; overflow:hidden; pointer-events:none;
+    background:linear-gradient(180deg,#2e8dff 0%,#45b4ff 22%,#8fd8ff 40%,#ffd3ec 58%,#ffc27a 72%,#ffc400 86%,#ffb000 100%); }
+  /* The ray burst behind the logo: pink, teal, gold and purple beams and
+     streaks, drawn live (startHomeRays) so it turns and flickers. */
+  .home-rays{ position:absolute; inset:0; width:100%; height:100%; }
+  .home-glow{ position:absolute; left:var(--hx, 50%); top:var(--hy, 40%); width:110vmin; height:110vmin; margin:-55vmin 0 0 -55vmin; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,250,225,0.9) 0%, rgba(255,236,170,0.5) 24%, rgba(255,214,110,0.12) 46%, rgba(255,214,110,0) 62%); }
+  /* A UFO zooms across the sky above the logo now and then - the riddle's
+     UFO (.riddle-ufo), on its own route and timing; back the other way on
+     the next pass. Never over the logo or Enter. */
+  .home-overlay .home-ufo{ display:block; z-index:1; font-size:32px; animation: homeUfoZoom 13s cubic-bezier(.5,0,.5,1) 4s infinite alternate both; }
+  .home-overlay .home-ufo i{ display:none; }
+  @keyframes homeUfoZoom{
+    0%{ transform:translate(-70px, 17vh) scale(0.7) rotate(-6deg); }
+    6%{ transform:translate(48vw, 8vh) scale(1.05) rotate(4deg); }
+    12%, 100%{ transform:translate(calc(100vw + 70px), 3vh) scale(0.75) rotate(-4deg); }
+  }
+  .home-waves{ position:absolute; left:0; right:0; bottom:0; width:100%; height:22vh; }
+  .home-overlay .doodle-scatter svg{ filter:brightness(0) invert(1); }
   /* The logo PNG has its own faint pixel/static texture behind the cards,
      right up to its rectangular edge - which is exactly what makes that
      edge readable as "an image pasted on a gradient" once the doodle field
@@ -1126,7 +1182,7 @@
      halves do (see the {cell, icons} passed to renderDoodleScatter) - more
      going on behind the logo helps it read as a screen with its own scene
      rather than an image pasted onto a plain gradient. */
-  .home-overlay .doodle-scatter svg{ opacity:0.26; }
+  .home-overlay .doodle-scatter svg{ opacity:0.2; }
   @keyframes doodleDrift{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
   /* Infinity Flips intensity ramp: --ramp (0..1, set from JS as the run's
      round count climbs - see applyRampTier) brightens the existing drifting
@@ -1539,7 +1595,7 @@
        Surrounding it with a glow in the page's own two sky-blue tones is
        the fix instead: it doesn't erase that edge, it makes the transition
        into the background look deliberate rather than pasted-on. */
-    filter: drop-shadow(0 0 20px rgba(164,224,253,0.95)) drop-shadow(0 0 44px rgba(130,201,248,0.6));
+    filter: drop-shadow(0 4px 10px rgba(120,50,0,0.25)) drop-shadow(0 0 26px rgba(255,236,170,0.75));
   }
   /* Ambient twinkle across the whole landing screen - the same .col-spark/
      colRise particle system as mode-select's gold half and the Collection
@@ -1563,9 +1619,10 @@
      what put the sparks (and doodles) in front of the button. */
   .home-logo-img, .home-enter-btn{ position:relative; z-index:2; }
   .home-enter-btn{
-    padding:13px 48px; font-size:16px; box-shadow:0 6px 18px rgba(242,84,91,0.4);
+    padding:13px 48px; font-size:16px; box-shadow:0 6px 18px rgba(242,84,91,0.4); border:3px solid #fff;
     animation: homeEnterPulse 2.8s ease-in-out infinite;
   }
+  .home-enter-btn.daily-btn.primary{ border-color:#fff; }
   @keyframes homeEnterPulse{
     0%,100%{ box-shadow:0 6px 18px rgba(242,84,91,0.4); }
     50%{ box-shadow:0 6px 27px rgba(242,84,91,0.75), 0 0 20px rgba(242,84,91,0.5); }
@@ -1582,7 +1639,7 @@
   }
   .home-legal-link{
     display:inline-flex; align-items:center; min-height:44px; padding:0 6px;
-    font-size:11.5px; color:rgba(255,255,255,0.75); text-decoration:underline; cursor:pointer;
+    font-size:11.5px; color:#fff; text-decoration:underline; cursor:pointer; font-weight:600; text-shadow:0 1px 2px rgba(50,15,80,0.85), 0 0 6px rgba(50,15,80,0.6);
   }
   .home-legal-dot{ color:rgba(255,255,255,0.4); font-size:11.5px; }
   .legal-overlay{
@@ -2072,8 +2129,18 @@
   <div class="riddle-ufo u3" aria-hidden="true"><span>🛸</span><i></i></div>
 </div>
 <div class="home-overlay" id="homeOverlay">
+  <div class="home-sky" aria-hidden="true">
+    <canvas class="home-rays" id="homeRays"></canvas>
+    <div class="home-glow"></div>
+    <svg class="home-waves" viewBox="0 0 400 100" preserveAspectRatio="none">
+      <path d="M0 38 C60 18 110 52 170 36 C230 20 280 50 340 32 C370 24 390 28 400 30 L400 100 L0 100 Z" fill="#ffd23f" opacity="0.75"/>
+      <path d="M0 62 C50 48 100 74 160 60 C220 46 270 72 330 58 C360 52 385 55 400 57 L400 100 L0 100 Z" fill="#ffb000" opacity="0.85"/>
+      <path d="M0 82 C70 70 120 92 190 80 C250 70 310 90 400 78 L400 100 L0 100 Z" fill="#ff9500" opacity="0.8"/>
+    </svg>
+  </div>
   <div class="home-sparks" id="homeSparks" aria-hidden="true"></div>
-  <img class="home-logo-img" src="images/flipstax-logo-transparent.png" alt="FlipStax - Flip, Vote, Jumble &amp; Solve">
+  <div class="riddle-ufo home-ufo" aria-hidden="true"><span>🛸</span><i></i></div>
+  <img class="home-logo-img" src="images/flipstax-logo-clean.png" alt="FlipStax - Flip, Vote, Jumble &amp; Solve">
   <div class="daily-btn primary home-enter-btn" id="homeEnterBtn">Enter</div>
   <div class="home-legal-links">
     <span class="home-legal-link" id="homeDisclaimerLink">Disclaimer</span>
@@ -2161,6 +2228,15 @@
   <div class="contact-footer" data-contact-footer></div>
 </div>
 
+<div class="cmc-overlay hidden" id="collectionCompleteOverlay" role="dialog" aria-label="Collection complete">
+  <div class="cmc-rays" aria-hidden="true"></div>
+  <div class="cmc-sparks" id="cmcSparks" aria-hidden="true"></div>
+  <div class="cmc-head">COLLECTION<br>COMPLETE</div>
+  <div class="cmc-sub">All 16 personalities collected</div>
+  <div class="cmc-title"><span class="col-master">👑 MASTER COLLECTOR</span></div>
+  <div class="cmc-stage" id="cmcStage"></div>
+  <div class="daily-btn primary cmc-continue hidden" id="cmcContinue">Continue ▶</div>
+</div>
 <div class="collection-overlay hidden" id="collectionOverlay" role="dialog" aria-label="My Collection">
   <div class="col-bg" aria-hidden="true">
     <div class="col-blob b1"></div><div class="col-blob b2"></div><div class="col-blob b3"></div>
@@ -2171,6 +2247,7 @@
     <div class="col-back" id="collectionBack" role="button" aria-label="Back">←</div>
     <div class="col-title">MY COLLECTION</div>
     <div class="col-count" id="collectionCount">0 / 16 collected</div>
+    <div class="col-master hidden" id="colMaster">👑 MASTER COLLECTOR</div>
     <div class="col-bar"><i id="collectionBar" style="width:0%"></i></div>
     <div class="col-tabs" role="tablist">
       <div class="col-tab active" data-tab="cards" role="tab">🃏 Cards</div>
@@ -3655,10 +3732,12 @@
     win:      'audio/victory-lap-results-trimmed.mp3',
     // The secret riddle solve: a victory fanfare for the celebration, played once.
     secretWin: 'audio/victory-lap-win-fanfare.mp3',
+    // Collection Complete (all 16 cards): the same fanfare, on its own element.
+    collectionWin: 'audio/victory-lap-win-fanfare.mp3',
     lose:     'audio/better-luck-next-time-trimmed.mp3',
   };
   // Played once, never looped.
-  const ONE_SHOT_TRACKS = ['fanfare', 'secret', 'secretWin'];
+  const ONE_SHOT_TRACKS = ['fanfare', 'secret', 'secretWin', 'collectionWin'];
   // Infinity plays a continuous playlist: Pacific Drive -> Palm Tree Pivot
   // -> High Noon Parade -> Victory Lap -> back to Pacific Drive, round and
   // round for as long as the player stays in Infinity Flips, so a long
@@ -5607,6 +5686,9 @@
     };
   }
   function collectedCount(){ return PERSONALITY_ORDER.filter(k=> collection.cards[k]).length; }
+  function isMasterCollector(){ return !!collection.completedOn; }
+  // A full set from before Master Collector existed: the title, no popup.
+  if (collectedCount() === PERSONALITY_ORDER.length && !collection.completedOn){ collection.completedOn = 'earlier'; collection.completeShown = true; saveCollection(); }
   // Called whenever a run awards a personality. Returns true the first time.
   // ---------- Personality Collection unlocks ----------
   // The 16 cards are a cumulative collection, separate from "today's
@@ -5682,6 +5764,12 @@
     ctx = ctx || {};
     const fresh = PERSONALITY_ORDER.filter(k=> !collection.cards[k] && UNLOCK_RULES[k] && UNLOCK_RULES[k].test(ctx));
     fresh.forEach(k=>{ collection.cards[k] = { first: todayStr(), count: 1, revealed: false }; });
+    // The card that completes the set - whichever it is - earns Master
+    // Collector, and the Collection Complete celebration plays once (after
+    // the new card's own reveal; see maybeCelebrateCollection).
+    if (fresh.length && collectedCount() === PERSONALITY_ORDER.length && !collection.completedOn){
+      collection.completedOn = todayStr(); collection.completedWith = fresh[fresh.length - 1]; collection.completeShown = false;
+    }
     if (fresh.length) saveCollection();
     return fresh;
   }
@@ -5709,6 +5797,7 @@
       if (isNew){ owned.revealed = true; setTimeout(()=> revealCollectionCard(card), 650 + i * 900); }
     });
     if (keys.length){ saveCollection(); renderCollectionBtn(); }
+    if (keys.length) maybeCelebrateCollection(reveal ? 650 + keys.length * 900 + 1500 : 600);
   }
 
   let runActive = false, runPhase = 'idle';
@@ -5922,12 +6011,12 @@
     // The results screen's own background (radial, centred high).
     const g = ctx.createRadialGradient(w/2, h*0.28, 0, w/2, h*0.28, h*0.75);
     if (daily){ g.addColorStop(0, '#3a1f6e'); g.addColorStop(0.62, '#150f2b'); g.addColorStop(1, '#0b0917'); }
-    else { g.addColorStop(0, '#123a4a'); g.addColorStop(0.62, '#0f1a2b'); g.addColorStop(1, '#090b17'); }
+    else { g.addColorStop(0, '#4a2a12'); g.addColorStop(0.62, '#1f1230'); g.addColorStop(1, '#0d0918'); }   // Infinity's gold
     ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
     const blob = (x, y, r, c)=>{ const b = ctx.createRadialGradient(x, y, 0, x, y, r); b.addColorStop(0, c); b.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = b; ctx.fillRect(0, 0, w, h); };
-    blob(w/2, h*0.3, 520, daily ? 'rgba(157,95,214,0.28)' : 'rgba(62,194,194,0.24)');
+    blob(w/2, h*0.3, 520, daily ? 'rgba(157,95,214,0.28)' : 'rgba(255,184,0,0.3)');
     blob(w*0.1, h*0.85, 520, 'rgba(120,60,200,0.22)');
-    blob(w*0.9, h*0.78, 480, daily ? 'rgba(255,90,180,0.12)' : 'rgba(62,194,194,0.12)');
+    blob(w*0.9, h*0.78, 480, daily ? 'rgba(255,90,180,0.12)' : 'rgba(255,196,0,0.14)');
     // A soft starfield - seeded, so every card has the same sky.
     const rnd = mulberry32(7);
     for (let i = 0; i < 90; i++){
@@ -6030,7 +6119,7 @@
     drawShareCardBackground(ctx, mode);
     ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
     drawWordmark(ctx, cx, 150);
-    ctx.font = '700 30px ' + SHARE_FONT_T; ctx.fillStyle = daily ? '#b98bf0' : '#7fdede';
+    ctx.font = '700 30px ' + SHARE_FONT_T; ctx.fillStyle = daily ? '#b98bf0' : '#ffd23f';
     shareSpacedText(ctx, data.badge, cx, 210, 4);
 
     // Everything between the header and the footer is laid out as blocks:
@@ -6106,8 +6195,8 @@
       }
     } else {
       blocks.push({ h: 230, draw: y=>{
-        ctx.font = '900 150px ' + SHARE_FONT_D; ctx.fillStyle = '#fff'; shareGlowText(ctx, data.heroText, cx, y + 150, 'rgba(62,194,194,0.75)', 50);
-        ctx.font = '600 38px ' + SHARE_FONT_T; ctx.fillStyle = 'rgba(224,248,255,0.88)'; ctx.fillText(data.statLine, cx, y + 222);
+        ctx.font = '900 150px ' + SHARE_FONT_D; ctx.fillStyle = '#ffe27a'; shareGlowText(ctx, data.heroText, cx, y + 150, 'rgba(255,184,0,0.8)', 50);
+        ctx.font = '600 38px ' + SHARE_FONT_T; ctx.fillStyle = 'rgba(255,244,214,0.9)'; ctx.fillText(data.statLine, cx, y + 222);
       } });
     }
     const vote = voteLines();
@@ -6780,6 +6869,34 @@
   // every 3.5-7s, fainter and slower than the celebration's, plus the CSS
   // UFO (.ambient). Stops the moment the riddle resolves.
   let riddleAmbientOn = false;
+  // Shooting stars - one look shared by the riddle screen, the riddle
+  // celebration and the splash; each passes its own settings. A star starts
+  // just off one side and heads down at a shallow angle, a bright head with
+  // a tapering tail.
+  const STAR_RIDDLE_AMBIENT = { ang:[0.2, 0.5], speed:[8, 13], y:[0.04, 0.44], off:30, colors:['rgba(255,255,255,0.75)'], tail:7, width:1.8, head:0 };
+  const STAR_CELEBRATION = { ang:[0.25, 0.6], speed:[14, 22], y:[0.05, 0.5], off:40, colors:['#ffffff', '#ffe9a8'], tail:9, width:3, head:2.6 };
+  const STAR_SPLASH = { ang:[0.16, 0.4], speed:[11, 17], y:[0.02, 0.26], off:40, colors:['#ffffff', '#fff3b0'], tail:11, width:3, head:2.4, glow:'rgba(255,255,255,0.95)' };
+  function spawnShootingStar(W, H, o){
+    const dir = Math.random() < 0.5 ? 1 : -1, ang = o.ang[0] + Math.random() * (o.ang[1] - o.ang[0]), speed = o.speed[0] + Math.random() * (o.speed[1] - o.speed[0]);
+    return { x: dir > 0 ? -o.off : W + o.off, y: H * (o.y[0] + Math.random() * (o.y[1] - o.y[0])),
+      vx: Math.cos(ang) * speed * dir, vy: Math.sin(ang) * speed, c: o.colors[Math.floor(Math.random() * o.colors.length)] };
+  }
+  // Moves and draws the stars one frame; returns the ones still on screen.
+  function stepShootingStars(ctx, stars, W, H, o){
+    const live = stars.filter(st=> st.x > -200 && st.x < W + 200 && st.y < H + 200);
+    if (o.glow){ ctx.save(); ctx.shadowColor = o.glow; ctx.shadowBlur = 8; }
+    for (const st of live){
+      st.x += st.vx; st.y += st.vy;
+      const tx = st.x - st.vx * o.tail, ty = st.y - st.vy * o.tail;
+      const g = ctx.createLinearGradient(st.x, st.y, tx, ty);
+      g.addColorStop(0, st.c); g.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.strokeStyle = g; ctx.lineWidth = o.width; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(st.x, st.y); ctx.lineTo(tx, ty); ctx.stroke();
+      if (o.head){ ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(st.x, st.y, o.head, 0, Math.PI * 2); ctx.fill(); }
+    }
+    if (o.glow) ctx.restore();
+    return live;
+  }
   function startRiddleAmbient(){
     if (riddleAmbientOn) return;
     try{ if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; }catch(e){}
@@ -6793,21 +6910,9 @@
     (function frame(now){
       if (!riddleAmbientOn){ ctx.clearRect(0, 0, W, H); return; }
       const t = now - start;
-      if (t >= next){
-        const dir = Math.random() < 0.5 ? 1 : -1, ang = 0.2 + Math.random() * 0.3, speed = 8 + Math.random() * 5;
-        stars.push({ x: dir > 0 ? -30 : W + 30, y: H * (0.04 + Math.random() * 0.4), vx: Math.cos(ang) * speed * dir, vy: Math.sin(ang) * speed });
-        next = t + 3500 + Math.random() * 3500;
-      }
+      if (t >= next){ stars.push(spawnShootingStar(W, H, STAR_RIDDLE_AMBIENT)); next = t + 3500 + Math.random() * 3500; }
       ctx.clearRect(0, 0, W, H);
-      stars = stars.filter(st=> st.x > -150 && st.x < W + 150 && st.y < H + 150);
-      for (const st of stars){
-        st.x += st.vx; st.y += st.vy;
-        const tx = st.x - st.vx * 7, ty = st.y - st.vy * 7;
-        const g = ctx.createLinearGradient(st.x, st.y, tx, ty);
-        g.addColorStop(0, 'rgba(255,255,255,0.75)'); g.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.strokeStyle = g; ctx.lineWidth = 1.8; ctx.lineCap = 'round';
-        ctx.beginPath(); ctx.moveTo(st.x, st.y); ctx.lineTo(tx, ty); ctx.stroke();
-      }
+      stars = stepShootingStars(ctx, stars, W, H, STAR_RIDDLE_AMBIENT);
       requestAnimationFrame(frame);
     })(start);
   }
@@ -6852,20 +6957,14 @@
         sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, c: Math.random() < 0.25 ? '#ffffff' : c, born: t });
       }
     };
-    const launchStar = (t)=>{
-      const dir = Math.random() < 0.5 ? 1 : -1, ang = 0.25 + Math.random() * 0.35;   // shallow, heading down
-      const speed = 14 + Math.random() * 8;
-      stars.push({ x: dir > 0 ? -40 : W + 40, y: H * (0.05 + Math.random() * 0.45), vx: Math.cos(ang) * speed * dir,
-        vy: Math.sin(ang) * speed, c: Math.random() < 0.5 ? '#ffffff' : '#ffe9a8' });
-      starN++;
-    };
+    const launchStar = ()=>{ stars.push(spawnShootingStar(W, H, STAR_CELEBRATION)); starN++; };
     (function frame(now){
       if (!secretCelebrating){ ctx.globalCompositeOperation = 'source-over'; ctx.clearRect(0, 0, W, H); return; }
       const t = now - start;
       ctx.globalCompositeOperation = 'destination-out'; ctx.fillStyle = 'rgba(0,0,0,0.22)'; ctx.fillRect(0, 0, W, H);
       ctx.globalCompositeOperation = 'lighter';
       while (t >= nextShell){ burst(t); nextShell += shellN < 7 ? 260 : 900; }
-      while (t >= nextStar){ launchStar(t); nextStar += starN < 8 ? 600 : 1600; }
+      while (t >= nextStar){ launchStar(); nextStar += starN < 8 ? 600 : 1600; }
       sparks = sparks.filter(p=> t - p.born <= 1300);
       for (const p of sparks){
         const age = t - p.born;
@@ -6873,18 +6972,8 @@
         ctx.globalAlpha = Math.max(0, 1 - age / 1300); ctx.fillStyle = p.c;
         ctx.beginPath(); ctx.arc(p.x, p.y, 2.2, 0, Math.PI * 2); ctx.fill();
       }
-      // Shooting stars: a bright head with a long tapering tail.
-      stars = stars.filter(st=> st.x > -200 && st.x < W + 200 && st.y < H + 200);
-      for (const st of stars){
-        st.x += st.vx; st.y += st.vy;
-        const len = 9, tx = st.x - st.vx * len, ty = st.y - st.vy * len;
-        const g = ctx.createLinearGradient(st.x, st.y, tx, ty);
-        g.addColorStop(0, st.c); g.addColorStop(1, 'rgba(255,255,255,0)');
-        ctx.globalAlpha = 1; ctx.strokeStyle = g; ctx.lineWidth = 3; ctx.lineCap = 'round';
-        ctx.beginPath(); ctx.moveTo(st.x, st.y); ctx.lineTo(tx, ty); ctx.stroke();
-        ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(st.x, st.y, 2.6, 0, Math.PI * 2); ctx.fill();
-      }
       ctx.globalAlpha = 1;
+      stars = stepShootingStars(ctx, stars, W, H, STAR_CELEBRATION);
       requestAnimationFrame(frame);
     })(start);
   }
@@ -7100,6 +7189,8 @@
   function renderCollectionBtn(){
     const n = collectedCount();
     els.collectionBtnCount.textContent = n + '/' + PERSONALITY_ORDER.length;
+    els.collectionBtn.classList.toggle('master', isMasterCollector());
+    els.collectionBtn.querySelector('.mcb-icon').textContent = isMasterCollector() ? '\uD83D\uDC51' : '\uD83C\uDCCF';
     els.collectionBtn.classList.toggle('has-new', PERSONALITY_ORDER.some(k=> collection.cards[k] && !collection.cards[k].revealed) || unseenBadges().length > 0);
   }
   // Shared by the Collection card-unlock reveal and the mode-select gold
@@ -7138,6 +7229,112 @@
   // Landing screen: 8 twinkles that stay put (see .home-spark), in the
   // outer strips either side of the logo/button column, spread top to
   // bottom so they don't cluster.
+  // ---------- Splash: the ray burst, drawn live ----------
+  // Two pre-drawn layers of beams and streaks, centred on the logo: one
+  // turns slowly, the other drifts the other way and flickers over it, so
+  // the burst shimmers; bright pulses run out along it, shooting stars
+  // cross the sky above. It blasts out as the logo zooms in. Reduced motion:
+  // one still frame. Stops for good once the splash is gone.
+  const HOME_RAY_COLS = ['#ff3cac', '#19e0ff', '#ffc400', '#9b4dff', '#ff5fb8', '#2dd4c4', '#ffd66e', '#b86bff'];
+  function hexA(hex, a){ const n = parseInt(hex.slice(1), 16); return 'rgba(' + (n >> 16) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')'; }
+  function buildRayLayer(R, dpr, seed, beams, streaks){
+    const size = Math.ceil(R * 5.6), c = document.createElement('canvas');
+    c.width = c.height = Math.ceil(size * dpr);
+    const x = c.getContext('2d'), m = size / 2, rnd = mulberry32(seed);
+    x.setTransform(dpr, 0, 0, dpr, 0, 0);
+    for (let i = 0; i < beams; i++){
+      const ang = (i / beams) * Math.PI * 2 + (rnd() - 0.5) * 0.14, hw = (1.2 + rnd() * 2.6) * Math.PI / 180;
+      const reach = R * (1.5 + rnd() * 1.2), col = HOME_RAY_COLS[i % HOME_RAY_COLS.length];
+      const g = x.createRadialGradient(m, m, R * 0.5, m, m, reach);
+      g.addColorStop(0, hexA(col, 0.95)); g.addColorStop(0.4, hexA(col, 0.6)); g.addColorStop(1, hexA(col, 0));
+      x.fillStyle = g; x.beginPath(); x.moveTo(m, m); x.arc(m, m, reach, ang - hw, ang + hw); x.closePath(); x.fill();
+    }
+    x.lineCap = 'round';
+    for (let i = 0; i < streaks; i++){
+      const a = rnd() * Math.PI * 2, r1 = R * (0.85 + rnd() * 0.3), len = R * (0.35 + rnd() * 1.4), w = 1 + rnd() * 3.5;
+      const col = HOME_RAY_COLS[Math.floor(rnd() * HOME_RAY_COLS.length)];
+      const x1 = m + Math.cos(a) * r1, y1 = m + Math.sin(a) * r1, x2 = m + Math.cos(a) * (r1 + len), y2 = m + Math.sin(a) * (r1 + len);
+      const g = x.createLinearGradient(x1, y1, x2, y2); g.addColorStop(0, hexA(col, 0.95)); g.addColorStop(1, hexA(col, 0));
+      x.strokeStyle = g; x.lineWidth = w; x.setLineDash(rnd() < 0.35 ? [w * 5, w * 3.5] : []);
+      x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2, y2); x.stroke();
+      if (rnd() < 0.4){
+        const gw = x.createLinearGradient(x1, y1, x2, y2); gw.addColorStop(0, 'rgba(255,255,255,0.9)'); gw.addColorStop(0.5, 'rgba(255,255,255,0)');
+        x.strokeStyle = gw; x.lineWidth = Math.max(0.8, w * 0.35); x.setLineDash([]); x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2, y2); x.stroke();
+      }
+    }
+    return { canvas: c, size };
+  }
+  let homeRaysOn = false;
+  function startHomeRays(){
+    const canvas = document.getElementById('homeRays'), logo = document.querySelector('.home-logo-img'), ctx = canvas && canvas.getContext('2d');
+    if (!ctx || homeRaysOn) return;
+    homeRaysOn = true;
+    let reduced = false;
+    try{ reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }catch(e){}
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    let W, H, cx, cy, R, A, B, layoutKey = '';
+    const layout = ()=>{
+      W = window.innerWidth; H = window.innerHeight;
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+      // The burst's centre is the logo's (offsets ignore its zoom/float).
+      const lw = logo.offsetWidth || Math.min(W - 48, 440), lh = logo.offsetHeight || lw * 0.54;
+      cx = logo.offsetLeft + lw / 2; cy = logo.offsetTop + lh / 2;
+      R = lw * 0.42;
+      els.homeOverlay.style.setProperty('--hx', cx + 'px'); els.homeOverlay.style.setProperty('--hy', cy + 'px');
+      const key = Math.round(R) + 'x' + dpr;
+      if (key !== layoutKey){ layoutKey = key; A = buildRayLayer(R, dpr, 101, 26, 110); B = buildRayLayer(R, dpr, 202, 18, 80); }
+    };
+    layout();
+    if (!logo.complete) logo.addEventListener('load', layout, { once:true });
+    window.addEventListener('resize', ()=>{ if (homeRaysOn) layout(); });
+    const draw = (t)=>{
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+      // Blasts out with the logo's zoom-in (450ms delay, 650ms).
+      const e = reduced ? 1 : Math.min(1, Math.max(0, (t - 420) / 900)), ease = 1 - Math.pow(1 - e, 3);
+      if (ease <= 0) return;
+      const sc = 0.3 + 0.7 * ease;
+      ctx.save(); ctx.translate(cx, cy);
+      ctx.save(); ctx.rotate(t * 0.00005); ctx.scale(sc, sc);
+      ctx.globalAlpha = ease * (0.9 + 0.1 * Math.sin(t / 530));
+      ctx.drawImage(A.canvas, -A.size / 2, -A.size / 2, A.size, A.size);
+      ctx.restore();
+      ctx.save(); ctx.rotate(-t * 0.00008 + 0.3); ctx.scale(sc, sc);
+      const flick = 0.5 + 0.5 * Math.sin(t / 310) * Math.sin(t / 830 + 1);
+      ctx.globalAlpha = ease * (0.25 + 0.6 * Math.abs(flick));
+      ctx.drawImage(B.canvas, -B.size / 2, -B.size / 2, B.size, B.size);
+      ctx.restore();
+      ctx.restore();
+    };
+    if (reduced){ draw(0); return; }
+    let stars = [], nextStar = 1600, pulses = [], last = 0;
+    const start = performance.now();
+    (function frame(now){
+      if (els.homeOverlay.classList.contains('hidden')){ homeRaysOn = false; ctx.clearRect(0, 0, canvas.width, canvas.height); return; }
+      requestAnimationFrame(frame);
+      if (now - last < 30) return;   // ~30fps is plenty for this
+      last = now;
+      const t = now - start;
+      draw(t);
+      // Bright pulses racing out along the burst.
+      if (t > 1100){
+        while (pulses.length < 7) pulses.push({ a: Math.random() * Math.PI * 2, r: R * (0.85 + Math.random() * 0.3), v: 4 + Math.random() * 5,
+          c: HOME_RAY_COLS[Math.floor(Math.random() * HOME_RAY_COLS.length)], len: R * (0.25 + Math.random() * 0.35) });
+        ctx.save(); ctx.lineCap = 'round';
+        pulses = pulses.filter(p=> p.r < R * 2.6);
+        for (const p of pulses){
+          p.r += p.v;
+          const fade = Math.max(0, 1 - (p.r - R) / (R * 1.6));
+          const x1 = cx + Math.cos(p.a) * p.r, y1 = cy + Math.sin(p.a) * p.r, x2 = cx + Math.cos(p.a) * (p.r - p.len), y2 = cy + Math.sin(p.a) * (p.r - p.len);
+          const g = ctx.createLinearGradient(x1, y1, x2, y2); g.addColorStop(0, 'rgba(255,255,255,' + (0.95 * fade) + ')'); g.addColorStop(0.3, hexA(p.c, 0.8 * fade)); g.addColorStop(1, hexA(p.c, 0));
+          ctx.strokeStyle = g; ctx.lineWidth = 3.5; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+        }
+        ctx.restore();
+      }
+      // Shooting stars across the sky above the logo.
+      if (t >= nextStar){ stars.push(spawnShootingStar(W, H, STAR_SPLASH)); nextStar = t + 2200 + Math.random() * 2600; }
+      stars = stepShootingStars(ctx, stars, W, H, STAR_SPLASH);
+    })(start);
+  }
   function buildHomeSparks(){
     const box = els.homeSparks;
     if (!box || box.childElementCount) return;
@@ -7174,11 +7371,13 @@
       els.collectionGrid.appendChild(card);
     });
     els.collectionScroll.scrollTop = 0;
+    els.collectionOverlay.classList.toggle('master', isMasterCollector());
+    document.getElementById('colMaster').classList.toggle('hidden', !isMasterCollector());
     setCollectionTab('cards'); els.collectionBar.style.width = '0%';
     els.collectionOverlay.classList.remove('hidden');
     requestAnimationFrame(()=> requestAnimationFrame(()=>{ els.collectionBar.style.width = (100 * n / total) + '%'; }));
     // Anything earned but not yet revealed gets its moment now, one at a time.
-    if (!pending.length || collectionRevealing) return;
+    if (!pending.length || collectionRevealing){ maybeCelebrateCollection(400); return; }
     collectionRevealing = true;
     await new Promise(r=> setTimeout(r, 500));
     for (const card of pending){
@@ -7193,7 +7392,97 @@
     }
     collectionRevealing = false;
     renderCollectionBtn();
+    maybeCelebrateCollection(400);
   }
+  // ---------- COLLECTION COMPLETE ----------
+  // Plays once, when the set is completed (collection.completeShown false).
+  // If it's missed (the page closed first), it plays the next time new
+  // cards or the Collection are shown.
+  let collectionCelebrating = false, cmcTimers = [];
+  function maybeCelebrateCollection(delay){
+    if (!collection.completedOn || collection.completeShown !== false || collectionCelebrating) return;
+    collectionCelebrating = true;
+    cmcTimers.push(setTimeout(showCollectionComplete, delay || 0));
+  }
+  // The fanfare is a music file (the iPhone silent switch doesn't mute it).
+  // Whatever was playing pauses for it and carries on afterwards.
+  let cmcMusicBefore = null;
+  function playCollectionFanfare(){
+    const prevKey = currentTrackKey, prevEl = prevKey && trackEls[prevKey];
+    cmcMusicBefore = { key: prevKey, el: prevEl && !prevEl.paused ? prevEl : null };
+    if (!soundOn) return;
+    pauseAllTracks();
+    currentTrackKey = 'collectionWin';
+    const el = getTrackEl('collectionWin'); el.muted = false;
+    try{ el.currentTime = 0; }catch(e){}
+    el.play().catch(()=>{});
+  }
+  function restoreMusicAfterCollection(){
+    if (trackEls.collectionWin) try{ trackEls.collectionWin.pause(); }catch(e){}
+    const b = cmcMusicBefore; cmcMusicBefore = null;
+    if (!b || currentTrackKey !== 'collectionWin') return;
+    currentTrackKey = b.key;
+    if (soundOn && b.el && trackEls[b.key] === b.el) b.el.play().catch(()=>{});
+  }
+  function showCollectionComplete(){
+    const ov = document.getElementById('collectionCompleteOverlay'), stage = document.getElementById('cmcStage'), btn = document.getElementById('cmcContinue');
+    collection.completeShown = true; saveCollection();
+    let reduced = false;
+    try{ reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }catch(e){}
+    // Card size: four rows of four fit the space left under the headline.
+    const W = Math.min(window.innerWidth - 32, 420), H = window.innerHeight, gap = 8;
+    const cw = Math.floor(Math.min(84, (W - 3 * gap) / 4, ((H - 300) - 3 * gap) / 4 * 360 / 492)), ch = Math.round(cw * 492 / 360);
+    stage.style.height = (4 * ch + 3 * gap) + 'px';
+    stage.innerHTML = '';
+    // The card that completed the set flies in last and keeps a gold glow.
+    const last = collection.completedWith, order = PERSONALITY_ORDER.filter(k=> k !== last).concat(PERSONALITY_ORDER.indexOf(last) !== -1 ? [last] : []);
+    const T = (x, y, r, sc)=> 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) translate(-50%,-50%) rotate(' + r.toFixed(1) + 'deg) scale(' + sc + ')';
+    const cells = order.map((k, i)=>{
+      const slot = PERSONALITY_ORDER.indexOf(k), col = slot % 4, row = Math.floor(slot / 4);
+      const el = document.createElement('div'); el.className = 'cmc-card' + (k === last ? ' last' : '');
+      el.style.width = cw + 'px';
+      el.appendChild(makeCollectionCard(k, true));
+      stage.appendChild(el);
+      const th = Math.random() * Math.PI * 2, d = 1.3 * Math.max(window.innerWidth, H);
+      const fanA = (-66 + i * (132 / 15)) * Math.PI / 180, R = Math.max(W * 0.62, 200);
+      return { el,
+        start: T(Math.cos(th) * d, Math.sin(th) * d, Math.random() * 540 - 270, 0.5),
+        fan: T(Math.sin(fanA) * R, R * 0.55 - Math.cos(fanA) * R, fanA * 180 / Math.PI, 1.05),
+        grid: T((col - 1.5) * (cw + gap), (row - 1.5) * (ch + gap), 0, 1) };
+    });
+    ov.classList.remove('settled'); btn.classList.add('hidden');
+    ov.classList.remove('hidden');
+    fillSparkField(document.getElementById('cmcSparks'), 26, ['\u2726','\u2727','\u2605','\u25C6','\u2726'], ['#fff6a8','#ffd166','#ffffff','#ffb800','#ff8ad4'], [10, 26], [0.5, 1], [7, 14]);
+    playCollectionFanfare();
+    haptic([20, 40, 20, 40, 60]);
+    if (reduced){
+      cells.forEach(c=>{ c.el.style.transition = 'none'; c.el.style.transform = c.grid; });
+      ov.classList.add('settled');
+      cmcTimers.push(setTimeout(()=> btn.classList.remove('hidden'), 1500));
+      return;
+    }
+    cells.forEach(c=>{ c.el.style.transition = 'none'; c.el.style.transform = c.start; });
+    void stage.offsetWidth;
+    cells.forEach((c, i)=>{ cmcTimers.push(setTimeout(()=>{ c.el.style.transition = ''; c.el.style.transform = c.fan; }, 60 + i * 75)); });
+    const settleAt = 60 + 16 * 75 + 1000;
+    cmcTimers.push(setTimeout(()=>{
+      cells.forEach((c, i)=>{ c.el.style.transitionDelay = (i * 0.025) + 's'; c.el.style.transform = c.grid; });
+      ov.classList.add('settled');
+    }, settleAt));
+    cmcTimers.push(setTimeout(()=> btn.classList.remove('hidden'), settleAt + 1400));
+  }
+  function closeCollectionComplete(){
+    cmcTimers.forEach(clearTimeout); cmcTimers = [];
+    collectionCelebrating = false;
+    document.getElementById('collectionCompleteOverlay').classList.add('hidden');
+    restoreMusicAfterCollection();
+    renderCollectionBtn();
+    if (!els.collectionOverlay.classList.contains('hidden')){
+      els.collectionOverlay.classList.add('master');
+      document.getElementById('colMaster').classList.remove('hidden');
+    }
+  }
+  document.getElementById('cmcContinue').addEventListener('click', closeCollectionComplete);
   function closeCollection(){
     markShownBadgesSeen();
     els.collectionOverlay.classList.add('hidden');
@@ -8813,6 +9102,7 @@
   renderDoodleScatter(els.halfA, {direction:'right'});
   renderDoodleScatter(els.halfB, {direction:'left'});
   buildHomeSparks();
+  startHomeRays();
   let doodleResizeTimer = null;
   window.addEventListener('resize', ()=>{
     clearTimeout(doodleResizeTimer);
