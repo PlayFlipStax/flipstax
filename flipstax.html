@@ -527,8 +527,27 @@
   @keyframes laserSweepL{ from{ transform:rotate(8deg); } to{ transform:rotate(58deg); } }
   @keyframes laserSweepR{ from{ transform:rotate(-8deg); } to{ transform:rotate(-58deg); } }
   .riddle-overlay.celebrating .riddle-result.win{ font-size:18px; animation: secretWinPulse 0.7s ease-in-out infinite alternate; }
+  /* While celebrating, the answer field and Submit make way for the result
+     and, after the hold, "Tap to continue". */
+  .riddle-overlay.celebrating .riddle-input, .riddle-overlay.celebrating .riddle-buttons{ display:none; }
+  .riddle-continue{ margin-top:16px; padding:12px 30px; font-size:15px; animation: ccNewPop 0.45s cubic-bezier(.3,1.8,.5,1) both; }
+  .riddle-continue.hidden{ display:none; }
+  /* UFOs: two glide across the sky, wobbling, beams flickering. */
+  .riddle-ufo{ position:absolute; z-index:2; top:0; left:0; display:none; pointer-events:none; font-size:44px; line-height:1;
+    filter:drop-shadow(0 0 10px rgba(125,255,176,0.8)); }
+  .riddle-ufo i{ position:absolute; left:50%; top:80%; width:46px; height:90px; transform:translateX(-50%);
+    background:linear-gradient(to bottom, rgba(125,255,176,0.55), rgba(125,255,176,0)); clip-path:polygon(35% 0, 65% 0, 100% 100%, 0 100%);
+    animation: ufoBeam 0.5s ease-in-out infinite alternate; }
+  .riddle-ufo span{ display:inline-block; animation: ufoWobble 0.9s ease-in-out infinite alternate; }
+  .riddle-overlay.ufos .riddle-ufo{ display:block; }
+  .riddle-overlay.ufos .riddle-ufo.u1{ animation: ufoFly1 3.4s cubic-bezier(.45,.05,.55,.95) 0.8s both; }
+  .riddle-overlay.ufos .riddle-ufo.u2{ animation: ufoFly2 3.0s cubic-bezier(.45,.05,.55,.95) 3.1s both; font-size:34px; }
+  @keyframes ufoFly1{ 0%{ transform:translate(-80px, 16vh); } 45%{ transform:translate(45vw, 8vh); } 100%{ transform:translate(calc(100vw + 80px), 20vh); } }
+  @keyframes ufoFly2{ 0%{ transform:translate(calc(100vw + 60px), 70vh) scale(0.8); } 50%{ transform:translate(50vw, 62vh) scale(1); } 100%{ transform:translate(-80px, 74vh) scale(0.8); } }
+  @keyframes ufoWobble{ from{ transform:rotate(-8deg) translateY(0); } to{ transform:rotate(8deg) translateY(-6px); } }
+  @keyframes ufoBeam{ from{ opacity:0.25; } to{ opacity:0.85; } }
   @keyframes secretWinPulse{ from{ text-shadow:0 0 10px rgba(125,255,176,0.6); transform:scale(1); } to{ text-shadow:0 0 22px rgba(125,255,176,1), 0 0 40px rgba(255,214,110,0.6); transform:scale(1.06); } }
-  @media (prefers-reduced-motion: reduce){ .riddle-lasers{ display:none; } .riddle-overlay.celebrating .riddle-result.win{ animation:none; } }
+  @media (prefers-reduced-motion: reduce){ .riddle-lasers, .riddle-ufo{ display:none !important; } .riddle-overlay.celebrating .riddle-result.win{ animation:none; } }
   .riddle-result.hidden{ display:none; }
   .riddle-result.win{ color:#7dffb0; text-shadow:0 0 10px rgba(125,255,176,0.6); }
   .riddle-result.lose{ color:#ff9a9a; text-shadow:0 0 10px rgba(255,90,90,0.5); }
@@ -2028,7 +2047,10 @@
       <div class="daily-btn primary riddle-submit" id="riddleSubmit">Submit</div>
     </div>
     <div class="riddle-result hidden" id="riddleResult"></div>
+    <div class="daily-btn primary riddle-continue hidden" id="riddleContinue">Tap to continue ▶</div>
   </div>
+  <div class="riddle-ufo u1" aria-hidden="true"><span>🛸</span><i></i></div>
+  <div class="riddle-ufo u2" aria-hidden="true"><span>🛸</span><i></i></div>
 </div>
 <div class="home-overlay" id="homeOverlay">
   <div class="home-sparks" id="homeSparks" aria-hidden="true"></div>
@@ -3605,10 +3627,12 @@
     // LUFS, matched to the Daily theme (-11.9).
     secret:   'audio/velvet-curtain-call-trimmed.mp3',
     win:      'audio/victory-lap-results-trimmed.mp3',
+    // The secret riddle solve: a victory fanfare for the celebration, played once.
+    secretWin: 'audio/victory-lap-win-fanfare.mp3',
     lose:     'audio/better-luck-next-time-trimmed.mp3',
   };
   // Played once, never looped.
-  const ONE_SHOT_TRACKS = ['fanfare', 'secret'];
+  const ONE_SHOT_TRACKS = ['fanfare', 'secret', 'secretWin'];
   // Infinity plays a continuous playlist: Pacific Drive -> Palm Tree Pivot
   // -> High Noon Parade -> Victory Lap -> back to Pacific Drive, round and
   // round for as long as the player stays in Infinity Flips, so a long
@@ -3820,9 +3844,24 @@
   function stopSecretMusic(){
     if (currentTrackKey === 'secret' && trackEls.secret) try{ trackEls.secret.pause(); }catch(e){}
   }
-  function resumeThemeAfterSecret(){
-    if (currentTrackKey !== 'secret') return;
+  // The solve fanfare is a music file (the iPhone silent switch doesn't mute
+  // it, same as the rest of the music). The code-built solve sound is only
+  // the fallback if the file can't play.
+  function playSecretWinFanfare(){
+    if (!soundOn) return;
+    if (!TRACK_SRC.secretWin){ sfx.secretSolve(); return; }
     stopSecretMusic();
+    Object.keys(trackEls).forEach(k=>{ if (k !== 'secretWin') try{ trackEls[k].pause(); }catch(e){} });
+    currentTrackKey = 'secretWin';
+    const el = getTrackEl('secretWin');
+    el.muted = false;
+    try{ el.currentTime = 0; }catch(e){}
+    el.play().catch(()=>{ if (secretCelebrating) sfx.secretSolve(); });
+  }
+  function resumeThemeAfterSecret(){
+    if (currentTrackKey !== 'secret' && currentTrackKey !== 'secretWin') return;
+    stopSecretMusic();
+    if (trackEls.secretWin) try{ trackEls.secretWin.pause(); }catch(e){}
     currentTrackKey = 'run';
     if (!soundOn) return;
     const el = getTrackEl('run');
@@ -6597,8 +6636,7 @@
     els.riddleInput.blur();
     stopSecretMusic();
     if (win){
-      sfx.secretSolve();
-      celebrateSecretSolve();
+      celebrateSecretSolve();   // plays the fanfare too
       runRiddleSolved = true;
       addRunScore(RIDDLE_BONUS_POINTS);
       if (!stats.badges.riddler){ stats.badges.riddler = true; saveStats(); }
@@ -6613,52 +6651,117 @@
       els.riddleResult.className = 'riddle-result lose';
     }
     saveRunSnapshot();
-    // A solve holds a little longer so the fireworks can play out.
+    if (win) return;   // the celebration holds until "Tap to continue" (continueAfterSecret)
     setTimeout(()=>{
       els.riddleOverlay.classList.add('hidden');
-      els.riddleOverlay.classList.remove('celebrating');
       if (!runActive) return;
       resumeThemeAfterSecret();
       advanceAfterTrivia();
-    }, win ? 3200 : dt(1800));
+    }, dt(1800));
   }
-  // Fireworks for the secret solve: shells burst one after another across
-  // the top of the screen, sparks falling with trails (~2.8s).
+  // The secret solve celebration - the rarest moment in the game, so it
+  // holds: at least SECRET_HOLD_MS (real time), then "Tap to continue"
+  // (the button or anywhere on the screen). The run clock is frozen for the
+  // whole celebration. Until the player continues: fireworks keep bursting,
+  // the lasers keep sweeping, shooting stars streak across (8 in the first
+  // 5s, then the odd one), and two UFOs glide by. The victory fanfare (a
+  // music file, so the iPhone silent switch doesn't mute it) plays over it
+  // once. Reduced motion: the hold, the
+  // sound and the button only.
+  const SECRET_HOLD_MS = 5000;
+  let secretCelebrating = false, secretCanContinue = false, secretCelebrateTimer = null;
   function celebrateSecretSolve(){
+    secretCelebrating = true; secretCanContinue = false;
+    // Freeze the run clock (the same field Pause uses, so a refresh mid-hold
+    // saves the frozen time too).
+    if (runActive && runTimerInterval){ pausedRunRemainingMs = Math.max(0, runEndsAt - Date.now()); clearInterval(runTimerInterval); runTimerInterval = null; }
+    playSecretWinFanfare();
+    els.riddleOverlay.classList.add('celebrating');
+    document.getElementById('riddleContinue').classList.add('hidden');
+    clearTimeout(secretCelebrateTimer);
+    secretCelebrateTimer = setTimeout(()=>{
+      secretCanContinue = true;
+      document.getElementById('riddleContinue').classList.remove('hidden');
+    }, SECRET_HOLD_MS);
     let reduced = false;
     try{ reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }catch(e){}
-    els.riddleOverlay.classList.add('celebrating');
     if (reduced) return;
+    els.riddleOverlay.classList.add('ufos');
     const canvas = document.getElementById('riddleFireworks'), ctx = canvas && canvas.getContext('2d');
     if (!ctx) return;
     const dpr = Math.min(2, window.devicePixelRatio || 1), W = window.innerWidth, H = window.innerHeight;
     canvas.width = W * dpr; canvas.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const cols = ['#ff3cac','#19e0ff','#ffd96e','#b26bff','#7dffb0','#ffffff','#ff9a3d'];
-    const sparks = [], start = performance.now(), life = 2800;
-    const shells = [0, 260, 520, 800, 1050, 1350, 1650].map((at, i)=> ({ at, x: W * (0.15 + Math.random() * 0.7), y: H * (0.12 + Math.random() * 0.38), c: cols[i % cols.length], done:false }));
+    let sparks = [], stars = [];
+    const start = performance.now();
+    // Fireworks: a quick opening volley, then a burst every ~0.9s.
+    let nextShell = 0, shellN = 0;
+    // Shooting stars: 8 spread over the first 5s, then one every ~1.6s.
+    let nextStar = 250, starN = 0;
+    const burst = (t)=>{
+      const x = W * (0.12 + Math.random() * 0.76), y = H * (0.1 + Math.random() * 0.4), c = cols[shellN++ % cols.length];
+      for (let k = 0; k < 70; k++){
+        const a = Math.random() * Math.PI * 2, v = 2 + Math.random() * 4.5;
+        sparks.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, c: Math.random() < 0.25 ? '#ffffff' : c, born: t });
+      }
+    };
+    const launchStar = (t)=>{
+      const dir = Math.random() < 0.5 ? 1 : -1, ang = 0.25 + Math.random() * 0.35;   // shallow, heading down
+      const speed = 14 + Math.random() * 8;
+      stars.push({ x: dir > 0 ? -40 : W + 40, y: H * (0.05 + Math.random() * 0.45), vx: Math.cos(ang) * speed * dir,
+        vy: Math.sin(ang) * speed, c: Math.random() < 0.5 ? '#ffffff' : '#ffe9a8' });
+      starN++;
+    };
     (function frame(now){
+      if (!secretCelebrating){ ctx.globalCompositeOperation = 'source-over'; ctx.clearRect(0, 0, W, H); return; }
       const t = now - start;
       ctx.globalCompositeOperation = 'destination-out'; ctx.fillStyle = 'rgba(0,0,0,0.22)'; ctx.fillRect(0, 0, W, H);
       ctx.globalCompositeOperation = 'lighter';
-      for (const s of shells){
-        if (s.done || t < s.at) continue;
-        s.done = true;
-        for (let k = 0; k < 70; k++){
-          const a = Math.random() * Math.PI * 2, v = 2 + Math.random() * 4.5;
-          sparks.push({ x: s.x, y: s.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, c: Math.random() < 0.25 ? '#ffffff' : s.c, born: t });
-        }
-      }
+      while (t >= nextShell){ burst(t); nextShell += shellN < 7 ? 260 : 900; }
+      while (t >= nextStar){ launchStar(t); nextStar += starN < 8 ? 600 : 1600; }
+      sparks = sparks.filter(p=> t - p.born <= 1300);
       for (const p of sparks){
-        const age = t - p.born; if (age > 1300) continue;
+        const age = t - p.born;
         p.vy += 0.06; p.vx *= 0.985; p.vy *= 0.985; p.x += p.vx; p.y += p.vy;
         ctx.globalAlpha = Math.max(0, 1 - age / 1300); ctx.fillStyle = p.c;
         ctx.beginPath(); ctx.arc(p.x, p.y, 2.2, 0, Math.PI * 2); ctx.fill();
       }
+      // Shooting stars: a bright head with a long tapering tail.
+      stars = stars.filter(st=> st.x > -200 && st.x < W + 200 && st.y < H + 200);
+      for (const st of stars){
+        st.x += st.vx; st.y += st.vy;
+        const len = 9, tx = st.x - st.vx * len, ty = st.y - st.vy * len;
+        const g = ctx.createLinearGradient(st.x, st.y, tx, ty);
+        g.addColorStop(0, st.c); g.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.globalAlpha = 1; ctx.strokeStyle = g; ctx.lineWidth = 3; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(st.x, st.y); ctx.lineTo(tx, ty); ctx.stroke();
+        ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(st.x, st.y, 2.6, 0, Math.PI * 2); ctx.fill();
+      }
       ctx.globalAlpha = 1;
-      if (t < life) requestAnimationFrame(frame);
-      else { ctx.globalCompositeOperation = 'source-over'; ctx.clearRect(0, 0, W, H); }
+      requestAnimationFrame(frame);
     })(start);
   }
+  function stopSecretCelebration(){
+    secretCelebrating = false; secretCanContinue = false;
+    clearTimeout(secretCelebrateTimer);
+    els.riddleOverlay.classList.remove('celebrating', 'ufos');
+    document.getElementById('riddleContinue').classList.add('hidden');
+  }
+  // "Tap to continue" (the button, or anywhere on the screen once it shows).
+  function continueAfterSecret(){
+    if (!secretCelebrating || !secretCanContinue) return;
+    stopSecretCelebration();
+    els.riddleOverlay.classList.add('hidden');
+    if (!runActive) return;
+    if (pausedRunRemainingMs != null && !isPaused){
+      runEndsAt = Date.now() + pausedRunRemainingMs; pausedRunRemainingMs = null;
+      clearInterval(runTimerInterval); runTimerInterval = setInterval(tickRunTimer, 500);
+    }
+    resumeThemeAfterSecret();
+    advanceAfterTrivia();
+  }
+  document.getElementById('riddleContinue').addEventListener('click', (e)=>{ e.stopPropagation(); continueAfterSecret(); });
+  els.riddleOverlay.addEventListener('click', ()=>{ if (secretCanContinue) continueAfterSecret(); });
   els.riddleSubmit.addEventListener('click', submitRiddleAnswer);
   els.riddleInput.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') submitRiddleAnswer(); });
 
@@ -8758,6 +8861,7 @@
     els.solveOverlay.classList.remove('celebrating');
     els.solveCelebrate.classList.add('hidden');
     els.riddleOverlay.classList.add('hidden');
+    stopSecretCelebration();
     els.runIntroOverlay.classList.add('hidden');
     infRiddleState = 'idle'; clearInterval(infRiddleInterval); clearTimeout(infRiddleCloseTimer);
     els.irOverlay.classList.add('hidden'); els.irOverlay.classList.remove('win', 'lose');
