@@ -539,11 +539,22 @@
     background:linear-gradient(to bottom, rgba(125,255,176,0.55), rgba(125,255,176,0)); clip-path:polygon(35% 0, 65% 0, 100% 100%, 0 100%);
     animation: ufoBeam 0.5s ease-in-out infinite alternate; }
   .riddle-ufo span{ display:inline-block; animation: ufoWobble 0.9s ease-in-out infinite alternate; }
-  .riddle-overlay.ufos .riddle-ufo{ display:block; }
-  .riddle-overlay.ufos .riddle-ufo.u1{ animation: ufoFly1 3.4s cubic-bezier(.45,.05,.55,.95) 0.8s both; }
-  .riddle-overlay.ufos .riddle-ufo.u2{ animation: ufoFly2 3.0s cubic-bezier(.45,.05,.55,.95) 3.1s both; font-size:34px; }
-  @keyframes ufoFly1{ 0%{ transform:translate(-80px, 16vh); } 45%{ transform:translate(45vw, 8vh); } 100%{ transform:translate(calc(100vw + 80px), 20vh); } }
-  @keyframes ufoFly2{ 0%{ transform:translate(calc(100vw + 60px), 70vh) scale(0.8); } 50%{ transform:translate(50vw, 62vh) scale(1); } 100%{ transform:translate(-80px, 74vh) scale(0.8); } }
+  /* They keep flying for as long as the celebration lasts: each crosses,
+     waits off-screen, and comes round again (7s laps, offset so one is
+     usually on screen). */
+  .riddle-overlay.ufos .riddle-ufo.u1, .riddle-overlay.ufos .riddle-ufo.u2{ display:block; }
+  .riddle-overlay.ufos .riddle-ufo.u1{ animation: ufoFly1 7s cubic-bezier(.45,.05,.55,.95) 0.8s infinite both; }
+  .riddle-overlay.ufos .riddle-ufo.u2{ animation: ufoFly2 7s cubic-bezier(.45,.05,.55,.95) 3.1s infinite both; font-size:34px; }
+  @keyframes ufoFly1{ 0%{ transform:translate(-80px, 16vh); } 22%{ transform:translate(45vw, 8vh); } 48%, 100%{ transform:translate(calc(100vw + 80px), 20vh); } }
+  @keyframes ufoFly2{ 0%{ transform:translate(calc(100vw + 60px), 70vh) scale(0.8); } 21%{ transform:translate(50vw, 62vh) scale(1); } 43%, 100%{ transform:translate(-80px, 74vh) scale(0.8); } }
+  /* While the riddle is being thought about: the odd shooting star (its own
+     canvas, behind the panel) and, now and then, a small distant UFO with
+     no beam - galaxy atmosphere, nothing like the celebration. */
+  .riddle-ambient{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:1; }
+  .riddle-ufo.u3{ z-index:1; font-size:24px; opacity:0.6; filter:drop-shadow(0 0 6px rgba(125,255,176,0.5)); }
+  .riddle-ufo.u3 i{ display:none; }
+  .riddle-overlay.ambient:not(.celebrating) .riddle-ufo.u3{ display:block; animation: ufoAmbient 22s linear 9s infinite both; }
+  @keyframes ufoAmbient{ 0%{ transform:translate(calc(100vw + 40px), 7vh); } 9%{ transform:translate(50vw, 4vh); } 18%, 100%{ transform:translate(-60px, 9vh); } }
   @keyframes ufoWobble{ from{ transform:rotate(-8deg) translateY(0); } to{ transform:rotate(8deg) translateY(-6px); } }
   @keyframes ufoBeam{ from{ opacity:0.25; } to{ opacity:0.85; } }
   @keyframes secretWinPulse{ from{ text-shadow:0 0 10px rgba(125,255,176,0.6); transform:scale(1); } to{ text-shadow:0 0 22px rgba(125,255,176,1), 0 0 40px rgba(255,214,110,0.6); transform:scale(1.06); } }
@@ -996,6 +1007,10 @@
     display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:16px;
     background:rgba(20,6,40,0.55); border:1px solid rgba(255,255,255,0.16);
   }
+  .bd-item{ position:relative; }
+  .bd-item.is-new .bd-new{ display:block; }
+  .col-tab{ position:relative; }
+  .col-tab.has-new::after{ content:''; position:absolute; top:-3px; right:-3px; width:10px; height:10px; border-radius:50%; background:#ffe066; box-shadow:0 0 8px rgba(255,224,102,0.9); }
   .bd-item.earned{ background:linear-gradient(135deg, rgba(255,60,172,0.35), rgba(255,184,0,0.3)); border-color:rgba(255,224,102,0.8); box-shadow:0 0 14px rgba(255,224,102,0.3); }
   .bd-icon{
     flex-shrink:0; width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center;
@@ -2037,6 +2052,7 @@
   </div>
   <div class="riddle-nebula" aria-hidden="true"></div>
   <div class="riddle-lasers" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <canvas class="riddle-ambient" id="riddleAmbient" aria-hidden="true"></canvas>
   <canvas class="riddle-fireworks" id="riddleFireworks" aria-hidden="true"></canvas>
   <div class="riddle-inner">
     <div class="riddle-eyebrow">🌌 THE SUPER SECRET HIDDEN RIDDLE 🌌</div>
@@ -2051,6 +2067,7 @@
   </div>
   <div class="riddle-ufo u1" aria-hidden="true"><span>🛸</span><i></i></div>
   <div class="riddle-ufo u2" aria-hidden="true"><span>🛸</span><i></i></div>
+  <div class="riddle-ufo u3" aria-hidden="true"><span>🛸</span><i></i></div>
 </div>
 <div class="home-overlay" id="homeOverlay">
   <div class="home-sparks" id="homeSparks" aria-hidden="true"></div>
@@ -2083,7 +2100,7 @@
         <span>FLIPS</span>
       </div>
       <div class="ms-tag">No clock. No limit.</div>
-      <div class="ms-desc">Endless swiping. Vote on opinions forever, climb the tiers, and chase streaks and bonus rounds.</div>
+      <div class="ms-desc">Endless flipping. Vote on opinions forever, climb the tiers, and chase streaks and bonus rounds.</div>
       <div class="ms-cta">START FLIPPING &#9654;</div>
     </div>
   </div>
@@ -2099,7 +2116,7 @@
         <span>STAX</span>
       </div>
       <div class="ms-tag">One run. Once a day.</div>
-      <div class="ms-desc">Swipe for points, answer trivia, collect letters, and solve today's hidden word before time runs out.</div>
+      <div class="ms-desc">Tap your pick for points, answer trivia, collect letters, and solve today's hidden word before time runs out.</div>
       <div class="ms-cta">PLAY TODAY &#9654;</div>
     </div>
   </div>
@@ -2177,7 +2194,7 @@
     <div class="intro-lines">
       FlipStax is for people who love opinions, trivia, and word jumbles &mdash;
       all rolled into one.<br><br>
-      Swipe to earn points. Hit milestones to unlock trivia. Answer right to
+      Tap your picks to earn points. Hit milestones to unlock trivia. Answer right to
       earn a letter of a hidden 6-letter word. Once all 6 questions are
       done, solve the word - guess any letters you didn't earn.
     </div>
@@ -5341,7 +5358,7 @@
   }
 
   // ---------- Daily Run: a bounded ritual (6min voting/trivia + 75s solve,
-  // 7:15 baseline, 8:00 if the riddle fires) - swipe for points,
+  // 7:15 baseline, 8:00 if the riddle fires) - tap for points,
   // hit thresholds to unlock trivia, answer correctly to collect a letter of
   // today's word, then solve it Wordle-style. One per day. ----------
   // Shuffled-deck cycling, not an independent daily draw: every calendar day
@@ -5527,6 +5544,18 @@
   function saveBadges(){ badgeStore.voted = Array.from(badgeVoted); try{ localStorage.setItem(BADGE_KEY, JSON.stringify(badgeStore)); }catch(e){} }
   function badgeEarned(id){ return id === 'weird_one' ? !!(stats.badges && stats.badges.wild) : !!badgeStore.earned[id]; }
   function earnedBadgeCount(){ return BADGES.filter(b=> badgeEarned(b.id)).length; }
+  // Badges earned since the player last looked at the Badges tab: they go
+  // to the top of the list with a NEW! tag (and light up the Collection
+  // button) until the player has seen them. Badges earned before this
+  // existed count as seen, so nobody opens to a wall of NEW!.
+  if (!Array.isArray(badgeStore.seen)){ badgeStore.seen = BADGES.filter(b=> badgeEarned(b.id)).map(b=> b.id); saveBadges(); }
+  function unseenBadges(){ if (!Array.isArray(badgeStore.seen)) return []; return BADGES.filter(b=> badgeEarned(b.id) && badgeStore.seen.indexOf(b.id) === -1).map(b=> b.id); }
+  let badgesShownNew = [];
+  function markShownBadgesSeen(){
+    if (!badgesShownNew.length) return;
+    badgesShownNew.forEach(id=>{ if (badgeStore.seen.indexOf(id) === -1) badgeStore.seen.push(id); });
+    badgesShownNew = []; saveBadges();
+  }
   function awardBadge(id){
     if (badgeEarned(id)) return;
     badgeStore.earned[id] = todayStr(); saveBadges();
@@ -6123,7 +6152,7 @@
     // previous run) mustn't count toward this run's best.
     comboCount = 0;
     renderRunBanner();
-    showToast('\uD83C\uDFAE Daily Stax started \u2014 swipe for points!');
+    showToast('\uD83C\uDFAE Daily Stax started \u2014 tap for points!');
     stopTallyPolling();
     lastWasEvent = true;
     // Fresh shuffle of the whole Daily pool (329 cards) for every run, so no
@@ -6594,6 +6623,7 @@
     els.riddleInput.value = '';
     els.riddleResult.className = 'riddle-result hidden';
     els.riddleOverlay.classList.remove('hidden');
+    startRiddleAmbient();
     els.slowdownBtn.classList.add('hidden');
     // Not a normal vote-and-reveal round, so clear stale voted/votedSinceTime
     // the same way startSolvePhase does - otherwise the stalled-round
@@ -6633,6 +6663,7 @@
     if (runPhase !== 'riddle') return;
     runPhase = 'riddle-resolving';
     clearInterval(riddleInterval);
+    stopRiddleAmbient();
     els.riddleInput.blur();
     stopSecretMusic();
     if (win){
@@ -6668,6 +6699,45 @@
   // music file, so the iPhone silent switch doesn't mute it) plays over it
   // once. Reduced motion: the hold, the
   // sound and the button only.
+  // The riddle screen's ambient sky (before it's answered): a shooting star
+  // every 3.5-7s, fainter and slower than the celebration's, plus the CSS
+  // UFO (.ambient). Stops the moment the riddle resolves.
+  let riddleAmbientOn = false;
+  function startRiddleAmbient(){
+    if (riddleAmbientOn) return;
+    try{ if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; }catch(e){}
+    const canvas = document.getElementById('riddleAmbient'), ctx = canvas && canvas.getContext('2d');
+    if (!ctx) return;
+    riddleAmbientOn = true; els.riddleOverlay.classList.add('ambient');
+    const dpr = Math.min(2, window.devicePixelRatio || 1), W = window.innerWidth, H = window.innerHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    let stars = [], next = 1500 + Math.random() * 1500;
+    const start = performance.now();
+    (function frame(now){
+      if (!riddleAmbientOn){ ctx.clearRect(0, 0, W, H); return; }
+      const t = now - start;
+      if (t >= next){
+        const dir = Math.random() < 0.5 ? 1 : -1, ang = 0.2 + Math.random() * 0.3, speed = 8 + Math.random() * 5;
+        stars.push({ x: dir > 0 ? -30 : W + 30, y: H * (0.04 + Math.random() * 0.4), vx: Math.cos(ang) * speed * dir, vy: Math.sin(ang) * speed });
+        next = t + 3500 + Math.random() * 3500;
+      }
+      ctx.clearRect(0, 0, W, H);
+      stars = stars.filter(st=> st.x > -150 && st.x < W + 150 && st.y < H + 150);
+      for (const st of stars){
+        st.x += st.vx; st.y += st.vy;
+        const tx = st.x - st.vx * 7, ty = st.y - st.vy * 7;
+        const g = ctx.createLinearGradient(st.x, st.y, tx, ty);
+        g.addColorStop(0, 'rgba(255,255,255,0.75)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.strokeStyle = g; ctx.lineWidth = 1.8; ctx.lineCap = 'round';
+        ctx.beginPath(); ctx.moveTo(st.x, st.y); ctx.lineTo(tx, ty); ctx.stroke();
+      }
+      requestAnimationFrame(frame);
+    })(start);
+  }
+  function stopRiddleAmbient(){
+    riddleAmbientOn = false;
+    els.riddleOverlay.classList.remove('ambient');
+  }
   const SECRET_HOLD_MS = 5000;
   let secretCelebrating = false, secretCanContinue = false, secretCelebrateTimer = null;
   function celebrateSecretSolve(){
@@ -6953,7 +7023,7 @@
   function renderCollectionBtn(){
     const n = collectedCount();
     els.collectionBtnCount.textContent = n + '/' + PERSONALITY_ORDER.length;
-    els.collectionBtn.classList.toggle('has-new', PERSONALITY_ORDER.some(k=> collection.cards[k] && !collection.cards[k].revealed));
+    els.collectionBtn.classList.toggle('has-new', PERSONALITY_ORDER.some(k=> collection.cards[k] && !collection.cards[k].revealed) || unseenBadges().length > 0);
   }
   // Shared by the Collection card-unlock reveal and the mode-select gold
   // half: same .col-spark markup and colRise keyframe (see CSS), just a
@@ -7048,6 +7118,7 @@
     renderCollectionBtn();
   }
   function closeCollection(){
+    markShownBadgesSeen();
     els.collectionOverlay.classList.add('hidden');
     els.collectionOverlay.classList.remove('revealing');
     els.cardZoom.classList.add('hidden');
@@ -7170,11 +7241,19 @@
   }
   function renderBadgeList(){
     els.badgeList.innerHTML = '';
-    BADGES.forEach(b=>{
+    // New ones first, then the rest of the earned ones (latest first), then
+    // the locked ones in their usual order.
+    const fresh = unseenBadges();
+    badgesShownNew = fresh.slice();
+    const dateOf = id=> { const d = badgeStore.earned[id]; return d && d !== 'earlier' ? d : ''; };
+    const rank = b=> fresh.indexOf(b.id) !== -1 ? 0 : (badgeEarned(b.id) ? 1 : 2);
+    const order = BADGES.map((b, i)=> ({ b, i })).sort((x, y)=> rank(x.b) - rank(y.b) ||
+      (rank(x.b) < 2 ? dateOf(y.b.id).localeCompare(dateOf(x.b.id)) : 0) || x.i - y.i).map(o=> o.b);
+    order.forEach(b=>{
       const earned = badgeEarned(b.id), when = badgeStore.earned[b.id];
       const row = document.createElement('div');
-      row.className = 'bd-item' + (earned ? ' earned' : ' locked');
-      row.innerHTML = '<div class="bd-icon"></div><div class="bd-text"><div class="bd-name"></div><div class="bd-desc"></div><div class="bd-when"></div></div>';
+      row.className = 'bd-item' + (earned ? ' earned' : ' locked') + (fresh.indexOf(b.id) !== -1 ? ' is-new' : '');
+      row.innerHTML = '<span class="cc-new bd-new">NEW!</span><div class="bd-icon"></div><div class="bd-text"><div class="bd-name"></div><div class="bd-desc"></div><div class="bd-when"></div></div>';
       row.querySelector('.bd-icon').textContent = b.icon;
       row.querySelector('.bd-name').textContent = b.name;
       row.querySelector('.bd-desc').textContent = b.desc;
@@ -7191,7 +7270,14 @@
     const n = badges ? earnedBadgeCount() : collectedCount(), total = badges ? BADGES.length : PERSONALITY_ORDER.length;
     els.collectionCount.textContent = n + ' / ' + total + (badges ? ' earned' : ' collected');
     els.collectionBar.style.width = (100 * n / total) + '%';
-    if (badges) renderBadgeList();
+    if (badges){ renderBadgeList(); els.badgeList.scrollTop = 0; }
+    else markShownBadgesSeen();
+    renderBadgeTabDot();
+  }
+  // A dot on the Badges tab while there are new badges to see.
+  function renderBadgeTabDot(){
+    const tab = els.colTabs.find(t=> t.dataset.tab === 'badges');
+    if (tab) tab.classList.toggle('has-new', unseenBadges().length > 0 && !tab.classList.contains('active'));
   }
   els.colTabs.forEach(t=> t.addEventListener('click', ()=>{ if (!collectionRevealing) setCollectionTab(t.dataset.tab); }));
 
@@ -8594,6 +8680,7 @@
       setCollection: (c) => { collection = c; saveCollection(); renderCollectionBtn(); },
       openCollection: () => openCollection(),
       startDailyRiddle: () => startRiddleRound(),
+      setRiddleRemainingMs: (ms) => { riddleEndsAt = Date.now() + ms; },
       riddleMatches: (guess, i) => riddleAnswerMatches(guess, RIDDLES[i]),
       currentRiddle: () => currentRiddle,
       startInfRiddle: (i) => startInfRiddle(i),
@@ -8861,7 +8948,7 @@
     els.solveOverlay.classList.remove('celebrating');
     els.solveCelebrate.classList.add('hidden');
     els.riddleOverlay.classList.add('hidden');
-    stopSecretCelebration();
+    stopSecretCelebration(); stopRiddleAmbient();
     els.runIntroOverlay.classList.add('hidden');
     infRiddleState = 'idle'; clearInterval(infRiddleInterval); clearTimeout(infRiddleCloseTimer);
     els.irOverlay.classList.add('hidden'); els.irOverlay.classList.remove('win', 'lose');
