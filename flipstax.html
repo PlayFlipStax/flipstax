@@ -3159,7 +3159,9 @@
     if (subject === 'math'){
       const want = pool === 'daily' ? 0 : 1;
       let m, guard = 0;
-      do { m = generateMathTrivia(rng); } while (hashStr(m.question) % 2 !== want && ++guard < 200);
+      // (and never the same sum twice in a row)
+      do { m = generateMathTrivia(rng); } while ((hashStr(m.question) % 2 !== want || (!rng && m.question === lastMathQuestion)) && ++guard < 200);
+      if (!rng) lastMathQuestion = m.question;
       return Object.assign({ category:'math' }, m);
     }
     const bank = subject === 'geography' ? GEOGRAPHY_SETS
@@ -3171,9 +3173,26 @@
                : HEALTH_SETS;
     // Never borrow from the other mode's half: an empty half (Infinity has
     // no electives) falls back to this pool's geography instead.
-    const set = pick(bank[pool].length ? bank[pool] : GEOGRAPHY_SETS[pool], rng);
+    const list = bank[pool].length ? bank[pool] : GEOGRAPHY_SETS[pool];
+    const set = rng ? pick(list, rng) : drawTrivia(list);
     const opts = shuffle([set.correct, ...set.wrongs], rng);
     return { category: subject, question: set.q, opts, correctIdx: opts.indexOf(set.correct) };
+  }
+  // Each question bank is dealt like a shuffled deck: every question comes up
+  // once before any repeats, and a fresh shuffle never opens with the one just
+  // asked. (It used to be a plain random pick, so the same question could
+  // come straight back.) Kept for the page's lifetime.
+  const triviaDecks = new Map();
+  let lastMathQuestion = null;
+  function drawTrivia(list){
+    let d = triviaDecks.get(list);
+    if (!d){ d = { order: [], last: null }; triviaDecks.set(list, d); }
+    if (!d.order.length){
+      d.order = shuffle(list.map((_, i)=> i));
+      if (list.length > 1 && d.order[d.order.length - 1] === d.last){ const t = d.order[0]; d.order[0] = d.order[d.order.length - 1]; d.order[d.order.length - 1] = t; }
+    }
+    d.last = d.order.pop();
+    return list[d.last];
   }
   function initials(name){ return name.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join(''); }
   function pick(arr,rng){ rng = rng || Math.random; return arr[Math.floor(rng()*arr.length)]; }
@@ -5273,7 +5292,7 @@
       raceState.completed = true;
       raceState.completionMs = Date.now() - raceState.startedAt;
       saveRaceState();
-      recordFlip('wild', 20); // one-time bonus into your permanent flip count
+      recordFlip(null, 20); // one-time bonus into your permanent flip count
       sfx.levelUp();
       showLevelUp('Hit ' + RACE_TARGET + '! ' + formatRaceTime(raceState.completionMs));
     } else {
@@ -5518,7 +5537,8 @@
       triviaN:0, triviaCorrect:0,                                   // Daily + Infinity trivia
       decisionMs:0, decisionN:0,                                    // every VS vote, both modes
       wildRuns:0,                                                   // Daily runs / Infinity sessions with a Wild Card pick
-      swing:[] };                                                   // last 10 qualifying runs' with-the-crowd %
+      swing:[],                                                     // last 10 qualifying runs' with-the-crowd %
+      vibeTier:null, vibeAt:0 };                                    // the lifetime vibe reveal's last tier shown
   }
   function loadProgress(){
     try{ const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || 'null'); if (p && p.v === 1) return Object.assign(freshProgress(), p); }catch(e){}
@@ -7517,8 +7537,25 @@
   });
 
   let personalityActive = false;
+  // The lifetime vibe reveal. It reads the fresh lifetime crowd counters
+  // (progress, from the crowd fix on), needs CROWD_MIN_PICKS counted picks,
+  // and only comes up when the vibe tier changes - the first time it's
+  // reached, then each move to a new tier, at least VIBE_REVEAL_GAP counted
+  // picks after the last one (so sitting on a boundary can't make it flap).
+  // It used to fire every 100 lifetime flips off the old, pre-fix figure, so
+  // it kept showing the same tier - usually right after a trivia answer's
+  // 25-flip bonus tipped the total over the next 100.
+  const VIBE_REVEAL_GAP = 25;
+  function maybeShowVibeReveal(){
+    if (runActive || personalityActive || progress.crowdN < UNLOCK.CROWD_MIN_PICKS) return;
+    const tier = vibeTierFor(Math.round(progress.crowdAgree / progress.crowdN * 100)).label;
+    if (tier === progress.vibeTier) return;
+    if (progress.vibeTier && progress.crowdN - (progress.vibeAt || 0) < VIBE_REVEAL_GAP) return;
+    progress.vibeTier = tier; progress.vibeAt = progress.crowdN; saveProgress();
+    showPersonalityReveal();
+  }
   function showPersonalityReveal(){
-    const pct = stats.decided > 0 ? Math.round((stats.agree / stats.decided) * 100) : 50;
+    const pct = progress.crowdN > 0 ? Math.round((progress.crowdAgree / progress.crowdN) * 100) : 50;
     const tier = vibeTierFor(pct);
     const specialist = topCategorySpecialist();
     els.personalityLabel.textContent = tier.label;
@@ -7552,26 +7589,22 @@
 
   // baseAmount: how many flipz this action is worth before the 2x bonus zone multiplier.
   // Misses/timeouts never call this - a miss simply earns nothing, it never subtracts.
+  // category: the VS card's category, or null for bonus flips (trivia, the
+  // +10 power-up, the Race bonus) - those count toward the flip total but not
+  // toward any category (they used to land in Wild Card).
   function recordFlip(category, baseAmount){
     baseAmount = (typeof baseAmount === 'number') ? baseAmount : 1;
     const amount = baseAmount * (bonusActive ? 2 : 1);
     const prevTier = tierFor(stats.flips);
     stats.flips += amount;
-    stats.byCat[category] = (stats.byCat[category] || 0) + 1;
+    if (category) stats.byCat[category] = (stats.byCat[category] || 0) + 1;
     bumpStreakIfNeeded();
     const newTier = tierFor(stats.flips);
     if (newTier !== prevTier){ sfx.levelUp(); showLevelUp(newTier); }
-    if (!stats.badges[category] && stats.byCat[category] >= BADGE_THRESHOLD && CAT_META[category]){
+    if (category && !stats.badges[category] && stats.byCat[category] >= BADGE_THRESHOLD && CAT_META[category]){
       stats.badges[category] = true;
       if (category === 'wild' && !badgeStore.earned.weird_one){ badgeStore.earned.weird_one = todayStr(); saveBadges(); }
       showToast(CAT_META[category].badge + ' unlocked!');
-    }
-    const newMilestone = Math.floor(stats.flips / 100);
-    // Never mid-Daily-run: the run gets exactly one personality, on its
-    // results screen. The lifetime vibe reveal waits for the next flip after.
-    if (newMilestone > stats.personalityMilestone && stats.decided >= 5 && !runActive){
-      stats.personalityMilestone = newMilestone;
-      showPersonalityReveal();
     }
     saveStats();
     renderStats();
@@ -8160,6 +8193,7 @@
       if (progress.lastVerdict !== null && progress.lastVerdict !== cv.withCrowd) progress.crowdSwitches++;
       progress.lastVerdict = cv.withCrowd;
     }
+    if (cv.counted) setTimeout(maybeShowVibeReveal, 0);
     progress.decisionMs += Math.max(0, votedSinceTime - roundStartedAt); progress.decisionN++;
     saveProgress();
     if (runActive && cv.counted){
@@ -8251,7 +8285,7 @@
     els.eventTiles.forEach(t=> t.onclick = null);
     if (wasCorrect === true){
       sfx.correct();
-      sessionFlips++; recordFlip('wild', 25);
+      sessionFlips++; recordFlip(null, 25);
       els.eventSubtitle.textContent = '';
       els.eventPrompt.textContent = '\u2705 CORRECT! +25 FLIPZ';
     } else if (wasCorrect === false){
@@ -8303,7 +8337,7 @@
       finishPowerUp();
     } else if (key === 'flips10'){
       sfx.powerUp();
-      sessionFlips++; recordFlip('wild', 10);
+      sessionFlips++; recordFlip(null, 10);
       els.eventPrompt.textContent = '\u26A1 +10 FLIPZ!';
       finishPowerUp();
     } else if (key === 'slowmo'){
