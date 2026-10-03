@@ -713,6 +713,7 @@
   .personality-overlay.show{ opacity:1; pointer-events:auto; }
   .personality-inner{ text-align:center; max-width:340px; animation: popIn 0.5s cubic-bezier(.2,1.4,.4,1); }
   .personality-mask{ font-size:52px; }
+  .readout-stack{ line-height:0; filter:drop-shadow(0 0 14px rgba(157,95,214,0.55)); }
   .personality-eyebrow{ color:#b98bf0; font-size:12px; font-weight:700; letter-spacing:0.6px; margin-top:4px; }
   .personality-label{
     font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:clamp(26px,8vw,46px);
@@ -779,14 +780,15 @@
   }
   .inf-award-overlay.hidden{ display:none; }
   .inf-award-overlay .personality-inner{ animation: popIn 0.5s cubic-bezier(.2,1.4,.4,1); }
-  /* Small contact line pinned to the bottom of mode select and the Daily
-     results. The address is filled in by JS (see CONTACT_EMAIL). */
+  /* Small contact line (and the copyright under it) pinned to the bottom of
+     mode select and the Daily results. Filled in by JS (see CONTACT_EMAIL). */
   .contact-footer{
     position:absolute; left:0; right:0; bottom:calc(8px + env(safe-area-inset-bottom)); z-index:8;
     text-align:center; font-size:11px; line-height:1.3; padding:0 16px; pointer-events:none;
     color:rgba(255,255,255,0.55);
   }
   .contact-footer a{ pointer-events:auto; color:#b98bf0; text-decoration:underline; }
+  .contact-copyright{ margin-top:2px; font-size:10px; opacity:0.8; }
   .split-select-overlay .contact-footer{ color:rgba(61,44,0,0.72); }
   .split-select-overlay .contact-footer a{ color:#6a1b9a; }
 
@@ -2238,7 +2240,14 @@
       <div class="rr-card" aria-hidden="true"><span class="rr-planet">🪐</span><span class="rr-label">SECRET<br>RIDDLER</span></div>
       <div class="rr-text"><span class="rr-name">The Secret Riddler</span><span class="rr-sub">Found the Super Secret Hidden Riddle · 🪐 badge earned</span></div>
     </div>
-    <div class="personality-mask" id="readoutMask">🏁</div>
+    <!-- The "Stax": three fanned cards in the logo's teal, pink and gold.
+         Drawn the same way on the share image (drawCardStack). -->
+    <div class="personality-mask readout-stack" id="readoutMask" aria-hidden="true"><svg viewBox="0 0 74 66" width="66" height="59">
+      <rect x="18" y="12" width="34" height="46" rx="6" fill="#3ec2c2" stroke="#fff" stroke-width="2.5" transform="rotate(-16 37 40)"/>
+      <rect x="20" y="10" width="34" height="46" rx="6" fill="#ff5c8a" stroke="#fff" stroke-width="2.5" transform="rotate(-2 37 40)"/>
+      <g transform="rotate(13 37 40)"><rect x="22" y="9" width="34" height="46" rx="6" fill="#ffb833" stroke="#fff" stroke-width="2.5"/>
+      <text x="39" y="40" text-anchor="middle" font-family="'Big Shoulders Display', sans-serif" font-weight="900" font-size="22" fill="#5a1a00">F</text></g>
+    </svg></div>
     <div class="personality-eyebrow">DAILY STAX COMPLETE</div>
     <div class="personality-label" id="readoutScore"></div>
     <div class="personality-blurb" id="readoutTrivia"></div>
@@ -5244,11 +5253,16 @@
   };
 
   // ---------- personal stats (this device, permanent - never wiped) ----------
-  // Today's date in UTC, not the device's local date - intentional. Every
-  // "today" in the game (the Daily word, one Daily run per day, the run
-  // streak, daily stats) turns over for everyone at the same moment,
-  // 00:00 UTC, so the Daily word is shared globally. See daysSinceEpoch.
-  function todayStr(){ return new Date().toISOString().slice(0,10); }
+  // Today's date on the player's own device - "today" in the game (the
+  // Daily word, one Daily run per day, the run streak, daily stats) turns
+  // over at each player's local midnight, wherever they are. (Until Oct 2026
+  // it was the UTC date, so US evening players found their next day already
+  // used up.) Everyone on the same calendar date gets the same word.
+  function localDateStr(d){ return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function todayStr(){ return localDateStr(new Date()); }
+  // The calendar day before a 'YYYY-MM-DD' date (built from parts, so a
+  // clock change doesn't skip or repeat a day).
+  function dayBefore(dateStr){ const p = dateStr.split('-').map(Number); return localDateStr(new Date(p[0], p[1] - 1, p[2] - 1)); }
   function loadStats(){
     const blank = { flips:0, lastDate:null, streak:0, byCat:{}, badges:{}, agree:0, decided:0, personalityMilestone:0, freezeAvailable:false, slowdownCharges:3, slowdownDate:null };
     try{
@@ -5377,12 +5391,10 @@
   // guarded: if a lap would open on the word the last lap ended on, its
   // first two days swap. Only the lap's last position is ever compared, and
   // the swap never touches it, so the check doesn't chain between laps.
-  // The day number comes from todayStr(), which is the UTC date - on
-  // purpose. The Daily word is shared globally: every player everywhere has
-  // the same word at the same moment, and it changes for everyone at once
-  // (00:00 UTC = 8pm US Eastern in summer, 7pm in winter). Don't "fix" this
-  // to local time: players in different time zones would then be on
-  // different words at the same moment.
+  // The day number comes from todayStr(), the player's local date: everyone
+  // on the same calendar date has the same word, and it changes at each
+  // player's own midnight (like Wordle) - so for a few hours a day, players
+  // in different time zones are on different words.
   function daysSinceEpoch(){ return Math.floor(Date.parse(todayStr() + 'T00:00:00Z') / 86400000); }
   // The list grew from 20 to 88 words on 30 Sep 2026. The schedule depends
   // on the list's length, so a longer list would have changed the word of
@@ -5392,7 +5404,7 @@
   // was; from that day on, laps go through the whole list, with their own
   // shuffle seeds. The lap-boundary repeat guard also covers the handover.
   // To add words later without moving today's word, do the same again:
-  // append, and start a new schedule from the next UTC day.
+  // append, and start a new schedule from a day after the update ships.
   const WORDS_V1_COUNT = 20;
   const WORDS_V2_FROM_DAY = Date.UTC(2026, 9, 1) / 86400000;   // 1 Oct 2026, 00:00 UTC
   function wordLapOrder(n, salt, cycle){ return shuffle(RUN_WORDS.slice(0, n).map((_, i) => i), mulberry32(hashStr(salt + cycle))); }
@@ -5424,6 +5436,16 @@
   }
   function saveRunResultToday(result){ try{ localStorage.setItem('flipstax_run_v1', JSON.stringify(result)); }catch(e){} }
   let runResultToday = loadRunResult();
+  // The day can turn over while the game sits open (phones keep tabs alive
+  // for days): re-check whenever the game comes back on screen, returns to
+  // mode select, or Daily is tapped - not only when the page loads.
+  function refreshDailyDay(){
+    if (runActive) return;
+    if (runResultToday && runResultToday.date !== todayStr()) runResultToday = null;
+    dailyRunStreak = peekDailyStreak();
+    if (document.documentElement.classList.contains('mode-daily')) renderRunBanner();
+  }
+  document.addEventListener('visibilitychange', ()=>{ if (!document.hidden) refreshDailyDay(); });
 
   // ---------- My Collection: one card per personality type ----------
   // Stored per device/browser in localStorage, alongside the game's other
@@ -5795,20 +5817,23 @@
   // mutates state; updateDailyStreak both updates and returns the count,
   // and is only ever called once, from endRun.
   let dailyRunStreak = 0;
+  // The streak still standing today: it lapses once a whole day goes by
+  // without a run (the last run was before yesterday).
   function peekDailyStreak(){
-    try{ const d = JSON.parse(localStorage.getItem('flipstax_streak') || '{}'); return d.streak || 0; }
-    catch(e){ return 0; }
+    try{
+      const d = JSON.parse(localStorage.getItem('flipstax_streak') || '{}'), today = todayStr();
+      return d.lastDay === today || d.lastDay === dayBefore(today) ? (d.streak || 0) : 0;
+    }catch(e){ return 0; }
   }
-  function updateDailyStreak(){
-    const today = todayStr();
+  function updateDailyStreak(runDate){
+    const today = runDate || todayStr();
     let streak = 0, lastDay = null;
     try{
       const d = JSON.parse(localStorage.getItem('flipstax_streak') || '{}');
       streak = d.streak || 0; lastDay = d.lastDay || null;
     }catch(e){}
     if (lastDay === today) return streak;
-    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
-    streak = (lastDay === yesterday) ? streak + 1 : 1;
+    streak = (lastDay === dayBefore(today)) ? streak + 1 : 1;
     try{ localStorage.setItem('flipstax_streak', JSON.stringify({ streak, lastDay: today })); }catch(e){}
     return streak;
   }
@@ -5853,7 +5878,7 @@
   }
 
   // ---------- share card: real canvas rendering, no AI image, no network ----------
-  const SHARE_CARD_W = 1080, SHARE_CARD_H = 1350;
+  const SHARE_CARD_W = 1080, SHARE_CARD_H = 1920;
   // Arbitrary flavor "day number" (Wordle-style) - not tied to any real
   // launch date, just needs to be stable and consistent for everyone.
   const SHARE_CARD_EPOCH = new Date(2026, 8, 1);
@@ -5870,111 +5895,121 @@
     ctx.arcTo(x, y, x+w, y, r);
     ctx.closePath();
   }
-  function wrapCenteredText(ctx, text, cx, y, maxWidth, lineHeight){
-    const words = text.split(' ');
-    let line = '', lines = [];
-    words.forEach(w=>{
-      const test = line ? line+' '+w : w;
-      if (line && ctx.measureText(test).width > maxWidth){ lines.push(line); line = w; }
-      else line = test;
-    });
-    lines.push(line);
-    lines.forEach((l,i)=> ctx.fillText(l, cx, y + i*lineHeight));
-    return lines.length;
-  }
-  // Same "cosmic" family as the riddle overlay (Daily Run) / mode-infinity's
-  // own accent colors (Infinity Flips) - dark base + soft radial color
-  // blobs + a scatter of glowing dots, just drawn to a canvas instead of CSS.
-  function drawShareCardBackground(ctx, mode){
-    const w = SHARE_CARD_W, h = SHARE_CARD_H;
-    const base = ctx.createLinearGradient(0, 0, w*0.35, h);
-    if (mode === 'daily'){
-      base.addColorStop(0, '#0a0620'); base.addColorStop(0.45, '#200a3d'); base.addColorStop(1, '#1a0630');
-    } else {
-      base.addColorStop(0, '#07161c'); base.addColorStop(0.45, '#12233a'); base.addColorStop(1, '#180a30');
-    }
-    ctx.fillStyle = base; ctx.fillRect(0, 0, w, h);
-
-    function blob(cx, cy, r, color){
-      const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-      g.addColorStop(0, color); g.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
-    }
-    if (mode === 'daily'){
-      blob(w*0.5, h*0.14, w*0.6, 'rgba(255,214,110,0.35)');
-      blob(w*0.15, h*0.75, w*0.55, 'rgba(160,90,255,0.4)');
-      blob(w*0.85, h*0.72, w*0.5, 'rgba(255,90,180,0.22)');
-    } else {
-      blob(w*0.5, h*0.14, w*0.6, 'rgba(62,194,194,0.35)');
-      blob(w*0.15, h*0.75, w*0.55, 'rgba(106,62,194,0.42)');
-      blob(w*0.85, h*0.72, w*0.5, 'rgba(62,194,194,0.2)');
-    }
-    const starColor = mode === 'daily' ? '#ffe9a8' : '#8be8e8';
-    const stars = [[0.15,0.08],[0.82,0.15],[0.08,0.5],[0.9,0.46],[0.5,0.05],[0.94,0.3],[0.4,0.94],[0.1,0.9],[0.65,0.22],[0.25,0.38]];
-    stars.forEach(([px,py])=>{
-      ctx.beginPath();
-      ctx.arc(w*px, h*py, 5, 0, Math.PI*2);
-      ctx.fillStyle = starColor; ctx.shadowColor = starColor; ctx.shadowBlur = 16;
-      ctx.fill();
-    });
-    ctx.shadowBlur = 0;
-  }
-  function drawWordmark(ctx, cx, y){
-    ctx.font = '700 46px Arial, sans-serif';
-    ctx.textBaseline = 'alphabetic';
-    const flipW = ctx.measureText('Flip').width;
-    const staxW = ctx.measureText('Stax').width;
-    const startX = cx - (flipW+staxW)/2;
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#ffb833'; ctx.fillText('Flip', startX, y);
-    ctx.fillStyle = '#2dd4c4'; ctx.fillText('Stax', startX+flipW, y);
+  // The share image matches the results screen: its gradient and glow, its
+  // fonts and panels, and the real card art (today's personality, when the
+  // player owns that card, and any cards unlocked this run). 9:16, so it
+  // fills a phone screen instead of sitting between black bars.
+  const SHARE_FONT_D = "'Big Shoulders Display', Arial, sans-serif", SHARE_FONT_T = "'Inter', Arial, sans-serif";
+  function shareSpacedText(ctx, text, cx, y, spacing){
+    const chars = Array.from(text);
+    let w = -spacing; chars.forEach(c=>{ w += ctx.measureText(c).width + spacing; });
+    let x = cx - w / 2; ctx.textAlign = 'left';
+    chars.forEach(c=>{ ctx.fillText(c, x, y); x += ctx.measureText(c).width + spacing; });
     ctx.textAlign = 'center';
   }
-  function drawLetterTiles(ctx, cx, y, word, accent){
-    const n = word.length, tile = 92, gap = 14;
-    const totalW = n*tile + (n-1)*gap;
-    let x = cx - totalW/2;
-    ctx.font = '800 52px Arial, sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    for (let i=0; i<n; i++){
-      roundRectPath(ctx, x, y, tile, tile, 14);
-      ctx.fillStyle = 'rgba(255,255,255,0.1)'; ctx.fill();
-      ctx.lineWidth = 3; ctx.strokeStyle = accent; ctx.stroke();
-      ctx.fillStyle = '#fff';
-      ctx.fillText(word[i].toUpperCase(), x+tile/2, y+tile/2+2);
-      x += tile+gap;
+  function shareGlowText(ctx, text, x, y, glow, blur){
+    ctx.save(); ctx.shadowColor = glow; ctx.shadowBlur = blur; ctx.fillText(text, x, y); ctx.restore();
+    ctx.fillText(text, x, y);
+  }
+  function shareWrapLines(ctx, text, maxWidth){
+    const lines = []; let line = '';
+    String(text).split(' ').forEach(w=>{ const t = line ? line + ' ' + w : w; if (line && ctx.measureText(t).width > maxWidth){ lines.push(line); line = w; } else line = t; });
+    if (line) lines.push(line);
+    return lines;
+  }
+  function drawShareCardBackground(ctx, mode){
+    const w = SHARE_CARD_W, h = SHARE_CARD_H, daily = mode === 'daily';
+    // The results screen's own background (radial, centred high).
+    const g = ctx.createRadialGradient(w/2, h*0.28, 0, w/2, h*0.28, h*0.75);
+    if (daily){ g.addColorStop(0, '#3a1f6e'); g.addColorStop(0.62, '#150f2b'); g.addColorStop(1, '#0b0917'); }
+    else { g.addColorStop(0, '#123a4a'); g.addColorStop(0.62, '#0f1a2b'); g.addColorStop(1, '#090b17'); }
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    const blob = (x, y, r, c)=>{ const b = ctx.createRadialGradient(x, y, 0, x, y, r); b.addColorStop(0, c); b.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = b; ctx.fillRect(0, 0, w, h); };
+    blob(w/2, h*0.3, 520, daily ? 'rgba(157,95,214,0.28)' : 'rgba(62,194,194,0.24)');
+    blob(w*0.1, h*0.85, 520, 'rgba(120,60,200,0.22)');
+    blob(w*0.9, h*0.78, 480, daily ? 'rgba(255,90,180,0.12)' : 'rgba(62,194,194,0.12)');
+    // A soft starfield - seeded, so every card has the same sky.
+    const rnd = mulberry32(7);
+    for (let i = 0; i < 90; i++){
+      const x = rnd() * w, y = rnd() * h, r = 0.8 + rnd() * 2.2, a = 0.25 + rnd() * 0.6, warm = rnd() < 0.3;
+      ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = warm ? '#ffe9a8' : '#ffffff'; ctx.shadowColor = '#fff'; ctx.shadowBlur = r * 4;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); ctx.restore();
     }
+  }
+  function drawWordmark(ctx, cx, y){
+    ctx.font = '900 64px ' + SHARE_FONT_D;
     ctx.textBaseline = 'alphabetic';
+    const flipW = ctx.measureText('Flip').width, staxW = ctx.measureText('Stax').width, startX = cx - (flipW + staxW)/2;
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#ffb833'; ctx.fillText('Flip', startX, y);
+    ctx.fillStyle = '#3ec2c2'; ctx.fillText('Stax', startX + flipW, y);
+    ctx.textAlign = 'center';
   }
-  // Tri-state: true = letter earned that round, false = missed, null/undefined
-  // = round never reached (run ended early) - each renders distinctly.
-  function drawProgressGrid(ctx, cx, y, results, accent){
-    const n = 6, size = 66, gap = 16;
-    const totalW = n*size + (n-1)*gap;
-    let x = cx - totalW/2;
-    for (let i=0; i<n; i++){
-      const state = results[i];
-      roundRectPath(ctx, x, y, size, size, 10);
-      if (state === true){ ctx.fillStyle = accent; ctx.fill(); }
-      else if (state === false){
-        ctx.fillStyle = 'rgba(255,255,255,0.08)'; ctx.fill();
-        ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255,255,255,0.5)'; ctx.stroke();
-      } else {
-        ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fill();
-      }
-      x += size+gap;
+  // The results screen's card-stack icon (#readoutMask), drawn: 74x66 units.
+  function drawCardStack(ctx, cx, top, scale){
+    ctx.save(); ctx.translate(cx - 37 * scale, top); ctx.scale(scale, scale);
+    ctx.shadowColor = 'rgba(157,95,214,0.55)'; ctx.shadowBlur = 14;
+    [[-16, 18, 12, '#3ec2c2'], [-2, 20, 10, '#ff5c8a'], [13, 22, 9, '#ffb833']].forEach(([deg, x, y, fill], i)=>{
+      ctx.save(); ctx.translate(37, 40); ctx.rotate(deg * Math.PI / 180); ctx.translate(-37, -40);
+      roundRectPath(ctx, x, y, 34, 46, 6); ctx.fillStyle = fill; ctx.fill(); ctx.lineWidth = 2.5; ctx.strokeStyle = '#fff'; ctx.stroke();
+      if (i === 2){ ctx.shadowBlur = 0; ctx.font = '900 22px ' + SHARE_FONT_D; ctx.fillStyle = '#5a1a00'; ctx.textAlign = 'center'; ctx.fillText('F', 39, 40); }
+      ctx.restore();
+    });
+    ctx.restore();
+  }
+  // Card art for the share image. Loaded ahead of time (when the results
+  // show) because the share has to be drawn synchronously; anything not
+  // loaded yet falls back to a drawn stand-in.
+  const shareArtCache = {};
+  function shareArtImg(type){
+    const file = PERSONALITY_CARD_ART[type];
+    if (!file) return null;
+    if (!shareArtCache[type]){ const img = new Image(); img.decoding = 'async'; img.src = 'images/personality-cards/' + file; shareArtCache[type] = img; }
+    const img = shareArtCache[type];
+    return img.complete && img.naturalWidth ? img : null;
+  }
+  function preloadShareArt(r){
+    if (!r) return;
+    [r.personalityType].concat(r.unlocked || []).forEach(k=>{ if (k) shareArtImg(k); });
+  }
+  preloadShareArt(runResultToday);   // today's result from an earlier visit (Share on the banner)
+  // A collection card as on the results screen: cream frame, the art, and a
+  // NEW! tag for one unlocked this run. Returns its height.
+  function drawShareCollectionCard(ctx, type, x, y, w, isNew){
+    const h = w * 492 / 360, img = shareArtImg(type), meta = PERSONALITY_META[type] || {};
+    ctx.save(); ctx.shadowColor = 'rgba(255,224,102,0.55)'; ctx.shadowBlur = 40;
+    roundRectPath(ctx, x, y, w, h, w * 0.06); ctx.fillStyle = '#f3e6c8'; ctx.fill(); ctx.restore();
+    const ix = x + w * 0.023, iy = y + w * 0.023, iw = w - w * 0.046, ih = h - w * 0.046;
+    ctx.save(); roundRectPath(ctx, ix, iy, iw, ih, w * 0.045); ctx.clip();
+    if (img) ctx.drawImage(img, ix, iy, iw, ih);
+    else {
+      const g = ctx.createLinearGradient(ix, iy, ix, iy + ih); g.addColorStop(0, '#5b2a8f'); g.addColorStop(1, '#25103f');
+      ctx.fillStyle = g; ctx.fillRect(ix, iy, iw, ih);
+      ctx.fillStyle = '#fff'; ctx.textAlign = 'center';
+      ctx.font = Math.round(w * 0.3) + 'px sans-serif'; ctx.fillText(meta.icon || '✨', x + w/2, y + h * 0.52);
     }
+    ctx.restore();
+    if (isNew){
+      ctx.font = '700 30px ' + SHARE_FONT_T;
+      const tw = ctx.measureText('NEW!').width + 34, tx = x + w - tw + 14, ty = y - 18;
+      roundRectPath(ctx, tx, ty, tw, 48, 22); ctx.fillStyle = '#ffe066'; ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = '#fff'; ctx.stroke();
+      ctx.fillStyle = '#5a1a00'; ctx.textAlign = 'center'; ctx.fillText('NEW!', tx + tw/2, ty + 35);
+    }
+    return h;
   }
+  const SHARE_MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
   function buildDailyShareData(r){
-    const results = (r.roundResults || []).slice(0, 6);
-    while (results.length < 6) results.push(null);
+    const p = (r.date || '').split('-').map(Number);
+    const type = PERSONALITY_META[r.personalityType] ? r.personalityType : null;
     return {
-      badge: 'DAILY STAX #' + dayNumberFor(r.date) + ' \u2014 ' + r.date,
-      solved: r.solved, word: r.word || '', lettersEarned: r.triviaCorrect,
-      roundResults: results,
-      statLine: r.solved ? ('Solved in ' + formatRaceTime(r.solveMs)) : (r.triviaCorrect + '/' + r.triviaTotal + ' trivia correct'),
+      badge: 'DAILY STAX #' + dayNumberFor(r.date) + (p.length === 3 ? ' · ' + SHARE_MONTHS[p[1] - 1] + ' ' + p[2] : ''),
+      solved: r.solved, word: r.word || '',
+      statLine: (r.solved ? '✅ Solved in ' + formatRaceTime(r.solveMs) : r.triviaCorrect + '/' + RUN_WORD_LENGTH + ' letters') + ' · ' + r.triviaCorrect + '/' + r.triviaTotal + ' trivia',
       score: shownScore(r.score),
-      personality: PERSONALITY_META[r.personalityType] ? Object.assign({}, PERSONALITY_META[r.personalityType], r.personalityNote ? { blurb: r.personalityNote } : {}) : null,
+      personalityType: type,
+      personality: type ? Object.assign({}, PERSONALITY_META[type], r.personalityNote ? { blurb: r.personalityNote } : {}) : null,
+      personalityOwned: !!(type && collection.cards[type] && PERSONALITY_CARD_ART[type]),
+      unlocked: (r.unlocked || []).filter(k=> PERSONALITY_META[k]),
       voteSummary: r.lastVote || null,
       secret: !!r.secretRiddle,
     };
@@ -5983,7 +6018,7 @@
     return {
       badge: 'INFINITY FLIPS',
       heroText: (els.tierEl.textContent || 'Unranked').toUpperCase(),
-      statLine: stats.flips.toLocaleString() + ' lifetime flipz \u00B7 ' + (stats.streak||0) + ' day streak',
+      statLine: stats.flips.toLocaleString() + ' lifetime flipz · ' + (stats.streak||0) + ' day streak',
       voteSummary: lastVoteSummary || null,
     };
   }
@@ -5991,89 +6026,131 @@
     const canvas = document.createElement('canvas');
     canvas.width = SHARE_CARD_W; canvas.height = SHARE_CARD_H;
     const ctx = canvas.getContext('2d');
-    const accent = mode === 'daily' ? '#ffd66e' : '#3ec2c2';
-    const cx = SHARE_CARD_W/2;
-
+    const W = SHARE_CARD_W, H = SHARE_CARD_H, cx = W/2, daily = mode === 'daily';
     drawShareCardBackground(ctx, mode);
-    drawWordmark(ctx, cx, 110);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    drawWordmark(ctx, cx, 150);
+    ctx.font = '700 30px ' + SHARE_FONT_T; ctx.fillStyle = daily ? '#b98bf0' : '#7fdede';
+    shareSpacedText(ctx, data.badge, cx, 210, 4);
 
-    ctx.textAlign = 'center';
-    ctx.font = '700 30px Arial, sans-serif';
-    ctx.fillStyle = accent;
-    ctx.fillText(data.badge, cx, 185);
-
-    let y = 340;
-    // A solved secret riddle tops the card: a glowing banner under the date,
-    // and everything below it moves down to make room (the footer stays put).
-    const SECRET_H = mode === 'daily' && data.secret ? 160 : 0;
-    if (SECRET_H){
-      const bw = 940, bx = cx - bw/2, by = 214;
-      roundRectPath(ctx, bx, by, bw, 140, 30);
-      const g = ctx.createLinearGradient(bx, by, bx + bw, by + 140);
-      g.addColorStop(0, '#3a0d6e'); g.addColorStop(0.5, '#7a1a8c'); g.addColorStop(1, '#1d2a8a');
-      ctx.fillStyle = g; ctx.fill();
-      ctx.lineWidth = 4; ctx.strokeStyle = '#ffd96e'; ctx.stroke();
-      ctx.shadowColor = 'rgba(255,138,212,0.95)'; ctx.shadowBlur = 28; ctx.fillStyle = '#fff';
-      ctx.font = '900 50px Arial, sans-serif'; ctx.fillText('YOU DISCOVERED THE', cx, by + 60);
-      ctx.fillStyle = '#ffd96e'; ctx.font = '900 56px Arial, sans-serif'; ctx.fillText('SUPER SECRET RIDDLE!!!', cx, by + 118);
-      ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
-    }
-    ctx.save(); ctx.translate(0, SECRET_H);
-    if (mode === 'daily'){
-      // The score, big - the headline of the card.
-      ctx.font = '900 118px Arial, sans-serif'; ctx.fillStyle = '#fff';
-      ctx.shadowColor = 'rgba(255,214,110,0.55)'; ctx.shadowBlur = 30;
-      ctx.fillText(data.score + ' PTS', cx, 322);
-      ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
-      y = 378;
-      if (data.solved){
-        drawLetterTiles(ctx, cx, y, data.word, accent);
-        y += 92 + 36;
-      } else {
-        ctx.font = '800 56px Arial, sans-serif'; ctx.fillStyle = '#fff';
-        ctx.fillText(data.lettersEarned + '/6 LETTERS', cx, y+50);
-        y += 100;
+    // Everything between the header and the footer is laid out as blocks:
+    // measured first, then centred as a stack, with the unlocked cards
+    // sized to whatever room is left.
+    // The busiest cards (the secret banner, new cards) pack a little tighter.
+    const busy = daily && (data.secret || data.unlocked.length > 0);
+    const TOP = 250, BOTTOM = H - 170, GAP = busy ? 32 : 40, blocks = [];
+    const voteLines = ()=>{
+      if (!data.voteSummary) return [];
+      ctx.font = '500 28px ' + SHARE_FONT_T;
+      return shareWrapLines(ctx, 'You agreed with ' + data.voteSummary.pct + '% of players on ' + data.voteSummary.itemA + ' vs ' + data.voteSummary.itemB, W - 200);
+    };
+    if (daily){
+      if (data.secret) blocks.push({ h: 210, draw: y=>{
+        ctx.font = '900 92px ' + SHARE_FONT_D;
+        const g = ctx.createLinearGradient(120, 0, W - 120, 0); ['#ffd96e','#ff8ad4','#b26bff','#19e0ff'].forEach((c, i)=> g.addColorStop(i/3, c));
+        ctx.fillStyle = g;
+        shareGlowText(ctx, 'YOU DISCOVERED THE', cx, y + 80, 'rgba(178,107,255,0.9)', 30);
+        shareGlowText(ctx, 'SUPER SECRET RIDDLE!!!', cx, y + 178, 'rgba(255,138,212,0.7)', 30);
+      } });
+      else blocks.push({ h: 130, draw: y=> drawCardStack(ctx, cx, y, 1.9) });
+      const scorePx = data.secret ? 170 : 200;
+      blocks.push({ h: scorePx + 70, draw: y=>{
+        ctx.font = '700 34px ' + SHARE_FONT_T; ctx.fillStyle = '#b98bf0'; shareSpacedText(ctx, 'DAILY STAX COMPLETE', cx, y + 34, 5);
+        ctx.font = '900 ' + scorePx + 'px ' + SHARE_FONT_D; ctx.fillStyle = '#fff'; shareGlowText(ctx, data.score + ' pts', cx, y + scorePx + 30, 'rgba(157,95,214,0.85)', 50);
+      } });
+      // The word as the solve screen's tiles - never its letters (like
+      // Wordle): players further west may not have had today's word yet.
+      // Solved: all green. Not solved: empty tiles with a '?'.
+      const word = (data.word || '??????').toUpperCase(), n = word.length, ts = n > 6 ? Math.floor(104 * 6 / n) : 104, tg = 16;
+      blocks.push({ h: ts + 90, draw: y=>{
+        let tx = cx - (n * ts + (n - 1) * tg) / 2;
+        Array.from(word).forEach(ch=>{
+          roundRectPath(ctx, tx, y, ts, ts, 16);
+          ctx.fillStyle = data.solved ? '#2f6b45' : 'rgba(255,255,255,0.06)'; ctx.fill();
+          ctx.lineWidth = 3; ctx.strokeStyle = data.solved ? '#3fa774' : 'rgba(255,255,255,0.25)'; ctx.stroke();
+          ctx.font = '900 ' + Math.round(ts * 0.63) + 'px ' + SHARE_FONT_D;
+          if (data.solved){ ctx.save(); ctx.shadowColor = 'rgba(63,167,116,0.6)'; ctx.shadowBlur = 24; roundRectPath(ctx, tx, y, ts, ts, 16); ctx.fillStyle = '#2f6b45'; ctx.fill(); ctx.restore(); }
+          else { ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.fillText('?', tx + ts/2, y + ts * 0.73); }
+          tx += ts + tg;
+        });
+        ctx.font = '600 38px ' + SHARE_FONT_T; ctx.fillStyle = 'rgba(232,224,255,0.88)'; ctx.fillText(data.statLine, cx, y + ts + 64);
+      } });
+      // Today's personality: the results screen's panel - with its card's
+      // art beside it when the player owns that card, else its emoji.
+      const p = data.personality;
+      if (p){
+        const pw = 860, px = cx - pw/2;
+        if (data.personalityOwned){
+          const aw = data.unlocked.length ? 130 : 170, ah = aw * 492/360, ph = ah + 56, tx = px + 40 + aw + 40, tw = pw - (tx - px) - 40;
+          ctx.font = '500 30px ' + SHARE_FONT_T; const blurb = shareWrapLines(ctx, p.blurb, tw).slice(0, 3);
+          blocks.push({ h: ph, draw: y=>{
+            roundRectPath(ctx, px, y, pw, ph, 36); ctx.fillStyle = 'rgba(255,255,255,0.06)'; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(185,139,240,0.35)'; ctx.stroke();
+            drawShareCollectionCard(ctx, data.personalityType, px + 40, y + 28, aw, false);
+            const ty = y + ph/2 - (84 + blurb.length * 40) / 2;
+            ctx.textAlign = 'left';
+            ctx.font = '700 26px ' + SHARE_FONT_T; ctx.fillStyle = '#b98bf0'; ctx.fillText("TODAY'S PERSONALITY", tx, ty + 24);
+            ctx.font = '900 64px ' + SHARE_FONT_D; ctx.fillStyle = '#fff'; shareGlowText(ctx, p.name, tx, ty + 86, 'rgba(157,95,214,0.65)', 24);
+            ctx.font = '500 30px ' + SHARE_FONT_T; ctx.fillStyle = 'rgba(232,224,255,0.72)'; blurb.forEach((l, i)=> ctx.fillText(l, tx, ty + 130 + i * 40));
+            ctx.textAlign = 'center';
+          } });
+        } else {
+          ctx.font = '500 32px ' + SHARE_FONT_T; const blurb = shareWrapLines(ctx, p.blurb, pw - 80).slice(0, 2), ph = 250 + blurb.length * 40;
+          blocks.push({ h: ph, draw: y=>{
+            roundRectPath(ctx, px, y, pw, ph, 36); ctx.fillStyle = 'rgba(255,255,255,0.06)'; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(185,139,240,0.35)'; ctx.stroke();
+            ctx.font = '700 28px ' + SHARE_FONT_T; ctx.fillStyle = '#b98bf0'; shareSpacedText(ctx, "TODAY'S PERSONALITY", cx, y + 58, 5);
+            ctx.fillStyle = '#fff'; ctx.font = '80px sans-serif'; ctx.fillText(p.icon, cx, y + 150);
+            ctx.font = '900 72px ' + SHARE_FONT_D; shareGlowText(ctx, p.name, cx, y + 222, 'rgba(157,95,214,0.65)', 24);
+            ctx.font = '500 32px ' + SHARE_FONT_T; ctx.fillStyle = 'rgba(232,224,255,0.72)'; blurb.forEach((l, i)=> ctx.fillText(l, cx, y + 268 + i * 40));
+          } });
+        }
       }
-      drawProgressGrid(ctx, cx, y, data.roundResults, accent);
-      y += 66 + 62;
-      ctx.font = '600 32px Arial, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.88)';
-      ctx.fillText(data.statLine, cx, y);
-      y += 44;
-      // Today's personality, in its own panel.
-      const p = data.personality || { icon:SECRET_RIDDLER.icon, name:SECRET_RIDDLER.name, blurb:SECRET_RIDDLER.blurb }, pw = 760, ph = 250, px = cx - pw/2;
-      roundRectPath(ctx, px, y, pw, ph, 28);
-      ctx.fillStyle = 'rgba(255,255,255,0.07)'; ctx.fill();
-      ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,214,110,0.55)'; ctx.stroke();
-      ctx.font = '800 24px Arial, sans-serif'; ctx.fillStyle = accent;
-      ctx.fillText("TODAY'S PERSONALITY", cx, y + 50);
-      ctx.font = '76px Arial, sans-serif'; ctx.fillStyle = '#fff';
-      ctx.fillText(p.icon, cx, y + 132);
-      ctx.font = '900 52px Arial, sans-serif';
-      ctx.fillText(p.name, cx, y + 192);
-      ctx.font = '500 28px Arial, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.78)';
-      ctx.fillText(p.blurb, cx, y + 232);
-      y += ph + 64;
     } else {
-      ctx.font = '800 66px Arial, sans-serif'; ctx.fillStyle = '#fff';
-      ctx.fillText(data.heroText, cx, y+50);
-      y += 160;
-      ctx.font = '600 32px Arial, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.88)';
-      ctx.fillText(data.statLine, cx, y);
-      y += 70;
+      blocks.push({ h: 230, draw: y=>{
+        ctx.font = '900 150px ' + SHARE_FONT_D; ctx.fillStyle = '#fff'; shareGlowText(ctx, data.heroText, cx, y + 150, 'rgba(62,194,194,0.75)', 50);
+        ctx.font = '600 38px ' + SHARE_FONT_T; ctx.fillStyle = 'rgba(224,248,255,0.88)'; ctx.fillText(data.statLine, cx, y + 222);
+      } });
     }
-
-    if (data.voteSummary){
-      ctx.font = '500 28px Arial, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.82)';
-      const line = 'You agreed with ' + data.voteSummary.pct + '% of players on ' + data.voteSummary.itemA + ' vs ' + data.voteSummary.itemB;
-      wrapCenteredText(ctx, line, cx, y, SHARE_CARD_W - 160, 38);
+    const vote = voteLines();
+    if (vote.length) blocks.push({ h: vote.length * 38, draw: y=>{
+      ctx.font = '500 28px ' + SHARE_FONT_T; ctx.fillStyle = 'rgba(255,255,255,0.7)'; vote.forEach((l, i)=> ctx.fillText(l, cx, y + 28 + i * 38));
+    } });
+    let used = blocks.reduce((a, b)=> a + b.h, 0) + GAP * (blocks.length - 1);
+    // New cards from this run go before the vote line, as big as fits.
+    const cards = daily ? data.unlocked : [];
+    if (cards.length){
+      const n = cards.length, cg = 40, fixed = 46 + 30 + 62;
+      const room = BOTTOM - TOP - used - GAP - fixed;
+      const cw = Math.max(140, Math.min(n === 1 ? 300 : n === 2 ? 260 : 220, Math.floor(room * 360 / 492), Math.floor((W - 160 - (n - 1) * cg) / n)));
+      const ch = cw * 492 / 360;
+      blocks.splice(vote.length ? blocks.length - 1 : blocks.length, 0, { h: fixed + ch, draw: y=>{
+        ctx.font = '700 38px ' + SHARE_FONT_T; ctx.fillStyle = '#ffe066';
+        shareGlowText(ctx, '✨ ' + (n > 1 ? n + ' NEW CARDS' : 'NEW CARD') + ' UNLOCKED ✨', cx, y + 34, 'rgba(255,224,102,0.8)', 22);
+        let x = cx - (n * cw + (n - 1) * cg) / 2;
+        cards.forEach(k=>{
+          drawShareCollectionCard(ctx, k, x, y + 76, cw, true);
+          // The name, shrunk if needed to stay within its card's column.
+          const name = PERSONALITY_META[k].name; let fs = 40;
+          do { ctx.font = '900 ' + fs + 'px ' + SHARE_FONT_D; } while (ctx.measureText(name).width > cw + cg - 12 && --fs > 22);
+          ctx.fillStyle = '#fff'; ctx.fillText(name, x + cw/2, y + 76 + ch + 50);
+          x += cw + cg;
+        });
+      } });
+      used += GAP + fixed + ch;
     }
+    // Last resort, so nothing can ever run into the footer: shrink the
+    // whole stack to fit.
+    const fit = Math.min(1, (BOTTOM - TOP) / used);
+    ctx.save();
+    if (fit < 1){ ctx.translate(cx, TOP); ctx.scale(fit, fit); ctx.translate(-cx, -TOP); }
+    let y = TOP + Math.max(0, (BOTTOM - TOP - used) / 2);
+    blocks.forEach(b=>{ b.draw(y); y += b.h + GAP; });
     ctx.restore();
 
-    ctx.font = '700 26px Arial, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.55)';
-    ctx.fillText('flipstax-one.vercel.app', cx, SHARE_CARD_H - 90);
-    ctx.font = '500 24px Arial, sans-serif'; ctx.fillStyle = 'rgba(255,255,255,0.45)';
-    ctx.fillText("Play today's FlipStax.", cx, SHARE_CARD_H - 55);
-
+    ctx.textAlign = 'center';
+    ctx.font = '700 34px ' + SHARE_FONT_T; ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.fillText('flipstax-one.vercel.app', cx, H - 110);
+    ctx.font = '500 30px ' + SHARE_FONT_T; ctx.fillStyle = 'rgba(255,255,255,0.45)';
+    ctx.fillText("Play today's FlipStax.", cx, H - 66);
     return canvas;
   }
   function dataUrlToBlob(dataUrl){
@@ -7575,7 +7652,7 @@
     });
     const personalityType = personality.type;
     runResultToday = {
-      date: todayStr(), score: runScore, triviaCorrect: runTriviaCorrect,
+      date: runStartDate || todayStr(), score: runScore, triviaCorrect: runTriviaCorrect,
       triviaTotal: runTriviaAttempted, solved: !!solved, solveMs: solveMs,
       word: runWord ? runWord.word : null, personalityType: personalityType,
       secondChance: runSecondChanceOutcome, perfect: runPerfect,
@@ -7595,7 +7672,7 @@
       solveLeftMs: solved ? Math.max(0, RUN_SOLVE_MS - solveMs) : null,
     } });
     saveRunResultToday(runResultToday);
-    dailyRunStreak = updateDailyStreak();
+    dailyRunStreak = updateDailyStreak(runResultToday.date);
     renderRunBanner();
     showRunReadout();
     voted = false; votedSinceTime = null;
@@ -7603,6 +7680,7 @@
   }
   function showRunReadout(){
     const r = runResultToday;
+    preloadShareArt(r);
     els.readoutScore.textContent = shownScore(r.score) + ' pts';
     els.readoutTrivia.textContent = r.triviaCorrect + '/' + r.triviaTotal + ' trivia correct'
       + (r.perfect ? ' · 🏆 Perfect Run' : '')
@@ -8050,7 +8128,6 @@
 
   // Noon Rush: a per-timezone local event, not a global one - every player's
   // OWN device clock decides their own noon. No server coordination needed.
-  // (Unlike the Daily day, which is deliberately UTC - see todayStr.)
   function isNoonRush(){ return new Date().getHours() === 12; }
 
   function maybeTriggerBonusZone(){
@@ -8782,6 +8859,9 @@
     // Mode select is one big tap target: a tap on the link must not start a mode.
     a.addEventListener('click', e=> e.stopPropagation());
     el.appendChild(a);
+    const c = document.createElement('div'); c.className = 'contact-copyright';
+    c.textContent = '\u00A9 2026 FlipStax LLC';
+    el.appendChild(c);
     // (Ko-fi: mode select and the Daily results screen both have the
     // floating Donations button, so no text link here.)
   });
@@ -8912,6 +8992,7 @@
     if (sessionHalted){ sessionHalted = false; voted = false; votedSinceTime = null; loadNext(); }
   });
   els.modeDailyBtn.addEventListener('click', ()=>{
+    refreshDailyDay();
     els.modeSelectOverlay.classList.add('hidden');
     document.documentElement.classList.add('mode-daily');
     document.documentElement.classList.remove('mode-infinity');
@@ -8931,6 +9012,7 @@
   // every gameplay overlay so nothing is left showing underneath.
   function returnToModeSelect(opts){
     opts = opts || {};
+    setTimeout(refreshDailyDay, 0);   // once the run is torn down
     stopTallyPolling();
     clearRoundTimer();
     clearTimeout(eventTimeoutId); eventTimeoutId = null;
