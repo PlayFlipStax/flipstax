@@ -5522,6 +5522,19 @@
   // The calendar day before a 'YYYY-MM-DD' date (built from parts, so a
   // clock change doesn't skip or repeat a day).
   function dayBefore(dateStr){ const p = dateStr.split('-').map(Number); return localDateStr(new Date(p[0], p[1] - 1, p[2] - 1)); }
+  // ---------- leftovers from the UTC-date rule (the Oct 2026 switch-over) ----------
+  // Before the switch, saves were stamped with the UTC date, so an evening
+  // save (US time) often carries the next day's date - which is "today" here
+  // now. Saves written since carry rule:'local'. An untagged save that claims
+  // to be from today is a leftover: an unfinished run isn't resumed and a
+  // finished one doesn't count as today's run. If it shows the player already
+  // did today's word, their run gets a stand-in word (dailyWordForPlayer).
+  // From Oct 4 nothing untagged can claim to be today; the check stops on
+  // Oct 5 regardless.
+  const SAVE_RULE = 'local', LEFTOVER_CHECK_UNTIL = '2026-10-05';
+  function isLeftoverSave(o){ return !!o && o.rule !== SAVE_RULE && o.date === todayStr() && todayStr() < LEFTOVER_CHECK_UNTIL; }
+  function noteLeftoverWord(word){ if (!word) return; try{ localStorage.setItem('flipstax_leftover_v1', JSON.stringify({ date: todayStr(), word })); }catch(e){} }
+  function leftoverWordToday(){ try{ const o = JSON.parse(localStorage.getItem('flipstax_leftover_v1') || 'null'); return o && o.date === todayStr() ? o.word : null; }catch(e){ return null; } }
   function loadStats(){
     const blank = { flips:0, lastDate:null, streak:0, byCat:{}, badges:{}, agree:0, decided:0, personalityMilestone:0, freezeAvailable:false, slowdownCharges:3, slowdownDate:null };
     try{
@@ -5682,6 +5695,19 @@
     return order[posInCycle];
   }
   function getTodayWord(){ return RUN_WORDS[wordIndexForDay(daysSinceEpoch())]; }
+  // This player's word for today: today's, unless a leftover save shows they
+  // already did it (see isLeftoverSave) - then a stand-in that isn't any word
+  // from a week back to three weeks ahead, the same stand-in for everyone in
+  // that spot today.
+  function dailyWordForPlayer(){
+    const word = getTodayWord(), seen = leftoverWordToday();
+    if (!seen || seen !== word.word) return word;
+    const day = daysSinceEpoch(), avoid = new Set([seen]);
+    for (let d = day - 7; d <= day + 21; d++) avoid.add(RUN_WORDS[wordIndexForDay(d)].word);
+    const order = shuffle(RUN_WORDS.map((_, i)=> i), mulberry32(hashStr('flipstax-stand-in-' + day)));
+    const i = order.find(k=> !avoid.has(RUN_WORDS[k].word));
+    return i != null ? RUN_WORDS[i] : word;
+  }
   function loadRunResult(){
     try{
       const raw = localStorage.getItem('flipstax_run_v1');
@@ -5690,6 +5716,7 @@
       // From before the riddle was decoupled: a solve picked 'riddler' as the
       // run's personality. Show it as the standalone reward instead.
       if (parsed && parsed.personalityType === 'riddler'){ parsed.secretRiddle = true; parsed.personalityType = null; }
+      if (isLeftoverSave(parsed)){ noteLeftoverWord(parsed.word); return null; }
       return parsed && parsed.date === todayStr() ? parsed : null;
     }catch(e){ return null; }
   }
@@ -6046,7 +6073,7 @@
     if (!runActive || !runWord) return;
     const deck = decks.daily;
     const snap = {
-      date: runStartDate, phase: runPhase, word: runWord.word,
+      date: runStartDate, rule: SAVE_RULE, savedAt: Date.now(), phase: runPhase, word: runWord.word,
       remainMs: pausedRunRemainingMs != null ? pausedRunRemainingMs : Math.max(0, runEndsAt - Date.now()),
       clockAdded: runClockAddedMs,
       score: runScore, letters: runLetters, thresholdsHit: runThresholdsHit, puThresholdsHit: runPowerupThresholdsHit,
@@ -6072,6 +6099,7 @@
   function loadRunSnapshot(){
     try{
       const snap = JSON.parse(localStorage.getItem(RUN_LIVE_KEY) || 'null');
+      if (isLeftoverSave(snap)){ noteLeftoverWord(snap.word); clearRunSnapshot(); return null; }
       if (snap && snap.date === todayStr() && Array.isArray(snap.letters)) return snap;
       if (snap) clearRunSnapshot();
     }catch(e){ clearRunSnapshot(); }
@@ -6089,9 +6117,15 @@
   let dailyRunStreak = 0;
   // The streak still standing today: it lapses once a whole day goes by
   // without a run (the last run was before yesterday).
+  // The streak record; a leftover one stamped "today" really means last night.
+  function readStreakRecord(){
+    const d = JSON.parse(localStorage.getItem('flipstax_streak') || '{}'), today = todayStr();
+    if (d.lastDay && isLeftoverSave({ rule: d.rule, date: d.lastDay })) d.lastDay = dayBefore(today);
+    return d;
+  }
   function peekDailyStreak(){
     try{
-      const d = JSON.parse(localStorage.getItem('flipstax_streak') || '{}'), today = todayStr();
+      const d = readStreakRecord(), today = todayStr();
       return d.lastDay === today || d.lastDay === dayBefore(today) ? (d.streak || 0) : 0;
     }catch(e){ return 0; }
   }
@@ -6099,12 +6133,12 @@
     const today = runDate || todayStr();
     let streak = 0, lastDay = null;
     try{
-      const d = JSON.parse(localStorage.getItem('flipstax_streak') || '{}');
+      const d = readStreakRecord();
       streak = d.streak || 0; lastDay = d.lastDay || null;
     }catch(e){}
     if (lastDay === today) return streak;
     streak = (lastDay === dayBefore(today)) ? streak + 1 : 1;
-    try{ localStorage.setItem('flipstax_streak', JSON.stringify({ streak, lastDay: today })); }catch(e){}
+    try{ localStorage.setItem('flipstax_streak', JSON.stringify({ streak, lastDay: today, rule: SAVE_RULE })); }catch(e){}
     return streak;
   }
   dailyRunStreak = peekDailyStreak();
@@ -6488,7 +6522,7 @@
     runPendingQ = null; runPowerupDone = false; runWildcardDelta = null; runSolvedAt = null; currentRiddle = null;
     runPendingTrivia = false; runPendingPowerUp = false;
     runStartDate = todayStr();
-    runWord = getTodayWord();
+    runWord = dailyWordForPlayer();
     runEndsAt = Date.now() + RUN_DURATION_MS;
     runClockAddedMs = 0;
     els.runTimerWrap.classList.remove('hidden');
@@ -8149,7 +8183,7 @@
     });
     const personalityType = personality.type;
     runResultToday = {
-      date: runStartDate || todayStr(), score: runScore, triviaCorrect: runTriviaCorrect,
+      date: runStartDate || todayStr(), rule: SAVE_RULE, savedAt: Date.now(), score: runScore, triviaCorrect: runTriviaCorrect,
       triviaTotal: runTriviaAttempted, solved: !!solved, solveMs: solveMs,
       word: runWord ? runWord.word : null, personalityType: personalityType,
       secondChance: runSecondChanceOutcome, perfect: runPerfect,
@@ -9377,6 +9411,7 @@
       checkUnlocks: (ctx) => checkUnlocks(ctx),
       setBadgeEarned: (id, date) => { badgeStore.earned[id] = date; saveBadges(); },
       todayWord: () => getTodayWord(),
+      playerWord: () => dailyWordForPlayer().word,
       getCurrentTrack: () => ({ key: currentTrackKey, paused: trackEls[currentTrackKey] ? trackEls[currentTrackKey].paused : null, src: trackEls[currentTrackKey] ? trackEls[currentTrackKey].src.split('/').pop() : null }),
       setRunClockMs: (ms) => { runEndsAt = Date.now() + ms; },
       extendPendingDeadlines: (ms) => { if (runPendingQ){ runPendingQEndsAt = Date.now() + ms; clearTimeout(eventTimeoutId); eventTimeoutId = setTimeout(()=> (runPhase === 'secondchance' ? resolveSecondChance : resolveRunTrivia)(false), ms); } if (runPhase === 'solving') solveEndsAt = Date.now() + ms; },
