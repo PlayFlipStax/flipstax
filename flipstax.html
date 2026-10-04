@@ -1585,7 +1585,9 @@
      0% matches the zoom's end state exactly, so there's no hand-off jump. */
   @keyframes logoFloat{ 0%,100%{ transform:translateY(0) scale(1); } 50%{ transform:translateY(-5px) scale(1.012); } }
   .home-logo-img{
-    width:100%; max-width:440px; height:auto; margin-bottom:34px;
+    /* The round badge (584x519): sized by width AND height so Enter and the
+       links keep their spacing on short phones. */
+    width:min(82vw, 330px, calc(42vh * 584 / 519)); height:auto; margin-bottom:34px;
     animation: logoZoomIn 650ms cubic-bezier(.25,.85,.35,1.25) 450ms both,
                logoFloat 4s ease-in-out infinite 1100ms;
     /* The PNG's own edge isn't fully transparent - a faint anti-aliasing
@@ -1633,6 +1635,19 @@
     .home-overlay .doodle-scatter-track{ animation:none !important; }
     .home-spark{ animation:none !important; opacity:calc(var(--o) * 0.7); }
   }
+  /* "Tap for sound": browsers allow no audible sound before a tap, so the
+     splash invites one. Any first tap starts the music (primeMusic); this
+     just makes it obvious, then says so and fades. */
+  .home-sound-hint{ position:absolute; z-index:3; top:calc(14px + env(safe-area-inset-top)); right:14px; padding:8px 14px; border-radius:99px; cursor:pointer;
+    background:rgba(255,255,255,0.9); color:#3d1a6e; font:700 13px 'Inter', system-ui, sans-serif; letter-spacing:0.2px; white-space:nowrap;
+    box-shadow:0 4px 14px rgba(40,20,90,0.25), 0 0 0 3px rgba(255,255,255,0.35); -webkit-tap-highlight-color:transparent;
+    animation: homeHintPulse 1.8s ease-in-out infinite; transition:opacity 0.5s ease, transform 0.5s ease; }
+  .home-sound-hint.hidden{ display:none; }
+  .home-sound-hint.on{ animation:none; }
+  .home-sound-hint.gone{ opacity:0; transform:translateY(-8px); pointer-events:none; }
+  @keyframes homeHintPulse{ 0%,100%{ transform:scale(1); box-shadow:0 4px 14px rgba(40,20,90,0.25), 0 0 0 3px rgba(255,255,255,0.35); }
+    50%{ transform:scale(1.06); box-shadow:0 4px 18px rgba(40,20,90,0.3), 0 0 0 7px rgba(255,255,255,0.25); } }
+  @media (prefers-reduced-motion: reduce){ .home-sound-hint{ animation:none; } }
   .home-legal-links{
     position:relative; z-index:1; margin-top:16px;
     display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:2px;
@@ -2139,8 +2154,9 @@
     </svg>
   </div>
   <div class="home-sparks" id="homeSparks" aria-hidden="true"></div>
+  <div class="home-sound-hint hidden" id="homeSoundHint" role="button" aria-label="Turn on sound">🔊 Tap for sound</div>
   <div class="riddle-ufo home-ufo" aria-hidden="true"><span>🛸</span><i></i></div>
-  <img class="home-logo-img" src="images/flipstax-logo-clean.png" alt="FlipStax - Flip, Vote, Jumble &amp; Solve">
+  <img class="home-logo-img" src="images/flipstax-logo-final.png" alt="FlipStax - Flip, Vote, Jumble &amp; Solve">
   <div class="daily-btn primary home-enter-btn" id="homeEnterBtn">Enter</div>
   <div class="home-legal-links">
     <span class="home-legal-link" id="homeDisclaimerLink">Disclaimer</span>
@@ -7277,9 +7293,9 @@
       W = window.innerWidth; H = window.innerHeight;
       canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
       // The burst's centre is the logo's (offsets ignore its zoom/float).
-      const lw = logo.offsetWidth || Math.min(W - 48, 440), lh = logo.offsetHeight || lw * 0.54;
+      const lw = logo.offsetWidth || Math.min(W * 0.82, 330), lh = logo.offsetHeight || lw * 519 / 584;
       cx = logo.offsetLeft + lw / 2; cy = logo.offsetTop + lh / 2;
-      R = lw * 0.42;
+      R = lw * 0.46;
       els.homeOverlay.style.setProperty('--hx', cx + 'px'); els.homeOverlay.style.setProperty('--hy', cy + 'px');
       const key = Math.round(R) + 'x' + dpr;
       if (key !== layoutKey){ layoutKey = key; A = buildRayLayer(R, dpr, 101, 26, 110); B = buildRayLayer(R, dpr, 202, 18, 80); }
@@ -9091,6 +9107,18 @@
   // same muted-autoplay pattern as before; it plays once, then the intro
   // theme takes over. Sound off = nothing plays.
   primeMusic('fanfare');
+  // The "Tap for sound" pill (only when sound is on): the first tap anywhere
+  // starts the fanfare (primeMusic's own listener); the pill confirms it and fades.
+  (function(){
+    const hint = document.getElementById('homeSoundHint');
+    if (!hint || !soundOn) return;
+    hint.classList.remove('hidden');
+    document.addEventListener('pointerdown', ()=>{
+      hint.textContent = '\uD83D\uDD0A Sound on'; hint.classList.add('on');
+      setTimeout(()=> hint.classList.add('gone'), 1400);
+      setTimeout(()=> hint.classList.add('hidden'), 2000);
+    }, { once:true });
+  })();
   updatePauseBtnVisibility();
   // The landing screen's doodle field used to be the one static background
   // in the whole game (moving:false skipped doodleDrift entirely) - give it
