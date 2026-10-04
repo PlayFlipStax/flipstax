@@ -1755,6 +1755,18 @@
     justify-content:center; background:rgba(8,10,24,0.82); padding:24px;
   }
   .legal-overlay.hidden{ display:none; }
+  /* Mode select's Donations button: a few words first, then on to Ko-fi. */
+  .donate-sheet{ position:fixed; inset:0; z-index:70; display:flex; align-items:center; justify-content:center; padding:24px; background:rgba(8,10,24,0.72); }
+  .donate-sheet.hidden{ display:none; }
+  .donate-panel{ max-width:340px; width:100%; padding:24px 22px 14px; border-radius:20px; text-align:center; color:#fff;
+    background:linear-gradient(160deg, #3a1a68, #1c1550); border:1px solid rgba(255,214,110,0.45); box-shadow:0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(255,184,0,0.18);
+    animation: popIn 0.35s cubic-bezier(.2,1.4,.4,1); }
+  .donate-cup{ font-size:42px; line-height:1; margin-bottom:10px; }
+  .donate-text{ margin:0 0 18px; font-size:15px; line-height:1.5; color:#efe6ff; }
+  .donate-go{ display:inline-flex; align-items:center; justify-content:center; padding:12px 26px; font-size:15px; text-decoration:none; }
+  .donate-later{ margin:6px auto 0; display:flex; align-items:center; justify-content:center; width:max-content; min-height:44px; padding:0 14px; font-size:13px; color:rgba(255,255,255,0.65); cursor:pointer; }
+  /* Results: support link under Done / Share - a secondary text link. */
+  .readout-support{ display:inline-block; margin-top:10px; padding:4px 8px; font-size:12px; color:#b98bf0; text-decoration:underline; opacity:0.9; }
   .legal-panel{
     background:var(--bg,#12142b); border-radius:16px; max-width:520px; width:100%;
     max-height:80vh; overflow-y:auto; padding:24px 22px; box-shadow:0 20px 60px rgba(0,0,0,0.5);
@@ -2349,6 +2361,14 @@
   <div class="contact-footer" data-contact-footer></div>
 </div>
 
+<div class="donate-sheet hidden" id="donateSheet" role="dialog" aria-label="Support FlipStax">
+  <div class="donate-panel">
+    <div class="donate-cup" aria-hidden="true">☕</div>
+    <p class="donate-text">Made by one guy with a full-time job and a love of trivia. Donations help keep FlipStax running and growing — thank you!</p>
+    <a class="daily-btn primary donate-go" id="donateGo" href="https://ko-fi.com/flipstax" target="_blank" rel="noopener noreferrer">☕ Support on Ko-fi</a>
+    <div class="donate-later" id="donateLater" role="button">Not now</div>
+  </div>
+</div>
 <div class="cmc-overlay hidden" id="collectionCompleteOverlay" role="dialog" aria-label="Collection complete">
   <div class="cmc-rays" aria-hidden="true"></div>
   <div class="cmc-sparks" id="cmcSparks" aria-hidden="true"></div>
@@ -2464,6 +2484,7 @@
       <div class="daily-btn" id="readoutDone">Done</div>
       <div class="daily-btn primary" id="readoutShare">📋 Share</div>
     </div>
+    <a class="readout-support" id="readoutSupport" href="https://ko-fi.com/flipstax" target="_blank" rel="noopener noreferrer">Enjoying FlipStax? ❤️ Support it</a>
   </div>
   <div class="contact-footer" data-contact-footer></div>
 </div>
@@ -7760,7 +7781,17 @@
     els.cardZoom.classList.remove('hidden');
   }
   els.collectionBtn.addEventListener('click', (e)=>{ e.stopPropagation(); openCollection(); });
-  els.coffeeBtn.addEventListener('click', e=> e.stopPropagation());
+  // Mode select's Donations button shows a few words first; the button in
+  // there goes on to Ko-fi. (The results / pause-screen copies of the button
+  // still link straight to Ko-fi.)
+  const donateSheet = document.getElementById('donateSheet');
+  const closeDonate = ()=> donateSheet.classList.add('hidden');
+  els.coffeeBtn.addEventListener('click', e=>{ e.stopPropagation(); e.preventDefault(); donateSheet.classList.remove('hidden'); });
+  donateSheet.addEventListener('click', e=>{ e.stopPropagation(); if (e.target === donateSheet) closeDonate(); });
+  document.getElementById('donateLater').addEventListener('click', closeDonate);
+  document.getElementById('donateGo').addEventListener('click', ()=> setTimeout(closeDonate, 300));
+  document.addEventListener('keydown', e=>{ if (e.key === 'Escape' && !donateSheet.classList.contains('hidden')) closeDonate(); });
+  document.getElementById('readoutSupport').addEventListener('click', e=> e.stopPropagation());
   els.collectionBack.addEventListener('click', closeCollection);
   els.cardZoom.addEventListener('click', ()=> els.cardZoom.classList.add('hidden'));
   renderCollectionBtn();
