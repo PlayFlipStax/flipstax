@@ -320,9 +320,20 @@
     animation: eventBgDrift 6s ease-in-out infinite alternate;
   }
   .event-overlay.hidden{ display:none; }
+  /* Behind the question and tiles (z-index -1 inside the overlay): shooting
+     stars from the shared system, and on some screens the riddle's UFO
+     zooming past, from either side. */
+  .event-sky{ position:absolute; inset:0; width:100%; height:100%; z-index:-1; pointer-events:none; }
+  .event-overlay.ufo-pass .event-ufo{ display:block; z-index:-1; font-size:28px; opacity:0.9; animation: eventUfoPass 3.4s cubic-bezier(.45,0,.55,1) 1.1s both; }
+  .event-overlay.ufo-pass.ufo-rtl .event-ufo{ animation-direction:reverse; }
+  .event-overlay .event-ufo i{ display:none; }
+  @keyframes eventUfoPass{ 0%{ transform:translate(-70px, 13vh) scale(0.8) rotate(-6deg); } 50%{ transform:translate(50vw, 6vh) scale(1) rotate(5deg); } 100%{ transform:translate(calc(100vw + 70px), 10vh) scale(0.8) rotate(-4deg); } }
   @keyframes eventBgDrift{ 0%{ background-position: 0% 10%; } 100%{ background-position: 100% 90%; } }
   @media (prefers-reduced-motion: reduce){ .event-overlay{ animation:none !important; } }
-  .event-subtitle{ font-size:12px; letter-spacing:0.4px; color:var(--pulse); font-weight:700; margin-bottom:6px; }
+  /* The small heading sits on a dark pill so it reads on any background. */
+  .event-subtitle{ display:inline-block; font-size:12px; letter-spacing:0.4px; color:var(--pulse); font-weight:700; margin-bottom:8px;
+    padding:4px 12px; border-radius:99px; background:rgba(14,8,40,0.55); box-shadow:0 0 0 1px rgba(255,255,255,0.12); }
+  .event-subtitle:empty{ display:none; }
   .powerup-icon{ font-size:56px; margin-bottom:6px; animation: powerupBounce 1s ease-in-out infinite; }
   .powerup-icon.hidden{ display:none; }
   @keyframes powerupBounce{ 0%,100%{ transform:translateY(0) rotate(-6deg); } 50%{ transform:translateY(-10px) rotate(6deg); } }
@@ -331,21 +342,42 @@
     margin-bottom:16px; color:#fff; text-shadow:0 2px 10px rgba(0,0,0,0.5);
   }
   .event-timerbar{ width:80%; max-width:320px; height:6px; background:rgba(255,255,255,0.15); border-radius:4px; overflow:hidden; margin-bottom:20px; }
-  .event-timerbar-fill{ height:100%; background:#fff; width:100%; }
+  .event-timerbar-fill{ height:100%; background:#fff; width:100%; box-shadow:0 0 8px rgba(255,255,255,0.8); }
   .event-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; width:100%; max-width:360px; }
+  /* Answer and power-up tiles: the colour (set from JS) with a glossy
+     top-light/bottom-shade, a white rim, a solid 3D base and soft drop
+     shadow - like Enter and the mode-select buttons - a shine that sweeps
+     across now and then, and a glow ring when tapped. */
   .event-tile{
-    padding:22px 10px; border-radius:14px; font-family:'Big Shoulders Display', sans-serif; font-weight:800;
-    font-size:17px; color:#fff; cursor:pointer; text-align:center; border:2px solid rgba(255,255,255,0.25);
-    transition: transform 0.12s ease;
+    position:relative; padding:22px 10px; border-radius:16px; font-family:'Big Shoulders Display', sans-serif; font-weight:800;
+    font-size:17px; color:#fff; cursor:pointer; text-align:center; border:2px solid rgba(255,255,255,0.7);
+    background-image:linear-gradient(180deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.1) 38%, rgba(255,255,255,0) 52%, rgba(0,0,0,0.24) 100%);
+    box-shadow:var(--tile-depth);
+    --tile-depth: 0 5px 0 rgba(20,10,60,0.38), 0 10px 18px rgba(20,10,60,0.35), inset 0 2px 0 rgba(255,255,255,0.45), inset 0 -3px 0 rgba(0,0,0,0.16);
+    text-shadow:0 2px 0 rgba(0,0,0,0.22), 0 0 8px rgba(0,0,0,0.25);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    -webkit-tap-highlight-color:transparent;
   }
-  .event-tile:active{ transform:scale(0.92); }
-  .event-tile:hover{ box-shadow: inset 0 0 0 4px #ffd93d, inset 0 0 40px rgba(255,217,61,0.4); }
-  .pu-icon{ font-size:28px; display:block; margin-bottom:4px; }
+  .event-tile::before{ content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    background:linear-gradient(115deg, rgba(255,255,255,0) 35%, rgba(255,255,255,0.38) 47%, rgba(255,255,255,0) 59%) no-repeat;
+    background-size:260% 100%; background-position:160% 0; animation: tileShine 4.2s ease-in-out infinite; }
+  .event-tile:nth-child(2)::before{ animation-delay:0.35s; } .event-tile:nth-child(3)::before{ animation-delay:0.7s; } .event-tile:nth-child(4)::before{ animation-delay:1.05s; }
+  @keyframes tileShine{ 0%, 55%{ background-position:160% 0; } 85%, 100%{ background-position:-60% 0; } }
+  .event-tile:active{ transform:translateY(3px) scale(0.97);
+    box-shadow:0 2px 0 rgba(20,10,60,0.38), 0 4px 10px rgba(20,10,60,0.3), inset 0 2px 0 rgba(255,255,255,0.45), inset 0 -3px 0 rgba(0,0,0,0.16); }
+  .event-tile:hover{ box-shadow:var(--tile-depth), inset 0 0 0 4px #ffd93d, inset 0 0 40px rgba(255,217,61,0.4); }
+  /* Tapped: a quick bright flash, and (Daily) a white glow ring. */
+  .event-tile.tapped{ animation: tileTap 0.45s ease-out !important; }
+  @keyframes tileTap{ 0%{ filter:brightness(1.45) saturate(1.2); transform:scale(1.05); } 100%{ filter:none; transform:none; } }
+  :root:not(.mode-infinity) .event-tile.tapped::after{ content:''; position:absolute; inset:-3px; border-radius:18px; pointer-events:none; animation: tileTapRing 0.45s ease-out forwards; }
+  @keyframes tileTapRing{ 0%{ box-shadow:0 0 0 0 rgba(255,255,255,0.95), 0 0 18px 4px rgba(255,255,255,0.7); } 100%{ box-shadow:0 0 0 12px rgba(255,255,255,0), 0 0 30px 10px rgba(255,255,255,0); } }
+  @media (prefers-reduced-motion: reduce){ .event-tile::before{ animation:none; background:none; } .event-tile.tapped, .event-tile.tapped::after{ animation:none !important; } }
+  .pu-icon{ font-size:28px; display:block; margin-bottom:4px; filter:drop-shadow(0 2px 2px rgba(0,0,0,0.3)); }
   .pu-label{ font-size:14px; }
   @keyframes tilePulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.05); } }
   @keyframes tileFire{
-    0%,100%{ box-shadow: 0 0 8px 2px rgba(255,140,0,0.55), 0 0 18px 5px rgba(255,60,0,0.3); }
-    50%{ box-shadow: 0 0 16px 5px rgba(255,190,0,0.8), 0 0 28px 9px rgba(255,90,0,0.45); }
+    0%,100%{ box-shadow: var(--tile-depth), 0 0 8px 2px rgba(255,140,0,0.55), 0 0 18px 5px rgba(255,60,0,0.3); }
+    50%{ box-shadow: var(--tile-depth), 0 0 16px 5px rgba(255,190,0,0.8), 0 0 28px 9px rgba(255,90,0,0.45); }
   }
   .event-overlay.powerup{
     background:
@@ -364,6 +396,54 @@
   .event-overlay.powerup .event-tile:nth-child(4){ animation-delay:0.6s, 0.45s; }
   @media (prefers-reduced-motion: reduce){ .event-overlay.powerup .event-tile{ animation:none !important; box-shadow:none !important; } }
 
+  /* Coin Flip: the power-up tiles make way for a 3D coin (two faces,
+     flipped by the JS so it lands on the right one), its shadow on the
+     "table", and a burst of gold sparks for a win. A loss deflates the coin
+     and greys it out; the result line sags. */
+  .coin-stage{ display:none; position:relative; width:220px; height:230px; margin:4px auto 0; }
+  /* The Coin Flip backdrop moves: a drifting purple-and-gold sky, the
+     splash's ray burst turning behind the coin (buildRayLayer), shooting
+     stars and a UFO pass. Heads flares the rays; tails drains them. */
+  .event-overlay.coin-mode{
+    background:
+      radial-gradient(circle at 50% 58%, rgba(255,214,80,0.55), transparent 50%),
+      radial-gradient(circle at 18% 18%, rgba(155,77,255,0.85), transparent 58%),
+      radial-gradient(circle at 86% 82%, rgba(255,60,172,0.6), transparent 55%),
+      linear-gradient(160deg, #2a1060, #4a1a6e 50%, #1a0f3d);
+    background-size:190% 190%; animation: eventBgDrift 4.5s ease-in-out infinite alternate; }
+  .coin-rays{ position:absolute; inset:0; width:100%; height:100%; z-index:-1; pointer-events:none; display:none; transition:opacity 0.7s ease, filter 0.7s ease; }
+  .event-overlay.coin-mode .coin-rays{ display:block; }
+  .event-overlay.coin-won .coin-rays{ filter:brightness(1.35) saturate(1.25); }
+  .event-overlay.coin-lost .coin-rays{ opacity:0.3; filter:grayscale(1) brightness(0.8); }
+  .event-overlay.coin-mode .coin-stage{ display:block; }
+  .event-overlay.coin-mode .event-grid, .event-overlay.coin-mode .event-timerbar, .event-overlay.coin-mode .powerup-icon{ display:none !important; }
+  .coin-toss{ position:absolute; left:50%; top:100px; width:116px; height:116px; margin-left:-58px; }
+  .coin{ position:relative; width:100%; height:100%; }
+  .coin .tails, .coin.show-tails .heads{ display:none; }
+  .coin.show-tails .tails{ display:flex; }
+  .coin-face{ position:absolute; inset:0; border-radius:50%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; color:#7a3d00;
+    background:radial-gradient(circle at 34% 28%, #fff7cf 0%, #ffd84a 30%, #f0a500 68%, #b96f00 100%);
+    box-shadow:inset 0 0 0 5px rgba(255,236,160,0.9), inset 0 0 0 9px rgba(185,111,0,0.55), inset 0 -8px 14px rgba(110,55,0,0.35), 0 0 18px rgba(255,200,60,0.55); }
+  .coin-face b{ font-weight:400; font-size:54px; line-height:1; filter:drop-shadow(0 2px 0 rgba(255,240,190,0.85)) drop-shadow(0 2px 3px rgba(110,55,0,0.45)); }
+  .coin-face small{ font-size:10px; font-weight:800; letter-spacing:1.5px; opacity:0.8; }
+  .coin-face.tails{ background:radial-gradient(circle at 34% 28%, #fff3c4 0%, #f5c93a 30%, #dc9300 68%, #a86200 100%); }
+  .coin-shadow{ position:absolute; left:50%; top:208px; width:96px; height:14px; margin-left:-48px; border-radius:50%; background:radial-gradient(closest-side, rgba(0,0,0,0.35), rgba(0,0,0,0)); }
+  .coin-burst{ position:absolute; left:50%; top:158px; width:0; height:0; pointer-events:none; }
+  .coin-burst i{ position:absolute; width:10px; height:10px; margin:-5px; border-radius:2px; background:#ffd84a; box-shadow:0 0 8px #ffe680; opacity:0; transform:rotate(45deg); }
+  .coin-stage.won .coin-burst i{ animation: coinSpark 0.9s ease-out forwards; }
+  .coin-burst i:nth-child(1){ --a:8deg; --d:70px; } .coin-burst i:nth-child(2){ --a:38deg; --d:88px; } .coin-burst i:nth-child(3){ --a:68deg; --d:106px; } .coin-burst i:nth-child(4){ --a:98deg; --d:70px; } .coin-burst i:nth-child(5){ --a:128deg; --d:88px; } .coin-burst i:nth-child(6){ --a:158deg; --d:106px; } .coin-burst i:nth-child(7){ --a:188deg; --d:70px; } .coin-burst i:nth-child(8){ --a:218deg; --d:88px; } .coin-burst i:nth-child(9){ --a:248deg; --d:106px; } .coin-burst i:nth-child(10){ --a:278deg; --d:70px; } .coin-burst i:nth-child(11){ --a:308deg; --d:88px; } .coin-burst i:nth-child(12){ --a:338deg; --d:106px; }
+  @keyframes coinSpark{ 0%{ opacity:1; transform:rotate(var(--a)) translateX(0) rotate(45deg) scale(1); } 100%{ opacity:0; transform:rotate(var(--a)) translateX(var(--d)) rotate(225deg) scale(0.4); } }
+  .coin-stage.won .coin-toss{ animation: coinWinPop 0.8s cubic-bezier(.3,1.8,.5,1) both; }
+  @keyframes coinWinPop{ 0%{ transform:scale(1); filter:none; } 40%{ transform:scale(1.18); filter:drop-shadow(0 0 22px rgba(255,220,90,1)) brightness(1.15); } 100%{ transform:scale(1.06); filter:drop-shadow(0 0 14px rgba(255,220,90,0.8)); } }
+  .coin-stage.lost .coin-toss{ animation: coinDeflate 1.2s ease-in-out both; }
+  @keyframes coinDeflate{ 0%{ transform:none; filter:none; } 18%{ transform:scale(1.06, 0.94); } 40%{ transform:translateY(6px) scale(0.86, 0.8); filter:grayscale(0.6) brightness(0.85); }
+    55%{ transform:translateY(4px) scale(0.9, 0.84); } 100%{ transform:translateY(18px) scale(0.72, 0.6); filter:grayscale(1) brightness(0.7); } }
+  .coin-stage.lost .coin-shadow{ transition:transform 1.2s ease, opacity 1.2s ease; transform:scaleX(0.75); opacity:0.6; }
+  .event-prompt.coin-sag{ animation: coinSag 1.1s ease-in-out both; }
+  @keyframes coinSag{ 0%{ transform:none; opacity:1; } 35%{ transform:translateY(4px) rotate(-2deg); } 70%{ transform:translateY(10px) rotate(1.5deg) scale(0.96); opacity:0.85; } 100%{ transform:translateY(8px) scale(0.95); opacity:0.8; } }
+  @media (prefers-reduced-motion: reduce){ .coin-stage.won .coin-toss, .coin-stage.lost .coin-toss, .coin-stage.won .coin-burst i, .event-prompt.coin-sag{ animation:none !important; }
+    .coin-stage.lost .coin-toss{ filter:grayscale(1) brightness(0.75); } }
   /* Quick, punchy "correct trivia answer" celebration - a confetti burst
      plus a bold text flash, layered over the trivia overlay for well under
      a second so it never slows the pace of play. Purely decorative and
@@ -1294,6 +1374,9 @@
   :root.mode-infinity .half:hover:not(.revealed){
     box-shadow:inset 0 0 0 3px #3ec2c2, inset 0 0 55px rgba(122,76,224,0.4);
   }
+  :root.mode-infinity .event-tile{ box-shadow:inset 0 2px 0 rgba(255,255,255,0.45), inset 0 -4px 0 rgba(0,0,0,0.2); }
+  :root.mode-infinity .event-tile:active{ box-shadow:inset 0 2px 0 rgba(255,255,255,0.45), inset 0 -2px 0 rgba(0,0,0,0.2); }
+  :root.mode-infinity .event-grid{ filter:drop-shadow(0 5px 0 rgba(20,10,60,0.38)) drop-shadow(0 9px 12px rgba(20,10,60,0.35)); }
   :root.mode-infinity .event-tile:hover{
     box-shadow:inset 0 0 0 3px #3ec2c2, inset 0 0 40px rgba(122,76,224,0.45);
   }
@@ -2059,6 +2142,9 @@
     </div>
 
     <div class="event-overlay hidden" id="eventOverlay">
+      <canvas class="coin-rays" id="coinRays" aria-hidden="true"></canvas>
+      <canvas class="event-sky" id="eventSky" aria-hidden="true"></canvas>
+      <div class="riddle-ufo event-ufo" aria-hidden="true"><span>🛸</span><i></i></div>
       <div class="powerup-icon hidden" id="powerupIcon">🎁</div>
       <div class="event-subtitle" id="eventSubtitle"></div>
       <div class="event-prompt" id="eventPrompt"></div>
@@ -2068,6 +2154,14 @@
         <div class="event-tile" data-i="1"></div>
         <div class="event-tile" data-i="2"></div>
         <div class="event-tile" data-i="3"></div>
+      </div>
+      <div class="coin-stage" id="coinStage" aria-hidden="true">
+        <div class="coin-shadow"></div>
+        <div class="coin-toss" id="coinToss"><div class="coin" id="coinFlip">
+          <div class="coin-face heads"><b>👽</b><small>HEADS</small></div>
+          <div class="coin-face tails"><b>🛸</b><small>TAILS</small></div>
+        </div></div>
+        <div class="coin-burst"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
       </div>
       <div class="trivia-celebrate hidden" id="triviaCelebrate">
         <div class="tc-text">YOU GOT IT!</div>
@@ -2505,12 +2599,12 @@
     fence_sitter: { name: 'The Fence Sitter', icon: '🪑', blurb: 'Split right down the middle with the crowd.' },
   };
 
-  const TILE_COLORS = ['#c73e3e','#3e6bc7','#3ec76b','#c7a63e'];
+  const TILE_COLORS = ['#f23c5a','#2f7bff','#17b86b','#f09d00'];
   const POWERUPS = [
-    { key:'flips10',  icon:'\u26A1',      label:'+10 Flipz', color:'#c7a63e' },
-    { key:'slowmo',   icon:'\uD83D\uDC0C', label:'Slow-Mo',    color:'#3e6bc7' },
-    { key:'skip',     icon:'\u23ED\uFE0F', label:'Skip',       color:'#3ec76b' },
-    { key:'wildcard', icon:'\uD83C\uDF81', label:'Wild Card',  color:'#c73e3e' },
+    { key:'flips10',  icon:'\u26A1',      label:'+10 Flipz', color:'#f09d00' },
+    { key:'slowmo',   icon:'\uD83D\uDC0C', label:'Slow-Mo',    color:'#2f7bff' },
+    { key:'coinflip', icon:'\uD83E\uDE99', label:'Coin Flip',  color:'#17b86b' },
+    { key:'wildcard', icon:'\uD83C\uDF81', label:'Wild Card',  color:'#f23c5a' },
   ];
   const FLAVOR_INTROS = [
     '\uD83D\uDC7D THE ALIENS WANT AN ANSWER', '\uD83D\uDEF8 BEAMED UP. SOLVE FAST.',
@@ -3184,10 +3278,10 @@
   const RUN_TRIVIA_GATES_MS = [55, 110, 165, 220, 275, 330].map(s=> s * 1000 / DEBUG_RUN_SCALE);
   let runClockAddedMs = 0;
   const RUN_POWERUPS = [
-    { key:'points10',  icon:'\u26A1', label:'+10 pts', color:'#c7a63e' },
-    { key:'slowclock', icon:'\uD83D\uDC0C', label:'+30s',    color:'#3e6bc7' },
-    { key:'wildcard',  icon:'\uD83C\uDF81', label:'Wild Card', color:'#c73e3e' },
-    { key:'hint',      icon:'\uD83D\uDCA1', label:'Free Hint', color:'#3ec76b' },
+    { key:'points10',  icon:'\u26A1', label:'+10 pts', color:'#f09d00' },
+    { key:'slowclock', icon:'\uD83D\uDC0C', label:'+30s',    color:'#2f7bff' },
+    { key:'wildcard',  icon:'\uD83C\uDF81', label:'Wild Card', color:'#f23c5a' },
+    { key:'hint',      icon:'\uD83D\uDCA1', label:'Free Hint', color:'#17b86b' },
   ];
   // The Super Secret Hidden Riddle's unlock combo (see checkSecretUnlock):
   // drawing these 5 power-ups in this exact relative order over the course
@@ -3622,6 +3716,75 @@
     }catch(e){}
   }
   // A short cinematic impact: sine sweep 140->36Hz plus a low-passed noise hit.
+  // Coin Flip sounds. A metal ping is a few inharmonic partials; a table tap
+  // is a short band-passed noise click.
+  function coinPing(ctx, t, vol, pitch){
+    [1, 1.52, 2.27, 3.08].forEach((r, i)=>{
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine'; o.frequency.setValueAtTime(pitch * r, t);
+      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol / (1 + i * 0.9), t + 0.004);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.28 / (1 + i * 0.5));
+      o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + 0.32);
+    });
+  }
+  let coinNoiseBuf = null;
+  function coinTap(ctx, t, vol, freq){
+    if (!coinNoiseBuf){
+      const len = Math.floor(ctx.sampleRate * 0.04); coinNoiseBuf = ctx.createBuffer(1, len, ctx.sampleRate);
+      const d = coinNoiseBuf.getChannelData(0); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+    }
+    const n = ctx.createBufferSource(); n.buffer = coinNoiseBuf;
+    const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = freq; bp.Q.value = 6;
+    const g = ctx.createGain(); g.gain.value = vol;
+    n.connect(bp); bp.connect(g); g.connect(ctx.destination); n.start(t);
+  }
+  // The flick, the landing, the spin slowing down on the table, a last
+  // rattle as it settles, and a soft thud - timed to the coin animation.
+  function playCoinSpin(){
+    if (!soundOn) return; const ctx = getAudioCtx(); if (!ctx) return;
+    try{
+      const t0 = ctx.currentTime;
+      coinPing(ctx, t0, 0.11, 2350);                       // thumb flick
+      coinTap(ctx, t0 + 0.81, 0.5, 3200); coinPing(ctx, t0 + 0.81, 0.07, 2100);   // lands
+      coinTap(ctx, t0 + 0.97, 0.3, 3000);                  // small bounce
+      let t = 1.0, gap = 0.035, k = 0;                      // spinning, slowing down
+      while (t < 1.52){ coinTap(ctx, t0 + t, 0.22 * (1 - (t - 1) * 0.9), k % 2 ? 2600 : 3400); t += gap; gap *= 1.16; k++; }
+      [0, 0.05, 0.085, 0.11, 0.128, 0.142].forEach((d, i)=> coinTap(ctx, t0 + 1.55 + d, 0.2 * (1 - i * 0.13), 2900));   // settling rattle
+      const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine';
+      o.frequency.setValueAtTime(170, t0 + 1.72); o.frequency.exponentialRampToValueAtTime(90, t0 + 1.85);
+      g.gain.setValueAtTime(0.0001, t0 + 1.72); g.gain.linearRampToValueAtTime(0.12, t0 + 1.73); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.9);
+      o.connect(g); g.connect(ctx.destination); o.start(t0 + 1.72); o.stop(t0 + 1.95);
+    }catch(e){}
+  }
+  // A cha-ching and a bright run upward.
+  function playCoinWin(){
+    if (!soundOn) return; const ctx = getAudioCtx(); if (!ctx) return;
+    try{
+      const t0 = ctx.currentTime;
+      coinPing(ctx, t0, 0.1, 2900); coinPing(ctx, t0 + 0.09, 0.1, 3700);
+      [659.25, 783.99, 987.77, 1318.5].forEach((f, i)=> playTone(f, 0.12 + i * 0.08, 0.2, 'triangle', 0.12));
+      playTone(1568, 0.46, 0.5, 'triangle', 0.1); playTone(2093, 0.46, 0.5, 'sine', 0.06);
+    }catch(e){}
+    haptic([15, 30, 15, 30, 40]);
+  }
+  // "Womp womp": two low, falling, wobbling brass-ish notes.
+  function playCoinLose(){
+    if (!soundOn) return; const ctx = getAudioCtx(); if (!ctx) return;
+    try{
+      const t0 = ctx.currentTime;
+      [[0, 0.42, 233, 196], [0.5, 0.85, 196, 139]].forEach(([at, dur, f1, f2])=>{
+        const o = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
+        o.type = 'sawtooth'; o.frequency.setValueAtTime(f1, t0 + at); o.frequency.exponentialRampToValueAtTime(f2, t0 + at + dur);
+        lfo.frequency.value = 6; lg.gain.value = 5; lfo.connect(lg); lg.connect(o.frequency);
+        lp.type = 'lowpass'; lp.frequency.setValueAtTime(900, t0 + at); lp.frequency.exponentialRampToValueAtTime(380, t0 + at + dur);
+        g.gain.setValueAtTime(0.0001, t0 + at); g.gain.linearRampToValueAtTime(0.11, t0 + at + 0.05); g.gain.setValueAtTime(0.11, t0 + at + dur * 0.6);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + at + dur);
+        o.connect(lp); lp.connect(g); g.connect(ctx.destination);
+        o.start(t0 + at); lfo.start(t0 + at); o.stop(t0 + at + dur + 0.05); lfo.stop(t0 + at + dur + 0.05);
+      });
+    }catch(e){}
+    haptic([80, 60, 160]);
+  }
   function playBoom(vol){
     if (!soundOn) return;
     const ctx = getAudioCtx();
@@ -3683,6 +3846,7 @@
   }
   const sfx = {
     secretSolve: ()=> playSecretSolveSound(),
+    coinSpin: ()=> playCoinSpin(), coinWin: ()=> playCoinWin(), coinLose: ()=> playCoinLose(),
     tap: (side)=>{ playClick(0.2, document.documentElement.classList.contains('mode-infinity') ? TAP_TONES.infinity : TAP_TONES.daily, side); haptic(8); },
     revealWin: ()=>{ playTone(660,0,0.09,'sine',0.1); playTone(880,0.08,0.14,'sine',0.1); },
     revealLose: ()=>{ playTone(320,0,0.15,'sine',0.07); },
@@ -5597,7 +5761,7 @@
     // counted toward crowd agreement (see crowdVerdict); agree / low are out
     // of crowd.
     return { votes:0, crowd:0, agree:0, low:0, decisionMs:0, maxCombo:0, points:0, firstHalfPoints:null,
-      trivia:0, triviaCorrect:0, wildCat:0, pu:{ flips10:0, slowmo:0, skip:0, wildcard:0 },
+      trivia:0, triviaCorrect:0, wildCat:0, pu:{ flips10:0, slowmo:0, coinflip:0, wildcard:0 },
       shape: freshRunCrowd() };
   }
   function loadInfBlock(){
@@ -5610,7 +5774,8 @@
           // (own vote included), so start them fresh.
           if (typeof b.crowd !== 'number'){ b.crowd = 0; b.agree = 0; b.low = 0; }
           if (!b.shape) b.shape = freshRunCrowd();
-          if (b.pu.skip == null) b.pu.skip = 0;
+          // Coin Flip took Skip's place: a block's Skip picks count for it.
+          if (b.pu.coinflip == null){ b.pu.coinflip = b.pu.skip || 0; delete b.pu.skip; }
           return Object.assign(freshInfBlock(), b);
         }
       }
@@ -5696,7 +5861,7 @@
       crowdN: b.crowd, crowdPct: b.crowd >= RUN_CROWD_MIN ? b.agree / b.crowd * 100 : null,
       switches: b.shape.switches, maxWith: b.shape.maxWith, maxAgainst: b.shape.maxAgainst,
       triviaN: b.trivia, triviaCorrect: b.triviaCorrect, perfect: b.trivia >= 6 && b.triviaCorrect === b.trivia,
-      allPowerups: ['flips10', 'slowmo', 'skip', 'wildcard'].every(k=> b.pu[k] > 0), wildcardPicked: b.pu.wildcard > 0,
+      allPowerups: ['flips10', 'slowmo', 'coinflip', 'wildcard'].every(k=> b.pu[k] > 0), wildcardPicked: b.pu.wildcard > 0,
       comeback: second >= 12 && second >= Math.max(1, first) * 1.8, maxCombo: b.maxCombo, solveLeftMs: null,
       avgDecisionMs: b.votes ? b.decisionMs / b.votes : 0, decisionN: b.votes, swingHistory: progress.swing.slice(),
     };
@@ -6545,7 +6710,7 @@
     els.eventPrompt.textContent = q.question;
     els.eventTiles.forEach((tileEl,i)=>{
       tileEl.textContent = q.opts[i];
-      tileEl.style.background = TILE_COLORS[i];
+      tileEl.style.backgroundColor = TILE_COLORS[i];
       tileEl.onclick = ()=> resolve(i === q.correctIdx);
     });
     startEventTimerBar(remain, dt(10000));
@@ -6696,7 +6861,7 @@
     els.eventTiles.forEach((tileEl,i)=>{
       const pu = RUN_POWERUPS[i];
       tileEl.innerHTML = '<span class="pu-icon">'+pu.icon+'</span><span class="pu-label">'+pu.label+'</span>';
-      tileEl.style.background = pu.color;
+      tileEl.style.backgroundColor = pu.color;
       tileEl.onclick = ()=> resolveRunPowerUp(pu.key);
     });
     startEventTimerBar(remain, dt(5000));
@@ -6891,6 +7056,7 @@
   // a tapering tail.
   const STAR_RIDDLE_AMBIENT = { ang:[0.2, 0.5], speed:[8, 13], y:[0.04, 0.44], off:30, colors:['rgba(255,255,255,0.75)'], tail:7, width:1.8, head:0 };
   const STAR_CELEBRATION = { ang:[0.25, 0.6], speed:[14, 22], y:[0.05, 0.5], off:40, colors:['#ffffff', '#ffe9a8'], tail:9, width:3, head:2.6 };
+  const STAR_EVENT = { ang:[0.18, 0.45], speed:[7, 12], y:[0.02, 0.4], off:40, colors:['#ffffff', '#fff3b0', '#c9f6ff'], tail:11, width:2.6, head:2.2, glow:'rgba(255,255,255,0.9)' };
   const STAR_SPLASH = { ang:[0.16, 0.4], speed:[11, 17], y:[0.02, 0.26], off:40, colors:['#ffffff', '#fff3b0'], tail:11, width:3, head:2.4, glow:'rgba(255,255,255,0.95)' };
   function spawnShootingStar(W, H, o){
     const dir = Math.random() < 0.5 ? 1 : -1, ang = o.ang[0] + Math.random() * (o.ang[1] - o.ang[0]), speed = o.speed[0] + Math.random() * (o.speed[1] - o.speed[0]);
@@ -6912,6 +7078,32 @@
     }
     if (o.glow) ctx.restore();
     return live;
+  }
+  // The trivia / power-up screen's sky: a shooting star every 1.4-3.2s
+  // behind the question and tiles, and on about one screen in three the UFO
+  // zooms past. Only while the overlay is open; none with reduced motion.
+  // Purely visual - the trivia itself (timing, answers, scoring) is untouched.
+  let eventSkyOn = false;
+  function startEventSky(){
+    if (eventSkyOn) return;
+    try{ if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; }catch(e){}
+    const ov = els.eventOverlay, canvas = document.getElementById('eventSky'), ctx = canvas && canvas.getContext('2d');
+    if (!ctx) return;
+    eventSkyOn = true;
+    ov.classList.remove('ufo-pass', 'ufo-rtl'); void ov.offsetWidth;
+    if (Math.random() < 0.35){ ov.classList.add('ufo-pass'); if (Math.random() < 0.5) ov.classList.add('ufo-rtl'); }
+    const dpr = Math.min(2, window.devicePixelRatio || 1), r = ov.getBoundingClientRect(), W = r.width, H = r.height;
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    let stars = [], next = 350 + Math.random() * 500;
+    const start = performance.now();
+    (function frame(now){
+      if (ov.classList.contains('hidden')){ eventSkyOn = false; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); return; }
+      requestAnimationFrame(frame);
+      const t = now - start;
+      if (t >= next){ stars.push(spawnShootingStar(W, H, STAR_EVENT)); next = t + 1400 + Math.random() * 1800; }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+      stars = stepShootingStars(ctx, stars, W, H, STAR_EVENT);
+    })(start);
   }
   function startRiddleAmbient(){
     if (riddleAmbientOn) return;
@@ -8427,6 +8619,15 @@
   // whether the pause button should be showing, instead of having to thread
   // an explicit call through every one of their many show/hide call sites.
   new MutationObserver(updatePauseBtnVisibility).observe(els.eventOverlay, { attributes:true, attributeFilter:['class'] });
+  new MutationObserver(()=>{ if (!els.eventOverlay.classList.contains('hidden')) startEventSky(); }).observe(els.eventOverlay, { attributes:true, attributeFilter:['class'] });
+  // A tapped answer / power-up tile flashes (see .event-tile.tapped) - only
+  // a live tile, and only visually; its onclick does the real work as before.
+  document.getElementById('eventGrid').addEventListener('pointerdown', e=>{
+    const t = e.target.closest('.event-tile');
+    if (!t || !t.onclick) return;
+    t.classList.remove('tapped'); void t.offsetWidth; t.classList.add('tapped');
+    setTimeout(()=> t.classList.remove('tapped'), 500);
+  });
   new MutationObserver(updatePauseBtnVisibility).observe(els.solveOverlay, { attributes:true, attributeFilter:['class'] });
   new MutationObserver(updatePauseBtnVisibility).observe(els.riddleOverlay, { attributes:true, attributeFilter:['class'] });
   new MutationObserver(updatePauseBtnVisibility).observe(els.runIntroOverlay, { attributes:true, attributeFilter:['class'] });
@@ -8832,7 +9033,7 @@
     els.eventPrompt.textContent = trivia.question;
     els.eventTiles.forEach((tileEl,i)=>{
       tileEl.textContent = trivia.opts[i];
-      tileEl.style.background = TILE_COLORS[i];
+      tileEl.style.backgroundColor = TILE_COLORS[i];
       tileEl.onclick = ()=> resolveEvent(i === trivia.correctIdx);
     });
     els.eventOverlay.classList.remove('hidden');
@@ -8882,7 +9083,7 @@
     els.eventTiles.forEach((tileEl,i)=>{
       const pu = POWERUPS[i];
       tileEl.innerHTML = '<span class="pu-icon">'+pu.icon+'</span><span class="pu-label">'+pu.label+'</span>';
-      tileEl.style.background = pu.color;
+      tileEl.style.backgroundColor = pu.color;
       tileEl.onclick = ()=> resolvePowerUp(pu.key);
     });
     els.eventTimerFill.style.transition = 'none';
@@ -8916,10 +9117,8 @@
       slowMoRoundsLeft = 3;
       els.eventPrompt.textContent = '\uD83D\uDC0C SLOW-MO for your next 3 rounds';
       finishPowerUp();
-    } else if (key === 'skip'){
-      sfx.powerUp();
-      els.eventPrompt.textContent = '\u23ED\uFE0F SKIPPED AHEAD';
-      finishPowerUp(true);
+    } else if (key === 'coinflip'){
+      runCoinFlip();
     } else if (key === 'wildcard'){
       let ticks = 0;
       els.eventPrompt.classList.remove('wildcard-pop');
@@ -8945,12 +9144,103 @@
       }, 90);
     }
   }
-  function finishPowerUp(extraSkip){
+  function finishPowerUp(){
     setTimeout(()=>{
       els.eventOverlay.classList.add('hidden');
+      els.eventOverlay.classList.remove('coin-mode', 'coin-won', 'coin-lost');
       scheduleNext(0);
-      if (extraSkip) scheduleNext(0);
     }, 1100);
+  }
+  // ---------- Coin Flip (Infinity power-up, in Skip's old slot) ----------
+  // Heads: +50% of your points; tails: -50% (rounded; never below 1). At 0
+  // or below there's nothing to halve, so it's a flat 5-point flip. The coin
+  // is tossed, lands and spins down on the table (sound in step), then the
+  // payoff: a gold burst and jingle, or a deflating coin and a womp-womp.
+  const COIN_FLAT_STAKE = 5;
+  function coinStake(){ ensureRaceToday(); const sc = raceState.score; return sc > 0 ? Math.max(1, Math.round(sc / 2)) : COIN_FLAT_STAKE; }
+  // The ray burst behind the coin: the splash's rays (buildRayLayer), smaller,
+  // turning and breathing until the Coin Flip screen closes. Reduced motion:
+  // one still frame.
+  function startCoinRays(){
+    const ov = els.eventOverlay, canvas = document.getElementById('coinRays'), ctx = canvas && canvas.getContext('2d');
+    if (!ctx) return;
+    let reduced = false;
+    try{ reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }catch(e){}
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    requestAnimationFrame(()=>{   // after coin-mode has laid the coin out
+      const r = ov.getBoundingClientRect(), c = document.getElementById('coinToss').getBoundingClientRect();
+      const W = r.width, H = r.height, cx = c.left - r.left + c.width / 2, cy = c.top - r.top + c.height / 2, R = c.width * 0.62;
+      canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+      const L = buildRayLayer(R, dpr, 303, 24, 90), t0 = performance.now();
+      const draw = (t)=>{
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+        ctx.save(); ctx.translate(cx, cy); ctx.rotate(t * 0.00018); const sc = 1 + 0.06 * Math.sin(t / 420); ctx.scale(sc, sc);
+        ctx.globalAlpha = 0.9; ctx.drawImage(L.canvas, -L.size / 2, -L.size / 2, L.size, L.size); ctx.restore();
+      };
+      if (reduced){ draw(0); return; }
+      (function frame(now){
+        if (!ov.classList.contains('coin-mode') || ov.classList.contains('hidden')){ ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); return; }
+        draw(now - t0); requestAnimationFrame(frame);
+      })(t0);
+    });
+  }
+  function runCoinFlip(){
+    const win = Math.random() < 0.5, stake = coinStake();
+    const ov = els.eventOverlay, coin = document.getElementById('coinFlip'), stage = document.getElementById('coinStage');
+    stage.classList.remove('won', 'lost');
+    ov.classList.remove('coin-won', 'coin-lost', 'ufo-pass', 'ufo-rtl'); void ov.offsetWidth;
+    ov.classList.add('coin-mode', 'ufo-pass');
+    if (Math.random() < 0.5) ov.classList.add('ufo-rtl');
+    startCoinRays();
+    els.eventPrompt.textContent = '\uD83D\uDC7D HEADS +' + stake + ' \u00B7 \uD83D\uDEF8 TAILS \u2212' + stake;
+    let reduced = false;
+    try{ reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }catch(e){}
+    const LAND = 1800;
+    sfx.coinSpin();
+    // The flip is drawn frame by frame: the coin narrows and widens as it
+    // turns (no CSS 3D, which some phones render with the wrong face), the
+    // face showing swaps at each edge-on moment, and it ends on heads for a
+    // win, tails for a loss. Toss: up, down onto the table (0.8s), a small
+    // bounce, then it spins down there and settles - in step with the sound.
+    const TURNS = Math.PI * 2 * 8 + (win ? 0 : Math.PI);
+    const tossY = (p)=>{   // px above the table at progress p (0..1)
+      const t = p * LAND;
+      if (t < 430) return 92 * Math.sin((t / 430) * Math.PI / 2);
+      if (t < 800) return 92 * Math.cos(((t - 430) / 370) * Math.PI / 2);
+      if (t < 960) return 14 * Math.sin(((t - 800) / 160) * Math.PI);
+      return 0;
+    };
+    const show = (theta, y, tilt)=>{
+      const c = Math.cos(theta);
+      coin.classList.toggle('show-tails', c < 0);
+      coin.style.transform = 'translateY(' + (-y).toFixed(1) + 'px) rotate(' + tilt.toFixed(1) + 'deg) scaleX(' + Math.max(0.06, Math.abs(c)).toFixed(3) + ')';
+    };
+    if (reduced){ show(TURNS, 0, 0); }
+    else {
+      const t0 = performance.now();
+      (function step(now){
+        const p = Math.min(1, (now - t0) / LAND);
+        const theta = TURNS * (1 - Math.pow(1 - p, 2.4));
+        const wob = p > 0.86 ? Math.sin((p - 0.86) / 0.14 * Math.PI * 3) * (1 - p) * 40 : 0;   // settling wobble
+        show(theta, tossY(p), wob);
+        if (p < 1 && !ov.classList.contains('hidden')) requestAnimationFrame(step);
+      })(t0);
+    }
+    setTimeout(()=>{
+      addRacePoints(win ? stake : -stake);
+      stage.classList.add(win ? 'won' : 'lost'); ov.classList.add(win ? 'coin-won' : 'coin-lost');
+      els.eventPrompt.classList.remove('wildcard-pop', 'coin-sag'); void els.eventPrompt.offsetWidth;
+      if (win){
+        sfx.coinWin();
+        els.eventPrompt.textContent = '\uD83D\uDC7D HEADS! +' + stake + ' points';
+        els.eventPrompt.classList.add('wildcard-pop');
+      } else {
+        sfx.coinLose();
+        els.eventPrompt.textContent = '\uD83D\uDEF8 Tails\u2026 \u2212' + stake + ' points';
+        els.eventPrompt.classList.add('coin-sag');
+      }
+      setTimeout(finishPowerUp, 600);
+    }, LAND + 60);
   }
 
   // ---------- live AI-generated wildcards (made-up scenarios only) ----------
@@ -9062,6 +9352,11 @@
       setCollection: (c) => { collection = c; saveCollection(); renderCollectionBtn(); },
       openCollection: () => openCollection(),
       startDailyRiddle: () => startRiddleRound(),
+      showRunTrivia: () => runTriviaQuestion(),
+      showRunPowerUp: () => runPowerUpRoundForRun(),
+      showInfTrivia: () => runWildEvent(),
+      showInfPowerUp: () => runPowerUpRound(),
+      holdEvent: () => { clearTimeout(eventTimeoutId); },
       setRiddleRemainingMs: (ms) => { riddleEndsAt = Date.now() + ms; },
       riddleMatches: (guess, i) => riddleAnswerMatches(guess, RIDDLES[i]),
       currentRiddle: () => currentRiddle,
@@ -9349,6 +9644,7 @@
     els.solveCelebrate.classList.add('hidden');
     els.riddleOverlay.classList.add('hidden');
     stopSecretCelebration(); stopRiddleAmbient();
+    els.eventOverlay.classList.remove('coin-mode', 'coin-won', 'coin-lost');
     els.runIntroOverlay.classList.add('hidden');
     infRiddleState = 'idle'; clearInterval(infRiddleInterval); clearTimeout(infRiddleCloseTimer);
     els.irOverlay.classList.add('hidden'); els.irOverlay.classList.remove('win', 'lose');
