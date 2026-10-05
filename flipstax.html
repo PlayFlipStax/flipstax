@@ -1552,6 +1552,9 @@
   @keyframes dailyClouds{ from{ transform:translateX(0); } to{ transform:translateX(calc(var(--cw) * -4)); } }
   :root.mode-daily .logo .flip{ color:#0d2b5e; }
   :root.mode-daily .logo .stax{ color:#e8590c; }
+  /* The same soft white glow as the wordmark, so the logo stays crisp when
+     the sun passes behind it. */
+  :root.mode-daily header .logo{ text-shadow:0 0 5px rgba(255,255,255,0.95), 0 0 12px rgba(255,255,255,0.7); }
   :root.mode-daily .me-chip{ color:#0d2b5e; }
   :root.mode-daily .tier{ color:#08183a; }
   :root.mode-daily .vibe-label{ color:#0d2b5e; }
@@ -1615,6 +1618,32 @@
   }
   @media (prefers-reduced-motion: reduce){ :root.mode-daily .daily-wordmark{ animation:none !important; } }
   @media (prefers-reduced-motion: reduce){ :root.mode-daily body::before{ animation:none; } }
+  /* ---- Daily Stax: the sun and the odd UFO ----
+     Background only, under everything (the sun behind the clouds, the UFO
+     just in front of them) and never takes a tap. The sun follows the run
+     clock across the top (startDailySky); the riddle's UFO (.riddle-ufo)
+     crosses now and then and once in a while beams something up from behind
+     the points pill. Reduced motion: the plain sky. */
+  .daily-sky{ display:none; position:fixed; inset:0; overflow:hidden; pointer-events:none; }
+  .daily-sky, .daily-sky *{ pointer-events:none !important; }
+  :root.mode-daily .daily-sky{ display:block; }
+  .daily-sky.sun-layer{ z-index:-2; }
+  .daily-sky.ufo-layer{ z-index:-1; }
+  .daily-sun{ position:absolute; left:0; top:0; width:40px; height:40px; margin:-20px 0 0 -20px; border-radius:50%;
+    transform:translate(-100px, 80px); transition:transform 1s linear; will-change:transform;
+    background:radial-gradient(circle at 42% 40%, #fffbe6 0%, #ffe680 38%, #ffcf3a 72%, #ffb627 100%);
+    box-shadow:0 0 18px 6px rgba(255,220,100,0.8), 0 0 54px 22px rgba(255,240,180,0.55); }
+  .daily-sun::before{ content:''; position:absolute; left:50%; top:50%; width:100px; height:100px; margin:-50px 0 0 -50px; border-radius:50%;
+    background:repeating-conic-gradient(rgba(255,226,120,0.5) 0 6deg, rgba(255,226,120,0) 6deg 30deg);
+    -webkit-mask:radial-gradient(circle, transparent 0 23px, #000 24px, transparent 50px); mask:radial-gradient(circle, transparent 0 23px, #000 24px, transparent 50px);
+    animation:dailySunSpin 80s linear infinite; }
+  @keyframes dailySunSpin{ to{ transform:rotate(360deg); } }
+  .daily-sky .riddle-ufo.daily-ufo{ display:block; z-index:1; font-size:26px; opacity:0; transform:translate(-100px, -100px); filter:drop-shadow(0 0 6px rgba(90,230,150,0.75)); }
+  .daily-ufo i{ display:none; width:30px; top:75%; }
+  .daily-ufo.beaming i{ display:block; }
+  .daily-abductee{ position:absolute; left:0; top:0; font-size:20px; line-height:1; opacity:0; transform:translate(-100px, -100px); }
+  .daily-abductee svg{ display:block; width:24px; height:17px; }
+  @media (prefers-reduced-motion: reduce){ .daily-sky{ display:none !important; } }
   /* ---- Contrast, both modes ----
      Audit over sampled rounds of the game's own per-matchup colours found
      the category tag under 4.5:1 in ~30% of halves (worst 3.8), white names
@@ -2075,6 +2104,11 @@
 </style>
 </head>
 <body>
+<div class="daily-sky sun-layer" aria-hidden="true"><div class="daily-sun" id="dailySun"></div></div>
+<div class="daily-sky ufo-layer" aria-hidden="true">
+  <div class="daily-abductee" id="dailyAbductee"></div>
+  <div class="riddle-ufo daily-ufo" id="dailyUfo"><span>🛸</span><i></i></div>
+</div>
 <div class="rotate-lock-overlay">
   <div class="rotate-lock-icon">📱</div>
   <div class="rotate-lock-text">Rotate your device<br>to play FlipStax</div>
@@ -6853,6 +6887,7 @@
     runWord = dailyWordForPlayer();
     runEndsAt = Date.now() + RUN_DURATION_MS;
     runClockAddedMs = 0;
+    dailySunP = 0;
     els.runTimerWrap.classList.remove('hidden');
     updateRunTimerBar();
     clearInterval(runTimerInterval);
@@ -6894,6 +6929,7 @@
     currentRiddle = snap.riddle >= 0 ? RIDDLES[snap.riddle] : null; riddleEndsAt = snap.riddleEndsAt;
     runSolvedAt = null;
     runClockAddedMs = snap.clockAdded || 0;
+    dailySunP = 0;
     runEndsAt = Date.now() + snap.remainMs;
     // The rest of this run's deck, in the same order - no repeats.
     const byId = {};
@@ -7489,6 +7525,85 @@
   function stopRiddleAmbient(){
     riddleAmbientOn = false;
     els.riddleOverlay.classList.remove('ambient');
+  }
+  // Daily Stax sky (see .daily-sky). The sun follows the run clock: it comes
+  // up from behind the points pill on the left as the run starts, arcs over
+  // the top and sets on the right as time runs out - it never slides back
+  // when +30s is added, it just waits for the clock to catch up. Every
+  // 30-75s or so (random) the UFO crosses the top of the sky, and about one
+  // pass in three it stops, beams down and takes something up - a cow, or
+  // now and then a little FlipStax card stack. All of it holds whenever the
+  // board isn't showing (paused, trivia, the word, other screens). Purely
+  // visual: nothing here touches the run.
+  let dailySkyTimer = null, dailySunP = 0, dailySunShown = -1, dailyUfoNext = 0, dailyUfoBusy = false, dailyUfoAnims = [];
+  function prefersReducedMotion(){ try{ return !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }catch(e){ return false; } }
+  function runClockProgress(){
+    const total = RUN_DURATION_MS + runClockAddedMs;
+    const left = pausedRunRemainingMs != null ? pausedRunRemainingMs : Math.max(0, runEndsAt - Date.now());
+    return Math.max(0, Math.min(1, 1 - left / total));
+  }
+  function dailySkyLive(){ return document.documentElement.classList.contains('mode-daily') && runActive && !isPaused && isOnVsScreen() && !document.hidden; }
+  function startDailySky(){
+    if (prefersReducedMotion()) return;
+    if (runResultToday) dailySunP = 1;
+    dailyUfoNext = Date.now() + 20000 + Math.random() * 25000;
+    clearInterval(dailySkyTimer); dailySkyTimer = setInterval(tickDailySky, 1000); tickDailySky();
+  }
+  function tickDailySky(){
+    if (!document.documentElement.classList.contains('mode-daily')){ clearInterval(dailySkyTimer); dailySkyTimer = null; stopDailyUfo(); return; }
+    if (runActive) dailySunP = Math.max(dailySunP, runClockProgress());
+    placeDailySun();
+    const live = dailySkyLive();
+    dailyUfoAnims.forEach(a=>{ if (!live && a.playState === 'running') a.pause(); else if (live && a.playState === 'paused') a.play(); });
+    if (live && !dailyUfoBusy && Date.now() >= dailyUfoNext) flyDailyUfo();
+  }
+  function placeDailySun(){
+    const sun = document.getElementById('dailySun'); if (!sun) return;
+    const W = window.innerWidth, pill = els.runBanner.getBoundingClientRect();
+    const ground = pill.height ? pill.top + 12 : 74, apex = 24, p = dailySunP;
+    const x = W * (0.07 + 0.86 * p), y = ground - (ground - apex) * Math.sin(Math.PI * p);
+    const jump = Math.abs(p - dailySunShown) > 0.05;   // a new run or a reload: no slide across the sky
+    if (jump) sun.style.transition = 'none';
+    sun.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
+    if (jump){ void sun.offsetWidth; sun.style.transition = ''; }
+    dailySunShown = p;
+  }
+  function stopDailyUfo(){
+    dailyUfoAnims.forEach(a=>{ try{ a.cancel(); }catch(e){} }); dailyUfoAnims = [];
+  }
+  async function flyDailyUfo(force){
+    const ufo = document.getElementById('dailyUfo'), thing = document.getElementById('dailyAbductee');
+    if (!ufo || dailyUfoBusy || typeof ufo.animate !== 'function') return false;
+    dailyUfoBusy = true;
+    const W = window.innerWidth, pill = els.runBanner.getBoundingClientRect(), ground = pill.height ? pill.top : 62;
+    const dir = Math.random() < 0.5 ? 1 : -1, xa = dir > 0 ? -40 : W + 40, xb = W - xa;
+    const abduct = force ? !!force.abduct : Math.random() < 0.33;
+    const at = (x, y)=> ({ transform:'translate(' + (x - 15).toFixed(1) + 'px,' + (y - 13).toFixed(1) + 'px)', opacity:0.92 });
+    const go = (el, frames, opts)=>{ const a = el.animate(frames, Object.assign({ fill:'forwards' }, opts)); dailyUfoAnims.push(a); if (!dailySkyLive()) a.pause(); return a.finished; };
+    try{
+      if (!abduct){
+        const y = 16 + Math.random() * 18, frames = [];
+        for (let k = 0; k <= 6; k++) frames.push(at(xa + (xb - xa) * k / 6, y + (k % 2 ? -5 : 4)));
+        await go(ufo, frames, { duration:7000 + Math.random() * 3000, easing:'linear' });
+      } else {
+        // Hover in the open sky between the logo and the Flipz chip, beam
+        // down to the points pill and lift whatever's behind it.
+        const lr = document.querySelector('header .logo').getBoundingClientRect(), cr = document.getElementById('meChip').getBoundingClientRect();
+        const hx = cr.left - lr.right > 50 ? (lr.right + cr.left) / 2 : W * (0.3 + Math.random() * 0.4), hy = 20;
+        await go(ufo, [at(xa, 14 + Math.random() * 14), at(hx, hy)], { duration:2600, easing:'cubic-bezier(.2,.7,.3,1)' });
+        const cards = force && force.what ? force.what === 'cards' : Math.random() < 0.25;
+        if (cards) thing.replaceChildren(document.querySelector('.daily-sym').cloneNode(true)); else thing.textContent = '\uD83D\uDC04';
+        const half = cards ? 12 : 10, t = (y, r, sc, o)=> ({ transform:'translate(' + (hx - half).toFixed(1) + 'px,' + (y - 10).toFixed(1) + 'px) rotate(' + r + 'deg) scale(' + sc + ')', opacity:o });
+        ufo.querySelector('i').style.height = Math.max(20, ground - hy - 6) + 'px';
+        ufo.classList.add('beaming');
+        await go(thing, [t(ground + 8, 0, 1, 0), t(ground - 12, 12, 1, 1), t(hy + 18, -14, 0.85, 1), t(hy + 6, 0, 0.25, 0)], { duration:2600, delay:300, easing:'ease-in-out' });
+        ufo.classList.remove('beaming');
+        await go(ufo, [at(hx, hy), at(hx - dir * 8, hy + 3), at(xb, -30)], { duration:1500, delay:250, easing:'cubic-bezier(.55,0,.9,.45)' });
+      }
+    }catch(e){ if (!e || e.name !== 'AbortError') console.error('FlipStax: Daily sky UFO', e); }   // AbortError: cancelled (left Daily Stax)
+    ufo.classList.remove('beaming'); stopDailyUfo();
+    dailyUfoBusy = false; dailyUfoNext = Date.now() + 30000 + Math.random() * 45000;
+    return true;
   }
   const SECRET_HOLD_MS = 5000;
   let secretCelebrating = false, secretCanContinue = false, secretCelebrateTimer = null;
@@ -9750,6 +9865,8 @@
       setCollection: (c) => { collection = c; saveCollection(); renderCollectionBtn(); },
       openCollection: () => openCollection(),
       startDailyRiddle: () => startRiddleRound(),
+      dailyUfo: (abduct, what) => { flyDailyUfo({ abduct: !!abduct, what }); return 'ok'; },
+      getDailySky: () => ({ sunP: dailySunP, busy: dailyUfoBusy, nextInMs: dailyUfoNext - Date.now(), ticking: !!dailySkyTimer, live: dailySkyLive() }),
       putNext: (name) => { const d = decks[contentPoolKey()]; const i = d.cards.findIndex((c, k)=> k >= d.next && (c.a === name || c.b === name)); if (i >= 0){ const [c] = d.cards.splice(i, 1); d.cards.splice(d.next, 0, c); } return i; },
       showRunTrivia: () => runTriviaQuestion(),
       showRunPowerUp: () => runPowerUpRoundForRun(),
@@ -10014,11 +10131,12 @@
     renderRunBanner();
     // Today's run is already done: show its results (and Share) again rather
     // than a frozen board. Done goes back to mode select, as after the run.
-    if (runResultToday){ showRunReadout(); updatePauseBtnVisibility(); return; }
+    if (runResultToday){ showRunReadout(); updatePauseBtnVisibility(); startDailySky(); return; }
     sessionHalted = false;
     playTrack('run');
     startDailyRun();
     updatePauseBtnVisibility();
+    startDailySky();
   });
   // Bails out of whatever's currently happening (VS board, trivia, puzzle,
   // riddle) back to mode-select. Stops every live timer/interval so nothing
