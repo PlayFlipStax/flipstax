@@ -294,6 +294,9 @@
     background:rgba(0,0,0,0.28); padding:2px 9px; border-radius:20px;
   }
   .half.bottom .cat-chip{ top:auto; bottom:8px; }
+  /* Narrow phones: a long label would run under the +5s / Pause pills, so the
+     top chip steps aside - the bottom chip still shows the same label. */
+  .cat-chip.squeezed{ visibility:hidden; }
 
   .divider{
     position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:4;
@@ -2530,7 +2533,7 @@
     // anyone who already has it keeps it under the new name.
     wild:   { label:'Wild Card', badge:'🌀 Weird One' },
     food:   { label:'Food', badge:'🍔 Food Head' },
-    fitness:{ label:'Fitness', badge:'💪 Fitness Head' },
+    fitness:{ label:'Exercise & Fitness', badge:'💪 Fitness Head' },
     geography: { label:'Geography', badge:'🌍 Globetrotter' },
     history: { label:'History', badge:'📜 History Head' },
     games: { label:'Video Games', badge:'\uD83C\uDFAE Game Head' },
@@ -2541,7 +2544,12 @@
     pets: { label:'Pets & Animals', badge:'\uD83D\uDC3E Animal Person' },
     nostalgia: { label:'Nostalgia', badge:'\uD83D\uDCFC Throwback Kid' },
     ideas: { label:'Big Ideas', badge:'\uD83E\uDDE0 Deep Thinker' },
-    books: { label:'Books', badge:'\uD83D\uDCDA Bookworm' },
+    books: { label:'Books & Authors', badge:'\uD83D\uDCDA Bookworm' },
+    realitytv: { label:'Reality TV', badge:'\uD83D\uDCFA Reality Junkie' },
+    celebrity: { label:'Celebrity', badge:'\uD83D\uDCF8 Pop Culture Pro' },
+    comedy: { label:'Comedy', badge:'\uD83D\uDE02 Class Clown' },
+    podcasts: { label:'Podcasts', badge:'\uD83C\uDF99\uFE0F Pod Squad' },
+    creators: { label:'YouTube & TikTok', badge:'\uD83D\uDCF1 Chronically Online' },
   };
   const BADGE_THRESHOLD = 10;
 
@@ -5057,6 +5065,137 @@
     ['fitness', 'CrossFit', 'Powerlifting', 'pick'],
     ['fitness', 'Gym Workouts', 'Home Workouts', 'pick'],
     ['fitness', 'Morning Gym Session', 'Night Gym Session', 'pick'],
+    // MMA (Oct 2026 broadening batch)
+    ['sports', 'Conor McGregor', 'Khabib Nurmagomedov', 'who'],
+    ['sports', 'Israel Adesanya', 'Alex Pereira', 'who'],
+    ['sports', 'Conor McGregor', 'Nate Diaz', 'who'],
+    ['sports', 'Islam Makhachev', 'Charles Oliveira', 'who'],
+    ['sports', 'Amanda Nunes', 'Valentina Shevchenko', 'who'],
+    ['sports', 'Submission Win', 'Knockout Win', 'pick'],
+    ['sports', 'Strikers', 'Grapplers', 'pick'],
+    // Pop (Oct 2026 broadening batch)
+    ['music', 'Katy Perry', 'Rihanna', 'who'],
+    ['music', 'Dua Lipa', 'Doja Cat', 'who'],
+    // Rock (Oct 2026 broadening batch)
+    ['music', 'Foo Fighters', 'Red Hot Chili Peppers', 'who'],
+    ['music', 'Guns N\' Roses', 'Metallica', 'who'],
+    // Hip Hop (Oct 2026 broadening batch)
+    ['music', 'Jay-Z', 'Nas', 'who'],
+    ['music', 'Kanye West', 'Travis Scott', 'who'],
+    // Country (Oct 2026 broadening batch)
+    ['music', 'Morgan Wallen', 'Luke Combs', 'who'],
+    ['music', 'Johnny Cash', 'Willie Nelson', 'who'],
+    ['music', 'Chris Stapleton', 'Zach Bryan', 'who'],
+    // General (Oct 2026 broadening batch)
+    ['music', 'An Old Favorite on Repeat', 'Finding Something New', 'pick'],
+    // Reality TV (Oct 2026 broadening batch)
+    ['realitytv', 'The Bachelor', 'Love Island', 'pick'],
+    ['realitytv', 'Big Brother', 'Survivor', 'pick'],
+    ['realitytv', 'The Kardashians', 'Vanderpump Rules', 'pick'],
+    ['realitytv', 'Jersey Shore', 'Teen Mom', 'pick'],
+    ['realitytv', 'The Amazing Race', 'Survivor', 'pick'],
+    ['realitytv', 'Shark Tank', 'Dragons\' Den', 'pick'],
+    ['realitytv', 'The Masked Singer', 'American Idol', 'pick'],
+    ['realitytv', 'Dancing with the Stars', 'So You Think You Can Dance', 'pick'],
+    ['realitytv', 'Queer Eye', 'Fixer Upper', 'pick'],
+    ['realitytv', 'Hell\'s Kitchen', 'Top Chef', 'pick'],
+    ['realitytv', 'Vanderpump Rules', 'Selling Sunset', 'pick'],
+    // Romance (Oct 2026 broadening batch)
+    ['books', 'Colleen Hoover', 'Emily Henry', 'who'],
+    ['books', 'When Harry Met Sally', 'Pretty Woman', 'pick'],
+    ['books', '10 Things I Hate About You', '13 Going on 30', 'pick'],
+    // Celebrity (Oct 2026 broadening batch)
+    ['celebrity', 'Kim Kardashian', 'Paris Hilton', 'who'],
+    ['celebrity', 'Red Carpet Fashion', 'Street Style', 'pick'],
+    // Books & Authors (Oct 2026 master batch)
+    ['books', 'Stephen King', 'J.K. Rowling', 'who'],
+    ['books', 'Game of Thrones', 'The Wheel of Time', 'pick'],
+    ['books', 'Gone Girl', 'The Girl on the Train', 'pick'],
+    ['books', 'To Kill a Mockingbird', 'The Catcher in the Rye', 'pick'],
+    ['books', 'Brandon Sanderson', 'George R.R. Martin', 'who'],
+    ['books', 'Pride and Prejudice', 'Jane Eyre', 'pick'],
+    ['books', 'Reading Before Bed', 'Reading at the Beach', 'pick'],
+    // Movies (Oct 2026 master batch)
+    ['movies', 'Brad Pitt', 'Tom Cruise', 'who'],
+    ['movies', 'Fight Club', 'Se7en', 'pick'],
+    ['movies', 'Steven Spielberg', 'George Lucas', 'who'],
+    ['movies', 'The Dark Knight', 'Joker', 'pick'],
+    ['movies', 'Will Smith', 'Dwayne Johnson', 'who'],
+    ['movies', 'Greta Gerwig', 'Sofia Coppola', 'who'],
+    ['movies', 'Barbie', 'Oppenheimer', 'pick'],
+    ['movies', 'Avengers: Endgame', 'Avengers: Infinity War', 'pick'],
+    ['movies', 'Parasite', 'Everything Everywhere All at Once', 'pick'],
+    // Comedy (Oct 2026 master batch)
+    ['comedy', 'Dave Chappelle', 'Shane Gillis', 'who'],
+    ['comedy', 'George Carlin', 'Richard Pryor', 'who'],
+    ['comedy', 'Kevin Hart', 'Chris Rock', 'who'],
+    ['comedy', 'Sebastian Maniscalco', 'Jim Jefferies', 'who'],
+    ['comedy', 'Hasan Minhaj', 'Trevor Noah', 'who'],
+    ['comedy', 'Amy Schumer', 'Ali Wong', 'who'],
+    ['comedy', 'Stand-Up Specials', 'Comedy Movies', 'pick'],
+    // Podcasts (Oct 2026 master batch)
+    ['podcasts', 'The Joe Rogan Experience', 'WTF with Marc Maron', 'pick'],
+    ['podcasts', 'Call Her Daddy', 'SmartLess', 'pick'],
+    ['podcasts', 'Dateline NBC', 'MrBallen Podcast', 'pick'],
+    ['podcasts', 'Good Hang with Amy Poehler', 'SmartLess', 'pick'],
+    ['podcasts', 'The Megyn Kelly Show', 'The Ben Shapiro Show', 'pick'],
+    ['podcasts', 'Video Podcasts', 'Audio-Only Podcasts', 'pick'],
+    ['podcasts', 'Listening at 1x Speed', 'Listening at 1.5x or 2x', 'pick'],
+    ['podcasts', 'New Episode Day', 'Binging the Back Catalog', 'pick'],
+    // YouTube & TikTok (Oct 2026 master batch)
+    ['creators', 'MrBeast', 'Kai Cenat', 'who'],
+    ['creators', 'Logan Paul', 'Jake Paul', 'who'],
+    ['creators', 'Khaby Lame', 'Charli D’Amelio', 'who'],
+    ['creators', 'Livestreams', 'Edited Videos', 'pick'],
+    ['creators', 'Gaming Streamers', 'Just Chatting Streamers', 'pick'],
+    ['creators', 'Collab Videos', 'Solo Videos', 'pick'],
+    ['creators', 'Creator Drama', 'Creator Philanthropy', 'pick'],
+    // Food (Oct 2026 master batch)
+    ['food', 'Lasagna', 'Chicken Parm', 'pick'],
+    ['food', 'Reuben', 'Turkey Club', 'pick'],
+    ['food', 'Deep Dish Pizza', 'Thin Crust Pizza', 'pick'],
+    ['food', 'Caesar Salad', 'Greek Salad', 'pick'],
+    ['food', 'Sushi', 'Poke Bowls', 'pick'],
+    ['food', 'Apple Pie', 'Pumpkin Pie', 'pick'],
+    ['food', 'Spaghetti and Meatballs', 'Fettuccine Alfredo', 'pick'],
+    ['food', 'Egg Rolls', 'Dumplings', 'pick'],
+    // Exercise & Fitness (Oct 2026 master batch)
+    ['fitness', 'Overhead Press', 'Romanian Deadlifts', 'pick'],
+    ['fitness', 'Swimming Laps', 'Cycling', 'pick'],
+    ['fitness', 'Running Outside', 'The Treadmill', 'pick'],
+    ['fitness', 'Deadlifts', 'Squats', 'pick'],
+    ['fitness', 'Pull-Ups', 'Lat Pulldowns', 'pick'],
+    ['fitness', 'Working Out Alone', 'Working Out with a Partner', 'pick'],
+    ['fitness', 'Rock Climbing', 'Hiking', 'pick'],
+    // Sports Teams (Oct 2026 master batch)
+    ['sports', 'Lakers', 'Celtics', 'who'],
+    ['sports', 'Lakers', 'Warriors', 'who'],
+    ['sports', 'Patriots', 'Chiefs', 'who'],
+    ['sports', 'Packers', 'Bears', 'who'],
+    ['sports', 'Steelers', 'Ravens', 'who'],
+    ['sports', 'Dodgers', 'Giants', 'who'],
+    ['sports', 'Cubs', 'Cardinals', 'who'],
+    ['sports', 'Penguins', 'Capitals', 'who'],
+    ['sports', 'Real Madrid', 'Barcelona', 'who'],
+    ['sports', 'Arsenal', 'Tottenham', 'who'],
+    ['sports', 'Michigan', 'Ohio State', 'who'],
+    // Sports Players (Oct 2026 master batch)
+    ['sports', 'Kevin Durant', 'Giannis Antetokounmpo', 'who'],
+    ['sports', 'Magic Johnson', 'Larry Bird', 'who'],
+    ['sports', 'Jerry Rice', 'Randy Moss', 'who'],
+    ['sports', 'Aaron Judge', 'Shohei Ohtani', 'who'],
+    ['sports', 'Mike Trout', 'Ronald Acuña Jr.', 'who'],
+    ['sports', 'Wayne Gretzky', 'Mario Lemieux', 'who'],
+    ['sports', 'Kylian Mbappé', 'Erling Haaland', 'who'],
+    // Sports Preferences (Oct 2026 master batch)
+    ['sports', 'Football Sundays', 'March Madness', 'pick'],
+    ['sports', 'Home Jerseys', 'Away Jerseys', 'pick'],
+    // Celebrity add-on (Oct 2026)
+    ['celebrity', 'Kim Kardashian', 'Kylie Jenner', 'who'],
+    ['celebrity', 'Blake Lively', 'Gwyneth Paltrow', 'who'],
+    ['celebrity', 'Paparazzi Photos', 'Posted Selfies', 'pick'],
+    ['celebrity', 'Celebrity Breakup Drama', 'Celebrity Weddings', 'pick'],
+    ['celebrity', 'Old Hollywood Glamour', 'Modern Influencer Fame', 'pick'],
   ];
   const INFINITY_PAIRS_RAW = [
     // food
@@ -5264,6 +5403,127 @@
     ['fitness', 'Yoga', 'Pilates', 'pick'],
     ['fitness', 'Rest Day', 'Extra Workout Day', 'pick'],
     ['fitness', 'Protein Shakes', 'Whole Food Meals', 'pick'],
+    // MMA (Oct 2026 broadening batch)
+    ['sports', 'Jon Jones', 'Daniel Cormier', 'who'],
+    ['sports', 'Khabib Nurmagomedov', 'Georges St-Pierre', 'who'],
+    ['sports', 'Anderson Silva', 'Georges St-Pierre', 'who'],
+    ['sports', 'Ronda Rousey', 'Amanda Nunes', 'who'],
+    ['sports', 'UFC', 'Boxing', 'pick'],
+    ['sports', 'The Cage', 'The Ring', 'pick'],
+    // Pop (Oct 2026 broadening batch)
+    ['music', 'Lady Gaga', 'Madonna', 'who'],
+    // Rock (Oct 2026 broadening batch)
+    ['music', 'Led Zeppelin', 'Pink Floyd', 'who'],
+    ['music', 'Queen', 'Rolling Stones', 'who'],
+    // Hip Hop (Oct 2026 broadening batch)
+    ['music', 'Eminem', '50 Cent', 'who'],
+    ['music', 'Cardi B', 'Nicki Minaj', 'who'],
+    // Country (Oct 2026 broadening batch)
+    ['music', 'Carrie Underwood', 'Miranda Lambert', 'who'],
+    ['music', 'Dolly Parton', 'Reba McEntire', 'who'],
+    // General (Oct 2026 broadening batch)
+    ['music', 'Sing-Along Songs', 'Headphones-Only Songs', 'pick'],
+    // Reality TV (Oct 2026 broadening batch)
+    ['realitytv', 'Real Housewives', 'Below Deck', 'pick'],
+    ['realitytv', 'RuPaul\'s Drag Race', 'Project Runway', 'pick'],
+    ['realitytv', 'Love Is Blind', 'Married at First Sight', 'pick'],
+    ['realitytv', '90 Day Fiancé', 'Love Is Blind', 'pick'],
+    ['realitytv', 'Dance Moms', 'Cheer', 'pick'],
+    ['realitytv', 'Catfish', 'Say Yes to the Dress', 'pick'],
+    ['realitytv', 'The Voice', 'American Idol', 'pick'],
+    ['realitytv', 'Top Chef', 'MasterChef', 'pick'],
+    ['realitytv', 'Below Deck', 'The Bachelor', 'pick'],
+    ['realitytv', 'Naked and Afraid', 'Survivor', 'pick'],
+    // Romance (Oct 2026 broadening batch)
+    ['books', 'The Notebook', 'Titanic', 'pick'],
+    ['books', 'Bridgerton', 'Outlander', 'pick'],
+    // Celebrity (Oct 2026 broadening batch)
+    ['celebrity', 'Celebrity Gossip Podcasts', 'True Crime Podcasts', 'pick'],
+    // Books & Authors (Oct 2026 master batch)
+    ['books', 'The Shining', 'It', 'pick'],
+    ['books', 'Agatha Christie', 'Gillian Flynn', 'who'],
+    ['books', 'Dune', 'Foundation', 'pick'],
+    ['books', 'Colleen Hoover', 'Taylor Jenkins Reid', 'who'],
+    ['books', 'Fourth Wing', 'A Court of Thorns and Roses', 'pick'],
+    ['books', 'The Great Gatsby', 'Of Mice and Men', 'pick'],
+    ['books', 'Rereading a Favorite', 'Always Something New', 'pick'],
+    // Movies (Oct 2026 master batch)
+    ['movies', 'Johnny Depp', 'Leonardo DiCaprio', 'who'],
+    ['movies', 'Inception', 'Shutter Island', 'pick'],
+    ['movies', 'Pulp Fiction', 'Reservoir Dogs', 'pick'],
+    ['movies', 'Denzel Washington', 'Samuel L. Jackson', 'who'],
+    ['movies', 'Margot Robbie', 'Scarlett Johansson', 'who'],
+    ['movies', 'Jordan Peele', 'M. Night Shyamalan', 'who'],
+    ['movies', 'La La Land', 'Whiplash', 'pick'],
+    ['movies', 'Interstellar', 'The Martian', 'pick'],
+    // Comedy (Oct 2026 master batch)
+    ['comedy', 'Mark Normand', 'Joe List', 'who'],
+    ['comedy', 'Bill Burr', 'Jim Gaffigan', 'who'],
+    ['comedy', 'Nikki Glaser', 'Taylor Tomlinson', 'who'],
+    ['comedy', 'Tom Segura', 'Theo Von', 'who'],
+    ['comedy', 'John Mulaney', 'Nate Bargatze', 'who'],
+    ['comedy', 'Eddie Murphy', 'Robin Williams', 'who'],
+    ['comedy', 'Dark Humor', 'Clean Comedy', 'pick'],
+    // Podcasts (Oct 2026 master batch)
+    ['podcasts', 'Crime Junkie', 'Morbid', 'pick'],
+    ['podcasts', 'The Daily', 'Pod Save America', 'pick'],
+    ['podcasts', 'Rotten Mango', 'Crime Junkie', 'pick'],
+    ['podcasts', 'The Herd with Colin Cowherd', 'Sports Talk Radio', 'pick'],
+    ['podcasts', 'True Crime Podcasts', 'Comedy Podcasts', 'pick'],
+    ['podcasts', 'Solo Hosts', 'Co-Host Duos', 'pick'],
+    ['podcasts', 'Podcasts While Driving', 'Podcasts While Working Out', 'pick'],
+    // YouTube & TikTok (Oct 2026 master batch)
+    ['creators', 'Kai Cenat', 'IShowSpeed', 'who'],
+    ['creators', 'PewDiePie', 'MrBeast', 'who'],
+    ['creators', 'Addison Rae', 'Bella Poarch', 'who'],
+    ['creators', 'Reaction Content', 'Original Content', 'pick'],
+    ['creators', 'Long-Form YouTube', 'Short-Form Videos', 'pick'],
+    ['creators', 'Subscribing', 'Just Watching', 'pick'],
+    // Food (Oct 2026 master batch)
+    ['food', 'Boneless Wings', 'Bone-In Wings', 'pick'],
+    ['food', 'Cookie Dough Ice Cream', 'Chocolate Ice Cream', 'pick'],
+    ['food', 'Buffalo Wings', 'BBQ Wings', 'pick'],
+    ['food', 'Pad Thai', 'Lo Mein', 'pick'],
+    ['food', 'Chili', 'Chowder', 'pick'],
+    ['food', 'Cheesecake', 'Tiramisu', 'pick'],
+    ['food', 'Nachos', 'Loaded Fries', 'pick'],
+    ['food', 'Ranch', 'Blue Cheese', 'pick'],
+    // Exercise & Fitness (Oct 2026 master batch)
+    ['fitness', 'CrossFit', 'Strength Training', 'pick'],
+    ['fitness', 'Squats', 'Lunges', 'pick'],
+    ['fitness', 'HIIT', 'Steady-State Cardio', 'pick'],
+    ['fitness', 'Bench Press', 'Push-Ups', 'pick'],
+    ['fitness', 'Rest Day', 'Active Recovery', 'pick'],
+    ['fitness', 'Marathon Training', 'Sprint Training', 'pick'],
+    ['fitness', 'Boxing', 'Martial Arts', 'pick'],
+    // Sports Teams (Oct 2026 master batch)
+    ['sports', 'Warriors', 'Celtics', 'who'],
+    ['sports', 'Knicks', 'Nets', 'who'],
+    ['sports', 'Cowboys', 'Eagles', 'who'],
+    ['sports', 'Chiefs', 'Bills', 'who'],
+    ['sports', 'Red Sox', 'Yankees', 'who'],
+    ['sports', 'Yankees', 'Mets', 'who'],
+    ['sports', 'Bruins', 'Canadiens', 'who'],
+    ['sports', 'Rangers', 'Islanders', 'who'],
+    ['sports', 'Manchester United', 'Liverpool', 'who'],
+    ['sports', 'Duke', 'UNC', 'who'],
+    ['sports', 'Alabama', 'Auburn', 'who'],
+    // Sports Players (Oct 2026 master batch)
+    ['sports', 'Luka Dončić', 'Jayson Tatum', 'who'],
+    ['sports', 'Patrick Mahomes', 'Josh Allen', 'who'],
+    ['sports', 'Lawrence Taylor', 'J.J. Watt', 'who'],
+    ['sports', 'Derek Jeter', 'Alex Rodriguez', 'who'],
+    ['sports', 'Connor McDavid', 'Sidney Crosby', 'who'],
+    ['sports', 'Alexander Ovechkin', 'Sidney Crosby', 'who'],
+    ['sports', 'Pelé', 'Diego Maradona', 'who'],
+    // Sports Preferences (Oct 2026 master batch)
+    ['sports', 'Fantasy Football', 'Fantasy Baseball', 'pick'],
+    // Celebrity add-on (Oct 2026)
+    ['celebrity', 'Taylor Swift', 'Travis Kelce', 'who'],
+    ['celebrity', 'Zendaya', 'Florence Pugh', 'who'],
+    ['celebrity', 'Celebrity Feuds', 'Celebrity Friendships', 'pick'],
+    ['celebrity', 'The Met Gala', 'The Oscars Red Carpet', 'pick'],
+    ['celebrity', 'Tabloid Headlines', 'Verified Statements', 'pick'],
   ];
 
   // Every non-scenario card shows an emoji per side, like the scenario
@@ -5413,6 +5673,12 @@
     'Mewtwo':'🧬', 'Mew':'💗', 'The Legend of Zelda':'🗡️', 'Super Mario':'🍄', 'League of Legends':'⚔️', 'Dota 2':'🛡️', 'Gears of War':'⚙️',
     'Elden Ring':'💍', 'Dark Souls':'🔥', 'Animal Crossing':'🍃', 'Stardew Valley':'🌻', 'Roblox':'🧱', 'Pokémon':'⚡', 'Digimon':'👾', 'Blastoise':'💧',
     'Squirtle':'💧', 'Bulbasaur':'🌱', 'Gengar':'👻', 'Snorlax':'😴',
+    // Oct 2026 broadening batch
+    'Conor McGregor':'🥊', 'Khabib Nurmagomedov':'🥊', 'Jon Jones':'🥊', 'Daniel Cormier':'🥊', 'Israel Adesanya':'🥊', 'Alex Pereira':'🥊', 'Georges St-Pierre':'🥊', 'Nate Diaz':'🥊', 'Anderson Silva':'🥊', 'Islam Makhachev':'🥊', 'Charles Oliveira':'🥊', 'Ronda Rousey':'🥊', 'Amanda Nunes':'🥊', 'Valentina Shevchenko':'🥊', 'UFC':'🤼', 'Submission Win':'🔒', 'Knockout Win':'💥', 'The Cage':'🏟️', 'The Ring':'⭕', 'Strikers':'👊', 'Grapplers':'🤼', 'Katy Perry':'🎤', 'Lady Gaga':'🎤', 'Madonna':'🎤', 'Foo Fighters':'🎸', 'Red Hot Chili Peppers':'🎸', 'Nas':'🎤', '50 Cent':'🎤', 'Cardi B':'🎤', 'Luke Combs':'🤠', 'Carrie Underwood':'🤠', 'Miranda Lambert':'🤠', 'Willie Nelson':'🤠', 'Dolly Parton':'🤠', 'Reba McEntire':'🤠', 'Chris Stapleton':'🤠', 'Zach Bryan':'🤠', 'An Old Favorite on Repeat':'🔁', 'Finding Something New':'🔎', 'Sing-Along Songs':'🎶', 'Headphones-Only Songs':'🎧', 'The Bachelor':'🌹', 'Love Island':'🏝️', 'Real Housewives':'🍸', 'Below Deck':'🛥️', 'Big Brother':'👁️', 'Survivor':'🔥', 'RuPaul\'s Drag Race':'👠', 'Project Runway':'🧵', 'The Kardashians':'💄', 'Vanderpump Rules':'🍷', 'Love Is Blind':'🙈', 'Married at First Sight':'💍', 'Jersey Shore':'🏖️', 'Teen Mom':'🍼', '90 Day Fiancé':'✈️', 'The Amazing Race':'🗺️', 'Dance Moms':'🩰', 'Cheer':'📣', 'Shark Tank':'🦈', 'Dragons\' Den':'🐉', 'Catfish':'🎣', 'Say Yes to the Dress':'👗', 'The Masked Singer':'🎭', 'American Idol':'🎤', 'The Voice':'🎙️', 'Dancing with the Stars':'💃', 'So You Think You Can Dance':'🕺', 'Top Chef':'👨‍🍳', 'MasterChef':'🍳', 'Queer Eye':'💇', 'Fixer Upper':'🔨', 'Hell\'s Kitchen':'🔪', 'Naked and Afraid':'🌿', 'Selling Sunset':'🏡', 'Colleen Hoover':'✍️', 'Emily Henry':'✍️', 'The Notebook':'💌', 'When Harry Met Sally':'☕', 'Pretty Woman':'👠', 'Bridgerton':'👑', 'Outlander':'⏳', '10 Things I Hate About You':'📝', '13 Going on 30':'🎂', 'Kim Kardashian':'💋', 'Paris Hilton':'👜', 'Celebrity Gossip Podcasts':'🗣️', 'True Crime Podcasts':'🔍', 'Red Carpet Fashion':'👗', 'Street Style':'🧢',
+    // Oct 2026 master batch
+    'The Shining':'🪓', 'It':'🎈', 'The Wheel of Time':'🛞', 'Gillian Flynn':'🔪', 'Gone Girl':'💔', 'The Girl on the Train':'🚆', 'Dune':'🏜️', 'Foundation':'🌌', 'Taylor Jenkins Reid':'✍️', 'Brandon Sanderson':'⚔️', 'George R.R. Martin':'🐺', 'Fourth Wing':'🐲', 'A Court of Thorns and Roses':'🌹', 'Pride and Prejudice':'🎩', 'Jane Eyre':'🕯️', 'Reading at the Beach':'🏖️', 'Rereading a Favorite':'🔁', 'Always Something New':'🆕', 'Johnny Depp':'🏴‍☠️', 'Fight Club':'🧼', 'Se7en':'📦', 'Shutter Island':'🏝️', 'Steven Spielberg':'🦖', 'George Lucas':'🌌', 'Pulp Fiction':'💼', 'Reservoir Dogs':'🕶️', 'Greta Gerwig':'🎀', 'Sofia Coppola':'🗾', 'Jordan Peele':'🫖', 'M. Night Shyamalan':'👻', 'Barbie':'🎀', 'Oppenheimer':'💣', 'La La Land':'🎹', 'Whiplash':'🥁', 'Avengers: Endgame':'🛡️', 'Avengers: Infinity War':'💎', 'Interstellar':'🪐', 'The Martian':'🥔', 'Parasite':'🪨', 'Everything Everywhere All at Once':'🥯', 'Dave Chappelle':'🎤', 'Shane Gillis':'🎤', 'Mark Normand':'🎤', 'Joe List':'🎤', 'George Carlin':'🎤', 'Richard Pryor':'🎤', 'Bill Burr':'🎤', 'Jim Gaffigan':'🎤', 'Kevin Hart':'🎤', 'Chris Rock':'🎤', 'Nikki Glaser':'🎤', 'Taylor Tomlinson':'🎤', 'Sebastian Maniscalco':'🎤', 'Jim Jefferies':'🎤', 'Tom Segura':'🎤', 'Theo Von':'🎤', 'Hasan Minhaj':'🎤', 'Trevor Noah':'🎤', 'John Mulaney':'🎤', 'Nate Bargatze':'🎤', 'Amy Schumer':'🎤', 'Ali Wong':'🎤', 'Eddie Murphy':'🎤', 'Robin Williams':'🎤', 'Stand-Up Specials':'🎤', 'Comedy Movies':'🍿', 'Dark Humor':'🖤', 'Clean Comedy':'😇', 'The Joe Rogan Experience':'🎙️', 'WTF with Marc Maron':'🎸', 'Crime Junkie':'🔍', 'Morbid':'💀', 'Call Her Daddy':'💋', 'SmartLess':'🤓', 'The Daily':'📰', 'Pod Save America':'🗳️', 'Dateline NBC':'🕵️', 'MrBallen Podcast':'🔦', 'Rotten Mango':'🥭', 'Good Hang with Amy Poehler':'🛋️', 'The Herd with Colin Cowherd':'🐄', 'Sports Talk Radio':'📻', 'The Megyn Kelly Show':'🎙️', 'The Ben Shapiro Show':'🎙️', 'Comedy Podcasts':'😂', 'Video Podcasts':'📹', 'Audio-Only Podcasts':'🎧', 'Solo Hosts':'🙋', 'Co-Host Duos':'👯', 'Listening at 1x Speed':'🐢', 'Listening at 1.5x or 2x':'⏩', 'Podcasts While Driving':'🚗', 'Podcasts While Working Out':'🏋️', 'New Episode Day':'📅', 'Binging the Back Catalog':'📚', 'MrBeast':'💰', 'Kai Cenat':'📺', 'IShowSpeed':'⚡', 'Logan Paul':'🥤', 'Jake Paul':'🥊', 'PewDiePie':'👊', 'Khaby Lame':'🤷', 'Charli D’Amelio':'💃', 'Addison Rae':'💄', 'Bella Poarch':'🎶', 'Livestreams':'🔴', 'Edited Videos':'✂️', 'Reaction Content':'😮', 'Original Content':'💡', 'Gaming Streamers':'🎮', 'Just Chatting Streamers':'💬', 'Long-Form YouTube':'🎬', 'Short-Form Videos':'📱', 'Collab Videos':'🤝', 'Solo Videos':'🙋', 'Subscribing':'🔔', 'Just Watching':'👀', 'Creator Drama':'🍿', 'Creator Philanthropy':'💝', 'Lasagna':'🍝', 'Chicken Parm':'🍗', 'Boneless Wings':'🍗', 'Bone-In Wings':'🍖', 'Reuben':'🥪', 'Turkey Club':'🦃', 'Cookie Dough Ice Cream':'🍪', 'Chocolate Ice Cream':'🍫', 'Deep Dish Pizza':'🥧', 'Thin Crust Pizza':'🍕', 'Buffalo Wings':'🌶️', 'BBQ Wings':'🍖', 'Caesar Salad':'🥗', 'Greek Salad':'🫒', 'Pad Thai':'🍜', 'Lo Mein':'🥡', 'Poke Bowls':'🐟', 'Chili':'🌶️', 'Chowder':'🥣', 'Apple Pie':'🍎', 'Pumpkin Pie':'🎃', 'Tiramisu':'☕', 'Spaghetti and Meatballs':'🍝', 'Fettuccine Alfredo':'🧈', 'Loaded Fries':'🍟', 'Egg Rolls':'🌯', 'Dumplings':'🥟', 'Blue Cheese':'🧀', 'Overhead Press':'🙌', 'Romanian Deadlifts':'🏋️', 'Strength Training':'💪', 'Swimming Laps':'🏊', 'Cycling':'🚴', 'Squats':'🦵', 'Lunges':'🚶', 'Running Outside':'🌳', 'The Treadmill':'🏃', 'HIIT':'⏱️', 'Steady-State Cardio':'❤️', 'Deadlifts':'🏋️', 'Bench Press':'🏋️', 'Push-Ups':'💪', 'Pull-Ups':'💪', 'Lat Pulldowns':'⬇️', 'Active Recovery':'🚶', 'Working Out Alone':'🎧', 'Working Out with a Partner':'👯', 'Marathon Training':'🏃', 'Sprint Training':'⚡', 'Rock Climbing':'🧗', 'Hiking':'🥾', 'Martial Arts':'🥋', 'Lakers':'💜', 'Celtics':'☘️', 'Warriors':'🌉', 'Knicks':'🗽', 'Nets':'🏀', 'Patriots':'🏈', 'Chiefs':'🏹', 'Cowboys':'🤠', 'Eagles':'🦅', 'Packers':'🧀', 'Bears':'🐻', 'Bills':'🦬', 'Steelers':'🏈', 'Ravens':'🏈', 'Red Sox':'🧦', 'Yankees':'⚾', 'Dodgers':'⚾', 'Giants':'⚾', 'Mets':'🍎', 'Cubs':'🧸', 'Cardinals':'🐦', 'Bruins':'🏒', 'Canadiens':'🍁', 'Penguins':'🐧', 'Capitals':'🏛️', 'Rangers':'🏒', 'Islanders':'🏝️', 'Real Madrid':'👑', 'Barcelona':'⚽', 'Manchester United':'😈', 'Liverpool':'🔴', 'Arsenal':'💥', 'Tottenham':'🐓', 'Duke':'🔵', 'UNC':'🐏', 'Michigan':'〽️', 'Ohio State':'🌰', 'Alabama':'🐘', 'Auburn':'🐯', 'Jayson Tatum':'☘️', 'Magic Johnson':'🏀', 'Larry Bird':'☘️', 'Josh Allen':'🏈', 'Jerry Rice':'🏈', 'Randy Moss':'🏈', 'Lawrence Taylor':'🏈', 'J.J. Watt':'🏈', 'Aaron Judge':'⚾', 'Shohei Ohtani':'⚾', 'Derek Jeter':'⚾', 'Alex Rodriguez':'⚾', 'Mike Trout':'⚾', 'Ronald Acuña Jr.':'⚾', 'Connor McDavid':'🏒', 'Mario Lemieux':'🏒', 'Alexander Ovechkin':'🏒', 'Kylian Mbappé':'⚽', 'Erling Haaland':'⚽', 'Diego Maradona':'⚽', 'Football Sundays':'🏈', 'March Madness':'🏀', 'Fantasy Football':'📋', 'Fantasy Baseball':'⚾', 'Home Jerseys':'🏠', 'Away Jerseys':'✈️',
+    // Celebrity add-on (Oct 2026)
+    'Travis Kelce':'🏈', 'Kylie Jenner':'💄', 'Blake Lively':'👱‍♀️', 'Gwyneth Paltrow':'🌿', 'Celebrity Feuds':'😤', 'Celebrity Friendships':'🤝', 'Paparazzi Photos':'📸', 'Posted Selfies':'🤳', 'The Met Gala':'👑', 'The Oscars Red Carpet':'🏆', 'Celebrity Breakup Drama':'💔', 'Celebrity Weddings':'💒', 'Tabloid Headlines':'📰', 'Verified Statements':'✅', 'Old Hollywood Glamour':'🎞️', 'Modern Influencer Fame':'📱'
   };
   function cardGlyph(name, cat){ return ITEM_GLYPHS[name] || ((CAT_META[cat] || {}).badge || '').split(' ')[0] || '\u2728'; }
   function matchCards(raw, p){
@@ -8545,11 +8811,12 @@
     const eventShowing = !els.eventOverlay.classList.contains('hidden');
     if (eventShowing || voted || !current){
       els.slowdownBtn.classList.add('hidden');
-      return;
+      fitTopChip(); return;
     }
     els.slowdownBtn.classList.remove('hidden');
     els.slowdownBtn.textContent = '\u23F1\uFE0F +5s (' + stats.slowdownCharges + ')';
     els.slowdownBtn.classList.toggle('disabled', stats.slowdownCharges <= 0);
+    fitTopChip();
   }
   function addSlowdownTime(){
     if (stats.slowdownCharges <= 0 || voted || !current) return;
@@ -8611,6 +8878,15 @@
   function updatePauseBtnVisibility(){
     if (isPaused){ els.pauseBtn.classList.add('hidden'); return; }
     els.pauseBtn.classList.toggle('hidden', !isOnVsScreen());
+    fitTopChip();
+  }
+  // Hide the top category chip when it would touch a visible +5s / Pause pill.
+  function fitTopChip(){
+    const c = els.chipA; c.classList.remove('squeezed');
+    const r = c.getBoundingClientRect(); if (!r.width) return;
+    const hits = [els.slowdownBtn, els.pauseBtn].some(b=>{ const p = b.getBoundingClientRect();
+      return p.width > 0 && p.left < r.right + 4 && p.right > r.left - 4 && p.top < r.bottom && p.bottom > r.top; });
+    c.classList.toggle('squeezed', hits);
   }
   function pauseGame(){
     if (isPaused || !isOnVsScreen()) return;
@@ -8834,6 +9110,7 @@
     const icon = (meta.badge || '').split(' ')[0] || '';
     const label = (current.bonusPoints ? '\u2B50 ' : '') + (icon ? (icon + ' ' + meta.label) : (meta.label || ''));
     els.chipA.textContent = label; els.chipB.textContent = label;
+    fitTopChip();
 
     if (current.mode === 'match'){
       const grads = pairGradients(current.a, current.b);
@@ -9473,6 +9750,7 @@
       setCollection: (c) => { collection = c; saveCollection(); renderCollectionBtn(); },
       openCollection: () => openCollection(),
       startDailyRiddle: () => startRiddleRound(),
+      putNext: (name) => { const d = decks[contentPoolKey()]; const i = d.cards.findIndex((c, k)=> k >= d.next && (c.a === name || c.b === name)); if (i >= 0){ const [c] = d.cards.splice(i, 1); d.cards.splice(d.next, 0, c); } return i; },
       showRunTrivia: () => runTriviaQuestion(),
       showRunPowerUp: () => runPowerUpRoundForRun(),
       showInfTrivia: () => runWildEvent(),
@@ -9555,6 +9833,7 @@
       renderDoodleScatter(els.homeOverlay, {direction:'left', cell:52, icons:HOME_DOODLE_ICONS});
       renderDoodleScatter(els.halfA, {direction:'right'});
       renderDoodleScatter(els.halfB, {direction:'left'});
+      fitTopChip();
     }, 200);
   });
   els.homeEnterBtn.addEventListener('click', ()=>{
