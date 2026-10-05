@@ -12,7 +12,7 @@
 <meta property="og:url" content="https://flipstax-one.vercel.app/">
 <meta property="og:title" content="FlipStax - Flip, Vote, Jumble & Solve">
 <meta property="og:description" content="A free daily browser game combining opinion-based versus matchups, trivia challenges, and a word-solving puzzle.">
-<meta property="og:image" content="https://flipstax-one.vercel.app/images/og-preview.png">
+<meta property="og:image" content="https://flipstax-one.vercel.app/images/og-preview-v2.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 
@@ -20,9 +20,10 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="FlipStax - Flip, Vote, Jumble & Solve">
 <meta name="twitter:description" content="A free daily browser game combining opinion-based versus matchups, trivia challenges, and a word-solving puzzle.">
-<meta name="twitter:image" content="https://flipstax-one.vercel.app/images/og-preview.png">
+<meta name="twitter:image" content="https://flipstax-one.vercel.app/images/og-preview-v2.jpg">
 
 <!-- Favicon / home-screen icons -->
+<link rel="icon" href="favicon.ico" sizes="48x48">
 <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="images/favicon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
@@ -801,6 +802,10 @@
     padding:24px;
   }
   .personality-overlay.show{ opacity:1; pointer-events:auto; }
+  /* Faded out = untouchable, links included (the contact footer's link sets
+     pointer-events:auto for itself and used to stay tappable, invisibly, over
+     the game after the results closed). */
+  .personality-overlay:not(.show) *, .levelup-overlay:not(.show) *{ pointer-events:none !important; }
   .personality-inner{ text-align:center; max-width:340px; animation: popIn 0.5s cubic-bezier(.2,1.4,.4,1); }
   .personality-mask{ font-size:52px; }
   .readout-stack{ line-height:0; filter:drop-shadow(0 0 14px rgba(157,95,214,0.55)); }
@@ -5708,12 +5713,33 @@
   const WORDS_V1_COUNT = 20;
   const WORDS_V2_FROM_DAY = Date.UTC(2026, 9, 1) / 86400000;   // 1 Oct 2026, 00:00 UTC
   function wordLapOrder(n, salt, cycle){ return shuffle(RUN_WORDS.slice(0, n).map((_, i) => i), mulberry32(hashStr(salt + cycle))); }
+  // From the v2 schedule's second lap on (28 Dec 2026), a lap opens only with
+  // words that weren't among the previous lap's last LAP_GAP days, so no word
+  // comes back within LAP_GAP days. (Each lap used to be shuffled on its own,
+  // so a word could return days later across a lap boundary - PODIUM after 6.)
+  // Lap 0 keeps its order: its days have been / are being played.
+  const LAP_GAP = 30;
+  const v2LapCache = new Map();
+  function v2LapOrder(cycle){
+    if (v2LapCache.has(cycle)) return v2LapCache.get(cycle);
+    const n = RUN_WORDS.length;
+    let order = wordLapOrder(n, 'flipstax-word-v2-cycle-', cycle);
+    if (cycle >= 1){
+      const gap = Math.min(LAP_GAP, Math.floor(n / 3)), prev = v2LapOrder(cycle - 1);
+      const tail = new Set(prev.slice(n - gap));
+      const head = order.filter(i=> !tail.has(i)).slice(0, gap), inHead = new Set(head);
+      order = head.concat(order.filter(i=> !inHead.has(i)));
+    }
+    v2LapCache.set(cycle, order);
+    return order;
+  }
   function wordIndexForDay(day){
     const v2 = day >= WORDS_V2_FROM_DAY;
     const n = v2 ? RUN_WORDS.length : WORDS_V1_COUNT;
     const d = v2 ? day - WORDS_V2_FROM_DAY : day;
     const salt = v2 ? 'flipstax-word-v2-cycle-' : 'flipstax-word-cycle-';
     const cycle = Math.floor(d / n), posInCycle = d % n;
+    if (v2 && cycle >= 1) return v2LapOrder(cycle)[posInCycle];
     const order = wordLapOrder(n, salt, cycle);
     if (n > 2 && posInCycle <= 1){
       // The word of the day before this lap began.
