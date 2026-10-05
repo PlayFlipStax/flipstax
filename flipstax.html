@@ -3309,10 +3309,12 @@
   // without timing out); the overall run clock only scales 2x (10min ->
   // 5min), leaving comfortable real-time headroom to actually reach every
   // threshold and the solve phase instead of racing the clock. Gated on an
-  // exact query param match so normal players never see or trigger it.
-  // Remove before shipping, or leave gated (off by default) if kept for
-  // future testing.
-  const DEBUG_FAST = new URLSearchParams(location.search).get('debug') === 'fast';
+  // exact query param match AND on running from localhost, so on the live
+  // site ?debug=fast does nothing at all - no timer scaling and no
+  // window.__debug hooks (awardBadge, setCollection, run-state setters).
+  // Everything debug-related hangs off this one constant.
+  const IS_LOCAL_HOST = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  const DEBUG_FAST = IS_LOCAL_HOST && new URLSearchParams(location.search).get('debug') === 'fast';
   const DEBUG_TIME_SCALE = DEBUG_FAST ? 6 : 1;
   const DEBUG_RUN_SCALE = DEBUG_FAST ? 2 : 1;
   // Scales the fixed reveal/transition pauses between rounds and events
@@ -5751,6 +5753,13 @@
   function contentPoolKey(){ return document.documentElement.classList.contains('mode-daily') ? 'daily' : 'infinity'; }
   const decks = { daily:{ cards:[], next:0 }, infinity:{ cards:[], next:0 } };
   let current = null, voted = false, votedSinceTime = null;
+  // Bumped every time a card is dealt. voteImpl remembers the value it
+  // started with, so a slow reply can tell the round has moved on (the
+  // watchdog skipped it, the player left, a new card is up) and drop its
+  // result instead of painting it onto a card nobody voted on there.
+  // (Comparing `current` isn't enough: a reshuffled deck can deal the same
+  // card object again.)
+  let roundSeq = 0;
   let tallyPollInterval = null;
   let sampleFn = null, sampleReady = false, aiRequested = false;
 
@@ -9218,6 +9227,7 @@
     const deckNow = decks[contentPoolKey()];
     if (deckNow.next >= deckNow.cards.length) resetDeck();
     current = deckNow.cards[deckNow.next++];
+    roundSeq++;
     current.bonusPoints = Math.random() < 0.2;
     rampOnRound();
 
@@ -9294,17 +9304,32 @@
   // Returns { ok, count }: whether the server recorded the vote and the
   // item's new total (used to take the player's own vote back out when
   // judging the crowd - see crowdVerdict).
+  // Both calls below race a hard deadline (withTimeout): a hung or very slow
+  // API (dead mobile data, a stalled function, a throttled database) used to
+  // leave the board frozen with no reveal until the stalled-round watchdog
+  // skipped the card at ~8s. On timeout they answer exactly like a failure -
+  // { ok:false } / null - so the reveal falls back to its placeholder
+  // percentages within ~2.5s per call (~5s worst case for vote + tally, under
+  // the watchdog). A late reply is swallowed by withTimeout, never applied.
+  // (A vote that timed out client-side may still land on the server; that
+  // only means the tally read afterwards can include the player's own pick.)
+  const VOTE_API_TIMEOUT_MS = 2500;
   async function castVote(itemId){
-    try{
-      const res = await fetch('/api/vote', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ itemId, sid: VOTE_SESSION_ID }),
-      });
-      if (!res.ok){ console.warn('Vote not recorded server-side:', res.status); return { ok:false }; }
-      let data = null; try{ data = await res.json(); }catch(e){}
-      return { ok:true, count: data && typeof data.count === 'number' ? data.count : null };
-    }catch(err){ console.warn('Vote request failed:', err); return { ok:false }; }
+    const attempt = (async ()=>{
+      try{
+        const res = await fetch('/api/vote', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ itemId, sid: VOTE_SESSION_ID }),
+        });
+        if (!res.ok){ console.warn('Vote not recorded server-side:', res.status); return { ok:false }; }
+        let data = null; try{ data = await res.json(); }catch(e){}
+        return { ok:true, count: data && typeof data.count === 'number' ? data.count : null };
+      }catch(err){ console.warn('Vote request failed:', err); return { ok:false }; }
+    })();
+    const result = await withTimeout(attempt, VOTE_API_TIMEOUT_MS);
+    if (!result) console.warn('Vote request timed out after ' + VOTE_API_TIMEOUT_MS + 'ms');
+    return result || { ok:false };
   }
   // Was this pick with the crowd? Judged on everyone else's votes only - the
   // player's own vote is taken back out (it used to be counted, so a card
@@ -9332,12 +9357,15 @@
     return { counted:true, withCrowd: pick > other, others: total, pickPct: Math.round(pick / total * 100) };
   }
   async function fetchTallies(itemIds){
-    try{
-      const params = new URLSearchParams({ ids: itemIds.join(',') });
-      const res = await fetch('/api/tallies?' + params);
-      if (!res.ok) return null;
-      return await res.json(); // { counts, percentages, total }
-    }catch(err){ console.warn('Tally fetch failed:', err); return null; }
+    const attempt = (async ()=>{
+      try{
+        const params = new URLSearchParams({ ids: itemIds.join(',') });
+        const res = await fetch('/api/tallies?' + params);
+        if (!res.ok) return null;
+        return await res.json(); // { counts, percentages, total }
+      }catch(err){ console.warn('Tally fetch failed:', err); return null; }
+    })();
+    return withTimeout(attempt, VOTE_API_TIMEOUT_MS);   // null on timeout, same as a failure
   }
   // Keeps the just-revealed result ticking as other players vote on the same
   // pairing, instead of freezing the instant you tap. Always stopped before
@@ -9411,6 +9439,13 @@
   async function voteImpl(side){
     if (voted || !current) return;
     voted = true;
+    const mySeq = roundSeq;
+    // True if this vote's round is no longer the live one: another card has
+    // been dealt (watchdog, new round) or voted was cleared by something that
+    // took the board over (Daily solve phase, a riddle, leaving to mode
+    // select). The reply is then dropped - nothing painted, scored or
+    // scheduled - so it can never land on the wrong card.
+    const roundMovedOn = ()=> roundSeq !== mySeq || !voted;
     votedSinceTime = Date.now();
     if (runActive){
       runDecisionMsTotal += votedSinceTime - roundStartedAt;
@@ -9430,7 +9465,9 @@
 
     const slugA = slugify(current.a), slugB = slugify(current.b);
     const myVote = await castVote(side === 'A' ? slugA : slugB);
+    if (roundMovedOn()) return;
     const tallyData = await fetchTallies([slugA, slugB]);
+    if (roundMovedOn()) return;
     let counts = tallyData
       ? { a: tallyData.counts[slugA] || 0, b: tallyData.counts[slugB] || 0 }
       : { a: 0, b: 0 }; // request failed - reveal() falls back to its own local estimate
