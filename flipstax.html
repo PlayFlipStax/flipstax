@@ -10258,10 +10258,17 @@
   // Free Hint); Infinity's are POWERUPS (+10 Points, Slow-Mo, Coin Flip, Wild
   // Card), with the numbers from resolveRunPowerUp / resolvePowerUp /
   // runCoinFlip / the slow-mo round timer (+3s for 3 rounds) / resolveEvent
-  // (Infinity trivia: +25 points, nothing lost on a miss). Screen 3 says only
-  // that a secret riddle exists - nothing about how it works or when.
-  const HOWTO_PICK = { icon:'👆', lead:"Tap the one YOU'd pick.", lines:['There are no wrong answers.', 'Then see how many other players agreed.'] };
-  const HOWTO_LAST = { icon:'✨', lead:'Your picks reveal your personality.', lines:['And keep an eye out for a rare secret riddle.'] };
+  // (Infinity trivia: +25 points, nothing lost on a miss). Daily's screen 3
+  // only asks whether you can find the Super Secret Riddle - nothing about
+  // how it works or when it appears.
+  const HOWTO_PICK = { icon:'👆', lead:"Tap the one YOU'd pick.",
+    lines:['There are no wrong answers.', "Then see what everyone else picked — are you with the crowd, or going against the grain?"] };
+  // Screen 3 differs: the secret riddle lives in Daily Stax only, and Infinity
+  // has no results screen - there the payoff is the personality (every
+  // INF_AWARD_VOTES votes), its collectible card (16 in all) and the badges.
+  const HOWTO_LAST_DAILY = { icon:'✨', lead:'Your picks reveal your personality.', lines:['Can you find the Super Secret Riddle?'] };
+  const HOWTO_LAST_INFINITY = { icon:'🃏', lead:'Collect your personality.',
+    lines:['Every 50 votes reveals your personality — collect all 16 cards.', 'Badges reward streaks, trivia and finishing categories.'] };
   const HOWTO_SCREENS = {
     daily: [
       HOWTO_PICK,
@@ -10270,7 +10277,7 @@
         chipsLabel:'Power-ups — pick one when they drop',
         chips:[ ['⚡ +10 pts', 'Instant points'], ['🐌 +30s', 'More time on the clock'],
                 ['🎁 Wild Card', '50/50: +25 or −25 points'], ['💡 Free Hint', 'A clue for the word'] ] },
-      HOWTO_LAST,
+      HOWTO_LAST_DAILY,
     ],
     infinity: [
       HOWTO_PICK,
@@ -10279,7 +10286,7 @@
         chipsLabel:'Power-ups — pick one when they drop',
         chips:[ ['⚡ +10 Points', 'Instant points'], ['🐌 Slow-Mo', '+3 seconds on your next 3 rounds'],
                 ['🪙 Coin Flip', '50/50: gain or lose half your points'], ['🎁 Wild Card', '50/50: +25 or −25 points'] ] },
-      HOWTO_LAST,
+      HOWTO_LAST_INFINITY,
     ],
   };
   let howtoMode = null, howtoIdx = 0, howtoOnDone = null;
