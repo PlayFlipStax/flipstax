@@ -201,6 +201,66 @@
   .pause-overlay.hidden{ display:none; }
   .pause-title{ font-size:22px; font-weight:800; color:#fff; letter-spacing:0.5px; }
   .pause-buttons{ display:flex; gap:10px; }
+  .pause-howto{
+    min-height:44px; padding:0 14px; display:flex; align-items:center; cursor:pointer;
+    color:rgba(255,255,255,0.75); font-size:14px; font-weight:700; text-decoration:underline;
+  }
+
+  /* ---------- How to play: three short screens, first time in each mode ----------
+     Shown after a player picks a mode (see openHowTo) and reopenable from the
+     pause screen. Above the pause screen (z 9 inside the board) and the
+     donate/legal sheets (70), below the toast (80). Closing is display:none
+     straight away - no fade-out that leaves an invisible layer eating taps. */
+  .howto-overlay{
+    position:fixed; inset:0; z-index:75; display:flex; align-items:center; justify-content:center;
+    padding:calc(14px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom));
+    background:rgba(8,5,26,0.84); font-family:'Inter', system-ui, sans-serif;
+  }
+  .howto-overlay.hidden{ display:none; }
+  .howto-card{
+    --accent:#7cc8ff; --glow:rgba(124,200,255,0.4);
+    width:100%; max-width:360px; max-height:100%; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    /* A steady height (content centred in .howto-body) so Skip / Next stay put
+       from screen to screen instead of the card resizing under the thumb;
+       it only grows past this on a narrow phone's busier power-ups screen. */
+    min-height:min(505px, 100%); display:flex; flex-direction:column;
+    box-sizing:border-box; padding:18px 18px 12px; border-radius:22px; text-align:center; color:#fff;
+    background:linear-gradient(165deg,#2b1f6b,#150f3d);
+    border:2px solid var(--accent); box-shadow:0 14px 40px rgba(0,0,0,0.5), 0 0 28px var(--glow);
+    animation:howtoPop 0.3s cubic-bezier(.2,.9,.3,1.15) both;
+  }
+  .howto-card.infinity{ --accent:#ffc400; --glow:rgba(255,196,0,0.4); }
+  @keyframes howtoPop{ from{ transform:scale(0.92); opacity:0; } to{ transform:scale(1); opacity:1; } }
+  .howto-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .howto-mode{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:15px; letter-spacing:2px; text-transform:uppercase; color:var(--accent); }
+  .howto-count{ font-size:12px; font-weight:700; letter-spacing:0.5px; opacity:0.7; }
+  .howto-body{ flex:1; display:flex; flex-direction:column; animation:howtoSwap 0.2s ease both; }
+  .howto-inner{ margin:auto 0; }   /* centres when there's room, top-aligns (scrolls) when there isn't */
+  @keyframes howtoSwap{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+  .howto-icon{ font-size:38px; line-height:1; margin:2px 0 8px; }
+  .howto-lead{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:27px; line-height:1.1; letter-spacing:0.3px; margin:0 0 9px; }
+  .howto-lines p{ margin:0 0 6px; font-size:16px; line-height:1.4; font-weight:600; color:rgba(255,255,255,0.92); }
+  .howto-chips-label{ margin:11px 0 6px; font-size:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:var(--accent); }
+  .howto-chips{ display:grid; grid-template-columns:1fr 1fr; gap:7px; text-align:left; }
+  .howto-chip{ background:rgba(255,255,255,0.09); border:1px solid rgba(255,255,255,0.16); border-radius:12px; padding:7px 9px; font-size:12.5px; line-height:1.25; font-weight:600; color:rgba(255,255,255,0.9); }
+  .howto-chip b{ display:block; font-size:13.5px; font-weight:800; color:#fff; margin-bottom:1px; }
+  .howto-dots{ display:flex; justify-content:center; gap:7px; margin:13px 0 4px; }
+  .howto-dots i{ width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,0.25); }
+  .howto-dots i.on{ background:var(--accent); }
+  .howto-actions{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .howto-skip{
+    min-width:72px; min-height:48px; padding:0 8px; background:none; border:0; cursor:pointer;
+    color:rgba(255,255,255,0.72); font:700 14px 'Inter', system-ui, sans-serif; text-decoration:underline;
+  }
+  .howto-next{
+    flex:1; max-width:190px; min-height:48px; border:0; border-radius:14px; cursor:pointer;
+    background:var(--accent); color:#1a1040; font:800 16px 'Inter', system-ui, sans-serif;
+    box-shadow:0 4px 0 rgba(0,0,0,0.28);
+  }
+  .howto-next:active{ transform:translateY(2px); box-shadow:0 2px 0 rgba(0,0,0,0.28); }
+  @media (prefers-reduced-motion: reduce){
+    .howto-card, .howto-body{ animation:none !important; }
+  }
   .run-timer-wrap{ position:absolute; top:16px; bottom:16px; left:8px; width:10px; z-index:6; }
   .run-timer-wrap.hidden{ display:none; }
   .run-timer-track{
@@ -2178,6 +2238,7 @@
         <div class="daily-btn primary" id="pauseResumeBtn">Resume</div>
         <div class="daily-btn hidden" id="pauseShareBtn">📋 Share</div>
       </div>
+      <div class="pause-howto" id="pauseHowtoBtn" role="button">❓ How to play</div>
     </div>
 
     <div class="half top" id="halfA">
@@ -2450,6 +2511,18 @@
   <div class="cc-zoom-meta" id="cardZoomMeta"></div>
 </div>
 
+<div class="howto-overlay hidden" id="howtoOverlay" role="dialog" aria-modal="true" aria-label="How to play">
+  <div class="howto-card" id="howtoCard">
+    <div class="howto-top"><span class="howto-mode" id="howtoMode"></span><span class="howto-count" id="howtoCount"></span></div>
+    <div class="howto-body" id="howtoBody"></div>
+    <div class="howto-dots" id="howtoDots" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="howto-actions">
+      <button type="button" class="howto-skip" id="howtoSkip">Skip</button>
+      <button type="button" class="howto-next" id="howtoNext">Next</button>
+    </div>
+  </div>
+</div>
+
 <div class="intro-overlay hidden" id="runIntroOverlay">
   <div class="intro-inner">
     <div class="logo"><span class="flip">Flip</span><span class="stax">Stax</span></div>
@@ -2554,6 +2627,12 @@
 
 <script>
 (function(){
+
+  // The game's public address - the one place to change if the domain does.
+  // Added to the caption of every shared results image (see
+  // exportAndShareCard) so a shared result carries a tappable link, and
+  // printed on the share card itself (the image alone has no link).
+  const GAME_URL = 'https://flipstax-one.vercel.app';
 
   const CAT_META = {
     sports: { label:'Sports', badge:'🏆 Sports Head' },
@@ -5825,6 +5904,11 @@
     runBanner: document.getElementById('runBanner'),
     runTimerWrap: document.getElementById('runTimerWrap'), runTimerFill: document.getElementById('runTimerFill'),
     runIntroOverlay: document.getElementById('runIntroOverlay'), runIntroDismiss: document.getElementById('runIntroDismiss'),
+    howtoOverlay: document.getElementById('howtoOverlay'), howtoCard: document.getElementById('howtoCard'),
+    howtoMode: document.getElementById('howtoMode'), howtoCount: document.getElementById('howtoCount'),
+    howtoBody: document.getElementById('howtoBody'), howtoDots: document.getElementById('howtoDots'),
+    howtoSkip: document.getElementById('howtoSkip'), howtoNext: document.getElementById('howtoNext'),
+    pauseHowtoBtn: document.getElementById('pauseHowtoBtn'),
     solveOverlay: document.getElementById('solveOverlay'), solveTimer: document.getElementById('solveTimer'),
     solveCelebrate: document.getElementById('solveCelebrate'), solveConfetti: document.getElementById('solveConfetti'),
     solveCelebrateSub: document.getElementById('solveCelebrateSub'),
@@ -6823,7 +6907,7 @@
 
     ctx.textAlign = 'center';
     ctx.font = '700 34px ' + SHARE_FONT_T; ctx.fillStyle = 'rgba(255,255,255,0.6)';
-    ctx.fillText('flipstax-one.vercel.app', cx, H - 110);
+    ctx.fillText(GAME_URL.replace(/^https?:\/\//, ''), cx, H - 110);
     ctx.font = '500 30px ' + SHARE_FONT_T; ctx.fillStyle = 'rgba(255,255,255,0.45)';
     ctx.fillText("Play today's FlipStax.", cx, H - 66);
     return canvas;
@@ -6846,7 +6930,10 @@
     const blob = dataUrlToBlob(canvas.toDataURL('image/png'));
     const file = new File([blob], filename, { type: 'image/png' });
     if (navigator.canShare && navigator.canShare({ files: [file] })){
-      try{ await navigator.share({ files: [file], text: captionText }); return; }
+      // The link goes in the caption text (not a separate `url` field): with
+      // an attached file, several share targets drop `url` but keep `text`.
+      const text = (captionText ? captionText + '\n' : '') + GAME_URL;
+      try{ await navigator.share({ files: [file], text }); return; }
       catch(e){ /* cancelled or failed - fall through to download */ }
     }
     const url = URL.createObjectURL(blob);
@@ -6872,12 +6959,12 @@
     if (runResultToday || runActive || levelUpActive || personalityActive) return;
     const saved = loadRunSnapshot();
     if (saved){ resumeDailyRun(saved); return; }
-    try{
-      if (localStorage.getItem('flipstax_seen_run_intro') !== '1'){
-        els.runIntroOverlay.classList.remove('hidden');
-        return;
-      }
-    }catch(e){}
+    // First Daily run: the How to play walkthrough comes first, and the run
+    // (clock, score, deck) only starts once it's finished or skipped - its
+    // close callback calls startDailyRun again, which then passes this gate.
+    // (It replaces the old one-screen intro, runIntroOverlay, which is kept
+    // in the markup but no longer shown.)
+    if (!hasSeenHowTo('daily')){ openHowTo('daily', startDailyRun); return; }
     runActive = true; runPhase = 'running';
     runScore = 0; runLetters = []; runThresholdsHit = []; runPowerupThresholdsHit = [];
     runTriviaAttempted = 0; runTriviaCorrect = 0; runRoundResults = [];
@@ -8996,6 +9083,7 @@
            els.irOverlay.classList.contains('hidden') &&
            els.infAwardOverlay.classList.contains('hidden') &&
            els.runIntroOverlay.classList.contains('hidden') &&
+           els.howtoOverlay.classList.contains('hidden') &&
            els.modeSelectOverlay.classList.contains('hidden') &&
            !els.readoutOverlay.classList.contains('show');
   }
@@ -9141,6 +9229,7 @@
   new MutationObserver(updatePauseBtnVisibility).observe(els.solveOverlay, { attributes:true, attributeFilter:['class'] });
   new MutationObserver(updatePauseBtnVisibility).observe(els.riddleOverlay, { attributes:true, attributeFilter:['class'] });
   new MutationObserver(updatePauseBtnVisibility).observe(els.runIntroOverlay, { attributes:true, attributeFilter:['class'] });
+  new MutationObserver(updatePauseBtnVisibility).observe(els.howtoOverlay, { attributes:true, attributeFilter:['class'] });
 
   // Noon Rush: a per-timezone local event, not a global one - every player's
   // OWN device clock decides their own noon. No server coordination needed.
@@ -9428,6 +9517,10 @@
   }
 
   async function vote(side){
+    // The How to play walkthrough covers the board; the keyboard shortcuts
+    // (arrows / 1 / 2) must not vote behind it.
+    if (!els.howtoOverlay.classList.contains('hidden')) return;
+    if (performance.now() - howtoClosedAt < HOWTO_TAP_SHIELD_MS) return;   // see howtoClosedAt
     try{
       await voteImpl(side);
     }catch(err){
@@ -10144,6 +10237,105 @@
     const link = e.target.closest('[data-legal-link]');
     if (link) openLegal(link.getAttribute('data-legal-link'));
   });
+  // ---------- How to play: a first-time walkthrough, once per mode ----------
+  // Three short screens (Next, then Got it; Skip on every one). Remembered per
+  // mode in localStorage - every access is in try/catch so blocked storage
+  // can't break the game; in that case it still shows only once per mode per
+  // page load (howtoSeenThisPage). Daily's run clock only starts after it
+  // closes (see startDailyRun's gate), and the pause screen reopens it.
+  const HOWTO_KEYS = { daily:'flipstax_howto_daily_v1', infinity:'flipstax_howto_infinity_v1' };
+  const howtoSeenThisPage = { daily:false, infinity:false };
+  function hasSeenHowTo(mode){
+    if (howtoSeenThisPage[mode]) return true;
+    try{ return localStorage.getItem(HOWTO_KEYS[mode]) === '1'; }catch(e){ return false; }
+  }
+  function markHowToSeen(mode){
+    howtoSeenThisPage[mode] = true;
+    try{ localStorage.setItem(HOWTO_KEYS[mode], '1'); }catch(e){}
+  }
+  // Every power-up named here is read from the game's own definitions, not
+  // invented: Daily's are RUN_POWERUPS (+10 pts, +30s on the clock, Wild Card,
+  // Free Hint); Infinity's are POWERUPS (+10 Points, Slow-Mo, Coin Flip, Wild
+  // Card), with the numbers from resolveRunPowerUp / resolvePowerUp /
+  // runCoinFlip / the slow-mo round timer (+3s for 3 rounds) / resolveEvent
+  // (Infinity trivia: +25 points, nothing lost on a miss). Screen 3 says only
+  // that a secret riddle exists - nothing about how it works or when.
+  const HOWTO_PICK = { icon:'👆', lead:"Tap the one YOU'd pick.", lines:['There are no wrong answers.', 'Then see how many other players agreed.'] };
+  const HOWTO_LAST = { icon:'✨', lead:'Your picks reveal your personality.', lines:['And keep an eye out for a rare secret riddle.'] };
+  const HOWTO_SCREENS = {
+    daily: [
+      HOWTO_PICK,
+      { icon:'🧩', lead:'Points unlock trivia.',
+        lines:["Each right answer reveals a letter of today's secret word.", 'Then unscramble it before time runs out.'],
+        chipsLabel:'Power-ups — pick one when they drop',
+        chips:[ ['⚡ +10 pts', 'Instant points'], ['🐌 +30s', 'More time on the clock'],
+                ['🎁 Wild Card', '50/50: +25 or −25 points'], ['💡 Free Hint', 'A clue for the word'] ] },
+      HOWTO_LAST,
+    ],
+    infinity: [
+      HOWTO_PICK,
+      { icon:'🏁', lead:'Every pick earns points.',
+        lines:['Race to 250 points.', 'Trivia pops up: right answer +25, a miss costs nothing.'],
+        chipsLabel:'Power-ups — pick one when they drop',
+        chips:[ ['⚡ +10 Points', 'Instant points'], ['🐌 Slow-Mo', '+3 seconds on your next 3 rounds'],
+                ['🪙 Coin Flip', '50/50: gain or lose half your points'], ['🎁 Wild Card', '50/50: +25 or −25 points'] ] },
+      HOWTO_LAST,
+    ],
+  };
+  let howtoMode = null, howtoIdx = 0, howtoOnDone = null;
+  // A quick double-tap on "Got it" would otherwise land its second tap on the
+  // card underneath and cast a vote nobody meant; vote() ignores taps for this
+  // long after the walkthrough closes. (Only votes, only briefly - nothing
+  // stays covering the board.)
+  let howtoClosedAt = -1000;
+  const HOWTO_TAP_SHIELD_MS = 250;
+  function renderHowToScreen(){
+    const screens = HOWTO_SCREENS[howtoMode], s = screens[howtoIdx], last = howtoIdx === screens.length - 1;
+    els.howtoCard.classList.toggle('infinity', howtoMode === 'infinity');
+    els.howtoMode.textContent = howtoMode === 'infinity' ? 'Infinity Flips' : 'Daily Stax';
+    els.howtoCount.textContent = (howtoIdx + 1) + ' / ' + screens.length;
+    // Static strings from HOWTO_SCREENS above only - no user input in here.
+    let html = '<div class="howto-inner"><div class="howto-icon" aria-hidden="true">' + s.icon + '</div><div class="howto-lead">' + s.lead + '</div>' +
+      '<div class="howto-lines">' + s.lines.map(l=> '<p>' + l + '</p>').join('') + '</div>';
+    if (s.chips) html += '<div class="howto-chips-label">' + s.chipsLabel + '</div><div class="howto-chips">' +
+      s.chips.map(c=> '<div class="howto-chip"><b>' + c[0] + '</b>' + c[1] + '</div>').join('') + '</div>';
+    els.howtoBody.innerHTML = html + '</div>';
+    els.howtoBody.style.animation = 'none'; void els.howtoBody.offsetWidth; els.howtoBody.style.animation = '';   // replay the swap-in
+    Array.prototype.forEach.call(els.howtoDots.children, (d, i)=> d.classList.toggle('on', i === howtoIdx));
+    els.howtoNext.textContent = last ? 'Got it' : 'Next';
+  }
+  function openHowTo(mode, onDone){
+    if (!HOWTO_SCREENS[mode] || !els.howtoOverlay.classList.contains('hidden')) return;
+    howtoMode = mode; howtoIdx = 0; howtoOnDone = onDone || null;
+    renderHowToScreen();
+    els.howtoOverlay.classList.remove('hidden');
+    els.howtoCard.style.animation = 'none'; void els.howtoCard.offsetWidth; els.howtoCard.style.animation = '';
+    try{ els.howtoNext.focus({ preventScroll:true }); }catch(e){}
+  }
+  // Finishing or skipping marks the mode as seen and runs the callback (Daily:
+  // start the run). opts.abandon (left to mode select mid-walkthrough) closes
+  // it without either, so it shows again next time.
+  function closeHowTo(opts){
+    if (els.howtoOverlay.classList.contains('hidden')) return;
+    const mode = howtoMode, done = howtoOnDone;
+    els.howtoOverlay.classList.add('hidden');     // gone immediately - nothing left over to catch taps
+    howtoMode = null; howtoOnDone = null;
+    howtoClosedAt = performance.now();
+    try{ if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); }catch(e){}
+    if (opts && opts.abandon) return;
+    if (mode) markHowToSeen(mode);
+    if (done) done();
+  }
+  els.howtoNext.addEventListener('click', ()=>{
+    if (!howtoMode) return;
+    if (howtoIdx >= HOWTO_SCREENS[howtoMode].length - 1) closeHowTo();
+    else { howtoIdx++; renderHowToScreen(); }
+  });
+  els.howtoSkip.addEventListener('click', ()=> closeHowTo());
+  els.howtoOverlay.addEventListener('click', e=> e.stopPropagation());
+  document.addEventListener('keydown', e=>{ if (e.key === 'Escape' && !els.howtoOverlay.classList.contains('hidden')) closeHowTo(); });
+  els.pauseHowtoBtn.addEventListener('click', e=>{ e.stopPropagation(); openHowTo(inInfinity() ? 'infinity' : 'daily'); });
+
   els.modeInfinityBtn.addEventListener('click', ()=>{
     els.modeSelectOverlay.classList.add('hidden');
     document.documentElement.classList.add('mode-infinity');
@@ -10158,6 +10350,10 @@
     // Coming back after a finished Daily run: that halted the board, so
     // deal a fresh round.
     if (sessionHalted){ sessionHalted = false; voted = false; votedSinceTime = null; loadNext(); }
+    // First time in Infinity Flips: the walkthrough. (No timer to hold here -
+    // Infinity has no run clock, and rounds that expire behind it cost nothing
+    // because isOnVsScreen() is false while it's open.)
+    if (!hasSeenHowTo('infinity')) openHowTo('infinity');
   });
   els.modeDailyBtn.addEventListener('click', ()=>{
     refreshDailyDay();
@@ -10202,6 +10398,7 @@
     stopSecretCelebration(); stopRiddleAmbient();
     els.eventOverlay.classList.remove('coin-mode', 'coin-won', 'coin-lost');
     els.runIntroOverlay.classList.add('hidden');
+    closeHowTo({ abandon:true });   // left mid-walkthrough: not "seen", no run starts
     infRiddleState = 'idle'; clearInterval(infRiddleInterval); clearTimeout(infRiddleCloseTimer);
     els.irOverlay.classList.add('hidden'); els.irOverlay.classList.remove('win', 'lose');
     els.infAwardOverlay.classList.add('hidden');
