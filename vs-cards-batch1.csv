@@ -1,0 +1,282 @@
+category,itemA,itemB
+Food,Pizza,Burgers
+Food,Tacos,Burritos
+Food,Pancakes,Waffles
+Food,French Fries,Onion Rings
+Food,Cake,Pie
+Food,Cookies,Brownies
+Food,Ice Cream,Frozen Yogurt
+Food,Ketchup,Ranch
+Food,Sushi,Pasta
+Food,Donuts,Muffins
+Food,Peanut Butter,Nutella
+Food,Nachos,Mozzarella Sticks
+Food,Garlic Bread,Breadsticks
+Food,Spicy Wings,Chicken Nuggets
+Food,Soup,Salad
+Food,Cereal,Toast
+Food,Hot Dogs,Burgers
+Food,Cheese Pizza,Pepperoni Pizza
+Food,Mac and Cheese,Grilled Cheese
+Food,Popcorn,Pretzels
+Food,Chocolate Cake,Cheesecake
+Food,Fried Chicken,Rotisserie Chicken
+Food,Guacamole,Salsa
+Food,Bacon,Sausage
+Food,Pancake Syrup,Honey
+Drinks,Coffee,Tea
+Drinks,Soda,Juice
+Drinks,Lemonade,Iced Tea
+Drinks,Milkshakes,Smoothies
+Drinks,Hot Chocolate,Apple Cider
+Drinks,Sparkling Water,Still Water
+Drinks,Energy Drinks,Coffee
+Drinks,Orange Juice,Apple Juice
+Drinks,Iced Coffee,Hot Coffee
+Drinks,Chocolate Milk,Regular Milk
+Drinks,Root Beer,Cola
+Drinks,Sweet Tea,Unsweet Tea
+Drinks,Fruit Punch,Hawaiian Punch
+Drinks,Coconut Water,Sports Drinks
+Drinks,Milk,Orange Juice
+Movies & TV,Marvel,DC
+Movies & TV,Star Wars,Star Trek
+Movies & TV,Harry Potter,Lord of the Rings
+Movies & TV,Comedies,Horror Movies
+Movies & TV,Sitcoms,Dramas
+Movies & TV,Reality TV,Scripted Shows
+Movies & TV,Cartoons,Anime
+Movies & TV,Sequels,Original Movies
+Movies & TV,Subtitles,Dubbing
+Movies & TV,Documentaries,Reality TV
+Movies & TV,Movie Theaters,Streaming at Home
+Movies & TV,Binge-Watching,One Episode a Week
+Movies & TV,Animated Movies,Live-Action Movies
+Movies & TV,Jump Scares,Slow-Burn Horror
+Movies & TV,Plot Twists,Happy Endings
+Movies & TV,The Office,Parks and Recreation
+Movies & TV,Breaking Bad,The Sopranos
+Movies & TV,Friends,Seinfeld
+Movies & TV,Toy Story,Shrek
+Movies & TV,The Matrix,Inception
+Movies & TV,Jurassic Park,Jaws
+Movies & TV,Batman,Superman
+Movies & TV,Spider-Man,Iron Man
+Movies & TV,Godzilla,King Kong
+Movies & TV,Rom-Coms,Action Movies
+Music,Rap,Rock
+Music,Pop,Country
+Music,Vinyl,Streaming
+Music,Concerts,Music Festivals
+Music,Solo Artists,Bands
+Music,Old Music,New Music
+Music,Lyrics,Beat
+Music,Studio Albums,Live Albums
+Music,Headphones,Speakers
+Music,Karaoke,Air Guitar
+Music,Beyoncé,Taylor Swift
+Music,Drake,Kendrick Lamar
+Music,The Beatles,The Rolling Stones
+Music,Michael Jackson,Prince
+Music,Country Music,Rock Music
+Music,EDM,Hip-Hop
+Music,Guitar,Piano
+Music,Singing in the Shower,Singing in the Car
+Music,Music Videos,Lyric Videos
+Music,80s Music,90s Music
+Sports,Football,Basketball
+Sports,Baseball,Hockey
+Sports,Soccer,American Football
+Sports,Tennis,Golf
+Sports,Boxing,Mixed Martial Arts
+Sports,Individual Sports,Team Sports
+Sports,Playing Sports,Watching Sports
+Sports,Offense,Defense
+Sports,Home Games,Away Games
+Sports,Olympics,World Cup
+Sports,Michael Jordan,LeBron James
+Sports,Tom Brady,Patrick Mahomes
+Sports,Swimming,Running
+Sports,Skateboarding,Surfing
+Sports,Bowling,Mini Golf
+Sports,Pickup Games,Organized Leagues
+Sports,Cheering from the Stands,Watching on TV
+Sports,Underdogs,Favorites
+Sports,Overtime,A Clean Finish
+Sports,Trash Talk,Good Sportsmanship
+Video Games,PlayStation,Xbox
+Video Games,Console,PC Gaming
+Video Games,Single-Player,Multiplayer
+Video Games,Mobile Games,Console Games
+Video Games,Racing Games,Fighting Games
+Video Games,Strategy Games,Adventure Games
+Video Games,Retro Games,Modern Games
+Video Games,Minecraft,Fortnite
+Video Games,Call of Duty,Halo
+Video Games,Board Games,Video Games
+Video Games,Speedrunning,100 Percent Completion
+Video Games,Local Co-op,Online Multiplayer
+Video Games,Open World Games,Linear Story Games
+Video Games,Easy Mode,Hard Mode
+Video Games,Arcade Games,Home Consoles
+Tech,iPhone,Android
+Tech,Mac,PC
+Tech,Laptop,Tablet
+Tech,Dark Mode,Light Mode
+Tech,Wired Earbuds,Wireless Earbuds
+Tech,Smartwatch,Traditional Watch
+Tech,Texting,Calling
+Tech,Video Calls,Phone Calls
+Tech,New Technology,Older Reliable Technology
+Tech,Physical Buttons,Touchscreens
+Tech,Social Media,Texting
+Tech,TikTok,Instagram
+Tech,YouTube,Netflix
+Tech,Podcasts,Audiobooks
+Tech,Voice Assistants,Typing It Yourself
+Travel,Beach Vacations,Mountain Vacations
+Travel,Hotels,Vacation Rentals
+Travel,Road Trips,Flying
+Travel,Backpacking,Luxury Travel
+Travel,Camping,Staying in Hotels
+Travel,Exploring Cities,Exploring Nature
+Travel,Traveling Alone,Traveling with Friends
+Travel,Theme Parks,Water Parks
+Travel,Museums,Zoos
+Travel,Cruises,Road Trips
+Travel,Window Seat,Aisle Seat
+Travel,Planning Every Detail,Winging It
+Travel,National Parks,Big Cities
+Travel,Summer Vacation,Winter Vacation
+Travel,Passport Stamps,Souvenirs
+Everyday Life,Mornings,Nights
+Everyday Life,Working from Home,Working in an Office
+Everyday Life,City Living,Countryside Living
+Everyday Life,Texting,Calling
+Everyday Life,Naps,Sleeping In
+Everyday Life,Silence,Background Noise
+Everyday Life,Showers,Baths
+Everyday Life,Cash,Cards
+Everyday Life,Saving Money,Spending Money
+Everyday Life,Planning Ahead,Being Spontaneous
+Everyday Life,Early Mornings,Late Nights
+Everyday Life,Staying In,Going Out
+Everyday Life,Cleaning,Organizing
+Everyday Life,Group Projects,Working Solo
+Everyday Life,Remote Work,In-Person Work
+Everyday Life,Dating Apps,Meeting in Person
+Everyday Life,Parties,Small Gatherings
+Everyday Life,Introverts,Extroverts
+Everyday Life,Routine,Spontaneity
+Everyday Life,Logic,Emotion
+Everyday Life,Christmas,Halloween
+Everyday Life,Summer,Winter
+Everyday Life,Birthdays,Anniversaries
+Everyday Life,New Year's Eve,Fourth of July
+Everyday Life,Snow Days,Beach Days
+Fashion,Sneakers,Boots
+Fashion,Casual Style,Formal Style
+Fashion,Vintage Fashion,Modern Fashion
+Fashion,Jeans,Sweatpants
+Fashion,Gold Jewelry,Silver Jewelry
+Fashion,Tattoos,Piercings
+Fashion,Hoodies,Jackets
+Fashion,Sneakers,Sandals
+Fashion,Bold Prints,Solid Colors
+Fashion,Name Brands,Thrifted Finds
+Pets & Animals,Dogs,Cats
+Pets & Animals,Big Dogs,Small Dogs
+Pets & Animals,Birds,Fish
+Pets & Animals,Adopting a Pet,Buying a Pet
+Pets & Animals,Ocean Animals,Jungle Animals
+Pets & Animals,Dinosaurs,Dragons
+Pets & Animals,Wolves,Big Cats
+Pets & Animals,Reptiles,Amphibians
+Pets & Animals,Farm Animals,Zoo Animals
+Pets & Animals,Horses,Elephants
+Nostalgia,80s,90s
+Nostalgia,Old Cartoons,New Cartoons
+Nostalgia,Classic Movies,New Releases
+Nostalgia,Flip Phones,Smartphones
+Nostalgia,Mixtapes,Playlists
+Nostalgia,Arcades,Home Gaming
+Nostalgia,Saturday Morning Cartoons,Streaming Anytime
+Nostalgia,Disposable Cameras,Phone Cameras
+Nostalgia,Handwritten Letters,Text Messages
+Nostalgia,Board Game Nights,Screen Time
+Personality & Ideas,Heroes,Villains
+Personality & Ideas,Fame,Privacy
+Personality & Ideas,Money,Free Time
+Personality & Ideas,Talent,Hard Work
+Personality & Ideas,Intelligence,Creativity
+Personality & Ideas,Luck,Skill
+Personality & Ideas,Freedom,Security
+Personality & Ideas,Popularity,Respect
+Personality & Ideas,Being Right,Being Liked
+Personality & Ideas,Taking Risks,Playing It Safe
+Personality & Ideas,Following Your Heart,Following Your Head
+Personality & Ideas,Adventure,Comfort
+Personality & Ideas,Honesty,Loyalty
+Personality & Ideas,Confidence,Kindness
+Personality & Ideas,The Past,The Future
+Books,Stephen King,Edgar Allan Poe
+Books,Of Mice and Men,The Catcher in the Rye
+Books,J.K. Rowling,Suzanne Collins
+Books,The Hunger Games,Divergent
+Books,Harry Potter,Percy Jackson
+Books,Physical Books,E-Books
+Books,Audiobooks,Physical Books
+Books,Stephen King,Dean Koontz
+Books,To Kill a Mockingbird,The Great Gatsby
+Books,1984,Brave New World
+Books,Fantasy Novels,Science Fiction Novels
+Books,Agatha Christie,Arthur Conan Doyle
+Books,Short Stories,Novels
+Books,Series,Standalone Books
+Books,Reading Before Bed,Reading in the Morning
+Books,Judging a Book by Its Cover,Reading the Summary First
+Books,Bookstores,Libraries
+Books,Highlighting While Reading,Keeping Books Pristine
+Books,Plot-Driven Books,Character-Driven Books
+Books,Slow Burn Stories,Fast-Paced Thrillers
+Wildcard,A Rewind Button for Your Life,A Fast-Forward Button for Your Life
+Wildcard,Reading Minds,Turning Invisible
+Wildcard,Flying,Teleporting
+Wildcard,Being 10 Feet Tall,Being the Size of a Mouse
+Wildcard,Never Needing Sleep,Never Needing Food
+Wildcard,Talking to Animals,Speaking Every Language
+Wildcard,Unlimited Money,Unlimited Time
+Wildcard,A Time Machine,A Cloning Machine
+Wildcard,Super Strength,Super Speed
+Wildcard,Freezing Time,Rewinding Time
+Wildcard,Living Underwater,Living in Space
+Wildcard,Winning the Lottery,Getting Your Dream Job
+Wildcard,A Personal Chef,A Personal Chauffeur
+Wildcard,A House That Cleans Itself,A Car That Drives Itself
+Wildcard,Knowing How You'll Die,Knowing When You'll Die
+Wildcard,Being Famous for a Week,Being Rich for a Week
+Wildcard,A Do-Over Button,A Skip Button
+Wildcard,Living Without Music,Living Without Movies
+Wildcard,Losing Your Sense of Smell,Losing Your Sense of Taste
+Wildcard,A Never-Ending Vacation,A Never-Ending Payday
+Wildcard,Being the Funniest Person in the Room,Being the Smartest Person in the Room
+Wildcard,Fighting One Horse-Sized Duck,Fighting 100 Duck-Sized Horses
+Wildcard,Only Being Able to Whisper,Only Being Able to Shout
+Wildcard,Explaining Memes to Your Grandparents,Explaining TikTok to Your Boss
+Wildcard,A Vending Machine That's Always Free,A Fridge That's Always Full
+Wildcard,Being Able to Pause Real Life,Being Able to Fast-Forward Meetings
+Wildcard,Waking Up as a Cat,Waking Up as a Dog
+Wildcard,Getting Stuck in an Elevator,Getting Stuck in Traffic
+Wildcard,A Group Chat That Never Stops,A Group Chat That Never Starts
+Wildcard,Autocorrect Fails,Butt Dials
+Wildcard,Losing Your Phone,Losing Your Wallet
+Wildcard,Forgetting Someone's Name,Forgetting Someone's Birthday
+Wildcard,Awkward Silence,Talking Over Each Other
+Wildcard,A Bad Haircut,A Bad Sunburn
+Wildcard,Stepping on a Lego,Stubbing Your Toe
+Wildcard,A Song Stuck in Your Head,An Itch You Can't Reach
+Wildcard,Being Put on Hold,Waiting in a Long Line
+Wildcard,A Typo in a Text,Sending It to the Wrong Person
+Wildcard,Running Out of Snacks,Running Out of Wi-Fi
+Wildcard,A Slow Walker in Front of You,A Loud Chewer Next to You
+Wildcard,Your Alarm Not Going Off,Your Alarm Going Off Too Early
