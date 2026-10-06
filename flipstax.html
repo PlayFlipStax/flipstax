@@ -10261,14 +10261,15 @@
   // (Infinity trivia: +25 points, nothing lost on a miss). Daily's screen 3
   // only asks whether you can find the Super Secret Riddle - nothing about
   // how it works or when it appears.
-  const HOWTO_PICK = { icon:'👆', lead:"Tap the one YOU'd pick.",
-    lines:['There are no wrong answers.', "Then see what everyone else picked — are you with the crowd, or going against the grain?"] };
+  const HOWTO_PICK = { icon:'👆', lead:'Two choices. Tap the one YOU prefer.',
+    lines:['There are no wrong answers.', 'Then see what everyone else picked: are you with the crowd, or do you go against the grain?'] };
   // Screen 3 differs: the secret riddle lives in Daily Stax only, and Infinity
   // has no results screen - there the payoff is the personality (every
   // INF_AWARD_VOTES votes), its collectible card (16 in all) and the badges.
-  const HOWTO_LAST_DAILY = { icon:'✨', lead:'Your picks reveal your personality.', lines:['Can you find the Super Secret Riddle?'] };
-  const HOWTO_LAST_INFINITY = { icon:'🃏', lead:'Collect your personality.',
-    lines:['Every 50 votes reveals your personality — collect all 16 cards.', 'Badges reward streaks, trivia and finishing categories.'] };
+  const HOWTO_LAST_DAILY = { icon:'✨', lead:'At the end of your run, your picks reveal your personality.',
+    lines:['And somewhere in there... can you find the Super Secret Riddle?', 'Cards are personality types you unlock by how you play. Badges are earned for finishing categories.'] };
+  const HOWTO_LAST_INFINITY = { icon:'🃏', lead:'The more you play, the more you unlock.',
+    lines:['Your personality type, revealed every 50 votes.', 'Cards: 16 personality types, each unlocked by how you play.', 'Badges: earned for streaks, trivia and finishing categories.'] };
   const HOWTO_SCREENS = {
     daily: [
       HOWTO_PICK,
