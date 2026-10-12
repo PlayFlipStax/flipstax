@@ -2428,7 +2428,7 @@
         <span class="me-line"><span id="flipCount">0 Flipz</span><span id="streakEl"></span></span>
       </div>
     </div>
-    <!-- The headline: this mode's points (Infinity: today's race to 250;
+    <!-- The headline: this mode's points (Infinity: the run's points toward FINISH_POINTS;
          Daily: the run's points and letters), plus the Points Zone / Noon
          Rush pill while one is on. -->
     <div class="pill-row">
@@ -6324,34 +6324,10 @@
     }
   }
 
-  // ---------- race to 250 (real stakes, resets daily, never touches your
-  // permanent Tier/flip count - this is its own separate score) ----------
-  const RACE_TARGET = 250;
-  function loadRaceState(){
-    try{
-      const raw = localStorage.getItem('flipstax_race_v1');
-      if (!raw) return null;
-      const parsed = JSON.parse(raw);
-      return parsed && parsed.date === todayStr() ? parsed : null;
-    }catch(e){ return null; }
-  }
-  function saveRaceState(){ try{ localStorage.setItem('flipstax_race_v1', JSON.stringify(raceState)); }catch(e){} }
-  let raceState = loadRaceState();
-  function ensureRaceToday(){
-    if (!raceState || raceState.date !== todayStr()){
-      raceState = { date: todayStr(), score: 0, startedAt: null, completed: false, completionMs: null };
-      saveRaceState();
-    }
-  }
   function formatRaceTime(ms){
     const totalSec = Math.max(0, Math.round(ms/1000));
     const m = Math.floor(totalSec/60), s = totalSec%60;
     return m + 'm ' + (s<10?'0':'') + s + 's';
-  }
-  // Today's race points live in the header's score pill (Infinity).
-  function renderRaceStatus(){
-    ensureRaceToday();
-    if (document.documentElement.classList.contains('mode-infinity')) renderRunBanner();
   }
   function addRacePoints(delta){
     if (inInfinity()){
@@ -6370,12 +6346,12 @@
       if (infRun.score >= m.at && infRun.milestones.indexOf(m.at) === -1){ infRun.milestones.push(m.at); celebrateInfMilestone(m); }
     });
     saveInfRun();
-    if (infRun.score >= INF_RUN_TARGET) endInfRun('points');
+    if (infRun.score >= FINISH_POINTS) endInfRun('points');
     renderRunBanner();
   }
 
   // ---------- Infinity run: a finish line ----------
-  // A run ends at INF_RUN_TARGET points or when the run clock reaches
+  // A run ends at FINISH_POINTS points or when the run clock reaches
   // INF_RUN_CLOCK_MS, whichever comes first, and finishes in the gold finale
   // (Run Complete -> Plinko -> the Vault). The clock counts active play only:
   // it runs while the vote board is showing (isOnVsScreen) and the game isn't
@@ -6384,16 +6360,21 @@
   // keys, clock and all; the finale's outcomes are drawn once and saved too,
   // so a refresh can't re-roll them or award anything twice.
   //
-  // Pacing (Oct 2026, measured with screenshots/qa/tools/pacing_sim.py from
-  // this code's own constants): the old scoring reached 250 in a median 3.4
-  // minutes of voting (~4.3s and ~5.9 points per vote round). Re-tuned so a
-  // typical player (about 2s per pick) reaches it in ~8.5-9.5 minutes:
-  // a star card is worth 2 (was 3), combos no longer add points, the Points
+  // Pacing (Oct 2026, screenshots/qa/tools/pacing_sim.py, from this code's own
+  // constants): the old scoring reached its 250 target in a median 3.4
+  // minutes of voting (~4.3s and ~5.9 points per vote round). Re-tuned: a
+  // star card is worth 2 (was 3), combos no longer add points, the Points
   // Zone is rarer (1.5% a round, was 8%) and doubles vote points only,
-  // trivia is worth 5 (was 25) plus a key, and Coin Flip / Wild Card are
-  // capped at 15 either way.
+  // trivia is worth 5 (was 25) plus a key, Coin Flip / Wild Card are capped
+  // at 15 either way. The finish line is FINISH_POINTS (350): with Guess the
+  // Crowd firing every 6-8 rounds a typical run reaches it in ~6.7 minutes
+  // (slow players ~7.7); while no card has CROWD_DATA_MIN votes Guess the
+  // Crowd can't fire, and most runs end on the 10:00 clock instead.
   const INF_RUN_KEY = 'flipstax_inf_run_v1';
-  const INF_RUN_TARGET = 250;
+  // The finish line (Oct 2026: 350, from pacing_sim.py's finish table - the
+  // closest of 300-350 to a 9-10 minute run once Guess the Crowd fires).
+  // Everything that shows or uses the target reads this.
+  const FINISH_POINTS = 350;
   const INF_RUN_CLOCK_MS = 10 * 60 * 1000;
   const INF_KEY_CAP = 8;
   const INF_STAR_POINTS = 2;
@@ -6402,7 +6383,7 @@
   const INF_ZONE_CHANCE = 0.015;
   const INF_TRIVIA_CHANCE = 0.13;    // was 0.12
   const INF_MATCHES_PER_KEY = 3;     // crowd matches in a row for a key
-  const INF_MILESTONES = [ { at:125, text:'Halfway!', icon:'🎉' }, { at:200, text:'Almost there!', icon:'🔥' } ];
+  const INF_MILESTONES = [ { at: Math.round(FINISH_POINTS / 2), text:'Halfway!', icon:'🎉' }, { at: Math.round(FINISH_POINTS * 0.8), text:'Almost there!', icon:'🔥' } ];
   function freshInfRun(){
     return { v:1, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7), startedAt: Date.now(),
       clockMs:0, score:0, keys:0, keyLog:{}, matchStreak:0, votes:0, crowdN:0, crowdAgree:0, boldest:null,
@@ -7139,13 +7120,13 @@
     // whenever the mode changes (see the mode buttons / returnToModeSelect).
     // The crowd meter is per run / per Infinity block, so it follows along.
     updateVibeMeter();
-    // Infinity: the run's points toward 250 (a progress bar behind them),
+    // Infinity: the run's points toward FINISH_POINTS (a progress bar behind them),
     // the run clock's time left, and the run's keys.
     if (document.documentElement.classList.contains('mode-infinity')){
       ensureInfRun();
-      const sc = infRun.score, pct = Math.max(0, Math.min(100, sc / INF_RUN_TARGET * 100));
+      const sc = infRun.score, pct = Math.max(0, Math.min(100, sc / FINISH_POINTS * 100));
       els.runBanner.innerHTML = '<i class="sp-bar" style="width:' + pct.toFixed(1) + '%"></i>' +
-        '<span class="sp-mode">\u267E\uFE0F</span><b class="sp-num">' + Math.max(0, sc) + '</b><span class="sp-of">/ ' + INF_RUN_TARGET + '</span>' +
+        '<span class="sp-mode">\u267E\uFE0F</span><b class="sp-num">' + Math.max(0, sc) + '</b><span class="sp-of">/ ' + FINISH_POINTS + '</span>' +
         '<span class="sp-sep">\u00B7</span><span class="sp-clock">\u23F1\uFE0F<span id="infClock"></span></span>' +
         '<span class="sp-sep">\u00B7</span><span class="sp-keys" title="Keys">\uD83D\uDD11<b id="infKeyCount">' + infRun.keys + '</b></span>';
       renderInfClock();
@@ -7326,7 +7307,7 @@
         badge: 'INFINITY FLIPS \u00B7 RUN COMPLETE',
         heroText: a.finalScore + ' PTS',
         statLine: [a.crowdPct !== null && a.crowdPct !== undefined ? 'Matched the crowd ' + a.crowdPct + '%' : null, '\uD83D\uDD11 ' + a.keys + ' key' + (a.keys === 1 ? '' : 's'),
-          a.ended === 'clock' ? '10:00 run' : '250 in ' + formatClock(a.clockMs)].filter(Boolean).join(' \u00B7 '),
+          a.ended === 'clock' ? '10:00 run' : FINISH_POINTS + ' in ' + formatClock(a.clockMs)].filter(Boolean).join(' \u00B7 '),
         boldest: a.boldest || null,
         personality: pm ? { icon: pm.icon, name: pm.name } : null,
         jackpot: !!a.jackpot,
@@ -8235,7 +8216,7 @@
   function renderFinComplete(){
     const r = infRun, el = document.getElementById('finComplete');
     document.getElementById('finReason').textContent = r.ended === 'clock'
-      ? '⏱️ Time! The 10:00 clock ran out.' : '🏁 ' + INF_RUN_TARGET + ' points in ' + formatClock(r.clockMs) + '!';
+      ? '⏱️ Time! The 10:00 clock ran out.' : '🏁 ' + FINISH_POINTS + ' points in ' + formatClock(r.clockMs) + '!';
     document.getElementById('finScore').textContent = Math.max(0, r.score);
     const pct = infCrowdPct(r);
     document.getElementById('finCrowd').textContent = pct === null ? '—' : pct + '%';
@@ -10393,7 +10374,7 @@
     if (!runActive && inInfinity()) infSession.fire = 0;   // a missed round breaks On Fire
     // Only a round the player is actually in costs points. The board keeps
     // dealing behind the home and mode-select screens, and those timeouts
-    // used to drain the Race to 250 score before anyone had played.
+    // used to drain the run's score before anyone had played.
     const inRound = runActive || (inInfinity() && isOnVsScreen());
     if (inRound){
       const penalty = current.bonusPoints ? (runActive ? 3 : INF_STAR_POINTS) : 1;
@@ -11007,7 +10988,7 @@
       b.maxCombo = Math.max(b.maxCombo, comboCount);
       if (current.category === 'wild') b.wildCat++;
       // The run's first half: 125 points or 5 minutes, whichever comes first.
-      if (b.firstHalfPoints == null && infRun && (infRun.score >= INF_RUN_TARGET / 2 || infRun.clockMs >= INF_RUN_CLOCK_MS / 2)) b.firstHalfPoints = b.points;
+      if (b.firstHalfPoints == null && infRun && (infRun.score >= FINISH_POINTS / 2 || infRun.clockMs >= INF_RUN_CLOCK_MS / 2)) b.firstHalfPoints = b.points;
       saveInfBlock(); renderRunBanner();
       badgesOnInfinityVote(cv.counted ? cv.withCrowd : null, votedSinceTime - roundStartedAt);
     }
@@ -11328,7 +11309,6 @@
   // ran underneath the intro, and was never stopped.
   els.soundToggle.textContent = soundOn ? '🔊' : '🔇';
   renderStatusBanner();
-  renderRaceStatus();
   renderRunBanner();
   els.readoutDone.addEventListener('click', finishDailySession);
   els.readoutShare.addEventListener('click', shareRunResult);
@@ -11690,10 +11670,10 @@
     lines:['And somewhere in there... can you find the Super Secret Riddle?', 'Cards are personality types you unlock by how you play. Badges are earned for finishing categories.'] };
   // Infinity's screens 2-3 (v3): the run's finish line, keys and power-ups,
   // then the new round types and the Vault finale. Numbers from the code:
-  // INF_RUN_TARGET / INF_RUN_CLOCK_MS, INF_MATCHES_PER_KEY, POWERUPS,
+  // FINISH_POINTS / INF_RUN_CLOCK_MS, INF_MATCHES_PER_KEY, POWERUPS,
   // INF_SWING_CAP, GUESS_SCORING, INF_RIDDLE_POINTS, the Plinko chips.
-  const HOWTO_RUN_INFINITY = { icon:'🏁', lead:'Race to 250 points — you have 10 minutes.',
-    lines:['The bar up top fills toward 250, and the clock shows your time left (it only runs while you’re voting).',
+  const HOWTO_RUN_INFINITY = { icon:'🏁', lead:'Race to ' + FINISH_POINTS + ' points — you have 10 minutes.',
+    lines:['The bar up top fills toward ' + FINISH_POINTS + ', and the clock shows your time left (it only runs while you’re voting).',
       'Earn 🔑 keys: match the crowd 3 times in a row, or nail a trivia question or a riddle.'],
     chipsLabel:'Power-ups — pick one when they drop',
     chips:[ ['⚡ +10 Points', 'Instant points'], ['🐌 Slow-Mo', '+3s on your next 3 rounds'], ['🪙 Coin Flip', '50/50: win or lose up to 15'],
