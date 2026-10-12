@@ -1092,6 +1092,14 @@
   .fin-vault.shown .vault-scene{ height:72px; }
   .fin-vault.shown .vault-body{ transform:translateY(-30px) scale(0.32); }
   .fin-vault.shown .vault-coins, .fin-vault.shown .vault-ufo, .fin-vault.shown .vault-beam-card{ display:none !important; }
+  /* The results are the share image itself (renderInfinityRunShare): the
+     same celebration layout, sized to fit above the button bar. If that
+     image can't be made, the HTML layout below it is shown instead. */
+  .vr-shareimg{ display:none; }
+  .fin-vault.as-image .vr-shareimg{ display:block; width:min(100%, calc((100dvh - 118px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 0.5625)); height:auto; aspect-ratio:9 / 16;
+    border-radius:16px; box-shadow:0 10px 30px rgba(20,0,40,0.55), 0 0 0 2px rgba(255,214,90,0.6); }
+  .fin-vault.as-image .vault-scene, .fin-vault.as-image .vault-rewards > :not(.vr-shareimg):not(.vault-buttons){ display:none !important; }
+  .fin-vault.as-image.shown{ padding-bottom:76px; min-height:calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); justify-content:center; }
   .fin-vault.shown .vault-buttons{ position:fixed; left:0; right:0; bottom:0; z-index:6; margin:0; gap:8px; flex-wrap:nowrap; justify-content:center;
     padding:10px 12px calc(10px + env(safe-area-inset-bottom)); background:linear-gradient(180deg, rgba(28,11,61,0), rgba(28,11,61,0.92) 30%); }
   .fin-vault.shown .vault-buttons .daily-btn{ flex:1 1 0; max-width:150px; padding:10px 8px; font-size:14px; white-space:nowrap; }
@@ -3046,6 +3054,7 @@
       <div class="vault-alien" id="vaultAlien" aria-hidden="true"><div class="va-art"></div><div class="va-say" id="vaultAlienSay"></div></div>
     </div>
     <div class="vault-rewards" id="vaultRewards">
+      <img class="vr-shareimg" id="vaultShareImg" alt="">
       <div class="vr-score"><span>FINAL SCORE</span><b id="vaultScore">0</b><em id="vaultScoreSub"></em></div>
       <div class="vr-row" id="vaultFlipz"></div>
       <div class="vr-personality" id="vaultPersonality">
@@ -7806,14 +7815,28 @@
     const badges = [];
     const newCard = (a.cards || []).concat(a.alien || []).filter(k=> k !== a.personality)[0];
     if (a.resultNew) badges.push('\u2728 New card: ' + (pm.name || ''));
-    else if (newCard && PERSONALITY_META[newCard]) badges.push('\u2728 New card: ' + PERSONALITY_META[newCard].name);
+    else if (newCard && PERSONALITY_META[newCard] && !(a.jackpot && newCard === 'mothership_jackpot')) badges.push('\u2728 New card: ' + PERSONALITY_META[newCard].name);   // (the jackpot pill says it already)
     if (a.jackpot) badges.push('\uD83D\uDEF8 Mothership Jackpot');
+    // (Oct 2026: the results screen is this image, so the run's badges are here too.)
+    (a.badges || []).forEach(id=>{ const bd = BADGES.find(x=> x.id === id); if (bd) badges.push(bd.icon + ' ' + bd.name); });
     if (badges.length){
       ctx.font = '800 30px ' + SHARE_FONT_T;
-      const ws = badges.map(b=> ctx.measureText(b).width + 56), total = ws.reduce((p, w)=> p + w, 0) + (badges.length - 1) * 20;
-      let x = cx - total / 2;
-      badges.forEach((b, i)=>{ roundRectPath(ctx, x, y - 44, ws[i], 64, 32); ctx.fillStyle = 'rgba(40,10,70,0.6)'; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = '#ffd23f'; ctx.stroke();
-        ctx.fillStyle = '#ffe066'; ctx.fillText(b, x + ws[i] / 2, y); x += ws[i] + 20; });
+      // centred rows of pills, at most two (anything that doesn't fit is left off)
+      const maxW = W - 120, rows = [[]]; let rowW = 0;
+      badges.forEach(b=>{ const w = Math.min(maxW, ctx.measureText(b).width + 56); if (rows[rows.length - 1].length && rowW + 20 + w > maxW){ rows.push([]); rowW = 0; }
+        rows[rows.length - 1].push({ b, w }); rowW += (rowW ? 20 : 0) + w; });
+      if (rows.length > 2){   // more than two rows: the second ends with "+N more"
+        const left = rows.slice(2).reduce((p, r)=> p + r.length, 0), r2 = rows[1];
+        let more = left, w = ()=> ctx.measureText('+' + more + ' more').width + 56;
+        while (r2.length > 1 && r2.reduce((p, it)=> p + it.w + 20, 0) + w() > maxW){ r2.pop(); more++; }
+        r2.push({ b: '+' + more + ' more', w: w() });
+      }
+      rows.slice(0, 2).forEach((row, r)=>{
+        const total = row.reduce((p, it)=> p + it.w, 0) + (row.length - 1) * 20, yy = y + r * 80;
+        let x = cx - total / 2;
+        row.forEach(it=>{ roundRectPath(ctx, x, yy - 44, it.w, 64, 32); ctx.fillStyle = 'rgba(40,10,70,0.6)'; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = '#ffd23f'; ctx.stroke();
+          ctx.fillStyle = '#ffe066'; ctx.fillText(it.b, x + it.w / 2, yy); x += it.w + 20; });
+      });
     }
     // footer
     ctx.font = '900 64px ' + SHARE_FONT_D; ctx.fillStyle = '#fff'; shareGlowText(ctx, 'Can you beat ' + a.finalScore + '?', cx, H - 130, 'rgba(255,184,0,0.7)', 26);
@@ -9024,8 +9047,21 @@
     const badgesEl = document.getElementById('vaultBadges');
     badgesEl.classList.toggle('hidden', !a.badges.length);
     badgesEl.innerHTML = a.badges.length ? '<div class="vb-eyebrow">🏅 BADGES EARNED THIS RUN</div>' + a.badges.map(id=>{ const bd = BADGES.find(x=> x.id === id) || { icon:'🏅', name:id }; return '<span class="vb-badge">' + bd.icon + ' ' + bd.name + '</span>'; }).join('') : '';
+    const shareImg = document.getElementById('vaultShareImg');
+    stage.classList.remove('as-image'); if (shareImg.src.startsWith('blob:')) URL.revokeObjectURL(shareImg.src); shareImg.removeAttribute('src');
+    const asImage = (pre)=>{
+      if (!pre || !pre.canvas || infRun.finale.award !== a) return false;
+      try{ shareImg.src = pre.blob ? URL.createObjectURL(pre.blob) : pre.canvas.toDataURL('image/png'); }catch(e){ return false; }
+      shareImg.alt = 'Run complete: ' + a.finalScore + ' points (' + a.runScore + ' run' + (a.bonus ? ' + ' + a.bonus + ' Plinko bonus' : '') + '). ' + pm.name + '. ' + runShareStatLine(a) + '.' +
+        (a.badges.length ? ' Badges: ' + a.badges.map(id=> (BADGES.find(x=> x.id === id) || { name:id }).name).join(', ') + '.' : '') + (newCards.length ? ' New card unlocked.' : '');
+      stage.classList.add('as-image'); return true;
+    };
     const showAll = ()=>{
       stage.classList.remove('collect'); coinRun = null;
+      // the share image, if it's ready (it was started when the vault opened);
+      // if not, the HTML layout now, swapped for the image if it's ready soon
+      const pre = prebuildRunShare(a), shownAt = performance.now();
+      if (!(pre.done && asImage(pre))) pre.promise.then(p=>{ if (performance.now() - shownAt < 4000 && stage.classList.contains('shown')) asImage(p); });
       stage.classList.add('open', 'shown');
       showUnlockCards(document.getElementById('vaultUnlocks'), document.getElementById('vaultCards'), newCards, reveal);
       stage.classList.toggle('has-extra', !document.getElementById('vaultUnlocks').classList.contains('hidden'));
