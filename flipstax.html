@@ -359,6 +359,12 @@
     font-size:clamp(20px, 5.6vw, 38px); opacity:0; margin-top:5px; transition: opacity 0.4s ease 0.25s;
   }
   .half.revealed .pct{ opacity:1; }
+  /* Before a vote the result lines are empty but keep their height (nothing jumps
+     when results appear); a small prompt fills the first of them so the name panel
+     doesn't read as an empty box. */
+  .half:not(.revealed) .pct{ opacity:1; }
+  .half:not(.revealed) .pct::after{ content:'Tap to pick'; font-family:'Inter', system-ui, sans-serif; font-weight:700; font-size:12px; letter-spacing:0.6px; text-transform:uppercase; color:rgba(255,255,255,0.85); text-shadow:0 1px 4px rgba(0,0,0,0.6); vertical-align:top; }
+  .half.revealed .pct::after{ content:none; }
   .half.top .pct{ color:#2a1c05; }
   .half.bottom .pct{ color:#06201f; }
 
