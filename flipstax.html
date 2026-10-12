@@ -7394,12 +7394,31 @@
   // show) because the share has to be drawn synchronously; anything not
   // loaded yet falls back to a drawn stand-in.
   const shareArtCache = {};
+  // Each card's image is requested once, decoded, and kept (for the share
+  // builder) - started as soon as the run's personality is decided, so it
+  // is almost always ready long before Share is tapped. shareArtLoad gives
+  // a promise of "loaded and decoded"; a failed image is dropped from the
+  // cache so the next ask requests it again.
+  const shareArtLoading = {};
+  function shareArtLoad(type){
+    const file = PERSONALITY_CARD_ART[type];
+    if (!file) return Promise.resolve(false);
+    if (shareArtCache[type] && shareArtCache[type].complete && shareArtCache[type].naturalWidth) return Promise.resolve(true);
+    if (!shareArtLoading[type]){
+      const img = new Image(); img.decoding = 'async'; img.src = 'images/personality-cards/' + file; shareArtCache[type] = img;
+      shareArtLoading[type] = (img.decode ? img.decode() : new Promise((res, rej)=>{ img.onload = res; img.onerror = rej; })).then(()=> true, ()=>{
+        if (shareArtCache[type] === img) delete shareArtCache[type];
+        return false;
+      }).then(ok=>{ delete shareArtLoading[type]; return ok; });
+    }
+    return shareArtLoading[type];
+  }
   function shareArtImg(type){
     const file = PERSONALITY_CARD_ART[type];
     if (!file) return null;
-    if (!shareArtCache[type]){ const img = new Image(); img.decoding = 'async'; img.src = 'images/personality-cards/' + file; shareArtCache[type] = img; }
+    if (!shareArtCache[type]) shareArtLoad(type);
     const img = shareArtCache[type];
-    return img.complete && img.naturalWidth ? img : null;
+    return img && img.complete && img.naturalWidth ? img : null;
   }
   function preloadShareArt(r){
     if (!r) return;
@@ -7671,15 +7690,18 @@
     const fonts = (document.fonts && document.fonts.check) ? document.fonts.check('900 64px "Big Shoulders Display"') && document.fonts.check('700 30px "Inter"') : true;
     return !!img && fonts;
   }
+  // The personality's card, any new cards and the share fonts: all requested
+  // (and the images decoded) as soon as the personality is decided.
   function preloadRunShare(a){
-    if (!a) return;
-    shareArtImg(a.personality);
-    try{ if (document.fonts && document.fonts.load){ document.fonts.load('900 64px "Big Shoulders Display"'); document.fonts.load('700 30px "Inter"'); document.fonts.load('600 30px "Inter"'); } }catch(e){}
+    if (!a) return Promise.resolve(false);
+    const arts = [a.personality].concat(a.cards || [], a.alien || []).filter(k=> k && PERSONALITY_CARD_ART[k]);
+    const fonts = (document.fonts && document.fonts.load) ? ['900 64px "Big Shoulders Display"', '800 30px "Inter"', '700 30px "Inter"', '600 30px "Inter"'].map(f=>{ try{ return document.fonts.load(f); }catch(e){ return Promise.resolve(); } }) : [];
+    return Promise.all(arts.map(shareArtLoad).concat(fonts)).then(()=> true, ()=> false);
   }
+  // Waits (up to ms) for the card art and fonts; true if everything is ready.
   async function waitRunShareAssets(a, ms){
-    preloadRunShare(a);
-    const t0 = performance.now();
-    while (!runShareAssetsReady(a) && performance.now() - t0 < ms) await new Promise(r=> setTimeout(r, 60));
+    const all = preloadRunShare(a);
+    await Promise.race([all, new Promise(r=> setTimeout(r, ms))]);
     return runShareAssetsReady(a);
   }
   function runShareStatLine(a){
@@ -7707,13 +7729,18 @@
     ctx.save(); ctx.shadowColor = 'rgba(50,0,40,0.75)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 4;
     ctx.save(); ctx.translate(cx, 140); ctx.scale(1.3, 1.3); ctx.translate(-cx, -140); drawWordmark(ctx, cx, 140); ctx.restore();
     ctx.font = '800 32px ' + SHARE_FONT_T; ctx.fillStyle = '#fff3c4';
+    ctx.shadowColor = 'rgba(70,8,45,0.9)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 2;   // a tight, darker shadow: pale text on bright orange stays readable
     shareSpacedText(ctx, 'INFINITY FLIPS \u00B7 RUN COMPLETE', cx, 210, 5);
+    shareSpacedText(ctx, 'INFINITY FLIPS \u00B7 RUN COMPLETE', cx, 210, 5);   // twice: the shadow doubles up
     ctx.restore();
-    // score
+    // score (POINTS and the run + Plinko line get the same soft dark shadow, drawn twice)
     ctx.font = '900 210px ' + SHARE_FONT_D; ctx.fillStyle = '#fff'; shareGlowText(ctx, String(a.finalScore), cx, 430, 'rgba(255,210,60,0.95)', 50);
-    ctx.font = '800 36px ' + SHARE_FONT_T; ctx.fillStyle = '#ffe9a6'; ctx.fillText('POINTS', cx, 482);
-    ctx.font = '600 34px ' + SHARE_FONT_T; ctx.fillStyle = 'rgba(255,243,214,0.92)';
-    ctx.fillText(a.runScore + ' run' + (a.bonus ? ' + ' + a.bonus + ' Plinko bonus' : ''), cx, 534);
+    ctx.save(); ctx.shadowColor = 'rgba(80,10,40,0.9)'; ctx.shadowBlur = 9; ctx.shadowOffsetY = 2;
+    ctx.font = '800 36px ' + SHARE_FONT_T; ctx.fillStyle = '#fff1c2'; ctx.fillText('POINTS', cx, 482); ctx.fillText('POINTS', cx, 482);
+    ctx.font = '600 34px ' + SHARE_FONT_T; ctx.fillStyle = '#fff8e6';
+    const runLine = a.runScore + ' run' + (a.bonus ? ' + ' + a.bonus + ' Plinko bonus' : '');
+    ctx.fillText(runLine, cx, 534); ctx.fillText(runLine, cx, 534);
+    ctx.restore();
     // the personality's full card
     const cw = 560, ch = cw * 492 / 360, cxl = cx - cw / 2, cy = 590;
     ctx.save(); ctx.shadowColor = 'rgba(255,214,90,0.7)'; ctx.shadowBlur = 60; roundRectPath(ctx, cxl, cy, cw, ch, 34); ctx.fillStyle = '#f3e6c8'; ctx.fill(); ctx.restore();
@@ -7744,8 +7771,18 @@
   }
   async function shareInfinityResult(){
     const a = infRun && infRun.finale && infRun.finale.award;
-    let canvas = null;
-    if (a){ try{ if (await waitRunShareAssets(a, 1500)) canvas = renderInfinityRunShare(a); }catch(e){ console.warn('FlipStax: run share image failed, using the simple one', e); canvas = null; } }
+    let canvas = null, why = '';
+    // Wait up to ~3s for the card art and fonts, draw; if that fails, one more
+    // try (a failed image is requested again); the simple card is the last resort.
+    if (a){
+      for (let attempt = 1; attempt <= 2 && !canvas; attempt++){
+        try{
+          if (await waitRunShareAssets(a, 3000)) canvas = renderInfinityRunShare(a);
+          else why = 'card art or fonts not ready after 3s (attempt ' + attempt + ')';
+        }catch(e){ why = (e && e.message) || String(e); canvas = null; }
+      }
+      if (!canvas) console.warn('FlipStax: run share image fell back to the simple card - ' + why);
+    }
     if (!canvas) canvas = renderShareCard('infinity', buildInfinityShareData());
     // The caption is the text result; exportAndShareCard adds GAME_URL.
     await exportAndShareCard(canvas, 'flipstax-infinity.png', a ? infRunShareText(a) : 'FlipStax Infinity Flips \u2014 ' + (els.tierEl.textContent||''));
@@ -8738,6 +8775,7 @@
       jackpot: f.chips.slice(0, f.dropped).some(c=> c.kind === 'jackpot') };
     f.awarded = true; f.vaultSeen = false;
     saveInfRun();
+    preloadRunShare(f.award);   // the share image's card art is requested and decoded now, long before Share is tapped
     renderCollectionBtn();
     return f.award;
   }
