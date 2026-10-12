@@ -415,6 +415,9 @@
   .event-overlay{
     position:absolute; inset:0; z-index:8; display:flex; flex-direction:column;
     align-items:center; justify-content:center; padding:24px; text-align:center;
+    /* The UFO pass ends parked just off the right edge: clip it (sideways
+       only, no scroll container) so the page never gets wider than the screen. */
+    overflow-x:clip;
     background:
       radial-gradient(circle at 22% 24%, rgba(90,160,255,0.95), transparent 58%),
       radial-gradient(circle at 80% 30%, rgba(178,110,255,0.9), transparent 58%),
