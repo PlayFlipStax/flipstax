@@ -6486,16 +6486,18 @@
   // star card is worth 2 (was 3), combos no longer add points, the Points
   // Zone is rarer (1.5% a round, was 8%) and doubles vote points only,
   // trivia is worth 5 (was 25) plus a key, Coin Flip is capped at 15 either
-  // way and Wild Card is a gift that never costs points. The finish line is
-  // FINISH_POINTS (350): with Guess the Crowd firing every 6-8 rounds a typical
-  // run reaches it in ~6.7 minutes (slow players ~7.7); while no card has
-  // CROWD_DATA_MIN votes Guess the Crowd can't fire, and most runs end on the
-  // 10:00 clock instead.
+  // way and Wild Card is a gift that never costs points.
+  // Finish line, second pass (Oct 2026): 350 made runs drag to the clock, so
+  // it is back at 250, with Guess the Crowd paying 8 / 5 / 2 every 10-12 rounds
+  // and riddles every 20-26 rounds. pacing_sim.py `oct` (median active time,
+  // typical 2.0s picks / slow 2.6s): Guess the Crowd off 7.4 / 8.9 minutes,
+  // on 6.7 / 7.9; personality_sim.py's varied players 8.5 off / 7.5 on.
+  // The 10:00 clock still ends any run that hasn't got there.
   const INF_RUN_KEY = 'flipstax_inf_run_v1';
-  const GUESS_FIRST_GAP = [6, 8];     // = GUESS_GAP (declared further down)
+  const GUESS_FIRST_GAP = [10, 12];   // = GUESS_GAP (declared further down)
   const RIDDLE_ROUND_GAP = [20, 26];  // vote rounds between riddle rounds - about 4 a run
   // The finish line. Everything that shows or uses the target reads this.
-  const FINISH_POINTS = 350;
+  const FINISH_POINTS = 250;
   const INF_RUN_CLOCK_MS = 10 * 60 * 1000;
   const INF_KEY_CAP = 8;
   const INF_STAR_POINTS = 2;
@@ -8964,8 +8966,12 @@
   // writes nothing - it reads tallies already fetched for reveals
   // (tallyCache) or one read of the next few cards' counts. No qualifying
   // card, or tallies down / past the 2.5s timeout: the round is skipped.
-  const GUESS_GAP = [6, 8];
-  const GUESS_SCORING = [ { within:5, pts:25, key:true }, { within:10, pts:15 }, { within:20, pts:5 } ];
+  // Oct 2026 re-tune (with the finish line back at 250): Guess the Crowd used
+  // to pay 25 / 15 / 5 every 6-8 rounds, which cut a run to ~5 minutes once it
+  // can fire; now 8 / 5 / 2 every 10-12 rounds (within 5 still earns a key),
+  // so runs land around 7-8 minutes with it on or off (pacing_sim / personality_sim).
+  const GUESS_GAP = [10, 12];
+  const GUESS_SCORING = [ { within:5, pts:8, key:true }, { within:10, pts:5 }, { within:20, pts:2 } ];
   let guessPrep = null, guessState = 'idle', guessCard = null, guessTruth = null, guessCloseTimer = null;
   function resetGuessGap(){ if (!infRun) return; infRun.sinceGuess = 0; infRun.nextGuessAt = GUESS_GAP[0] + Math.floor(Math.random() * (GUESS_GAP[1] - GUESS_GAP[0] + 1)); saveInfRun(); }
   function upcomingCards(n){ const d = decks[contentPoolKey()]; return d.cards.slice(d.next, d.next + n); }
