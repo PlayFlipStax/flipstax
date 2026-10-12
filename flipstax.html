@@ -7427,7 +7427,8 @@
         badge: 'INFINITY FLIPS \u00B7 RUN COMPLETE',
         heroText: a.finalScore + ' PTS',
         statLine: [a.crowdPct !== null && a.crowdPct !== undefined ? 'Matched the crowd ' + a.crowdPct + '%' : null, '\uD83D\uDD11 ' + a.keys + ' key' + (a.keys === 1 ? '' : 's'),
-          a.ended === 'clock' ? '10:00 run' : FINISH_POINTS + ' in ' + formatClock(a.clockMs)].filter(Boolean).join(' \u00B7 '),
+          a.ended === 'clock' ? 'Time\u2019s up at 10:00' : 'Finished in ' + formatClock(a.clockMs)].filter(Boolean).join(' \u00B7 '),
+        score: a.finalScore,
         boldest: a.boldest || null,
         personality: pm ? { icon: pm.icon, name: pm.name } : null,
         jackpot: !!a.jackpot,
@@ -7587,7 +7588,7 @@
     ctx.font = '700 34px ' + SHARE_FONT_T; ctx.fillStyle = 'rgba(255,255,255,0.6)';
     ctx.fillText(GAME_URL.replace(/^https?:\/\//, ''), cx, H - 110);
     ctx.font = '500 30px ' + SHARE_FONT_T; ctx.fillStyle = 'rgba(255,255,255,0.45)';
-    ctx.fillText("Play today's FlipStax.", cx, H - 66);
+    ctx.fillText(daily ? "Play today's FlipStax." : (data.score != null ? 'Can you beat ' + data.score + '?' : 'Can you beat it?'), cx, H - 66);
     return canvas;
   }
   function dataUrlToBlob(dataUrl){
@@ -7628,9 +7629,94 @@
     // starts), the music stops with it.
     pauseAllTracks();
   }
+  // ---------- Infinity run share image: the celebration screen, in one picture ----------
+  // 1080 x 1920: the results screen's gradient and ray burst, the logo and
+  // "INFINITY FLIPS · RUN COMPLETE", the big score with its run + Plinko line,
+  // the personality's full card, one stat line, a badge row (new card /
+  // Mothership Jackpot) and "Can you beat [score]?" with GAME_URL. The card
+  // art and fonts are loaded first (preloaded when the vault opens); if
+  // anything fails, the old simple card is used instead.
+  function runShareAssetsReady(a){
+    const img = shareArtImg(a.personality);
+    const fonts = (document.fonts && document.fonts.check) ? document.fonts.check('900 64px "Big Shoulders Display"') && document.fonts.check('700 30px "Inter"') : true;
+    return !!img && fonts;
+  }
+  function preloadRunShare(a){
+    if (!a) return;
+    shareArtImg(a.personality);
+    try{ if (document.fonts && document.fonts.load){ document.fonts.load('900 64px "Big Shoulders Display"'); document.fonts.load('700 30px "Inter"'); document.fonts.load('600 30px "Inter"'); } }catch(e){}
+  }
+  async function waitRunShareAssets(a, ms){
+    preloadRunShare(a);
+    const t0 = performance.now();
+    while (!runShareAssetsReady(a) && performance.now() - t0 < ms) await new Promise(r=> setTimeout(r, 60));
+    return runShareAssetsReady(a);
+  }
+  function runShareStatLine(a){
+    return [a.crowdPct !== null && a.crowdPct !== undefined ? 'Matched the crowd ' + a.crowdPct + '%' : null,
+      a.keys + ' key' + (a.keys === 1 ? '' : 's'),
+      a.ended === 'clock' ? 'Time\u2019s up at 10:00' : 'Finished in ' + formatClock(a.clockMs)].filter(Boolean).join(' \u00B7 ');
+  }
+  function renderInfinityRunShare(a){
+    if (DEBUG_FAST && window.__failRunShare) throw new Error('forced failure (test)');
+    const img = shareArtImg(a.personality);
+    if (!img) throw new Error('card art not loaded');
+    const canvas = document.createElement('canvas'); canvas.width = SHARE_CARD_W; canvas.height = SHARE_CARD_H;
+    const ctx = canvas.getContext('2d'), W = SHARE_CARD_W, H = SHARE_CARD_H, cx = W / 2;
+    // background: the results screen's gradient, its ray burst, a soft glow
+    const bg = ctx.createRadialGradient(cx, H * 0.18, 0, cx, H * 0.18, H * 0.95);
+    [[0, '#ffcf4a'], [0.16, '#ff8a1f'], [0.38, '#c2275f'], [0.66, '#4a1478'], [1, '#1c0b3d']].forEach(([o, c])=> bg.addColorStop(o, c));
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    ctx.save(); ctx.translate(cx, H * 0.2);
+    const rays = ctx.createRadialGradient(0, 0, 40, 0, 0, 1300); rays.addColorStop(0, 'rgba(255,240,180,0.42)'); rays.addColorStop(1, 'rgba(255,240,180,0)');
+    ctx.fillStyle = rays;
+    for (let k = 0; k < 24; k++){ const a0 = k * Math.PI * 2 / 24; ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, 1400, a0, a0 + Math.PI * 2 / 72); ctx.closePath(); ctx.fill(); }
+    ctx.restore();
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    // header
+    ctx.save(); ctx.shadowColor = 'rgba(50,0,40,0.75)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 4;
+    ctx.save(); ctx.translate(cx, 140); ctx.scale(1.3, 1.3); ctx.translate(-cx, -140); drawWordmark(ctx, cx, 140); ctx.restore();
+    ctx.font = '800 32px ' + SHARE_FONT_T; ctx.fillStyle = '#fff3c4';
+    shareSpacedText(ctx, 'INFINITY FLIPS \u00B7 RUN COMPLETE', cx, 210, 5);
+    ctx.restore();
+    // score
+    ctx.font = '900 210px ' + SHARE_FONT_D; ctx.fillStyle = '#fff'; shareGlowText(ctx, String(a.finalScore), cx, 430, 'rgba(255,210,60,0.95)', 50);
+    ctx.font = '800 36px ' + SHARE_FONT_T; ctx.fillStyle = '#ffe9a6'; ctx.fillText('POINTS', cx, 482);
+    ctx.font = '600 34px ' + SHARE_FONT_T; ctx.fillStyle = 'rgba(255,243,214,0.92)';
+    ctx.fillText(a.runScore + ' run' + (a.bonus ? ' + ' + a.bonus + ' Plinko bonus' : ''), cx, 534);
+    // the personality's full card
+    const cw = 560, ch = cw * 492 / 360, cxl = cx - cw / 2, cy = 590;
+    ctx.save(); ctx.shadowColor = 'rgba(255,214,90,0.7)'; ctx.shadowBlur = 60; roundRectPath(ctx, cxl, cy, cw, ch, 34); ctx.fillStyle = '#f3e6c8'; ctx.fill(); ctx.restore();
+    ctx.save(); roundRectPath(ctx, cxl, cy, cw, ch, 34); ctx.clip(); ctx.drawImage(img, cxl, cy, cw, ch); ctx.restore();
+    let y = cy + ch + 70;
+    const pm = PERSONALITY_META[a.personality] || {};
+    ctx.font = '600 32px ' + SHARE_FONT_T; ctx.fillStyle = 'rgba(255,243,214,0.9)';
+    const cap = shareWrapLines(ctx, pm.blurb || '', W - 240).slice(0, 2); cap.forEach((l, i)=> ctx.fillText(l, cx, y + i * 40)); y += cap.length * 40 + 30;
+    // one stat line
+    ctx.font = '700 38px ' + SHARE_FONT_T; ctx.fillStyle = '#fff'; ctx.fillText(runShareStatLine(a), cx, y); y += 70;
+    // badge row
+    const badges = [];
+    const newCard = (a.cards || []).concat(a.alien || []).filter(k=> k !== a.personality)[0];
+    if (a.resultNew) badges.push('\u2728 New card: ' + (pm.name || ''));
+    else if (newCard && PERSONALITY_META[newCard]) badges.push('\u2728 New card: ' + PERSONALITY_META[newCard].name);
+    if (a.jackpot) badges.push('\uD83D\uDEF8 Mothership Jackpot');
+    if (badges.length){
+      ctx.font = '800 30px ' + SHARE_FONT_T;
+      const ws = badges.map(b=> ctx.measureText(b).width + 56), total = ws.reduce((p, w)=> p + w, 0) + (badges.length - 1) * 20;
+      let x = cx - total / 2;
+      badges.forEach((b, i)=>{ roundRectPath(ctx, x, y - 44, ws[i], 64, 32); ctx.fillStyle = 'rgba(40,10,70,0.6)'; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = '#ffd23f'; ctx.stroke();
+        ctx.fillStyle = '#ffe066'; ctx.fillText(b, x + ws[i] / 2, y); x += ws[i] + 20; });
+    }
+    // footer
+    ctx.font = '900 64px ' + SHARE_FONT_D; ctx.fillStyle = '#fff'; shareGlowText(ctx, 'Can you beat ' + a.finalScore + '?', cx, H - 130, 'rgba(255,184,0,0.7)', 26);
+    ctx.font = '700 36px ' + SHARE_FONT_T; ctx.fillStyle = 'rgba(255,243,214,0.85)'; ctx.fillText(GAME_URL.replace(/^https?:\/\//, ''), cx, H - 70);
+    return canvas;
+  }
   async function shareInfinityResult(){
-    const canvas = renderShareCard('infinity', buildInfinityShareData());
     const a = infRun && infRun.finale && infRun.finale.award;
+    let canvas = null;
+    if (a){ try{ if (await waitRunShareAssets(a, 1500)) canvas = renderInfinityRunShare(a); }catch(e){ console.warn('FlipStax: run share image failed, using the simple one', e); canvas = null; } }
+    if (!canvas) canvas = renderShareCard('infinity', buildInfinityShareData());
     // The caption is the text result; exportAndShareCard adds GAME_URL.
     await exportAndShareCard(canvas, 'flipstax-infinity.png', a ? infRunShareText(a) : 'FlipStax Infinity Flips \u2014 ' + (els.tierEl.textContent||''));
   }
@@ -8749,6 +8835,7 @@
   let vaultTimers = [];
   function renderVault(){
     const f = infRun.finale, a = finaleAward();
+    preloadRunShare(a);
     const stage = document.getElementById('finVault'), scene = document.getElementById('vaultScene'), rewards = document.getElementById('vaultRewards');
     vaultTimers.forEach(clearTimeout); vaultTimers = [];
     stage.classList.remove('hidden', 'open', 'dial', 'jackpot', 'shown');
@@ -11567,6 +11654,7 @@
       slug: (t) => slugify(t),
       getInfRun: () => infRun,
       runStats: () => infRunStats(),
+      runShareDataUrl: async () => { const a = infRun.finale.award; await waitRunShareAssets(a, 3000); return renderInfinityRunShare(a).toDataURL('image/png'); },
       runPersonalityFor: (st) => determineRunPersonality(st),
       spawnTapUfo: (force) => spawnTapUfo(force),
       abductStack: () => abductStack(),
