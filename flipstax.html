@@ -752,6 +752,8 @@
     transition: filter 0.6s ease;
   }
   .ir-overlay.hidden{ display:none; }
+  .test-tag{ position:fixed; left:6px; bottom:calc(4px + env(safe-area-inset-bottom)); z-index:9998; pointer-events:none; font:800 10px/1.4 'Inter', system-ui, sans-serif;
+    letter-spacing:0.5px; color:#fff; background:rgba(200,0,90,0.85); padding:2px 7px; border-radius:6px; }
   /* The alien layer: the Mystery Visitor (riddle host), its transmission
      intro, the tappable UFO and the abduction beam. Decorative parts never
      take taps; the tappable UFO is the only one that does, and only itself. */
@@ -3710,6 +3712,32 @@
   // Everything debug-related hangs off this one constant.
   const IS_LOCAL_HOST = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   const DEBUG_FAST = IS_LOCAL_HOST && new URLSearchParams(location.search).get('debug') === 'fast';
+  // Testing switches for localhost and Vercel *preview* deployments only
+  // (any *.vercel.app address except the production one). On the production
+  // domains (flipstax-one.vercel.app, playflipstax.com) none of this exists.
+  //   ?crowdmin=N  Guess the Crowd / Boldest Pick accept cards with N+ votes
+  //                (1-30) for this browser session, instead of CROWD_DATA_MIN.
+  //   ?test=1      no vote writes for this session (tallies are still read).
+  //                A preview starts in this mode by default, in case it
+  //                shares the production vote database; ?test=0 turns real
+  //                votes back on. (Localhost has no vote API at all.)
+  const PRODUCTION_HOSTS = ['flipstax-one.vercel.app', 'playflipstax.com', 'www.playflipstax.com'];
+  const IS_PREVIEW_HOST = /\.vercel\.app$/.test(location.hostname) && PRODUCTION_HOSTS.indexOf(location.hostname) === -1;
+  const TEST_HOST = IS_LOCAL_HOST || IS_PREVIEW_HOST;
+  const TEST_SWITCHES = (()=>{
+    const out = { crowdMin: null, noVotes: false };
+    if (!TEST_HOST) return out;
+    const q = new URLSearchParams(location.search);
+    const store = (k, v)=>{ try{ if (v === null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, v); }catch(e){} };
+    const read = k=>{ try{ return sessionStorage.getItem(k); }catch(e){ return null; } };
+    if (q.has('crowdmin')){ const n = parseInt(q.get('crowdmin'), 10); store('flipstax_test_crowdmin', n >= 1 && n <= 30 ? String(n) : null); }
+    if (q.has('test')) store('flipstax_test_novotes', q.get('test') === '0' ? '0' : '1');
+    const cm = parseInt(read('flipstax_test_crowdmin'), 10);
+    if (cm >= 1 && cm <= 30) out.crowdMin = cm;
+    const nv = read('flipstax_test_novotes');
+    out.noVotes = nv === '1' || (nv === null && IS_PREVIEW_HOST);
+    return out;
+  })();
   const DEBUG_TIME_SCALE = DEBUG_FAST ? 6 : 1;
   const DEBUG_RUN_SCALE = DEBUG_FAST ? 2 : 1;
   // Scales the fixed reveal/transition pauses between rounds and events
@@ -8740,7 +8768,7 @@
   let guessPrep = null, guessState = 'idle', guessCard = null, guessTruth = null, guessCloseTimer = null;
   function resetGuessGap(){ if (!infRun) return; infRun.sinceGuess = 0; infRun.nextGuessAt = GUESS_GAP[0] + Math.floor(Math.random() * (GUESS_GAP[1] - GUESS_GAP[0] + 1)); saveInfRun(); }
   function upcomingCards(n){ const d = decks[contentPoolKey()]; return d.cards.slice(d.next, d.next + n); }
-  function guessCounts(c){ const a = tallyCache.get(slugify(c.a)), b = tallyCache.get(slugify(c.b)); return (a != null && b != null && a + b >= CROWD_DATA_MIN) ? { a, b } : null; }
+  function guessCounts(c){ const a = tallyCache.get(slugify(c.a)), b = tallyCache.get(slugify(c.b)); return (a != null && b != null && a + b >= CROWD_DATA_MIN_NOW) ? { a, b } : null; }
   // Looks a couple of rounds ahead for a qualifying card (one read at most
   // per guess round).
   function prepareGuess(){
@@ -10733,6 +10761,8 @@
   // only means the tally read afterwards can include the player's own pick.)
   const VOTE_API_TIMEOUT_MS = 2500;
   async function castVote(itemId){
+    // Test session (?test=1, or a preview by default): nothing is written.
+    if (TEST_SWITCHES.noVotes) return { ok:false, test:true };
     const attempt = (async ()=>{
       try{
         const res = await fetch('/api/vote', {
@@ -10764,6 +10794,14 @@
   // Infinity's Guess the Crowd and Boldest Pick only use a card with at
   // least this many votes on it (both sides together).
   const CROWD_DATA_MIN = 30;
+  // The minimum in use: CROWD_DATA_MIN, unless a test session lowered it
+  // (?crowdmin=, localhost / preview only - see TEST_SWITCHES).
+  const CROWD_DATA_MIN_NOW = TEST_SWITCHES.crowdMin || CROWD_DATA_MIN;
+  if (TEST_SWITCHES.crowdMin || TEST_SWITCHES.noVotes){
+    const tag = document.createElement('div'); tag.className = 'test-tag'; tag.setAttribute('aria-hidden', 'true');
+    tag.textContent = 'TEST' + (TEST_SWITCHES.noVotes ? ' \u00B7 votes not saved' : ' \u00B7 votes saved') + (TEST_SWITCHES.crowdMin ? ' \u00B7 crowdmin ' + TEST_SWITCHES.crowdMin : '');
+    document.body.appendChild(tag);
+  }
   // Item counts already fetched for reveals (slug -> count), so Guess the
   // Crowd can often find a qualifying card without another request.
   const tallyCache = new Map();
@@ -10970,7 +11008,7 @@
           if (infRun.matchStreak % INF_MATCHES_PER_KEY === 0 && addInfKey('streak')) showToast('\uD83D\uDD11 ' + infRun.matchStreak + ' crowd matches in a row \u2014 +1 key');
           if (infRun.matchStreak === 5) abductStack();
         } else infRun.matchStreak = 0;
-        if (!cv.withCrowd && cv.others >= CROWD_DATA_MIN){
+        if (!cv.withCrowd && cv.others >= CROWD_DATA_MIN_NOW){
           const against = 100 - cv.pickPct;
           if (!infRun.boldest || against > infRun.boldest.against)
             infRun.boldest = { pick: side === 'A' ? current.a : current.b, other: side === 'A' ? current.b : current.a, against, n: cv.others };
