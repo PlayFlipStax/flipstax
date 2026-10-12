@@ -110,6 +110,22 @@
   .score-pill .sp-of{ font-weight:700; opacity:0.75; }
   .score-pill .sp-sep{ opacity:0.5; margin:0 1px; }
   .score-pill .sp-done{ font-weight:800; }
+  /* Infinity run: clock and keys in the points pill, and the Halfway / Almost
+     there pill that floats up from it (decorative - no taps). */
+  .score-pill .sp-clock, .score-pill .sp-keys{ display:inline-flex; align-items:center; gap:2px; font-weight:800; }
+  .score-pill .sp-clock #infClock{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:15px; letter-spacing:0.3px; min-width:30px; text-align:left; }
+  .score-pill .sp-keys b{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:16px; color:#ffd23f; text-shadow:0 0 6px rgba(255,190,0,0.7); display:inline-block; }
+  .score-pill .sp-keys b.pop{ animation: keyPop 0.6s cubic-bezier(.3,1.8,.5,1); }
+  @keyframes keyPop{ 0%{ transform:scale(1); } 40%{ transform:scale(1.7); color:#fff6c2; } 100%{ transform:scale(1); } }
+  .score-pill .sp-clock.low #infClock{ color:#ffe066; animation: runTimerPulse 0.8s ease-in-out infinite; }
+  .pill-row{ position:relative; }
+  .inf-milestone{ position:absolute; left:50%; top:100%; z-index:20; pointer-events:none; white-space:nowrap; opacity:0;
+    transform:translate(-50%, 4px) scale(0.8); padding:5px 14px; border-radius:99px; font-weight:900; font-size:14px; letter-spacing:0.5px;
+    color:#3a2200; background:linear-gradient(180deg,#fff2a8,#ffc928 55%,#ff9d00); box-shadow:0 0 0 2px #fff7cf, 0 6px 22px rgba(255,170,0,0.75); }
+  .inf-milestone.show{ animation: milestoneUp 2.4s cubic-bezier(.2,.9,.3,1) both; }
+  @keyframes milestoneUp{ 0%{ opacity:0; transform:translate(-50%, 8px) scale(0.6); } 12%{ opacity:1; transform:translate(-50%, 10px) scale(1.12); }
+    22%{ transform:translate(-50%, 10px) scale(1); } 80%{ opacity:1; transform:translate(-50%, 6px) scale(1); } 100%{ opacity:0; transform:translate(-50%, -6px) scale(0.95); } }
+  @media (prefers-reduced-motion: reduce){ .inf-milestone.show{ animation:none; opacity:1; transform:translate(-50%, 8px); } .score-pill .sp-keys b.pop, .score-pill .sp-clock.low #infClock{ animation:none; } }
   /* Header is only ever visible during gameplay, and the fixed back
      button is always showing then too - reserve room on the left so its
      44px corner tap target doesn't sit on top of the sound toggle. */
@@ -736,6 +752,58 @@
     transition: filter 0.6s ease;
   }
   .ir-overlay.hidden{ display:none; }
+
+  /* ---- Infinity run finale (Run Complete, Plinko, the Vault) ----
+     Gold on a deep violet sky, the game's own ray burst behind it. Every
+     decorative layer is pointer-events:none; only the buttons, the board's
+     drop button and the cards take taps. Reduced motion: no moving effects,
+     results shown straight away (see openInfFinale / the Plinko and Vault
+     code). */
+  .fin-overlay{ position:fixed; inset:0; z-index:65; overflow:hidden auto; display:flex; align-items:flex-start; justify-content:center;
+    padding:calc(18px + env(safe-area-inset-top)) 16px calc(18px + env(safe-area-inset-bottom)); text-align:center; font-family:'Inter', system-ui, sans-serif;
+    background: radial-gradient(120% 70% at 50% 18%, #ffcf4a 0%, #ff8a1f 18%, #c2275f 42%, #4a1478 70%, #1c0b3d 100%); color:#fff; }
+  .fin-overlay.hidden{ display:none; }
+  .fin-sky, .vault-coins{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+  .fin-sky{ position:fixed; z-index:0; }
+  .fin-rays{ position:fixed; left:50%; top:22%; width:180vmax; height:180vmax; margin:-90vmax 0 0 -90vmax; z-index:0; pointer-events:none; opacity:0.35;
+    background:repeating-conic-gradient(rgba(255,240,180,0.55) 0 5deg, rgba(255,240,180,0) 5deg 15deg); animation: finRays 60s linear infinite;
+    -webkit-mask:radial-gradient(circle, #000 0 18%, transparent 55%); mask:radial-gradient(circle, #000 0 18%, transparent 55%); }
+  @keyframes finRays{ to{ transform:rotate(360deg); } }
+  .fin-stage{ position:relative; z-index:1; width:100%; max-width:440px; margin:auto 0; display:flex; flex-direction:column; align-items:center; gap:10px;
+    animation: finIn 0.5s cubic-bezier(.2,.9,.3,1.2) both; }
+  .fin-stage.hidden{ display:none; }
+  @keyframes finIn{ from{ opacity:0; transform:translateY(16px) scale(0.96); } to{ opacity:1; transform:none; } }
+  .fin-eyebrow{ font-size:12px; font-weight:900; letter-spacing:2.5px; color:#fff3c4; padding:4px 12px; border-radius:99px; background:rgba(40,10,70,0.45); box-shadow:0 0 0 1px rgba(255,230,150,0.35); }
+  .fin-title{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:clamp(40px, 13vw, 58px); line-height:0.95; letter-spacing:2px;
+    background:linear-gradient(180deg,#fffbe0 0%,#ffe066 40%,#ffb000 75%,#ff8a00 100%); -webkit-background-clip:text; background-clip:text; color:transparent;
+    filter:drop-shadow(0 3px 0 #7a2e00) drop-shadow(0 0 18px rgba(255,200,40,0.65)); }
+  .fin-reason{ font-size:15px; font-weight:800; color:#fff; text-shadow:0 2px 8px rgba(60,0,60,0.6); }
+  .fin-score{ display:flex; align-items:baseline; gap:8px; }
+  .fin-score b{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:clamp(64px, 22vw, 96px); line-height:1; color:#fff;
+    text-shadow:0 0 22px rgba(255,210,60,0.95), 0 4px 0 #b05a00; }
+  .fin-score span{ font-size:14px; font-weight:900; letter-spacing:2px; text-transform:uppercase; color:#ffe9a6; }
+  .fin-stats{ display:flex; gap:10px; width:100%; }
+  .fin-stat{ flex:1; padding:10px 6px; border-radius:16px; background:linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.06));
+    box-shadow:inset 0 0 0 1.5px rgba(255,225,140,0.55), 0 6px 18px rgba(40,0,60,0.35); }
+  .fin-stat b{ display:block; font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:30px; color:#ffe066; text-shadow:0 0 10px rgba(255,190,0,0.7); }
+  .fin-stat span{ font-size:11px; font-weight:800; letter-spacing:0.6px; text-transform:uppercase; color:#fff3d6; }
+  .fin-bold{ width:100%; padding:12px; border-radius:18px; background:linear-gradient(135deg, rgba(255,60,172,0.35), rgba(120,40,220,0.35)); box-shadow:inset 0 0 0 1.5px rgba(255,170,230,0.6); }
+  .fin-bold.hidden{ display:none; }
+  .fin-bold-eyebrow{ font-size:11px; font-weight:900; letter-spacing:2px; color:#ffd1f0; }
+  .fin-bold-card{ display:flex; flex-wrap:wrap; justify-content:center; align-items:baseline; gap:6px; margin:6px 0 2px; }
+  .fin-bold-card .fb-pick{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:24px; color:#fff; }
+  .fin-bold-card .fb-over{ font-size:12px; font-weight:800; color:#ffd1f0; text-transform:uppercase; }
+  .fin-bold-card .fb-other{ font-size:16px; font-weight:800; color:rgba(255,255,255,0.8); }
+  .fin-bold-pct{ font-size:13px; font-weight:800; color:#ffe066; }
+  .fin-buttons{ display:flex; flex-wrap:wrap; justify-content:center; gap:10px; margin-top:6px; width:100%; }
+  .fin-overlay .daily-btn{ min-height:46px; display:inline-flex; align-items:center; justify-content:center; }
+  :root:root .fin-overlay .daily-btn.primary, :root:root .guess-overlay .daily-btn.primary, :root:root .ir-overlay .ir-opts .daily-btn.primary{
+    --btn-fill:linear-gradient(180deg,#fff3a8,#ffcb2b 50%,#ff9900); background:var(--btn-fill); color:#3a1d00; font-weight:900; text-shadow:none;
+    filter:drop-shadow(0 4px 0 #a85500) drop-shadow(0 6px 14px rgba(255,160,0,0.5)); }
+  :root:root .fin-overlay .daily-btn:not(.primary), :root:root .guess-overlay .daily-btn:not(.primary){ --btn-fill:rgba(40,10,70,0.55); color:#fff3c4; }
+  .fin-overlay .daily-btn.disabled{ opacity:0.45; pointer-events:none; }
+  .fin-go{ padding:12px 30px; font-size:16px; }
+  @media (prefers-reduced-motion: reduce){ .fin-rays, .fin-stage{ animation:none !important; } }
   .ir-field{ position:absolute; inset:0; pointer-events:none; }
   .ir-mark{
     position:absolute; left:var(--x); top:var(--y); font-family:'Big Shoulders Display', sans-serif; font-weight:900;
@@ -2193,6 +2261,7 @@
     <div class="pill-row">
       <div class="status-banner daily" id="statusBanner"></div>
       <div class="status-banner daily score-pill" id="runBanner"></div>
+      <div class="inf-milestone" id="infMilestone" aria-hidden="true"></div>
     </div>
     <div class="vibe-wrap" id="vibeWrap">
       <div class="vibe-track"><div class="vibe-dot" id="vibeDot"></div></div>
@@ -2604,6 +2673,68 @@
   <div class="contact-footer" data-contact-footer></div>
 </div>
 
+<!-- Infinity run finale: Run Complete -> Plinko -> the Vault (see openInfFinale). -->
+<div class="fin-overlay hidden" id="finOverlay" role="dialog" aria-modal="true" aria-label="Run complete">
+  <canvas class="fin-sky" id="finSky" aria-hidden="true"></canvas>
+  <div class="fin-rays" aria-hidden="true"></div>
+  <div class="fin-stage fin-complete hidden" id="finComplete">
+    <div class="fin-eyebrow">♾️ INFINITY RUN</div>
+    <div class="fin-title">RUN COMPLETE</div>
+    <div class="fin-reason" id="finReason"></div>
+    <div class="fin-score"><b id="finScore">0</b><span>points</span></div>
+    <div class="fin-stats">
+      <div class="fin-stat"><b id="finCrowd">—</b><span>matched the crowd</span></div>
+      <div class="fin-stat"><b id="finKeys">0</b><span>keys earned</span></div>
+    </div>
+    <div class="fin-bold hidden" id="finBold">
+      <div class="fin-bold-eyebrow">😈 YOUR BOLDEST PICK</div>
+      <div class="fin-bold-card"><span class="fb-pick" id="finBoldPick"></span><span class="fb-over">over</span><span class="fb-other" id="finBoldOther"></span></div>
+      <div class="fin-bold-pct" id="finBoldPct"></div>
+    </div>
+    <div class="fin-buttons"><div class="daily-btn primary fin-go" id="finToPlinko" role="button" tabindex="0"></div></div>
+  </div>
+  <div class="fin-stage fin-plinko hidden" id="finPlinko">
+    <div class="fin-eyebrow">🪙 KEY CHIPS</div>
+    <div class="fin-plinko-sub" id="finPlinkoSub"></div>
+    <div class="plinko-board" id="plinkoBoard">
+      <svg class="plinko-svg" id="plinkoSvg" aria-hidden="true"></svg>
+      <div class="plinko-chip-layer" id="plinkoChips" aria-hidden="true"></div>
+    </div>
+    <div class="plinko-tally" id="plinkoTally" aria-live="polite"></div>
+    <div class="fin-buttons">
+      <div class="daily-btn primary fin-go" id="plinkoDrop" role="button" tabindex="0">Drop a chip</div>
+      <div class="daily-btn fin-skip" id="plinkoSkip" role="button" tabindex="0">Skip ⏭</div>
+    </div>
+  </div>
+  <div class="fin-stage fin-vault hidden" id="finVault">
+    <div class="vault-scene" id="vaultScene">
+      <div class="vault-ufo riddle-ufo" id="vaultUfo" aria-hidden="true"><span>🛸</span><i></i></div>
+      <div class="vault-beam-card" id="vaultBeamCard" aria-hidden="true"></div>
+      <div class="vault-body" aria-hidden="true">
+        <div class="vault-inside"><div class="vault-glow"></div></div>
+        <div class="vault-door" id="vaultDoor"><div class="vault-dial" id="vaultDial"><i></i><i></i><i></i><i></i><b></b></div><div class="vault-bolts"></div></div>
+      </div>
+      <canvas class="vault-coins" id="vaultCoins" aria-hidden="true"></canvas>
+    </div>
+    <div class="vault-rewards" id="vaultRewards">
+      <div class="vr-score"><span>FINAL SCORE</span><b id="vaultScore">0</b><em id="vaultScoreSub"></em></div>
+      <div class="vr-row" id="vaultFlipz"></div>
+      <div class="vr-personality" id="vaultPersonality">
+        <div class="vrp-eyebrow">YOUR PERSONALITY THIS RUN</div>
+        <div class="vrp-icon" id="vaultPIcon"></div><div class="vrp-name" id="vaultPName"></div><div class="vrp-blurb" id="vaultPBlurb"></div>
+      </div>
+      <div class="readout-unlocks hidden" id="vaultUnlocks"><div class="readout-new">✨ NEW CARD UNLOCKED ✨</div><div class="ru-cards" id="vaultCards"></div></div>
+      <div class="vr-badges hidden" id="vaultBadges"></div>
+      <div class="fin-buttons vault-buttons">
+        <div class="daily-btn primary" id="vaultShare" role="button" tabindex="0">📤 Share</div>
+        <div class="daily-btn" id="vaultCopy" role="button" tabindex="0">📋 Copy result</div>
+        <div class="daily-btn primary fin-again" id="vaultAgain" role="button" tabindex="0">New run ▶</div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Infinity Guess the Crowd (see startGuessRound). -->
+<div class="guess-overlay hidden" id="guessOverlay" role="dialog" aria-modal="true" aria-label="Guess the crowd"></div>
 <div class="inf-award-overlay hidden" id="infAwardOverlay" role="dialog" aria-label="Personality earned">
   <div class="personality-inner">
     <div class="personality-mask">♾️</div>
@@ -4004,7 +4135,21 @@
     }catch(e){}
     haptic([30, 40, 30, 40, 60, 60, 200]);
   }
+  // Infinity run sounds (keys, the finale's coins and chips), built from the
+  // Coin Flip's coin voices at the same levels - Web Audio, so the sound
+  // setting and the silent switch apply like every other effect.
+  function withSfxCtx(fn){ if (!soundOn) return; const ctx = getAudioCtx(); if (!ctx) return; try{ fn(ctx, ctx.currentTime); }catch(e){} }
   const sfx = {
+    key: ()=> withSfxCtx((ctx, t)=>{ coinPing(ctx, t, 0.09, 1568); coinPing(ctx, t + 0.09, 0.08, 2093); haptic([8,20,8]); }),
+    milestone: ()=>{ [659, 784, 988, 1319].forEach((f, i)=> playTone(f, i * 0.08, 0.18, 'triangle', 0.1)); haptic([12,30,12]); },
+    chipPeg: (i)=> withSfxCtx((ctx, t)=> coinTap(ctx, t, 0.22, 2600 + (i % 4) * 280)),
+    chipLand: (big)=> withSfxCtx((ctx, t)=>{ coinPing(ctx, t, 0.1, big ? 1175 : 988); if (big) coinPing(ctx, t + 0.1, 0.09, 1568); }),
+    coins: (n)=> withSfxCtx((ctx, t)=>{ for (let i = 0; i < (n || 14); i++) coinPing(ctx, t + i * 0.07 + Math.random() * 0.04, 0.045 + Math.random() * 0.03, 1100 + Math.random() * 900); }),
+    vaultClick: (i)=> withSfxCtx((ctx, t)=> coinTap(ctx, t, 0.35, 900 + (i % 3) * 150)),
+    vaultOpen: ()=>{ playTone(98, 0, 0.5, 'triangle', 0.12); playTone(147, 0.05, 0.6, 'sine', 0.08); haptic([30,40,60]); },
+    jackpot: ()=>{ [523, 659, 784, 1047, 1319, 1568].forEach((f, i)=> playTone(f, i * 0.07, 0.3, 'triangle', 0.1)); playTone(2093, 0.5, 0.7, 'sine', 0.07); haptic([20,30,20,30,80]); },
+    ufoTap: ()=>{ playTone(880, 0, 0.08, 'sine', 0.09); playTone(1320, 0.06, 0.1, 'sine', 0.09); playTone(1760, 0.13, 0.14, 'triangle', 0.08); },
+    lockIn: ()=>{ playTone(520, 0, 0.08, 'square', 0.06); playTone(780, 0.07, 0.12, 'square', 0.06); },
     secretSolve: ()=> playSecretSolveSound(),
     coinSpin: ()=> playCoinSpin(), coinWin: ()=> playCoinWin(), coinLose: ()=> playCoinLose(),
     tap: (side)=>{ playClick(0.2, document.documentElement.classList.contains('mode-infinity') ? TAP_TONES.infinity : TAP_TONES.daily, side); haptic(8); },
@@ -5902,6 +6047,8 @@
     modeSelectOverlay: document.getElementById('modeSelectOverlay'), modeDailyBtn: document.getElementById('modeDailyBtn'),
     modeInfinityBtn: document.getElementById('modeInfinityBtn'),
     runBanner: document.getElementById('runBanner'),
+    finOverlay: document.getElementById('finOverlay'),
+    guessOverlay: document.getElementById('guessOverlay'),
     runTimerWrap: document.getElementById('runTimerWrap'), runTimerFill: document.getElementById('runTimerFill'),
     runIntroOverlay: document.getElementById('runIntroOverlay'), runIntroDismiss: document.getElementById('runIntroDismiss'),
     howtoOverlay: document.getElementById('howtoOverlay'), howtoCard: document.getElementById('howtoCard'),
@@ -6053,21 +6200,130 @@
       if (ss.score <= -10) ss.wentNegative = true;
       if (ss.score > ss.high){ if (ss.wentNegative) awardBadge('comeback'); ss.high = ss.score; }
     }
-    ensureRaceToday();
-    if (raceState.completed) { renderRaceStatus(); return; }
-    if (raceState.startedAt == null) raceState.startedAt = Date.now();
-    raceState.score += delta;
-    if (raceState.score >= RACE_TARGET){
-      raceState.completed = true;
-      raceState.completionMs = Date.now() - raceState.startedAt;
-      saveRaceState();
-      sfx.levelUp();
-      showLevelUp('Hit ' + RACE_TARGET + '! ' + formatRaceTime(raceState.completionMs));
-    } else {
-      saveRaceState();
-    }
-    renderRaceStatus();
+    // Infinity's points belong to the current run (see infRun); the old
+    // once-a-day race state isn't kept any more.
+    ensureInfRun();
+    if (infRun.ended){ renderRunBanner(); return; }
+    infRun.score += delta;
+    INF_MILESTONES.forEach(m=>{
+      if (infRun.score >= m.at && infRun.milestones.indexOf(m.at) === -1){ infRun.milestones.push(m.at); celebrateInfMilestone(m); }
+    });
+    saveInfRun();
+    if (infRun.score >= INF_RUN_TARGET) endInfRun('points');
+    renderRunBanner();
   }
+
+  // ---------- Infinity run: a finish line ----------
+  // A run ends at INF_RUN_TARGET points or when the run clock reaches
+  // INF_RUN_CLOCK_MS, whichever comes first, and finishes in the gold finale
+  // (Run Complete -> Plinko -> the Vault). The clock counts active play only:
+  // it runs while the vote board is showing (isOnVsScreen) and the game isn't
+  // paused or in a background tab - popups, the walkthrough and menus stop it.
+  // The run is saved per device (INF_RUN_KEY) and picks up after a refresh,
+  // keys, clock and all; the finale's outcomes are drawn once and saved too,
+  // so a refresh can't re-roll them or award anything twice.
+  //
+  // Pacing (Oct 2026, measured with screenshots/qa/tools/pacing_sim.py from
+  // this code's own constants): the old scoring reached 250 in a median 3.4
+  // minutes of voting (~4.3s and ~5.9 points per vote round). Re-tuned so a
+  // typical player (about 2s per pick) reaches it in ~8.5-9.5 minutes:
+  // a star card is worth 2 (was 3), combos no longer add points, the Points
+  // Zone is rarer (1.5% a round, was 8%) and doubles vote points only,
+  // trivia is worth 5 (was 25) plus a key, and Coin Flip / Wild Card are
+  // capped at 15 either way.
+  const INF_RUN_KEY = 'flipstax_inf_run_v1';
+  const INF_RUN_TARGET = 250;
+  const INF_RUN_CLOCK_MS = 10 * 60 * 1000;
+  const INF_KEY_CAP = 8;
+  const INF_STAR_POINTS = 2;
+  const INF_TRIVIA_POINTS = 5;
+  const INF_SWING_CAP = 15;          // Coin Flip and Wild Card, either way
+  const INF_ZONE_CHANCE = 0.015;
+  const INF_TRIVIA_CHANCE = 0.13;    // was 0.12
+  const INF_MATCHES_PER_KEY = 3;     // crowd matches in a row for a key
+  const INF_MILESTONES = [ { at:125, text:'Halfway!', icon:'🎉' }, { at:200, text:'Almost there!', icon:'🔥' } ];
+  function freshInfRun(){
+    return { v:1, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7), startedAt: Date.now(),
+      clockMs:0, score:0, keys:0, keyLog:{}, matchStreak:0, votes:0, crowdN:0, crowdAgree:0, boldest:null,
+      voteRounds:0, riddles:0, riddlesRight:0, nextRiddleAt: 26 + Math.floor(Math.random() * 9),
+      sinceGuess:0, nextGuessAt: 6 + Math.floor(Math.random() * 3), guesses:0,
+      ufoTaps:0, ufoRewards:0, nextUfoAt: 12 + Math.floor(Math.random() * 7),
+      milestones:[], pendingBadges:[], ended:null, endedAt:null, finale:null };
+  }
+  function loadInfRun(){
+    try{
+      const r = JSON.parse(localStorage.getItem(INF_RUN_KEY) || 'null');
+      if (r && r.v === 1 && typeof r.score === 'number' && typeof r.clockMs === 'number') return Object.assign(freshInfRun(), r);
+    }catch(e){}
+    return null;
+  }
+  function saveInfRun(){ if (!infRun) return; try{ localStorage.setItem(INF_RUN_KEY, JSON.stringify(infRun)); }catch(e){} }
+  let infRun = loadInfRun();
+  // A new run also starts a new personality block: the finale judges the run.
+  function ensureInfRun(){
+    if (infRun) return infRun;
+    infRun = freshInfRun();
+    infBlock = freshInfBlock(); saveInfBlock();
+    saveInfRun();
+    return infRun;
+  }
+  function infRunLive(){ return !!infRun && !infRun.ended && inInfinity(); }
+  function infClockLeftMs(){ return Math.max(0, INF_RUN_CLOCK_MS - (infRun ? infRun.clockMs : 0)); }
+  function formatClock(ms){ const s = Math.ceil(ms / 1000), m = Math.floor(s / 60); return m + ':' + String(s % 60).padStart(2, '0'); }
+  // The clock: a 250ms tick that adds real elapsed time only while play is
+  // active (a throttled background tick never adds more than a second).
+  let infClockTimer = null, infClockLast = 0, infClockSavedAt = 0;
+  function infClockActive(){ return infRunLive() && isOnVsScreen() && !isPaused && !document.hidden; }
+  function startInfClock(){
+    clearInterval(infClockTimer); infClockLast = performance.now();
+    infClockTimer = setInterval(tickInfClock, 250);
+  }
+  function tickInfClock(){
+    const now = performance.now(), d = Math.min(1000, Math.max(0, now - infClockLast)); infClockLast = now;
+    if (!inInfinity()){ clearInterval(infClockTimer); infClockTimer = null; saveInfRun(); return; }
+    if (!infClockActive()) return;
+    infRun.clockMs = Math.min(INF_RUN_CLOCK_MS, infRun.clockMs + d);
+    renderInfClock();
+    if (now - infClockSavedAt > 2000){ infClockSavedAt = now; saveInfRun(); }
+    if (infRun.clockMs >= INF_RUN_CLOCK_MS) endInfRun('clock');
+  }
+  window.addEventListener('pagehide', saveInfRun);
+  // The run is over: no new round is dealt; the finale opens as soon as the
+  // board is free (now, or when the current popup or reveal finishes).
+  function endInfRun(reason){
+    if (!infRun || infRun.ended) return;
+    infRun.ended = reason; infRun.endedAt = Date.now();
+    saveInfRun(); renderRunBanner();
+    if (!inInfinity()) return;
+    if (isOnVsScreen() && !voted){ clearRoundTimer(); stopTallyPolling(); loadNext(); }
+  }
+  // Keys: a small gold counter in the header, at most INF_KEY_CAP a run.
+  function addInfKey(source){
+    if (!infRun || infRun.ended || infRun.keys >= INF_KEY_CAP) return false;
+    infRun.keys++; infRun.keyLog[source] = (infRun.keyLog[source] || 0) + 1; saveInfRun();
+    renderRunBanner();
+    const k = document.getElementById('infKeyCount');
+    if (k){ k.classList.remove('pop'); void k.offsetWidth; k.classList.add('pop'); }
+    sfx.key();
+    return true;
+  }
+  // Halfway / Almost there: a small gold pill that floats up from the
+  // header - decorative, never in the way of a tap.
+  function celebrateInfMilestone(m){
+    sfx.milestone();
+    const el = document.getElementById('infMilestone'); if (!el) return;
+    el.textContent = m.icon + ' ' + m.text + ' ' + m.at + ' pts';
+    el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+    clearTimeout(celebrateInfMilestone._t);
+    celebrateInfMilestone._t = setTimeout(()=> el.classList.remove('show'), 2400);
+  }
+  function renderInfClock(){
+    const c = document.getElementById('infClock'); if (!c || !infRun) return;
+    const left = infClockLeftMs();
+    c.textContent = formatClock(left);
+    c.parentElement.classList.toggle('low', left <= 60000 && !infRun.ended);
+  }
+
 
   // ---------- Daily Run: a bounded ritual (6min voting/trivia + 75s solve,
   // 7:15 baseline, 8:00 if the riddle fires) - tap for points,
@@ -6312,8 +6568,14 @@
     badgesShownNew.forEach(id=>{ if (badgeStore.seen.indexOf(id) === -1) badgeStore.seen.push(id); });
     badgesShownNew = []; saveBadges();
   }
-  function awardBadge(id){
+  // During an Infinity run, badges are held (infRun.pendingBadges) and handed
+  // out once, in the finale's Vault; opts.now awards straight away.
+  function awardBadge(id, opts){
     if (badgeEarned(id)) return;
+    if (!(opts && opts.now) && inInfinity() && infRun && !(infRun.finale && infRun.finale.awarded)){
+      if (infRun.pendingBadges.indexOf(id) === -1){ infRun.pendingBadges.push(id); saveInfRun(); }
+      return;
+    }
     badgeStore.earned[id] = todayStr(); saveBadges();
     const b = BADGES.find(x=> x.id === id);
     if (b) queueBadgeBanner(b);
@@ -6596,16 +6858,16 @@
     // whenever the mode changes (see the mode buttons / returnToModeSelect).
     // The crowd meter is per run / per Infinity block, so it follows along.
     updateVibeMeter();
-    // Infinity: today's points toward 250, with a progress bar behind them.
-    // (The 50-vote block still runs - its award and Collection checks - it
-    // just isn't counted out on screen.)
+    // Infinity: the run's points toward 250 (a progress bar behind them),
+    // the run clock's time left, and the run's keys.
     if (document.documentElement.classList.contains('mode-infinity')){
-      ensureRaceToday();
-      const sc = raceState.score, pct = Math.max(0, Math.min(100, sc / RACE_TARGET * 100));
-      els.runBanner.innerHTML = '<i class="sp-bar" style="width:' + (raceState.completed ? 100 : pct).toFixed(1) + '%"></i>' +
-        '<span class="sp-mode">\u267E\uFE0F</span><span class="sp-label">Points</span>' +
-        (raceState.completed ? '<span class="sp-done">250 reached in ' + formatRaceTime(raceState.completionMs) + ' \u2713</span>'
-          : '<b class="sp-num">' + sc + '</b><span class="sp-of">/ ' + RACE_TARGET + '</span>');
+      ensureInfRun();
+      const sc = infRun.score, pct = Math.max(0, Math.min(100, sc / INF_RUN_TARGET * 100));
+      els.runBanner.innerHTML = '<i class="sp-bar" style="width:' + pct.toFixed(1) + '%"></i>' +
+        '<span class="sp-mode">\u267E\uFE0F</span><b class="sp-num">' + Math.max(0, sc) + '</b><span class="sp-of">/ ' + INF_RUN_TARGET + '</span>' +
+        '<span class="sp-sep">\u00B7</span><span class="sp-clock">\u23F1\uFE0F<span id="infClock"></span></span>' +
+        '<span class="sp-sep">\u00B7</span><span class="sp-keys" title="Keys">\uD83D\uDD11<b id="infKeyCount">' + infRun.keys + '</b></span>';
+      renderInfClock();
       return;
     }
     const streakTag = dailyRunStreak > 0 ? ('<span class="sp-sep">\u00B7</span>\uD83D\uDD25' + dailyRunStreak) : '';
@@ -7618,6 +7880,120 @@
       requestAnimationFrame(frame);
     })(start);
   }
+  // ---------- Infinity run finale ----------
+  // Run Complete -> Plinko (one chip per key, 1 to 5) -> the Vault. The
+  // finale's state lives in infRun.finale and is saved at every step, so a
+  // refresh comes back to the same stage with the same results; the chips'
+  // landing slots are drawn once, up front. Awards happen once, in the Vault
+  // (see finaleAward).
+  const PLINKO_MIN_CHIPS = 1, PLINKO_MAX_CHIPS = 5;
+  let finTapShieldAt = -1000;   // the 250ms tap shield, after a stage or overlay change
+  function finTap(fn){ return e=>{ if (e) e.stopPropagation(); if (performance.now() - finTapShieldAt < TAP_SHIELD_MS) return; fn(e); }; }
+  function infCrowdPct(r){ return r.crowdN ? Math.round(r.crowdAgree / r.crowdN * 100) : null; }
+  function openInfFinale(){
+    if (!infRun) return;
+    if (!infRun.ended){ infRun.ended = 'points'; infRun.endedAt = Date.now(); }
+    stopTallyPolling(); clearRoundTimer(); voted = false; votedSinceTime = null;
+    clearTimeout(eventTimeoutId);
+    if (!infRun.finale){ infRun.finale = buildInfFinale(); saveInfRun(); }
+    els.slowdownBtn.classList.add('hidden');
+    els.eventOverlay.classList.add('hidden');
+    const wasHidden = els.finOverlay.classList.contains('hidden');
+    els.finOverlay.classList.remove('hidden');
+    updatePauseBtnVisibility();
+    if (wasHidden){ finTapShieldAt = performance.now(); startFinSky(); }
+    showFinStage(infRun.finale.stage);
+  }
+  function buildInfFinale(){
+    const chips = Math.max(PLINKO_MIN_CHIPS, Math.min(PLINKO_MAX_CHIPS, infRun.keys));
+    return { stage:'complete', chips: drawPlinkoOutcomes(chips), dropped:0, bonus:0, awarded:false, award:null };
+  }
+  function showFinStage(stage){
+    ['finComplete', 'finPlinko', 'finVault'].forEach(id=> document.getElementById(id).classList.add('hidden'));
+    finTapShieldAt = performance.now();
+    if (stage === 'complete') renderFinComplete();
+    else if (stage === 'plinko') renderPlinko();
+    else renderVault();
+  }
+  function renderFinComplete(){
+    const r = infRun, el = document.getElementById('finComplete');
+    document.getElementById('finReason').textContent = r.ended === 'clock'
+      ? '⏱️ Time! The 10:00 clock ran out.' : '🏁 ' + INF_RUN_TARGET + ' points in ' + formatClock(r.clockMs) + '!';
+    document.getElementById('finScore').textContent = Math.max(0, r.score);
+    const pct = infCrowdPct(r);
+    document.getElementById('finCrowd').textContent = pct === null ? '—' : pct + '%';
+    document.getElementById('finKeys').textContent = '🔑 ' + r.keys;
+    const bold = document.getElementById('finBold');
+    bold.classList.toggle('hidden', !r.boldest);
+    if (r.boldest){
+      document.getElementById('finBoldPick').textContent = r.boldest.pick;
+      document.getElementById('finBoldOther').textContent = r.boldest.other;
+      document.getElementById('finBoldPct').textContent = 'You went against ' + r.boldest.against + '% of the crowd';
+    }
+    const chips = r.finale.chips.length;
+    document.getElementById('finToPlinko').textContent = '🪙 Drop ' + chips + ' key chip' + (chips > 1 ? 's' : '') + ' ▶';
+    el.classList.remove('hidden');
+    sfx.levelUp();
+  }
+  document.getElementById('finToPlinko').addEventListener('click', finTap(()=>{
+    if (!infRun || !infRun.finale || infRun.finale.stage !== 'complete') return;
+    infRun.finale.stage = 'plinko'; saveInfRun(); showFinStage('plinko');
+  }));
+  // Hides the finale without changing it (leaving to mode select): it comes
+  // back on the same stage next time Infinity is picked.
+  function closeInfFinaleView(){ els.finOverlay.classList.add('hidden'); stopFinSky(); }
+  // After the Vault: the run is done - a fresh run starts on the board.
+  function startNewInfRun(){
+    infRun = null; try{ localStorage.removeItem(INF_RUN_KEY); }catch(e){}
+    ensureInfRun();
+    closeInfFinaleView();
+    infSession = freshInfSession(); comboCount = 0; lastWasEvent = false;
+    renderRunBanner(); startInfClock();
+    finTapShieldAt = performance.now(); noteOverlayClosed();
+    if (inInfinity()) scheduleNext(0);
+  }
+  // Gold shooting stars behind the finale (the shared star system).
+  const STAR_FINALE = { ang:[0.18, 0.5], speed:[8, 14], y:[0.02, 0.5], off:40, colors:['#ffffff', '#fff3b0', '#ffd23f'], tail:11, width:2.6, head:2.2, glow:'rgba(255,230,140,0.9)' };
+  let finSkyOn = false;
+  function startFinSky(){
+    if (finSkyOn || prefersReducedMotion()) return;
+    const canvas = document.getElementById('finSky'), ctx = canvas && canvas.getContext('2d'); if (!ctx) return;
+    finSkyOn = true;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    let stars = [], next = 300, W = 0, H = 0;
+    const size = ()=>{ W = innerWidth; H = innerHeight; canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr); };
+    size(); const start = performance.now();
+    (function frame(now){
+      if (!finSkyOn || els.finOverlay.classList.contains('hidden')){ finSkyOn = false; ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); return; }
+      requestAnimationFrame(frame);
+      if (innerWidth !== W || innerHeight !== H) size();
+      const t = now - start;
+      if (t >= next){ stars.push(spawnShootingStar(W, H, STAR_FINALE)); next = t + 900 + Math.random() * 1600; }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+      stars = stepShootingStars(ctx, stars, W, H, STAR_FINALE);
+    })(start);
+  }
+  function stopFinSky(){ finSkyOn = false; }
+  // (Phase 1 stand-ins - the Plinko board and the Vault replace these.)
+  function drawPlinkoOutcomes(n){ return Array.from({ length:n }, ()=> ({ slot:0, kind:'x1', pts:20 })); }
+  function renderPlinko(){ infRun.finale.stage = 'vault'; saveInfRun(); renderVault(); }
+  function renderVault(){
+    if (!infRun.finale.awarded){ infRun.finale.awarded = true; saveInfRun(); }
+    document.getElementById('vaultScore').textContent = Math.max(0, infRun.score);
+    document.getElementById('finVault').classList.remove('hidden');
+  }
+  document.getElementById('vaultAgain').addEventListener('click', finTap(()=> startNewInfRun()));
+  // Infinity run events that take a round's place (riddle rounds, Guess the
+  // Crowd); true if one started. Filled in with the new round types.
+  function infRunEventDue(){ return false; }
+  // A 5-in-a-row crowd-match streak: the tractor beam lifts the card stack
+  // (Phase 5 - the alien layer). Decorative only.
+  function abductStack(){}
+  // The 250ms tap shield after any overlay closes: vote() ignores taps for
+  // this long, so a double tap on a closing button can't vote by accident.
+  const TAP_SHIELD_MS = 250;
+  let overlayClosedAt = -1000;
+  function noteOverlayClosed(){ overlayClosedAt = performance.now(); }
   function stopRiddleAmbient(){
     riddleAmbientOn = false;
     els.riddleOverlay.classList.remove('ambient');
@@ -9063,7 +9439,7 @@
     // used to drain the Race to 250 score before anyone had played.
     const inRound = runActive || (inInfinity() && isOnVsScreen());
     if (inRound){
-      const penalty = current.bonusPoints ? 3 : 1;
+      const penalty = current.bonusPoints ? (runActive ? 3 : INF_STAR_POINTS) : 1;
       if (runActive) addRunScore(-penalty); else addRacePoints(-penalty);
       showToast('\u23F1\uFE0F Too slow \u2014 \u2212' + penalty + ' point' + (penalty>1?'s':''));
     }
@@ -9082,6 +9458,8 @@
            els.riddleOverlay.classList.contains('hidden') &&
            els.irOverlay.classList.contains('hidden') &&
            els.infAwardOverlay.classList.contains('hidden') &&
+           els.finOverlay.classList.contains('hidden') &&
+           els.guessOverlay.classList.contains('hidden') &&
            els.runIntroOverlay.classList.contains('hidden') &&
            els.howtoOverlay.classList.contains('hidden') &&
            els.modeSelectOverlay.classList.contains('hidden') &&
@@ -9230,6 +9608,11 @@
   new MutationObserver(updatePauseBtnVisibility).observe(els.riddleOverlay, { attributes:true, attributeFilter:['class'] });
   new MutationObserver(updatePauseBtnVisibility).observe(els.runIntroOverlay, { attributes:true, attributeFilter:['class'] });
   new MutationObserver(updatePauseBtnVisibility).observe(els.howtoOverlay, { attributes:true, attributeFilter:['class'] });
+  // Any gameplay overlay closing starts the 250ms tap shield (noteOverlayClosed).
+  [els.eventOverlay, els.irOverlay, els.guessOverlay, els.finOverlay, els.pauseOverlay].forEach(ov=>{
+    let open = !ov.classList.contains('hidden');
+    new MutationObserver(()=>{ const now = !ov.classList.contains('hidden'); if (open && !now) noteOverlayClosed(); open = now; updatePauseBtnVisibility(); }).observe(ov, { attributes:true, attributeFilter:['class'] });
+  });
 
   // Noon Rush: a per-timezone local event, not a global one - every player's
   // OWN device clock decides their own noon. No server coordination needed.
@@ -9240,11 +9623,12 @@
     const now = Date.now();
     if (lastBonusEnd && now - lastBonusEnd < 45000) return;
     if (sessionFlips < 3) return;
-    const chance = isNoonRush() ? 0.08 * 2.5 : 0.08;
+    const base = inInfinity() ? INF_ZONE_CHANCE : 0.08;
+    const chance = isNoonRush() ? base * 2.5 : base;
     if (Math.random() < chance) startBonusZone();
   }
-  // Infinity's Points Zone doubles the points from votes, combos, trivia and
-  // +10 Points while it lasts (Wild Card, Coin Flip and penalties as normal).
+  // Infinity's Points Zone doubles the points from votes while it lasts
+  // (since the run re-tune, nothing else).
   function zonePoints(n){ return (bonusActive && !runActive) ? n * 2 : n; }
   function startBonusZone(){
     bonusActive = true;
@@ -9286,6 +9670,7 @@
     if (sessionHalted) return;
     if (infRiddleState !== 'idle') return;
     if (!els.infAwardOverlay.classList.contains('hidden')) return;
+    if (!els.finOverlay.classList.contains('hidden') || !els.guessOverlay.classList.contains('hidden')) return;
     if (isPaused) return;   // e.g. the stalled-round watchdog; scheduleNext deals it on Resume
     stopTallyPolling();
     clearRoundTimer();
@@ -9296,13 +9681,18 @@
       if (runPendingPowerUp){ runPendingPowerUp = false; runPowerUpRoundForRun(); return; }
     } else {
       renderStatusBanner();
+      // Infinity: a finished run goes to its finale instead of another card.
+      // (The 50-vote personality award is now the finale's.)
+      if (inInfinity()){
+        ensureInfRun();
+        if (infRun.ended || infRun.finale){ openInfFinale(); return; }
+      }
       maybeTriggerBonusZone();
-      if (inInfinity() && infBlock.votes >= INF_AWARD_VOTES){ showInfAward(); return; }
-      if (!lastWasEvent && shouldStartInfRiddle()){ lastWasEvent = true; startInfRiddle(); return; }
+      if (inInfinity() && !lastWasEvent && infRunEventDue()){ lastWasEvent = true; return; }
       if (!lastWasEvent && sessionFlips >= 4){
         const boost = isNoonRush() ? 2.5 : 1;
         const roll = Math.random();
-        if (roll < 0.12 * boost){ lastWasEvent = true; runWildEvent(); return; }
+        if (roll < (inInfinity() ? INF_TRIVIA_CHANCE : 0.12) * boost){ lastWasEvent = true; runWildEvent(); return; }
       }
       // Power-ups are a milestone now, not a random roll - fires exactly
       // once per 15 flips instead of "sometimes every few flips."
@@ -9317,6 +9707,7 @@
     if (deckNow.next >= deckNow.cards.length) resetDeck();
     current = deckNow.cards[deckNow.next++];
     roundSeq++;
+    if (inInfinity() && infRun && !infRun.ended){ infRun.voteRounds++; infRun.sinceGuess++; saveInfRun(); }
     current.bonusPoints = Math.random() < 0.2;
     rampOnRound();
 
@@ -9432,6 +9823,13 @@
   // personality inputs, the In Sync / Lone Wolf streaks and the lifetime
   // figure.
   const CROWD_MIN_OTHERS = 5;
+  // Infinity's Guess the Crowd and Boldest Pick only use a card with at
+  // least this many votes on it (both sides together).
+  const CROWD_DATA_MIN = 30;
+  // Item counts already fetched for reveals (slug -> count), so Guess the
+  // Crowd can often find a qualifying card without another request.
+  const tallyCache = new Map();
+  function cacheTallies(counts){ if (!counts) return; Object.keys(counts).forEach(k=>{ if (typeof counts[k] === 'number') tallyCache.set(k, counts[k]); }); }
   function crowdVerdict(side, counts, myVote){
     let a = counts.a, b = counts.b;
     if (myVote && myVote.ok){
@@ -9446,6 +9844,16 @@
     return { counted:true, withCrowd: pick > other, others: total, pickPct: Math.round(pick / total * 100) };
   }
   async function fetchTallies(itemIds){
+    // Localhost testing only (?debug=fast): stand-in tallies, or a hung or
+    // failed API. Never on the live site (DEBUG_FAST is localhost-only).
+    if (DEBUG_FAST && window.__mockTallies){
+      const m = window.__mockTallies;
+      if (m === 'timeout') return withTimeout(new Promise(()=>{}), VOTE_API_TIMEOUT_MS);
+      if (m === 'fail') return null;
+      const counts = {}; let total = 0;
+      itemIds.forEach(id=>{ const c = typeof m === 'function' ? m(id) : (m[id] != null ? m[id] : 0); counts[id] = c; total += c; });
+      return { counts, total };
+    }
     const attempt = (async ()=>{
       try{
         const params = new URLSearchParams({ ids: itemIds.join(',') });
@@ -9521,6 +9929,7 @@
     // (arrows / 1 / 2) must not vote behind it.
     if (!els.howtoOverlay.classList.contains('hidden')) return;
     if (performance.now() - howtoClosedAt < HOWTO_TAP_SHIELD_MS) return;   // see howtoClosedAt
+    if (performance.now() - overlayClosedAt < TAP_SHIELD_MS) return;   // see noteOverlayClosed
     try{
       await voteImpl(side);
     }catch(err){
@@ -9551,7 +9960,7 @@
     // the Infinity selection outline appears the instant of the tap.
     els.halfA.classList.toggle('picked', side === 'A');
     els.halfB.classList.toggle('picked', side === 'B');
-    const points = current.bonusPoints ? 3 : 1;
+    const points = current.bonusPoints ? (runActive ? 3 : INF_STAR_POINTS) : 1;
     if (runActive) addRunScore(points); else addRacePoints(zonePoints(points));
     els.roundTimerFill.style.transition = 'none';
     els.roundTimerFill.style.width = '0%';
@@ -9564,6 +9973,7 @@
     let counts = tallyData
       ? { a: tallyData.counts[slugA] || 0, b: tallyData.counts[slugB] || 0 }
       : { a: 0, b: 0 }; // request failed - reveal() falls back to its own local estimate
+    if (tallyData) cacheTallies(tallyData.counts);
 
     const { pctA, pctB } = reveal(counts);
     // Keep the result ticking live while it's on screen, in case other
@@ -9610,6 +10020,25 @@
       trackCrowdShape(runCrowd, cv.withCrowd);
     }
 
+    // Infinity run: crowd matches in a row earn keys, and the boldest pick
+    // (the most-lopsided card the player went against) is kept for the finale.
+    if (!runActive && inInfinity() && infRun && !infRun.finale){
+      infRun.votes++;
+      if (cv.counted){
+        infRun.crowdN++;
+        if (cv.withCrowd){
+          infRun.crowdAgree++; infRun.matchStreak++;
+          if (infRun.matchStreak % INF_MATCHES_PER_KEY === 0 && addInfKey('streak')) showToast('\uD83D\uDD11 ' + infRun.matchStreak + ' crowd matches in a row \u2014 +1 key');
+          if (infRun.matchStreak === 5) abductStack();
+        } else infRun.matchStreak = 0;
+        if (!cv.withCrowd && cv.others >= CROWD_DATA_MIN){
+          const against = 100 - cv.pickPct;
+          if (!infRun.boldest || against > infRun.boldest.against)
+            infRun.boldest = { pick: side === 'A' ? current.a : current.b, other: side === 'A' ? current.b : current.a, against, n: cv.others };
+        }
+      }
+      saveInfRun();
+    }
     comboCount++;
     if (runActive) runMaxCombo = Math.max(runMaxCombo, comboCount);
     if (!runActive && inInfinity()){
@@ -9628,8 +10057,8 @@
     // trivia and power-ups on sooner.
     if (comboCount % 3 === 0){
       sfx.combo();
-      if (!runActive && inInfinity()){ const n = zonePoints(1); addRacePoints(n); showToast('\uD83D\uDD25 Combo x' + comboCount + '! +' + n + ' point' + (n > 1 ? 's' : '')); }
-      else showToast('\uD83D\uDD25 Combo x' + comboCount + '!');
+      // (Infinity's combo point is gone with the run re-tune - the cheer stays.)
+      showToast('\uD83D\uDD25 Combo x' + comboCount + '!');
     }
 
     sessionFlips++;
@@ -9699,9 +10128,10 @@
     if (wasCorrect === true){
       sfx.correct();
       sessionFlips++;
-      const n = zonePoints(25); addRacePoints(n);
+      const n = INF_TRIVIA_POINTS; addRacePoints(n);
+      const key = addInfKey('trivia');
       els.eventSubtitle.textContent = '';
-      els.eventPrompt.textContent = '\u2705 CORRECT! +' + n + ' POINTS';
+      els.eventPrompt.textContent = '\u2705 CORRECT! +' + n + ' POINTS' + (key ? ' \u00B7 \uD83D\uDD11 +1 KEY' : '');
     } else if (wasCorrect === false){
       sfx.wrong();
       els.eventSubtitle.textContent = 'No flip this time';
@@ -9752,7 +10182,7 @@
     } else if (key === 'flips10'){
       sfx.powerUp();
       sessionFlips++;
-      const n = zonePoints(10); addRacePoints(n);
+      const n = 10; addRacePoints(n);
       els.eventPrompt.textContent = '\u26A1 +' + n + ' POINTS!';
       finishPowerUp();
     } else if (key === 'slowmo'){
@@ -9769,18 +10199,18 @@
       els.eventPrompt.classList.add('wildcard-pop');
       const rollInterval = setInterval(()=>{
         sfx.spinTick(ticks);
-        els.eventPrompt.textContent = '\uD83C\uDF81 ' + pick(['+25?','\u221225?']);
+        els.eventPrompt.textContent = '\uD83C\uDF81 ' + pick(['+' + INF_SWING_CAP + '?','\u2212' + INF_SWING_CAP + '?']);
         ticks++;
         if (ticks >= 6){
           clearInterval(rollInterval);
-          const win = Math.random() < 0.5;
-          addRacePoints(win ? 25 : -25);
+          const win = Math.random() < 0.5, w = INF_SWING_CAP;
+          addRacePoints(win ? w : -w);
           if (win){
             sfx.correct();
-            els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: +25 points!';
+            els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: +' + w + ' points!';
           } else {
             sfx.wrong();
-            els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: \u221225 points';
+            els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: \u2212' + w + ' points';
           }
           finishPowerUp();
         }
@@ -9800,7 +10230,9 @@
   // is tossed, lands and spins down on the table (sound in step), then the
   // payoff: a gold burst and jingle, or a deflating coin and a womp-womp.
   const COIN_FLAT_STAKE = 5;
-  function coinStake(){ ensureRaceToday(); const sc = raceState.score; return sc > 0 ? Math.max(1, Math.round(sc / 2)) : COIN_FLAT_STAKE; }
+  // Half the run's points, capped at INF_SWING_CAP so one flip can't make or
+  // break the run's pacing.
+  function coinStake(){ ensureInfRun(); const sc = infRun.score; return sc > 0 ? Math.min(INF_SWING_CAP, Math.max(1, Math.round(sc / 2))) : COIN_FLAT_STAKE; }
   // The ray burst behind the coin: the splash's rays (buildRayLayer), smaller,
   // turning and breathing until the Coin Flip screen closes. Reduced motion:
   // one still frame.
@@ -9997,6 +10429,13 @@
       startDailyRiddle: () => startRiddleRound(),
       dailyUfo: (abduct, what) => { flyDailyUfo({ abduct: !!abduct, what }); return 'ok'; },
       getDailySky: () => ({ sunP: dailySunP, busy: dailyUfoBusy, nextInMs: dailyUfoNext - Date.now(), ticking: !!dailySkyTimer, live: dailySkyLive() }),
+      slug: (t) => slugify(t),
+      getInfRun: () => infRun,
+      setInfRun: (o) => { ensureInfRun(); Object.assign(infRun, o); saveInfRun(); renderRunBanner(); return infRun; },
+      setInfClockMs: (ms) => { ensureInfRun(); infRun.clockMs = ms; saveInfRun(); renderInfClock(); },
+      endInfRun: (why) => endInfRun(why || 'points'),
+      newInfRun: () => startNewInfRun(),
+      addInfKey: (src) => addInfKey(src || 'test'),
       putNext: (name) => { const d = decks[contentPoolKey()]; const i = d.cards.findIndex((c, k)=> k >= d.next && (c.a === name || c.b === name)); if (i >= 0){ const [c] = d.cards.splice(i, 1); d.cards.splice(d.next, 0, c); } return i; },
       showRunTrivia: () => runTriviaQuestion(),
       showRunPowerUp: () => runPowerUpRoundForRun(),
@@ -10355,6 +10794,10 @@
     playTrack('infinity');
     infSession = freshInfSession();   // a new Infinity session for the badges
     comboCount = 0;                   // and a fresh combo (not one carried over from a Daily run)
+    // The run carries on where it left off (or a new one starts); the clock
+    // only counts while the board is showing.
+    ensureInfRun(); renderRunBanner(); startInfClock();
+    if (infRun.ended || infRun.finale){ clearRoundTimer(); stopTallyPolling(); openInfFinale(); }
     // Coming back after a finished Daily run: that halted the board, so
     // deal a fresh round.
     if (sessionHalted){ sessionHalted = false; voted = false; votedSinceTime = null; loadNext(); }
@@ -10410,6 +10853,7 @@
     infRiddleState = 'idle'; clearInterval(infRiddleInterval); clearTimeout(infRiddleCloseTimer);
     els.irOverlay.classList.add('hidden'); els.irOverlay.classList.remove('win', 'lose');
     els.infAwardOverlay.classList.add('hidden');
+    closeInfFinaleView();
     els.levelupOverlay.classList.remove('show');
     els.personalityOverlay.classList.remove('show');
     els.readoutOverlay.classList.remove('show');
