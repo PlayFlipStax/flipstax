@@ -520,6 +520,31 @@
   .event-overlay.coin-won .coin-rays{ filter:brightness(1.35) saturate(1.25); }
   .event-overlay.coin-lost .coin-rays{ opacity:0.3; filter:grayscale(1) brightness(0.8); }
   .event-overlay.coin-mode .coin-stage{ display:block; }
+  /* Wild Card (Infinity): a gift box that shakes, pops its lid and shows the
+     prize - no downside. Same overlay as Coin Flip, its own look. */
+  .gift-stage{ display:none; position:relative; width:220px; height:210px; margin:4px auto 0; }
+  .event-overlay.gift-mode .gift-stage{ display:block; }
+  .event-overlay.gift-mode .event-grid, .event-overlay.gift-mode .event-timerbar, .event-overlay.gift-mode .powerup-icon{ display:none !important; }
+  .gift-glow{ position:absolute; left:50%; top:58%; width:220px; height:220px; margin:-110px 0 0 -110px; border-radius:50%; opacity:0;
+    background:radial-gradient(circle, rgba(255,240,170,0.95), rgba(255,200,40,0.4) 40%, transparent 70%); transition:opacity 0.4s ease; }
+  .gift-stage.opened .gift-glow{ opacity:1; }
+  .gift-box{ position:absolute; left:50%; bottom:20px; width:110px; height:96px; margin-left:-55px; }
+  .gift-body{ position:absolute; left:6px; right:6px; bottom:0; height:70px; border-radius:8px; background:linear-gradient(180deg,#ff5fb8,#d4237d); box-shadow:inset 0 -6px 0 rgba(0,0,0,0.15), 0 6px 16px rgba(0,0,0,0.35); }
+  .gift-lid{ position:absolute; left:0; right:0; top:14px; height:24px; border-radius:7px; background:linear-gradient(180deg,#ff8ad4,#e83a93); box-shadow:0 3px 0 rgba(0,0,0,0.18); }
+  .gift-ribbon{ position:absolute; left:50%; top:14px; bottom:0; width:18px; margin-left:-9px; background:linear-gradient(180deg,#fff3a8,#ffc928); }
+  .gift-bow{ position:absolute; left:50%; top:-4px; width:52px; height:26px; margin-left:-26px;
+    background:radial-gradient(ellipse at 25% 60%, #ffd23f 0 38%, transparent 40%), radial-gradient(ellipse at 75% 60%, #ffd23f 0 38%, transparent 40%), radial-gradient(circle at 50% 70%, #ffb000 0 18%, transparent 20%); }
+  .gift-stage.shaking .gift-box{ animation: giftShake 0.32s ease-in-out infinite; }
+  @keyframes giftShake{ 0%,100%{ transform:rotate(0) translateY(0); } 25%{ transform:rotate(-7deg) translateY(-3px); } 75%{ transform:rotate(7deg) translateY(-3px); } }
+  .gift-stage.opened .gift-lid, .gift-stage.opened .gift-bow{ animation: giftLid 0.7s cubic-bezier(.2,.8,.3,1) forwards; }
+  @keyframes giftLid{ to{ transform:translate(46px, -90px) rotate(38deg); opacity:0; } }
+  .gift-prize{ position:absolute; left:0; right:0; top:34px; text-align:center; font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:40px; color:#fff;
+    text-shadow:0 0 16px rgba(255,210,60,0.95), 0 3px 0 #a85500; opacity:0; transform:translateY(40px) scale(0.5); }
+  .gift-stage.opened .gift-prize{ animation: giftPrize 0.6s cubic-bezier(.3,1.7,.5,1) 0.15s forwards; }
+  @keyframes giftPrize{ to{ opacity:1; transform:none; } }
+  .gift-stage.opened .gift-burst i{ animation: coinSpark 0.9s ease-out forwards; }
+  @media (prefers-reduced-motion: reduce){ .gift-stage.shaking .gift-box, .gift-stage.opened .gift-lid, .gift-stage.opened .gift-bow, .gift-stage.opened .gift-burst i{ animation:none !important; }
+    .gift-stage.opened .gift-prize{ animation:none; opacity:1; transform:none; } .gift-stage.opened .gift-lid, .gift-stage.opened .gift-bow{ opacity:0; } }
   .event-overlay.coin-mode .event-grid, .event-overlay.coin-mode .event-timerbar, .event-overlay.coin-mode .powerup-icon{ display:none !important; }
   .coin-toss{ position:absolute; left:50%; top:100px; width:116px; height:116px; margin-left:-58px; }
   .coin{ position:relative; width:100%; height:100%; }
@@ -2538,6 +2563,12 @@
         <div class="event-tile" data-i="1"></div>
         <div class="event-tile" data-i="2"></div>
         <div class="event-tile" data-i="3"></div>
+      </div>
+      <div class="gift-stage" id="giftStage" aria-hidden="true">
+        <div class="gift-glow"></div>
+        <div class="gift-box" id="giftBox"><div class="gift-body"></div><div class="gift-lid"></div><div class="gift-ribbon"></div><div class="gift-bow"></div></div>
+        <div class="gift-prize" id="giftPrize"></div>
+        <div class="coin-burst gift-burst"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
       </div>
       <div class="coin-stage" id="coinStage" aria-hidden="true">
         <div class="coin-shadow"></div>
@@ -8244,7 +8275,7 @@
     showFinStage(infRun.finale.stage);
   }
   function buildInfFinale(){
-    const chips = Math.max(PLINKO_MIN_CHIPS, Math.min(PLINKO_MAX_CHIPS, infRun.keys));
+    const chips = Math.max(PLINKO_MIN_CHIPS, Math.min(PLINKO_MAX_CHIPS, infRun.keys) + (infRun.bonusChip ? 1 : 0));   // a Wild Card bonus chip on top: 6 at most
     return { stage:'complete', chips: drawPlinkoOutcomes(chips), dropped:0, bonus:0, awarded:false, award:null };
   }
   function showFinStage(stage){
@@ -11227,34 +11258,50 @@
     } else if (key === 'coinflip'){
       runCoinFlip();
     } else if (key === 'wildcard'){
-      let ticks = 0;
-      els.eventPrompt.classList.remove('wildcard-pop');
-      void els.eventPrompt.offsetWidth;
-      els.eventPrompt.classList.add('wildcard-pop');
-      const rollInterval = setInterval(()=>{
-        sfx.spinTick(ticks);
-        els.eventPrompt.textContent = '\uD83C\uDF81 ' + pick(['+' + INF_SWING_CAP + '?','\u2212' + INF_SWING_CAP + '?']);
-        ticks++;
-        if (ticks >= 6){
-          clearInterval(rollInterval);
-          const win = Math.random() < 0.5, w = INF_SWING_CAP;
-          addRacePoints(win ? w : -w);
-          if (win){
-            sfx.correct();
-            els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: +' + w + ' points!';
-          } else {
-            sfx.wrong();
-            els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: \u2212' + w + ' points';
-          }
-          finishPowerUp();
-        }
-      }, 90);
+      runWildGift();
     }
+  }
+  // ---------- Wild Card (Infinity): a mystery prize, no downside ----------
+  // +10 or +20 points, a key, or one bonus Plinko chip (at most one a run -
+  // a second one becomes +10; a key with a full key ring becomes +10 too).
+  // The weights put its average at about 16 points (a key or chip counted
+  // at roughly a Plinko chip's average payout) - the size of the old
+  // Wild Card's +/-15 stake, which on average gave 0.
+  const WILD_WEIGHT_POINTS10 = 0.50, WILD_WEIGHT_POINTS20 = 0.30, WILD_WEIGHT_KEY = 0.15, WILD_WEIGHT_CHIP = 0.05;
+  function drawWildPrize(){
+    let r = Math.random() * (WILD_WEIGHT_POINTS10 + WILD_WEIGHT_POINTS20 + WILD_WEIGHT_KEY + WILD_WEIGHT_CHIP);
+    let prize = (r -= WILD_WEIGHT_POINTS10) < 0 ? 'points10' : (r -= WILD_WEIGHT_POINTS20) < 0 ? 'points20' : (r -= WILD_WEIGHT_KEY) < 0 ? 'key' : 'chip';
+    if (DEBUG_FAST && window.__forceWild) prize = window.__forceWild;
+    if (prize === 'chip' && (!infRun || infRun.bonusChip)) prize = 'points10';
+    if (prize === 'key' && (!infRun || infRun.keys >= INF_KEY_CAP)) prize = 'points10';
+    return prize;
+  }
+  function runWildGift(){
+    const prize = drawWildPrize(), ov = els.eventOverlay, stage = document.getElementById('giftStage'), label = document.getElementById('giftPrize');
+    stage.classList.remove('shaking', 'opened'); label.textContent = '';
+    ov.classList.add('gift-mode');
+    els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD \u2014 what\u2019s inside?';
+    const open = ()=>{
+      stage.classList.remove('shaking'); stage.classList.add('opened');
+      let text;
+      if (prize === 'points10'){ addRacePoints(10); text = '+10 points'; }
+      else if (prize === 'points20'){ addRacePoints(20); text = '+20 points'; }
+      else if (prize === 'key'){ addInfKey('wildcard'); text = '\uD83D\uDD11 +1 key'; }
+      else { infRun.bonusChip = true; saveInfRun(); text = '\uD83E\uDE99 Bonus Plinko chip!'; }
+      label.textContent = text;
+      els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: ' + text;
+      sfx.correct(); if (prize === 'chip' || prize === 'key') sfx.coins(6);
+      setTimeout(finishPowerUp, 500);
+    };
+    if (prefersReducedMotion()){ open(); return; }
+    stage.classList.add('shaking');
+    let ticks = 0; const t = setInterval(()=>{ sfx.spinTick(ticks++); if (ticks >= 6) clearInterval(t); }, 150);
+    setTimeout(open, 1000);
   }
   function finishPowerUp(){
     setTimeout(()=>{
       els.eventOverlay.classList.add('hidden');
-      els.eventOverlay.classList.remove('coin-mode', 'coin-won', 'coin-lost');
+      els.eventOverlay.classList.remove('coin-mode', 'coin-won', 'coin-lost', 'gift-mode');
       scheduleNext(0);
     }, 1100);
   }
@@ -11764,8 +11811,8 @@
     lines:['The bar up top fills toward ' + FINISH_POINTS + ', and the clock shows your time left (it only runs while you’re voting).',
       'Earn 🔑 keys: match the crowd 3 times in a row, or nail a trivia question or a riddle.'],
     chipsLabel:'Power-ups — pick one when they drop',
-    chips:[ ['⚡ +10 Points', 'Instant points'], ['🐌 Slow-Mo', '+3s on your next 3 rounds'], ['🪙 Coin Flip', '50/50: win or lose up to 15'],
-            ['🎁 Wild Card', '50/50: +15 or −15 points'], ['🔑 Golden Key', 'An extra key'] ] };
+    chips:[ ['⚡ +10 Points', 'Instant points'], ['🐌 Slow-Mo', '+3s on your next 3 rounds'], ['🪙 Coin Flip', 'Heads or tails: win or lose up to 15'],
+            ['🎁 Wild Card', 'A mystery prize — never a loss'], ['🔑 Golden Key', 'An extra key'] ] };
   const HOWTO_LAST_INFINITY = { icon:'🛸', lead:'New rounds, then the Vault.',
     lines:['📡 Guess the Crowd: slide to the % you think picked the left card. The closer, the more points.',
       '🧩 Riddle rounds: pick the answer. Right = +20 and a key, a miss costs nothing.',
@@ -11905,7 +11952,7 @@
     els.solveCelebrate.classList.add('hidden');
     els.riddleOverlay.classList.add('hidden');
     stopSecretCelebration(); stopRiddleAmbient();
-    els.eventOverlay.classList.remove('coin-mode', 'coin-won', 'coin-lost');
+    els.eventOverlay.classList.remove('coin-mode', 'coin-won', 'coin-lost', 'gift-mode');
     els.runIntroOverlay.classList.add('hidden');
     closeHowTo({ abandon:true });   // left mid-walkthrough: not "seen", no run starts
     infRiddleState = 'idle'; clearInterval(infRiddleInterval); clearTimeout(infRiddleCloseTimer);
