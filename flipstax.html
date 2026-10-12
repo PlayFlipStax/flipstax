@@ -963,7 +963,9 @@
   .vr-row span{ padding:5px 10px; border-radius:99px; font-size:12.5px; font-weight:800; background:rgba(40,10,70,0.55); box-shadow:inset 0 0 0 1.5px rgba(255,225,140,0.5); }
   .vr-personality{ width:100%; padding:12px; border-radius:18px; background:linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.05)); box-shadow:inset 0 0 0 1.5px rgba(255,225,140,0.55); }
   .vrp-eyebrow{ font-size:11px; font-weight:900; letter-spacing:2px; color:#ffd23f; }
-  .vrp-icon{ font-size:38px; line-height:1.1; } .vrp-name{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:28px; }
+  .vrp-icon{ font-size:38px; line-height:1.1; }
+  .vrp-icon.has-card{ display:flex; justify-content:center; margin:6px 0 4px; }
+  .vrp-icon.has-card .cc-card{ width:150px; cursor:default; } .vrp-name{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:28px; }
   .vrp-blurb{ font-size:13.5px; font-weight:600; color:#fff3d6; }
   .vr-badges{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px; }
   .vr-badges.hidden{ display:none; }
@@ -2884,6 +2886,7 @@
     <div class="fin-buttons">
       <div class="daily-btn primary fin-go" id="plinkoDrop" role="button" tabindex="0">Drop a chip</div>
       <div class="daily-btn fin-skip" id="plinkoSkip" role="button" tabindex="0">Skip ⏭</div>
+      <div class="daily-btn fin-skip hidden" id="plinkoKeep" role="button" tabindex="0"></div>
     </div>
   </div>
   <div class="fin-stage fin-vault hidden" id="finVault">
@@ -8362,6 +8365,12 @@
     drop.textContent = left > 0 ? '🪙 Drop chip ' + (f.dropped + 1) + ' of ' + n : '🔐 Open the Vault ▶';
     drop.classList.toggle('disabled', plinkoBusy);
     skip.classList.toggle('hidden', left === 0);
+    // After the first chip, the rest can be kept: those keys stay on your
+    // key ring (Key Keeper) instead of becoming chips (Vault Cracker).
+    const keep = document.getElementById('plinkoKeep');
+    keep.classList.toggle('hidden', left === 0 || f.dropped === 0 || plinkoBusy);
+    const keepKeys = Math.max(0, infRun.keys - f.dropped);
+    keep.textContent = '\uD83D\uDDDD\uFE0F Keep ' + (keepKeys > 0 ? keepKeys + ' key' + (keepKeys > 1 ? 's' : '') : 'the rest') + ' \u25B6';
   }
   function chipEl(i){
     const c = document.createElement('div'); c.className = 'pk-chip'; c.innerHTML = '<span>🔑</span>'; c.dataset.i = i;
@@ -8427,11 +8436,56 @@
   }
   function goToVault(){
     const f = infRun.finale;
-    if (f.stage !== 'plinko' || f.dropped < f.chips.length) return;
+    if (f.stage !== 'plinko' || (f.dropped < f.chips.length && !f.kept)) return;
     f.stage = 'vault'; saveInfRun(); showFinStage('vault');
   }
+  function keepRestOfKeys(){
+    const f = infRun.finale;
+    if (plinkoBusy || f.dropped === 0 || f.dropped >= f.chips.length) return;
+    f.kept = true; saveInfRun();
+    sfx.key();
+    goToVault();
+  }
+  document.getElementById('plinkoKeep').addEventListener('click', finTap(()=>{ if (infRun && infRun.finale && infRun.finale.stage === 'plinko') keepRestOfKeys(); }));
   document.getElementById('plinkoDrop').addEventListener('click', finTap(()=>{ if (infRun && infRun.finale && infRun.finale.stage === 'plinko') dropNextChip(); }));
   document.getElementById('plinkoSkip').addEventListener('click', finTap(()=>{ if (infRun && infRun.finale && infRun.finale.stage === 'plinko') skipPlinko(); }));
+
+  // ---------- Infinity run personalities ----------
+  // One result per run, judged at the Vault. The first rule that fits, in
+  // this priority order, wins; if none fits, the existing personality logic
+  // (determinePersonality on the run's stats) decides, as before. Every
+  // threshold is a named constant to tune.
+  const STARSEEKER_UFO_TAPS = 2;          // or survived the abduction moment
+  const LUCKY_PLINKO_MIN = 200;           // Plinko bonus, or the jackpot
+  const WHISPERER_MIN_GUESSES = 2, WHISPERER_MAX_AVG_ERROR = 12;   // or any dead-on guess
+  const WHISPERER_MATCH_RATE = 0.70, CROWD_RATE_MIN_ROUNDS = 15;    // rounds with a crowd result
+  const SAGE_MIN_RIDDLES = 4, SAGE_MIN_ACCURACY = 0.75;
+  const CRACKER_KEYS_SPENT = 5;           // keys turned into Plinko chips
+  const WOLF_MAX_MATCH_RATE = 0.35;
+  const KEEPER_KEYS_HELD = 6;             // keys still on the ring after Plinko
+  function infRunStats(){
+    const r = infRun, f = r.finale || { chips:[], dropped:0 };
+    const dropped = f.chips.slice(0, f.dropped), spent = Math.min(f.dropped, r.keys);
+    return {
+      ufoTaps: r.ufoTaps || 0, abducted: !!r.abducted,
+      plinkoBonus: dropped.reduce((a, c)=> a + c.pts, 0), jackpot: dropped.some(c=> c.kind === 'jackpot'),
+      guesses: r.guessLocked || 0, guessAvgErr: r.guessLocked ? (r.guessErrSum || 0) / r.guessLocked : null, deadOn: !!r.perfectGuess,
+      crowdRounds: r.crowdN || 0, matchRate: r.crowdN ? r.crowdAgree / r.crowdN : null, votedRounds: r.votes || 0,
+      riddlesAnswered: r.riddlesAnswered || 0, riddlesRight: r.riddlesRight || 0,
+      keysEarned: r.keys, keysSpent: spent, keysHeld: r.keys - spent,
+    };
+  }
+  const RUN_PERSONALITY_RULES = [
+    ['starseeker',      s=> s.ufoTaps >= STARSEEKER_UFO_TAPS || s.abducted],
+    ['lucky_bounce',    s=> s.jackpot || s.plinkoBonus >= LUCKY_PLINKO_MIN],
+    ['crowd_whisperer', s=> (s.guesses >= WHISPERER_MIN_GUESSES && s.guessAvgErr <= WHISPERER_MAX_AVG_ERROR) || s.deadOn ||
+                            (s.crowdRounds >= CROWD_RATE_MIN_ROUNDS && s.matchRate >= WHISPERER_MATCH_RATE)],
+    ['riddle_sage',     s=> s.riddlesAnswered >= SAGE_MIN_RIDDLES && s.riddlesRight / s.riddlesAnswered >= SAGE_MIN_ACCURACY],
+    ['vault_cracker',   s=> s.keysSpent >= CRACKER_KEYS_SPENT],
+    ['lone_wolf',       s=> s.crowdRounds >= CROWD_RATE_MIN_ROUNDS && s.matchRate <= WOLF_MAX_MATCH_RATE],
+    ['key_keeper',      s=> s.keysHeld >= KEEPER_KEYS_HELD],
+  ];
+  function determineRunPersonality(s){ for (const [type, fits] of RUN_PERSONALITY_RULES){ if (fits(s)) return type; } return null; }
 
   // ---------- the Vault: everything is awarded here, once ----------
   // finaleAward runs the existing award code exactly once per run - the
@@ -8445,19 +8499,25 @@
     if (f.awarded && f.award) return f.award;
     const b = infBlock;
     if (b.crowd >= 10 && b.agree * 2 === b.crowd && infRun.pendingBadges.indexOf('coin_flip') === -1) infRun.pendingBadges.push('coin_flip');
-    const personality = determinePersonality(infBlockPersonalityStats(b));
+    const rs = infRunStats();
+    const runType = determineRunPersonality(rs);
+    const personality = runType ? { type: runType, note: null } : determinePersonality(infBlockPersonalityStats(b));
     if (b.crowd) recordSwing(b.agree, b.crowd);
     const cards = checkUnlocks({});
     const alien = [];
+    // A run personality's card is earned with the result (shown there, so it
+    // isn't repeated in the new-cards list).
+    let resultNew = false;
+    if (runType){ resultNew = !!grantRunCard(runType); if (collection.cards[runType]){ collection.cards[runType].revealed = true; saveCollection(); } }
     if (f.chips.slice(0, f.dropped).some(c=> c.kind === 'jackpot')){ const k = grantRunCard('mothership_jackpot'); if (k) alien.push(k); }
     closeEncounterUnlocks().forEach(k=>{ const g = grantRunCard(k); if (g) alien.push(g); });
     const badges = infRun.pendingBadges.filter(id=> !badgeEarned(id) && BADGES.some(x=> x.id === id));
     badges.forEach(id=> awardBadge(id, { now:true }));
-    const bonus = f.chips.reduce((a, c)=> a + c.pts, 0);
-    f.award = { personality: personality.type, note: personality.note || null, alienLine: alienPersonalityLine(personality.type),
+    const bonus = f.chips.slice(0, f.dropped).reduce((a, c)=> a + c.pts, 0);
+    f.award = { personality: personality.type, runPersonality: !!runType, resultNew, stats: rs, note: personality.note || null, alienLine: runType ? null : alienPersonalityLine(personality.type),
       cards, alien, badges, runScore: Math.max(0, infRun.score), bonus, finalScore: Math.max(0, infRun.score) + bonus,
       flipz: infRun.votes, crowdPct: infCrowdPct(infRun), keys: infRun.keys, boldest: infRun.boldest, ended: infRun.ended, clockMs: infRun.clockMs,
-      jackpot: f.chips.some(c=> c.kind === 'jackpot') };
+      jackpot: f.chips.slice(0, f.dropped).some(c=> c.kind === 'jackpot') };
     f.awarded = true; f.vaultSeen = false;
     saveInfRun();
     renderCollectionBtn();
@@ -8600,7 +8660,14 @@
     document.getElementById('vaultScoreSub').textContent = a.runScore + ' run' + (a.bonus ? ' + ' + a.bonus + ' Plinko bonus' : '');
     document.getElementById('vaultFlipz').innerHTML = '<span>⚡ +' + a.flipz + ' Flipz this run</span><span>' + stats.flips.toLocaleString() + ' lifetime</span><span>🔑 ' + a.keys + ' keys</span>';
     const pm = PERSONALITY_META[a.personality] || PERSONALITY_META.fence_sitter;
-    document.getElementById('vaultPIcon').textContent = pm.icon;
+    // The result with its full card: a run personality's card always (it's
+    // earned with the result); one of the 16 only if it's in the collection
+    // already (those unlock by their own rules - no spoilers), else its emoji.
+    const pIcon = document.getElementById('vaultPIcon');
+    const showCard = a.runPersonality || (collection.cards[a.personality] && collection.cards[a.personality].revealed);
+    pIcon.classList.toggle('has-card', !!showCard);
+    if (showCard){ pIcon.innerHTML = ''; const c = makeCollectionCard(a.personality, true); fillCardFront(c.querySelector('.cc-front'), a.personality); if (a.resultNew) c.classList.add('is-new'); pIcon.appendChild(c); }
+    else pIcon.textContent = pm.icon;
     document.getElementById('vaultPName').textContent = pm.name;
     document.getElementById('vaultPBlurb').textContent = (a.note || pm.blurb) + (a.alienLine ? ' ' + a.alienLine : '');
     const newCards = a.cards.concat(a.alien);
@@ -8663,6 +8730,7 @@
     const parts = [a.finalScore + ' pts'];
     if (a.crowdPct !== null && a.crowdPct !== undefined) parts.push('matched the crowd ' + a.crowdPct + '%');
     if (a.boldest) parts.push('boldest pick: ' + a.boldest.pick);
+    const pm = PERSONALITY_META[a.personality]; if (pm) parts.splice(1, 0, pm.name);
     return 'FlipStax Infinity: ' + parts.join(', ');
   }
   document.getElementById('vaultShare').addEventListener('click', finTap(()=> shareInfinityResult()));
@@ -8790,6 +8858,7 @@
     res.querySelector('.gr-verdict').textContent = '';
     res.classList.remove('hidden'); ov.classList.add('revealed');
     const off = Math.abs(guess - truth), sc = guessScore(off);
+    if (infRun && !infRun.finale){ infRun.guessLocked = (infRun.guessLocked || 0) + 1; infRun.guessErrSum = (infRun.guessErrSum || 0) + off; saveInfRun(); }
     if (off === 0 && infRun && !infRun.finale){ infRun.perfectGuess = true; saveInfRun(); }
     const finish = ()=>{
       real.textContent = truth + '%';
@@ -9099,6 +9168,7 @@
     if (pickedBtn && result !== 'win') pickedBtn.classList.add('wrong');
     const reduced = prefersReducedMotion();
     if (infRun && !infRun.finale) infRun.riddles = (infRun.riddles || 0);   // counted when it started (infRunEventDue)
+    if (result !== 'timeout' && infRun && !infRun.finale){ infRun.riddlesAnswered = (infRun.riddlesAnswered || 0) + 1; saveInfRun(); }
     if (result === 'win'){
       if (infRun && !infRun.finale){ infRun.riddlesRight = (infRun.riddlesRight || 0) + 1; saveInfRun(); }
       const key = addInfKey('riddle');
@@ -11328,6 +11398,8 @@
       getDailySky: () => ({ sunP: dailySunP, busy: dailyUfoBusy, nextInMs: dailyUfoNext - Date.now(), ticking: !!dailySkyTimer, live: dailySkyLive() }),
       slug: (t) => slugify(t),
       getInfRun: () => infRun,
+      runStats: () => infRunStats(),
+      runPersonalityFor: (st) => determineRunPersonality(st),
       spawnTapUfo: (force) => spawnTapUfo(force),
       abductStack: () => abductStack(),
       startGuess: (name) => { const c = name ? CARD_POOLS[contentPoolKey()].find(x=> x.a === name || x.b === name) : upcomingCards(12).find(guessCounts); return c ? startGuessRound(c) : 'no qualifying card'; },
