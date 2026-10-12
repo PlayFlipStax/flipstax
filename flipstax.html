@@ -290,9 +290,16 @@
   .run-timer-fill.danger{ animation: runTimerPulse 0.8s ease-in-out infinite; }
   @keyframes runTimerPulse{ 0%,100%{ opacity:1; } 50%{ opacity:0.5; } }
 
+  /* Each card keeps bands clear that its text is never placed in (set by
+     layoutBoard from the real layout): at the top of the top card the
+     +5s / Pause pills and its tag, where the cards meet the VS badge, and at
+     the top of the bottom card its tag. */
   .half{
     position:relative; flex:1; display:flex; align-items:center; justify-content:center;
-    padding:12px 20px; cursor:pointer; overflow:hidden; min-height:0;
+    padding:var(--band-top, 12px) 20px var(--band-bottom, 12px); cursor:pointer; overflow:hidden; min-height:0;
+    /* Exactly half the board each (minus half the gap) - with flex:1 the
+       card with the bigger bands would come out taller. */
+    flex:0 0 calc(50% - var(--board-gap, 0px) / 2);
     transition: transform 0.18s ease, opacity 0.18s ease;
   }
   .half.tap-chosen{ transform:scale(1.02); }
@@ -311,6 +318,10 @@
   .half.has-glyph{ flex-direction:column; align-items:center; justify-content:center; gap:2px; }
   .half.has-glyph .scene{ position:relative; inset:auto; flex:0 0 auto; }
   .half.has-glyph .scene .glyph{ font-size:min(13vh,88px); opacity:0.85; transform:none; }
+  /* Not enough room for picture + text (long names, results showing, short
+     phones): the picture shrinks, then steps aside - the text never does. */
+  .half.has-glyph.fit-tight .scene .glyph{ font-size:min(7vh,44px); }
+  .half.has-glyph.fit-none .scene{ display:none; }
   /* Mirrored only - no colour shift: a hue-rotated emoji reads as broken
      (a blue burger), and the two halves' backgrounds already tell them apart. */
   .half.has-glyph .scene .glyph.vs-twin{ display:inline-block; transform:scaleX(-1); }
@@ -369,13 +380,16 @@
     font-size:10px; font-weight:600; letter-spacing:0.3px; color:rgba(255,255,255,0.8);
     background:rgba(0,0,0,0.28); padding:2px 9px; border-radius:20px;
   }
-  .half.bottom .cat-chip{ top:auto; bottom:8px; }
+  /* The bottom card's tag sits in its top-left corner, in the band kept clear
+     at the top of that card (see layoutBoard) - it used to sit at the bottom
+     and could cover the "N people" line. */
+  .half.bottom .cat-chip{ top:8px; bottom:auto; left:10px; transform:none; }
   /* Narrow phones: a long label would run under the +5s / Pause pills, so the
      top chip steps aside - the bottom chip still shows the same label. */
   .cat-chip.squeezed{ visibility:hidden; }
 
   .divider{
-    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:4;
+    position:absolute; top:var(--seam, 50%); left:50%; transform:translate(-50%,-50%); z-index:4;
     width:48px; height:48px; border-radius:50%; background:var(--bg);
     border:3px solid var(--divider); display:flex; align-items:center; justify-content:center;
     font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:13px;
@@ -1721,7 +1735,7 @@
      anything else). */
   .inf-wordmark, .inf-floaters{ display:none; }
   :root.mode-infinity .board{
-    padding:50px 10px 10px; gap:8px;   /* 38px wordmark strip + 12px for the round timer under it */
+    padding:50px 10px 10px; gap:8px; --board-gap:8px;   /* 38px wordmark strip + 12px for the round timer under it */
   }
   /* Gold shell: everything around the panels - page background, the header
      and logo area, the board frame, the hint bar - goes bright shiny gold
@@ -1868,7 +1882,7 @@
   :root.mode-daily .status-banner.daily{ background:rgba(255,255,255,0.85); color:#0d2b5e; border-color:rgba(13,43,94,0.22); }
   /* Same board padding/gap as Infinity (including the 38px strip for the
      wordmark); Infinity adds 12px under its wordmark for its round timer. */
-  :root.mode-daily .board{ padding:38px 10px 10px; gap:8px; }
+  :root.mode-daily .board{ padding:38px 10px 10px; gap:8px; --board-gap:8px; }
   :root.mode-daily .half{
     --frame-ring:#fff;
     box-shadow:0 0 0 3px rgba(255,255,255,0.32), 0 6px 16px rgba(13,43,94,0.28);
@@ -10273,7 +10287,7 @@
     setTimeout(function tick(){
       // Paused mid-reveal: hold the next round until Resume (it used to be
       // dealt behind the pause screen and time out, costing points).
-      if (levelUpActive || personalityActive || isPaused){ setTimeout(tick, 150); return; }
+      if (levelUpActive || personalityActive || isPaused || (DEBUG_FAST && window.__holdBoard)){ setTimeout(tick, 150); return; }
       loadNext();
     }, delay);
   }
@@ -10435,6 +10449,38 @@
     els.pauseBtn.classList.toggle('hidden', !isOnVsScreen());
     fitTopChip();
   }
+  // The board's layout, from the real positions: the VS badge's centre on the
+  // seam between the two cards, the bands each card keeps clear (see .half),
+  // and the picture shrinking or hiding when a card's text needs the room.
+  // Runs when a card is dealt or revealed, on resize and on a mode change.
+  function layoutBoard(){
+    const board = els.board, A = els.halfA, B = els.halfB, vs = board && board.querySelector('.divider');
+    if (!board || !A.offsetHeight || !B.offsetHeight || !vs) return;
+    const br = board.getBoundingClientRect(), ar = A.getBoundingClientRect(), bRect = B.getBoundingClientRect();
+    board.style.setProperty('--seam', ((ar.bottom + bRect.top) / 2 - br.top).toFixed(1) + 'px');
+    const vsBand = Math.ceil(vs.offsetHeight / 2 + 6 - (bRect.top - ar.bottom) / 2);
+    // Top card: below the +5s / Pause pills (wherever they sit in this mode,
+    // shown or not, so the layout doesn't jump when they come and go) and its tag.
+    let top = 12;
+    [els.slowdownBtn, els.pauseBtn].forEach(p=>{ const cs = getComputedStyle(p); const t = parseFloat(cs.top) || 0, h = parseFloat(cs.minHeight) || 44;
+      top = Math.max(top, Math.ceil(br.top + t + h - ar.top + 4)); });
+    top = Math.max(top, Math.ceil(8 + els.chipA.offsetHeight + 4));
+    A.style.setProperty('--band-top', top + 'px'); A.style.setProperty('--band-bottom', Math.max(12, vsBand) + 'px');
+    B.style.setProperty('--band-top', Math.max(12, vsBand, 8 + els.chipB.offsetHeight + 4) + 'px'); B.style.setProperty('--band-bottom', '12px');
+    [A, B].forEach(fitHalf);
+  }
+  function fitHalf(h){
+    h.classList.remove('fit-tight', 'fit-none');
+    if (!h.classList.contains('has-glyph')) return;
+    const cs = getComputedStyle(h), room = h.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    const need = ()=> [...h.children].filter(c=> c.classList.contains('scene') || c.classList.contains('content')).reduce((a, c)=> a + c.offsetHeight, 0) + 2;
+    if (need() <= room) return;
+    h.classList.add('fit-tight');
+    if (need() > room){ h.classList.remove('fit-tight'); h.classList.add('fit-none'); }
+  }
+  let layoutBoardRaf = 0;
+  function queueLayoutBoard(){ cancelAnimationFrame(layoutBoardRaf); layoutBoardRaf = requestAnimationFrame(layoutBoard); }
+  window.addEventListener('resize', queueLayoutBoard);
   // Hide the top category chip when it would touch a visible +5s / Pause pill.
   function fitTopChip(){
     const c = els.chipA; c.classList.remove('squeezed');
@@ -10720,6 +10766,7 @@
     if (slowMoRoundsLeft > 0){ roundMs += 3000; slowMoRoundsLeft--; }
     startRoundTimer(roundMs / DEBUG_TIME_SCALE);
     maybeRequestMoreWild();
+    queueLayoutBoard();
   }
 
   // Stable per-item key for the shared vote counters - e.g. "Kendrick Lamar"
@@ -10876,6 +10923,7 @@
       els.votesA.textContent = a.toLocaleString() + (a===1?' person':' people');
       els.votesB.textContent = b.toLocaleString() + (b===1?' person':' people');
     } else { els.votesA.textContent = 'be the first'; els.votesB.textContent = 'be the first'; }
+    queueLayoutBoard();
     return { pctA, pctB };
   }
 
@@ -10961,6 +11009,7 @@
     if (won) sfx.revealWin(); else sfx.revealLose();
     els.tagA.textContent = side==='A' ? 'Your pick' : '';
     els.tagB.textContent = side==='B' ? 'Your pick' : '';
+    queueLayoutBoard();
 
     // With the crowd or not - other players' votes only (see crowdVerdict).
     const cv = crowdVerdict(side, counts, myVote);
@@ -11432,6 +11481,8 @@
       endInfRun: (why) => endInfRun(why || 'points'),
       newInfRun: () => startNewInfRun(),
       addInfKey: (src) => addInfKey(src || 'test'),
+      holdBoard: (on) => { window.__holdBoard = !!on; if (on) clearRoundTimer(); },
+      layoutBoard: () => layoutBoard(),
       putNext: (name) => { const d = decks[contentPoolKey()]; const i = d.cards.findIndex((c, k)=> k >= d.next && (c.a === name || c.b === name)); if (i >= 0){ const [c] = d.cards.splice(i, 1); d.cards.splice(d.next, 0, c); } return i; },
       showRunTrivia: () => runTriviaQuestion(),
       showRunPowerUp: () => runPowerUpRoundForRun(),
@@ -11802,7 +11853,7 @@
     comboCount = 0;                   // and a fresh combo (not one carried over from a Daily run)
     // The run carries on where it left off (or a new one starts); the clock
     // only counts while the board is showing.
-    ensureInfRun(); renderRunBanner(); startInfClock();
+    ensureInfRun(); renderRunBanner(); startInfClock(); queueLayoutBoard();
     if (infRun.ended || infRun.finale){ clearRoundTimer(); stopTallyPolling(); openInfFinale(); }
     // Coming back after a finished Daily run: that halted the board, so
     // deal a fresh round.
@@ -11827,6 +11878,7 @@
     startDailyRun();
     updatePauseBtnVisibility();
     startDailySky();
+    queueLayoutBoard();
   });
   // Bails out of whatever's currently happening (VS board, trivia, puzzle,
   // riddle) back to mode-select. Stops every live timer/interval so nothing
