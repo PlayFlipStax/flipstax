@@ -7658,8 +7658,8 @@
   // not the async toBlob callback) so there's no gap between the click
   // that triggered this and the share() call - Safari revokes a share
   // request's "user activation" if too much async work happens first.
-  async function exportAndShareCard(canvas, filename, captionText){
-    const blob = dataUrlToBlob(canvas.toDataURL('image/png'));
+  async function exportAndShareCard(canvas, filename, captionText, readyBlob){
+    const blob = readyBlob || dataUrlToBlob(canvas.toDataURL('image/png'));
     const file = new File([blob], filename, { type: 'image/png' });
     if (navigator.canShare && navigator.canShare({ files: [file] })){
       // The link goes in the caption text (not a separate `url` field): with
@@ -7773,23 +7773,57 @@
     ctx.font = '700 36px ' + SHARE_FONT_T; ctx.fillStyle = 'rgba(255,243,214,0.85)'; ctx.fillText(GAME_URL.replace(/^https?:\/\//, ''), cx, H - 70);
     return canvas;
   }
+  // The run's share image is built in the background as soon as the results
+  // appear (prebuildRunShare), already encoded to a PNG blob, so a tap on Share
+  // only has to hand over a finished file - Safari refuses a share sheet that
+  // comes too long after the tap. Waits up to ~3s for the card art and fonts,
+  // draws; if that fails, one more try (a failed image is requested again);
+  // null means the simple card is the last resort (with a console warning).
+  async function buildRunShareCanvas(a){
+    let canvas = null, why = '';
+    for (let attempt = 1; attempt <= 2 && !canvas; attempt++){
+      try{
+        if (await waitRunShareAssets(a, 3000)) canvas = renderInfinityRunShare(a);
+        else why = 'card art or fonts not ready after 3s (attempt ' + attempt + ')';
+      }catch(e){ why = (e && e.message) || String(e); canvas = null; }
+    }
+    if (!canvas) console.warn('FlipStax: run share image fell back to the simple card - ' + why);
+    return canvas;
+  }
+  let runSharePre = null;   // { a, done, canvas, blob, promise } for the current run's award
+  function prebuildRunShare(a){
+    if (!a) return null;
+    if (runSharePre && runSharePre.a === a) return runSharePre;
+    const p = { a, done:false, canvas:null, blob:null, promise:null };
+    p.promise = buildRunShareCanvas(a).then(canvas=>{
+      if (canvas){ try{ p.blob = dataUrlToBlob(canvas.toDataURL('image/png')); p.canvas = canvas; }catch(e){ console.warn('FlipStax: run share image could not be encoded', e); } }
+      p.done = true; return p;
+    });
+    runSharePre = p; return p;
+  }
+  let infShareBusy = false;
   async function shareInfinityResult(){
     const a = infRun && infRun.finale && infRun.finale.award;
-    let canvas = null, why = '';
-    // Wait up to ~3s for the card art and fonts, draw; if that fails, one more
-    // try (a failed image is requested again); the simple card is the last resort.
-    if (a){
-      for (let attempt = 1; attempt <= 2 && !canvas; attempt++){
-        try{
-          if (await waitRunShareAssets(a, 3000)) canvas = renderInfinityRunShare(a);
-          else why = 'card art or fonts not ready after 3s (attempt ' + attempt + ')';
-        }catch(e){ why = (e && e.message) || String(e); canvas = null; }
+    if (infShareBusy) return;
+    infShareBusy = true;
+    const btn = document.getElementById('vaultShare'), label = btn ? btn.textContent : '';
+    try{
+      let canvas = null, blob = null;
+      if (a){
+        const pre = prebuildRunShare(a);
+        if (!pre.done){   // not ready yet: a short "Preparing..." state, then share
+          if (btn){ btn.textContent = '\u23f3 Preparing\u2026'; btn.classList.add('disabled'); }
+          await pre.promise;
+        }
+        canvas = pre.canvas; blob = pre.blob;
       }
-      if (!canvas) console.warn('FlipStax: run share image fell back to the simple card - ' + why);
+      if (!canvas){ canvas = renderShareCard('infinity', buildInfinityShareData()); blob = null; }
+      // The caption is the text result; exportAndShareCard adds GAME_URL.
+      await exportAndShareCard(canvas, 'flipstax-infinity.png', a ? infRunShareText(a) : 'FlipStax Infinity Flips \u2014 ' + (els.tierEl.textContent||''), blob);
+    } finally {
+      infShareBusy = false;
+      if (btn){ btn.textContent = label; btn.classList.remove('disabled'); }
     }
-    if (!canvas) canvas = renderShareCard('infinity', buildInfinityShareData());
-    // The caption is the text result; exportAndShareCard adds GAME_URL.
-    await exportAndShareCard(canvas, 'flipstax-infinity.png', a ? infRunShareText(a) : 'FlipStax Infinity Flips \u2014 ' + (els.tierEl.textContent||''));
   }
 
   function startDailyRun(){
@@ -8520,7 +8554,7 @@
   function closeInfFinaleView(){ els.finOverlay.classList.add('hidden'); stopFinSky(); }
   // After the Vault: the run is done - a fresh run starts on the board.
   function startNewInfRun(){
-    infRun = null; try{ localStorage.removeItem(INF_RUN_KEY); }catch(e){}
+    infRun = null; runSharePre = null; try{ localStorage.removeItem(INF_RUN_KEY); }catch(e){}
     ensureInfRun();
     closeInfFinaleView();
     infSession = freshInfSession(); comboCount = 0; lastWasEvent = false;
@@ -8914,7 +8948,7 @@
   let vaultTimers = [];
   function renderVault(){
     const f = infRun.finale, a = finaleAward();
-    preloadRunShare(a);
+    prebuildRunShare(a);   // the share image is built now, while the vault opens
     const stage = document.getElementById('finVault'), scene = document.getElementById('vaultScene'), rewards = document.getElementById('vaultRewards');
     vaultTimers.forEach(clearTimeout); vaultTimers = [];
     stage.classList.remove('hidden', 'open', 'dial', 'jackpot', 'shown');
