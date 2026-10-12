@@ -829,15 +829,23 @@
   .irt-text span{ font-size:clamp(22px, 6.6vw, 38px); letter-spacing:2px; text-align:center; max-width:calc(100vw - 40px); } .irt-text b{ font-size:18px; letter-spacing:8px; animation: irtDots 0.9s steps(3) infinite; }
   @keyframes irtGlitch{ 0%{ transform:skewX(0) translateX(0); } 50%{ transform:skewX(-8deg) translateX(3px); } 100%{ transform:skewX(4deg) translateX(-2px); } }
   @keyframes irtDots{ 0%{ opacity:0.3; } 50%{ opacity:1; } 100%{ opacity:0.3; } }
-  .tap-ufo{ position:fixed; left:0; z-index:12; width:52px; height:44px; padding:0; border:0; background:none; cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent;
-    filter:sepia(0.6) saturate(3) hue-rotate(-10deg) drop-shadow(0 0 10px rgba(255,214,90,0.95)); }
-  .tap-ufo span{ display:inline-block; font-size:34px; line-height:44px; animation: ufoWobble 0.7s ease-in-out infinite alternate; }
+  .tap-ufo{ position:fixed; left:0; z-index:12; width:52px; height:44px; padding:0; border:0; background:none; cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+  .tap-ufo span{ display:inline-block; font-size:34px; line-height:44px; animation: ufoWobble 0.7s ease-in-out infinite alternate;
+    filter:sepia(0.6) saturate(3) hue-rotate(-10deg) var(--ufo-pop); }
+  /* Infinity's UFOs fly over gold and orange backgrounds, where a gold UFO
+     disappeared (Oct 2026 phone playthrough): a crisp white outline, a cyan
+     glow and a soft dark halo behind make them stand out on any background.
+     (Daily's sky UFO keeps its own look.) */
+  :root{ --ufo-pop: drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 2px rgba(20,4,48,0.9)) drop-shadow(0 0 9px rgba(0,234,255,0.95)); }
+  .tap-ufo::before, .abduct-ufo::before, .pk-ufo::before, .vault-ufo::before{ content:''; position:absolute; left:50%; top:50%; width:150%; height:120%; transform:translate(-50%, -55%); z-index:-1;
+    border-radius:50%; background:radial-gradient(closest-side, rgba(22,6,52,0.55), rgba(22,6,52,0.28) 55%, rgba(22,6,52,0)); pointer-events:none; }
   .tap-ufo.caught span{ animation: ufoCaught 0.6s ease-out both; }
   @keyframes ufoCaught{ 0%{ transform:scale(1); } 40%{ transform:scale(1.6) rotate(20deg); filter:brightness(2); } 100%{ transform:scale(0) rotate(180deg); opacity:0; } }
   .tap-ufo-pop{ position:fixed; z-index:13; pointer-events:none; white-space:nowrap; font-weight:900; font-size:15px; color:#3a2200; padding:4px 10px; border-radius:99px;
     background:linear-gradient(180deg,#fff2a8,#ffc928); box-shadow:0 0 14px rgba(255,200,40,0.9); animation: ufoPop 1.2s ease-out both; }
   @keyframes ufoPop{ 0%{ opacity:0; transform:translateY(0) scale(0.6); } 20%{ opacity:1; transform:translateY(-10px) scale(1.1); } 100%{ opacity:0; transform:translateY(-40px) scale(1); } }
-  .riddle-ufo.abduct-ufo{ position:fixed; z-index:11; font-size:42px; pointer-events:none !important; }
+  .riddle-ufo.abduct-ufo{ position:fixed; z-index:11; font-size:42px; pointer-events:none !important; filter:none; }
+  .abduct-ufo span{ filter:var(--ufo-pop); }
   .riddle-ufo.abduct-ufo i{ width:150px; height:120px; top:70%; background:linear-gradient(to bottom, rgba(255,240,170,0.75), rgba(255,240,170,0)); }
   .riddle-ufo.abduct-ufo.go{ display:block; animation: abductIn 1.9s ease-in-out both; }
   @keyframes abductIn{ 0%{ opacity:0; transform:translateY(-40px) scale(0.6); } 20%{ opacity:1; transform:none; } 80%{ opacity:1; transform:none; } 100%{ opacity:0; transform:translate(80px,-40px) scale(0.6); } }
@@ -976,8 +984,8 @@
   .pk-status .pk-chipno{ color:#fff3c4; } .pk-status .pk-run{ color:rgba(255,243,214,0.85); font-weight:700; }
   .pk-status .pk-bonus b{ color:#ffe066; font-size:15px; }
   .plinko-board{ margin-top:44px; }
-  .pk-ufo.riddle-ufo{ display:block; left:50%; top:-52px; z-index:3; margin-left:-34px; font-size:58px;
-    filter:sepia(0.7) saturate(4) hue-rotate(-12deg) brightness(1.1) drop-shadow(0 0 10px rgba(255,214,90,0.9)); }
+  .pk-ufo.riddle-ufo{ display:block; left:50%; top:-52px; z-index:3; margin-left:-34px; font-size:58px; filter:none; }
+  .pk-ufo span{ filter:sepia(0.7) saturate(4) hue-rotate(-12deg) brightness(1.1) var(--ufo-pop); }
   .pk-ufo.riddle-ufo i{ width:46px; height:40px; top:70%; background:linear-gradient(to bottom, rgba(255,240,170,0.85), rgba(255,240,170,0)); opacity:0.2; animation:none; transition:opacity 0.2s; }
   .pk-ufo.beaming i{ opacity:1; }
   .pk-buttons{ align-items:center; }
@@ -1031,8 +1039,8 @@
   .fin-vault.dial .vault-dial{ animation: dialSpin 1.05s cubic-bezier(.4,0,.2,1) both; }
   @keyframes dialSpin{ 0%{ transform:rotate(0); } 45%{ transform:rotate(250deg); } 75%{ transform:rotate(130deg); } 100%{ transform:rotate(360deg); } }
   .vault-coins{ z-index:3; }
-  .vault-ufo.riddle-ufo{ display:none; left:50%; top:0; z-index:4; font-size:56px; margin-left:-30px;
-    filter:sepia(1) saturate(5) hue-rotate(-14deg) brightness(1.15) drop-shadow(0 0 14px rgba(255,210,60,0.95)); }
+  .vault-ufo.riddle-ufo{ display:none; left:50%; top:0; z-index:4; font-size:56px; margin-left:-30px; filter:none; }
+  .vault-ufo span{ filter:sepia(1) saturate(5) hue-rotate(-14deg) brightness(1.15) var(--ufo-pop); }
   .vault-ufo.riddle-ufo i{ width:70px; height:150px; top:72%; background:linear-gradient(to bottom, rgba(255,240,170,0.85), rgba(255,240,170,0)); }
   .fin-vault.jackpot .vault-ufo.riddle-ufo{ display:block; animation: vaultUfoIn 0.9s cubic-bezier(.2,.9,.3,1.1) both; }
   @keyframes vaultUfoIn{ from{ transform:translate(-160px, -60px) scale(0.6); opacity:0; } to{ transform:none; opacity:1; } }
