@@ -995,8 +995,9 @@
   @keyframes jackGlow{ from{ filter:drop-shadow(0 0 0 rgba(125,249,255,0)); } to{ filter:drop-shadow(0 0 18px rgba(125,249,255,0.75)); } }
   .fin-skip.hidden{ display:none; }
   /* The Vault */
-  .vault-scene{ position:relative; width:min(100%, 340px); height:250px; }
-  .vault-body{ position:absolute; left:50%; bottom:6px; width:210px; height:210px; margin-left:-105px; border-radius:28px; perspective:800px;
+  .vault-scene{ position:relative; width:min(100%, 340px); height:250px; transition:height 0.6s cubic-bezier(.4,0,.2,1); }
+  .vault-body{ position:absolute; left:50%; top:34px; width:210px; height:210px; margin-left:-105px; border-radius:28px; perspective:800px;
+    transform-origin:50% 0; transition:transform 0.6s cubic-bezier(.4,0,.2,1);
     background:linear-gradient(160deg,#8a5a12,#4d2c05); box-shadow:inset 0 0 0 6px #ffcf4a, inset 0 0 0 10px #8a5a12, 0 12px 30px rgba(0,0,0,0.5); }
   .vault-inside{ position:absolute; inset:24px; border-radius:50%; background:radial-gradient(circle, #3a1500 0%, #1a0700 70%); overflow:hidden; }
   .vault-glow{ position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle, #fff6c2 0%, #ffd23f 30%, rgba(255,160,0,0.3) 60%, transparent 75%); opacity:0; transition:opacity 0.8s ease 0.3s; }
@@ -1033,13 +1034,30 @@
   .vrp-eyebrow{ font-size:11px; font-weight:900; letter-spacing:2px; color:#ffd23f; }
   .vrp-icon{ font-size:38px; line-height:1.1; }
   .vrp-icon.has-card{ display:flex; justify-content:center; margin:6px 0 4px; }
-  .vrp-icon.has-card .cc-card{ width:150px; cursor:default; } .vrp-name{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:28px; }
+  .vrp-icon.has-card .cc-card{ cursor:default; } .vrp-name{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:28px; }
   .vrp-blurb{ font-size:13.5px; font-weight:600; color:#fff3d6; }
   .vr-badges{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px; }
   .vr-badges.hidden{ display:none; }
   .vb-eyebrow{ width:100%; font-size:11px; font-weight:900; letter-spacing:2px; color:#ffd23f; }
   .vb-badge{ padding:5px 10px; border-radius:99px; font-size:13px; font-weight:800; background:linear-gradient(180deg,rgba(255,210,63,0.4),rgba(255,140,0,0.25)); box-shadow:inset 0 0 0 1.5px #ffe58a; }
   .fin-vault .readout-unlocks{ width:100%; }
+  /* After the opening: the vault shrinks to a small open-vault strip so the
+     results fit one phone screen; the three buttons are a bar along the
+     bottom; new cards and badges sit below. */
+  .fin-vault{ margin-top:0; }
+  .fin-vault.shown{ padding-bottom:84px; animation:none; transform:none; }   /* no transform: the fixed button bar must anchor to the screen */
+  .fin-vault.shown .vault-scene{ height:72px; }
+  .fin-vault.shown .vault-body{ transform:translateY(-30px) scale(0.32); }
+  .fin-vault.shown .vault-coins, .fin-vault.shown .vault-ufo, .fin-vault.shown .vault-beam-card{ display:none !important; }
+  .fin-vault.shown .vault-buttons{ position:fixed; left:0; right:0; bottom:0; z-index:6; margin:0; gap:8px; flex-wrap:nowrap; justify-content:center;
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom)); background:linear-gradient(180deg, rgba(28,11,61,0), rgba(28,11,61,0.92) 30%); }
+  .fin-vault.shown .vault-buttons .daily-btn{ flex:1 1 0; max-width:150px; padding:10px 8px; font-size:14px; white-space:nowrap; }
+  .fin-vault .vr-score b{ font-size:clamp(52px, 15vw, 76px); }
+  .vrp-icon.has-card .cc-card{ width:clamp(96px, calc((100dvh - 500px) * 0.73), 168px); }
+  .fin-vault .vr-personality{ padding:8px 10px; }
+  .fin-vault .vrp-name{ font-size:24px; line-height:1.05; }
+  .fin-vault .vrp-blurb{ font-size:13px; }
+  @media (prefers-reduced-motion: reduce){ .vault-scene, .vault-body{ transition:none; } }
   @media (prefers-reduced-motion: reduce){
     .vault-door, .vault-glow, .vault-rewards{ transition:none !important; } .fin-vault.dial .vault-dial, .fin-vault.jackpot .vault-ufo.riddle-ufo, .fin-vault.jackpot .vault-beam-card,
     .plinko-svg .pk-peg.ping, .fin-plinko.jackpot .plinko-board{ animation:none !important; }
@@ -8744,7 +8762,7 @@
     // earned with the result); one of the 16 only if it's in the collection
     // already (those unlock by their own rules - no spoilers), else its emoji.
     const pIcon = document.getElementById('vaultPIcon');
-    const showCard = a.runPersonality || (collection.cards[a.personality] && collection.cards[a.personality].revealed);
+    const showCard = !!PERSONALITY_CARD_ART[a.personality];   // every personality has its card art
     pIcon.classList.toggle('has-card', !!showCard);
     if (showCard){ pIcon.innerHTML = ''; const c = makeCollectionCard(a.personality, true); fillCardFront(c.querySelector('.cc-front'), a.personality); if (a.resultNew) c.classList.add('is-new'); pIcon.appendChild(c); }
     else pIcon.textContent = pm.icon;
