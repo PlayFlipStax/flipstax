@@ -408,9 +408,13 @@
     position:fixed; left:50%; bottom:calc(14px + env(safe-area-inset-bottom)); transform:translateX(-50%) translateY(20px);
     background:var(--panel); border:1px solid var(--divider); color:var(--ink);
     padding:9px 18px; border-radius:20px; font-size:13px; opacity:0; text-align:center;
-    max-width:86vw; transition: all 0.35s ease; pointer-events:none; z-index:10;
+    max-width:86vw; width:max-content; transition: all 0.35s ease; pointer-events:none; z-index:10;
   }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  /* Round feedback ("Too slow", "+5 seconds") sits just under the header, over the
+     mode-title strip - never over a card's name, result or the helper line. */
+  .toast.under-header{ bottom:auto; transform:translateX(-50%) translateY(-12px); padding:6px 14px; white-space:nowrap; }
+  .toast.under-header.show{ transform:translateX(-50%) translateY(0); }
 
   .event-overlay{
     position:absolute; inset:0; z-index:8; display:flex; flex-direction:column;
@@ -10611,7 +10615,7 @@
       els.roundTimerFill.style.width = '0%';
     });
     sfx.powerUp();
-    showToast('\u23F1\uFE0F +5 seconds');
+    showToast('\u23F1\uFE0F +5 seconds', true);
     renderSlowdownBtn();
   }
   els.slowdownBtn.addEventListener('click', addSlowdownTime);
@@ -10628,7 +10632,7 @@
     if (inRound){
       const penalty = current.bonusPoints ? (runActive ? 3 : INF_STAR_POINTS) : 1;
       if (runActive) addRunScore(-penalty); else addRacePoints(-penalty);
-      showToast('\u23F1\uFE0F Too slow \u2014 \u2212' + penalty + ' point' + (penalty>1?'s':''));
+      showToast('\u23F1\uFE0F Too slow \u2014 \u2212' + penalty + ' point' + (penalty>1?'s':''), true);
     }
     scheduleNext(dt(900));
   }
@@ -11149,8 +11153,12 @@
     requestAnimationFrame(tick);
   }
 
-  function showToast(msg){
-    els.toast.textContent = msg; els.toast.classList.add('show');
+  function showToast(msg, underHeader){
+    els.toast.textContent = msg;
+    els.toast.classList.toggle('under-header', !!underHeader);
+    if (underHeader){ const h = document.querySelector('.app > header'); els.toast.style.top = (h ? Math.round(h.getBoundingClientRect().bottom) + 4 : 8) + 'px'; }
+    else els.toast.style.top = '';
+    els.toast.classList.add('show');
     clearTimeout(showToast._t);
     showToast._t = setTimeout(()=> els.toast.classList.remove('show'), 1700);
   }
