@@ -8658,7 +8658,7 @@
     // rewards
     document.getElementById('vaultScore').textContent = '0';
     document.getElementById('vaultScoreSub').textContent = a.runScore + ' run' + (a.bonus ? ' + ' + a.bonus + ' Plinko bonus' : '');
-    document.getElementById('vaultFlipz').innerHTML = '<span>⚡ +' + a.flipz + ' Flipz this run</span><span>' + stats.flips.toLocaleString() + ' lifetime</span><span>🔑 ' + a.keys + ' keys</span>';
+    document.getElementById('vaultFlipz').innerHTML = '<span>⚡ +' + a.flipz + ' Flipz this run</span><span>' + stats.flips.toLocaleString() + ' lifetime</span><span>🔑 ' + a.keys + (a.stats && a.stats.keysHeld > 0 ? ' earned · ' + a.stats.keysHeld + ' kept' : ' keys') + '</span>';
     const pm = PERSONALITY_META[a.personality] || PERSONALITY_META.fence_sitter;
     // The result with its full card: a run personality's card always (it's
     // earned with the result); one of the 16 only if it's in the collection
