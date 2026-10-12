@@ -949,7 +949,34 @@
   .fin-go{ padding:12px 30px; font-size:16px; }
   @media (prefers-reduced-motion: reduce){ .fin-rays, .fin-stage{ animation:none !important; } }
   /* Plinko */
-  .fin-plinko-sub{ font-size:13px; font-weight:800; color:#fff3d6; }
+  /* The bonus round: a banner, the chips' count and running bonus, and the
+     UFO above the board that drops each chip from its beam. */
+  .pk-banner{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:clamp(34px, 11vw, 48px); letter-spacing:3px; line-height:1;
+    padding:6px 22px 4px; border-radius:14px; color:#3a1d00; background:linear-gradient(180deg,#fff6c2,#ffd23f 50%,#ff9d00);
+    box-shadow:0 0 0 3px #fff7cf, 0 6px 22px rgba(255,170,0,0.7); transform:rotate(-2deg); animation: pkBanner 0.6s cubic-bezier(.3,1.7,.5,1) both; }
+  @keyframes pkBanner{ from{ transform:rotate(-2deg) scale(0.4); opacity:0; } to{ transform:rotate(-2deg) scale(1); opacity:1; } }
+  .pk-line{ font-size:15px; font-weight:800; color:#fff; text-shadow:0 2px 6px rgba(60,0,60,0.6); }
+  .pk-status{ display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; font-size:13px; font-weight:800; }
+  .pk-status > span{ padding:4px 10px; border-radius:99px; background:rgba(40,10,70,0.55); box-shadow:inset 0 0 0 1.5px rgba(255,225,140,0.5); }
+  .pk-status .pk-chipno{ color:#fff3c4; } .pk-status .pk-run{ color:rgba(255,243,214,0.85); font-weight:700; }
+  .pk-status .pk-bonus b{ color:#ffe066; font-size:15px; }
+  .plinko-board{ margin-top:44px; }
+  .pk-ufo.riddle-ufo{ display:block; left:50%; top:-52px; z-index:3; margin-left:-34px; font-size:58px;
+    filter:sepia(0.7) saturate(4) hue-rotate(-12deg) brightness(1.1) drop-shadow(0 0 10px rgba(255,214,90,0.9)); }
+  .pk-ufo.riddle-ufo i{ width:46px; height:40px; top:70%; background:linear-gradient(to bottom, rgba(255,240,170,0.85), rgba(255,240,170,0)); opacity:0.2; animation:none; transition:opacity 0.2s; }
+  .pk-ufo.beaming i{ opacity:1; }
+  .pk-buttons{ align-items:center; }
+  .pk-drop{ min-width:200px; font-size:18px; padding:14px 32px; }
+  .pk-all{ font-size:13px; padding:8px 16px; min-height:40px !important; }
+  .pk-all.hidden, .pk-drop.hidden{ display:none !important; }
+  @media (prefers-reduced-motion: reduce){ .pk-banner{ animation:none; } }
+  /* The vault's little green alien: pops out, reacts, ducks away. */
+  .vault-alien{ position:absolute; left:50%; top:42px; z-index:2; width:64px; margin-left:-32px; opacity:0; transform:translateY(40px) scale(0.6); pointer-events:none; }
+  .vault-alien .va-art svg{ width:64px; height:64px; display:block; }
+  .va-say{ position:absolute; left:58px; top:-6px; white-space:nowrap; padding:4px 10px; border-radius:12px; background:#fff; color:#1a6b2a; font-weight:900; font-size:13px; box-shadow:0 3px 10px rgba(0,0,0,0.3); }
+  .vault-alien.pop{ animation: alienPop 2.2s cubic-bezier(.3,1.5,.5,1) both; }
+  @keyframes alienPop{ 0%{ opacity:0; transform:translateY(40px) scale(0.6); } 15%{ opacity:1; transform:translateY(-14px) scale(1.05); } 25%{ transform:translateY(-8px) scale(1); }
+    75%{ opacity:1; transform:translateY(-8px) scale(1); } 100%{ opacity:0; transform:translateY(40px) scale(0.6); } }
   .plinko-board{ position:relative; width:min(100%, 340px); aspect-ratio:320 / 360; }
   .plinko-svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
   .plinko-svg .pk-peg{ transform-box:fill-box; transform-origin:center; }
@@ -2923,17 +2950,18 @@
     <div class="fin-buttons"><div class="daily-btn primary fin-go" id="finToPlinko" role="button" tabindex="0"></div></div>
   </div>
   <div class="fin-stage fin-plinko hidden" id="finPlinko">
-    <div class="fin-eyebrow">🪙 KEY CHIPS</div>
-    <div class="fin-plinko-sub" id="finPlinkoSub"></div>
+    <div class="pk-banner">BONUS ROUND</div>
+    <div class="pk-line">Drop your chips. Every chip pays.</div>
+    <div class="pk-status"><span class="pk-run" id="pkRunScore"></span><span class="pk-chipno" id="pkChipNo"></span><span class="pk-bonus">Bonus <b id="pkBonus">+0</b></span></div>
     <div class="plinko-board" id="plinkoBoard">
+      <div class="pk-ufo riddle-ufo" id="pkUfo" aria-hidden="true"><span>🛸</span><i></i></div>
       <svg class="plinko-svg" id="plinkoSvg" aria-hidden="true"></svg>
       <div class="plinko-chip-layer" id="plinkoChips" aria-hidden="true"></div>
     </div>
     <div class="plinko-tally" id="plinkoTally" aria-live="polite"></div>
-    <div class="fin-buttons">
-      <div class="daily-btn primary fin-go" id="plinkoDrop" role="button" tabindex="0">Drop a chip</div>
-      <div class="daily-btn fin-skip" id="plinkoSkip" role="button" tabindex="0">Skip ⏭</div>
-      <div class="daily-btn fin-skip hidden" id="plinkoKeep" role="button" tabindex="0"></div>
+    <div class="fin-buttons pk-buttons">
+      <div class="daily-btn primary fin-go pk-drop" id="plinkoDrop" role="button" tabindex="0">Drop chip</div>
+      <div class="daily-btn fin-skip pk-all" id="plinkoAll" role="button" tabindex="0">Drop all</div>
     </div>
   </div>
   <div class="fin-stage fin-vault hidden" id="finVault">
@@ -2945,6 +2973,7 @@
         <div class="vault-door" id="vaultDoor"><div class="vault-dial" id="vaultDial"><i></i><i></i><i></i><i></i><b></b></div><div class="vault-bolts"></div></div>
       </div>
       <canvas class="vault-coins" id="vaultCoins" aria-hidden="true"></canvas>
+      <div class="vault-alien" id="vaultAlien" aria-hidden="true"><div class="va-art"></div><div class="va-say" id="vaultAlienSay"></div></div>
     </div>
     <div class="vault-rewards" id="vaultRewards">
       <div class="vr-score"><span>FINAL SCORE</span><b id="vaultScore">0</b><em id="vaultScoreSub"></em></div>
@@ -6747,7 +6776,8 @@
     opts = opts || {};
     const id = 'v' + Math.random().toString(36).slice(2, 7);
     return '<svg class="' + (opts.cls || '') + '" viewBox="0 0 120 120" aria-hidden="true">' +
-      '<defs><radialGradient id="' + id + 'h" cx="0.42" cy="0.35" r="0.7"><stop offset="0" stop-color="#d9c6ff"/><stop offset="0.55" stop-color="#9f7bff"/><stop offset="1" stop-color="#5a3bd6"/></radialGradient>' +
+      (opts.green ? '<defs><radialGradient id="' + id + 'h" cx="0.42" cy="0.35" r="0.7"><stop offset="0" stop-color="#d8ffc9"/><stop offset="0.55" stop-color="#5fe08a"/><stop offset="1" stop-color="#1f9a4a"/></radialGradient>'
+        : '<defs><radialGradient id="' + id + 'h" cx="0.42" cy="0.35" r="0.7"><stop offset="0" stop-color="#d9c6ff"/><stop offset="0.55" stop-color="#9f7bff"/><stop offset="1" stop-color="#5a3bd6"/></radialGradient>') +
       '<radialGradient id="' + id + 'e" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#2a6a7a"/><stop offset="0.6" stop-color="#0b2a3a"/><stop offset="1" stop-color="#061820"/></radialGradient></defs>' +
       // antennae with star tips
       '<g stroke="#ffd23f" stroke-width="3" stroke-linecap="round" fill="none"><path d="M44 30 Q38 14 30 10"/><path d="M60 26 L60 6"/><path d="M76 30 Q82 14 90 10"/></g>' +
@@ -8256,7 +8286,7 @@
   // refresh comes back to the same stage with the same results; the chips'
   // landing slots are drawn once, up front. Awards happen once, in the Vault
   // (see finaleAward).
-  const PLINKO_MIN_CHIPS = 1, PLINKO_MAX_CHIPS = 5;
+  const PLINKO_MAX_CHIPS = 5;   // key chips; a Wild Card bonus chip can make it 6. No keys, no bonus chip: no Plinko.
   let finTapShieldAt = -1000;   // the 250ms tap shield, after a stage or overlay change
   function finTap(fn){ return e=>{ if (e) e.stopPropagation(); if (performance.now() - finTapShieldAt < TAP_SHIELD_MS) return; fn(e); }; }
   function infCrowdPct(r){ return r.crowdN ? Math.round(r.crowdAgree / r.crowdN * 100) : null; }
@@ -8275,7 +8305,7 @@
     showFinStage(infRun.finale.stage);
   }
   function buildInfFinale(){
-    const chips = Math.max(PLINKO_MIN_CHIPS, Math.min(PLINKO_MAX_CHIPS, infRun.keys) + (infRun.bonusChip ? 1 : 0));   // a Wild Card bonus chip on top: 6 at most
+    const chips = Math.min(PLINKO_MAX_CHIPS, infRun.keys) + (infRun.bonusChip ? 1 : 0);   // a Wild Card bonus chip on top: 6 at most
     return { stage:'complete', chips: drawPlinkoOutcomes(chips), dropped:0, bonus:0, awarded:false, award:null };
   }
   function showFinStage(stage){
@@ -8301,13 +8331,14 @@
       document.getElementById('finBoldPct').textContent = 'You went against ' + r.boldest.against + '% of the crowd';
     }
     const chips = r.finale.chips.length;
-    document.getElementById('finToPlinko').textContent = '🪙 Drop ' + chips + ' key chip' + (chips > 1 ? 's' : '') + ' ▶';
+    document.getElementById('finToPlinko').textContent = chips ? '🪙 Bonus round: ' + chips + ' chip' + (chips > 1 ? 's' : '') + ' ▶' : '🔐 Open the Vault ▶';
     el.classList.remove('hidden');
     sfx.levelUp();
   }
   document.getElementById('finToPlinko').addEventListener('click', finTap(()=>{
     if (!infRun || !infRun.finale || infRun.finale.stage !== 'complete') return;
-    infRun.finale.stage = 'plinko'; saveInfRun(); showFinStage('plinko');
+    // No keys and no bonus chip: no bonus round - straight to the vault.
+    infRun.finale.stage = infRun.finale.chips.length ? 'plinko' : 'vault'; saveInfRun(); showFinStage(infRun.finale.stage);
   }));
   // Hides the finale without changing it (leaving to mode select): it comes
   // back on the same stage next time Infinity is picked.
@@ -8397,33 +8428,33 @@
     });
     svg.innerHTML = g;
   }
-  let plinkoBusy = false;
+  // Chips are one per key (up to 5) plus any Wild Card bonus chip; they're
+  // all dropped - no choice to keep any. "Drop chip" drops the next one from
+  // the UFO's beam; "Drop all" sends the rest down one after another. Odds
+  // and payouts are as before; the player doesn't choose where chips land.
+  let pkLaunched = 0, pkAuto = false;
   function renderPlinko(){
     const f = infRun.finale;
-    document.getElementById('finPlinko').classList.remove('hidden');
+    document.getElementById('finPlinko').classList.remove('hidden', 'jackpot');
     buildPlinkoBoard();
     document.getElementById('plinkoChips').innerHTML = '';
     // Chips already dropped (before a refresh) sit in their slots.
     f.chips.slice(0, f.dropped).forEach((c, i)=> placeChip(c, i, true));
+    if (f.chips.slice(0, f.dropped).some(c=> c.kind === 'jackpot')) document.getElementById('finPlinko').classList.add('jackpot');
+    pkLaunched = f.dropped; pkAuto = false;
     renderPlinkoTally();
-    plinkoBusy = false;
   }
   function renderPlinkoTally(){
     const f = infRun.finale, n = f.chips.length, left = n - f.dropped;
     const won = f.chips.slice(0, f.dropped).reduce((a, c)=> a + c.pts, 0);
-    document.getElementById('finPlinkoSub').textContent = '🔑 ' + infRun.keys + ' key' + (infRun.keys === 1 ? '' : 's') + ' → ' + n + ' gold chip' + (n > 1 ? 's' : '') + ' · every slot wins · ×1 = ' + PLINKO_BASE + ' pts';
-    document.getElementById('plinkoTally').innerHTML = f.chips.slice(0, f.dropped).map(c=> '<span class="pt-chip' + (c.kind === 'jackpot' ? ' jack' : '') + '">' + plinkoLabel(c.kind) + ' <b>+' + c.pts + '</b></span>').join('') +
-      (f.dropped ? '<span class="pt-total">Bonus <b>+' + won + '</b></span>' : '');
-    const drop = document.getElementById('plinkoDrop'), skip = document.getElementById('plinkoSkip');
-    drop.textContent = left > 0 ? '🪙 Drop chip ' + (f.dropped + 1) + ' of ' + n : '🔐 Open the Vault ▶';
-    drop.classList.toggle('disabled', plinkoBusy);
-    skip.classList.toggle('hidden', left === 0);
-    // After the first chip, the rest can be kept: those keys stay on your
-    // key ring (Key Keeper) instead of becoming chips (Vault Cracker).
-    const keep = document.getElementById('plinkoKeep');
-    keep.classList.toggle('hidden', left === 0 || f.dropped === 0 || plinkoBusy);
-    const keepKeys = Math.max(0, infRun.keys - f.dropped);
-    keep.textContent = '\uD83D\uDDDD\uFE0F Keep ' + (keepKeys > 0 ? keepKeys + ' key' + (keepKeys > 1 ? 's' : '') : 'the rest') + ' \u25B6';
+    document.getElementById('pkRunScore').textContent = 'Run score: ' + Math.max(0, infRun.score);
+    document.getElementById('pkChipNo').textContent = left > 0 ? 'Chip ' + Math.min(n, pkLaunched > f.dropped ? pkLaunched : f.dropped + 1) + ' of ' + n : 'All ' + n + ' chips in';
+    document.getElementById('pkBonus').textContent = '+' + won;
+    document.getElementById('plinkoTally').innerHTML = f.chips.slice(0, f.dropped).map(c=> '<span class="pt-chip' + (c.kind === 'jackpot' ? ' jack' : '') + '">' + plinkoLabel(c.kind) + ' <b>+' + c.pts + '</b></span>').join('');
+    const drop = document.getElementById('plinkoDrop'), all = document.getElementById('plinkoAll');
+    drop.textContent = left > 0 ? '\uD83E\uDE99 Drop chip' : '\uD83D\uDD10 Open the Vault \u25B6';
+    drop.classList.toggle('disabled', left > 0 && (pkAuto || pkLaunched > f.dropped));
+    all.classList.toggle('hidden', left <= 1 || pkAuto);
   }
   function chipEl(i){
     const c = document.createElement('div'); c.className = 'pk-chip'; c.innerHTML = '<span>🔑</span>'; c.dataset.i = i;
@@ -8438,16 +8469,17 @@
     if (settled) document.querySelector('.pk-slot[data-i="' + c.slot + '"]').classList.add('hit');
     return el;
   }
-  function dropNextChip(){
+  // One chip out of the UFO's beam and down the pegs.
+  function launchChip(fast){
     const f = infRun.finale;
-    if (plinkoBusy) return;
-    if (f.dropped >= f.chips.length){ goToVault(); return; }
-    const i = f.dropped, c = f.chips[i];
+    if (pkLaunched >= f.chips.length) return;
+    const i = pkLaunched++, c = f.chips[i];
     if (prefersReducedMotion()){ landChip(i); return; }
-    plinkoBusy = true; renderPlinkoTally();
-    const el = chipEl(i), k = plinkoScale(), frames = [], T = 1700, rowT = 1 / (PLINKO_ROWS + 1);
-    let x = PB.cx, rights = 0;
-    frames.push({ transform: 'translate(' + (x * k) + 'px,' + (6 * k) + 'px)', offset: 0, easing: 'ease-in' });
+    const ufo = document.getElementById('pkUfo'); ufo.classList.add('beaming'); setTimeout(()=> ufo.classList.remove('beaming'), 380);
+    const el = chipEl(i), k = plinkoScale(), frames = [], T = fast ? 1100 : 1700, rowT = 1 / (PLINKO_ROWS + 1);
+    let rights = 0;
+    frames.push({ transform: 'translate(' + (PB.cx * k) + 'px,' + (-14 * k) + 'px) scale(0.5)', offset: 0, easing: 'ease-in' });
+    frames.push({ transform: 'translate(' + (PB.cx * k) + 'px,' + (10 * k) + 'px) scale(1)', offset: rowT * 0.5, easing: 'ease-in' });
     c.path.forEach((dir, r)=>{
       const peg = plinkoXY(rights, r);             // the peg it lands on
       const top = { x: peg.x, y: peg.y - 12 };
@@ -8456,7 +8488,6 @@
       const o = (r + 1) * rowT;
       frames.push({ transform: 'translate(' + (top.x * k).toFixed(1) + 'px,' + (top.y * k).toFixed(1) + 'px)', offset: Math.min(0.97, o - rowT * 0.35), easing: 'ease-out' });
       frames.push({ transform: 'translate(' + (((top.x + next) / 2) * k).toFixed(1) + 'px,' + ((top.y - 9) * k).toFixed(1) + 'px)', offset: Math.min(0.98, o - rowT * 0.1), easing: 'ease-in' });
-      x = next;
       setTimeout(()=>{ sfx.chipPeg(r); const p = document.querySelector('.pk-peg[data-r="' + r + '"][data-k="' + (rights - dir) + '"]'); if (p){ p.classList.remove('ping'); void p.getBoundingClientRect(); p.classList.add('ping'); } }, T * (o - rowT * 0.35));
     });
     const end = slotXY(c.slot);
@@ -8464,44 +8495,40 @@
     const anim = el.animate(frames, { duration: T, fill: 'forwards' });
     anim.finished.then(()=>{ el.remove(); landChip(i); }, ()=>{});
     el._anim = anim;
+    renderPlinkoTally();
   }
   function landChip(i){
     const f = infRun.finale;
-    if (i !== f.dropped) return;   // already landed (Skip)
+    if (i !== f.dropped) return;   // landed already
     const c = f.chips[i];
     placeChip(c, i, true);
     f.dropped++; saveInfRun();
-    plinkoBusy = false;
     sfx.chipLand(c.kind === 'jackpot' || c.kind === 'x3');
-    if (c.kind === 'jackpot'){ sfx.jackpot(); showToast('🛸 MOTHERSHIP JACKPOT! +100 and a bonus card'); document.getElementById('finPlinko').classList.add('jackpot'); }
+    if (c.kind === 'jackpot'){ sfx.jackpot(); showToast('\uD83D\uDEF8 MOTHERSHIP JACKPOT! +100 and a bonus card'); document.getElementById('finPlinko').classList.add('jackpot'); }
+    if (f.dropped >= f.chips.length) pkAuto = false;
     renderPlinkoTally();
   }
-  function skipPlinko(){
+  function dropAllChips(){
     const f = infRun.finale;
-    document.querySelectorAll('#plinkoChips .pk-chip').forEach(el=>{ if (el._anim) try{ el._anim.cancel(); }catch(e){} el.remove(); });
-    plinkoBusy = false;
-    f.chips.slice(0, f.dropped).forEach((c, i)=> placeChip(c, i, true));
-    while (f.dropped < f.chips.length){ const i = f.dropped; placeChip(f.chips[i], i, true); f.dropped++; }
-    saveInfRun();
-    if (f.chips.some(c=> c.kind === 'jackpot')) document.getElementById('finPlinko').classList.add('jackpot');
-    sfx.coins(8);
-    renderPlinkoTally();
+    if (pkAuto || f.dropped >= f.chips.length) return;
+    pkAuto = true;
+    if (prefersReducedMotion()){ while (pkLaunched < f.chips.length) launchChip(true); return; }
+    // Already one falling: the rest follow it, a short gap apart.
+    const go = ()=>{ if (!infRun || !infRun.finale || infRun.finale.stage !== 'plinko' || pkLaunched >= f.chips.length) return; launchChip(true); setTimeout(go, 420); };
+    go();
   }
   function goToVault(){
     const f = infRun.finale;
-    if (f.stage !== 'plinko' || (f.dropped < f.chips.length && !f.kept)) return;
+    if (f.stage !== 'plinko' || f.dropped < f.chips.length) return;
     f.stage = 'vault'; saveInfRun(); showFinStage('vault');
   }
-  function keepRestOfKeys(){
-    const f = infRun.finale;
-    if (plinkoBusy || f.dropped === 0 || f.dropped >= f.chips.length) return;
-    f.kept = true; saveInfRun();
-    sfx.key();
-    goToVault();
-  }
-  document.getElementById('plinkoKeep').addEventListener('click', finTap(()=>{ if (infRun && infRun.finale && infRun.finale.stage === 'plinko') keepRestOfKeys(); }));
-  document.getElementById('plinkoDrop').addEventListener('click', finTap(()=>{ if (infRun && infRun.finale && infRun.finale.stage === 'plinko') dropNextChip(); }));
-  document.getElementById('plinkoSkip').addEventListener('click', finTap(()=>{ if (infRun && infRun.finale && infRun.finale.stage === 'plinko') skipPlinko(); }));
+  document.getElementById('plinkoAll').addEventListener('click', finTap(()=>{ if (infRun && infRun.finale && infRun.finale.stage === 'plinko') dropAllChips(); }));
+  document.getElementById('plinkoDrop').addEventListener('click', finTap(()=>{
+    const f = infRun && infRun.finale; if (!f || f.stage !== 'plinko') return;
+    if (f.dropped >= f.chips.length){ goToVault(); return; }
+    if (pkAuto || pkLaunched > f.dropped) return;   // one already falling
+    launchChip(false);
+  }));
 
   // ---------- Infinity run personalities ----------
   // One result per run, judged at the Vault. The first rule that fits, in
@@ -8745,8 +8772,18 @@
       vaultTimers.push(setTimeout(()=>{ stage.classList.add('jackpot'); sfx.jackpot(); const bc = document.getElementById('vaultBeamCard'); bc.innerHTML = cardArtHtml('mothership_jackpot'); }, t));
       t += 2600;
     }
-    vaultTimers.push(setTimeout(()=>{ pourCoins(); sfx.coins(18); }, t));
+    vaultTimers.push(setTimeout(()=>{ pourCoins(); sfx.coins(18); vaultAlienPop(a); }, t));
     vaultTimers.push(setTimeout(showAll, t + 700));
+  }
+  // The little green alien: up out of the vault, a quick reaction, back down.
+  function vaultAlienPop(a){
+    if (prefersReducedMotion()) return;
+    const el = document.getElementById('vaultAlien'); if (!el) return;
+    const art = el.querySelector('.va-art'); if (!art.childElementCount) art.innerHTML = visitorSvg({ green:true });
+    const big = a.jackpot || a.bonus >= 100;
+    document.getElementById('vaultAlienSay').textContent = a.jackpot ? 'MOTHERSHIP!! \uD83D\uDE80' : big ? 'WOOO! Jackpot vibes! \uD83C\uDF89' : a.bonus > 0 ? 'Shiny! \u2728' : 'Ooh, treasure!';
+    el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+    if (big) sfx.ufoTap();
   }
   function countUp(el, to, ms){
     if (!ms){ el.textContent = to; return; }
