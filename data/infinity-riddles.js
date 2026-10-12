@@ -2,8 +2,9 @@
 //
 // Written for FlipStax (Oct 2026): original wording, family-friendly, one
 // clear answer each. `a` is the right answer; `wrong` are the other three
-// options (the game shuffles all four). About 3-4 come up per Infinity run,
-// and a device works through all of them before any repeats.
+// options (the game shuffles all four). About 4 come up per Infinity run,
+// about a third of them from the `hard: true` riddles at the end, and a
+// device works through each set before any of it repeats.
 //
 // Edit freely: keep exactly three `wrong` options, keep the right answer
 // clearly the best fit, and avoid any answer used by Daily Stax's Super
@@ -89,4 +90,37 @@ window.FLIPSTAX_INFINITY_RIDDLES = [
     a: 'A toaster', wrong: ['An oven', 'A microwave', 'A grill'] },
   { q: 'I’m a pig who never eats a crumb, yet I get heavier every time you feed me coins. What am I?',
     a: 'A piggy bank', wrong: ['A wallet', 'A vending machine', 'A cash register'] },
+  // ---- Hard riddles (hard: true) - wordplay and lateral thinking, with
+  // wrong answers that sound right. About a third of a run's riddle rounds
+  // are drawn from these, and Riddle Master needs them solved too.
+  { hard: true, q: 'Forward I’m heavy; spell me backward and I’m not. What am I?',
+    a: 'A ton', wrong: ['A boulder', 'An anchor', 'A truck'] },
+  { hard: true, q: 'I show up once in a minute, twice in a moment, and never in a thousand years. What am I?',
+    a: 'The letter M', wrong: ['A blink', 'A heartbeat', 'A shooting star'] },
+  { hard: true, q: 'Which word is spelled wrong in every dictionary ever printed?',
+    a: '“Wrong”', wrong: ['“Misspelled”', '“Dictionary”', '“Incorrectly”'] },
+  { hard: true, q: 'Which building has more stories than any other in town?',
+    a: 'A library', wrong: ['A skyscraper', 'A hotel', 'A parking garage'] },
+  { hard: true, q: 'Some months have 31 days and some have 30. How many have 28?',
+    a: 'All twelve', wrong: ['Just February', 'February, in a leap year', 'None'] },
+  { hard: true, q: 'A rooster lays an egg right on the peak of a barn roof. Which side does the egg roll down?',
+    a: 'Neither: roosters don’t lay eggs', wrong: ['The side the wind blows toward', 'The steeper side', 'It balances on top'] },
+  { hard: true, q: 'Two fathers and two sons go fishing. Each catches one fish, yet they bring home only three. How?',
+    a: 'They’re a grandpa, dad and son', wrong: ['One fish got away', 'They cooked one on the boat', 'One slipped back into the lake'] },
+  { hard: true, q: 'Which five-letter word gets shorter when you add two letters to it?',
+    a: 'Short', wrong: ['Small', 'Brief', 'Tiny'] },
+  { hard: true, q: 'I travel all over the world, yet I never leave the corner I’m stuck in. What am I?',
+    a: 'A stamp', wrong: ['A compass', 'A globe', 'A satellite'] },
+  { hard: true, q: 'I have cities without houses, forests without trees and rivers without a drop of water. What am I?',
+    a: 'A map', wrong: ['A painting', 'A dream', 'A snow globe'] },
+  { hard: true, q: 'If you have me, you want to share me. Once you share me, you don’t have me anymore. What am I?',
+    a: 'A secret', wrong: ['A pizza', 'A joke', 'A photo'] },
+  { hard: true, q: 'You can catch me easily, but no one has ever managed to throw me. What am I?',
+    a: 'A cold', wrong: ['A ball', 'A fish', 'A frisbee'] },
+  { hard: true, q: 'I go up every single year and never once come back down. What am I?',
+    a: 'Your age', wrong: ['A balloon', 'Smoke', 'A rocket'] },
+  { hard: true, q: 'I run but never walk, I have a mouth but never talk, and I have a bed but never sleep. What am I?',
+    a: 'A river', wrong: ['A clock', 'A nose', 'A train'] },
+  { hard: true, q: 'I can fill a whole room and still take up no space at all. What am I?',
+    a: 'Light', wrong: ['Air', 'Smoke', 'Water'] },
 ];

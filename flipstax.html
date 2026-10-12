@@ -1115,6 +1115,8 @@
   }
   @keyframes irPanelIn{ 0%{ transform:scale(0.6) rotate(-4deg); opacity:0; } 100%{ transform:none; opacity:1; } }
   .ir-eyebrow{ color:#c9ff7a; font-size:12px; font-weight:900; letter-spacing:2px; }
+  .ir-hard{ display:none; margin-left:8px; padding:2px 8px; border-radius:99px; background:#ff3cac; color:#fff; font-size:11px; letter-spacing:1px; vertical-align:1px; box-shadow:0 0 10px rgba(255,60,172,0.7); }
+  .ir-overlay.hard .ir-hard{ display:inline-block; }
   .ir-timer{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:30px; color:#fff; margin:6px 0 4px; }
   .ir-timer.danger{ color:#ffe066; animation: runTimerPulse 0.8s ease-in-out infinite; }
   .ir-q{ color:#fff; font-size:18px; font-weight:800; line-height:1.4; margin:4px 0 8px; }
@@ -2689,7 +2691,7 @@
   <div class="ir-rings" aria-hidden="true"><i></i><i></i><i></i></div>
   <canvas id="irConfetti" aria-hidden="true"></canvas>
   <div class="ir-panel" id="irPanel">
-    <div class="ir-eyebrow">❓ RIDDLE ROUND ❓</div>
+    <div class="ir-eyebrow">❓ RIDDLE ROUND ❓<span class="ir-hard">🧠 HARD</span></div>
     <div class="ir-timer" id="irTimer">0:30</div>
     <div class="ir-q" id="irQ"></div>
     <div class="ir-len" id="irLen"></div>
@@ -6828,7 +6830,7 @@
     mothership_jackpot: { name:'Mothership Jackpot', icon:'🛸', blurb:'Hit the Mothership Jackpot in the Vault finale.', how:'Land a Plinko chip in the Mothership Jackpot' },
     signal_decoded:     { name:'Signal Decoded', icon:'📡', blurb:'Guessed the crowd exactly right.', how:'A Guess the Crowd answer dead on (0 off)' },
     abduction_survivor: { name:'Abduction Survivor', icon:'🐄', blurb:'Got lifted by the tractor beam and lived to vote again.', how:'5 crowd matches in a row in an Infinity run (the abduction moment)' },
-    riddle_master:      { name:'Riddle Master', icon:'🧩', blurb:'Solved every riddle in an Infinity run (3 or more).', how:'Solve every riddle round in a run (at least 3)' },
+    riddle_master:      { name:'Riddle Master', icon:'🧩', blurb:'Solved every riddle in an Infinity run (3 or more), the hard ones too.', how:'Solve every riddle round in a run (at least 3, including a hard one)' },
   };
   Object.keys(ALIEN_META).forEach(k=>{ PERSONALITY_META[k] = Object.assign({ rare:true }, ALIEN_META[k]); });
   function isAlienCard(k){ return ALIEN_ORDER.indexOf(k) !== -1; }
@@ -8957,7 +8959,8 @@
   function closeEncounterUnlocks(){
     const out = [];
     if ((infRun.ufoTaps || 0) >= 3) out.push('first_contact');
-    if ((infRun.riddles || 0) >= 3 && infRun.riddlesRight === infRun.riddles) out.push('riddle_master');
+    // Riddle Master: every riddle of the run solved (3 or more), the hard ones included.
+    if ((infRun.riddles || 0) >= 3 && infRun.riddlesRight === infRun.riddles && (infRun.riddlesHard || 0) >= 1 && infRun.riddlesHardRight === infRun.riddlesHard) out.push('riddle_master');
     if (infRun.perfectGuess) out.push('signal_decoded');
     if (infRun.abducted) out.push('abduction_survivor');
     return out;
@@ -9439,19 +9442,31 @@
   // "transmission incoming" intro (see riddleIntro).
   const INF_RIDDLE_MS = 20000;
   const INF_RIDDLE_POINTS = 20;
-  const INF_RIDDLE_BAG_KEY = 'flipstax_inf_riddles_v2';
+  const INF_RIDDLE_BAG_KEY = 'flipstax_inf_riddles_v3';   // { normal:{n,bag}, hard:{n,bag} }
   let infRiddle = null, infRiddleState = 'idle', infRiddleEndsAt = 0, infRiddleInterval = null;
   let infRiddleCloseTimer = null, infRiddleShownAt = 0, infRiddleIntroTimer = null;
-  // The device works through every riddle before any comes back (like the
-  // Daily secret riddles' bag).
-  function nextInfRiddleIdx(){
+  // The device works through every riddle of a set (normal / hard) before
+  // any of that set comes back (like the Daily secret riddles' bag).
+  function nextInfRiddleIdx(hard){
+    const pool = INFINITY_RIDDLES.map((r, i)=> i).filter(i=> !!INFINITY_RIDDLES[i].hard === !!hard);
+    if (!pool.length) return nextInfRiddleIdx(!hard);
     let st = null; try{ st = JSON.parse(localStorage.getItem(INF_RIDDLE_BAG_KEY) || 'null'); }catch(e){}
-    const n = INFINITY_RIDDLES.length;
-    let bag = (st && st.n === n && Array.isArray(st.bag)) ? st.bag.filter(i=> i >= 0 && i < n) : [];
-    if (!bag.length) bag = shuffle(INFINITY_RIDDLES.map((_, i)=> i));
+    if (!st || typeof st !== 'object') st = {};
+    const k = hard ? 'hard' : 'normal', n = pool.length, s0 = st[k];
+    let bag = (s0 && s0.n === n && Array.isArray(s0.bag)) ? s0.bag.filter(i=> pool.includes(i)) : [];
+    if (!bag.length) bag = shuffle(pool.slice());
     const idx = bag.pop();
-    try{ localStorage.setItem(INF_RIDDLE_BAG_KEY, JSON.stringify({ n, bag })); }catch(e){}
+    st[k] = { n, bag };
+    try{ localStorage.setItem(INF_RIDDLE_BAG_KEY, JSON.stringify(st)); }catch(e){}
     return idx;
+  }
+  // About a third of a run's riddle rounds are hard: one in every three, at
+  // a spot picked per run (riddleHardAt), so any run with 3+ riddles has at
+  // least one hard one (and a 4-riddle run one or two).
+  function infRiddleIsHardNext(){
+    if (!infRun) return Math.random() < 1 / 3;
+    if (infRun.riddleHardAt == null){ infRun.riddleHardAt = Math.floor(Math.random() * 3); saveInfRun(); }
+    return (infRun.riddles || 0) % 3 === infRun.riddleHardAt;
   }
   function buildRiddleField(){
     const field = els.irField; field.innerHTML = '';
@@ -9471,8 +9486,10 @@
   }
   function startInfRiddle(forceIdx){
     if (infRiddleState !== 'idle' || !INFINITY_RIDDLES.length) return false;
-    infRiddle = INFINITY_RIDDLES[typeof forceIdx === 'number' ? forceIdx : nextInfRiddleIdx()];
+    infRiddle = INFINITY_RIDDLES[typeof forceIdx === 'number' ? forceIdx : nextInfRiddleIdx(infRiddleIsHardNext())];
     infRiddleState = 'intro';
+    if (infRiddle.hard && infRun && !infRun.finale){ infRun.riddlesHard = (infRun.riddlesHard || 0) + 1; saveInfRun(); }
+    els.irOverlay.classList.toggle('hard', !!infRiddle.hard);
     stopTallyPolling(); clearRoundTimer();
     // Not a vote round - keep the stalled-round watchdog out of it.
     voted = false; votedSinceTime = null;
@@ -9529,7 +9546,7 @@
     if (infRun && !infRun.finale) infRun.riddles = (infRun.riddles || 0);   // counted when it started (infRunEventDue)
     if (result !== 'timeout' && infRun && !infRun.finale){ infRun.riddlesAnswered = (infRun.riddlesAnswered || 0) + 1; saveInfRun(); }
     if (result === 'win'){
-      if (infRun && !infRun.finale){ infRun.riddlesRight = (infRun.riddlesRight || 0) + 1; saveInfRun(); }
+      if (infRun && !infRun.finale){ infRun.riddlesRight = (infRun.riddlesRight || 0) + 1; if (infRiddle.hard) infRun.riddlesHardRight = (infRun.riddlesHardRight || 0) + 1; saveInfRun(); }
       const key = addInfKey('riddle');
       els.irVerdictSub.textContent = infRiddle.a + ' · +' + INF_RIDDLE_POINTS + ' points' + (key ? ' · 🔑 +1 key' : '');
       els.irField.querySelectorAll('.ir-mark').forEach(m=> m.textContent = '!');
@@ -11855,6 +11872,7 @@
       currentRiddle: () => currentRiddle,
       startInfRiddle: (i) => startInfRiddle(i),
       getInfRiddle: () => ({ state: infRiddleState, riddle: infRiddle, count: INFINITY_RIDDLES.length }),
+      riddleHardNext: () => infRiddleIsHardNext(),
       closeInfRiddle: () => closeInfRiddle(),
       setInfRiddleRemainingMs: (ms) => { infRiddleEndsAt = Date.now() + ms; tickInfRiddle(); },
       showPersonalityReveal: () => showPersonalityReveal(),
