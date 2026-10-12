@@ -6485,15 +6485,16 @@
   // minutes of voting (~4.3s and ~5.9 points per vote round). Re-tuned: a
   // star card is worth 2 (was 3), combos no longer add points, the Points
   // Zone is rarer (1.5% a round, was 8%) and doubles vote points only,
-  // trivia is worth 5 (was 25) plus a key, Coin Flip / Wild Card are capped
-  // at 15 either way. The finish line is FINISH_POINTS (350): with Guess the
-  // Crowd firing every 6-8 rounds a typical run reaches it in ~6.7 minutes
-  // (slow players ~7.7); while no card has CROWD_DATA_MIN votes Guess the
-  // Crowd can't fire, and most runs end on the 10:00 clock instead.
+  // trivia is worth 5 (was 25) plus a key, Coin Flip is capped at 15 either
+  // way and Wild Card is a gift that never costs points. The finish line is
+  // FINISH_POINTS (350): with Guess the Crowd firing every 6-8 rounds a typical
+  // run reaches it in ~6.7 minutes (slow players ~7.7); while no card has
+  // CROWD_DATA_MIN votes Guess the Crowd can't fire, and most runs end on the
+  // 10:00 clock instead.
   const INF_RUN_KEY = 'flipstax_inf_run_v1';
-  // The finish line (Oct 2026: 350, from pacing_sim.py's finish table - the
-  // closest of 300-350 to a 9-10 minute run once Guess the Crowd fires).
-  // Everything that shows or uses the target reads this.
+  const GUESS_FIRST_GAP = [6, 8];     // = GUESS_GAP (declared further down)
+  const RIDDLE_ROUND_GAP = [20, 26];  // vote rounds between riddle rounds - about 4 a run
+  // The finish line. Everything that shows or uses the target reads this.
   const FINISH_POINTS = 350;
   const INF_RUN_CLOCK_MS = 10 * 60 * 1000;
   const INF_KEY_CAP = 8;
@@ -6507,8 +6508,8 @@
   function freshInfRun(){
     return { v:1, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7), startedAt: Date.now(),
       clockMs:0, score:0, keys:0, keyLog:{}, matchStreak:0, votes:0, crowdN:0, crowdAgree:0, boldest:null,
-      voteRounds:0, riddles:0, riddlesRight:0, nextRiddleAt: 26 + Math.floor(Math.random() * 9),
-      sinceGuess:0, nextGuessAt: 6 + Math.floor(Math.random() * 3), guesses:0,
+      voteRounds:0, riddles:0, riddlesRight:0, nextRiddleAt: RIDDLE_ROUND_GAP[0] + Math.floor(Math.random() * (RIDDLE_ROUND_GAP[1] - RIDDLE_ROUND_GAP[0] + 1)),
+      sinceGuess:0, nextGuessAt: GUESS_FIRST_GAP[0] + Math.floor(Math.random() * (GUESS_FIRST_GAP[1] - GUESS_FIRST_GAP[0] + 1)), guesses:0,
       ufoTaps:0, ufoRewards:0, nextUfoAt: 12 + Math.floor(Math.random() * 7),
       milestones:[], pendingBadges:[], ended:null, endedAt:null, finale:null };
   }
@@ -6560,8 +6561,15 @@
     if (isOnVsScreen() && !voted){ clearRoundTimer(); stopTallyPolling(); loadNext(); }
   }
   // Keys: a small gold counter in the header, at most INF_KEY_CAP a run.
+  // Keys earned this run, including any that came while the ring was full.
+  // (A run saved before keysEarned existed counts at least what it holds.)
+  function infKeysEarned(r){ return Math.max(r.keysEarned || 0, r.keys || 0); }
   function addInfKey(source){
-    if (!infRun || infRun.ended || infRun.keys >= INF_KEY_CAP) return false;
+    if (!infRun || infRun.ended) return false;
+    // Every key earned counts toward Key Keeper (keysEarned), even when the
+    // key ring is already full and it can't be kept.
+    infRun.keysEarned = (infRun.keysEarned || 0) + 1;
+    if (infRun.keys >= INF_KEY_CAP){ saveInfRun(); return false; }
     infRun.keys++; infRun.keyLog[source] = (infRun.keyLog[source] || 0) + 1; saveInfRun();
     renderRunBanner();
     const k = document.getElementById('infKeyCount');
@@ -6784,9 +6792,9 @@
     lucky_bounce:    { name:'Lucky Bounce', icon:'\uD83C\uDF40', blurb:'The pegs loved you. Every bounce went your way.' },
     crowd_whisperer: { name:'The Crowd Whisperer', icon:'\uD83D\uDCE3', blurb:'You don\u2019t guess the crowd. You hear it coming.' },
     riddle_sage:     { name:'The Riddle Sage', icon:'\uD83E\uDD89', blurb:'Riddles fold before you like paper airplanes.' },
-    vault_cracker:   { name:'Vault Cracker', icon:'\uD83D\uDD13', blurb:'Five keys in, every chip down. The vault never stood a chance.' },
+    vault_cracker:   { name:'Vault Cracker', icon:'\uD83D\uDD13', blurb:'Every chip down, bonus chip too. The vault never stood a chance.' },
     lone_wolf:       { name:'The Lone Wolf', icon:'\uD83D\uDC3A', blurb:'The herd went one way. You strolled the other.' },
-    key_keeper:      { name:'Key Keeper', icon:'\uD83D\uDDDD\uFE0F', blurb:'Why spend keys when you can jingle them?' },
+    key_keeper:      { name:'Key Keeper', icon:'\uD83D\uDDDD\uFE0F', blurb:'Keys, keys and more keys. Your pockets jingle.' },
   };
   Object.keys(RUN_CARD_META).forEach(k=>{ PERSONALITY_META[k] = Object.assign({ run:true }, RUN_CARD_META[k]); });
   function isRunCard(k){ return RUN_CARD_ORDER.indexOf(k) !== -1; }
@@ -8426,7 +8434,7 @@
     document.getElementById('finScore').textContent = Math.max(0, r.score);
     const pct = infCrowdPct(r);
     document.getElementById('finCrowd').textContent = pct === null ? '—' : pct + '%';
-    document.getElementById('finKeys').textContent = '🔑 ' + r.keys;
+    document.getElementById('finKeys').textContent = '🔑 ' + infKeysEarned(r);
     const bold = document.getElementById('finBold');
     bold.classList.toggle('hidden', !r.boldest);
     if (r.boldest){
@@ -8639,35 +8647,39 @@
   // this priority order, wins; if none fits, the existing personality logic
   // (determinePersonality on the run's stats) decides, as before. Every
   // threshold is a named constant to tune.
-  const STARSEEKER_UFO_TAPS = 2;          // or survived the abduction moment
-  const LUCKY_PLINKO_MIN = 200;           // Plinko bonus, or the jackpot
-  const WHISPERER_MIN_GUESSES = 2, WHISPERER_MAX_AVG_ERROR = 12;   // or any dead-on guess
-  const WHISPERER_MATCH_RATE = 0.70, CROWD_RATE_MIN_ROUNDS = 15;    // rounds with a crowd result
-  const SAGE_MIN_RIDDLES = 4, SAGE_MIN_ACCURACY = 0.75;
-  const CRACKER_KEYS_SPENT = 5;           // keys turned into Plinko chips
+  // Calibrated Oct 2026 with screenshots/qa/tools/personality_sim.py (varied
+  // simulated players, Guess the Crowd on and off) so no result passes ~25%
+  // and each new one lands at 3% or more.
+  const STARSEEKER_UFO_TAPS = 3;          // all of a run's UFOs (UFO_MAX_PASSES), or...
+  const STARSEEKER_ABDUCTIONS = 6;        // ...this many abductions (5-match streaks) in one run
+  const LUCKY_PLINKO_MIN = 280;           // Plinko bonus - about the top 10% of runs
+  const WHISPERER_MIN_GUESSES = 2, WHISPERER_MAX_AVG_ERROR = 8, WHISPERER_DEAD_ONS = 2;
+  const WHISPERER_MATCH_RATE = 0.82, CROWD_RATE_MIN_ROUNDS = 15;    // rounds with a crowd result
+  const SAGE_MIN_RIDDLES = 3, SAGE_MIN_ACCURACY = 0.80;
+  const CRACKER_CHIPS_DROPPED = 6;        // all 5 key chips plus the Wild Card bonus chip
   const WOLF_MAX_MATCH_RATE = 0.35;
-  const KEEPER_KEYS_HELD = 6;             // keys still on the ring after Plinko
+  const KEEPER_KEYS_EARNED = 18;          // key-earning moments in the run, kept or not
   function infRunStats(){
     const r = infRun, f = r.finale || { chips:[], dropped:0 };
     const dropped = f.chips.slice(0, f.dropped), spent = Math.min(f.dropped, r.keys);
     return {
-      ufoTaps: r.ufoTaps || 0, abducted: !!r.abducted,
+      ufoTaps: r.ufoTaps || 0, abducted: !!r.abducted, abductions: r.abductions || 0, chipsDropped: f.dropped,
       plinkoBonus: dropped.reduce((a, c)=> a + c.pts, 0), jackpot: dropped.some(c=> c.kind === 'jackpot'),
-      guesses: r.guessLocked || 0, guessAvgErr: r.guessLocked ? (r.guessErrSum || 0) / r.guessLocked : null, deadOn: !!r.perfectGuess,
+      guesses: r.guessLocked || 0, guessAvgErr: r.guessLocked ? (r.guessErrSum || 0) / r.guessLocked : null, deadOn: !!r.perfectGuess, deadOns: r.deadOns || (r.perfectGuess ? 1 : 0),
       crowdRounds: r.crowdN || 0, matchRate: r.crowdN ? r.crowdAgree / r.crowdN : null, votedRounds: r.votes || 0,
       riddlesAnswered: r.riddlesAnswered || 0, riddlesRight: r.riddlesRight || 0,
-      keysEarned: r.keys, keysSpent: spent, keysHeld: r.keys - spent,
+      keysEarned: infKeysEarned(r), keysSpent: spent, keysHeld: r.keys - spent,
     };
   }
   const RUN_PERSONALITY_RULES = [
-    ['starseeker',      s=> s.ufoTaps >= STARSEEKER_UFO_TAPS || s.abducted],
-    ['lucky_bounce',    s=> s.jackpot || s.plinkoBonus >= LUCKY_PLINKO_MIN],
-    ['crowd_whisperer', s=> (s.guesses >= WHISPERER_MIN_GUESSES && s.guessAvgErr <= WHISPERER_MAX_AVG_ERROR) || s.deadOn ||
+    ['starseeker',      s=> s.ufoTaps >= STARSEEKER_UFO_TAPS || s.abductions >= STARSEEKER_ABDUCTIONS],
+    ['lucky_bounce',    s=> s.plinkoBonus >= LUCKY_PLINKO_MIN],   // (the jackpot has its own card, Mothership Jackpot)
+    ['crowd_whisperer', s=> (s.guesses >= WHISPERER_MIN_GUESSES && s.guessAvgErr <= WHISPERER_MAX_AVG_ERROR) || s.deadOns >= WHISPERER_DEAD_ONS ||
                             (s.crowdRounds >= CROWD_RATE_MIN_ROUNDS && s.matchRate >= WHISPERER_MATCH_RATE)],
     ['riddle_sage',     s=> s.riddlesAnswered >= SAGE_MIN_RIDDLES && s.riddlesRight / s.riddlesAnswered >= SAGE_MIN_ACCURACY],
-    ['vault_cracker',   s=> s.keysSpent >= CRACKER_KEYS_SPENT],
+    ['vault_cracker',   s=> s.chipsDropped >= CRACKER_CHIPS_DROPPED],
     ['lone_wolf',       s=> s.crowdRounds >= CROWD_RATE_MIN_ROUNDS && s.matchRate <= WOLF_MAX_MATCH_RATE],
-    ['key_keeper',      s=> s.keysHeld >= KEEPER_KEYS_HELD],
+    ['key_keeper',      s=> s.keysEarned >= KEEPER_KEYS_EARNED],
   ];
   function determineRunPersonality(s){ for (const [type, fits] of RUN_PERSONALITY_RULES){ if (fits(s)) return type; } return null; }
 
@@ -8700,7 +8712,7 @@
     const bonus = f.chips.slice(0, f.dropped).reduce((a, c)=> a + c.pts, 0);
     f.award = { personality: personality.type, runPersonality: !!runType, resultNew, stats: rs, note: personality.note || null, alienLine: runType ? null : alienPersonalityLine(personality.type),
       cards, alien, badges, runScore: Math.max(0, infRun.score), bonus, finalScore: Math.max(0, infRun.score) + bonus,
-      flipz: infRun.votes, crowdPct: infCrowdPct(infRun), keys: infRun.keys, boldest: infRun.boldest, ended: infRun.ended, clockMs: infRun.clockMs,
+      flipz: infRun.votes, crowdPct: infCrowdPct(infRun), keys: infKeysEarned(infRun), boldest: infRun.boldest, ended: infRun.ended, clockMs: infRun.clockMs,
       jackpot: f.chips.slice(0, f.dropped).some(c=> c.kind === 'jackpot') };
     f.awarded = true; f.vaultSeen = false;
     saveInfRun();
@@ -8737,9 +8749,10 @@
   // --- the tappable UFO
   const UFO_ROUND_GAP = [12, 18];   // about one every 15 rounds
   const UFO_MAX_REWARDS = 3;
+  const UFO_MAX_PASSES = 3;         // passes per run, caught or not (Oct 2026 calibration - Starseeker means catching them all)
   let tapUfoEl = null, tapUfoTimer = null;
   function maybeScheduleTapUfo(){
-    if (!infRun || infRun.ended || infRun.ufoRewards >= UFO_MAX_REWARDS || prefersReducedMotion()) return;
+    if (!infRun || infRun.ended || infRun.ufoRewards >= UFO_MAX_REWARDS || (infRun.ufoPasses || 0) >= UFO_MAX_PASSES || prefersReducedMotion()) return;
     if (infRun.voteRounds < infRun.nextUfoAt) return;
     infRun.nextUfoAt = infRun.voteRounds + UFO_ROUND_GAP[0] + Math.floor(Math.random() * (UFO_ROUND_GAP[1] - UFO_ROUND_GAP[0] + 1)); saveInfRun();
     const seq = roundSeq;
@@ -8764,6 +8777,7 @@
     const anim = el.animate([{ transform:'translateX(' + x0 + 'px) translateY(0)' }, { transform:'translateX(' + ((x0 + x1) / 2) + 'px) translateY(-6px)' }, { transform:'translateX(' + x1 + 'px) translateY(0)' }],
       { duration: 4000, easing:'linear', fill:'forwards' });
     tapUfoEl = el;
+    if (!force && infRun){ infRun.ufoPasses = (infRun.ufoPasses || 0) + 1; saveInfRun(); }
     const done = ()=>{ if (tapUfoEl === el) tapUfoEl = null; el.remove(); };
     anim.finished.then(done, done);
     const tap = e=>{
@@ -8799,8 +8813,9 @@
   // stack gets lifted and set back down - earns Abduction Survivor (in that
   // run's Vault) and counts toward Starseeker. Counts with reduced motion too
   // (the lift just isn't animated).
+  const ABDUCTION_STREAK = 5;   // crowd matches in a row; each new streak is another abduction
   function abductStack(){
-    if (inInfinity() && infRun && !infRun.finale && !infRun.abducted){ infRun.abducted = true; saveInfRun(); }
+    if (inInfinity() && infRun && !infRun.finale){ infRun.abducted = true; infRun.abductions = (infRun.abductions || 0) + 1; saveInfRun(); }
     if (prefersReducedMotion() || !inInfinity()) return;
     const board = els.board; if (!board || typeof board.animate !== 'function') return;
     let u = document.getElementById('abductUfo');
@@ -9054,7 +9069,7 @@
     res.classList.remove('hidden'); ov.classList.add('revealed');
     const off = Math.abs(guess - truth), sc = guessScore(off);
     if (infRun && !infRun.finale){ infRun.guessLocked = (infRun.guessLocked || 0) + 1; infRun.guessErrSum = (infRun.guessErrSum || 0) + off; saveInfRun(); }
-    if (off === 0 && infRun && !infRun.finale){ infRun.perfectGuess = true; saveInfRun(); }
+    if (off === 0 && infRun && !infRun.finale){ infRun.perfectGuess = true; infRun.deadOns = (infRun.deadOns || 0) + 1; saveInfRun(); }
     const finish = ()=>{
       real.textContent = truth + '%';
       if (sc.pts) addRacePoints(sc.pts);
@@ -9084,7 +9099,7 @@
   function infRunEventDue(){
     if (!infRun || infRun.ended) return false;
     if (infRun.voteRounds >= infRun.nextRiddleAt && INFINITY_RIDDLES.length && startInfRiddle()){
-      infRun.riddles++; infRun.nextRiddleAt = infRun.voteRounds + 26 + Math.floor(Math.random() * 9); saveInfRun();
+      infRun.riddles++; infRun.nextRiddleAt = infRun.voteRounds + RIDDLE_ROUND_GAP[0] + Math.floor(Math.random() * (RIDDLE_ROUND_GAP[1] - RIDDLE_ROUND_GAP[0] + 1)); saveInfRun();
       return true;
     }
     return maybeGuessRound();
@@ -11227,7 +11242,7 @@
         if (cv.withCrowd){
           infRun.crowdAgree++; infRun.matchStreak++;
           if (infRun.matchStreak % INF_MATCHES_PER_KEY === 0 && addInfKey('streak')) showToast('\uD83D\uDD11 ' + infRun.matchStreak + ' crowd matches in a row \u2014 +1 key');
-          if (infRun.matchStreak === 5) abductStack();
+          if (infRun.matchStreak === ABDUCTION_STREAK) abductStack();
         } else infRun.matchStreak = 0;
         if (!cv.withCrowd && cv.others >= CROWD_DATA_MIN_NOW){
           const against = 100 - cv.pickPct;
@@ -11409,7 +11424,10 @@
   // The weights put its average at about 16 points (a key or chip counted
   // at roughly a Plinko chip's average payout) - the size of the old
   // Wild Card's +/-15 stake, which on average gave 0.
-  const WILD_WEIGHT_POINTS10 = 0.50, WILD_WEIGHT_POINTS20 = 0.30, WILD_WEIGHT_KEY = 0.15, WILD_WEIGHT_CHIP = 0.05;
+  // (Bonus chip 5% -> 15% and +10 50% -> 40% in the personality calibration,
+  // so Vault Cracker - all 6 chips - comes up in a few percent of runs.
+  // Average now ~19 points.)
+  const WILD_WEIGHT_POINTS10 = 0.40, WILD_WEIGHT_POINTS20 = 0.30, WILD_WEIGHT_KEY = 0.15, WILD_WEIGHT_CHIP = 0.15;
   function drawWildPrize(){
     let r = Math.random() * (WILD_WEIGHT_POINTS10 + WILD_WEIGHT_POINTS20 + WILD_WEIGHT_KEY + WILD_WEIGHT_CHIP);
     let prize = (r -= WILD_WEIGHT_POINTS10) < 0 ? 'points10' : (r -= WILD_WEIGHT_POINTS20) < 0 ? 'points20' : (r -= WILD_WEIGHT_KEY) < 0 ? 'key' : 'chip';
