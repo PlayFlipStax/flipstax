@@ -950,7 +950,7 @@
   .fin-vault.jackpot .vault-ufo.riddle-ufo{ display:block; animation: vaultUfoIn 0.9s cubic-bezier(.2,.9,.3,1.1) both; }
   @keyframes vaultUfoIn{ from{ transform:translate(-160px, -60px) scale(0.6); opacity:0; } to{ transform:none; opacity:1; } }
   .vault-beam-card{ position:absolute; left:50%; top:30px; width:66px; height:90px; margin-left:-33px; z-index:3; opacity:0; border-radius:8px; overflow:hidden; box-shadow:0 0 18px rgba(255,220,90,0.9); }
-  .vault-beam-card svg{ width:100%; height:100%; display:block; }
+  .vault-beam-card svg, .vault-beam-card img{ width:100%; height:100%; display:block; }
   .fin-vault.jackpot .vault-beam-card{ animation: beamCardDown 2.2s ease-in-out 0.6s both; }
   @keyframes beamCardDown{ 0%{ opacity:0; transform:translateY(-10px) scale(0.4) rotate(-8deg); } 25%{ opacity:1; } 80%{ opacity:1; transform:translateY(110px) scale(1) rotate(4deg); } 100%{ opacity:0; transform:translateY(130px) scale(0.6); } }
   .vault-rewards{ width:100%; display:flex; flex-direction:column; align-items:center; gap:10px; opacity:0; transform:translateY(10px); transition:opacity 0.6s ease, transform 0.6s ease; pointer-events:none; }
@@ -2739,6 +2739,11 @@
   </div>
   <div class="col-scroll" id="collectionScroll">
     <div class="col-grid" id="collectionGrid"></div>
+    <div class="col-rare col-run" id="collectionRunWrap">
+      <div class="col-rare-title">♾️ INFINITY RUN CARDS <span id="collectionRunCount"></span></div>
+      <div class="col-rare-sub">Earned when a run ends — extras, not part of the 16.</div>
+      <div class="col-grid col-rare-grid" id="collectionRun"></div>
+    </div>
     <div class="col-rare" id="collectionRareWrap">
       <div class="col-rare-title">🛸 CLOSE ENCOUNTERS <span id="collectionRareCount"></span></div>
       <div class="col-rare-sub">Rare cards from Infinity runs — extras, not part of the 16.</div>
@@ -6603,6 +6608,17 @@
     perfectionist:'the_perfectionist.jpg', overthinker:'the_overthinker.jpg', trivia_titan:'the_maverick.jpg', skeptic:'the_skeptic.jpg',
     fence_sitter:'the_fence_sitter.jpg', gambler:'the_gambler.jpg', comeback_kid:'comeback_kid.jpg', speed_demon:'the_swing_voter.jpg',
     trivia_trainwreck:'the_bandwagoner.jpg', combo_king_queen:'the_combo_royalty.jpg', last_second_hero:'last_second_hero.jpg', crowd_pleaser:'crowd_pleaser.jpg',
+    // THE one lookup table for card art: card id -> file in images/personality-cards/
+    // (360 x 492 JPEG, trimmed to the card edge). A card with no entry here gets
+    // a placeholder (a drawn stand-in; Close Encounters cards get their SVG).
+    // To add art later: drop the file in that folder and add one line here.
+    // Infinity run personalities (Oct 2026):
+    starseeker:'starseeker.jpg', key_keeper:'key_keeper.jpg', vault_cracker:'vault_cracker.jpg', lone_wolf:'the_lone_wolf.jpg',
+    riddle_sage:'the_riddle_sage.jpg', crowd_whisperer:'the_crowd_whisperer.jpg',
+    // lucky_bounce: no art yet (placeholder)
+    // Close Encounters:
+    first_contact:'first_contact.jpg', mothership_jackpot:'mothership_jackpot.jpg', signal_decoded:'signal_decoded.jpg', abduction_survivor:'abduction_survivor.jpg',
+    // riddle_master: no art yet (placeholder)
   };
   // Collection order (and card numbers #01-#16): the lone-wolf to
   // crowd-pleaser spectrum, four groups of four - Lone Wolves, Independents,
@@ -6624,6 +6640,10 @@
           // secret riddle. That's its own reward now (the 🪐 badge, kept in
           // stats), so it's no longer one of the 16.
           if (parsed.cards.riddler){ delete parsed.cards.riddler; try{ localStorage.setItem(COLLECTION_KEY, JSON.stringify(parsed)); }catch(e){} }
+          // Close Encounters cards renamed to match their art (Oct 2026, preview builds only).
+          [['mothership', 'mothership_jackpot'], ['perfect_signal', 'signal_decoded']].forEach(([from, to])=>{
+            if (parsed.cards[from]){ if (!parsed.cards[to]) parsed.cards[to] = parsed.cards[from]; delete parsed.cards[from]; try{ localStorage.setItem(COLLECTION_KEY, JSON.stringify(parsed)); }catch(e){} }
+          });
           return parsed;
         }
       }
@@ -6639,15 +6659,34 @@
   // is a gold-rimmed saucer. These cards sit outside the 16-card
   // Personality set (they never count toward 16/16); they're listed in their
   // own Close Encounters row in My Collection.
-  const ALIEN_ORDER = ['first_contact', 'mothership', 'riddle_master', 'perfect_signal'];
+  const ALIEN_ORDER = ['first_contact', 'mothership_jackpot', 'signal_decoded', 'abduction_survivor', 'riddle_master'];
+  // `how` is the rule, kept for the code and tests only - the collection
+  // never shows it (no spoilers for the UFO surprises).
   const ALIEN_META = {
-    first_contact:  { name:'First Contact', icon:'👽', blurb:'Tapped 3 passing UFOs in one Infinity run.', how:'Tap 3 UFOs in one Infinity run' },
-    mothership:     { name:'The Mothership', icon:'🛸', blurb:'Hit the Mothership Jackpot in the Vault finale.', how:'Land a chip in the Mothership Jackpot' },
-    riddle_master:  { name:'Riddle Master', icon:'🧩', blurb:'Solved every riddle in an Infinity run (3 or more).', how:'Solve every riddle round in a run (at least 3)' },
-    perfect_signal: { name:'Perfect Signal', icon:'📡', blurb:'Guessed the crowd exactly right.', how:'Guess the Crowd dead on (0 off)' },
+    first_contact:      { name:'First Contact', icon:'👽', blurb:'Tapped 3 passing UFOs in one Infinity run.', how:'Tap 3 UFOs in one Infinity run' },
+    mothership_jackpot: { name:'Mothership Jackpot', icon:'🛸', blurb:'Hit the Mothership Jackpot in the Vault finale.', how:'Land a Plinko chip in the Mothership Jackpot' },
+    signal_decoded:     { name:'Signal Decoded', icon:'📡', blurb:'Guessed the crowd exactly right.', how:'A Guess the Crowd answer dead on (0 off)' },
+    abduction_survivor: { name:'Abduction Survivor', icon:'🐄', blurb:'Got lifted by the tractor beam and lived to vote again.', how:'5 crowd matches in a row in an Infinity run (the abduction moment)' },
+    riddle_master:      { name:'Riddle Master', icon:'🧩', blurb:'Solved every riddle in an Infinity run (3 or more).', how:'Solve every riddle round in a run (at least 3)' },
   };
   Object.keys(ALIEN_META).forEach(k=>{ PERSONALITY_META[k] = Object.assign({ rare:true }, ALIEN_META[k]); });
   function isAlienCard(k){ return ALIEN_ORDER.indexOf(k) !== -1; }
+  // Infinity run personalities: the result at the end of a run (see
+  // determineRunPersonality), each with its own card, earned the first time
+  // it's your result. Their own row in My Collection - not part of the 16.
+  // `blurb` is the one-line caption under the result.
+  const RUN_CARD_ORDER = ['starseeker', 'lucky_bounce', 'crowd_whisperer', 'riddle_sage', 'vault_cracker', 'lone_wolf', 'key_keeper'];
+  const RUN_CARD_META = {
+    starseeker:      { name:'Starseeker', icon:'\uD83D\uDD2D', blurb:'Eyes on the sky. The UFOs noticed you right back.' },
+    lucky_bounce:    { name:'Lucky Bounce', icon:'\uD83C\uDF40', blurb:'The pegs loved you. Every bounce went your way.' },
+    crowd_whisperer: { name:'The Crowd Whisperer', icon:'\uD83D\uDCE3', blurb:'You don\u2019t guess the crowd. You hear it coming.' },
+    riddle_sage:     { name:'The Riddle Sage', icon:'\uD83E\uDD89', blurb:'Riddles fold before you like paper airplanes.' },
+    vault_cracker:   { name:'Vault Cracker', icon:'\uD83D\uDD13', blurb:'Five keys in, every chip down. The vault never stood a chance.' },
+    lone_wolf:       { name:'The Lone Wolf', icon:'\uD83D\uDC3A', blurb:'The herd went one way. You strolled the other.' },
+    key_keeper:      { name:'Key Keeper', icon:'\uD83D\uDDDD\uFE0F', blurb:'Why spend keys when you can jingle them?' },
+  };
+  Object.keys(RUN_CARD_META).forEach(k=>{ PERSONALITY_META[k] = Object.assign({ run:true }, RUN_CARD_META[k]); });
+  function isRunCard(k){ return RUN_CARD_ORDER.indexOf(k) !== -1; }
   function visitorSvg(opts){
     opts = opts || {};
     const id = 'v' + Math.random().toString(36).slice(2, 7);
@@ -6688,8 +6727,8 @@
   function alienCardSvg(type){
     const m = ALIEN_META[type] || { name:'?' };
     let art = '';
-    if (type === 'mothership') art = '<g transform="translate(40 120) scale(1.75)">' + mothershipSvg().replace(/^<svg[^>]*>|<\/svg>$/g, '') + '</g>';
-    else if (type === 'perfect_signal') art = '<g transform="translate(60 110) scale(2)">' + dishSvg().replace(/^<svg[^>]*>|<\/svg>$/g, '') + '</g>';
+    if (type === 'mothership_jackpot') art = '<g transform="translate(40 120) scale(1.75)">' + mothershipSvg().replace(/^<svg[^>]*>|<\/svg>$/g, '') + '</g>';
+    else if (type === 'signal_decoded') art = '<g transform="translate(60 110) scale(2)">' + dishSvg().replace(/^<svg[^>]*>|<\/svg>$/g, '') + '</g>';
     else art = '<g transform="translate(60 92) scale(2)">' + visitorSvg().replace(/^<svg[^>]*>|<\/svg>$/g, '') + '</g>';
     let stars = ''; for (let i = 0; i < 26; i++){ const x = (i * 137) % 340 + 10, y = (i * 89) % 300 + 20; stars += '<circle cx="' + x + '" cy="' + y + '" r="' + (1 + (i % 3) * 0.7) + '" fill="#fff" opacity="' + (0.35 + (i % 4) * 0.15) + '"/>'; }
     const extra = type === 'riddle_master' ? '<text x="300" y="120" font-size="64" font-weight="900" fill="#ffd23f" font-family="Arial Black, Arial" opacity="0.9">?</text><text x="30" y="150" font-size="44" font-weight="900" fill="#7df9ff" font-family="Arial Black, Arial" opacity="0.8">?</text>' : '';
@@ -6703,9 +6742,14 @@
       '<text x="180" y="40" text-anchor="middle" font-family="Inter, Arial" font-weight="800" font-size="16" fill="#ffd23f" letter-spacing="4">CLOSE ENCOUNTER</text>' +
       '</svg>';
   }
+  function cardArtHtml(k){
+    const file = PERSONALITY_CARD_ART[k];
+    if (file) return '<img src="images/personality-cards/' + file + '" alt="" decoding="async">';
+    return isAlienCard(k) ? alienCardSvg(k) : '<div class="cc-stand"><span class="cs-icon">' + ((PERSONALITY_META[k] || {}).icon || '?') + '</span><span class="cs-name"></span><span class="cs-soon">ART COMING SOON</span></div>';
+  }
   // Adds a Close Encounters card - once per run at most, and only from the
   // finale's award (see finaleAward). Returns the card key if it's new.
-  function grantAlienCard(k){
+  function grantRunCard(k){
     const owned = collection.cards[k];
     if (owned){ if (owned.lastRun !== (infRun && infRun.id)){ owned.count = (owned.count || 1) + 1; owned.lastRun = infRun && infRun.id; saveCollection(); } return null; }
     collection.cards[k] = { first: todayStr(), count: 1, revealed: false, lastRun: infRun && infRun.id };
@@ -8405,8 +8449,8 @@
     if (b.crowd) recordSwing(b.agree, b.crowd);
     const cards = checkUnlocks({});
     const alien = [];
-    if (f.chips.some(c=> c.kind === 'jackpot')){ const k = grantAlienCard('mothership'); if (k) alien.push(k); }
-    closeEncounterUnlocks().forEach(k=>{ const g = grantAlienCard(k); if (g) alien.push(g); });
+    if (f.chips.slice(0, f.dropped).some(c=> c.kind === 'jackpot')){ const k = grantRunCard('mothership_jackpot'); if (k) alien.push(k); }
+    closeEncounterUnlocks().forEach(k=>{ const g = grantRunCard(k); if (g) alien.push(g); });
     const badges = infRun.pendingBadges.filter(id=> !badgeEarned(id) && BADGES.some(x=> x.id === id));
     badges.forEach(id=> awardBadge(id, { now:true }));
     const bonus = f.chips.reduce((a, c)=> a + c.pts, 0);
@@ -8507,7 +8551,12 @@
     if (infRun.ufoTaps >= 3){ awardBadge('first_contact'); showToast('👽 First Contact! 3 UFOs this run'); }
   }
   // --- abduction streak: lift the card stack and set it back
+  // The abduction moment: 5 crowd matches in a row. Surviving it - the card
+  // stack gets lifted and set back down - earns Abduction Survivor (in that
+  // run's Vault) and counts toward Starseeker. Counts with reduced motion too
+  // (the lift just isn't animated).
   function abductStack(){
+    if (inInfinity() && infRun && !infRun.finale && !infRun.abducted){ infRun.abducted = true; saveInfRun(); }
     if (prefersReducedMotion() || !inInfinity()) return;
     const board = els.board; if (!board || typeof board.animate !== 'function') return;
     let u = document.getElementById('abductUfo');
@@ -8526,7 +8575,8 @@
     const out = [];
     if ((infRun.ufoTaps || 0) >= 3) out.push('first_contact');
     if ((infRun.riddles || 0) >= 3 && infRun.riddlesRight === infRun.riddles) out.push('riddle_master');
-    if (infRun.perfectGuess) out.push('perfect_signal');
+    if (infRun.perfectGuess) out.push('signal_decoded');
+    if (infRun.abducted) out.push('abduction_survivor');
     return out;
   }
   const ALIEN_PERSONALITY_LINES = {
@@ -8572,7 +8622,7 @@
     vaultTimers.push(setTimeout(()=>{ stage.classList.add('open'); sfx.vaultOpen(); }, t));
     t += 900;
     if (a.jackpot){
-      vaultTimers.push(setTimeout(()=>{ stage.classList.add('jackpot'); sfx.jackpot(); const bc = document.getElementById('vaultBeamCard'); bc.innerHTML = alienCardSvg('mothership'); }, t));
+      vaultTimers.push(setTimeout(()=>{ stage.classList.add('jackpot'); sfx.jackpot(); const bc = document.getElementById('vaultBeamCard'); bc.innerHTML = cardArtHtml('mothership_jackpot'); }, t));
       t += 2600;
     }
     vaultTimers.push(setTimeout(()=>{ pourCoins(); sfx.coins(18); }, t));
@@ -9101,7 +9151,7 @@
     card.dataset.type = type;
     const inner = document.createElement('div'); inner.className = 'cc-inner';
     const back = document.createElement('div'); back.className = 'cc-face cc-back';
-    const num = isAlienCard(type) ? '\uD83D\uDEF8' + (ALIEN_ORDER.indexOf(type) + 1) : '#' + String(idx + 1).padStart(2, '0');
+    const num = isAlienCard(type) ? '\uD83D\uDEF8' + (ALIEN_ORDER.indexOf(type) + 1) : isRunCard(type) ? '\u267E' + (RUN_CARD_ORDER.indexOf(type) + 1) : '#' + String(idx + 1).padStart(2, '0');
     back.innerHTML = '<span class="cc-num">' + num + '</span><span class="cc-q">?</span><span class="cc-lock">🔒</span>';
     if (isAlienCard(type)) card.classList.add('alien');
     const front = document.createElement('div'); front.className = 'cc-face cc-front';
@@ -9129,7 +9179,7 @@
     if (front.childElementCount) return;
     const meta = PERSONALITY_META[type];
     const art = PERSONALITY_CARD_ART[type];
-    if (isAlienCard(type)){ front.innerHTML = alienCardSvg(type); return; }
+    if (!art && isAlienCard(type)){ front.innerHTML = alienCardSvg(type); return; }   // placeholder
     if (art){
       const img = document.createElement('img');
       img.src = 'images/personality-cards/' + art; img.alt = meta.name; img.decoding = 'async';
@@ -9343,7 +9393,16 @@
       card.addEventListener('click', ()=> onCollectionCardTap(card));
       els.collectionGrid.appendChild(card);
     });
-    // Close Encounters: the rare alien cards, in their own row.
+    // Infinity run cards, then Close Encounters, each in its own row.
+    const runRow = document.getElementById('collectionRun'); runRow.innerHTML = '';
+    RUN_CARD_ORDER.forEach(type=>{
+      const owned = collection.cards[type];
+      const card = makeCollectionCard(type, !!owned && owned.revealed);
+      if (owned && !owned.revealed) pending.push(card);
+      card.addEventListener('click', ()=> onCollectionCardTap(card));
+      runRow.appendChild(card);
+    });
+    document.getElementById('collectionRunCount').textContent = RUN_CARD_ORDER.filter(k=> collection.cards[k]).length + ' / ' + RUN_CARD_ORDER.length;
     const rare = document.getElementById('collectionRare'); rare.innerHTML = '';
     ALIEN_ORDER.forEach(type=>{
       const owned = collection.cards[type];
@@ -9476,7 +9535,7 @@
   function onCollectionCardTap(card){
     if (collectionRevealing) return;
     const type = card.dataset.type, owned = collection.cards[type];
-    if (!owned || !owned.revealed){ showToast(isAlienCard(type) ? '\uD83D\uDEF8 ' + ALIEN_META[type].how : '🔒 Still a mystery — keep playing to discover it'); return; }
+    if (!owned || !owned.revealed){ showToast(isAlienCard(type) ? '\uD83D\uDEF8 A close encounter... keep playing Infinity' : isRunCard(type) ? '\u267E\uFE0F Earned at the end of an Infinity run... keep playing' : '🔒 Still a mystery — keep playing to discover it'); return; }
     const meta = PERSONALITY_META[type];
     els.cardZoomSlot.innerHTML = '';
     els.cardZoomSlot.appendChild(makeCollectionCard(type, true));
@@ -9644,6 +9703,7 @@
     els.collectionGrid.classList.toggle('hidden', badges);
     els.badgeList.classList.toggle('hidden', !badges);
     document.getElementById('collectionRareWrap').classList.toggle('hidden', badges);
+    document.getElementById('collectionRunWrap').classList.toggle('hidden', badges);
     els.colHint.textContent = badges ? 'Badges are earned in Infinity Flips; category badges in either mode.' : 'Each card unlocks from how you play - checked at the end of every Daily Stax run and every Infinity run.';
     const n = badges ? earnedBadgeCount() : collectedCount(), total = badges ? BADGES.length : PERSONALITY_ORDER.length;
     els.collectionCount.textContent = n + ' / ' + total + (badges ? ' earned' : ' collected');
