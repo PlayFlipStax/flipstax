@@ -1056,7 +1056,12 @@
     padding:10px 12px calc(10px + env(safe-area-inset-bottom)); background:linear-gradient(180deg, rgba(28,11,61,0), rgba(28,11,61,0.92) 30%); }
   .fin-vault.shown .vault-buttons .daily-btn{ flex:1 1 0; max-width:150px; padding:10px 8px; font-size:14px; white-space:nowrap; }
   .fin-vault .vr-score b{ font-size:clamp(52px, 15vw, 76px); }
-  .vrp-icon.has-card .cc-card{ width:clamp(96px, calc((100dvh - 500px) * 0.73), 168px); }
+  /* The personality card grows with the screen (to 240px wide), so a tall phone's free space is used and
+     the button bar stays in view without scrolling; when another new card is shown under it as a
+     thumbnail, the big card and the thumbnail both leave room for that. */
+  .vrp-icon.has-card .cc-card{ width:clamp(96px, calc((100dvh - 440px) * 0.73), 240px); }
+  .fin-vault.has-extra .vrp-icon.has-card .cc-card{ width:clamp(84px, calc((100dvh - 600px) * 0.73), 200px); }
+  .fin-vault .ru-cell{ width:clamp(52px, calc((100dvh - 540px) * 0.3), 76px); }
   .fin-vault .vr-personality{ padding:8px 10px; }
   .fin-vault .vrp-name{ font-size:24px; line-height:1.05; }
   .fin-vault .vrp-blurb{ font-size:13px; }
@@ -7097,10 +7102,12 @@
   // unlock section; `reveal` false = already seen (results reopened later).
   function showUnlockCards(wrap, slot, keys, reveal){
     slot.innerHTML = '';
+    // Only cards that can actually be drawn count: the header never shows over an empty slot.
+    keys = keys.filter(k=> collection.cards[k] && PERSONALITY_META[k]);
     wrap.classList.toggle('hidden', !keys.length);
     wrap.querySelector('.readout-new').textContent = keys.length > 1 ? '✨ ' + keys.length + ' NEW CARDS UNLOCKED ✨' : '✨ NEW CARD UNLOCKED ✨';
     keys.forEach((k, i)=>{
-      const owned = collection.cards[k]; if (!owned) return;
+      const owned = collection.cards[k];
       const isNew = reveal && !owned.revealed;
       const cell = document.createElement('div'); cell.className = 'ru-cell';
       const card = makeCollectionCard(k, !isNew);
@@ -8875,7 +8882,10 @@
     else pIcon.textContent = pm.icon;
     document.getElementById('vaultPName').textContent = pm.name;
     document.getElementById('vaultPBlurb').textContent = (a.note || pm.blurb) + (a.alienLine ? ' ' + a.alienLine : '');
-    const newCards = a.cards.concat(a.alien);
+    // The personality card is already shown in full above (with its own NEW!
+    // badge), so it is never repeated under the "new card" header; any other
+    // unlock shows there as a thumbnail.
+    const newCards = a.cards.concat(a.alien).filter(k=> !(showCard && k === a.personality));
     const reveal = !f.vaultSeen;
     const badgesEl = document.getElementById('vaultBadges');
     badgesEl.classList.toggle('hidden', !a.badges.length);
@@ -8883,6 +8893,7 @@
     const showAll = ()=>{
       stage.classList.add('open', 'shown');
       showUnlockCards(document.getElementById('vaultUnlocks'), document.getElementById('vaultCards'), newCards, reveal);
+      stage.classList.toggle('has-extra', !document.getElementById('vaultUnlocks').classList.contains('hidden'));
       countUp(document.getElementById('vaultScore'), a.finalScore, prefersReducedMotion() ? 0 : 900);
       if (!f.vaultSeen){ f.vaultSeen = true; saveInfRun(); }
     };
