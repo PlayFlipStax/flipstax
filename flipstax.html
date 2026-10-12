@@ -752,6 +752,13 @@
     transition: filter 0.6s ease;
   }
   .ir-overlay.hidden{ display:none; }
+  .col-rare{ margin:18px 0 6px; padding:12px 8px 4px; border-radius:18px; background:linear-gradient(180deg, rgba(91,43,184,0.35), rgba(14,6,48,0.25)); box-shadow:inset 0 0 0 1.5px rgba(255,210,63,0.45); }
+  .col-rare-title{ font-size:13px; font-weight:900; letter-spacing:2px; color:#ffd23f; text-align:center; }
+  .col-rare-title span{ color:#fff3c4; letter-spacing:0.5px; margin-left:4px; }
+  .col-rare-sub{ font-size:11.5px; font-weight:600; color:rgba(255,255,255,0.7); text-align:center; margin:2px 0 10px; }
+  .col-rare.hidden{ display:none; }
+  .cc-card.alien .cc-back{ background:radial-gradient(circle at 50% 35%, #5b2bb8, #1c0b3d); box-shadow:inset 0 0 0 3px #ffd23f; }
+  .alien-card-art{ width:100%; height:100%; display:block; }
   /* Guess the Crowd: a signal scanner on a deep-space panel, gold accents. */
   .guess-overlay{ position:fixed; inset:0; z-index:62; display:flex; align-items:center; justify-content:center; overflow:auto;
     padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); text-align:center; color:#fff; font-family:'Inter', system-ui, sans-serif;
@@ -2696,6 +2703,11 @@
   </div>
   <div class="col-scroll" id="collectionScroll">
     <div class="col-grid" id="collectionGrid"></div>
+    <div class="col-rare" id="collectionRareWrap">
+      <div class="col-rare-title">\uD83D\uDEF8 CLOSE ENCOUNTERS <span id="collectionRareCount"></span></div>
+      <div class="col-rare-sub">Rare cards from Infinity runs \u2014 extras, not part of the 16.</div>
+      <div class="col-grid col-rare-grid" id="collectionRare"></div>
+    </div>
     <div class="bd-list hidden" id="badgeList"></div>
     <div class="col-hint" id="colHint">Each card unlocks from how you play.</div>
   </div>
@@ -9183,6 +9195,16 @@
       card.addEventListener('click', ()=> onCollectionCardTap(card));
       els.collectionGrid.appendChild(card);
     });
+    // Close Encounters: the rare alien cards, in their own row.
+    const rare = document.getElementById('collectionRare'); rare.innerHTML = '';
+    ALIEN_ORDER.forEach(type=>{
+      const owned = collection.cards[type];
+      const card = makeCollectionCard(type, !!owned && owned.revealed);
+      if (owned && !owned.revealed) pending.push(card);
+      card.addEventListener('click', ()=> onCollectionCardTap(card));
+      rare.appendChild(card);
+    });
+    document.getElementById('collectionRareCount').textContent = ALIEN_ORDER.filter(k=> collection.cards[k]).length + ' / ' + ALIEN_ORDER.length;
     els.collectionScroll.scrollTop = 0;
     els.collectionOverlay.classList.toggle('master', isMasterCollector());
     document.getElementById('colMaster').classList.toggle('hidden', !isMasterCollector());
@@ -9306,12 +9328,12 @@
   function onCollectionCardTap(card){
     if (collectionRevealing) return;
     const type = card.dataset.type, owned = collection.cards[type];
-    if (!owned || !owned.revealed){ showToast('🔒 Still a mystery — keep playing to discover it'); return; }
+    if (!owned || !owned.revealed){ showToast(isAlienCard(type) ? '\uD83D\uDEF8 ' + ALIEN_META[type].how : '🔒 Still a mystery — keep playing to discover it'); return; }
     const meta = PERSONALITY_META[type];
     els.cardZoomSlot.innerHTML = '';
     els.cardZoomSlot.appendChild(makeCollectionCard(type, true));
     els.cardZoomName.textContent = meta.icon + ' ' + meta.name;
-    els.cardZoomMeta.textContent = (UNLOCK_RULES[type] ? UNLOCK_RULES[type].how : meta.blurb) + '\nUnlocked ' + owned.first;
+    els.cardZoomMeta.textContent = (UNLOCK_RULES[type] ? UNLOCK_RULES[type].how : meta.blurb) + '\nUnlocked ' + owned.first + (owned.count > 1 ? ' \u00B7 \u00D7' + owned.count : '');
     els.cardZoomMeta.style.whiteSpace = 'pre-line';
     els.cardZoom.classList.remove('hidden');
   }
@@ -9473,7 +9495,8 @@
     els.colTabs.forEach(t=> t.classList.toggle('active', t.dataset.tab === tab));
     els.collectionGrid.classList.toggle('hidden', badges);
     els.badgeList.classList.toggle('hidden', !badges);
-    els.colHint.textContent = badges ? 'Badges are earned in Infinity Flips; category badges in either mode.' : 'Each card unlocks from how you play - checked at the end of every Daily Stax run and every 50 votes in Infinity Flips.';
+    document.getElementById('collectionRareWrap').classList.toggle('hidden', badges);
+    els.colHint.textContent = badges ? 'Badges are earned in Infinity Flips; category badges in either mode.' : 'Each card unlocks from how you play - checked at the end of every Daily Stax run and every Infinity run.';
     const n = badges ? earnedBadgeCount() : collectedCount(), total = badges ? BADGES.length : PERSONALITY_ORDER.length;
     els.collectionCount.textContent = n + ' / ' + total + (badges ? ' earned' : ' collected');
     els.collectionBar.style.width = (100 * n / total) + '%';
@@ -10705,7 +10728,8 @@
       b.decisionMs += Math.max(0, votedSinceTime - roundStartedAt);
       b.maxCombo = Math.max(b.maxCombo, comboCount);
       if (current.category === 'wild') b.wildCat++;
-      if (b.votes === Math.floor(INF_AWARD_VOTES / 2)) b.firstHalfPoints = b.points;
+      // The run's first half: 125 points or 5 minutes, whichever comes first.
+      if (b.firstHalfPoints == null && infRun && (infRun.score >= INF_RUN_TARGET / 2 || infRun.clockMs >= INF_RUN_CLOCK_MS / 2)) b.firstHalfPoints = b.points;
       saveInfBlock(); renderRunBanner();
       badgesOnInfinityVote(cv.counted ? cv.withCrowd : null, votedSinceTime - roundStartedAt);
     }
@@ -11355,7 +11379,9 @@
   // can't break the game; in that case it still shows only once per mode per
   // page load (howtoSeenThisPage). Daily's run clock only starts after it
   // closes (see startDailyRun's gate), and the pause screen reopens it.
-  const HOWTO_KEYS = { daily:'flipstax_howto_daily_v2', infinity:'flipstax_howto_infinity_v2' };
+  // Infinity's walkthrough moved to v3 with the run finale (Oct 2026), so returning
+  // players see the new one once; Daily's is unchanged.
+  const HOWTO_KEYS = { daily:'flipstax_howto_daily_v2', infinity:'flipstax_howto_infinity_v3' };
   const howtoSeenThisPage = { daily:false, infinity:false };
   function hasSeenHowTo(mode){
     if (howtoSeenThisPage[mode]) return true;
@@ -11380,8 +11406,20 @@
   // INF_AWARD_VOTES votes), its collectible card (16 in all) and the badges.
   const HOWTO_LAST_DAILY = { icon:'✨', lead:'At the end of your run, your picks reveal your personality.',
     lines:['And somewhere in there... can you find the Super Secret Riddle?', 'Cards are personality types you unlock by how you play. Badges are earned for finishing categories.'] };
-  const HOWTO_LAST_INFINITY = { icon:'🃏', lead:'The more you play, the more you unlock.',
-    lines:['Your personality type, revealed every 50 votes.', 'Cards: 16 personality types, each unlocked by how you play.', 'Badges: earned for streaks, trivia and finishing categories.'] };
+  // Infinity's screens 2-3 (v3): the run's finish line, keys and power-ups,
+  // then the new round types and the Vault finale. Numbers from the code:
+  // INF_RUN_TARGET / INF_RUN_CLOCK_MS, INF_MATCHES_PER_KEY, POWERUPS,
+  // INF_SWING_CAP, GUESS_SCORING, INF_RIDDLE_POINTS, the Plinko chips.
+  const HOWTO_RUN_INFINITY = { icon:'🏁', lead:'Race to 250 points — you have 10 minutes.',
+    lines:['The bar up top fills toward 250, and the clock shows your time left (it only runs while you’re voting).',
+      'Earn 🔑 keys: match the crowd 3 times in a row, or nail a trivia question or a riddle.'],
+    chipsLabel:'Power-ups — pick one when they drop',
+    chips:[ ['⚡ +10 Points', 'Instant points'], ['🐌 Slow-Mo', '+3s on your next 3 rounds'], ['🪙 Coin Flip', '50/50: win or lose up to 15'],
+            ['🎁 Wild Card', '50/50: +15 or −15 points'], ['🔑 Golden Key', 'An extra key'] ] };
+  const HOWTO_LAST_INFINITY = { icon:'🛸', lead:'New rounds, then the Vault.',
+    lines:['📡 Guess the Crowd: slide to the % you think picked the left card. The closer, the more points.',
+      '🧩 Riddle rounds: pick the answer. Right = +20 and a key, a miss costs nothing.',
+      '🔐 Finish the run, drop a gold chip for each key, then open the Vault: your score, personality, cards and badges.'] };
   const HOWTO_SCREENS = {
     daily: [
       HOWTO_PICK,
@@ -11394,11 +11432,7 @@
     ],
     infinity: [
       HOWTO_PICK,
-      { icon:'🏁', lead:'Every pick earns points.',
-        lines:['Race to 250 points.', 'Trivia pops up: right answer +25, a miss costs nothing.'],
-        chipsLabel:'Power-ups — pick one when they drop',
-        chips:[ ['⚡ +10 Points', 'Instant points'], ['🐌 Slow-Mo', '+3 seconds on your next 3 rounds'],
-                ['🪙 Coin Flip', '50/50: gain or lose half your points'], ['🎁 Wild Card', '50/50: +25 or −25 points'] ] },
+      HOWTO_RUN_INFINITY,
       HOWTO_LAST_INFINITY,
     ],
   };
@@ -11475,7 +11509,7 @@
     // deal a fresh round.
     if (sessionHalted){ sessionHalted = false; voted = false; votedSinceTime = null; loadNext(); }
     // First time in Infinity Flips: the walkthrough. (No timer to hold here -
-    // Infinity has no run clock, and rounds that expire behind it cost nothing
+    // Infinity's run clock is stopped while it's open, and rounds that expire behind it cost nothing
     // because isOnVsScreen() is false while it's open.)
     if (!hasSeenHowTo('infinity')) openHowTo('infinity');
   });
