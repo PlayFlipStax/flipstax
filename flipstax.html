@@ -3858,6 +3858,22 @@
   // (which dominate real wall-clock time far more than the round timers
   // themselves) by the same debug factor.
   function dt(ms){ return ms / DEBUG_TIME_SCALE; }
+  // Round pacing on the VS cards. The pick timer is how long a player has to
+  // choose before "Too slow" fires; the reveal is how long the percentages
+  // and "Your pick" stay up (counted from when they appear - they count up
+  // over the first 550ms) before the next matchup is dealt.
+  // Oct 2026: a tester found Infinity's cards too fast, so its pick timer
+  // got 1.5s more (5s -> 6.5s; Points Zone rounds 3s -> 4.5s). Daily is
+  // unchanged: its 6:00 voting clock is fixed, so the pick timer only
+  // changes how many cards fit, not how long the run takes.
+  const DAILY_PICK_MS = 5000;
+  const INF_PICK_MS = 6500;
+  const INF_ZONE_PICK_MS = 4500;              // Infinity's 2x Points Zone rounds
+  const SLOWMO_EXTRA_MS = 3000, SLOWMO_ROUNDS = 3;   // Infinity's Slow-Mo power-up
+  const PLUS5_EXTRA_MS = 5000;                // the +5s button (3 charges a day, both modes)
+  const REVEAL_MS = 1650;                     // both modes
+  const TOO_SLOW_NEXT_MS = 900;               // after a "Too slow", before the next matchup
+  const TOO_SLOW_PENALTY = 1, DAILY_TOO_SLOW_STAR_PENALTY = 3;   // (Infinity star cards: INF_STAR_POINTS)
   // Timing restructure: 6min voting/trivia phase + 75s fixed solve phase
   // (7:15 baseline; +45s if the riddle fires, 8:00 total). Thresholds
   // re-tuned lower than the old 300-point ceiling so a realistically-paced
@@ -10674,7 +10690,7 @@
       fitTopChip(); return;
     }
     els.slowdownBtn.classList.remove('hidden');
-    els.slowdownBtn.textContent = '\u23F1\uFE0F +5s (' + stats.slowdownCharges + ')';
+    els.slowdownBtn.textContent = '\u23F1\uFE0F +' + PLUS5_EXTRA_MS / 1000 + 's (' + stats.slowdownCharges + ')';
     els.slowdownBtn.classList.toggle('disabled', stats.slowdownCharges <= 0);
     fitTopChip();
   }
@@ -10686,7 +10702,7 @@
     const currentWidthPx = parseFloat(getComputedStyle(els.roundTimerFill).width) || 0;
     const currentPct = trackWidth ? (currentWidthPx / trackWidth * 100) : 0;
     const elapsed = Date.now() - roundStartedAt;
-    const remaining = Math.max(0, roundDurationMs - elapsed) + 5000;
+    const remaining = Math.max(0, roundDurationMs - elapsed) + PLUS5_EXTRA_MS;
     roundDurationMs = elapsed + remaining;
     clearTimeout(roundTimeoutId);
     roundTimeoutId = setTimeout(onRoundTimeout, remaining);
@@ -10697,7 +10713,7 @@
       els.roundTimerFill.style.width = '0%';
     });
     sfx.powerUp();
-    showToast('\u23F1\uFE0F +5 seconds', true);
+    showToast('\u23F1\uFE0F +' + PLUS5_EXTRA_MS / 1000 + ' seconds', true);
     renderSlowdownBtn();
   }
   els.slowdownBtn.addEventListener('click', addSlowdownTime);
@@ -10712,11 +10728,11 @@
     // used to drain the run's score before anyone had played.
     const inRound = runActive || (inInfinity() && isOnVsScreen());
     if (inRound){
-      const penalty = current.bonusPoints ? (runActive ? 3 : INF_STAR_POINTS) : 1;
+      const penalty = current.bonusPoints ? (runActive ? DAILY_TOO_SLOW_STAR_PENALTY : INF_STAR_POINTS) : TOO_SLOW_PENALTY;
       if (runActive) addRunScore(-penalty); else addRacePoints(-penalty);
       showToast('\u23F1\uFE0F Too slow \u2014 \u2212' + penalty + ' point' + (penalty>1?'s':''), true);
     }
-    scheduleNext(dt(900));
+    scheduleNext(dt(TOO_SLOW_NEXT_MS));
   }
 
   // The pause button only makes sense on the base VS/comparison screen - not
@@ -11056,8 +11072,8 @@
     renderUnvoted();
     voted = false;
     votedSinceTime = null;
-    let roundMs = bonusActive ? 3000 : 5000;
-    if (slowMoRoundsLeft > 0){ roundMs += 3000; slowMoRoundsLeft--; }
+    let roundMs = !inInfinity() ? DAILY_PICK_MS : bonusActive ? INF_ZONE_PICK_MS : INF_PICK_MS;
+    if (slowMoRoundsLeft > 0){ roundMs += SLOWMO_EXTRA_MS; slowMoRoundsLeft--; }
     startRoundTimer(roundMs / DEBUG_TIME_SCALE);
     maybeRequestMoreWild();
     queueLayoutBoard();
@@ -11389,7 +11405,7 @@
     recordFlip(current.category);
     updateVibeMeter();
 
-    scheduleNext(dt(1650));
+    scheduleNext(dt(REVEAL_MS));
   }
 
   function tapFeedback(chosen, other){
@@ -11519,8 +11535,8 @@
       finishPowerUp();
     } else if (key === 'slowmo'){
       sfx.powerUp();
-      slowMoRoundsLeft = 3;
-      els.eventPrompt.textContent = '\uD83D\uDC0C SLOW-MO for your next 3 rounds';
+      slowMoRoundsLeft = SLOWMO_ROUNDS;
+      els.eventPrompt.textContent = '\uD83D\uDC0C SLOW-MO: +' + SLOWMO_EXTRA_MS / 1000 + 's on your next ' + SLOWMO_ROUNDS + ' rounds';
       finishPowerUp();
     } else if (key === 'coinflip'){
       runCoinFlip();
@@ -12082,7 +12098,7 @@
     lines:['The bar up top fills toward ' + FINISH_POINTS + ', and the clock shows your time left (it only runs while you’re voting).',
       'Earn 🔑 keys: match the crowd 3 times in a row, or nail a trivia question or a riddle.'],
     chipsLabel:'Power-ups — pick one when they drop',
-    chips:[ ['⚡ +10 Points', 'Instant points'], ['🐌 Slow-Mo', '+3s on your next 3 rounds'], ['🪙 Coin Flip', 'Heads or tails: win or lose up to 15'],
+    chips:[ ['⚡ +10 Points', 'Instant points'], ['🐌 Slow-Mo', '+' + SLOWMO_EXTRA_MS / 1000 + 's on your next ' + SLOWMO_ROUNDS + ' rounds'], ['🪙 Coin Flip', 'Heads or tails: win or lose up to 15'],
             ['🎁 Wild Card', 'A mystery prize — never a loss'], ['🔑 Golden Key', 'An extra key'] ] };
   const HOWTO_LAST_INFINITY = { icon:'🛸', lead:'New rounds, then the Vault.',
     lines:['📡 Guess the Crowd: slide to the % you think picked the left card. The closer, the more points.',
