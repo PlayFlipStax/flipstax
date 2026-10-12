@@ -752,6 +752,42 @@
     transition: filter 0.6s ease;
   }
   .ir-overlay.hidden{ display:none; }
+  /* The alien layer: the Mystery Visitor (riddle host), its transmission
+     intro, the tappable UFO and the abduction beam. Decorative parts never
+     take taps; the tappable UFO is the only one that does, and only itself. */
+  .ir-host{ display:flex; align-items:center; gap:10px; margin:-4px 0 6px; text-align:left; }
+  .ir-host-art{ flex:0 0 auto; width:62px; height:62px; filter:drop-shadow(0 0 10px rgba(201,255,122,0.65)); animation: hostBob 2.4s ease-in-out infinite alternate; }
+  .ir-host-art svg{ width:100%; height:100%; display:block; overflow:visible; }
+  .ir-host-say{ flex:1; position:relative; padding:8px 12px; border-radius:14px; background:rgba(255,255,255,0.92); color:#2a1166; font-size:13px; font-weight:800; line-height:1.3; }
+  .ir-host-say::before{ content:''; position:absolute; left:-7px; top:50%; margin-top:-7px; border:7px solid transparent; border-right-color:rgba(255,255,255,0.92); border-left:0; }
+  .ir-overlay:not(.intro) .ir-host{ animation: hostIn 0.5s cubic-bezier(.3,1.6,.5,1) both; }
+  @keyframes hostIn{ from{ opacity:0; transform:translateY(-10px) scale(0.8); } to{ opacity:1; transform:none; } }
+  @keyframes hostBob{ from{ transform:translateY(0) rotate(-3deg); } to{ transform:translateY(-4px) rotate(3deg); } }
+  .ir-transmission{ position:absolute; inset:0; z-index:6; display:none; align-items:center; justify-content:center; pointer-events:none; }
+  .ir-overlay.intro .ir-transmission{ display:flex; }
+  .ir-overlay.intro .ir-panel{ visibility:hidden; }
+  .irt-static{ position:absolute; inset:0; opacity:0.55; mix-blend-mode:screen;
+    background:repeating-linear-gradient(0deg, rgba(255,255,255,0.18) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(201,255,122,0.10) 0 2px, transparent 2px 5px);
+    animation: irtStatic 0.12s steps(3) infinite; }
+  @keyframes irtStatic{ 0%{ transform:translate(0,0); } 33%{ transform:translate(-6px,3px); } 66%{ transform:translate(5px,-4px); } 100%{ transform:translate(0,0); } }
+  .irt-text{ position:relative; display:flex; flex-direction:column; align-items:center; gap:6px; font-family:'Big Shoulders Display', sans-serif; font-weight:900; color:#eaffc9;
+    letter-spacing:3px; text-shadow:2px 0 #ff3cac, -2px 0 #19e0ff, 0 0 18px rgba(201,255,122,0.9); animation: irtGlitch 0.4s steps(2) infinite; }
+  .irt-text span{ font-size:clamp(22px, 6.6vw, 38px); letter-spacing:2px; text-align:center; max-width:calc(100vw - 40px); } .irt-text b{ font-size:18px; letter-spacing:8px; animation: irtDots 0.9s steps(3) infinite; }
+  @keyframes irtGlitch{ 0%{ transform:skewX(0) translateX(0); } 50%{ transform:skewX(-8deg) translateX(3px); } 100%{ transform:skewX(4deg) translateX(-2px); } }
+  @keyframes irtDots{ 0%{ opacity:0.3; } 50%{ opacity:1; } 100%{ opacity:0.3; } }
+  .tap-ufo{ position:fixed; left:0; z-index:12; width:52px; height:44px; padding:0; border:0; background:none; cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent;
+    filter:sepia(0.6) saturate(3) hue-rotate(-10deg) drop-shadow(0 0 10px rgba(255,214,90,0.95)); }
+  .tap-ufo span{ display:inline-block; font-size:34px; line-height:44px; animation: ufoWobble 0.7s ease-in-out infinite alternate; }
+  .tap-ufo.caught span{ animation: ufoCaught 0.6s ease-out both; }
+  @keyframes ufoCaught{ 0%{ transform:scale(1); } 40%{ transform:scale(1.6) rotate(20deg); filter:brightness(2); } 100%{ transform:scale(0) rotate(180deg); opacity:0; } }
+  .tap-ufo-pop{ position:fixed; z-index:13; pointer-events:none; white-space:nowrap; font-weight:900; font-size:15px; color:#3a2200; padding:4px 10px; border-radius:99px;
+    background:linear-gradient(180deg,#fff2a8,#ffc928); box-shadow:0 0 14px rgba(255,200,40,0.9); animation: ufoPop 1.2s ease-out both; }
+  @keyframes ufoPop{ 0%{ opacity:0; transform:translateY(0) scale(0.6); } 20%{ opacity:1; transform:translateY(-10px) scale(1.1); } 100%{ opacity:0; transform:translateY(-40px) scale(1); } }
+  .riddle-ufo.abduct-ufo{ position:fixed; z-index:11; font-size:42px; pointer-events:none !important; }
+  .riddle-ufo.abduct-ufo i{ width:150px; height:120px; top:70%; background:linear-gradient(to bottom, rgba(255,240,170,0.75), rgba(255,240,170,0)); }
+  .riddle-ufo.abduct-ufo.go{ display:block; animation: abductIn 1.9s ease-in-out both; }
+  @keyframes abductIn{ 0%{ opacity:0; transform:translateY(-40px) scale(0.6); } 20%{ opacity:1; transform:none; } 80%{ opacity:1; transform:none; } 100%{ opacity:0; transform:translate(80px,-40px) scale(0.6); } }
+  @media (prefers-reduced-motion: reduce){ .ir-host-art, .ir-overlay:not(.intro) .ir-host, .irt-static, .irt-text, .irt-text b, .tap-ufo span{ animation:none !important; } .tap-ufo, .abduct-ufo{ display:none !important; } }
   .col-rare{ margin:18px 0 6px; padding:12px 8px 4px; border-radius:18px; background:linear-gradient(180deg, rgba(91,43,184,0.35), rgba(14,6,48,0.25)); box-shadow:inset 0 0 0 1.5px rgba(255,210,63,0.45); }
   .col-rare-title{ font-size:13px; font-weight:900; letter-spacing:2px; color:#ffd23f; text-align:center; }
   .col-rare-title span{ color:#fff3c4; letter-spacing:0.5px; margin-left:4px; }
@@ -2704,8 +2740,8 @@
   <div class="col-scroll" id="collectionScroll">
     <div class="col-grid" id="collectionGrid"></div>
     <div class="col-rare" id="collectionRareWrap">
-      <div class="col-rare-title">\uD83D\uDEF8 CLOSE ENCOUNTERS <span id="collectionRareCount"></span></div>
-      <div class="col-rare-sub">Rare cards from Infinity runs \u2014 extras, not part of the 16.</div>
+      <div class="col-rare-title">🛸 CLOSE ENCOUNTERS <span id="collectionRareCount"></span></div>
+      <div class="col-rare-sub">Rare cards from Infinity runs — extras, not part of the 16.</div>
       <div class="col-grid col-rare-grid" id="collectionRare"></div>
     </div>
     <div class="bd-list hidden" id="badgeList"></div>
@@ -6739,6 +6775,7 @@
     // same way as before (10 votes on Wild Card-category cards, either mode)
     // and its state lives in stats.badges.wild.
     { id:'weird_one',    icon:'🌀', name:'Weird One',      desc:'Voted on 10 Wild Card matchups' },
+    { id:'first_contact',icon:'👽', name:'First Contact',  desc:'Tapped 3 passing UFOs in one Infinity run' },
   ];
   const BADGE_KEY = 'flipstax_badges_v1';
   function loadBadges(){
@@ -8382,9 +8419,125 @@
     renderCollectionBtn();
     return f.award;
   }
-  // (Phase 5: the alien layer's extra unlocks and personality lines.)
-  function closeEncounterUnlocks(){ return []; }
-  function alienPersonalityLine(type){ return null; }
+  // ---------- the alien layer (Infinity) ----------
+  // 1. The Mystery Visitor hosts the riddle rounds: a "transmission incoming"
+  //    static burst, then the visitor pops in beside the question.
+  // 2. A rare tappable UFO crosses the strip just above the cards: +5 points
+  //    or a key (at random), at most 3 a run; 3 in a run = First Contact.
+  // 3. Five crowd matches in a row: the tractor beam lifts the card stack
+  //    a little and sets it back down (decorative - voting carries on).
+  // Reduced motion: no static, no flying UFO, no lift.
+  const RIDDLE_INTRO_MS = 1300;
+  const VISITOR_LINES = ['Greetings, Earthling. Solve this:', 'Incoming riddle from the outer rim:', 'My crew is stumped. Help us out:', 'Translate this signal, Earthling:', 'A puzzle from three galaxies over:'];
+  function riddleIntro(){
+    const ov = els.irOverlay;
+    let host = ov.querySelector('.ir-host');
+    if (!host){
+      host = document.createElement('div'); host.className = 'ir-host';
+      host.innerHTML = '<div class="ir-host-art">' + visitorSvg() + '</div><div class="ir-host-say"></div>';
+      const panel = document.getElementById('irPanel'); panel.insertBefore(host, panel.firstChild);
+      const tx = document.createElement('div'); tx.className = 'ir-transmission'; tx.setAttribute('aria-hidden', 'true');
+      tx.innerHTML = '<div class="irt-static"></div><div class="irt-text"><span>📡 TRANSMISSION INCOMING</span><b>● ● ●</b></div>';
+      ov.appendChild(tx);
+    }
+    host.querySelector('.ir-host-say').textContent = pick(VISITOR_LINES);
+    if (prefersReducedMotion()) return 0;
+    ov.classList.add('intro');
+    playTone(140, 0, 0.5, 'sawtooth', 0.025); playTone(1800, 0.15, 0.08, 'square', 0.02); playTone(2400, 0.45, 0.06, 'square', 0.02);
+    return RIDDLE_INTRO_MS;
+  }
+  // --- the tappable UFO
+  const UFO_ROUND_GAP = [12, 18];   // about one every 15 rounds
+  const UFO_MAX_REWARDS = 3;
+  let tapUfoEl = null, tapUfoTimer = null;
+  function maybeScheduleTapUfo(){
+    if (!infRun || infRun.ended || infRun.ufoRewards >= UFO_MAX_REWARDS || prefersReducedMotion()) return;
+    if (infRun.voteRounds < infRun.nextUfoAt) return;
+    infRun.nextUfoAt = infRun.voteRounds + UFO_ROUND_GAP[0] + Math.floor(Math.random() * (UFO_ROUND_GAP[1] - UFO_ROUND_GAP[0] + 1)); saveInfRun();
+    const seq = roundSeq;
+    clearTimeout(tapUfoTimer);
+    // Never in a round's first 600ms.
+    tapUfoTimer = setTimeout(()=>{ if (roundSeq === seq) spawnTapUfo(); }, 700 + Math.random() * 900);
+  }
+  function spawnTapUfo(force){
+    if (tapUfoEl) return false;
+    if (!force && (!infRunLive() || !isOnVsScreen() || isPaused || document.hidden || infRun.ufoRewards >= UFO_MAX_REWARDS)) return false;
+    // Only in the strip above the cards (the wordmark row): skip when a
+    // small screen leaves too little room there.
+    const top = els.halfA.getBoundingClientRect().top, pill = els.runBanner.getBoundingClientRect().bottom;
+    const y = top - 26;
+    if (top < 120 || y - 20 < pill + 6) return false;
+    const el = document.createElement('button');
+    el.type = 'button'; el.className = 'tap-ufo'; el.setAttribute('aria-label', 'A passing UFO - tap it!');
+    el.innerHTML = '<span>🛸</span>';
+    el.style.top = (y - 22) + 'px';
+    document.body.appendChild(el);
+    const W = innerWidth, dir = Math.random() < 0.5 ? 1 : -1, x0 = dir > 0 ? -60 : W + 10, x1 = dir > 0 ? W + 10 : -60;
+    const anim = el.animate([{ transform:'translateX(' + x0 + 'px) translateY(0)' }, { transform:'translateX(' + ((x0 + x1) / 2) + 'px) translateY(-6px)' }, { transform:'translateX(' + x1 + 'px) translateY(0)' }],
+      { duration: 4000, easing:'linear', fill:'forwards' });
+    tapUfoEl = el;
+    const done = ()=>{ if (tapUfoEl === el) tapUfoEl = null; el.remove(); };
+    anim.finished.then(done, done);
+    const tap = e=>{
+      e.preventDefault(); e.stopPropagation();
+      if (el.classList.contains('caught')) return;
+      el.classList.add('caught'); try{ anim.pause(); }catch(err){}
+      catchTapUfo(el);
+      setTimeout(done, 700);
+    };
+    el.addEventListener('pointerdown', tap);
+    el.addEventListener('click', e=>{ e.preventDefault(); e.stopPropagation(); });
+    // Hide it (not caught) the moment the board gives way to anything else.
+    const watch = setInterval(()=>{ if (!document.body.contains(el)){ clearInterval(watch); return; } if (!isOnVsScreen() || isPaused){ clearInterval(watch); try{ anim.cancel(); }catch(err){} } }, 150);
+    return true;
+  }
+  function catchTapUfo(el){
+    if (!infRun || infRun.ended) return;
+    infRun.ufoTaps = (infRun.ufoTaps || 0) + 1;
+    infRun.ufoRewards = (infRun.ufoRewards || 0) + 1;
+    const key = Math.random() < 0.5 && infRun.keys < INF_KEY_CAP;
+    let label;
+    if (key && addInfKey('ufo')) label = '🔑 +1 key';
+    else { addRacePoints(5); label = '+5 points'; }
+    saveInfRun();
+    sfx.ufoTap();
+    const pop = document.createElement('div'); pop.className = 'tap-ufo-pop'; pop.textContent = label;
+    pop.style.left = el.getBoundingClientRect().left + 'px'; pop.style.top = el.getBoundingClientRect().top + 'px';
+    document.body.appendChild(pop); setTimeout(()=> pop.remove(), 1200);
+    if (infRun.ufoTaps >= 3){ awardBadge('first_contact'); showToast('👽 First Contact! 3 UFOs this run'); }
+  }
+  // --- abduction streak: lift the card stack and set it back
+  function abductStack(){
+    if (prefersReducedMotion() || !inInfinity()) return;
+    const board = els.board; if (!board || typeof board.animate !== 'function') return;
+    let u = document.getElementById('abductUfo');
+    if (!u){ u = document.createElement('div'); u.id = 'abductUfo'; u.className = 'riddle-ufo abduct-ufo'; u.setAttribute('aria-hidden', 'true'); u.innerHTML = '<span>🛸</span><i></i>'; document.body.appendChild(u); }
+    const r = els.halfA.getBoundingClientRect();
+    u.style.left = (r.left + r.width / 2 - 26) + 'px'; u.style.top = Math.max(4, r.top - 54) + 'px';
+    u.classList.remove('go'); void u.offsetWidth; u.classList.add('go');
+    board.animate([{ transform:'none' }, { transform:'translateY(-14px) scale(0.985)', offset:0.35 }, { transform:'translateY(-14px) scale(0.985)', offset:0.6 }, { transform:'none' }],
+      { duration: 1800, easing:'cubic-bezier(.4,0,.2,1)' });
+    playTone(220, 0, 0.6, 'sine', 0.03); playTone(330, 0.1, 0.6, 'sine', 0.03);
+    showToast('🛸 5 crowd matches in a row — the Mothership noticed!');
+    setTimeout(()=> u.classList.remove('go'), 2000);
+  }
+  // --- Close Encounters unlocks and alien personality lines (finale only)
+  function closeEncounterUnlocks(){
+    const out = [];
+    if ((infRun.ufoTaps || 0) >= 3) out.push('first_contact');
+    if ((infRun.riddles || 0) >= 3 && infRun.riddlesRight === infRun.riddles) out.push('riddle_master');
+    if (infRun.perfectGuess) out.push('perfect_signal');
+    return out;
+  }
+  const ALIEN_PERSONALITY_LINES = {
+    contrarian: '👽 Cosmic Contrarian: even the Mothership couldn’t predict your picks.',
+    crowd_pleaser: '🛸 Abduction Magnet: if the aliens beam up one voice for Earth, it’s yours.',
+    chaos_agent: '🌌 Signal Scrambler: your picks jammed every scanner in orbit.',
+    fence_sitter: '🪐 Orbit Balancer: perfectly poised between two planets.',
+    overthinker: '📡 Deep-Space Listener: you wait for the whole transmission before you answer.',
+    trivia_titan: '☄️ Lone Comet: blazing your own trail across the sky.',
+  };
+  function alienPersonalityLine(type){ return ALIEN_PERSONALITY_LINES[type] || null; }
   let vaultTimers = [];
   function renderVault(){
     const f = infRun.finale, a = finaleAward();
@@ -8587,6 +8740,7 @@
     res.querySelector('.gr-verdict').textContent = '';
     res.classList.remove('hidden'); ov.classList.add('revealed');
     const off = Math.abs(guess - truth), sc = guessScore(off);
+    if (off === 0 && infRun && !infRun.finale){ infRun.perfectGuess = true; saveInfRun(); }
     const finish = ()=>{
       real.textContent = truth + '%';
       if (sc.pts) addRacePoints(sc.pts);
@@ -8621,9 +8775,6 @@
     }
     return maybeGuessRound();
   }
-  // A 5-in-a-row crowd-match streak: the tractor beam lifts the card stack
-  // (Phase 5 - the alien layer). Decorative only.
-  function abductStack(){}
   // The 250ms tap shield after any overlay closes: vote() ignores taps for
   // this long, so a double tap on a closing button can't vote by accident.
   const TAP_SHIELD_MS = 250;
@@ -8882,9 +9033,6 @@
     }, introMs);
     return true;
   }
-  // (The host and the static intro are Phase 5's; until then the question
-  // simply appears.)
-  function riddleIntro(){ return 0; }
   function tickInfRiddle(){
     const remain = Math.max(0, infRiddleEndsAt - Date.now());
     const sec = Math.ceil(remain / 1000);
@@ -10386,7 +10534,7 @@
     if (deckNow.next >= deckNow.cards.length) resetDeck();
     current = deckNow.cards[deckNow.next++];
     roundSeq++;
-    if (inInfinity() && infRun && !infRun.ended){ infRun.voteRounds++; infRun.sinceGuess++; saveInfRun(); }
+    if (inInfinity() && infRun && !infRun.ended){ infRun.voteRounds++; infRun.sinceGuess++; saveInfRun(); maybeScheduleTapUfo(); }
     current.bonusPoints = Math.random() < 0.2;
     rampOnRound();
 
@@ -11120,6 +11268,8 @@
       getDailySky: () => ({ sunP: dailySunP, busy: dailyUfoBusy, nextInMs: dailyUfoNext - Date.now(), ticking: !!dailySkyTimer, live: dailySkyLive() }),
       slug: (t) => slugify(t),
       getInfRun: () => infRun,
+      spawnTapUfo: (force) => spawnTapUfo(force),
+      abductStack: () => abductStack(),
       startGuess: (name) => { const c = name ? CARD_POOLS[contentPoolKey()].find(x=> x.a === name || x.b === name) : upcomingCards(12).find(guessCounts); return c ? startGuessRound(c) : 'no qualifying card'; },
       startGuessMock: (ca, cb) => { const c = upcomingCards(1)[0]; tallyCache.set(slugify(c.a), ca); tallyCache.set(slugify(c.b), cb); return startGuessRound(c); },
       guessState: () => ({ state: guessState, prep: guessPrep && guessPrep.status, inDom: els.guessOverlay.textContent }),
