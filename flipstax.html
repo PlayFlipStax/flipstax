@@ -896,6 +896,8 @@
   .gr-mark{ position:absolute; top:-8px; width:4px; height:38px; margin-left:-2px; border-radius:2px; background:#7df9ff; box-shadow:0 0 8px #7df9ff; }
   .gr-mark span{ position:absolute; top:40px; left:50%; transform:translateX(-50%); font-size:10px; font-weight:900; letter-spacing:1px; color:#7df9ff; text-transform:uppercase; }
   .gr-verdict{ margin-top:12px; font-size:15px; font-weight:800; color:#fff6c2; min-height:20px; }
+  .gr-skip{ margin-top:6px; font-size:12px; font-weight:700; letter-spacing:0.5px; color:rgba(255,246,194,0.6); }
+  .guess-overlay.revealed{ cursor:pointer; }
   @media (prefers-reduced-motion: reduce){ .guess-inner{ animation:none; } .gd-sweep{ display:none; } .guess-dial .gd-needle{ transition:none; } }
   /* Riddle round answers: four gold tiles (multiple choice). */
   .ir-opts{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:4px; }
@@ -9137,13 +9139,14 @@
       '<div class="fin-buttons guess-lock-row"><div class="daily-btn primary guess-lock" role="button" tabindex="0">🔒 Lock In</div></div>' +
       '<div class="guess-result hidden" aria-live="polite"><div class="gr-title">🛸 The Mothership reports: <b class="gr-real">0%</b></div>' +
         '<div class="gr-bar"><i class="gr-fill"></i><b class="gr-mark gr-mark-guess"><span>you</span></b></div>' +
-        '<div class="gr-verdict"></div><div class="fin-buttons"><div class="daily-btn primary guess-done" role="button" tabindex="0">Continue ▶</div></div></div>' +
+        '<div class="gr-verdict"></div><div class="gr-skip">Tap anywhere to continue</div></div>' +
       '</div>';
     const slider = ov.querySelector('.guess-slider');
     slider.addEventListener('input', ()=> setGuessDial(+slider.value));
     ov.querySelector('.guess-lock').addEventListener('click', e=>{ e.stopPropagation(); lockGuess(); });
-    ov.querySelector('.guess-done').addEventListener('click', e=>{ e.stopPropagation(); closeGuessRound(); });
-    ov.addEventListener('click', e=> e.stopPropagation());
+    // After Lock In the result plays out and moves on by itself; a tap
+    // anywhere skips ahead (finishing the count first, so nothing is lost).
+    ov.addEventListener('click', e=>{ e.stopPropagation(); if (guessState === 'revealing' && performance.now() - guessLockedAt > GUESS_SKIP_SHIELD_MS) skipGuessReveal(); });
   }
   function setGuessDial(v){
     const ov = els.guessOverlay;
@@ -9177,10 +9180,23 @@
     sfx.riddleAppear();
     return true;
   }
+  // Oct 2026 (phone playthrough): no Continue button. The crowd % counts up
+  // in GUESS_COUNT_MS (it used to take 1.3s with a long slow tail, a second
+  // of dead time before the verdict), then the round moves on after
+  // GUESS_REVEAL_HOLD_MS; a tap anywhere skips ahead.
+  const GUESS_COUNT_MS = 900, GUESS_REVEAL_HOLD_MS = 1800, GUESS_SKIP_SHIELD_MS = 300;
+  let guessLockedAt = 0, guessFinish = null;
+  function skipGuessReveal(){
+    if (guessFinish){   // the count is still running: settle it (points and all) first, and say what it paid
+      guessFinish();
+      const v = els.guessOverlay.querySelector('.gr-verdict').textContent; if (v) showToast('\uD83D\uDCE1 ' + v);
+    }
+    closeGuessRound();
+  }
   function guessScore(off){ for (const s of GUESS_SCORING){ if (off <= s.within) return s; } return { pts:0 }; }
   function lockGuess(){
     if (guessState !== 'guessing') return;
-    guessState = 'revealing';
+    guessState = 'revealing'; guessLockedAt = performance.now();
     const ov = els.guessOverlay, slider = ov.querySelector('.guess-slider'), guess = +slider.value, truth = guessTruth;
     slider.disabled = true;
     sfx.lockIn();
@@ -9193,25 +9209,28 @@
     if (infRun && !infRun.finale){ infRun.guessLocked = (infRun.guessLocked || 0) + 1; infRun.guessErrSum = (infRun.guessErrSum || 0) + off; saveInfRun(); }
     if (off === 0 && infRun && !infRun.finale){ infRun.perfectGuess = true; infRun.deadOns = (infRun.deadOns || 0) + 1; saveInfRun(); }
     const finish = ()=>{
-      real.textContent = truth + '%';
+      if (guessFinish !== finish) return;   // once per round
+      guessFinish = null;
+      real.textContent = truth + '%'; fill.style.transition = 'none'; fill.style.width = truth + '%';
       if (sc.pts) addRacePoints(sc.pts);
       const key = sc.key ? addInfKey('guess') : false;
       res.querySelector('.gr-verdict').textContent = (off === 0 ? '🎯 Dead on! ' : 'You said ' + guess + '% — ' + off + ' off. ') +
         (sc.pts ? '+' + sc.pts + ' points' + (key ? ' · 🔑 +1 key' : '') : 'No points this time');
       if (sc.pts >= 15) sfx.correct(); else if (sc.pts) sfx.revealWin(); else sfx.revealLose();
-      clearTimeout(guessCloseTimer); guessCloseTimer = setTimeout(closeGuessRound, 4500);
+      clearTimeout(guessCloseTimer); guessCloseTimer = setTimeout(closeGuessRound, GUESS_REVEAL_HOLD_MS);
     };
+    guessFinish = finish;
     const fill = res.querySelector('.gr-fill');
     if (prefersReducedMotion()){ fill.style.transition = 'none'; fill.style.width = truth + '%'; finish(); return; }
     fill.style.transition = 'none'; fill.style.width = '0%'; void fill.offsetWidth;
-    fill.style.transition = 'width 1.3s cubic-bezier(.2,.8,.3,1)'; fill.style.width = truth + '%';
+    fill.style.transition = 'width ' + GUESS_COUNT_MS / 1000 + 's cubic-bezier(.3,.6,.4,1)'; fill.style.width = truth + '%';
     const t0 = performance.now();
-    (function count(now){ const t = Math.min(1, (now - t0) / 1300), e = 1 - Math.pow(1 - t, 3);
+    (function count(now){ if (guessFinish !== finish) return; const t = Math.min(1, (now - t0) / GUESS_COUNT_MS), e = 1 - Math.pow(1 - t, 2);
       real.textContent = Math.round(truth * e) + '%'; if (t < 1) requestAnimationFrame(count); else finish(); })(t0);
   }
   function closeGuessRound(){
     if (guessState === 'idle') return;
-    clearTimeout(guessCloseTimer); guessCloseTimer = null;
+    clearTimeout(guessCloseTimer); guessCloseTimer = null; guessFinish = null;
     guessState = 'idle'; guessTruth = null; guessCard = null;
     els.guessOverlay.classList.add('hidden');
     if (inInfinity()) scheduleNext(0);
