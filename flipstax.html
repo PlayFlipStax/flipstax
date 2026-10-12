@@ -990,7 +990,9 @@
   .vault-alien.pop{ animation: alienPop 2.2s cubic-bezier(.3,1.5,.5,1) both; }
   @keyframes alienPop{ 0%{ opacity:0; transform:translateY(40px) scale(0.6); } 15%{ opacity:1; transform:translateY(-14px) scale(1.05); } 25%{ transform:translateY(-8px) scale(1); }
     75%{ opacity:1; transform:translateY(-8px) scale(1); } 100%{ opacity:0; transform:translateY(40px) scale(0.6); } }
-  .plinko-board{ position:relative; width:min(100%, 340px); aspect-ratio:320 / 360; }
+  /* Also limited by the screen's height (330px = everything else on this stage) so
+     Drop chip / Drop all are always on screen without scrolling, even at 360x640. */
+  .plinko-board{ position:relative; width:max(200px, min(100%, 340px, calc((100dvh - 330px) * 0.889))); aspect-ratio:320 / 360; }
   .plinko-svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
   .plinko-svg .pk-peg{ transform-box:fill-box; transform-origin:center; }
   .plinko-svg .pk-peg.ping{ animation: pegPing 0.35s ease-out; }
