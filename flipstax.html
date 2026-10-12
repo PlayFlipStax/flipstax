@@ -864,6 +864,74 @@
   .fin-overlay .daily-btn.disabled{ opacity:0.45; pointer-events:none; }
   .fin-go{ padding:12px 30px; font-size:16px; }
   @media (prefers-reduced-motion: reduce){ .fin-rays, .fin-stage{ animation:none !important; } }
+  /* Plinko */
+  .fin-plinko-sub{ font-size:13px; font-weight:800; color:#fff3d6; }
+  .plinko-board{ position:relative; width:min(100%, 340px); aspect-ratio:320 / 360; }
+  .plinko-svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+  .plinko-svg .pk-peg{ transform-box:fill-box; transform-origin:center; }
+  .plinko-svg .pk-peg.ping{ animation: pegPing 0.35s ease-out; }
+  @keyframes pegPing{ 0%{ transform:scale(1); filter:none; } 40%{ transform:scale(1.7); filter:drop-shadow(0 0 6px #fff6a8); } 100%{ transform:scale(1); } }
+  .plinko-svg .pk-slot.hit rect{ filter:drop-shadow(0 0 8px rgba(255,220,90,0.95)); }
+  .plinko-chip-layer{ position:absolute; inset:0; pointer-events:none; }
+  .pk-chip{ position:absolute; left:0; top:0; width:26px; height:26px; margin:-13px 0 0 -13px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px;
+    background:radial-gradient(circle at 35% 30%, #fffbe0, #ffc928 55%, #b86a00); border:2px solid #fff3a8; box-shadow:0 2px 6px rgba(0,0,0,0.45), 0 0 10px rgba(255,210,60,0.8); will-change:transform; }
+  .plinko-tally{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px; min-height:28px; }
+  .pt-chip{ padding:4px 10px; border-radius:99px; font-size:13px; font-weight:800; background:rgba(40,10,70,0.55); box-shadow:inset 0 0 0 1.5px rgba(255,225,140,0.6); }
+  .pt-chip.jack{ box-shadow:inset 0 0 0 2px #7df9ff, 0 0 12px rgba(125,249,255,0.7); }
+  .pt-chip b, .pt-total b{ color:#ffe066; }
+  .pt-total{ padding:4px 12px; border-radius:99px; font-size:14px; font-weight:900; background:linear-gradient(180deg,rgba(255,210,63,0.35),rgba(255,140,0,0.25)); }
+  .fin-plinko.jackpot .plinko-board{ animation: jackGlow 1.6s ease-in-out infinite alternate; }
+  @keyframes jackGlow{ from{ filter:drop-shadow(0 0 0 rgba(125,249,255,0)); } to{ filter:drop-shadow(0 0 18px rgba(125,249,255,0.75)); } }
+  .fin-skip.hidden{ display:none; }
+  /* The Vault */
+  .vault-scene{ position:relative; width:min(100%, 340px); height:250px; }
+  .vault-body{ position:absolute; left:50%; bottom:6px; width:210px; height:210px; margin-left:-105px; border-radius:28px; perspective:800px;
+    background:linear-gradient(160deg,#8a5a12,#4d2c05); box-shadow:inset 0 0 0 6px #ffcf4a, inset 0 0 0 10px #8a5a12, 0 12px 30px rgba(0,0,0,0.5); }
+  .vault-inside{ position:absolute; inset:24px; border-radius:50%; background:radial-gradient(circle, #3a1500 0%, #1a0700 70%); overflow:hidden; }
+  .vault-glow{ position:absolute; inset:0; border-radius:50%; background:radial-gradient(circle, #fff6c2 0%, #ffd23f 30%, rgba(255,160,0,0.3) 60%, transparent 75%); opacity:0; transition:opacity 0.8s ease 0.3s; }
+  .fin-vault.open .vault-glow{ opacity:1; }
+  .vault-door{ position:absolute; inset:18px; border-radius:50%; transform-origin:0% 50%; transition:transform 0.9s cubic-bezier(.5,0,.3,1);
+    background:radial-gradient(circle at 38% 32%, #fff6c2 0%, #ffd23f 22%, #e0a000 55%, #9a6200 100%); box-shadow:inset 0 0 0 7px #b87a00, inset 0 0 0 10px #ffe58a, 0 6px 16px rgba(0,0,0,0.45); }
+  .fin-vault.open .vault-door{ transform:rotateY(-112deg); }
+  .vault-dial{ position:absolute; left:50%; top:50%; width:84px; height:84px; margin:-42px 0 0 -42px; border-radius:50%;
+    background:radial-gradient(circle at 40% 35%, #fffbe0, #c9c9c9 45%, #7a7a7a); box-shadow:0 0 0 5px #9a6200, 0 3px 8px rgba(0,0,0,0.5); }
+  .vault-dial i{ position:absolute; left:50%; top:50%; width:8px; height:60px; margin:-30px 0 0 -4px; border-radius:4px; background:#6b4400; }
+  .vault-dial i:nth-child(2){ transform:rotate(45deg); } .vault-dial i:nth-child(3){ transform:rotate(90deg); } .vault-dial i:nth-child(4){ transform:rotate(135deg); }
+  .vault-dial b{ position:absolute; left:50%; top:50%; width:22px; height:22px; margin:-11px 0 0 -11px; border-radius:50%; background:#ffd23f; box-shadow:0 0 0 3px #6b4400; }
+  .fin-vault.dial .vault-dial{ animation: dialSpin 1.05s cubic-bezier(.4,0,.2,1) both; }
+  @keyframes dialSpin{ 0%{ transform:rotate(0); } 45%{ transform:rotate(250deg); } 75%{ transform:rotate(130deg); } 100%{ transform:rotate(360deg); } }
+  .vault-coins{ z-index:3; }
+  .vault-ufo.riddle-ufo{ display:none; left:50%; top:0; z-index:4; font-size:56px; margin-left:-30px;
+    filter:sepia(1) saturate(5) hue-rotate(-14deg) brightness(1.15) drop-shadow(0 0 14px rgba(255,210,60,0.95)); }
+  .vault-ufo.riddle-ufo i{ width:70px; height:150px; top:72%; background:linear-gradient(to bottom, rgba(255,240,170,0.85), rgba(255,240,170,0)); }
+  .fin-vault.jackpot .vault-ufo.riddle-ufo{ display:block; animation: vaultUfoIn 0.9s cubic-bezier(.2,.9,.3,1.1) both; }
+  @keyframes vaultUfoIn{ from{ transform:translate(-160px, -60px) scale(0.6); opacity:0; } to{ transform:none; opacity:1; } }
+  .vault-beam-card{ position:absolute; left:50%; top:30px; width:66px; height:90px; margin-left:-33px; z-index:3; opacity:0; border-radius:8px; overflow:hidden; box-shadow:0 0 18px rgba(255,220,90,0.9); }
+  .vault-beam-card svg{ width:100%; height:100%; display:block; }
+  .fin-vault.jackpot .vault-beam-card{ animation: beamCardDown 2.2s ease-in-out 0.6s both; }
+  @keyframes beamCardDown{ 0%{ opacity:0; transform:translateY(-10px) scale(0.4) rotate(-8deg); } 25%{ opacity:1; } 80%{ opacity:1; transform:translateY(110px) scale(1) rotate(4deg); } 100%{ opacity:0; transform:translateY(130px) scale(0.6); } }
+  .vault-rewards{ width:100%; display:flex; flex-direction:column; align-items:center; gap:10px; opacity:0; transform:translateY(10px); transition:opacity 0.6s ease, transform 0.6s ease; pointer-events:none; }
+  .fin-vault.shown .vault-rewards{ opacity:1; transform:none; pointer-events:auto; }
+  .vr-score{ display:flex; flex-direction:column; align-items:center; }
+  .vr-score span{ font-size:12px; font-weight:900; letter-spacing:2px; color:#fff3c4; }
+  .vr-score b{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:clamp(60px, 20vw, 86px); line-height:1; color:#fff; text-shadow:0 0 22px rgba(255,210,60,0.95), 0 4px 0 #b05a00; }
+  .vr-score em{ font-style:normal; font-size:13px; font-weight:800; color:#ffe9a6; }
+  .vr-row{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px; }
+  .vr-row span{ padding:5px 10px; border-radius:99px; font-size:12.5px; font-weight:800; background:rgba(40,10,70,0.55); box-shadow:inset 0 0 0 1.5px rgba(255,225,140,0.5); }
+  .vr-personality{ width:100%; padding:12px; border-radius:18px; background:linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.05)); box-shadow:inset 0 0 0 1.5px rgba(255,225,140,0.55); }
+  .vrp-eyebrow{ font-size:11px; font-weight:900; letter-spacing:2px; color:#ffd23f; }
+  .vrp-icon{ font-size:38px; line-height:1.1; } .vrp-name{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:28px; }
+  .vrp-blurb{ font-size:13.5px; font-weight:600; color:#fff3d6; }
+  .vr-badges{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px; }
+  .vr-badges.hidden{ display:none; }
+  .vb-eyebrow{ width:100%; font-size:11px; font-weight:900; letter-spacing:2px; color:#ffd23f; }
+  .vb-badge{ padding:5px 10px; border-radius:99px; font-size:13px; font-weight:800; background:linear-gradient(180deg,rgba(255,210,63,0.4),rgba(255,140,0,0.25)); box-shadow:inset 0 0 0 1.5px #ffe58a; }
+  .fin-vault .readout-unlocks{ width:100%; }
+  @media (prefers-reduced-motion: reduce){
+    .vault-door, .vault-glow, .vault-rewards{ transition:none !important; } .fin-vault.dial .vault-dial, .fin-vault.jackpot .vault-ufo.riddle-ufo, .fin-vault.jackpot .vault-beam-card,
+    .plinko-svg .pk-peg.ping, .fin-plinko.jackpot .plinko-board{ animation:none !important; }
+    .fin-vault.jackpot .vault-ufo.riddle-ufo{ display:block; }
+  }
   .ir-field{ position:absolute; inset:0; pointer-events:none; }
   .ir-mark{
     position:absolute; left:var(--x); top:var(--y); font-family:'Big Shoulders Display', sans-serif; font-weight:900;
@@ -6516,6 +6584,86 @@
   }
   function saveCollection(){ try{ localStorage.setItem(COLLECTION_KEY, JSON.stringify(collection)); }catch(e){} }
   let collection = loadCollection();
+  // ---------- Close Encounters: rare cards and the Mystery Visitor ----------
+  // Original art, drawn here in SVG (nothing traced or borrowed): the
+  // Mystery Visitor is a round, lavender-and-teal visitor with three
+  // star-tipped antennae, big glossy eyes and gold freckles; the Mothership
+  // is a gold-rimmed saucer. These cards sit outside the 16-card
+  // Personality set (they never count toward 16/16); they're listed in their
+  // own Close Encounters row in My Collection.
+  const ALIEN_ORDER = ['first_contact', 'mothership', 'riddle_master', 'perfect_signal'];
+  const ALIEN_META = {
+    first_contact:  { name:'First Contact', icon:'👽', blurb:'Tapped 3 passing UFOs in one Infinity run.', how:'Tap 3 UFOs in one Infinity run' },
+    mothership:     { name:'The Mothership', icon:'🛸', blurb:'Hit the Mothership Jackpot in the Vault finale.', how:'Land a chip in the Mothership Jackpot' },
+    riddle_master:  { name:'Riddle Master', icon:'🧩', blurb:'Solved every riddle in an Infinity run (3 or more).', how:'Solve every riddle round in a run (at least 3)' },
+    perfect_signal: { name:'Perfect Signal', icon:'📡', blurb:'Guessed the crowd exactly right.', how:'Guess the Crowd dead on (0 off)' },
+  };
+  Object.keys(ALIEN_META).forEach(k=>{ PERSONALITY_META[k] = Object.assign({ rare:true }, ALIEN_META[k]); });
+  function isAlienCard(k){ return ALIEN_ORDER.indexOf(k) !== -1; }
+  function visitorSvg(opts){
+    opts = opts || {};
+    const id = 'v' + Math.random().toString(36).slice(2, 7);
+    return '<svg class="' + (opts.cls || '') + '" viewBox="0 0 120 120" aria-hidden="true">' +
+      '<defs><radialGradient id="' + id + 'h" cx="0.42" cy="0.35" r="0.7"><stop offset="0" stop-color="#d9c6ff"/><stop offset="0.55" stop-color="#9f7bff"/><stop offset="1" stop-color="#5a3bd6"/></radialGradient>' +
+      '<radialGradient id="' + id + 'e" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#2a6a7a"/><stop offset="0.6" stop-color="#0b2a3a"/><stop offset="1" stop-color="#061820"/></radialGradient></defs>' +
+      // antennae with star tips
+      '<g stroke="#ffd23f" stroke-width="3" stroke-linecap="round" fill="none"><path d="M44 30 Q38 14 30 10"/><path d="M60 26 L60 6"/><path d="M76 30 Q82 14 90 10"/></g>' +
+      '<g fill="#fff3a8" stroke="#ffb000" stroke-width="1.5"><path d="M30 4 l2.2 4.4 4.8 .7-3.5 3.4.8 4.8-4.3-2.3-4.3 2.3.8-4.8-3.5-3.4 4.8-.7z"/><path d="M60 0 l2.2 4.4 4.8 .7-3.5 3.4.8 4.8-4.3-2.3-4.3 2.3.8-4.8-3.5-3.4 4.8-.7z"/><path d="M90 4 l2.2 4.4 4.8 .7-3.5 3.4.8 4.8-4.3-2.3-4.3 2.3.8-4.8-3.5-3.4 4.8-.7z"/></g>' +
+      // head: a wide rounded bean, teal cheeks, gold freckles
+      '<path d="M60 26 C92 26 106 46 104 68 C102 92 84 108 60 108 C36 108 18 92 16 68 C14 46 28 26 60 26 Z" fill="url(#' + id + 'h)" stroke="#ffd23f" stroke-width="3"/>' +
+      '<ellipse cx="30" cy="80" rx="9" ry="6" fill="#2dd4c4" opacity="0.55"/><ellipse cx="90" cy="80" rx="9" ry="6" fill="#2dd4c4" opacity="0.55"/>' +
+      '<g fill="#ffd23f"><circle cx="36" cy="88" r="1.8"/><circle cx="41" cy="92" r="1.4"/><circle cx="84" cy="88" r="1.8"/><circle cx="79" cy="92" r="1.4"/></g>' +
+      // eyes: big round glossy, with a teal glint
+      '<g class="vis-eyes"><circle cx="43" cy="64" r="15" fill="url(#' + id + 'e)" stroke="#1a0b40" stroke-width="2"/><circle cx="77" cy="64" r="15" fill="url(#' + id + 'e)" stroke="#1a0b40" stroke-width="2"/>' +
+      '<circle cx="38" cy="58" r="5" fill="#fff"/><circle cx="72" cy="58" r="5" fill="#fff"/><circle cx="47" cy="69" r="2.2" fill="#7df9ff"/><circle cx="81" cy="69" r="2.2" fill="#7df9ff"/></g>' +
+      // a small, friendly smile
+      '<path d="M50 90 Q60 98 70 90" stroke="#1a0b40" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+      '</svg>';
+  }
+  function mothershipSvg(){
+    return '<svg viewBox="0 0 160 110" aria-hidden="true"><defs><linearGradient id="msb" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fff3a8"/><stop offset="0.5" stop-color="#ffc928"/><stop offset="1" stop-color="#b86a00"/></linearGradient>' +
+      '<linearGradient id="msd" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#d6fbff"/><stop offset="1" stop-color="#5fd4e6"/></linearGradient>' +
+      '<linearGradient id="msbeam" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="rgba(255,240,170,0.85)"/><stop offset="1" stop-color="rgba(255,240,170,0)"/></linearGradient></defs>' +
+      '<path d="M60 58 L100 58 L132 110 L28 110 Z" fill="url(#msbeam)"/>' +
+      '<ellipse cx="80" cy="36" rx="28" ry="22" fill="url(#msd)" stroke="#fff" stroke-width="2"/>' +
+      '<ellipse cx="80" cy="50" rx="74" ry="17" fill="url(#msb)" stroke="#7a3d00" stroke-width="2.5"/>' +
+      '<ellipse cx="80" cy="46" rx="60" ry="7" fill="rgba(255,255,255,0.35)"/>' +
+      '<g fill="#ff3cac"><circle cx="24" cy="52" r="4"/><circle cx="52" cy="58" r="4" fill="#19e0ff"/><circle cx="80" cy="60" r="4" fill="#fff"/><circle cx="108" cy="58" r="4" fill="#19e0ff"/><circle cx="136" cy="52" r="4"/></g>' +
+      '</svg>';
+  }
+  function dishSvg(){
+    return '<svg viewBox="0 0 120 120" aria-hidden="true"><g fill="none" stroke="#7df9ff" stroke-width="3" stroke-linecap="round" opacity="0.9"><path d="M78 30 Q92 34 96 48"/><path d="M84 18 Q104 24 108 46"/></g>' +
+      '<path d="M22 70 Q40 30 82 46 Q70 84 22 70 Z" fill="#ffd23f" stroke="#7a3d00" stroke-width="3"/><circle cx="58" cy="58" r="5" fill="#fff"/><path d="M58 58 L74 40" stroke="#7a3d00" stroke-width="3"/>' +
+      '<path d="M48 72 L40 104 L76 104 L66 72 Z" fill="#9f7bff" stroke="#1a0b40" stroke-width="3"/></svg>';
+  }
+  // The full card front for a Close Encounters card (360 x 492, like the art).
+  function alienCardSvg(type){
+    const m = ALIEN_META[type] || { name:'?' };
+    let art = '';
+    if (type === 'mothership') art = '<g transform="translate(40 120) scale(1.75)">' + mothershipSvg().replace(/^<svg[^>]*>|<\/svg>$/g, '') + '</g>';
+    else if (type === 'perfect_signal') art = '<g transform="translate(60 110) scale(2)">' + dishSvg().replace(/^<svg[^>]*>|<\/svg>$/g, '') + '</g>';
+    else art = '<g transform="translate(60 92) scale(2)">' + visitorSvg().replace(/^<svg[^>]*>|<\/svg>$/g, '') + '</g>';
+    let stars = ''; for (let i = 0; i < 26; i++){ const x = (i * 137) % 340 + 10, y = (i * 89) % 300 + 20; stars += '<circle cx="' + x + '" cy="' + y + '" r="' + (1 + (i % 3) * 0.7) + '" fill="#fff" opacity="' + (0.35 + (i % 4) * 0.15) + '"/>'; }
+    const extra = type === 'riddle_master' ? '<text x="300" y="120" font-size="64" font-weight="900" fill="#ffd23f" font-family="Arial Black, Arial" opacity="0.9">?</text><text x="30" y="150" font-size="44" font-weight="900" fill="#7df9ff" font-family="Arial Black, Arial" opacity="0.8">?</text>' : '';
+    return '<svg class="alien-card-art" viewBox="0 0 360 492" preserveAspectRatio="xMidYMid slice" role="img" aria-label="' + m.name + '">' +
+      '<defs><radialGradient id="acbg" cx="0.5" cy="0.35" r="0.8"><stop offset="0" stop-color="#5b2bb8"/><stop offset="0.6" stop-color="#2a1166"/><stop offset="1" stop-color="#0e0630"/></radialGradient>' +
+      '<linearGradient id="acgold" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#fff3a8"/><stop offset="0.5" stop-color="#ffc928"/><stop offset="1" stop-color="#d98200"/></linearGradient></defs>' +
+      '<rect width="360" height="492" rx="26" fill="url(#acbg)"/>' + stars + extra + art +
+      '<rect x="8" y="8" width="344" height="476" rx="22" fill="none" stroke="url(#acgold)" stroke-width="8"/>' +
+      '<rect x="30" y="398" width="300" height="66" rx="16" fill="rgba(0,0,0,0.45)" stroke="url(#acgold)" stroke-width="3"/>' +
+      '<text x="180" y="442" text-anchor="middle" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="34" fill="#fff3c4" letter-spacing="1">' + m.name.toUpperCase() + '</text>' +
+      '<text x="180" y="40" text-anchor="middle" font-family="Inter, Arial" font-weight="800" font-size="16" fill="#ffd23f" letter-spacing="4">CLOSE ENCOUNTER</text>' +
+      '</svg>';
+  }
+  // Adds a Close Encounters card - once per run at most, and only from the
+  // finale's award (see finaleAward). Returns the card key if it's new.
+  function grantAlienCard(k){
+    const owned = collection.cards[k];
+    if (owned){ if (owned.lastRun !== (infRun && infRun.id)){ owned.count = (owned.count || 1) + 1; owned.lastRun = infRun && infRun.id; saveCollection(); } return null; }
+    collection.cards[k] = { first: todayStr(), count: 1, revealed: false, lastRun: infRun && infRun.id };
+    saveCollection();
+    return k;
+  }
 
   // ---------- Infinity personality awards ----------
   // Every INF_AWARD_VOTES votes in Infinity get a personality label, judged
@@ -7073,6 +7221,22 @@
     };
   }
   function buildInfinityShareData(){
+    // A finished run: its summary (score, crowd match, keys, boldest pick,
+    // personality). Mid-run (the Pause screen's Share): the old tier card.
+    const a = infRun && infRun.finale && infRun.finale.award;
+    if (a){
+      const pm = PERSONALITY_META[a.personality] || null;
+      return {
+        badge: 'INFINITY FLIPS \u00B7 RUN COMPLETE',
+        heroText: a.finalScore + ' PTS',
+        statLine: [a.crowdPct !== null && a.crowdPct !== undefined ? 'Matched the crowd ' + a.crowdPct + '%' : null, '\uD83D\uDD11 ' + a.keys + ' key' + (a.keys === 1 ? '' : 's'),
+          a.ended === 'clock' ? '10:00 run' : '250 in ' + formatClock(a.clockMs)].filter(Boolean).join(' \u00B7 '),
+        boldest: a.boldest || null,
+        personality: pm ? { icon: pm.icon, name: pm.name } : null,
+        jackpot: !!a.jackpot,
+        voteSummary: null,
+      };
+    }
     return {
       badge: 'INFINITY FLIPS',
       heroText: (els.tierEl.textContent || 'Unranked').toUpperCase(),
@@ -7167,6 +7331,24 @@
         ctx.font = '900 150px ' + SHARE_FONT_D; ctx.fillStyle = '#ffe27a'; shareGlowText(ctx, data.heroText, cx, y + 150, 'rgba(255,184,0,0.8)', 50);
         ctx.font = '600 38px ' + SHARE_FONT_T; ctx.fillStyle = 'rgba(255,244,214,0.9)'; ctx.fillText(data.statLine, cx, y + 222);
       } });
+      // A finished run: the boldest pick, and the run's personality.
+      if (data.boldest){
+        const pw = 880, px = cx - pw / 2;
+        ctx.font = '900 64px ' + SHARE_FONT_D; const pick = shareWrapLines(ctx, data.boldest.pick, pw - 80).slice(0, 2);
+        const ph = 120 + pick.length * 66 + 50;
+        blocks.push({ h: ph, draw: y=>{
+          roundRectPath(ctx, px, y, pw, ph, 36); ctx.fillStyle = 'rgba(255,60,172,0.16)'; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(255,170,230,0.55)'; ctx.stroke();
+          ctx.font = '700 28px ' + SHARE_FONT_T; ctx.fillStyle = '#ffc6ec'; shareSpacedText(ctx, 'BOLDEST PICK', cx, y + 56, 5);
+          ctx.font = '900 64px ' + SHARE_FONT_D; ctx.fillStyle = '#fff'; pick.forEach((l, i)=> shareGlowText(ctx, l, cx, y + 128 + i * 66, 'rgba(255,60,172,0.6)', 20));
+          ctx.font = '600 32px ' + SHARE_FONT_T; ctx.fillStyle = '#ffe27a';
+          ctx.fillText('over ' + data.boldest.other + ' \u2014 against ' + data.boldest.against + '% of the crowd', cx, y + 128 + (pick.length - 1) * 66 + 62);
+        } });
+      }
+      if (data.personality) blocks.push({ h: 110, draw: y=>{
+        ctx.font = '700 26px ' + SHARE_FONT_T; ctx.fillStyle = '#ffd23f'; shareSpacedText(ctx, 'THIS RUN\u2019S PERSONALITY', cx, y + 30, 4);
+        ctx.font = '900 64px ' + SHARE_FONT_D; ctx.fillStyle = '#fff'; shareGlowText(ctx, data.personality.icon + ' ' + data.personality.name, cx, y + 98, 'rgba(255,184,0,0.6)', 24);
+      } });
+      if (data.jackpot) blocks.push({ h: 60, draw: y=>{ ctx.font = '800 36px ' + SHARE_FONT_T; ctx.fillStyle = '#7df9ff'; ctx.fillText('\uD83D\uDEF8 Hit the Mothership Jackpot!', cx, y + 44); } });
     }
     const vote = voteLines();
     if (vote.length) blocks.push({ h: vote.length * 38, draw: y=>{
@@ -7251,7 +7433,9 @@
   }
   async function shareInfinityResult(){
     const canvas = renderShareCard('infinity', buildInfinityShareData());
-    await exportAndShareCard(canvas, 'flipstax-infinity.png', 'FlipStax Infinity Flips \u2014 ' + (els.tierEl.textContent||''));
+    const a = infRun && infRun.finale && infRun.finale.award;
+    // The caption is the text result; exportAndShareCard adds GAME_URL.
+    await exportAndShareCard(canvas, 'flipstax-infinity.png', a ? infRunShareText(a) : 'FlipStax Infinity Flips \u2014 ' + (els.tierEl.textContent||''));
   }
 
   function startDailyRun(){
@@ -8011,15 +8195,273 @@
     })(start);
   }
   function stopFinSky(){ finSkyOn = false; }
-  // (Phase 1 stand-ins - the Plinko board and the Vault replace these.)
-  function drawPlinkoOutcomes(n){ return Array.from({ length:n }, ()=> ({ slot:0, kind:'x1', pts:20 })); }
-  function renderPlinko(){ infRun.finale.stage = 'vault'; saveInfRun(); renderVault(); }
-  function renderVault(){
-    if (!infRun.finale.awarded){ infRun.finale.awarded = true; saveInfRun(); }
-    document.getElementById('vaultScore').textContent = Math.max(0, infRun.score);
-    document.getElementById('finVault').classList.remove('hidden');
+  // ---------- Plinko: one gold chip per key (1 to 5) ----------
+  // Every slot wins: x1 / x2 / x3 multiply the chip's base PLINKO_BASE, +50
+  // is flat, and the rare Mothership Jackpot is +100 and a bonus card (at
+  // most one jackpot a finale). Each chip's slot is drawn when the finale
+  // starts (saved), and its path down the pegs is built to land there - so
+  // the physics is simple, light and smooth: a chip only animates a
+  // transform (no physics engine). Skip lands every remaining chip at once.
+  const PLINKO_BASE = 20;
+  const PLINKO_SLOTS = ['x2', '+50', 'x1', 'jackpot', 'x3', 'x1', 'x2'];
+  const PLINKO_ODDS = [ ['x1', 0.30], ['x2', 0.30], ['+50', 0.18], ['x3', 0.15], ['jackpot', 0.07] ];
+  const PLINKO_ROWS = 6;
+  function plinkoPoints(kind){ return kind === 'jackpot' ? 100 : kind === '+50' ? 50 : PLINKO_BASE * +kind.slice(1); }
+  function plinkoLabel(kind){ return kind === 'jackpot' ? '🛸' : kind === '+50' ? '+50' : '×' + kind.slice(1); }
+  function drawPlinkoOutcomes(n){
+    let jackpot = false; const out = [];
+    for (let c = 0; c < n; c++){
+      let kind;
+      do { let r = Math.random(); kind = PLINKO_ODDS.find(o=> (r -= o[1]) < 0); kind = kind ? kind[0] : 'x1'; } while (kind === 'jackpot' && jackpot);
+      if (kind === 'jackpot') jackpot = true;
+      const slots = PLINKO_SLOTS.map((k, i)=> k === kind ? i : -1).filter(i=> i >= 0), slot = slots[Math.floor(Math.random() * slots.length)];
+      // A route with exactly `slot` rights among the rows, in a random order.
+      const path = shuffle(Array.from({ length: PLINKO_ROWS }, (_, i)=> i < slot ? 1 : 0));
+      out.push({ kind, slot, pts: plinkoPoints(kind), path });
+    }
+    if (DEBUG_FAST && window.__forcePlinko) window.__forcePlinko.forEach((k, i)=>{ if (out[i]){ const slot = PLINKO_SLOTS.indexOf(k); out[i] = { kind:k, slot, pts: plinkoPoints(k), path: shuffle(Array.from({ length: PLINKO_ROWS }, (_, j)=> j < slot ? 1 : 0)) }; } });
+    return out;
   }
-  document.getElementById('vaultAgain').addEventListener('click', finTap(()=> startNewInfRun()));
+  // Board geometry, in the SVG's own 320 x 360 units.
+  const PB = { w:320, h:360, cx:160, dx:40, y0:44, dy:38, slotY:286, slotH:62 };
+  function plinkoXY(i, r){ return { x: PB.cx + (i - r / 2) * PB.dx, y: PB.y0 + r * PB.dy }; }
+  function buildPlinkoBoard(){
+    const svg = document.getElementById('plinkoSvg');
+    svg.setAttribute('viewBox', '0 0 ' + PB.w + ' ' + PB.h);
+    let g = '<defs><radialGradient id="pkPeg" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#fffbe0"/><stop offset="0.6" stop-color="#ffc928"/><stop offset="1" stop-color="#b86a00"/></radialGradient>' +
+      '<linearGradient id="pkSlot" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="rgba(255,255,255,0.22)"/><stop offset="1" stop-color="rgba(255,255,255,0.04)"/></linearGradient>' +
+      '<linearGradient id="pkJack" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7df9ff"/><stop offset="1" stop-color="#3b1d8f"/></linearGradient></defs>';
+    g += '<rect x="4" y="4" width="312" height="352" rx="22" fill="rgba(30,8,60,0.55)" stroke="#ffd23f" stroke-width="3"/>';
+    // Pegs: the full staggered board (the chip's routes stay in the middle).
+    for (let r = 0; r < PLINKO_ROWS; r++){
+      const y = PB.y0 + r * PB.dy;
+      for (let k = -4; k <= r + 4; k++){
+        const x = PB.cx + (k - r / 2) * PB.dx;
+        if (x < 18 || x > PB.w - 18) continue;
+        g += '<circle class="pk-peg" data-r="' + r + '" data-k="' + k + '" cx="' + x.toFixed(1) + '" cy="' + y + '" r="5.5" fill="url(#pkPeg)"/>';
+      }
+    }
+    PLINKO_SLOTS.forEach((kind, i)=>{
+      const x = PB.cx + (i - 3) * PB.dx;
+      g += '<g class="pk-slot" data-i="' + i + '"><rect x="' + (x - 18) + '" y="' + PB.slotY + '" width="36" height="' + PB.slotH + '" rx="8" fill="' + (kind === 'jackpot' ? 'url(#pkJack)' : 'url(#pkSlot)') + '" stroke="' + (kind === 'jackpot' ? '#7df9ff' : '#ffd23f') + '" stroke-width="2"/>' +
+        '<text x="' + x + '" y="' + (PB.slotY + 38) + '" text-anchor="middle" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="' + (kind === 'jackpot' ? 22 : 17) + '" fill="#fff6c2">' + plinkoLabel(kind) + '</text></g>';
+    });
+    svg.innerHTML = g;
+  }
+  let plinkoBusy = false;
+  function renderPlinko(){
+    const f = infRun.finale;
+    document.getElementById('finPlinko').classList.remove('hidden');
+    buildPlinkoBoard();
+    document.getElementById('plinkoChips').innerHTML = '';
+    // Chips already dropped (before a refresh) sit in their slots.
+    f.chips.slice(0, f.dropped).forEach((c, i)=> placeChip(c, i, true));
+    renderPlinkoTally();
+    plinkoBusy = false;
+  }
+  function renderPlinkoTally(){
+    const f = infRun.finale, n = f.chips.length, left = n - f.dropped;
+    const won = f.chips.slice(0, f.dropped).reduce((a, c)=> a + c.pts, 0);
+    document.getElementById('finPlinkoSub').textContent = '🔑 ' + infRun.keys + ' key' + (infRun.keys === 1 ? '' : 's') + ' → ' + n + ' gold chip' + (n > 1 ? 's' : '') + ' · every slot wins · ×1 = ' + PLINKO_BASE + ' pts';
+    document.getElementById('plinkoTally').innerHTML = f.chips.slice(0, f.dropped).map(c=> '<span class="pt-chip' + (c.kind === 'jackpot' ? ' jack' : '') + '">' + plinkoLabel(c.kind) + ' <b>+' + c.pts + '</b></span>').join('') +
+      (f.dropped ? '<span class="pt-total">Bonus <b>+' + won + '</b></span>' : '');
+    const drop = document.getElementById('plinkoDrop'), skip = document.getElementById('plinkoSkip');
+    drop.textContent = left > 0 ? '🪙 Drop chip ' + (f.dropped + 1) + ' of ' + n : '🔐 Open the Vault ▶';
+    drop.classList.toggle('disabled', plinkoBusy);
+    skip.classList.toggle('hidden', left === 0);
+  }
+  function chipEl(i){
+    const c = document.createElement('div'); c.className = 'pk-chip'; c.innerHTML = '<span>🔑</span>'; c.dataset.i = i;
+    document.getElementById('plinkoChips').appendChild(c); return c;
+  }
+  // Pixels per board unit (the SVG scales with the board's width).
+  function plinkoScale(){ return document.getElementById('plinkoBoard').getBoundingClientRect().width / PB.w; }
+  function slotXY(slot){ return { x: PB.cx + (slot - 3) * PB.dx, y: PB.slotY + 20 + 0 }; }
+  function placeChip(c, i, settled){
+    const el = chipEl(i), k = plinkoScale(), p = slotXY(c.slot);
+    el.style.transform = 'translate(' + (p.x * k).toFixed(1) + 'px,' + (p.y * k).toFixed(1) + 'px)';
+    if (settled) document.querySelector('.pk-slot[data-i="' + c.slot + '"]').classList.add('hit');
+    return el;
+  }
+  function dropNextChip(){
+    const f = infRun.finale;
+    if (plinkoBusy) return;
+    if (f.dropped >= f.chips.length){ goToVault(); return; }
+    const i = f.dropped, c = f.chips[i];
+    if (prefersReducedMotion()){ landChip(i); return; }
+    plinkoBusy = true; renderPlinkoTally();
+    const el = chipEl(i), k = plinkoScale(), frames = [], T = 1700, rowT = 1 / (PLINKO_ROWS + 1);
+    let x = PB.cx, rights = 0;
+    frames.push({ transform: 'translate(' + (x * k) + 'px,' + (6 * k) + 'px)', offset: 0, easing: 'ease-in' });
+    c.path.forEach((dir, r)=>{
+      const peg = plinkoXY(rights, r);             // the peg it lands on
+      const top = { x: peg.x, y: peg.y - 12 };
+      rights += dir;
+      const next = PB.cx + (rights - (r + 1) / 2) * PB.dx;
+      const o = (r + 1) * rowT;
+      frames.push({ transform: 'translate(' + (top.x * k).toFixed(1) + 'px,' + (top.y * k).toFixed(1) + 'px)', offset: Math.min(0.97, o - rowT * 0.35), easing: 'ease-out' });
+      frames.push({ transform: 'translate(' + (((top.x + next) / 2) * k).toFixed(1) + 'px,' + ((top.y - 9) * k).toFixed(1) + 'px)', offset: Math.min(0.98, o - rowT * 0.1), easing: 'ease-in' });
+      x = next;
+      setTimeout(()=>{ sfx.chipPeg(r); const p = document.querySelector('.pk-peg[data-r="' + r + '"][data-k="' + (rights - dir) + '"]'); if (p){ p.classList.remove('ping'); void p.getBoundingClientRect(); p.classList.add('ping'); } }, T * (o - rowT * 0.35));
+    });
+    const end = slotXY(c.slot);
+    frames.push({ transform: 'translate(' + (end.x * k).toFixed(1) + 'px,' + (end.y * k).toFixed(1) + 'px)', offset: 1 });
+    const anim = el.animate(frames, { duration: T, fill: 'forwards' });
+    anim.finished.then(()=>{ el.remove(); landChip(i); }, ()=>{});
+    el._anim = anim;
+  }
+  function landChip(i){
+    const f = infRun.finale;
+    if (i !== f.dropped) return;   // already landed (Skip)
+    const c = f.chips[i];
+    placeChip(c, i, true);
+    f.dropped++; saveInfRun();
+    plinkoBusy = false;
+    sfx.chipLand(c.kind === 'jackpot' || c.kind === 'x3');
+    if (c.kind === 'jackpot'){ sfx.jackpot(); showToast('🛸 MOTHERSHIP JACKPOT! +100 and a bonus card'); document.getElementById('finPlinko').classList.add('jackpot'); }
+    renderPlinkoTally();
+  }
+  function skipPlinko(){
+    const f = infRun.finale;
+    document.querySelectorAll('#plinkoChips .pk-chip').forEach(el=>{ if (el._anim) try{ el._anim.cancel(); }catch(e){} el.remove(); });
+    plinkoBusy = false;
+    f.chips.slice(0, f.dropped).forEach((c, i)=> placeChip(c, i, true));
+    while (f.dropped < f.chips.length){ const i = f.dropped; placeChip(f.chips[i], i, true); f.dropped++; }
+    saveInfRun();
+    if (f.chips.some(c=> c.kind === 'jackpot')) document.getElementById('finPlinko').classList.add('jackpot');
+    sfx.coins(8);
+    renderPlinkoTally();
+  }
+  function goToVault(){
+    const f = infRun.finale;
+    if (f.stage !== 'plinko' || f.dropped < f.chips.length) return;
+    f.stage = 'vault'; saveInfRun(); showFinStage('vault');
+  }
+  document.getElementById('plinkoDrop').addEventListener('click', finTap(()=>{ if (infRun && infRun.finale && infRun.finale.stage === 'plinko') dropNextChip(); }));
+  document.getElementById('plinkoSkip').addEventListener('click', finTap(()=>{ if (infRun && infRun.finale && infRun.finale.stage === 'plinko') skipPlinko(); }));
+
+  // ---------- the Vault: everything is awarded here, once ----------
+  // finaleAward runs the existing award code exactly once per run - the
+  // personality (determinePersonality on the run's stats), new cards
+  // (checkUnlocks), the badges held during the run (awardBadge), the
+  // Mothership's bonus card and the Close Encounters cards - and saves what
+  // it gave, so a refresh or a double tap shows the same Vault again
+  // without awarding anything twice.
+  function finaleAward(){
+    const f = infRun.finale;
+    if (f.awarded && f.award) return f.award;
+    const b = infBlock;
+    if (b.crowd >= 10 && b.agree * 2 === b.crowd && infRun.pendingBadges.indexOf('coin_flip') === -1) infRun.pendingBadges.push('coin_flip');
+    const personality = determinePersonality(infBlockPersonalityStats(b));
+    if (b.crowd) recordSwing(b.agree, b.crowd);
+    const cards = checkUnlocks({});
+    const alien = [];
+    if (f.chips.some(c=> c.kind === 'jackpot')){ const k = grantAlienCard('mothership'); if (k) alien.push(k); }
+    closeEncounterUnlocks().forEach(k=>{ const g = grantAlienCard(k); if (g) alien.push(g); });
+    const badges = infRun.pendingBadges.filter(id=> !badgeEarned(id) && BADGES.some(x=> x.id === id));
+    badges.forEach(id=> awardBadge(id, { now:true }));
+    const bonus = f.chips.reduce((a, c)=> a + c.pts, 0);
+    f.award = { personality: personality.type, note: personality.note || null, alienLine: alienPersonalityLine(personality.type),
+      cards, alien, badges, runScore: Math.max(0, infRun.score), bonus, finalScore: Math.max(0, infRun.score) + bonus,
+      flipz: infRun.votes, crowdPct: infCrowdPct(infRun), keys: infRun.keys, boldest: infRun.boldest, ended: infRun.ended, clockMs: infRun.clockMs,
+      jackpot: f.chips.some(c=> c.kind === 'jackpot') };
+    f.awarded = true; f.vaultSeen = false;
+    saveInfRun();
+    renderCollectionBtn();
+    return f.award;
+  }
+  // (Phase 5: the alien layer's extra unlocks and personality lines.)
+  function closeEncounterUnlocks(){ return []; }
+  function alienPersonalityLine(type){ return null; }
+  let vaultTimers = [];
+  function renderVault(){
+    const f = infRun.finale, a = finaleAward();
+    const stage = document.getElementById('finVault'), scene = document.getElementById('vaultScene'), rewards = document.getElementById('vaultRewards');
+    vaultTimers.forEach(clearTimeout); vaultTimers = [];
+    stage.classList.remove('hidden', 'open', 'dial', 'jackpot', 'shown');
+    stage.classList.toggle('has-jackpot', !!a.jackpot);
+    // rewards
+    document.getElementById('vaultScore').textContent = '0';
+    document.getElementById('vaultScoreSub').textContent = a.runScore + ' run' + (a.bonus ? ' + ' + a.bonus + ' Plinko bonus' : '');
+    document.getElementById('vaultFlipz').innerHTML = '<span>⚡ +' + a.flipz + ' Flipz this run</span><span>' + stats.flips.toLocaleString() + ' lifetime</span><span>🔑 ' + a.keys + ' keys</span>';
+    const pm = PERSONALITY_META[a.personality] || PERSONALITY_META.fence_sitter;
+    document.getElementById('vaultPIcon').textContent = pm.icon;
+    document.getElementById('vaultPName').textContent = pm.name;
+    document.getElementById('vaultPBlurb').textContent = (a.note || pm.blurb) + (a.alienLine ? ' ' + a.alienLine : '');
+    const newCards = a.cards.concat(a.alien);
+    const reveal = !f.vaultSeen;
+    const badgesEl = document.getElementById('vaultBadges');
+    badgesEl.classList.toggle('hidden', !a.badges.length);
+    badgesEl.innerHTML = a.badges.length ? '<div class="vb-eyebrow">🏅 BADGES EARNED THIS RUN</div>' + a.badges.map(id=>{ const bd = BADGES.find(x=> x.id === id) || { icon:'🏅', name:id }; return '<span class="vb-badge">' + bd.icon + ' ' + bd.name + '</span>'; }).join('') : '';
+    const showAll = ()=>{
+      stage.classList.add('open', 'shown');
+      showUnlockCards(document.getElementById('vaultUnlocks'), document.getElementById('vaultCards'), newCards, reveal);
+      countUp(document.getElementById('vaultScore'), a.finalScore, prefersReducedMotion() ? 0 : 900);
+      if (!f.vaultSeen){ f.vaultSeen = true; saveInfRun(); }
+    };
+    if (prefersReducedMotion() || f.vaultSeen){ showAll(); return; }
+    // dial -> door -> (jackpot: the gold UFO beams the bonus card) -> coins -> rewards
+    stage.classList.add('dial');
+    for (let i = 0; i < 6; i++) vaultTimers.push(setTimeout(()=> sfx.vaultClick(i), 120 + i * 150));
+    let t = 1100;
+    vaultTimers.push(setTimeout(()=>{ stage.classList.add('open'); sfx.vaultOpen(); }, t));
+    t += 900;
+    if (a.jackpot){
+      vaultTimers.push(setTimeout(()=>{ stage.classList.add('jackpot'); sfx.jackpot(); const bc = document.getElementById('vaultBeamCard'); bc.innerHTML = alienCardSvg('mothership'); }, t));
+      t += 2600;
+    }
+    vaultTimers.push(setTimeout(()=>{ pourCoins(); sfx.coins(18); }, t));
+    vaultTimers.push(setTimeout(showAll, t + 700));
+  }
+  function countUp(el, to, ms){
+    if (!ms){ el.textContent = to; return; }
+    const t0 = performance.now();
+    (function step(now){ const t = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - t, 3); el.textContent = Math.round(to * e); if (t < 1) requestAnimationFrame(step); })(t0);
+  }
+  // Gold coins tumbling out of the open vault (a short canvas burst).
+  function pourCoins(){
+    const canvas = document.getElementById('vaultCoins'), ctx = canvas && canvas.getContext('2d'); if (!ctx) return;
+    const r = canvas.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1), W = r.width, H = r.height;
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    const coins = Array.from({ length: 46 }, ()=> ({ x: W * 0.5 + (Math.random() - 0.5) * 30, y: H * 0.42, vx: (Math.random() - 0.5) * 7, vy: -3 - Math.random() * 6,
+      s: 7 + Math.random() * 6, a: Math.random() * 6, va: (Math.random() - 0.5) * 0.4, d: Math.random() * 300 }));
+    const t0 = performance.now();
+    (function frame(now){
+      const t = now - t0; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+      if (t > 2600 || els.finOverlay.classList.contains('hidden')){ ctx.clearRect(0, 0, W, H); return; }
+      coins.forEach(c=>{
+        if (t < c.d) return;
+        c.vy += 0.35; c.x += c.vx; c.y += c.vy; c.a += c.va;
+        if (c.y > H - 10){ c.y = H - 10; c.vy *= -0.35; c.vx *= 0.8; }
+        const sq = Math.abs(Math.cos(c.a));
+        ctx.save(); ctx.translate(c.x, c.y); ctx.scale(Math.max(0.15, sq), 1);
+        const g = ctx.createRadialGradient(-c.s * 0.3, -c.s * 0.3, 1, 0, 0, c.s);
+        g.addColorStop(0, '#fffbe0'); g.addColorStop(0.5, '#ffc928'); g.addColorStop(1, '#b86a00');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, c.s, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#7a3d00'; ctx.lineWidth = 1.2; ctx.stroke(); ctx.restore();
+      });
+      requestAnimationFrame(frame);
+    })(t0);
+  }
+  // Share: the image (with the run summary) and a text result to paste.
+  function infRunShareText(a){
+    const parts = [a.finalScore + ' pts'];
+    if (a.crowdPct !== null && a.crowdPct !== undefined) parts.push('matched the crowd ' + a.crowdPct + '%');
+    if (a.boldest) parts.push('boldest pick: ' + a.boldest.pick);
+    return 'FlipStax Infinity: ' + parts.join(', ');
+  }
+  document.getElementById('vaultShare').addEventListener('click', finTap(()=> shareInfinityResult()));
+  document.getElementById('vaultCopy').addEventListener('click', finTap(()=>{
+    const a = infRun && infRun.finale && infRun.finale.award; if (!a) return;
+    copyText(infRunShareText(a) + ' ' + GAME_URL);
+  }));
+  function copyText(text){
+    const ok = ()=> showToast('📋 Copied — paste it anywhere');
+    const fallback = ()=>{ try{ const t = document.createElement('textarea'); t.value = text; t.setAttribute('readonly', ''); t.style.position = 'fixed'; t.style.opacity = '0'; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove(); ok(); }catch(e){ showToast(text); } };
+    try{ if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(ok, fallback); return; } }catch(e){}
+    fallback();
+  }
+  document.getElementById('vaultAgain').addEventListener('click', finTap(()=>{ if (infRun && infRun.finale && infRun.finale.awarded) startNewInfRun(); }));
   // ---------- Guess the Crowd (Infinity) ----------
   // About once every 6-8 vote rounds: a matchup with at least CROWD_DATA_MIN
   // votes, and a slider for "what percent picked the LEFT card?". Lock In,
@@ -8499,7 +8941,9 @@
     card.dataset.type = type;
     const inner = document.createElement('div'); inner.className = 'cc-inner';
     const back = document.createElement('div'); back.className = 'cc-face cc-back';
-    back.innerHTML = '<span class="cc-num">#' + String(idx + 1).padStart(2, '0') + '</span><span class="cc-q">?</span><span class="cc-lock">🔒</span>';
+    const num = isAlienCard(type) ? '\uD83D\uDEF8' + (ALIEN_ORDER.indexOf(type) + 1) : '#' + String(idx + 1).padStart(2, '0');
+    back.innerHTML = '<span class="cc-num">' + num + '</span><span class="cc-q">?</span><span class="cc-lock">🔒</span>';
+    if (isAlienCard(type)) card.classList.add('alien');
     const front = document.createElement('div'); front.className = 'cc-face cc-front';
     // Locked cards never load their art or name - nothing to peek at.
     if (unlocked) fillCardFront(front, type);
@@ -8525,6 +8969,7 @@
     if (front.childElementCount) return;
     const meta = PERSONALITY_META[type];
     const art = PERSONALITY_CARD_ART[type];
+    if (isAlienCard(type)){ front.innerHTML = alienCardSvg(type); return; }
     if (art){
       const img = document.createElement('img');
       img.src = 'images/personality-cards/' + art; img.alt = meta.name; img.decoding = 'async';
