@@ -752,6 +752,66 @@
     transition: filter 0.6s ease;
   }
   .ir-overlay.hidden{ display:none; }
+  /* Guess the Crowd: a signal scanner on a deep-space panel, gold accents. */
+  .guess-overlay{ position:fixed; inset:0; z-index:62; display:flex; align-items:center; justify-content:center; overflow:auto;
+    padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); text-align:center; color:#fff; font-family:'Inter', system-ui, sans-serif;
+    background: radial-gradient(90% 60% at 50% 30%, #3b1d8f 0%, #22105a 45%, #0d0628 100%); }
+  .guess-overlay.hidden{ display:none; }
+  .guess-sky{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+  .guess-inner{ position:relative; width:100%; max-width:420px; display:flex; flex-direction:column; align-items:center; gap:10px; animation: finIn 0.45s cubic-bezier(.2,.9,.3,1.2) both; }
+  .guess-eyebrow{ font-size:12px; font-weight:900; letter-spacing:2.5px; color:#7df9ff; padding:4px 12px; border-radius:99px; background:rgba(0,0,0,0.35); box-shadow:0 0 0 1px rgba(125,249,255,0.4), 0 0 14px rgba(125,249,255,0.35); }
+  .guess-q{ font-size:19px; font-weight:900; line-height:1.25; }
+  .guess-q b{ color:#ffd23f; }
+  .guess-cards{ display:flex; align-items:stretch; gap:8px; width:100%; }
+  .guess-card{ position:relative; flex:1; min-height:96px; border-radius:16px; padding:22px 8px 10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+    box-shadow:inset 0 0 0 2px rgba(255,255,255,0.35), 0 6px 18px rgba(0,0,0,0.35); }
+  .guess-card .gc-glyph{ font-size:34px; line-height:1; }
+  .guess-card .gc-name{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:19px; line-height:1.05; text-shadow:0 2px 6px rgba(0,0,0,0.55); }
+  .guess-card .gc-tag{ position:absolute; top:6px; left:50%; transform:translateX(-50%); font-size:10px; font-weight:900; letter-spacing:1.5px; color:#3a1d00; background:#ffd23f; padding:2px 8px; border-radius:99px; }
+  .guess-vs{ align-self:center; font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:18px; color:#ffd23f; }
+  .guess-dial{ position:relative; width:220px; margin-top:4px; }
+  .guess-dial svg{ display:block; width:220px; height:124px; overflow:visible; }
+  .guess-dial .gd-track{ fill:none; stroke:rgba(255,255,255,0.12); stroke-width:16; stroke-linecap:round; }
+  .guess-dial .gd-arc{ fill:none; stroke:url(#gdArc); stroke-width:6; stroke-linecap:round; filter:drop-shadow(0 0 6px rgba(255,210,63,0.7)); }
+  .guess-dial .gd-ticks line{ stroke:rgba(255,240,190,0.75); stroke-width:2; }
+  .guess-dial .gd-needle{ transform-origin:110px 112px; transform:rotate(0deg); transition:transform 0.12s ease-out; }
+  .guess-dial .gd-needle line{ stroke:#ffd23f; stroke-width:4; stroke-linecap:round; filter:drop-shadow(0 0 5px rgba(255,210,63,0.9)); }
+  .guess-dial .gd-needle circle{ fill:#ffd23f; stroke:#fff6c2; stroke-width:2; }
+  .guess-dial .gd-read{ position:relative; margin-top:6px; font-family:'Big Shoulders Display', sans-serif; font-weight:900; color:#fff; text-shadow:0 0 12px rgba(125,249,255,0.7); }
+  .guess-dial .gd-read b{ font-size:44px; line-height:1; } .guess-dial .gd-read span{ font-size:22px; color:#7df9ff; }
+  .guess-dial .gd-sweep{ position:absolute; left:50%; top:112px; width:200px; height:200px; margin:-100px 0 0 -100px; border-radius:50%; pointer-events:none;
+    background:conic-gradient(from 0deg, rgba(125,249,255,0.0) 0deg, rgba(125,249,255,0.22) 30deg, rgba(125,249,255,0) 32deg); clip-path:inset(0 0 50% 0); animation: gdSweep 2.6s linear infinite; }
+  @keyframes gdSweep{ from{ transform:rotate(-90deg); } to{ transform:rotate(90deg); } }
+  .guess-overlay.revealed .gd-sweep{ display:none; }
+  .guess-slider{ -webkit-appearance:none; appearance:none; width:100%; height:44px; background:transparent; margin:4px 0 0; touch-action:pan-y; }
+  .guess-slider::-webkit-slider-runnable-track{ height:14px; border-radius:99px; background:linear-gradient(90deg,#19e0ff,#ffd23f 50%,#ff3cac); box-shadow:inset 0 0 0 2px rgba(255,255,255,0.35); }
+  .guess-slider::-moz-range-track{ height:14px; border-radius:99px; background:linear-gradient(90deg,#19e0ff,#ffd23f 50%,#ff3cac); }
+  .guess-slider::-webkit-slider-thumb{ -webkit-appearance:none; width:46px; height:46px; margin-top:-16px; border-radius:50%; cursor:grab;
+    background:radial-gradient(circle at 40% 35%, #fffbe0, #ffd23f 55%, #e08a00); border:3px solid #fff; box-shadow:0 4px 12px rgba(0,0,0,0.45), 0 0 16px rgba(255,210,63,0.8); }
+  .guess-slider::-moz-range-thumb{ width:40px; height:40px; border-radius:50%; background:radial-gradient(circle at 40% 35%, #fffbe0, #ffd23f 55%, #e08a00); border:3px solid #fff; }
+  .guess-slider:disabled{ opacity:0.6; }
+  .guess-scale{ display:flex; justify-content:space-between; width:100%; font-size:11px; font-weight:800; color:rgba(255,255,255,0.6); margin-top:-4px; }
+  .guess-lock-row.hidden, .guess-result.hidden{ display:none; }
+  .guess-result{ width:100%; display:flex; flex-direction:column; gap:8px; align-items:center; }
+  .gr-title{ font-size:16px; font-weight:900; } .gr-title b{ font-family:'Big Shoulders Display', sans-serif; font-size:30px; color:#ffd23f; text-shadow:0 0 14px rgba(255,200,40,0.8); }
+  .gr-bar{ position:relative; width:100%; height:22px; border-radius:99px; background:rgba(255,255,255,0.12); box-shadow:inset 0 0 0 2px rgba(255,255,255,0.25); }
+  .gr-fill{ position:absolute; left:0; top:0; bottom:0; width:0; border-radius:99px; background:linear-gradient(90deg,#ffe066,#ffb000); box-shadow:0 0 14px rgba(255,190,0,0.8); }
+  .gr-mark{ position:absolute; top:-8px; width:4px; height:38px; margin-left:-2px; border-radius:2px; background:#7df9ff; box-shadow:0 0 8px #7df9ff; }
+  .gr-mark span{ position:absolute; top:40px; left:50%; transform:translateX(-50%); font-size:10px; font-weight:900; letter-spacing:1px; color:#7df9ff; text-transform:uppercase; }
+  .gr-verdict{ margin-top:12px; font-size:15px; font-weight:800; color:#fff6c2; min-height:20px; }
+  @media (prefers-reduced-motion: reduce){ .guess-inner{ animation:none; } .gd-sweep{ display:none; } .guess-dial .gd-needle{ transition:none; } }
+  /* Riddle round answers: four gold tiles (multiple choice). */
+  .ir-opts{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:4px; }
+  .ir-opt{ min-height:58px; padding:10px 8px; border:0; border-radius:16px; font:800 15px/1.2 'Inter', system-ui, sans-serif; color:#3a1d00; cursor:pointer;
+    background:linear-gradient(180deg,#fff7c8,#ffd23f 55%,#ffad00); box-shadow:0 4px 0 #a85d00, 0 8px 16px rgba(0,0,0,0.25);
+    animation: irOptIn 0.35s cubic-bezier(.3,1.6,.5,1) calc(var(--i) * 70ms + 120ms) both; -webkit-tap-highlight-color:transparent; }
+  .ir-opt:active{ transform:translateY(3px); box-shadow:0 1px 0 #a85d00, 0 4px 10px rgba(0,0,0,0.2); }
+  .ir-opt:disabled{ cursor:default; }
+  .ir-opt.right{ background:linear-gradient(180deg,#e2ffbd,#6ce38f 60%,#2fbf62); color:#06331a; box-shadow:0 4px 0 #1d7a3c, 0 0 18px rgba(120,255,160,0.8); }
+  .ir-opt.wrong{ background:linear-gradient(180deg,#ffd0d0,#ff7b7b); color:#4a0000; box-shadow:0 4px 0 #9c2a2a; }
+  .ir-overlay.answered .ir-opt:not(.right):not(.wrong){ opacity:0.45; }
+  @keyframes irOptIn{ from{ opacity:0; transform:translateY(10px) scale(0.92); } to{ opacity:1; transform:none; } }
+  @media (prefers-reduced-motion: reduce){ .ir-opt{ animation:none; } }
 
   /* ---- Infinity run finale (Run Complete, Plinko, the Vault) ----
      Gold on a deep violet sky, the game's own ray burst behind it. Every
@@ -2396,8 +2456,7 @@
     <div class="ir-timer" id="irTimer">0:30</div>
     <div class="ir-q" id="irQ"></div>
     <div class="ir-len" id="irLen"></div>
-    <input class="ir-input" id="irInput" type="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="Type your answer…" maxlength="30">
-    <div class="ir-buttons"><div class="daily-btn primary ir-submit" id="irSubmit">Answer</div></div>
+    <div class="ir-opts" id="irOpts"></div>
     <div class="ir-lose-box" aria-live="polite">
       <div class="ir-lose-title" id="irLoseTitle"></div>
       <div class="ir-lose-answer" id="irLoseAnswer"></div>
@@ -2756,6 +2815,7 @@
   </div>
 </div>
 
+<script src="data/infinity-riddles.js"></script>
 <script>
 (function(){
 
@@ -2894,6 +2954,7 @@
     { key:'slowmo',   icon:'\uD83D\uDC0C', label:'Slow-Mo',    color:'#2f7bff' },
     { key:'coinflip', icon:'\uD83E\uDE99', label:'Coin Flip',  color:'#17b86b' },
     { key:'wildcard', icon:'\uD83C\uDF81', label:'Wild Card',  color:'#f23c5a' },
+    { key:'goldkey',  icon:'\uD83D\uDD11', label:'Golden Key', color:'#d99a00' },
   ];
   const FLAVOR_INTROS = [
     '\uD83D\uDC7D THE ALIENS WANT AN ANSWER', '\uD83D\uDEF8 BEAMED UP. SOLVE FAST.',
@@ -3613,38 +3674,16 @@
     { q:'What gets bigger the more you take away from it?', a:'HOLE' },
     { q:'What can you break without ever touching it?', a:'PROMISE' },
   ];
-  // Infinity Flips' own riddle pool - never shared with Daily's RIDDLES above
-  // (same content rule as the VS cards and trivia). Classic folk riddles.
-  // `alts` are other answers accepted as correct; matching ignores case,
-  // spaces, punctuation, a leading "a/an/the/your" and a trailing plural s.
-  const INFINITY_RIDDLES = [
-    { q:'What has to be broken before you can use it?', a:'EGG' },
-    { q:'What gets wetter the more it dries?', a:'TOWEL' },
-    { q:'What has hands but can’t clap?', a:'CLOCK', alts:['WATCH'] },
-    { q:'What has a neck but no head?', a:'BOTTLE' },
-    { q:'What can travel around the world while staying in a corner?', a:'STAMP' },
-    { q:'What has lots of teeth but can’t bite?', a:'COMB', alts:['ZIPPER','SAW'] },
-    { q:'What goes up but never comes down?', a:'AGE' },
-    { q:'What has an eye but can’t see?', a:'NEEDLE', alts:['HURRICANE','STORM'] },
-    { q:'What can you catch but not throw?', a:'COLD' },
-    { q:'What runs but never walks, and has a mouth but never talks?', a:'RIVER' },
-    { q:'What has words but never speaks?', a:'BOOK' },
-    { q:'What is full of holes but still holds water?', a:'SPONGE' },
-    { q:'What building has the most stories?', a:'LIBRARY' },
-    { q:'What has one head, one foot and four legs?', a:'BED' },
-    { q:'What can fill a room but takes up no space?', a:'LIGHT', alts:['AIR','SOUND'] },
-    { q:'What belongs to you, but other people use it more than you do?', a:'NAME' },
-    { q:'What has cities but no houses, forests but no trees, and water but no fish?', a:'MAP' },
-    { q:'What kind of band never plays music?', a:'RUBBER BAND', alts:['RUBBERBAND','HAIR BAND','HAIRBAND'] },
-    { q:'What has a thumb and four fingers but isn’t alive?', a:'GLOVE', alts:['MITTEN'] },
-    { q:'What goes through towns and over hills but never moves?', a:'ROAD', alts:['STREET','PATH'] },
-    { q:'What can you hold in your right hand but never in your left?', a:'LEFT HAND', alts:['LEFTHAND','YOUR LEFT HAND','LEFT ELBOW'] },
-    { q:'What has a head and a tail but no body?', a:'COIN' },
-  ];
+  // Infinity Flips' riddle rounds: multiple choice, from data/infinity-riddles.js
+  // (a readable file to review and edit - 40 original riddles). Never sharing
+  // an answer with Daily's RIDDLES above (checked at startup, below). If the
+  // file didn't load, Infinity just has no riddle rounds.
+  const INFINITY_RIDDLES = (Array.isArray(window.FLIPSTAX_INFINITY_RIDDLES) ? window.FLIPSTAX_INFINITY_RIDDLES : [])
+    .filter(r=> r && typeof r.q === 'string' && typeof r.a === 'string' && Array.isArray(r.wrong) && r.wrong.length === 3);
   // Content rule: Daily's secret riddles and Infinity's riddles never share
   // an answer (same check the VS card pools get at startup).
   (function(){
-    const norm = t=> String(t).toUpperCase().replace(/[^A-Z0-9]+/g, '');
+    const norm = t=> String(t).toUpperCase().replace(/^\s*(A|AN|THE|YOUR)\s+/, '').replace(/[^A-Z0-9]+/g, '');
     const inf = new Set(); INFINITY_RIDDLES.forEach(r=> [r.a].concat(r.alts || []).forEach(a=> inf.add(norm(a))));
     RIDDLES.forEach(r=> [r.a].concat(r.alts || []).forEach(a=>{ if (inf.has(norm(a))) console.error('FlipStax: Daily secret riddle shares an answer with Infinity:', a); }));
   })();
@@ -3667,8 +3706,6 @@
     try{ localStorage.setItem(SECRET_RIDDLE_KEY, JSON.stringify({ n, bag, last: idx })); }catch(e){}
     return RIDDLES[idx];
   }
-  const INF_RIDDLE_MS = 30000;
-  const INF_RIDDLE_POINTS = 25;
   // Daily Run trivia: 5 core subjects (always one each) + 1 rotating elective
   // (always exactly one, randomly chosen each run) = 6 total, matching the
   // 6-letter word. Kept separate from DAILY_SUBJECTS above, which is used
@@ -6034,8 +6071,8 @@
     personalityBlurb: document.getElementById('personalityBlurb'), personalityPct: document.getElementById('personalityPct'),
     riddleOverlay: document.getElementById('riddleOverlay'), riddleTimer: document.getElementById('riddleTimer'),
     irOverlay: document.getElementById('irOverlay'), irField: document.getElementById('irField'), irConfetti: document.getElementById('irConfetti'),
-    irQ: document.getElementById('irQ'), irLen: document.getElementById('irLen'), irTimer: document.getElementById('irTimer'), irInput: document.getElementById('irInput'),
-    irSubmit: document.getElementById('irSubmit'), irVerdictSub: document.getElementById('irVerdictSub'),
+    irQ: document.getElementById('irQ'), irLen: document.getElementById('irLen'), irTimer: document.getElementById('irTimer'), irOpts: document.getElementById('irOpts'),
+    irVerdictSub: document.getElementById('irVerdictSub'),
     irLoseTitle: document.getElementById('irLoseTitle'), irLoseAnswer: document.getElementById('irLoseAnswer'),
     riddleQ: document.getElementById('riddleQ'), riddleInput: document.getElementById('riddleInput'),
     riddleSubmit: document.getElementById('riddleSubmit'), riddleResult: document.getElementById('riddleResult'),
@@ -6491,7 +6528,7 @@
     // counted toward crowd agreement (see crowdVerdict); agree / low are out
     // of crowd.
     return { votes:0, crowd:0, agree:0, low:0, decisionMs:0, maxCombo:0, points:0, firstHalfPoints:null,
-      trivia:0, triviaCorrect:0, wildCat:0, pu:{ flips10:0, slowmo:0, coinflip:0, wildcard:0 },
+      trivia:0, triviaCorrect:0, wildCat:0, pu:{ flips10:0, slowmo:0, coinflip:0, wildcard:0, goldkey:0 },
       shape: freshRunCrowd() };
   }
   function loadInfBlock(){
@@ -7983,9 +8020,153 @@
     document.getElementById('finVault').classList.remove('hidden');
   }
   document.getElementById('vaultAgain').addEventListener('click', finTap(()=> startNewInfRun()));
-  // Infinity run events that take a round's place (riddle rounds, Guess the
-  // Crowd); true if one started. Filled in with the new round types.
-  function infRunEventDue(){ return false; }
+  // ---------- Guess the Crowd (Infinity) ----------
+  // About once every 6-8 vote rounds: a matchup with at least CROWD_DATA_MIN
+  // votes, and a slider for "what percent picked the LEFT card?". Lock In,
+  // then the real figure is revealed. Within 5 = +25 and a key, within 10 =
+  // +15, within 20 = +5. The real tally is never put on screen (or anywhere
+  // in the page) before the guess is locked in; a guess casts no vote and
+  // writes nothing - it reads tallies already fetched for reveals
+  // (tallyCache) or one read of the next few cards' counts. No qualifying
+  // card, or tallies down / past the 2.5s timeout: the round is skipped.
+  const GUESS_GAP = [6, 8];
+  const GUESS_SCORING = [ { within:5, pts:25, key:true }, { within:10, pts:15 }, { within:20, pts:5 } ];
+  let guessPrep = null, guessState = 'idle', guessCard = null, guessTruth = null, guessCloseTimer = null;
+  function resetGuessGap(){ if (!infRun) return; infRun.sinceGuess = 0; infRun.nextGuessAt = GUESS_GAP[0] + Math.floor(Math.random() * (GUESS_GAP[1] - GUESS_GAP[0] + 1)); saveInfRun(); }
+  function upcomingCards(n){ const d = decks[contentPoolKey()]; return d.cards.slice(d.next, d.next + n); }
+  function guessCounts(c){ const a = tallyCache.get(slugify(c.a)), b = tallyCache.get(slugify(c.b)); return (a != null && b != null && a + b >= CROWD_DATA_MIN) ? { a, b } : null; }
+  // Looks a couple of rounds ahead for a qualifying card (one read at most
+  // per guess round).
+  function prepareGuess(){
+    if (guessPrep) return;
+    const cards = upcomingCards(10);
+    if (cards.some(guessCounts)){ guessPrep = { status:'ready' }; return; }
+    const ids = [];
+    cards.forEach(c=> [slugify(c.a), slugify(c.b)].forEach(id=>{ if (!tallyCache.has(id) && ids.indexOf(id) === -1 && ids.length < 20) ids.push(id); }));
+    if (!ids.length){ guessPrep = { status:'none' }; return; }
+    const prep = guessPrep = { status:'loading' };
+    fetchTallies(ids).then(data=>{
+      if (guessPrep !== prep) return;
+      if (data && data.counts) cacheTallies(data.counts);
+      prep.status = upcomingCards(12).some(guessCounts) ? 'ready' : 'none';
+    });
+  }
+  // Called from infRunEventDue; true if a guess round started.
+  function maybeGuessRound(){
+    if (!infRun || infRun.ended) return false;
+    if (infRun.sinceGuess >= infRun.nextGuessAt - 2) prepareGuess();
+    if (infRun.sinceGuess < infRun.nextGuessAt || !guessPrep || guessPrep.status === 'loading') return false;
+    const ready = guessPrep.status === 'ready'; guessPrep = null;
+    const card = ready ? upcomingCards(12).find(guessCounts) : null;
+    resetGuessGap();
+    return card ? startGuessRound(card) : false;   // nothing qualifying: skipped silently
+  }
+  function buildGuessOverlay(){
+    const ov = els.guessOverlay; if (ov.childElementCount) return;
+    let ticks = '';
+    for (let i = 0; i <= 10; i++){ const a = Math.PI * (1 - i / 10), r1 = 92, r2 = i % 5 ? 82 : 76;
+      ticks += '<line x1="' + (110 + Math.cos(a) * r1).toFixed(1) + '" y1="' + (112 - Math.sin(a) * r1).toFixed(1) + '" x2="' + (110 + Math.cos(a) * r2).toFixed(1) + '" y2="' + (112 - Math.sin(a) * r2).toFixed(1) + '"/>'; }
+    ov.innerHTML = '<canvas class="guess-sky" aria-hidden="true"></canvas><div class="guess-inner">' +
+      '<div class="guess-eyebrow">📡 GUESS THE CROWD</div>' +
+      '<div class="guess-q">What percent picked the <b>LEFT</b> card?</div>' +
+      '<div class="guess-cards"><div class="guess-card gc-left"><span class="gc-tag">LEFT</span><span class="gc-glyph"></span><span class="gc-name"></span></div>' +
+      '<div class="guess-vs">VS</div><div class="guess-card gc-right"><span class="gc-glyph"></span><span class="gc-name"></span></div></div>' +
+      '<div class="guess-dial" aria-hidden="true"><svg viewBox="0 0 220 124"><defs><linearGradient id="gdArc" x1="0" x2="1"><stop offset="0" stop-color="#19e0ff"/><stop offset="0.5" stop-color="#ffd23f"/><stop offset="1" stop-color="#ff3cac"/></linearGradient></defs>' +
+        '<path class="gd-track" d="M18 112 A92 92 0 0 1 202 112"/><path class="gd-arc" d="M18 112 A92 92 0 0 1 202 112"/><g class="gd-ticks">' + ticks + '</g>' +
+        '<g class="gd-needle"><line x1="110" y1="112" x2="110" y2="30"/><circle cx="110" cy="112" r="8"/></g></svg>' +
+        '<div class="gd-read"><b class="gd-val">50</b><span>%</span></div><div class="gd-sweep"></div></div>' +
+      '<input class="guess-slider" type="range" min="0" max="100" step="1" value="50" aria-label="Percent of players who picked the left card">' +
+      '<div class="guess-scale"><span>0%</span><span>50%</span><span>100%</span></div>' +
+      '<div class="fin-buttons guess-lock-row"><div class="daily-btn primary guess-lock" role="button" tabindex="0">🔒 Lock In</div></div>' +
+      '<div class="guess-result hidden" aria-live="polite"><div class="gr-title">🛸 The Mothership reports: <b class="gr-real">0%</b></div>' +
+        '<div class="gr-bar"><i class="gr-fill"></i><b class="gr-mark gr-mark-guess"><span>you</span></b></div>' +
+        '<div class="gr-verdict"></div><div class="fin-buttons"><div class="daily-btn primary guess-done" role="button" tabindex="0">Continue ▶</div></div></div>' +
+      '</div>';
+    const slider = ov.querySelector('.guess-slider');
+    slider.addEventListener('input', ()=> setGuessDial(+slider.value));
+    ov.querySelector('.guess-lock').addEventListener('click', e=>{ e.stopPropagation(); lockGuess(); });
+    ov.querySelector('.guess-done').addEventListener('click', e=>{ e.stopPropagation(); closeGuessRound(); });
+    ov.addEventListener('click', e=> e.stopPropagation());
+  }
+  function setGuessDial(v){
+    const ov = els.guessOverlay;
+    ov.querySelector('.gd-val').textContent = v;
+    ov.querySelector('.gd-needle').style.transform = 'rotate(' + ((v / 100) * 180 - 90).toFixed(1) + 'deg)';
+  }
+  function startGuessRound(card){
+    if (guessState !== 'idle') return false;
+    const counts = guessCounts(card); if (!counts) return false;
+    // Taken out of this lap of the deck: once its split has been seen, it
+    // shouldn't come back as an ordinary vote.
+    const d = decks[contentPoolKey()], at = d.cards.indexOf(card);
+    if (at >= d.next) d.cards.splice(at, 1);
+    buildGuessOverlay();
+    stopTallyPolling(); clearRoundTimer(); voted = false; votedSinceTime = null;
+    guessState = 'guessing'; guessCard = card;
+    guessTruth = Math.round(counts.a / (counts.a + counts.b) * 100);   // kept here only until the reveal
+    const ov = els.guessOverlay;
+    const L = ov.querySelector('.gc-left'), R = ov.querySelector('.gc-right'), grads = pairGradients(card.a, card.b);
+    L.style.background = card.mode === 'match' ? grads[0] : boostGradient(card.gradA); R.style.background = card.mode === 'match' ? grads[1] : boostGradient(card.gradB);
+    L.querySelector('.gc-glyph').textContent = card.glyphA || ''; L.querySelector('.gc-name').textContent = card.a;
+    R.querySelector('.gc-glyph').textContent = card.glyphB || ''; R.querySelector('.gc-name').textContent = card.b;
+    const slider = ov.querySelector('.guess-slider'); slider.value = 50; slider.disabled = false; setGuessDial(50);
+    ov.querySelector('.guess-result').classList.add('hidden');
+    ov.querySelector('.guess-lock-row').classList.remove('hidden');
+    ov.classList.remove('revealed');
+    ov.querySelector('.gr-fill').style.width = '0%';
+    ov.classList.remove('hidden');
+    els.slowdownBtn.classList.add('hidden');
+    if (infRun){ infRun.guesses = (infRun.guesses || 0) + 1; saveInfRun(); }
+    sfx.riddleAppear();
+    return true;
+  }
+  function guessScore(off){ for (const s of GUESS_SCORING){ if (off <= s.within) return s; } return { pts:0 }; }
+  function lockGuess(){
+    if (guessState !== 'guessing') return;
+    guessState = 'revealing';
+    const ov = els.guessOverlay, slider = ov.querySelector('.guess-slider'), guess = +slider.value, truth = guessTruth;
+    slider.disabled = true;
+    sfx.lockIn();
+    ov.querySelector('.guess-lock-row').classList.add('hidden');
+    const res = ov.querySelector('.guess-result'), real = res.querySelector('.gr-real');
+    res.querySelector('.gr-mark-guess').style.left = guess + '%';
+    res.querySelector('.gr-verdict').textContent = '';
+    res.classList.remove('hidden'); ov.classList.add('revealed');
+    const off = Math.abs(guess - truth), sc = guessScore(off);
+    const finish = ()=>{
+      real.textContent = truth + '%';
+      if (sc.pts) addRacePoints(sc.pts);
+      const key = sc.key ? addInfKey('guess') : false;
+      res.querySelector('.gr-verdict').textContent = (off === 0 ? '🎯 Dead on! ' : 'You said ' + guess + '% — ' + off + ' off. ') +
+        (sc.pts ? '+' + sc.pts + ' points' + (key ? ' · 🔑 +1 key' : '') : 'No points this time');
+      if (sc.pts >= 15) sfx.correct(); else if (sc.pts) sfx.revealWin(); else sfx.revealLose();
+      clearTimeout(guessCloseTimer); guessCloseTimer = setTimeout(closeGuessRound, 4500);
+    };
+    const fill = res.querySelector('.gr-fill');
+    if (prefersReducedMotion()){ fill.style.transition = 'none'; fill.style.width = truth + '%'; finish(); return; }
+    fill.style.transition = 'none'; fill.style.width = '0%'; void fill.offsetWidth;
+    fill.style.transition = 'width 1.3s cubic-bezier(.2,.8,.3,1)'; fill.style.width = truth + '%';
+    const t0 = performance.now();
+    (function count(now){ const t = Math.min(1, (now - t0) / 1300), e = 1 - Math.pow(1 - t, 3);
+      real.textContent = Math.round(truth * e) + '%'; if (t < 1) requestAnimationFrame(count); else finish(); })(t0);
+  }
+  function closeGuessRound(){
+    if (guessState === 'idle') return;
+    clearTimeout(guessCloseTimer); guessCloseTimer = null;
+    guessState = 'idle'; guessTruth = null; guessCard = null;
+    els.guessOverlay.classList.add('hidden');
+    if (inInfinity()) scheduleNext(0);
+  }
+  // Infinity run events that take a round's place - a riddle round (one every
+  // 26-34 vote rounds, about 3-4 a run) or Guess the Crowd; true if one started.
+  function infRunEventDue(){
+    if (!infRun || infRun.ended) return false;
+    if (infRun.voteRounds >= infRun.nextRiddleAt && INFINITY_RIDDLES.length && startInfRiddle()){
+      infRun.riddles++; infRun.nextRiddleAt = infRun.voteRounds + 26 + Math.floor(Math.random() * 9); saveInfRun();
+      return true;
+    }
+    return maybeGuessRound();
+  }
   // A 5-in-a-row crowd-match streak: the tractor beam lifts the card stack
   // (Phase 5 - the alien layer). Decorative only.
   function abductStack(){}
@@ -8158,16 +8339,8 @@
   els.riddleSubmit.addEventListener('click', submitRiddleAnswer);
   els.riddleInput.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') submitRiddleAnswer(); });
 
-  // ---------- Infinity Flips riddle round ----------
-  // Pops up now and then in Infinity (never Daily): not before 12 flips in a
-  // session, at least 18 flips apart, then an 8% chance per round - roughly
-  // one every 25-30 flips. One answer per riddle, 30s on the clock.
-  let infRiddle = null, infRiddleState = 'idle', infRiddleEndsAt = 0, infRiddleInterval = null;
-  let infRiddleCloseTimer = null, lastInfRiddleFlip = -100, infRiddleBag = [], infRiddleShownAt = 0;
-  function shouldStartInfRiddle(){
-    return document.documentElement.classList.contains('mode-infinity') &&
-      sessionFlips >= 12 && sessionFlips - lastInfRiddleFlip >= 18 && Math.random() < 0.08;
-  }
+  // Daily's Super Secret Riddle answer matching (forgiving: case, spaces,
+  // punctuation, a leading a/an/the/your and a trailing plural s).
   function normRiddleAnswer(t){
     return String(t || '').toUpperCase().replace(/[^A-Z0-9 ]+/g, ' ').replace(/^\s*(A|AN|THE|YOUR)\s+/, '').replace(/\s+/g, '');
   }
@@ -8175,6 +8348,27 @@
     const g = normRiddleAnswer(guess);
     if (!g) return false;
     return [r.a].concat(r.alts || []).some(ans=>{ const a = normRiddleAnswer(ans); return g === a || g === a + 'S' || g + 'S' === a || g === a + 'ES'; });
+  }
+  // ---------- Infinity Flips riddle round ----------
+  // About 3-4 a run: one every 26-34 vote rounds (see infRunEventDue). Four
+  // options, one right; right = +INF_RIDDLE_POINTS and a key, wrong or out of
+  // time = nothing lost. Hosted by the Mystery Visitor after a short
+  // "transmission incoming" intro (see riddleIntro).
+  const INF_RIDDLE_MS = 20000;
+  const INF_RIDDLE_POINTS = 20;
+  const INF_RIDDLE_BAG_KEY = 'flipstax_inf_riddles_v2';
+  let infRiddle = null, infRiddleState = 'idle', infRiddleEndsAt = 0, infRiddleInterval = null;
+  let infRiddleCloseTimer = null, infRiddleShownAt = 0, infRiddleIntroTimer = null;
+  // The device works through every riddle before any comes back (like the
+  // Daily secret riddles' bag).
+  function nextInfRiddleIdx(){
+    let st = null; try{ st = JSON.parse(localStorage.getItem(INF_RIDDLE_BAG_KEY) || 'null'); }catch(e){}
+    const n = INFINITY_RIDDLES.length;
+    let bag = (st && st.n === n && Array.isArray(st.bag)) ? st.bag.filter(i=> i >= 0 && i < n) : [];
+    if (!bag.length) bag = shuffle(INFINITY_RIDDLES.map((_, i)=> i));
+    const idx = bag.pop();
+    try{ localStorage.setItem(INF_RIDDLE_BAG_KEY, JSON.stringify({ n, bag })); }catch(e){}
+    return idx;
   }
   function buildRiddleField(){
     const field = els.irField; field.innerHTML = '';
@@ -8193,52 +8387,70 @@
     }
   }
   function startInfRiddle(forceIdx){
-    if (infRiddleState !== 'idle') return;
-    if (!infRiddleBag.length) infRiddleBag = shuffle(INFINITY_RIDDLES.map((_, i)=> i));
-    infRiddle = INFINITY_RIDDLES[typeof forceIdx === 'number' ? forceIdx : infRiddleBag.pop()];
-    infRiddleState = 'asking';
-    lastInfRiddleFlip = sessionFlips;
+    if (infRiddleState !== 'idle' || !INFINITY_RIDDLES.length) return false;
+    infRiddle = INFINITY_RIDDLES[typeof forceIdx === 'number' ? forceIdx : nextInfRiddleIdx()];
+    infRiddleState = 'intro';
     stopTallyPolling(); clearRoundTimer();
     // Not a vote round - keep the stalled-round watchdog out of it.
     voted = false; votedSinceTime = null;
-    els.irOverlay.classList.remove('win', 'lose');
+    els.irOverlay.classList.remove('win', 'lose', 'answered');
     buildRiddleField();
     els.irQ.textContent = infRiddle.q;
-    els.irLen.textContent = infRiddle.a.replace(/[^A-Z ]/g, '').split(' ').map(w=> w.length + ' letters').join(' + ');
-    els.irInput.value = '';
+    els.irLen.textContent = 'Right answer: +' + INF_RIDDLE_POINTS + ' points · 🔑 1 key · a miss costs nothing';
+    const opts = shuffle([infRiddle.a].concat(infRiddle.wrong));
+    els.irOpts.innerHTML = '';
+    opts.forEach((o, i)=>{
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'ir-opt'; b.textContent = o; b.dataset.right = o === infRiddle.a ? '1' : '';
+      b.style.setProperty('--i', i);
+      b.addEventListener('click', e=>{ e.stopPropagation(); if (infRiddleState !== 'asking') return; resolveInfRiddle(o === infRiddle.a ? 'win' : 'wrong', b); });
+      els.irOpts.appendChild(b);
+    });
     els.irLoseTitle.textContent = ''; els.irLoseAnswer.textContent = '';
+    els.irTimer.textContent = '0:' + String(Math.round(INF_RIDDLE_MS / 1000)).padStart(2, '0');
     els.irOverlay.classList.remove('hidden');
     els.slowdownBtn.classList.add('hidden');
     updatePauseBtnVisibility();
-    sfx.riddleAppear();
-    setTimeout(()=>{ if (infRiddleState === 'asking') try{ els.irInput.focus({ preventScroll:true }); }catch(e){} }, 400);
-    infRiddleEndsAt = Date.now() + dt(INF_RIDDLE_MS);
-    infRiddleShownAt = Date.now();
-    clearInterval(infRiddleInterval);
-    infRiddleInterval = setInterval(tickInfRiddle, 200);
-    tickInfRiddle();
+    // The Mystery Visitor's transmission comes in first (skipped with
+    // reduced motion); the timer starts once the question is up.
+    const introMs = riddleIntro();
+    clearTimeout(infRiddleIntroTimer);
+    infRiddleIntroTimer = setTimeout(()=>{
+      if (infRiddleState !== 'intro') return;
+      infRiddleState = 'asking';
+      els.irOverlay.classList.remove('intro');
+      sfx.riddleAppear();
+      infRiddleEndsAt = Date.now() + dt(INF_RIDDLE_MS);
+      infRiddleShownAt = Date.now();
+      clearInterval(infRiddleInterval);
+      infRiddleInterval = setInterval(tickInfRiddle, 200);
+      tickInfRiddle();
+    }, introMs);
+    return true;
   }
+  // (The host and the static intro are Phase 5's; until then the question
+  // simply appears.)
+  function riddleIntro(){ return 0; }
   function tickInfRiddle(){
     const remain = Math.max(0, infRiddleEndsAt - Date.now());
     const sec = Math.ceil(remain / 1000);
     els.irTimer.textContent = '0:' + (sec < 10 ? '0' : '') + sec;
-    els.irTimer.classList.toggle('danger', remain <= dt(8000));
+    els.irTimer.classList.toggle('danger', remain <= dt(6000));
     if (remain <= 0) resolveInfRiddle('timeout');
   }
-  function submitInfRiddle(){
-    if (infRiddleState !== 'asking') return;
-    if (!normRiddleAnswer(els.irInput.value)) return;   // empty - keep waiting
-    resolveInfRiddle(riddleAnswerMatches(els.irInput.value, infRiddle) ? 'win' : 'wrong');
-  }
-  function resolveInfRiddle(result){
-    if (infRiddleState !== 'asking') return;   // a submit racing the timeout
+  function resolveInfRiddle(result, pickedBtn){
+    if (infRiddleState !== 'asking') return;   // a tap racing the timeout
     infRiddleState = 'resolving';
     clearInterval(infRiddleInterval); infRiddleInterval = null;
-    try{ els.irInput.blur(); }catch(e){}
-    let reduced = false;
-    try{ reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }catch(e){}
+    els.irOverlay.classList.add('answered');
+    els.irOpts.querySelectorAll('.ir-opt').forEach(b=>{ b.disabled = true; if (b.dataset.right) b.classList.add('right'); });
+    if (pickedBtn && result !== 'win') pickedBtn.classList.add('wrong');
+    const reduced = prefersReducedMotion();
+    if (infRun && !infRun.finale) infRun.riddles = (infRun.riddles || 0);   // counted when it started (infRunEventDue)
     if (result === 'win'){
-      els.irVerdictSub.textContent = infRiddle.a + ' · +' + INF_RIDDLE_POINTS + ' points';
+      if (infRun && !infRun.finale){ infRun.riddlesRight = (infRun.riddlesRight || 0) + 1; saveInfRun(); }
+      const key = addInfKey('riddle');
+      els.irVerdictSub.textContent = infRiddle.a + ' · +' + INF_RIDDLE_POINTS + ' points' + (key ? ' · 🔑 +1 key' : '');
       els.irField.querySelectorAll('.ir-mark').forEach(m=> m.textContent = '!');
       void els.irOverlay.offsetWidth;
       els.irOverlay.classList.add('win');
@@ -8251,13 +8463,13 @@
       if (!reduced){
         const box = { left: innerWidth / 2 - 60, top: innerHeight * 0.45, width: 120, height: 0 };
         const burst = (n, spread)=> confettiBurst(els.irConfetti, box, { burst:n, spread:spread, speed:11, rain:90, life:3000,
-          colors:['#fff6a8','#c9ff7a','#ffffff','#ffd93d','#43e28c','#ff9f1c','#7df9ff'] });
+          colors:['#fff6a8','#ffe066','#ffffff','#ffd23f','#ffb000','#ff9f1c','#7df9ff'] });
         setTimeout(()=> burst(200, 2), 120);
         setTimeout(()=> burst(140, 1.4), 700);
       }
     } else {
       els.irLoseTitle.textContent = result === 'timeout' ? '⏰ TIME’S UP' : '❌ NOT QUITE';
-      els.irLoseAnswer.innerHTML = 'The answer was <b></b>';
+      els.irLoseAnswer.innerHTML = 'The answer was <b></b> · no points lost';
       els.irLoseAnswer.querySelector('b').textContent = infRiddle.a;
       els.irOverlay.classList.add('lose');
       if (result === 'timeout') sfx.riddleTimeout(); else sfx.riddleWrong();
@@ -8267,17 +8479,16 @@
   }
   function closeInfRiddle(){
     clearTimeout(infRiddleCloseTimer); infRiddleCloseTimer = null;
+    clearTimeout(infRiddleIntroTimer); infRiddleIntroTimer = null;
     clearInterval(infRiddleInterval); infRiddleInterval = null;
     const wasOpen = infRiddleState !== 'idle';
     infRiddleState = 'idle';
     els.irOverlay.classList.add('hidden');
-    els.irOverlay.classList.remove('win', 'lose');
+    els.irOverlay.classList.remove('win', 'lose', 'answered', 'intro');
     const c = els.irConfetti.getContext && els.irConfetti.getContext('2d');
     if (c) c.clearRect(0, 0, els.irConfetti.width, els.irConfetti.height);
     if (wasOpen && document.documentElement.classList.contains('mode-infinity')) scheduleNext(0);
   }
-  els.irSubmit.addEventListener('click', submitInfRiddle);
-  els.irInput.addEventListener('keydown', (e)=>{ if (e.key === 'Enter') submitInfRiddle(); });
 
   // ---------- My Collection screen ----------
   function makeCollectionCard(type, unlocked){
@@ -9930,6 +10141,7 @@
     if (!els.howtoOverlay.classList.contains('hidden')) return;
     if (performance.now() - howtoClosedAt < HOWTO_TAP_SHIELD_MS) return;   // see howtoClosedAt
     if (performance.now() - overlayClosedAt < TAP_SHIELD_MS) return;   // see noteOverlayClosed
+    if (!els.guessOverlay.classList.contains('hidden') || !els.finOverlay.classList.contains('hidden') || !els.irOverlay.classList.contains('hidden')) return;
     try{
       await voteImpl(side);
     }catch(err){
@@ -10152,8 +10364,11 @@
     renderSlowdownBtn();
     els.eventSubtitle.textContent = '\uD83C\uDF89 POWER-UP DROPPED';
     els.eventPrompt.textContent = "Choose one \u2014 it's yours";
+    // Four of the five, one left out at random (the board has four tiles).
+    const skip = Math.floor(Math.random() * POWERUPS.length), offer = POWERUPS.filter((_, i)=> i !== skip);
+    if (DEBUG_FAST) window.__debugPowerupOffer = offer.map(p=> p.key);
     els.eventTiles.forEach((tileEl,i)=>{
-      const pu = POWERUPS[i];
+      const pu = offer[i];
       tileEl.innerHTML = '<span class="pu-icon">'+pu.icon+'</span><span class="pu-label">'+pu.label+'</span>';
       tileEl.style.backgroundColor = pu.color;
       tileEl.onclick = ()=> resolvePowerUp(pu.key);
@@ -10184,6 +10399,11 @@
       sessionFlips++;
       const n = 10; addRacePoints(n);
       els.eventPrompt.textContent = '\u26A1 +' + n + ' POINTS!';
+      finishPowerUp();
+    } else if (key === 'goldkey'){
+      sfx.powerUp();
+      const got = addInfKey('golden');
+      els.eventPrompt.textContent = got ? '\uD83D\uDD11 GOLDEN KEY! +1 key' : '\uD83D\uDD11 Your key ring is full (' + INF_KEY_CAP + ' max)';
       finishPowerUp();
     } else if (key === 'slowmo'){
       sfx.powerUp();
@@ -10431,6 +10651,14 @@
       getDailySky: () => ({ sunP: dailySunP, busy: dailyUfoBusy, nextInMs: dailyUfoNext - Date.now(), ticking: !!dailySkyTimer, live: dailySkyLive() }),
       slug: (t) => slugify(t),
       getInfRun: () => infRun,
+      startGuess: (name) => { const c = name ? CARD_POOLS[contentPoolKey()].find(x=> x.a === name || x.b === name) : upcomingCards(12).find(guessCounts); return c ? startGuessRound(c) : 'no qualifying card'; },
+      startGuessMock: (ca, cb) => { const c = upcomingCards(1)[0]; tallyCache.set(slugify(c.a), ca); tallyCache.set(slugify(c.b), cb); return startGuessRound(c); },
+      guessState: () => ({ state: guessState, prep: guessPrep && guessPrep.status, inDom: els.guessOverlay.textContent }),
+      lockGuess: (v) => { const sl = els.guessOverlay.querySelector('.guess-slider'); sl.value = v; setGuessDial(v); lockGuess(); },
+      tallyCacheSize: () => tallyCache.size,
+      startInfRiddleNow: (i) => startInfRiddle(i),
+      powerupOffer: () => window.__debugPowerupOffer,
+      resolvePowerUp: (k) => resolvePowerUp(k),
       setInfRun: (o) => { ensureInfRun(); Object.assign(infRun, o); saveInfRun(); renderRunBanner(); return infRun; },
       setInfClockMs: (ms) => { ensureInfRun(); infRun.clockMs = ms; saveInfRun(); renderInfClock(); },
       endInfRun: (why) => endInfRun(why || 'points'),
@@ -10446,7 +10674,7 @@
       riddleMatches: (guess, i) => riddleAnswerMatches(guess, RIDDLES[i]),
       currentRiddle: () => currentRiddle,
       startInfRiddle: (i) => startInfRiddle(i),
-      getInfRiddle: () => ({ state: infRiddleState, riddle: infRiddle, lastFlip: lastInfRiddleFlip }),
+      getInfRiddle: () => ({ state: infRiddleState, riddle: infRiddle, count: INFINITY_RIDDLES.length }),
       closeInfRiddle: () => closeInfRiddle(),
       setInfRiddleRemainingMs: (ms) => { infRiddleEndsAt = Date.now() + ms; tickInfRiddle(); },
       showPersonalityReveal: () => showPersonalityReveal(),
