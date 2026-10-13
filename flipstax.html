@@ -2943,7 +2943,7 @@
 
 <div class="solve-overlay hidden" id="solveOverlay">
   <div class="solve-inner">
-    <div class="solve-title">🧩 Solve Today's Word</div>
+    <div class="solve-title" id="solveTitle">🧩 Word Warp: solve today's word</div>
     <div class="solve-header">
       <span class="solve-timer" id="solveTimer">1:00</span>
     </div>
@@ -3029,8 +3029,8 @@
     <div class="fin-buttons"><div class="daily-btn primary fin-go" id="finToPlinko" role="button" tabindex="0"></div></div>
   </div>
   <div class="fin-stage fin-plinko hidden" id="finPlinko">
-    <div class="pk-banner">BONUS ROUND</div>
-    <div class="pk-line">Drop your chips. Every chip pays.</div>
+    <div class="pk-banner" id="pkBanner">ORBIT DROP</div>
+    <div class="pk-line">Bonus round! Drop your chips. Every chip pays.</div>
     <div class="pk-status"><span class="pk-run" id="pkRunScore"></span><span class="pk-chipno" id="pkChipNo"></span><span class="pk-bonus">Bonus <b id="pkBonus">+0</b></span></div>
     <div class="plinko-board" id="plinkoBoard">
       <div class="pk-ufo riddle-ufo" id="pkUfo" aria-hidden="true"><span>🛸</span><i></i></div>
@@ -3074,7 +3074,7 @@
   </div>
 </div>
 <!-- Infinity Guess the Crowd (see startGuessRound). -->
-<div class="guess-overlay hidden" id="guessOverlay" role="dialog" aria-modal="true" aria-label="Guess the crowd"></div>
+<div class="guess-overlay hidden" id="guessOverlay" role="dialog" aria-modal="true" aria-label="Crowd Scan"></div>
 <div class="inf-award-overlay hidden" id="infAwardOverlay" role="dialog" aria-label="Personality earned">
   <div class="personality-inner">
     <div class="personality-mask">♾️</div>
@@ -3097,8 +3097,16 @@
 </div>
 
 <script src="data/infinity-riddles.js"></script>
+<script src="data/game-names.js"></script>
 <script>
 (function(){
+
+  // Player-facing game names and the alien host's lines live in
+  // data/game-names.js (the defaults here are only a fallback if it fails).
+  const GN = Object.assign({ orbitDrop:'Orbit Drop', cosmicSurprise:'Cosmic Surprise', crowdScan:'Crowd Scan', brainBeam:'Brain Beam', riddleRound:'Riddle Round',
+    zapWords:'Zap Words', priceProbe:'Price Probe', oddballAlert:'Oddball Alert', emojiDecode:'Emoji Decode', timeWarp:'Time Warp', portalPick:'Portal Pick',
+    wordWarp:'Word Warp', vault:'The Mothership Vault' }, (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.names) || {});
+  const HOST_LINES = (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.host) || {};
 
   // The game's public address - the one place to change if the domain does.
   // Added to the caption of every shared results image (see
@@ -3216,7 +3224,7 @@
     trivia_trainwreck: { name: 'The Bandwagoner', icon: '🚩', blurb: 'Rode the crowd\u2019s wave, pick after pick.' },
     perfectionist: { name: 'The Perfectionist', icon: '✨', blurb: 'Six trivia questions, six right answers.' },
     last_second_hero: { name: 'Last Second Hero', icon: '⏱️', blurb: 'Solved it with the clock nearly out.' },
-    wildcard_menace: { name: 'Wildcard Menace', icon: '🌀', blurb: 'Couldn\u2019t resist the Wild Card.' },
+    wildcard_menace: { name: 'Wildcard Menace', icon: '🌀', blurb: 'Couldn\u2019t resist the Cosmic Surprise.' },
     combo_king_queen: { name: 'The Combo Royalty', icon: '🔥', blurb: 'An unstoppable combo.' },
     comeback_kid: { name: 'Comeback Kid', icon: '📈', blurb: 'Slow start, big finish.' },
     gambler: { name: 'The Gambler', icon: '🎲', blurb: 'Tried every power-up in the box.' },
@@ -3233,13 +3241,8 @@
   const POWERUPS = [
     { key:'flips10',  icon:'\u26A1',      label:'+10 Points', color:'#f09d00' },
     { key:'coinflip', icon:'\uD83E\uDE99', label:'Coin Flip',  color:'#17b86b' },
-    { key:'wildcard', icon:'\uD83C\uDF81', label:'Wild Card',  color:'#f23c5a' },
+    { key:'wildcard', icon:'\uD83C\uDF81', label:GN.cosmicSurprise, color:'#f23c5a' },
     { key:'goldkey',  icon:'\uD83D\uDD11', label:'Golden Key', color:'#d99a00' },
-  ];
-  const FLAVOR_INTROS = [
-    '\uD83D\uDC7D THE ALIENS WANT AN ANSWER', '\uD83D\uDEF8 BEAMED UP. SOLVE FAST.',
-    '\uD83D\uDD2E THE ORACLE TESTS YOU', '\uD83E\uDDFF PROVE YOUR FATE',
-    '\u26A1 THE MACHINE DEMANDS PROOF',
   ];
   const SPELLING_SETS = [
     { correct:'Receive', wrongs:['Recieve','Receeve','Receve'] },
@@ -3952,7 +3955,7 @@
   const RUN_POWERUPS = [
     { key:'points10',  icon:'\u26A1', label:'+10 pts', color:'#f09d00' },
     { key:'slowclock', icon:'\uD83D\uDC0C', label:'+30s',    color:'#2f7bff' },
-    { key:'wildcard',  icon:'\uD83C\uDF81', label:'Wild Card', color:'#f23c5a' },
+    { key:'wildcard',  icon:'\uD83C\uDF81', label:GN.cosmicSurprise, color:'#f23c5a' },
     { key:'hint',      icon:'\uD83D\uDCA1', label:'Free Hint', color:'#17b86b' },
   ];
   // The Super Secret Hidden Riddle's unlock combo (see checkSecretUnlock):
@@ -6842,7 +6845,7 @@
   // never shows it (no spoilers for the UFO surprises).
   const ALIEN_META = {
     first_contact:      { name:'First Contact', icon:'👽', blurb:'Tapped 3 passing UFOs in one Infinity run.', how:'Tap 3 UFOs in one Infinity run' },
-    mothership_jackpot: { name:'Mothership Jackpot', icon:'🛸', blurb:'Hit the Mothership Jackpot in the Vault finale.', how:'Land a Plinko chip in the Mothership Jackpot' },
+    mothership_jackpot: { name:'Mothership Jackpot', icon:'🛸', blurb:'Hit the Mothership Jackpot in Orbit Drop.', how:'Land an Orbit Drop chip in the Mothership Jackpot' },
     signal_decoded:     { name:'Signal Decoded', icon:'📡', blurb:'Read the crowd to within a point, twice.', how:'Two Crowd Scan guesses within 1 point in one Infinity run' },
     abduction_survivor: { name:'Abduction Survivor', icon:'🐄', blurb:'Rode the tractor beam all the way up and lived to vote again.', how:'16 crowd matches in a row in an Infinity run' },
     riddle_master:      { name:'Riddle Master', icon:'🧩', blurb:'Cracked three riddles in one run, a hard one among them.', how:'3 riddles right in one Infinity run, including a hard one' },
@@ -6859,7 +6862,7 @@
     lucky_bounce:    { name:'Lucky Bounce', icon:'\uD83C\uDF40', blurb:'The pegs loved you. Every bounce went your way.' },
     crowd_whisperer: { name:'The Crowd Whisperer', icon:'\uD83D\uDCE3', blurb:'You don\u2019t guess the crowd. You hear it coming.' },
     riddle_sage:     { name:'The Riddle Sage', icon:'\uD83E\uDD89', blurb:'Riddles fold before you like paper airplanes.' },
-    vault_cracker:   { name:'Vault Cracker', icon:'\uD83D\uDD13', blurb:'Every chip down, bonus chip too. The vault never stood a chance.' },
+    vault_cracker:   { name:'Vault Cracker', icon:'\uD83D\uDD13', blurb:'Every chip down, bonus chip too. The Mothership Vault never stood a chance.' },
     lone_wolf:       { name:'The Lone Wolf', icon:'\uD83D\uDC3A', blurb:'The herd went one way. You strolled the other.' },
     key_keeper:      { name:'Key Keeper', icon:'\uD83D\uDDDD\uFE0F', blurb:'Keys, keys and more keys. Your pockets jingle.' },
   };
@@ -6989,7 +6992,7 @@
     { id:'know_it_all',  icon:'🧠', name:'Know-It-All',    desc:'15 trivia questions right in one session' },
     { id:'riddle_solver',icon:'🧩', name:'Riddle Solver',  desc:'Solved 5 Riddle Rounds (all-time)' },
     { id:'quick_draw',   icon:'⚡', name:'Quick Draw',     desc:'Solved a Riddle Round in under 5 seconds' },
-    { id:'high_roller',  icon:'🎲', name:'High Roller',    desc:'Picked Wild Card 10 times in one session' },
+    { id:'high_roller',  icon:'🎲', name:'High Roller',    desc:'Picked Cosmic Surprise 10 times in one session' },
     { id:'comeback',     icon:'💥', name:'Comeback Story', desc:'Fell to −10 or lower in a session, then beat that session’s high' },
     { id:'foodie',       icon:'🍕', name:'Foodie',         desc:'Voted on every Food matchup in Infinity' },
     { id:'cinephile',    icon:'🎬', name:'Cinephile',      desc:'Voted on every Movies & TV matchup in Infinity' },
@@ -7114,7 +7117,7 @@
   // ctx.run: the Daily run that just ended (absent at an Infinity award).
   const UNLOCK_RULES = {
     contrarian:        { how:'With the crowd 20% of the time or less, lifetime', test: ()=> crowdPct() !== null && crowdPct() <= 20 },
-    wildcard_menace:   { how:'Picked the Wild Card power-up in 10 different runs or Infinity sessions', test: ()=> progress.wildRuns >= 10 },
+    wildcard_menace:   { how:'Picked the Cosmic Surprise power-up in 10 different runs or Infinity sessions', test: ()=> progress.wildRuns >= 10 },
     chaos_agent:       { how:'Flip-flopped between with and against the crowd on 60%+ of your picks, lifetime',
                          test: ()=> progress.crowdN >= UNLOCK.CROWD_MIN_PICKS && progress.crowdSwitches / (progress.crowdN - 1) >= UNLOCK.CHAOS_SWITCH_RATE },
     silent_assassin:   { how:'With the crowd 35% or less AND 90%+ trivia accuracy, lifetime',
@@ -7790,7 +7793,7 @@
     ctx.save(); ctx.shadowColor = 'rgba(80,10,40,0.9)'; ctx.shadowBlur = 9; ctx.shadowOffsetY = 2;
     ctx.font = '800 36px ' + SHARE_FONT_T; ctx.fillStyle = '#fff1c2'; ctx.fillText('POINTS', cx, 482); ctx.fillText('POINTS', cx, 482);
     ctx.font = '600 34px ' + SHARE_FONT_T; ctx.fillStyle = '#fff8e6';
-    const runLine = a.runScore + ' run' + (a.bonus ? ' + ' + a.bonus + ' Plinko bonus' : '');
+    const runLine = a.runScore + ' run' + (a.bonus ? ' + ' + a.bonus + ' ' + GN.orbitDrop + ' bonus' : '');
     ctx.fillText(runLine, cx, 534); ctx.fillText(runLine, cx, 534);
     ctx.restore();
     // the personality's full card
@@ -8133,7 +8136,7 @@
     els.powerupIcon.classList.add('hidden');
     fitTopChip();
     els.eventSubtitle.textContent = second ? '🔁 SECOND CHANCE · answer right, recover a letter'
-      : '\uD83C\uDFAE RUN TRIVIA \u00B7 answer right, earn a letter';
+      : '\uD83E\uDDE0 ' + GN.brainBeam.toUpperCase() + ' \u00B7 answer right, earn a letter';
     els.eventPrompt.textContent = q.question;
     els.eventTiles.forEach((tileEl,i)=>{
       tileEl.textContent = q.opts[i];
@@ -8342,7 +8345,7 @@
           clearInterval(rollInterval);
           if (runWildcardDelta == null) return;   // run left mid-spin; resume applies it
           const delta = runWildcardDelta; runWildcardDelta = null;
-          if (wildWin){ addRunScore(delta); sfx.correct(); els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: +25 points!'; }
+          if (wildWin){ addRunScore(delta); sfx.correct(); els.eventPrompt.textContent = '\uD83C\uDF81 ' + GN.cosmicSurprise.toUpperCase() + ': +25 points!'; }
           else{
             // A loss can't drop the score below the last trivia milestone
             // reached (a full -25 used to open ~2.5-minute gaps before the
@@ -8351,7 +8354,7 @@
             const loss = -delta;
             addRunScore(-loss);
             sfx.wrong();
-            els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: ' + (loss === 25 ? '\u221225 points'
+            els.eventPrompt.textContent = '\uD83C\uDF81 ' + GN.cosmicSurprise.toUpperCase() + ': ' + (loss === 25 ? '\u221225 points'
               : loss > 0 ? ('\u2212' + loss + ' points (floored at ' + floor + ')') : 'no points lost \u2014 your milestone is safe');
           }
           finishRunPowerUp();
@@ -8600,7 +8603,7 @@
       document.getElementById('finBoldPct').textContent = 'You went against ' + r.boldest.against + '% of the crowd';
     }
     const chips = r.finale.chips.length;
-    document.getElementById('finToPlinko').textContent = chips ? '🪙 Bonus round: ' + chips + ' chip' + (chips > 1 ? 's' : '') + ' ▶' : '🔐 Open the Vault ▶';
+    document.getElementById('finToPlinko').textContent = chips ? '🪙 ' + GN.orbitDrop + ': ' + chips + ' chip' + (chips > 1 ? 's' : '') + ' ▶' : '🔐 Open ' + GN.vault + ' ▶';
     el.classList.remove('hidden');
     sfx.levelUp();
   }
@@ -8721,7 +8724,7 @@
     document.getElementById('pkBonus').textContent = '+' + won;
     document.getElementById('plinkoTally').innerHTML = f.chips.slice(0, f.dropped).map(c=> '<span class="pt-chip' + (c.kind === 'jackpot' ? ' jack' : '') + '">' + plinkoLabel(c.kind) + ' <b>+' + c.pts + '</b></span>').join('');
     const drop = document.getElementById('plinkoDrop'), all = document.getElementById('plinkoAll');
-    drop.textContent = left > 0 ? '\uD83E\uDE99 Drop chip' : '\uD83D\uDD10 Open the Vault \u25B6';
+    drop.textContent = left > 0 ? '\uD83E\uDE99 Drop chip' : '\uD83D\uDD10 Open ' + GN.vault + ' \u25B6';
     drop.classList.toggle('disabled', left > 0 && (pkAuto || pkLaunched > f.dropped));
     all.classList.toggle('hidden', left <= 1 || pkAuto);
   }
@@ -9024,7 +9027,7 @@
     stage.classList.toggle('has-jackpot', !!a.jackpot);
     // rewards
     document.getElementById('vaultScore').textContent = '0';
-    document.getElementById('vaultScoreSub').textContent = a.runScore + ' run' + (a.bonus ? ' + ' + a.bonus + ' Plinko bonus' : '');
+    document.getElementById('vaultScoreSub').textContent = a.runScore + ' run' + (a.bonus ? ' + ' + a.bonus + ' ' + GN.orbitDrop + ' bonus' : '');
     document.getElementById('vaultFlipz').innerHTML = '<span>⚡ +' + a.flipz + ' Flipz this run</span><span>' + Math.max(stats.flips, a.flipz).toLocaleString() + ' lifetime</span><span>🔑 ' + a.keys + (a.stats && a.stats.keysHeld > 0 ? ' earned · ' + a.stats.keysHeld + ' kept' : ' keys') + '</span>';
     const pm = PERSONALITY_META[a.personality] || PERSONALITY_META.fence_sitter;
     // The result with its full card: a run personality's card always (it's
@@ -9050,7 +9053,7 @@
     const asImage = (pre)=>{
       if (!pre || !pre.canvas || infRun.finale.award !== a) return false;
       try{ shareImg.src = pre.blob ? URL.createObjectURL(pre.blob) : pre.canvas.toDataURL('image/png'); }catch(e){ return false; }
-      shareImg.alt = 'Run complete: ' + a.finalScore + ' points (' + a.runScore + ' run' + (a.bonus ? ' + ' + a.bonus + ' Plinko bonus' : '') + '). ' + pm.name + '. ' + runShareStatLine(a) + '.' +
+      shareImg.alt = 'Run complete: ' + a.finalScore + ' points (' + a.runScore + ' run' + (a.bonus ? ' + ' + a.bonus + ' ' + GN.orbitDrop + ' bonus' : '') + '). ' + pm.name + '. ' + runShareStatLine(a) + '.' +
         (a.badges.length ? ' Badges: ' + a.badges.map(id=> (BADGES.find(x=> x.id === id) || { name:id }).name).join(', ') + '.' : '') + (newCards.length ? ' New card unlocked.' : '');
       stage.classList.add('as-image'); return true;
     };
@@ -9264,7 +9267,7 @@
     for (let i = 0; i <= 10; i++){ const a = Math.PI * (1 - i / 10), r1 = 92, r2 = i % 5 ? 82 : 76;
       ticks += '<line x1="' + (110 + Math.cos(a) * r1).toFixed(1) + '" y1="' + (112 - Math.sin(a) * r1).toFixed(1) + '" x2="' + (110 + Math.cos(a) * r2).toFixed(1) + '" y2="' + (112 - Math.sin(a) * r2).toFixed(1) + '"/>'; }
     ov.innerHTML = '<canvas class="guess-sky" aria-hidden="true"></canvas><div class="guess-inner">' +
-      '<div class="guess-eyebrow">📡 GUESS THE CROWD</div>' +
+      '<div class="guess-eyebrow">📡 ' + GN.crowdScan.toUpperCase() + '</div>' +
       '<div class="guess-q">What percent picked the <b>LEFT</b> card?</div>' +
       '<div class="guess-cards"><div class="guess-card gc-left"><span class="gc-tag">LEFT</span><span class="gc-glyph"></span><span class="gc-name"></span></div>' +
       '<div class="guess-vs">VS</div><div class="guess-card gc-right"><span class="gc-glyph"></span><span class="gc-name"></span></div></div>' +
@@ -11591,7 +11594,7 @@
     const trivia = generateSubjectTrivia(subject, contentPoolKey());
     if (DEBUG_FAST) window.__debugLastTriviaQ = trivia;
     els.powerupIcon.classList.add('hidden');
-    els.eventSubtitle.textContent = pick(FLAVOR_INTROS);
+    els.eventSubtitle.textContent = '\uD83E\uDDE0 ' + GN.brainBeam.toUpperCase();
     els.eventPrompt.textContent = trivia.question;
     els.eventTiles.forEach((tileEl,i)=>{
       tileEl.textContent = trivia.opts[i];
@@ -11713,16 +11716,16 @@
     const prize = drawWildPrize(), ov = els.eventOverlay, stage = document.getElementById('giftStage'), label = document.getElementById('giftPrize');
     stage.classList.remove('shaking', 'opened'); label.textContent = '';
     ov.classList.add('gift-mode');
-    els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD \u2014 what\u2019s inside?';
+    els.eventPrompt.textContent = '\uD83C\uDF81 ' + GN.cosmicSurprise.toUpperCase() + ' \u2014 what\u2019s inside?';
     const open = ()=>{
       stage.classList.remove('shaking'); stage.classList.add('opened');
       let text;
       if (prize === 'points10'){ addRacePoints(10); text = '+10 points'; }
       else if (prize === 'points20'){ addRacePoints(20); text = '+20 points'; }
       else if (prize === 'key'){ addInfKey('wildcard'); text = '\uD83D\uDD11 +1 key'; }
-      else { infRun.bonusChip = true; saveInfRun(); text = '\uD83E\uDE99 Bonus Plinko chip!'; }
+      else { infRun.bonusChip = true; saveInfRun(); text = '\uD83E\uDE99 Bonus ' + GN.orbitDrop + ' chip!'; }
       label.textContent = text;
-      els.eventPrompt.textContent = '\uD83C\uDF81 WILD CARD: ' + text;
+      els.eventPrompt.textContent = '\uD83C\uDF81 ' + GN.cosmicSurprise.toUpperCase() + ': ' + text;
       sfx.correct(); if (prize === 'chip' || prize === 'key') sfx.coins(6);
       setTimeout(finishPowerUp, 500);
     };
@@ -12246,11 +12249,11 @@
       'Earn 🔑 keys: match the crowd 3 times in a row, or nail a trivia question or a riddle.'],
     chipsLabel:'Power-ups — pick one when they drop',
     chips:[ ['⚡ +10 Points', 'Instant points'], ['🪙 Coin Flip', 'Heads or tails: win or lose up to 15'],
-            ['🎁 Wild Card', 'A mystery prize — never a loss'], ['🔑 Golden Key', 'An extra key'] ] };
-  const HOWTO_LAST_INFINITY = { icon:'🛸', lead:'New rounds, then the Vault.',
-    lines:['📡 Guess the Crowd: slide to the % you think picked the left card. The closer, the more points.',
+            ['🎁 ' + GN.cosmicSurprise, 'A mystery prize — never a loss'], ['🔑 Golden Key', 'An extra key'] ] };
+  const HOWTO_LAST_INFINITY = { icon:'🛸', lead:'New rounds, then ' + GN.vault + '.',
+    lines:['📡 ' + GN.crowdScan + ': slide to the % you think picked the left card. The closer, the more points.',
       '🧩 Riddle rounds: pick the answer. Right = +20 and a key, a miss costs nothing.',
-      '🔐 Finish the run, drop a gold chip for each key, then open the Vault: your score, personality, cards and badges.'] };
+      '🔐 Finish the run, drop a gold chip for each key in ' + GN.orbitDrop + ', then open ' + GN.vault + ': your score, personality, cards and badges.'] };
   const HOWTO_SCREENS = {
     daily: [
       HOWTO_PICK,
@@ -12258,7 +12261,7 @@
         lines:["Each right answer reveals a letter of today's secret word.", 'Then unscramble it before time runs out.'],
         chipsLabel:'Power-ups — pick one when they drop',
         chips:[ ['⚡ +10 pts', 'Instant points'], ['🐌 +30s', 'More time on the clock'],
-                ['🎁 Wild Card', '50/50: +25 or −25 points'], ['💡 Free Hint', 'A clue for the word'] ] },
+                ['🎁 ' + GN.cosmicSurprise, '50/50: +25 or −25 points'], ['💡 Free Hint', 'A clue for the word'] ] },
       HOWTO_LAST_DAILY,
     ],
     infinity: [
