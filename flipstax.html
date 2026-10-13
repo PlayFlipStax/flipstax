@@ -2232,7 +2232,7 @@
      opacity only; motion stops while the tab is hidden; reduced motion: a
      still sunburst. */
   .show-bg, .show-frame, .show-fx, .show-host{ display:none; }
-  :root.mode-daily .show-bg{ display:block; position:fixed; z-index:-3; pointer-events:none; }
+  :root.mode-daily .show-bg, :root.mode-infinity .show-bg{ display:block; position:fixed; z-index:-3; pointer-events:none; }
   :root.mode-daily .show-frame, :root.mode-infinity .show-frame{ display:block; position:fixed; inset:0; z-index:70; pointer-events:none; border-radius:22px;
     box-shadow:0 0 0 40px #1c0b3d, inset 0 0 0 3px #ffd23f, inset 0 0 0 5px rgba(122,61,0,0.55), inset 0 0 22px rgba(255,200,60,0.35); }
   :root.mode-daily .show-fx, :root.mode-infinity .show-fx{ display:block; position:fixed; z-index:71; }
@@ -2254,7 +2254,7 @@
   :root.mode-daily .half.picked::after{ border-color:#ffd23f; }
   :root.mode-daily .half.picked::before{ box-shadow:inset 0 0 40px 8px rgba(255,236,150,0.6); animation:none; }
   /* the host: bottom-left, bobbing; a speech bubble for his lines (B9) */
-  :root.mode-daily .show-host{ display:flex; align-items:flex-end; gap:6px; position:fixed; left:12px; bottom:calc(6px + env(safe-area-inset-bottom)); z-index:72; pointer-events:none; }
+  :root.mode-daily .show-host, :root.mode-infinity .show-host{ display:flex; align-items:flex-end; gap:6px; position:fixed; left:12px; bottom:calc(6px + env(safe-area-inset-bottom)); z-index:72; pointer-events:none; }
   .show-host .alien{ width:36px; height:41px; }
   .show-say{ max-width:min(250px, calc(100vw - 80px)); padding:6px 11px; border-radius:14px 14px 14px 4px; background:#fff; color:#3a1060; font:800 13px/1.25 'Inter', sans-serif;
     box-shadow:0 3px 10px rgba(30,0,40,0.4); opacity:0; transform:translateY(6px) scale(0.9); transform-origin:0 100%; transition:opacity 0.2s, transform 0.25s var(--ease-pop); margin-bottom:22px; }
@@ -2299,6 +2299,21 @@
   :root.mode-daily #readoutOverlay{ background:none; }
   #readoutOverlay:not(.show) .warp-bg{ display:none; }   /* (the overlay only fades out, so its rays would keep turning unseen) */
   :root.mode-daily #readoutOverlay .personality-inner{ position:relative; z-index:1; padding:18px 16px; border-radius:22px; background:rgba(32,8,56,0.82); border:2px solid rgba(255,214,90,0.6); box-shadow:0 10px 30px rgba(20,0,40,0.5); }
+  /* Infinity's VS screen (C5, Oct 2026): the show background in the gold
+     "entry" world (gold to orange to magenta - Infinity stays the gold mode,
+     Daily is pink), turning rays in place of the gold shell's sparkles and
+     sweep; the VS badge is a gold coin; a pick rings gold; the host bobs in
+     the corner; more room between the cards and bigger names, as in Daily.
+     Same pink and cyan bevelled cards, same rules. */
+  :root.mode-infinity body{ background:#3a0f6b; }
+  :root.mode-infinity body::before, :root.mode-infinity body::after{ display:none; }
+  :root.mode-infinity .board{ gap:22px; --board-gap:22px; }
+  :root.mode-infinity .take{ font-size:clamp(26px, 7.8vw, 42px); font-weight:800; }
+  :root:is(.mode-infinity, .mode-daily) .divider{ width:56px; height:56px; font-size:19px; color:#2a1300; border:4px solid #7a3d00; animation:none;
+    background:radial-gradient(circle at 35% 30%, #fff8c8, #ffd23f 50%, #f5a300); box-shadow:0 0 18px rgba(255,210,60,0.85), 0 3px 0 rgba(60,20,0,0.5); }
+  :root.mode-infinity #board .half.picked::after{ background:#ffd23f; }
+  :root.mode-infinity .half.picked::before{ box-shadow:inset 0 0 40px 8px rgba(255,214,90,0.7); animation:none; }
+  :root.mode-infinity .hint{ padding-left:52px; padding-right:52px; }
   /* Infinity's Riddle Round (C2, Oct 2026): the riddle world (deep blue,
      cyan accents) with turning rays behind the drifting question marks; the
      panel in the show's dark-and-gold; the gold frame flashes on a right
@@ -12122,8 +12137,14 @@
   let showWorldNow = 'vs';
   function setShowWorld(w){ if (w === showWorldNow) return; showWorldNow = w; showBg.className = 'show-bg bg w-' + w; }
   function syncShowWorld(){
-    if (!document.documentElement.classList.contains('mode-daily')) return;
     const open = el=> el && !el.classList.contains('hidden');
+    if (document.documentElement.classList.contains('mode-infinity')){
+      // C5: Infinity's VS world; paused under its full-screen layers.
+      setShowWorld('entry');
+      showBg.classList.toggle('paused', open(els.finOverlay) || open(els.irOverlay) || open(els.guessOverlay));
+      return;
+    }
+    if (!document.documentElement.classList.contains('mode-daily')) return;
     if (els.readoutOverlay.classList.contains('show')) setShowWorld('results');
     else if (open(els.solveOverlay)) setShowWorld('jumble');
     else if (open(els.eventOverlay)) setShowWorld(els.eventOverlay.classList.contains('powerup') || runPhase === 'powerup' ? 'powerup' : 'trivia');
@@ -12132,7 +12153,7 @@
     // (the Word Warp and results have their own; the Vault is on top).
     showBg.classList.toggle('paused', open(els.solveOverlay) || els.readoutOverlay.classList.contains('show') || open(els.finOverlay) || !showCard.classList.contains('hidden'));
   }
-  [els.eventOverlay, els.solveOverlay, els.readoutOverlay, els.finOverlay, document.getElementById('showCard')].forEach(ov=> new MutationObserver(syncShowWorld).observe(ov, { attributes:true, attributeFilter:['class'] }));
+  [els.eventOverlay, els.solveOverlay, els.readoutOverlay, els.finOverlay, els.irOverlay, els.guessOverlay, document.getElementById('showCard'), document.documentElement].forEach(ov=> new MutationObserver(syncShowWorld).observe(ov, { attributes:true, attributeFilter:['class'] }));
   // C1: Infinity's popup world - the power-up pick, a Cosmic Surprise, or
   // the bonus Brain Beam.
   const evBg = document.getElementById('evBg');
@@ -12152,7 +12173,7 @@
   let hostSayT = null;
   function hostLine(key){ const v = HOST_CAMEO[key]; return Array.isArray(v) ? v[Math.floor(Math.random() * v.length)] : (v || ''); }
   function hostSay(text, ms){
-    if (!text || !document.documentElement.classList.contains('mode-daily')) return;
+    if (!text || !document.documentElement.classList.contains('mode-daily') && !document.documentElement.classList.contains('mode-infinity')) return;
     const b = document.getElementById('showSay');
     b.textContent = text; b.classList.add('on');
     clearTimeout(hostSayT); hostSayT = setTimeout(()=> b.classList.remove('on'), ms || 1600);
@@ -12635,6 +12656,7 @@
       if (cv.counted){
         infRun.crowdN++;
         if (cv.withCrowd){
+          { const ph = side === 'A' ? els.halfA : els.halfB; FX.glowSweep(showFx, ph); FX.burstAt(showFx, ph, { count:8, spread:70, shapes:['star'], colors:['#ffd23f', '#fff3c4', '#ffb21f'] }); }   // C5
           infRun.crowdAgree++; infRun.matchStreak++; infRun.maxMatchStreak = Math.max(infRun.maxMatchStreak || 0, infRun.matchStreak);
           if (infRun.matchStreak % INF_MATCHES_PER_KEY === 0 && addInfKey('streak')) showToast('\uD83D\uDD11 ' + infRun.matchStreak + ' crowd matches in a row \u2014 +1 key');
           if (infRun.matchStreak === ABDUCTION_STREAK) abductStack();
