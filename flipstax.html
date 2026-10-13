@@ -2273,6 +2273,10 @@
   @keyframes scFlash{ 0%{ opacity:0; } 12%{ opacity:0.85; } 30%{ opacity:0.2; } 45%{ opacity:0.6; } 100%{ opacity:0; } }
   @media (prefers-reduced-motion: reduce){ .show-card .sc-title, .sc-name, .sc-tap{ animation:none; } .sc-flash{ animation:none; display:none; } }
   @media (max-height:660px){ .show-card .sc-title{ font-size:44px; } .sc-host{ width:56px; height:64px; } .show-card .sc-inner{ gap:9px; } .sc-rules{ font-size:13px; } }
+  /* B9: the tapped answer / door rattles while the drumroll plays. */
+  .event-tile.picked-wait{ animation:tileRattle 0.12s linear infinite !important; box-shadow:var(--tile-depth), 0 0 0 4px #fff3c4, 0 0 18px rgba(255,240,180,0.8); }
+  @keyframes tileRattle{ 0%, 100%{ transform:rotate(0); } 25%{ transform:rotate(-1.5deg); } 75%{ transform:rotate(1.5deg); } }
+  @media (prefers-reduced-motion: reduce){ .event-tile.picked-wait{ animation:none !important; } }
   /* Brain Beam answers (B3): the right one rings green, a wrong pick red. */
   .event-tile.is-right{ box-shadow:var(--tile-depth), 0 0 0 4px #7dff9e, 0 0 22px 6px rgba(80,255,140,0.75); z-index:1; }
   .event-tile.is-wrong{ box-shadow:var(--tile-depth), 0 0 0 4px #ff4d4d, 0 0 20px 5px rgba(255,40,40,0.7); opacity:0.85; }
@@ -4317,6 +4321,7 @@
   const SHOW_VS_AFTER = [3, 4];              // VS cards between the Brain Beam and the Portal Pick
   const SHOW_RIDDLE_CHANCE = 0.5;            // chance an episode swaps one round's Brain Beam for a riddle
   const SHOW_BUMPER_MS = 1000;               // the round title card with its light flash
+  const QUIZ_DRUMROLL_MS = 450;              // B9: the drumroll between tapping an answer (or a portal) and its reveal
   // Brain Breaks are not built yet: one slot per round, after its Portal
   // Pick. Put a game in a slot as (done) => { ...; done(); } and the show
   // runs it there; null slots are skipped. BRAIN_BREAK_EST_MS is the time a
@@ -4896,8 +4901,82 @@
   // Infinity run sounds (keys, the finale's coins and chips), built from the
   // Coin Flip's coin voices at the same levels - Web Audio, so the sound
   // setting and the silent switch apply like every other effect.
-  function withSfxCtx(fn){ if (!soundOn) return; const ctx = getAudioCtx(); if (!ctx) return; try{ fn(ctx, ctx.currentTime); }catch(e){} }
+  function withSfxCtx(fn){ if (!soundOn) return; const ctx = getAudioCtx(); if (!ctx) return; try{ fn(ctx, ctx.currentTime); }catch(e){ if (DEBUG_FAST) (window.__sfxErrors = window.__sfxErrors || []).push(String(e && e.stack || e)); } }
+  // ---------- The show's sounds (B9, Oct 2026) ----------
+  // All synthesized (no files): the host's voice (gibberish blips under
+  // his speech bubble, which is the subtitle), a snare drumroll before a
+  // reveal, the studio crowd's "ooh", the round bumpers' brass stab, a
+  // ding when a letter lands, a sad trombone for a missed Word Warp. Muted
+  // with everything else (withSfxCtx / playTone check the sound switch).
+  let showNoiseBuf = null;
+  function showNoise(ctx){
+    if (!showNoiseBuf){ const len = Math.floor(ctx.sampleRate); showNoiseBuf = ctx.createBuffer(1, len, ctx.sampleRate); const d = showNoiseBuf.getChannelData(0); for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1; }
+    return showNoiseBuf;
+  }
+  function noiseHit(ctx, t, vol, dur, type, freq, q){
+    const n = ctx.createBufferSource(); n.buffer = showNoise(ctx);
+    const f = ctx.createBiquadFilter(); f.type = type; f.frequency.value = freq; if (q) f.Q.value = q;
+    const g = ctx.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    n.connect(f); f.connect(g); g.connect(ctx.destination); n.start(t, Math.random() * 0.5, dur + 0.05);
+  }
+  function brass(ctx, t, freqs, dur, vol){
+    freqs.forEach(fq=>{
+      const o = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain();
+      o.type = 'sawtooth'; o.frequency.setValueAtTime(fq * 0.985, t); o.frequency.linearRampToValueAtTime(fq, t + 0.05);
+      lp.type = 'lowpass'; lp.frequency.setValueAtTime(900, t); lp.frequency.linearRampToValueAtTime(2600, t + 0.06); lp.frequency.exponentialRampToValueAtTime(700, t + dur);
+      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(lp); lp.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + dur + 0.05);
+    });
+  }
+  const showSfx = {
+    // The host talks: one blip a syllable-ish (up to 12), in a sing-song.
+    hostVoice: (text)=> withSfxCtx((ctx, t)=>{
+      const n = Math.max(3, Math.min(12, Math.round(String(text).replace(/[^a-z]/gi, '').length / 3)));
+      for (let k = 0; k < n; k++){
+        const f = 300 + 140 * Math.sin(k * 1.7) + Math.random() * 90, at = t + k * 0.068;
+        const o = ctx.createOscillator(), g = ctx.createGain(); o.type = k % 3 ? 'square' : 'triangle';
+        o.frequency.setValueAtTime(f, at); o.frequency.linearRampToValueAtTime(f * (k === n - 1 ? 0.8 : 1.12), at + 0.05);
+        g.gain.setValueAtTime(0.0001, at); g.gain.linearRampToValueAtTime(0.03, at + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.055);
+        o.connect(g); g.connect(ctx.destination); o.start(at); o.stop(at + 0.07);
+      }
+    }),
+    // A snare roll that swells for `ms`, then a cymbal tap.
+    drumroll: (ms)=> withSfxCtx((ctx, t)=>{
+      const dur = (ms || 450) / 1000;
+      for (let x = 0; x < dur; x += 0.032) noiseHit(ctx, t + x, 0.025 + 0.08 * (x / dur), 0.05, 'highpass', 1700);
+      noiseHit(ctx, t + dur, 0.12, 0.5, 'highpass', 5200);
+    }),
+    // The studio audience: "ooooh" - detuned voices through a sliding vowel filter.
+    crowdOoh: ()=> withSfxCtx((ctx, t)=>{
+      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 3;
+      bp.frequency.setValueAtTime(380, t); bp.frequency.linearRampToValueAtTime(720, t + 0.35); bp.frequency.linearRampToValueAtTime(430, t + 1.0);
+      const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.11, t + 0.18); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.1);
+      bp.connect(g); g.connect(ctx.destination);
+      [196, 220, 247, 262, 294, 330].forEach((f, i)=>{ const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.setValueAtTime(f * (1 + (Math.random() - 0.5) * 0.03), t);
+        o.frequency.linearRampToValueAtTime(f * 1.12, t + 0.35); o.frequency.linearRampToValueAtTime(f * 0.94, t + 1.0); o.connect(bp); o.start(t + i * 0.012); o.stop(t + 1.15); });
+      noiseHit(ctx, t, 0.04, 1.0, 'bandpass', 900, 0.8);
+    }),
+    // The round bumper's jingle: a brass stab and a cymbal; bigger for the finale.
+    bumper: (last)=> withSfxCtx((ctx, t)=>{
+      brass(ctx, t, [392, 494, 587], 0.16, 0.05); brass(ctx, t + 0.17, [523, 659, 784], last ? 0.6 : 0.42, 0.055);
+      if (last) brass(ctx, t + 0.5, [587, 740, 880, 1175], 0.8, 0.05);
+      noiseHit(ctx, t + 0.17, 0.09, 0.7, 'highpass', 5600);
+    }),
+    letterLand: ()=> withSfxCtx((ctx, t)=>{ coinPing(ctx, t, 0.09, 1760); coinPing(ctx, t + 0.08, 0.08, 2349); }),
+    // A missed Word Warp: the sad trombone (four falling notes, the last one wobbles).
+    warpMiss: ()=> withSfxCtx((ctx, t)=>{
+      [[392, 0, 0.3], [370, 0.32, 0.3], [349, 0.64, 0.3], [330, 0.96, 0.9]].forEach(([f, at, d], i)=>{
+        const o = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain(); o.type = 'sawtooth';
+        o.frequency.setValueAtTime(f, t + at);
+        if (i === 3){ const lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 6; lg.gain.value = 9; lfo.connect(lg); lg.connect(o.frequency); lfo.start(t + at); lfo.stop(t + at + d); o.frequency.linearRampToValueAtTime(f * 0.94, t + at + d); }
+        lp.type = 'lowpass'; lp.frequency.value = 1100;
+        g.gain.setValueAtTime(0.0001, t + at); g.gain.linearRampToValueAtTime(0.07, t + at + 0.04); g.gain.setValueAtTime(0.07, t + at + d * 0.7); g.gain.exponentialRampToValueAtTime(0.0001, t + at + d);
+        o.connect(lp); lp.connect(g); g.connect(ctx.destination); o.start(t + at); o.stop(t + at + d + 0.05);
+      });
+    }),
+  };
   const sfx = {
+    hostVoice: showSfx.hostVoice, drumroll: showSfx.drumroll, crowdOoh: showSfx.crowdOoh, bumper: showSfx.bumper, letterLand: showSfx.letterLand, warpMiss: showSfx.warpMiss,
     key: ()=> withSfxCtx((ctx, t)=>{ coinPing(ctx, t, 0.09, 1568); coinPing(ctx, t + 0.09, 0.08, 2093); haptic([8,20,8]); }),
     milestone: ()=>{ [659, 784, 988, 1319].forEach((f, i)=> playTone(f, i * 0.08, 0.18, 'triangle', 0.1)); haptic([12,30,12]); },
     chipPeg: (i)=> withSfxCtx((ctx, t)=> coinTap(ctx, t, 0.22, 2600 + (i % 4) * 280)),
@@ -8797,7 +8876,13 @@
       tileEl.classList.remove('portal', 'open', 'is-right', 'is-wrong');
       tileEl.textContent = q.opts[i];
       tileEl.style.backgroundColor = TILE_COLORS[i];
-      tileEl.onclick = ()=>{ runQuizPick = i; resolve(i === q.correctIdx); };
+      tileEl.onclick = ()=>{
+        // B9: a drumroll, then the reveal (the answer is locked in at the tap).
+        runQuizPick = i; clearTimeout(eventTimeoutId);
+        els.eventTiles.forEach(t=> t.onclick = null); tileEl.classList.add('picked-wait');
+        sfx.drumroll(QUIZ_DRUMROLL_MS);
+        setTimeout(()=>{ tileEl.classList.remove('picked-wait'); resolve(i === q.correctIdx); }, dt(QUIZ_DRUMROLL_MS));
+      };
     });
     startEventTimerBar(remain, dt(10000));
     clearTimeout(eventTimeoutId);
@@ -8956,7 +9041,12 @@
       tileEl.style.backgroundColor = '';
       tileEl.dataset.pu = pu.key;
       tileEl.classList.add('portal'); tileEl.classList.remove('open', 'is-right', 'is-wrong');
-      tileEl.onclick = ()=>{ tileEl.classList.add('open'); portalFx(tileEl, pu.key); resolveRunPowerUp(pu.key); };
+      tileEl.onclick = ()=>{
+        // B9: the door rattles to a drumroll, then swings open.
+        clearTimeout(eventTimeoutId); els.eventTiles.forEach(t=> t.onclick = null);
+        tileEl.classList.add('picked-wait'); sfx.drumroll(QUIZ_DRUMROLL_MS);
+        setTimeout(()=>{ tileEl.classList.remove('picked-wait'); tileEl.classList.add('open'); portalFx(tileEl, pu.key); resolveRunPowerUp(pu.key); }, dt(QUIZ_DRUMROLL_MS));
+      };
     });
     hostSay(hostLine('portal'), 1500);
     startEventTimerBar(remain, dt(5000));
@@ -12014,7 +12104,7 @@
       showFlash('win'); hostMood('cheer'); hostSay(hostLine('right'));
       if (right){ FX.beamHit(showFx, [right]); FX.glowSweep(showFx, right); }
     } else {
-      showFlash('lose'); hostMood('sad'); hostSay(hostLine(pickIdx == null ? 'slow' : 'wrong'));
+      showFlash('lose'); hostMood('sad'); hostSay(hostLine(pickIdx == null ? 'slow' : 'wrong')); sfx.crowdOoh();
       if (picked) picked.classList.add('is-wrong');
       FX.shake(document.getElementById('eventGrid'));
     }
@@ -12450,7 +12540,7 @@
       : cv.others < CROWD_MIN_OTHERS ? '\u23F3 Too few votes yet to call the crowd'
       : '\u2696\uFE0F Dead heat \u2014 split right down the middle';
     else if (Math.abs(cv.pickPct - 50) <= 3) els.hint.innerHTML = '\u2696\uFE0F Dead heat \u2014 almost split down the middle';
-    else if (cv.pickPct <= 20) els.hint.innerHTML = '\uD83D\uDD25 Hot take \u2014 only ' + cv.pickPct + '% picked this';
+    else if (cv.pickPct <= 20){ els.hint.innerHTML = '\uD83D\uDD25 Hot take \u2014 only ' + cv.pickPct + '% picked this'; if (runActive) sfx.crowdOoh(); }
     else if (cv.withCrowd) els.hint.innerHTML = "You're with the majority";
     else els.hint.innerHTML = "You're in the minority on this one";
 
@@ -13042,6 +13132,7 @@
       comboVerdict: (w, base) => { comboOnVerdict(!!w, base || 1); return { streak: runMatchStreak, mult: comboMult(runMatchStreak), bonus: runComboBonus, bank: runComboBank, score: runScore }; },
       showState: () => ({ step: runShow.step, left: runShow.left, phase: runPhase, episode: showEpisode(runStartDate || todayStr()) }),
       startColdOpenTap: () => showCard.click(),
+      playSfx: (name, arg) => { const errs = []; try{ sfx[name](arg); }catch(e){ errs.push(String(e)); } return { name, on: soundOn, ctx: audioCtx ? audioCtx.state : null, errs }; },
       dailyVault: (score, bonus) => { playDailyVault({ score, warpPoints: bonus || 0, comboBonus: 0 }, ()=>{ window.__dailyVaultDone = true; }); return 'ok'; },
       showRunPowerUp: () => runPowerUpRoundForRun(),
       showInfTrivia: () => runWildEvent(),
