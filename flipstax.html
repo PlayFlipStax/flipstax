@@ -2285,6 +2285,7 @@
   .fin-overlay.daily-vault .vault-rewards, .fin-overlay.daily-vault .fin-buttons{ display:none !important; }
   /* Daily's results sit in the results world (its own sunburst), on a panel. */
   :root.mode-daily #readoutOverlay{ background:none; }
+  #readoutOverlay:not(.show) .warp-bg{ display:none; }   /* (the overlay only fades out, so its rays would keep turning unseen) */
   :root.mode-daily #readoutOverlay .personality-inner{ position:relative; z-index:1; padding:18px 16px; border-radius:22px; background:rgba(32,8,56,0.82); border:2px solid rgba(255,214,90,0.6); box-shadow:0 10px 30px rgba(20,0,40,0.5); }
   /* The letter tray (B5): six blanks in the score pill; an earned letter
      sits in its spot (it flies in from the right answer - .letter-fly). */
@@ -12084,8 +12085,11 @@
     else if (open(els.solveOverlay)) setShowWorld('jumble');
     else if (open(els.eventOverlay)) setShowWorld(els.eventOverlay.classList.contains('powerup') || runPhase === 'powerup' ? 'powerup' : 'trivia');
     else setShowWorld('vs');
+    // Pause the background's motion while a full-screen layer covers it
+    // (the Word Warp and results have their own; the Vault is on top).
+    showBg.classList.toggle('paused', open(els.solveOverlay) || els.readoutOverlay.classList.contains('show') || open(els.finOverlay) || !showCard.classList.contains('hidden'));
   }
-  [els.eventOverlay, els.solveOverlay, els.readoutOverlay].forEach(ov=> new MutationObserver(syncShowWorld).observe(ov, { attributes:true, attributeFilter:['class'] }));
+  [els.eventOverlay, els.solveOverlay, els.readoutOverlay, els.finOverlay, document.getElementById('showCard')].forEach(ov=> new MutationObserver(syncShowWorld).observe(ov, { attributes:true, attributeFilter:['class'] }));
   function hostMood(m){ FX.alien(showAlien, m); }
   function showFlash(kind){ FX.flash(showFrame, kind); }
   // The host's speech bubble (B3): a short line from data/game-names.js
