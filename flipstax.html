@@ -461,6 +461,59 @@
   .event-overlay.brainbreak .bb-sub{ font-size:11.5px; font-weight:700; opacity:0.92; }
   .event-overlay.bb-emojiDecode .event-prompt{ font-size:clamp(34px, 11vw, 52px); letter-spacing:4px; line-height:1.15; }
   @media (prefers-reduced-motion: reduce){ .bb-marquee{ animation:none; } }
+  /* ---- Daily's Brain Beam, Riddle and Brain Break screens (the "stack" layout, after the
+     style board): the whole screen used. A marquee panel on top holds the question, a timer
+     bar under it, then full-width tall answer bars (texture, bevel, glow, bulbs down both
+     edges) that share the rest of the height. Price Probe and Time Warp: two huge cards with
+     a VS badge; Oddball Alert: a 2x2 of big tiles. Animations are transform / opacity only. */
+  :root.mode-daily .event-overlay.stack{ justify-content:flex-start; align-items:stretch; padding:44px 14px 14px; gap:0; text-align:center; }
+  :root.mode-daily .event-overlay.stack .bb-marquee{ display:block; width:100%; max-width:none; margin:0 0 8px; }
+  :root.mode-daily .event-overlay.stack .event-subtitle{ align-self:center; margin:0 0 8px; font-size:13px; }
+  :root.mode-daily .event-overlay.stack .event-prompt{ position:relative; width:100%; flex:0 1 auto; min-height:17%; max-height:38%; overflow:hidden; display:flex; align-items:center; justify-content:center; margin:0 0 12px; padding:16px 16px;
+    font-size:clamp(25px, 7.4vw, 33px); line-height:1.12; border-radius:20px; border:3px solid var(--bb, #ffd23f); background:linear-gradient(180deg, rgba(44,12,88,0.95), rgba(20,6,52,0.96));
+    box-shadow:0 0 0 3px rgba(20,4,40,0.6), 0 0 16px var(--bb, #ffd23f), inset 0 0 26px rgba(0,0,0,0.5); }
+  :root.mode-daily .event-overlay.stack .event-prompt.long{ font-size:clamp(19px, 5.4vw, 24px); }
+  :root.mode-daily .event-overlay.stack .event-prompt::before, :root.mode-daily .event-overlay.stack .event-prompt::after{ content:''; position:absolute; left:10px; right:10px; height:8px; pointer-events:none;
+    background-image:radial-gradient(circle, var(--bb, #ffd23f) 0 2.8px, rgba(255,255,255,0) 3.6px); background-size:24px 8px; background-repeat:repeat-x; }
+  :root.mode-daily .event-overlay.stack .event-prompt::before{ top:3px; animation:bulbA 0.6s steps(1) infinite; }
+  :root.mode-daily .event-overlay.stack .event-prompt::after{ bottom:3px; background-position:12px 0; animation:bulbB 0.6s steps(1) infinite; }
+  @keyframes bulbA{ 0%{ opacity:1; } 50%{ opacity:0.3; } }
+  @keyframes bulbB{ 0%{ opacity:0.3; } 50%{ opacity:1; } }
+  :root.mode-daily .event-overlay.stack.flash-win .event-prompt::before, :root.mode-daily .event-overlay.stack.flash-win .event-prompt::after{ animation:bbBlink 0.16s steps(1) 6; }
+  @keyframes bbBlink{ 50%{ opacity:0.15; } }
+  :root.mode-daily .event-overlay.stack .event-timerbar{ width:100%; max-width:none; height:9px; margin:0 0 12px; flex:0 0 auto; }
+  :root.mode-daily .event-overlay.stack .event-grid{ position:relative; flex:1 1 0; min-height:0; display:flex; flex-direction:column; gap:11px; width:100%; max-width:none; }
+  :root.mode-daily .event-overlay.stack .event-tile{ flex:1 1 0; min-height:0; display:flex; align-items:center; justify-content:flex-start; gap:12px; padding:6px 18px 6px 30px; border-radius:20px; border:3px solid rgba(255,255,255,0.9);
+    text-align:left; font-size:clamp(20px, 5.8vw, 26px); line-height:1.1;
+    background-image:radial-gradient(circle, #fff6c0 0 2.6px, rgba(255,214,90,0) 3.4px), radial-gradient(circle, #fff6c0 0 2.6px, rgba(255,214,90,0) 3.4px),
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.09) 0 7px, rgba(255,255,255,0) 7px 14px), linear-gradient(180deg, rgba(255,255,255,0.36) 0%, rgba(255,255,255,0.1) 38%, rgba(255,255,255,0) 52%, rgba(0,0,0,0.28) 100%);
+    background-size:12px 20px, 12px 20px, auto, auto; background-position:5px 0, calc(100% - 5px) 0, 0 0, 0 0; background-repeat:repeat-y, repeat-y, repeat, no-repeat;
+    box-shadow:var(--tile-depth), 0 0 16px rgba(255,255,255,0.28); }
+  :root.mode-daily .event-overlay.stack .tkey{ flex:0 0 auto; width:40px; height:40px; border-radius:50%; display:grid; place-items:center; font:900 23px/1 var(--f-display); color:#fff3c4; background:rgba(28,6,48,0.82); border:2px solid #fff3c4; box-shadow:0 2px 0 rgba(0,0,0,0.3); }
+  :root.mode-daily .event-overlay.stack .ttxt{ flex:1; min-width:0; }
+  :root.mode-daily .event-overlay.stack .event-tile.is-right{ box-shadow:var(--tile-depth), 0 0 0 4px #7dff9e, 0 0 28px 8px rgba(80,255,140,0.8); }
+  :root.mode-daily .event-overlay.stack .event-tile.is-wrong{ animation:bbShake 0.4s ease both; }
+  :root.mode-daily .event-overlay.stack .event-tile.bb-press{ animation:bbPress 0.18s ease-out both; }
+  @keyframes bbShake{ 0%, 100%{ transform:translateX(0); } 20%{ transform:translateX(-10px); } 40%{ transform:translateX(9px); } 60%{ transform:translateX(-6px); } 80%{ transform:translateX(4px); } }
+  @keyframes bbPress{ 0%{ transform:scale(1); } 50%{ transform:translateY(3px) scale(0.96); } 100%{ transform:scale(1.02); } }
+  /* Brain Breaks: big glyphs, centred cards */
+  :root.mode-daily .event-overlay.stack.brainbreak .event-tile{ flex-direction:column; justify-content:center; text-align:center; gap:4px; padding:8px 30px; }
+  :root.mode-daily .event-overlay.stack.brainbreak .bb-glyph{ font-size:96px; line-height:1; filter:drop-shadow(0 4px 4px rgba(0,0,0,0.3)); }
+  :root.mode-daily .event-overlay.stack.brainbreak .bb-name{ font-size:clamp(22px, 6.4vw, 28px); line-height:1.1; }
+  :root.mode-daily .event-overlay.stack.brainbreak .bb-sub{ font-size:14px; font-weight:700; opacity:0.95; }
+  :root.mode-daily .event-overlay.stack.bb-two .bb-sub.flip{ font:900 34px/1 var(--f-display); letter-spacing:1px; opacity:1; }
+  .bb-sub.flip{ display:inline-block; animation:bbFlip 0.55s cubic-bezier(.3,1.4,.5,1) both; }
+  @keyframes bbFlip{ from{ transform:rotateX(90deg) scale(0.6); opacity:0; } to{ transform:none; opacity:1; } }
+  :root.mode-daily .event-overlay.stack.bb-oddballAlert .event-grid{ display:grid; grid-template-columns:1fr 1fr; grid-auto-rows:1fr; gap:11px; }
+  :root.mode-daily .event-overlay.stack.bb-oddballAlert .bb-glyph{ font-size:76px; }
+  :root.mode-daily .event-overlay.stack.bb-oddballAlert .event-tile{ padding:8px 22px; }
+  :root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt{ font-size:clamp(72px, 21vw, 88px); letter-spacing:6px; line-height:1.05; min-height:22%; }
+  .bb-vs{ display:none; position:absolute; left:50%; top:50%; width:62px; height:62px; margin:-31px 0 0 -31px; z-index:3; border-radius:50%; place-items:center; font:900 27px/1 var(--f-display); color:#3a1a00;
+    background:radial-gradient(circle at 35% 30%, #fff8c8, #ffd23f 50%, #e08a00); border:4px solid #7a3d00; box-shadow:0 0 18px rgba(255,210,63,0.9), 0 4px 0 rgba(0,0,0,0.3); }
+  :root.mode-daily .event-overlay.bb-two .bb-vs{ display:grid; }
+  @media (prefers-reduced-motion: reduce){ :root.mode-daily .event-overlay.stack .event-prompt::before, :root.mode-daily .event-overlay.stack .event-prompt::after, .bb-sub.flip,
+    :root.mode-daily .event-overlay.stack .event-tile.is-wrong, :root.mode-daily .event-overlay.stack .event-tile.bb-press{ animation:none !important; } }
+  @media (max-height:700px){ :root.mode-daily .event-overlay.stack.brainbreak .bb-glyph{ font-size:84px; } }
   .powerup-icon{ font-size:56px; margin-bottom:6px; animation: powerupBounce 1s ease-in-out infinite; }
   .powerup-icon.hidden{ display:none; }
   @keyframes powerupBounce{ 0%,100%{ transform:translateY(0) rotate(-6deg); } 50%{ transform:translateY(-10px) rotate(6deg); } }
@@ -3062,6 +3115,7 @@
         <div class="event-tile" data-i="1"></div>
         <div class="event-tile" data-i="2"></div>
         <div class="event-tile" data-i="3"></div>
+        <div class="bb-vs" aria-hidden="true">VS</div>
       </div>
       <div class="gift-stage" id="giftStage" aria-hidden="true">
         <div class="gift-glow"></div>
@@ -8937,10 +8991,21 @@
     const sw = rng() < 0.5, t = sw ? [x.b, x.a] : [x.a, x.b], correct = sw ? 1 - x.first : x.first;
     return { prompt:'Which came first?', tiles:t.map(i=> ({ glyph:i.glyph, name:i.event })), correct, revealSub:t.map(i=> String(i.year)) };
   }
-  function fillBreakTile(tileEl, t, sub){
+  // `sub` replaces the tile's small line (the price / the year revealed after the
+  // answer); `flip` plays the flip-in on it.
+  function fillBreakTile(tileEl, t, sub, flip){
     tileEl.textContent = '';
-    const add = (cls, text)=>{ if (!text) return; const s = document.createElement('span'); s.className = cls; s.textContent = text; tileEl.appendChild(s); };
-    add('bb-glyph', t.glyph); add('bb-name', t.name); add('bb-sub', sub != null ? sub : t.sub);
+    const add = (cls, text)=>{ if (!text) return null; const s = document.createElement('span'); s.className = cls; s.textContent = text; tileEl.appendChild(s); return s; };
+    add('bb-glyph', t.glyph); add('bb-name', t.name);
+    const s = add('bb-sub', sub != null ? sub : t.sub); if (s && flip) s.classList.add('flip');
+  }
+  // A Brain Beam / riddle answer bar: its letter key, then the text.
+  function fillQuizTile(tileEl, i, text){
+    tileEl.textContent = '';
+    if (!document.documentElement.classList.contains('mode-daily')){ tileEl.textContent = text; return; }
+    const k = document.createElement('span'); k.className = 'tkey'; k.textContent = 'ABCD'[i];
+    const t = document.createElement('span'); t.className = 'ttxt'; t.textContent = text;
+    tileEl.appendChild(k); tileEl.appendChild(t);
   }
   // Plays one Brain Break in the Brain Beam screen's frame. done() runs when it
   // has finished; returns false (and plays nothing) if the game's data is unusable.
@@ -8950,13 +9015,13 @@
     const rd = buildBreakRound(key, st.seed), ov = els.eventOverlay, tiles = els.eventTiles, n = rd.tiles.length;
     runPhase = 'break';
     stopTallyPolling(); clearRoundTimer(); voted = false; votedSinceTime = null;
-    ov.classList.remove('hidden', 'powerup'); ov.classList.add('brainbreak', 'bb-' + key); ov.style.setProperty('--bb', def.accent);
+    ov.classList.remove('hidden', 'powerup'); ov.classList.add('brainbreak', 'stack', 'bb-' + key); if (n === 2) ov.classList.add('bb-two'); ov.style.setProperty('--bb', def.accent); els.eventPrompt.classList.remove('long');
     els.powerupIcon.classList.add('hidden');
     fitTopChip();
     els.eventSubtitle.textContent = '🎲 BRAIN BREAK · ' + def.name().toUpperCase() + (rd.kind ? ' · ' + rd.kind.toUpperCase() : '');
     els.eventPrompt.textContent = rd.prompt;
     tiles.forEach((tileEl, i)=>{
-      tileEl.classList.remove('portal', 'open', 'is-right', 'is-wrong', 'picked-wait');
+      tileEl.classList.remove('portal', 'open', 'is-right', 'is-wrong', 'picked-wait', 'bb-press');
       if (i >= n){ tileEl.style.display = 'none'; tileEl.onclick = null; return; }
       tileEl.style.display = '';
       tileEl.style.backgroundColor = TILE_COLORS[i];
@@ -8965,7 +9030,7 @@
     hostSay(HOST_LINES[key] || def.rule, 2600);
     let settled = false;
     const finish = ()=>{
-      ov.classList.add('hidden'); ov.classList.remove('brainbreak', 'bb-' + key); ov.style.removeProperty('--bb');
+      ov.classList.add('hidden'); ov.classList.remove('brainbreak', 'stack', 'bb-two', 'flash-win', 'bb-' + key); ov.style.removeProperty('--bb');
       tiles.forEach(t=>{ t.style.display = ''; t.classList.remove('is-right', 'is-wrong'); t.onclick = null; });
       if (runActive) done();
     };
@@ -8973,13 +9038,13 @@
       if (settled || !runActive) return; settled = true;
       clearTimeout(eventTimeoutId); tiles.forEach(t=> t.onclick = null);
       const right = tiles[rd.correct], ok = pick === rd.correct;
-      tiles.forEach((t, i)=>{ if (i < n && rd.revealSub) fillBreakTile(t, rd.tiles[i], rd.revealSub[i]); });
+      tiles.forEach((t, i)=>{ if (i < n && rd.revealSub) fillBreakTile(t, rd.tiles[i], rd.revealSub[i], true); });
       if (right) right.classList.add('is-right');
       if (ok){
         addRunScore(BRAIN_BREAK_POINTS);
         els.eventSubtitle.textContent = '✅ +' + BRAIN_BREAK_POINTS + ' POINTS';
         if (rd.why) els.eventPrompt.textContent = rd.why;
-        showFlash('win'); hostMood('cheer'); hostSay(hostLine('right')); sfx.combo();
+        showFlash('win'); hostMood('cheer'); hostSay(hostLine('right')); sfx.combo(); ov.classList.add('flash-win');
         if (right){ FX.burstAt(showFx, right, { count:12, spread:100, shapes:['star', 'coin'] }); FX.pop(right, 1.25); }
       } else {
         if (pick != null && tiles[pick]) tiles[pick].classList.add('is-wrong');
@@ -8991,7 +9056,7 @@
       saveRunSnapshot();
       setTimeout(finish, dt(ok ? 900 : BRAIN_BREAK_REVEAL_MS));
     };
-    tiles.forEach((tileEl, i)=>{ if (i < n) tileEl.onclick = ()=> resolve(i); });
+    tiles.forEach((tileEl, i)=>{ if (i < n) tileEl.onclick = ()=>{ tileEl.classList.add('bb-press'); resolve(i); }; });
     startEventTimerBar(dt(BRAIN_BREAK_MS), dt(BRAIN_BREAK_MS));
     clearTimeout(eventTimeoutId);
     eventTimeoutId = setTimeout(()=> resolve(null), dt(BRAIN_BREAK_MS));
@@ -9001,8 +9066,8 @@
   // mid-game), it hands the shared Brain Beam screen back clean.
   new MutationObserver(()=>{
     const ov = els.eventOverlay;
-    if (!ov.classList.contains('hidden') || !ov.classList.contains('brainbreak')) return;
-    Array.from(ov.classList).filter(c=> c === 'brainbreak' || c.indexOf('bb-') === 0).forEach(c=> ov.classList.remove(c));
+    if (!ov.classList.contains('hidden') || !(ov.classList.contains('brainbreak') || ov.classList.contains('stack'))) return;
+    Array.from(ov.classList).filter(c=> c === 'brainbreak' || c === 'stack' || c === 'flash-win' || c.indexOf('bb-') === 0).forEach(c=> ov.classList.remove(c));
     ov.style.removeProperty('--bb');
     els.eventTiles.forEach(t=>{ t.style.display = ''; t.classList.remove('is-right', 'is-wrong'); });
   }).observe(els.eventOverlay, { attributes:true, attributeFilter:['class'] });
@@ -9229,17 +9294,17 @@
     runPendingQEndsAt = resumeEndsAt || (Date.now() + dt(10000));
     const remain = Math.max(0, runPendingQEndsAt - Date.now());
     if (DEBUG_FAST) window.__debugLastTriviaQ = q;
-    els.eventOverlay.classList.remove('hidden', 'powerup');
+    els.eventOverlay.classList.remove('hidden', 'powerup'); els.eventOverlay.classList.add('stack'); els.eventOverlay.style.setProperty('--bb', q.riddle ? '#c792ff' : '#ffd23f');
     els.powerupIcon.classList.add('hidden');
     fitTopChip();
     els.eventSubtitle.textContent = second ? '🔁 SECOND CHANCE · answer right, recover a letter'
       : q.riddle ? '\uD83E\uDDE9 ' + GN.riddleRound.toUpperCase() + (step && step.extra ? ' \u00B7 BONUS' : '') + ' \u00B7 answer right, ' + (runLetters.length < MAX_EARNED_LETTERS ? 'earn a letter' : '+' + EXTRA_BEAM_POINTS + ' points')
       : '\uD83E\uDDE0 ' + GN.brainBeam.toUpperCase() + (step && step.extra ? ' \u00B7 BONUS' : '') + ' \u00B7 answer right, ' + (runLetters.length < MAX_EARNED_LETTERS ? 'earn a letter' : '+' + EXTRA_BEAM_POINTS + ' points');
-    els.eventPrompt.textContent = q.question;
+    els.eventPrompt.textContent = q.question; els.eventPrompt.classList.toggle('long', q.question.length > 90);
     runQuizPick = null;
     els.eventTiles.forEach((tileEl,i)=>{
       tileEl.classList.remove('portal', 'open', 'is-right', 'is-wrong');
-      tileEl.textContent = q.opts[i];
+      fillQuizTile(tileEl, i, q.opts[i]);
       tileEl.style.backgroundColor = TILE_COLORS[i];
       tileEl.onclick = ()=>{
         // B9: a drumroll, then the reveal (the answer is locked in at the tap).
@@ -9398,7 +9463,7 @@
     stopTallyPolling();
     clearRoundTimer();
     els.eventOverlay.classList.remove('hidden');
-    els.eventOverlay.classList.add('powerup');
+    els.eventOverlay.classList.add('powerup'); els.eventOverlay.classList.remove('stack'); els.eventPrompt.classList.remove('long');
     els.powerupIcon.classList.remove('hidden');
     fitTopChip();
     els.eventSubtitle.textContent = '\uD83C\uDF00 ' + GN.portalPick.toUpperCase();
