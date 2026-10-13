@@ -86,7 +86,8 @@
     layout(); window.addEventListener('resize', ()=>{ clearTimeout(build._t); build._t = setTimeout(layout, 150); });
     wire();
   }
-  function layout(){ $$('.screen .frame').forEach(f=> FX.marquee(f, getComputedStyle(document.documentElement).getPropertyValue('--bulb-gap') ? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bulb-gap')) : 26)); }
+  // (The entry screen - the game's mode picker - has no marquee bulbs; the game screens do.)
+  function layout(){ $$('.screen:not(#entry) .frame').forEach(f=> FX.marquee(f, getComputedStyle(document.documentElement).getPropertyValue('--bulb-gap') ? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bulb-gap')) : 26)); }
 
   const win = (sc, el, msg)=>{ const f = $('.frame', sc); FX.flash(f, 'win'); if (el) FX.burstAt($('.fx-layer', sc), el); FX.sound('win'); FX.alien($('.alien', sc), 'cheer'); say(sc, msg, 'good'); };
   const lose = (sc, msg)=>{ FX.flash($('.frame', sc), 'lose'); FX.sound('lose'); FX.alien($('.alien', sc), 'sad'); say(sc, msg, 'bad'); };
