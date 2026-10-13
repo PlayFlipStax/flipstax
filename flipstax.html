@@ -2276,6 +2276,12 @@
   /* Brain Beam answers (B3): the right one rings green, a wrong pick red. */
   .event-tile.is-right{ box-shadow:var(--tile-depth), 0 0 0 4px #7dff9e, 0 0 22px 6px rgba(80,255,140,0.75); z-index:1; }
   .event-tile.is-wrong{ box-shadow:var(--tile-depth), 0 0 0 4px #ff4d4d, 0 0 20px 5px rgba(255,40,40,0.7); opacity:0.85; }
+  /* Daily's Vault (B6): the scene and the tally only - Infinity's rewards
+     panel and buttons never show (the Daily results come after). */
+  .fin-overlay.daily-vault .vault-rewards, .fin-overlay.daily-vault .fin-buttons{ display:none !important; }
+  /* Daily's results sit in the results world (its own sunburst), on a panel. */
+  :root.mode-daily #readoutOverlay{ background:none; }
+  :root.mode-daily #readoutOverlay .personality-inner{ position:relative; z-index:1; padding:18px 16px; border-radius:22px; background:rgba(32,8,56,0.82); border:2px solid rgba(255,214,90,0.6); box-shadow:0 10px 30px rgba(20,0,40,0.5); }
   /* The letter tray (B5): six blanks in the score pill; an earned letter
      sits in its spot (it flies in from the right answer - .letter-fly). */
   .sp-tray{ display:inline-flex; gap:3px; vertical-align:middle; margin-left:2px; }
@@ -3264,6 +3270,7 @@
 </div>
 
 <div class="personality-overlay" id="readoutOverlay">
+  <div class="bg w-results warp-bg" aria-hidden="true"><i class="rays"></i><i class="glow"></i></div>
   <div class="personality-inner">
     <div class="readout-secret hidden" id="readoutSecret">YOU DISCOVERED THE SUPER SECRET RIDDLE!!!</div>
     <div class="readout-riddler hidden" id="readoutRiddler" aria-label="The Secret Riddler">
@@ -9781,7 +9788,13 @@
       if (!f.vaultSeen){ f.vaultSeen = true; saveInfRun(); }
     };
     if (prefersReducedMotion() || f.vaultSeen){ showAll(); return; }
-    // dial -> door -> (jackpot: the gold UFO beams the bonus card) -> coins to collect -> rewards
+    vaultDrama(stage, a, showAll);
+  }
+  // The Vault's big moment, shared by Infinity's finale and (B6) Daily's
+  // reward: dial -> bolts -> door -> (jackpot: the gold UFO beams the bonus
+  // card) -> coins to collect -> done(). The coins carry a.bonus on top of
+  // a.runScore (or the whole a.finalScore with no bonus).
+  function vaultDrama(stage, a, done){
     document.getElementById('vaultTallyNum').textContent = a.bonus > 0 ? a.runScore : 0;
     stage.classList.remove('unbolt', 'slam');
     stage.classList.add('dial');
@@ -9798,8 +9811,35 @@
       vaultTimers.push(setTimeout(()=>{ stage.classList.add('jackpot'); sfx.jackpot(); const bc = document.getElementById('vaultBeamCard'); bc.innerHTML = cardArtHtml('mothership_jackpot'); }, t));
       t += 2600;
     }
-    vaultTimers.push(setTimeout(()=>{ sfx.coins(18); vaultAlienPop(a); collectVaultCoins(a, showAll); }, t));
+    vaultTimers.push(setTimeout(()=>{ sfx.coins(18); vaultAlienPop(a); collectVaultCoins(a, done); }, t));
   }
+  // ---------- Daily's reward: The Mothership Vault (B6, Oct 2026) ----------
+  // After the Word Warp, the Vault opens on the run's final score: the dial,
+  // the bolts, the door, then the coins - the run's VS and Brain Beam points
+  // are already in the tally, and the coins carry the bonus on top (the
+  // Word Warp's points plus the combo meter's). Then today's results, as
+  // before. Same Vault as Infinity's finale (vaultDrama); no new card or
+  // currency. Reduced motion: straight to the results.
+  function playDailyVault(r, then){
+    if (prefersReducedMotion() || !document.documentElement.classList.contains('mode-daily')){ then(); return; }
+    const final = shownScore(r.score), bonus = Math.max(0, Math.min(final, (r.warpPoints || 0) + (r.comboBonus || 0)));
+    const a = { finalScore: final, runScore: final - bonus, bonus, jackpot: false };
+    const stage = document.getElementById('finVault');
+    ['finComplete', 'finPlinko'].forEach(id=> document.getElementById(id).classList.add('hidden'));
+    vaultTimers.forEach(clearTimeout); vaultTimers = [];
+    stage.classList.remove('hidden', 'open', 'dial', 'jackpot', 'shown', 'collect', 'unbolt', 'slam', 'has-jackpot', 'as-image');
+    els.finOverlay.classList.add('daily-vault');
+    els.finOverlay.classList.remove('hidden');
+    finTapShieldAt = performance.now(); startFinSky();
+    document.getElementById('vaultTallyHint').textContent = 'Tap the coins!';
+    hostSay(HOST_QUIPS.vault || 'Vault time, baby!', 1600);
+    let closed = false;
+    const close = ()=>{ if (closed) return; closed = true; vaultTimers.forEach(clearTimeout); vaultTimers = []; coinRun = null;
+      els.finOverlay.classList.add('hidden'); els.finOverlay.classList.remove('daily-vault'); stage.classList.remove('collect'); stopFinSky(); then(); };
+    vaultDrama(stage, a, ()=> vaultTimers.push(setTimeout(close, 900)));
+    dailyVaultClose = close;
+  }
+  let dailyVaultClose = null;
   // The little green alien: up out of the vault, a quick reaction, back down.
   function vaultAlienPop(a){
     if (prefersReducedMotion()) return;
@@ -11383,6 +11423,7 @@
       lastVote: lastVoteSummary ? Object.assign({}, lastVoteSummary) : null,
       secretRiddle: !!runRiddleSolved,
       personalityNote: personality.note,
+      warpPoints: runWarpPoints, comboBonus: runComboBonus,   // B5/B6: the Word Warp's points and the combo meter's (in the score already)
     };
     // Collection unlocks for this checkpoint (today's personality above is
     // just a label - it isn't collected).
@@ -11397,9 +11438,10 @@
     saveRunResultToday(runResultToday);
     dailyRunStreak = updateDailyStreak(runResultToday.date);
     renderRunBanner();
-    showRunReadout();
     voted = false; votedSinceTime = null;
     playRunEndMusic(!!solved);
+    // B6: the Vault opens on the score first, then today's results.
+    playDailyVault(runResultToday, showRunReadout);
   }
   function showRunReadout(){
     const r = runResultToday;
@@ -12952,6 +12994,7 @@
       comboVerdict: (w, base) => { comboOnVerdict(!!w, base || 1); return { streak: runMatchStreak, mult: comboMult(runMatchStreak), bonus: runComboBonus, bank: runComboBank, score: runScore }; },
       showState: () => ({ step: runShow.step, left: runShow.left, phase: runPhase, episode: showEpisode(runStartDate || todayStr()) }),
       startColdOpenTap: () => showCard.click(),
+      dailyVault: (score, bonus) => { playDailyVault({ score, warpPoints: bonus || 0, comboBonus: 0 }, ()=>{ window.__dailyVaultDone = true; }); return 'ok'; },
       showRunPowerUp: () => runPowerUpRoundForRun(),
       showInfTrivia: () => runWildEvent(),
       showInfPowerUp: () => runPowerUpRound(),
@@ -13350,6 +13393,7 @@
   // every gameplay overlay so nothing is left showing underneath.
   function returnToModeSelect(opts){
     opts = opts || {};
+    if (els.finOverlay.classList.contains('daily-vault')){ vaultTimers.forEach(clearTimeout); vaultTimers = []; coinRun = null; els.finOverlay.classList.add('hidden'); els.finOverlay.classList.remove('daily-vault'); stopFinSky(); }
     setTimeout(refreshDailyDay, 0);   // once the run is torn down
     stopTallyPolling();
     clearRoundTimer();
