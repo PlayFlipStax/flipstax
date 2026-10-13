@@ -9492,7 +9492,7 @@
   const HOST_INTRO_MS = 2600;
   function hostIntro(key, then){
     const line = HOST_LINES[key];
-    if (!line || !inInfinity() || !infRun || (infRun.hostSeen && infRun.hostSeen[key])){ then(); return; }
+    if (!line || !inInfinity() || !infRun || (infRun.hostSeen && infRun.hostSeen[key]) || (DEBUG_FAST && window.__noHost)){ then(); return; }   // (__noHost: localhost test runs only)
     infRun.hostSeen = Object.assign({}, infRun.hostSeen, { [key]: true }); saveInfRun();
     const ov = els.hostOverlay, art = ov.querySelector('.host-art');
     if (!art.childElementCount) art.innerHTML = visitorSvg({ green:true });
