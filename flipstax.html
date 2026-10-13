@@ -4375,7 +4375,7 @@
   const SHOW_VS_BEFORE = [5, 6];             // VS cards before a round's Brain Beam (min, max)
   const SHOW_VS_AFTER = [3, 4];              // VS cards between the Brain Beam and the Portal Pick
   const SHOW_RIDDLE_CHANCE = 0.5;            // chance an episode swaps one round's Brain Beam for a riddle
-  const SHOW_BUMPER_MS = 1000;               // the round title card with its light flash
+  const SHOW_BUMPER_MS = 1500;               // the round title card ("Round N") with its light flash
   const SHOW_NEW_ROUND_MIN_MS = 10000;       // a new round only starts with at least this much on the clock
   const QUIZ_DRUMROLL_MS = 450;              // B9: the drumroll between tapping an answer (or a portal) and its reveal
   // Brain Breaks are not built yet: one slot per round, after its Portal
@@ -4419,7 +4419,11 @@
       steps.push({ t:'quiz', round, riddle: r === riddleAt, subject: subjects[r % subjects.length], seed: (rng() * 4294967296) >>> 0 });
       steps.push({ t:'vs', n: showRange(SHOW_VS_AFTER, rng) });
       steps.push({ t:'portal', round, doors: shuffle(RUN_POWERUPS.map(p=> p.key), rng) });
-      steps.push({ t:'break', round: r });
+      // A Brain Break slot nobody has built yet is never skipped silently (a
+      // dead moment): it becomes a bonus Brain Beam - every other round a riddle
+      // instead - until a game is put in BRAIN_BREAK_SLOTS.
+      if (typeof BRAIN_BREAK_SLOTS[r] === 'function') steps.push({ t:'break', round: r });
+      else steps.push({ t:'quiz', round, extra:true, riddle: r % 2 === 1 && r !== riddleAt, subject: subjects[(r + 2) % subjects.length], seed: (rng() * 4294967296) >>> 0 });
     }
     return steps;
   }
@@ -8955,8 +8959,8 @@
     els.powerupIcon.classList.add('hidden');
     fitTopChip();
     els.eventSubtitle.textContent = second ? '🔁 SECOND CHANCE · answer right, recover a letter'
-      : q.riddle ? '\uD83E\uDDE9 ' + GN.riddleRound.toUpperCase() + ' \u00B7 answer right, earn a letter'
-      : '\uD83E\uDDE0 ' + GN.brainBeam.toUpperCase() + ' \u00B7 answer right, earn a letter';
+      : q.riddle ? '\uD83E\uDDE9 ' + GN.riddleRound.toUpperCase() + (step && step.extra ? ' \u00B7 BONUS' : '') + ' \u00B7 answer right, ' + (runLetters.length < RUN_WORD_LENGTH ? 'earn a letter' : '+' + EXTRA_BEAM_POINTS + ' points')
+      : '\uD83E\uDDE0 ' + GN.brainBeam.toUpperCase() + (step && step.extra ? ' \u00B7 BONUS' : '') + ' \u00B7 answer right, ' + (runLetters.length < RUN_WORD_LENGTH ? 'earn a letter' : '+' + EXTRA_BEAM_POINTS + ' points');
     els.eventPrompt.textContent = q.question;
     runQuizPick = null;
     els.eventTiles.forEach((tileEl,i)=>{
