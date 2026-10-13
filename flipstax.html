@@ -1043,8 +1043,23 @@
   .pk-status > span{ padding:4px 10px; border-radius:99px; background:rgba(40,10,70,0.55); box-shadow:inset 0 0 0 1.5px rgba(255,225,140,0.5); }
   .pk-status .pk-chipno{ color:#fff3c4; } .pk-status .pk-run{ color:rgba(255,243,214,0.85); font-weight:700; }
   .pk-status .pk-bonus b{ color:#ffe066; font-size:15px; }
-  .plinko-board{ margin-top:44px; }
-  .pk-ufo.riddle-ufo{ display:block; left:50%; top:-52px; z-index:3; margin-left:-34px; font-size:58px; filter:none; }
+  .plinko-board{ margin-top:30px; }
+  /* Aiming (Oct 2026): the UFO hovers over the board and follows the
+     player's thumb (transform only); let go and the chip drops from it. */
+  .pk-ufo.riddle-ufo{ display:block; left:0; top:-38px; z-index:3; width:52px; margin-left:-26px; font-size:44px; line-height:1; filter:none; pointer-events:none; transform:translateX(var(--aim-px, 50%)); }
+  .pk-ufo .pk-held{ position:absolute; left:50%; top:100%; width:var(--pk-chip, 14px); height:var(--pk-chip, 14px); margin:-8px 0 0 calc(var(--pk-chip, 14px) / -2); border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fffbe0, #ffc928 55%, #b86a00); box-shadow:0 0 8px rgba(255,210,60,0.9); transition:opacity 0.15s; }
+  .pk-ufo.empty .pk-held{ opacity:0; }
+  .pk-guide{ position:absolute; left:0; top:0; width:0; height:var(--guide-h, 70%); border-left:2px dotted rgba(255,246,190,0.45); pointer-events:none; z-index:2; transform:translate(-1px, var(--guide-y, 12px)) translateX(var(--aim-px, 50%)); transition:opacity 0.2s; }
+  .plinko-board.locked .pk-guide{ opacity:0.15; }
+  .plinko-board.done .pk-guide, .plinko-board.done .pk-ufo .pk-held{ opacity:0; }
+  .plinko-board{ touch-action:none; cursor:grab; -webkit-user-select:none; user-select:none; outline:none; }
+  .plinko-board.done{ cursor:default; }
+  .plinko-board:focus-visible{ box-shadow:0 0 0 3px #7df9ff; border-radius:22px; }
+  .plinko-svg .pk-jglow{ animation:pkJackGlow 1.1s ease-in-out infinite alternate; }
+  @keyframes pkJackGlow{ from{ opacity:0.25; } to{ opacity:1; } }
+  .plinko-svg .pk-guardpeg{ }
+  @media (prefers-reduced-motion: reduce){ .plinko-svg .pk-jglow{ animation:none; opacity:0.8; } }
   .pk-ufo span{ filter:sepia(0.7) saturate(4) hue-rotate(-12deg) brightness(1.1) var(--ufo-pop); }
   .pk-ufo.riddle-ufo i{ width:46px; height:40px; top:70%; background:linear-gradient(to bottom, rgba(255,240,170,0.85), rgba(255,240,170,0)); opacity:0.2; animation:none; transition:opacity 0.2s; }
   .pk-ufo.beaming i{ opacity:1; height:70px; }
@@ -1065,17 +1080,30 @@
   .vault-alien.pop{ animation: alienPop 2.2s cubic-bezier(.3,1.5,.5,1) both; }
   @keyframes alienPop{ 0%{ opacity:0; transform:translateY(40px) scale(0.6); } 15%{ opacity:1; transform:translateY(-14px) scale(1.05); } 25%{ transform:translateY(-8px) scale(1); }
     75%{ opacity:1; transform:translateY(-8px) scale(1); } 100%{ opacity:0; transform:translateY(40px) scale(0.6); } }
-  /* Also limited by the screen's height (330px = everything else on this stage) so
-     Drop chip / Drop all are always on screen without scrolling, even at 360x640. */
-  .plinko-board{ position:relative; width:max(200px, min(100%, 340px, calc((100dvh - 330px) * 0.889))); aspect-ratio:320 / 360; }
+  /* Also limited by the screen's height (300px = everything else on this stage) so
+     the whole board and Auto-drop are on screen without scrolling, even at 360x640. */
+  .plinko-board{ position:relative; width:max(200px, min(100%, 340px, calc((100dvh - 320px) * 0.762))); aspect-ratio:320 / 420; }
+  /* Short phones: a tighter header and tally, so the board, the tally and
+     the Vault button all fit without scrolling. */
+  @media (max-height:700px){
+    .fin-plinko{ gap:6px; }
+    .fin-plinko .pk-banner{ font-size:30px; padding:4px 16px 2px; }
+    .fin-plinko .pk-line{ font-size:13px; }
+    .fin-plinko .pk-status{ gap:5px; font-size:11.5px; flex-wrap:nowrap; }
+    .fin-plinko .pk-status > span{ padding:3px 8px; white-space:nowrap; }
+    .fin-plinko .pk-status .pk-bonus b{ font-size:13px; }
+    .fin-plinko .plinko-tally{ gap:4px; min-height:22px; }
+    .fin-plinko .pt-chip{ font-size:11.5px; padding:3px 7px; }
+    .fin-plinko .fin-buttons{ margin-top:2px; }
+  }
   .plinko-svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
   .plinko-svg .pk-peg{ transform-box:fill-box; transform-origin:center; }
   .plinko-svg .pk-peg.ping{ animation: pegPing 0.35s ease-out; }
   @keyframes pegPing{ 0%{ transform:scale(1); filter:none; } 40%{ transform:scale(1.7); filter:drop-shadow(0 0 6px #fff6a8); } 100%{ transform:scale(1); } }
   .plinko-svg .pk-slot.hit rect{ filter:drop-shadow(0 0 8px rgba(255,220,90,0.95)); }
   .plinko-chip-layer{ position:absolute; inset:0; pointer-events:none; }
-  .pk-chip{ position:absolute; left:0; top:0; width:26px; height:26px; margin:-13px 0 0 -13px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px;
-    background:radial-gradient(circle at 35% 30%, #fffbe0, #ffc928 55%, #b86a00); border:2px solid #fff3a8; box-shadow:0 2px 6px rgba(0,0,0,0.45), 0 0 10px rgba(255,210,60,0.8); will-change:transform; }
+  .pk-chip{ position:absolute; left:0; top:0; width:var(--pk-chip, 14px); height:var(--pk-chip, 14px); margin:calc(var(--pk-chip, 14px) / -2) 0 0 calc(var(--pk-chip, 14px) / -2); border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fffbe0, #ffc928 55%, #b86a00); border:1.5px solid #fff3a8; box-shadow:0 2px 6px rgba(0,0,0,0.45), 0 0 10px rgba(255,210,60,0.8); will-change:transform; }
   .plinko-tally{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px; min-height:28px; }
   .pt-chip{ padding:4px 10px; border-radius:99px; font-size:13px; font-weight:800; background:rgba(40,10,70,0.55); box-shadow:inset 0 0 0 1.5px rgba(255,225,140,0.6); }
   .pt-chip.jack{ box-shadow:inset 0 0 0 2px #7df9ff, 0 0 12px rgba(125,249,255,0.7); }
@@ -3149,17 +3177,18 @@
   </div>
   <div class="fin-stage fin-plinko hidden" id="finPlinko">
     <div class="pk-banner" id="pkBanner">ORBIT DROP</div>
-    <div class="pk-line">Bonus round! Drop your chips. Every chip pays.</div>
+    <div class="pk-line" id="pkLine">Drag the UFO, let go to drop. Every chip pays.</div>
     <div class="pk-status"><span class="pk-run" id="pkRunScore"></span><span class="pk-chipno" id="pkChipNo"></span><span class="pk-bonus">Bonus <b id="pkBonus">+0</b></span></div>
-    <div class="plinko-board" id="plinkoBoard">
-      <div class="pk-ufo riddle-ufo" id="pkUfo" aria-hidden="true"><span>🛸</span><i></i></div>
+    <div class="plinko-board" id="plinkoBoard" role="slider" tabindex="0" aria-label="Aim the UFO: left and right arrows, Enter to drop" aria-valuemin="0" aria-valuemax="100">
       <svg class="plinko-svg" id="plinkoSvg" aria-hidden="true"></svg>
+      <i class="pk-guide" id="pkGuide" aria-hidden="true"></i>
+      <div class="pk-ufo riddle-ufo" id="pkUfo" aria-hidden="true"><span>🛸</span><i></i><b class="pk-held"></b></div>
       <div class="plinko-chip-layer" id="plinkoChips" aria-hidden="true"></div>
     </div>
     <div class="plinko-tally" id="plinkoTally" aria-live="polite"></div>
     <div class="fin-buttons pk-buttons">
-      <div class="daily-btn primary fin-go pk-drop" id="plinkoDrop" role="button" tabindex="0">Drop chip</div>
-      <div class="daily-btn fin-skip pk-all" id="plinkoAll" role="button" tabindex="0">Drop all</div>
+      <div class="daily-btn primary fin-go pk-drop hidden" id="plinkoDrop" role="button" tabindex="0"></div>
+      <div class="daily-btn fin-skip pk-all" id="plinkoAll" role="button" tabindex="0">Auto-drop</div>
     </div>
   </div>
   <div class="fin-stage fin-vault hidden" id="finVault">
@@ -3226,6 +3255,7 @@
 
 <script src="data/infinity-riddles.js"></script>
 <script src="data/game-names.js"></script>
+<script src="lib/orbit-physics.js"></script>
 <script>
 (function(){
 
@@ -8835,173 +8865,226 @@
     })(start);
   }
   function stopFinSky(){ finSkyOn = false; }
-  // ---------- Plinko: one gold chip per key (1 to 5) ----------
-  // Every slot wins: x1 / x2 / x3 multiply the chip's base PLINKO_BASE, +50
-  // is flat, and the rare Mothership Jackpot is +100 and a bonus card (at
-  // most one jackpot a finale). Each chip's slot is drawn when the finale
-  // starts (saved), and its path down the pegs is built to land there - so
-  // the physics is simple, light and smooth: a chip only animates a
-  // transform (no physics engine). Skip lands every remaining chip at once.
+  // ---------- Orbit Drop: one gold chip per key (2 to 5, +1 bonus) ----------
+  // Rebuilt Oct 2026 (A1): the player aims every chip. The UFO hovers over
+  // the board; drag it left or right and let go to drop. The chip's fall is
+  // real physics - lib/orbit-physics.js, the same code the balance
+  // simulation (screenshots/qa/tools/orbit_sim.py) runs, so the game and the
+  // numbers always agree. Its path is simulated at the drop (pure, a fixed
+  // time step, a saved luck seed) and played back as a transform, so it is
+  // as light as before. High-value slots are narrow and ringed by pegs, low
+  // ones wide; a random dropper averages about the old board's 40.9 a chip,
+  // a good aimer about 30% more. Auto-drop drops the rest at random.
   const PLINKO_BASE = 20;
-  const PLINKO_SLOTS = ['x2', '+50', 'x1', 'jackpot', 'x3', 'x1', 'x2'];
-  const PLINKO_ODDS = [ ['x1', 0.315], ['x2', 0.315], ['+50', 0.18], ['x3', 0.15], ['jackpot', 0.04] ];   // jackpot 7% -> 4% (Close Encounters calibration)
-  const PLINKO_ROWS = 6;
-  function plinkoPoints(kind){ return kind === 'jackpot' ? 100 : kind === '+50' ? 50 : PLINKO_BASE * +kind.slice(1); }
+  const OP = window.OrbitPhysics;
+  const PK_DROP_GAP_MS = 350;   // the UFO reloads this long between drops
+  const PK_AUTO_GAP_MS = 420;   // Auto-drop: the gap between chips
+  const PK_PLAY_SPEED = 1.15;   // playback speed of the simulated fall (1 = real time)
+  function plinkoPoints(kind){ return OP.SLOT_POINTS[kind] || 0; }
   function plinkoLabel(kind){ return kind === 'jackpot' ? '🛸' : kind === '+50' ? '+50' : '×' + kind.slice(1); }
-  function drawPlinkoOutcomes(n){
-    let jackpot = false; const out = [];
-    for (let c = 0; c < n; c++){
-      let kind;
-      do { let r = Math.random(); kind = PLINKO_ODDS.find(o=> (r -= o[1]) < 0); kind = kind ? kind[0] : 'x1'; } while (kind === 'jackpot' && jackpot);
-      if (kind === 'jackpot') jackpot = true;
-      const slots = PLINKO_SLOTS.map((k, i)=> k === kind ? i : -1).filter(i=> i >= 0), slot = slots[Math.floor(Math.random() * slots.length)];
-      // A route with exactly `slot` rights among the rows, in a random order.
-      const path = shuffle(Array.from({ length: PLINKO_ROWS }, (_, i)=> i < slot ? 1 : 0));
-      out.push({ kind, slot, pts: plinkoPoints(kind), path });
-    }
-    if (DEBUG_FAST && window.__forcePlinko) window.__forcePlinko.forEach((k, i)=>{ if (out[i]){ const slot = PLINKO_SLOTS.indexOf(k); out[i] = { kind:k, slot, pts: plinkoPoints(k), path: shuffle(Array.from({ length: PLINKO_ROWS }, (_, j)=> j < slot ? 1 : 0)) }; } });
-    return out;
-  }
-  // Board geometry, in the SVG's own 320 x 360 units.
-  const PB = { w:320, h:360, cx:160, dx:40, y0:44, dy:38, slotY:286, slotH:62 };
-  function plinkoXY(i, r){ return { x: PB.cx + (i - r / 2) * PB.dx, y: PB.y0 + r * PB.dy }; }
-  function buildPlinkoBoard(){
-    const svg = document.getElementById('plinkoSvg');
-    svg.setAttribute('viewBox', '0 0 ' + PB.w + ' ' + PB.h);
-    let g = '<defs><radialGradient id="pkPeg" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#fffbe0"/><stop offset="0.6" stop-color="#ffc928"/><stop offset="1" stop-color="#b86a00"/></radialGradient>' +
-      '<linearGradient id="pkSlot" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="rgba(255,255,255,0.22)"/><stop offset="1" stop-color="rgba(255,255,255,0.04)"/></linearGradient>' +
-      '<linearGradient id="pkJack" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7df9ff"/><stop offset="1" stop-color="#3b1d8f"/></linearGradient></defs>';
-    g += '<rect x="4" y="4" width="312" height="352" rx="22" fill="rgba(30,8,60,0.55)" stroke="#ffd23f" stroke-width="3"/>';
-    // Pegs: the full staggered board (the chip's routes stay in the middle).
-    for (let r = 0; r < PLINKO_ROWS; r++){
-      const y = PB.y0 + r * PB.dy;
-      for (let k = -4; k <= r + 4; k++){
-        const x = PB.cx + (k - r / 2) * PB.dx;
-        if (x < 18 || x > PB.w - 18) continue;
-        g += '<circle class="pk-peg" data-r="' + r + '" data-k="' + k + '" cx="' + x.toFixed(1) + '" cy="' + y + '" r="5.5" fill="url(#pkPeg)"/>';
+  // The finale starts with n chips still to aim (results come at the drop).
+  function drawPlinkoOutcomes(n){ return Array.from({ length: n }, ()=> ({ kind:null })); }
+  // One drop's result, simulated now. (Tests can force a slot: the search
+  // finds a real aim and seed that lands there.)
+  function simulateChip(i, aimX){
+    let seed = (Math.random() * 4294967296) >>> 0 || 1;
+    const want = DEBUG_FAST && window.__forcePlinko && window.__forcePlinko[i];
+    if (want){
+      const slots = OP.SLOTS.map((s, k)=> s[0] === want ? k : -1).filter(k=> k >= 0);
+      for (let tries = 0; tries < 4000; tries++){
+        const e = OP.slotEdges, k = slots[tries % slots.length], x = (e[k] + e[k + 1]) / 2 + (Math.random() - 0.5) * 30, sd = (tries * 7919 + 13) >>> 0;
+        const r = OP.simulate(x, sd, { noPath:true });
+        if (r.kind === want){ aimX = x; seed = sd; break; }
       }
     }
-    PLINKO_SLOTS.forEach((kind, i)=>{
-      const x = PB.cx + (i - 3) * PB.dx;
-      g += '<g class="pk-slot" data-i="' + i + '"><rect x="' + (x - 18) + '" y="' + PB.slotY + '" width="36" height="' + PB.slotH + '" rx="8" fill="' + (kind === 'jackpot' ? 'url(#pkJack)' : 'url(#pkSlot)') + '" stroke="' + (kind === 'jackpot' ? '#7df9ff' : '#ffd23f') + '" stroke-width="2"/>' +
-        '<text x="' + x + '" y="' + (PB.slotY + 21) + '" text-anchor="middle" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="' + (kind === 'jackpot' ? 22 : 17) + '" fill="#fff6c2">' + plinkoLabel(kind) + '</text></g>';
+    const r = OP.simulate(aimX, seed);
+    return { kind:r.kind, slot:r.slot, pts:r.pts, x:+r.x.toFixed(1), aim:+aimX.toFixed(1), seed, path:r.path, hits:r.hits };
+  }
+  function buildPlinkoBoard(){
+    const svg = document.getElementById('plinkoSvg'), W = OP.C.W, H = OP.C.H, top = OP.C.SLOT_TOP, floor = OP.C.FLOOR_Y, e = OP.slotEdges;
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    let g = '<defs><radialGradient id="pkPeg" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#fffbe0"/><stop offset="0.6" stop-color="#ffc928"/><stop offset="1" stop-color="#b86a00"/></radialGradient>' +
+      '<radialGradient id="pkGuard" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#ffffff"/><stop offset="0.6" stop-color="#7df9ff"/><stop offset="1" stop-color="#2a5fb8"/></radialGradient>' +
+      '<linearGradient id="pkSlot" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="rgba(255,255,255,0.22)"/><stop offset="1" stop-color="rgba(255,255,255,0.04)"/></linearGradient>' +
+      '<linearGradient id="pkJack" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7df9ff"/><stop offset="1" stop-color="#3b1d8f"/></linearGradient>' +
+      '<linearGradient id="pkBeamUp" x1="0" x2="0" y1="1" y2="0"><stop offset="0" stop-color="rgba(125,249,255,0.55)"/><stop offset="1" stop-color="rgba(125,249,255,0)"/></linearGradient></defs>';
+    g += '<rect x="2" y="2" width="' + (W - 4) + '" height="' + (H - 4) + '" rx="20" fill="rgba(30,8,60,0.55)" stroke="#ffd23f" stroke-width="3"/>';
+    OP.SLOTS.forEach(([kind], i)=>{
+      const l = e[i], r = e[i + 1], w = r - l, cx = (l + r) / 2, jack = kind === 'jackpot';
+      if (jack) g += '<rect class="pk-jglow" x="' + (l + 1) + '" y="' + (top - 120) + '" width="' + (w - 2) + '" height="120" fill="url(#pkBeamUp)"/>';
+      g += '<g class="pk-slot" data-i="' + i + '"><rect x="' + (l + 1.5) + '" y="' + top + '" width="' + (w - 3) + '" height="' + (floor - top) + '" rx="5" fill="' + (jack ? 'url(#pkJack)' : 'url(#pkSlot)') + '" stroke="' + (jack ? '#7df9ff' : '#ffd23f') + '" stroke-width="1.5"' + (jack ? ' class="pk-jglow"' : '') + '/>' +
+        '<text x="' + cx + '" y="' + (top + 20) + '" text-anchor="middle" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="' + (jack ? 16 : w < 32 ? 13 : 16) + '" fill="#fff6c2">' + plinkoLabel(kind) + '</text></g>';
+    });
+    OP.pegs.forEach((p, i)=>{
+      g += '<circle class="pk-peg' + (p.guard ? ' pk-guardpeg' : '') + '" data-p="' + i + '" cx="' + p.x.toFixed(1) + '" cy="' + p.y + '" r="' + OP.C.PEG_R + '" fill="url(#' + (p.guard ? 'pkGuard' : 'pkPeg') + ')"/>';
     });
     svg.innerHTML = g;
   }
-  // Chips are one per key (up to 5) plus any Wild Card bonus chip; they're
-  // all dropped - no choice to keep any. "Drop chip" drops the next one from
-  // the UFO's beam; "Drop all" sends the rest down one after another. Odds
-  // and payouts are as before; the player doesn't choose where chips land.
-  let pkLaunched = 0, pkAuto = false;
+  let pkLaunched = 0, pkAuto = false, pkAim = OP.C.W / 2, pkLanded = [], pkLastDrop = -1e9, pkDragging = false;
+  const pkFalling = new Map();   // chip index -> its animation (in flight)
   function renderPlinko(){
     const f = infRun.finale;
     document.getElementById('finPlinko').classList.remove('hidden', 'jackpot');
     buildPlinkoBoard();
+    pkFalling.forEach(a=>{ try{ a.cancel(); }catch(e){} }); pkFalling.clear();
     document.getElementById('plinkoChips').innerHTML = '';
     // Chips already dropped (before a refresh) sit in their slots.
-    f.chips.slice(0, f.dropped).forEach((c, i)=> placeChip(c, i, true));
+    pkLanded = [];
+    f.chips.slice(0, f.dropped).forEach((c, i)=>{ placeChip(c, i, true); pkLanded.push(i); });
     if (f.chips.slice(0, f.dropped).some(c=> c.kind === 'jackpot')) document.getElementById('finPlinko').classList.add('jackpot');
-    pkLaunched = f.dropped; pkAuto = false;
+    pkLaunched = f.dropped; pkAuto = false; pkLastDrop = -1e9;
+    setAim(OP.C.W / 2);
     renderPlinkoTally();
   }
+  function plinkoAllLanded(){ const f = infRun.finale; return f.dropped >= f.chips.length && pkLanded.length >= f.chips.length; }
   function renderPlinkoTally(){
     const f = infRun.finale, n = f.chips.length, left = n - f.dropped;
-    const won = f.chips.slice(0, f.dropped).reduce((a, c)=> a + c.pts, 0);
+    const landed = pkLanded.map(i=> f.chips[i]), won = landed.reduce((a, c)=> a + c.pts, 0);
     document.getElementById('pkRunScore').textContent = 'Run score: ' + Math.max(0, infRun.score);
-    document.getElementById('pkChipNo').textContent = left > 0 ? 'Chip ' + Math.min(n, pkLaunched > f.dropped ? pkLaunched : f.dropped + 1) + ' of ' + n : 'All ' + n + ' chips in';
+    document.getElementById('pkChipNo').textContent = left > 0 ? 'Chip ' + (f.dropped + 1) + ' of ' + n : 'All ' + n + ' chips in';
     document.getElementById('pkBonus').textContent = '+' + won;
-    document.getElementById('plinkoTally').innerHTML = f.chips.slice(0, f.dropped).map(c=> '<span class="pt-chip' + (c.kind === 'jackpot' ? ' jack' : '') + '">' + plinkoLabel(c.kind) + ' <b>+' + c.pts + '</b></span>').join('');
-    const drop = document.getElementById('plinkoDrop'), all = document.getElementById('plinkoAll');
-    drop.textContent = left > 0 ? '\uD83E\uDE99 Drop chip' : '\uD83D\uDD10 Open ' + GN.vault + ' \u25B6';
-    drop.classList.toggle('disabled', left > 0 && (pkAuto || pkLaunched > f.dropped));
-    all.classList.toggle('hidden', left <= 1 || pkAuto);
+    document.getElementById('plinkoTally').innerHTML = landed.map(c=> '<span class="pt-chip' + (c.kind === 'jackpot' ? ' jack' : '') + '">' + plinkoLabel(c.kind) + ' <b>+' + c.pts + '</b></span>').join('');
+    const drop = document.getElementById('plinkoDrop'), all = document.getElementById('plinkoAll'), board = document.getElementById('plinkoBoard');
+    const done = plinkoAllLanded();
+    drop.textContent = '🔐 Open ' + GN.vault + ' ▶';
+    drop.classList.toggle('hidden', !done);
+    all.classList.toggle('hidden', left <= 0 || pkAuto);
+    board.classList.toggle('done', left <= 0);
+    board.classList.toggle('locked', pkAuto);
+    document.getElementById('pkUfo').classList.toggle('empty', left <= 0 || performance.now() - pkLastDrop < PK_DROP_GAP_MS);
+  }
+  // Board units -> pixels (the SVG scales with the board's width).
+  function plinkoScale(){ return document.getElementById('plinkoBoard').getBoundingClientRect().width / OP.C.W; }
+  function setAim(x){
+    pkAim = Math.max(OP.AIM_MIN, Math.min(OP.AIM_MAX, x));
+    const board = document.getElementById('plinkoBoard'), k = plinkoScale();
+    board.style.setProperty('--aim-px', (pkAim * k).toFixed(1) + 'px');
+    board.style.setProperty('--pk-chip', Math.max(10, OP.C.BALL_R * 2 * k + 2).toFixed(1) + 'px');
+    board.style.setProperty('--guide-y', (OP.C.DROP_Y * k).toFixed(1) + 'px');
+    board.style.setProperty('--guide-h', ((OP.C.SLOT_TOP - OP.C.DROP_Y) * k).toFixed(1) + 'px');
+    board.setAttribute('aria-valuenow', Math.round((pkAim - OP.AIM_MIN) / (OP.AIM_MAX - OP.AIM_MIN) * 100));
   }
   function chipEl(i){
-    const c = document.createElement('div'); c.className = 'pk-chip'; c.innerHTML = '<span>🔑</span>'; c.dataset.i = i;
+    const c = document.createElement('div'); c.className = 'pk-chip'; c.dataset.i = i;
     document.getElementById('plinkoChips').appendChild(c); return c;
   }
-  // Pixels per board unit (the SVG scales with the board's width).
-  function plinkoScale(){ return document.getElementById('plinkoBoard').getBoundingClientRect().width / PB.w; }
-  // Landed chips rest in the lower half of their slot, under its label.
-  function slotXY(slot){ return { x: PB.cx + (slot - 3) * PB.dx, y: PB.slotY + 44 }; }
+  // Where a landed chip rests (old saves without x: the middle of its kind's first slot).
+  function restXY(c){
+    let x = c.x;
+    if (x == null){ const k = Math.max(0, OP.SLOTS.findIndex(s=> s[0] === c.kind)); x = (OP.slotEdges[k] + OP.slotEdges[k + 1]) / 2; }
+    return { x, y: OP.C.FLOOR_Y - OP.C.BALL_R };
+  }
+  function slotIndexOf(c){ return c.x == null ? Math.max(0, OP.SLOTS.findIndex(s=> s[0] === c.kind)) : c.slot; }
   function placeChip(c, i, settled){
-    const el = chipEl(i), k = plinkoScale(), p = slotXY(c.slot);
+    const el = chipEl(i), k = plinkoScale(), p = restXY(c);
     el.style.transform = 'translate(' + (p.x * k).toFixed(1) + 'px,' + (p.y * k).toFixed(1) + 'px)';
-    if (settled) document.querySelector('.pk-slot[data-i="' + c.slot + '"]').classList.add('hit');
+    if (settled){ const s = document.querySelector('.pk-slot[data-i="' + slotIndexOf(c) + '"]'); if (s) s.classList.add('hit'); }
     return el;
   }
   // The UFO zaps a chip that lands on a big slot (x3, +50, the jackpot).
   function pkLaser(c){
     if (prefersReducedMotion()) return;
     const board = document.getElementById('plinkoBoard'), ufo = document.getElementById('pkUfo'); if (!board || !ufo || !board.animate) return;
-    const br = board.getBoundingClientRect(), ur = ufo.getBoundingClientRect(), k = plinkoScale(), p = slotXY(c.slot);
+    const br = board.getBoundingClientRect(), ur = ufo.getBoundingClientRect(), k = plinkoScale(), p = restXY(c);
     const x0 = ur.left + ur.width / 2 - br.left, y0 = ur.top + ur.height * 0.7 - br.top, x1 = p.x * k, y1 = p.y * k;
     const len = Math.hypot(x1 - x0, y1 - y0), ang = Math.atan2(x0 - x1, y1 - y0) * 180 / Math.PI;
     const z = document.createElement('i'); z.className = 'pk-laser'; z.style.left = x0 + 'px'; z.style.top = y0 + 'px'; z.style.height = len + 'px'; z.style.transform = 'rotate(' + ang + 'deg)';
     board.appendChild(z); ufo.classList.remove('spin'); void ufo.offsetWidth; ufo.classList.add('spin'); sfx.laser();
     z.animate([{ opacity:0 }, { opacity:1, offset:0.15 }, { opacity:0.4, offset:0.4 }, { opacity:1, offset:0.6 }, { opacity:0 }], { duration:520, easing:'ease-out' }).onfinish = ()=> z.remove();
   }
-  // One chip out of the UFO's beam and down the pegs.
-  function launchChip(fast){
+  function pingPeg(idx, n){
+    sfx.chipPeg(n);
+    const p = document.querySelector('.pk-peg[data-p="' + idx + '"]'); if (p){ p.classList.remove('ping'); void p.getBoundingClientRect(); p.classList.add('ping'); }
+  }
+  // One chip out of the UFO's beam at x, down the pegs. The result is saved
+  // at the drop (a refresh mid-fall finds it in its slot).
+  function launchChip(aimX){
     const f = infRun.finale;
-    if (pkLaunched >= f.chips.length) return;
-    const i = pkLaunched++, c = f.chips[i];
+    if (f.dropped >= f.chips.length) return;
+    const i = f.dropped, c = simulateChip(i, aimX);
+    if (!c.kind) return;
+    const path = c.path, hits = c.hits; delete c.path; delete c.hits;
+    f.chips[i] = c; f.dropped++; pkLaunched = f.dropped; saveInfRun();
+    pkLastDrop = performance.now(); setTimeout(()=>{ if (infRun && infRun.finale === f) renderPlinkoTally(); }, PK_DROP_GAP_MS + 20);
     if (prefersReducedMotion()){ landChip(i); return; }
-    const ufo = document.getElementById('pkUfo'); ufo.classList.remove('spin'); void ufo.offsetWidth; ufo.classList.add('beaming', 'spin'); sfx.ufoBeam(); setTimeout(()=> ufo.classList.remove('beaming'), 520);
-    const el = chipEl(i), k = plinkoScale(), frames = [], T = fast ? 1100 : 1700, rowT = 1 / (PLINKO_ROWS + 1);
-    let rights = 0;
-    frames.push({ transform: 'translate(' + (PB.cx * k) + 'px,' + (-14 * k) + 'px) scale(0.5)', offset: 0, easing: 'ease-in' });
-    frames.push({ transform: 'translate(' + (PB.cx * k) + 'px,' + (10 * k) + 'px) scale(1)', offset: rowT * 0.5, easing: 'ease-in' });
-    c.path.forEach((dir, r)=>{
-      const peg = plinkoXY(rights, r);             // the peg it lands on
-      const top = { x: peg.x, y: peg.y - 12 };
-      rights += dir;
-      const next = PB.cx + (rights - (r + 1) / 2) * PB.dx;
-      const o = (r + 1) * rowT;
-      frames.push({ transform: 'translate(' + (top.x * k).toFixed(1) + 'px,' + (top.y * k).toFixed(1) + 'px)', offset: Math.min(0.97, o - rowT * 0.35), easing: 'ease-out' });
-      frames.push({ transform: 'translate(' + (((top.x + next) / 2) * k).toFixed(1) + 'px,' + ((top.y - 9) * k).toFixed(1) + 'px)', offset: Math.min(0.98, o - rowT * 0.1), easing: 'ease-in' });
-      setTimeout(()=>{ sfx.chipPeg(r); const p = document.querySelector('.pk-peg[data-r="' + r + '"][data-k="' + (rights - dir) + '"]'); if (p){ p.classList.remove('ping'); void p.getBoundingClientRect(); p.classList.add('ping'); } }, T * (o - rowT * 0.35));
-    });
-    const end = slotXY(c.slot);
-    frames.push({ transform: 'translate(' + (end.x * k).toFixed(1) + 'px,' + (end.y * k).toFixed(1) + 'px)', offset: 1 });
-    const anim = el.animate(frames, { duration: T, fill: 'forwards' });
-    anim.finished.then(()=>{ el.remove(); landChip(i); }, ()=>{});
-    el._anim = anim;
+    const ufo = document.getElementById('pkUfo'); ufo.classList.remove('spin'); void ufo.offsetWidth; ufo.classList.add('beaming', 'spin'); sfx.ufoBeam(); setTimeout(()=> ufo.classList.remove('beaming'), 420);
+    const el = chipEl(i), k = plinkoScale(), T = path[path.length - 1] || 1, frames = [];
+    for (let j = 0; j < path.length; j += 3) frames.push({ transform:'translate(' + (path[j] * k).toFixed(1) + 'px,' + (path[j + 1] * k).toFixed(1) + 'px)', offset: Math.min(1, path[j + 2] / T) });
+    frames[0].offset = 0; frames[frames.length - 1].offset = 1;
+    const dur = T * 1000 / PK_PLAY_SPEED;
+    const anim = el.animate(frames, { duration: dur, fill:'forwards' });
+    pkFalling.set(i, anim);
+    for (let h = 0; h < hits.length; h += 2){ const idx = hits[h], n = h / 2; setTimeout(()=>{ if (pkFalling.get(i) === anim) pingPeg(idx, n); }, hits[h + 1] * 1000 / PK_PLAY_SPEED); }
+    anim.finished.then(()=>{ if (pkFalling.get(i) !== anim) return; pkFalling.delete(i); el.remove(); landChip(i); }, ()=>{});
     renderPlinkoTally();
   }
   function landChip(i){
     const f = infRun.finale;
-    if (i !== f.dropped) return;   // landed already
+    if (pkLanded.indexOf(i) >= 0) return;   // landed already
     const c = f.chips[i];
     placeChip(c, i, true);
-    f.dropped++; saveInfRun();
+    pkLanded.push(i);
     sfx.chipLand(c.kind === 'jackpot' || c.kind === 'x3');
     if (c.kind === 'jackpot' || c.kind === 'x3' || c.kind === '+50') pkLaser(c);
-    if (c.kind === 'jackpot'){ sfx.jackpot(); showToast('\uD83D\uDEF8 MOTHERSHIP JACKPOT! +100 and a bonus card'); document.getElementById('finPlinko').classList.add('jackpot'); }
-    if (f.dropped >= f.chips.length) pkAuto = false;
+    if (c.kind === 'jackpot'){ sfx.jackpot(); showToast('🛸 MOTHERSHIP JACKPOT! +100' + (f.chips.slice(0, f.dropped).filter(x=> x.kind === 'jackpot').length === 1 ? ' and a bonus card' : '')); document.getElementById('finPlinko').classList.add('jackpot'); }
+    if (pkLanded.length >= f.chips.length) pkAuto = false;
     renderPlinkoTally();
   }
+  function canDropNow(){
+    const f = infRun && infRun.finale;
+    return !!f && f.stage === 'plinko' && !pkAuto && f.dropped < f.chips.length && performance.now() - pkLastDrop >= PK_DROP_GAP_MS && performance.now() - finTapShieldAt >= TAP_SHIELD_MS;
+  }
+  // Auto-drop: the rest fall from random spots (the random dropper's odds).
   function dropAllChips(){
     const f = infRun.finale;
     if (pkAuto || f.dropped >= f.chips.length) return;
     pkAuto = true;
-    if (prefersReducedMotion()){ while (pkLaunched < f.chips.length) launchChip(true); return; }
-    // Already one falling: the rest follow it, a short gap apart.
-    const go = ()=>{ if (!infRun || !infRun.finale || infRun.finale.stage !== 'plinko' || pkLaunched >= f.chips.length) return; launchChip(true); setTimeout(go, 420); };
+    const randomAim = ()=> OP.AIM_MIN + Math.random() * (OP.AIM_MAX - OP.AIM_MIN);
+    if (prefersReducedMotion()){ while (f.dropped < f.chips.length) launchChip(randomAim()); return; }
+    const go = ()=>{
+      if (!infRun || infRun.finale !== f || f.stage !== 'plinko' || f.dropped >= f.chips.length) return;
+      const x = randomAim(); setAim(x); launchChip(x); setTimeout(go, PK_AUTO_GAP_MS);
+    };
     go();
   }
+  // Aiming: press anywhere on the board, slide, let go to drop. Keyboard:
+  // arrows aim, Enter or Space drops.
+  (function(){
+    const board = document.getElementById('plinkoBoard');
+    const toUnits = e=>{ const r = board.getBoundingClientRect(); return (e.clientX - r.left) / r.width * OP.C.W; };
+    const live = ()=>{ const f = infRun && infRun.finale; return f && f.stage === 'plinko' && !pkAuto && f.dropped < f.chips.length; };
+    board.addEventListener('pointerdown', e=>{
+      if (!live()) return;
+      e.preventDefault(); pkDragging = true;
+      try{ board.setPointerCapture(e.pointerId); }catch(err){}
+      setAim(toUnits(e));
+    });
+    board.addEventListener('pointermove', e=>{ if (pkDragging) setAim(toUnits(e)); });
+    const release = (e, cancelled)=>{
+      if (!pkDragging) return; pkDragging = false;
+      if (!cancelled && canDropNow()) launchChip(pkAim);
+    };
+    board.addEventListener('pointerup', e=> release(e, false));
+    board.addEventListener('pointercancel', e=> release(e, true));
+    board.addEventListener('keydown', e=>{
+      if (!live()) return;
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight'){ e.preventDefault(); setAim(pkAim + (e.key === 'ArrowLeft' ? -8 : 8)); }
+      else if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); if (canDropNow()) launchChip(pkAim); }
+    });
+    addEventListener('resize', ()=>{ if (infRun && infRun.finale && infRun.finale.stage === 'plinko' && !document.getElementById('finPlinko').classList.contains('hidden')){ setAim(pkAim); renderPlinko(); } });
+  })();
   function goToVault(){
     const f = infRun.finale;
     if (f.stage !== 'plinko' || f.dropped < f.chips.length) return;
+    pkFalling.forEach(a=>{ try{ a.cancel(); }catch(e){} }); pkFalling.clear();
     f.stage = 'vault'; saveInfRun();
     hostIntro('vault', ()=> showFinStage('vault'));
   }
   document.getElementById('plinkoAll').addEventListener('click', finTap(()=>{ if (infRun && infRun.finale && infRun.finale.stage === 'plinko') dropAllChips(); }));
   document.getElementById('plinkoDrop').addEventListener('click', finTap(()=>{
     const f = infRun && infRun.finale; if (!f || f.stage !== 'plinko') return;
-    if (f.dropped >= f.chips.length){ goToVault(); return; }
-    if (pkAuto || pkLaunched > f.dropped) return;   // one already falling
-    launchChip(false);
+    if (f.dropped >= f.chips.length){ if (plinkoAllLanded() || !pkFalling.size) goToVault(); return; }
+    if (canDropNow()) launchChip(pkAim);   // (hidden while chips are left; a keyboard or test path)
   }));
 
   // ---------- Infinity run personalities ----------
