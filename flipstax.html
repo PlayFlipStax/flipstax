@@ -191,14 +191,6 @@
   .round-timer-fill{ height:100%; background:var(--pulse); width:100%; }
   /* Pause sits at the right of the top card's top row, beside its category
      chip - VS screen only. */
-  .pause-btn{
-    position:absolute; top:12px; right:18px; z-index:6;
-    background:rgba(20,24,31,0.75); border:1px solid rgba(255,255,255,0.2); color:var(--ink);
-    font-size:12px; font-weight:700; padding:5px 14px; border-radius:20px; cursor:pointer;
-    min-height:44px; display:flex; align-items:center;
-  }
-  .pause-btn:active{ background:rgba(255,255,255,0.2); }
-  .pause-btn.hidden{ display:none; }
   .pause-overlay{
     position:absolute; inset:0; z-index:9; display:flex; flex-direction:column;
     align-items:center; justify-content:center; gap:16px; background:rgba(10,12,20,0.88);
@@ -206,10 +198,11 @@
   .pause-overlay.hidden{ display:none; }
   .pause-title{ font-size:22px; font-weight:800; color:#fff; letter-spacing:0.5px; }
   .pause-buttons{ display:flex; gap:10px; }
-  .pause-howto{
-    min-height:44px; padding:0 14px; display:flex; align-items:center; cursor:pointer;
-    color:rgba(255,255,255,0.75); font-size:14px; font-weight:700; text-decoration:underline;
-  }
+  .pause-count{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:96px; line-height:1; color:#ffd23f; text-shadow:0 0 24px rgba(255,210,60,0.8); min-height:96px; }
+  .pause-count.tick{ animation:pauseTick 0.9s ease-out; }
+  @keyframes pauseTick{ from{ transform:scale(1.5); opacity:0.3; } 30%{ transform:scale(1); opacity:1; } }
+  .pause-hint{ font-size:14px; font-weight:700; color:rgba(255,255,255,0.8); }
+  @media (prefers-reduced-motion: reduce){ .pause-count.tick{ animation:none; } }
 
   /* ---------- How to play: three short screens, first time in each mode ----------
      Shown after a player picks a mode (see openHowTo) and reopenable from the
@@ -1416,8 +1409,6 @@
      the top-right corner like on mode select. */
   .readout-coffee{ position:absolute; top:calc(12px + env(safe-area-inset-top)); right:12px; }
   /* Infinity's Pause screen (inside the board, so no safe-area offset). */
-  .pause-coffee{ position:absolute; top:12px; right:12px; }
-  :root:not(.mode-infinity) .pause-coffee{ display:none; }
   @keyframes msCoffeeIdle{
     0%, 78%, 100%{ transform:scale(1) rotate(0deg); }
     84%{ transform:scale(1.1) rotate(-8deg); }
@@ -1792,7 +1783,7 @@
      width, so the ring lines up with the outer edge). */
   :root.mode-infinity :is(
     .half, .half:not(.revealed):not(.has-glyph) .content, .event-tile, .status-banner,
-    .pause-btn, .daily-btn, .toast
+    .daily-btn, .toast
   ){
     --ring-w: 1.5px;
     --bi: calc(var(--b) + var(--ring-w) * 0.414);
@@ -1826,23 +1817,21 @@
      fall through to the half underneath and register as a vote. Instead
      the element stays a full transparent rectangle (same tap area as
      before the redesign) and its beveled fill + glow live on ::before. */
-  :root.mode-infinity :is(.pause-btn, .daily-btn){
+  :root.mode-infinity .daily-btn{
     isolation:isolate; background:transparent; box-shadow:none;
   }
-  :root.mode-infinity :is(.pause-btn, .daily-btn)::before{
+  :root.mode-infinity .daily-btn::before{
     content:''; position:absolute; inset:calc(0px - var(--bw, 0px)); z-index:-1; pointer-events:none;
     clip-path:var(--bevel-clip);
     background:var(--btn-fill, rgba(20,24,31,0.75));
     box-shadow:inset 0 0 10px rgba(62,194,194,0.30), inset 0 0 20px rgba(122,76,224,0.18);
   }
-  :root.mode-infinity .pause-btn{ --btn-fill:rgba(20,24,31,0.75); }
-  :root.mode-infinity .pause-btn:active{ --btn-fill:rgba(255,255,255,0.2); }
   :root.mode-infinity .daily-btn{ --btn-fill:rgba(255,255,255,0.12); }
   :root.mode-infinity .daily-btn:active{ --btn-fill:rgba(255,255,255,0.25); }
   :root.mode-infinity .daily-btn.primary{ --btn-fill:var(--pulse); }
   :root.mode-infinity :is(
     .half, .half:not(.revealed):not(.has-glyph) .content, .event-tile, .status-banner,
-    .pause-btn, .daily-btn, .toast
+    .daily-btn, .toast
   )::after{
     content:''; position:absolute; inset:calc(0px - var(--bw, 0px)); pointer-events:none;
     background:linear-gradient(135deg, #3ec2c2, #8a5cf0 60%, #3ec2c2);
@@ -1854,7 +1843,7 @@
   /* overflow:hidden clips at the padding box, so the ring can't extend into
      the border area here - it sits just inside it instead. */
   :root.mode-infinity .status-banner{ --b:7px; --bw:0px; }
-  :root.mode-infinity :is(.pause-btn, .daily-btn){ --b:8px; --bw:1px; }
+  :root.mode-infinity .daily-btn{ --b:8px; --bw:1px; }
   :root.mode-infinity .toast{ --b:9px; --bw:1px; }
   /* Small labels: bevel only, no edge line. */
   :root.mode-infinity :is(.cat-chip, .you-tag){
@@ -1968,7 +1957,7 @@
     to{ box-shadow:inset 0 0 54px 12px rgba(198,255,0,0.9); }
   }
   /* Pause sits in the top half's top row, which starts 50px down here. */
-  :root.mode-infinity .pause-btn{ top:58px; }
+
   :root.mode-infinity .inf-wordmark{
     display:flex; align-items:center; gap:9px; height:26px;
     position:absolute; top:6px; left:50%; transform:translateX(-50%); z-index:5;
@@ -2071,7 +2060,7 @@
   /* The Daily run clock (the green vertical bar) lives in the frame now, and
      Pause keeps its spot over the top box. */
   :root.mode-daily .run-timer-wrap{ left:2px; width:8px; }
-  :root.mode-daily .pause-btn{ top:46px; }
+
   /* Daily Stax wordmark - identical size and placement to Infinity's, with a
      small fan of cards between the words where Infinity has its symbol. */
   .daily-wordmark{ display:none; }
@@ -2415,6 +2404,8 @@
   .split-select-header .logo{ font-size:26px; letter-spacing:0.3px; }
   .split-select-header .logo .flip{ color:#0d2b5e; }
   .split-select-header .logo .stax{ color:#e8590c; }
+  .ms-howto{ margin-top:3px; font-size:11px; font-weight:700; color:#0d2b5e; opacity:0.8; pointer-events:auto; }
+  .ms-howto span{ text-decoration:underline; cursor:pointer; padding:4px 2px; }
   .split-select-title{ color:#0d2b5e; font-size:11px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; opacity:0.85; }
   .split-divider{
     position:absolute; top:var(--sy); left:50%; transform:translate(-50%,-50%); z-index:7;
@@ -2640,17 +2631,13 @@
     <div class="inf-floaters" aria-hidden="true">
       <span>⭐</span><span>🔥</span><span>🏆</span><span>⚡</span><span>💎</span><span>🎯</span><span>🚀</span><span>✨</span>
     </div>
-    <div class="pause-btn hidden" id="pauseBtn">⏸️ Pause</div>
     <div class="run-timer-wrap hidden" id="runTimerWrap">
       <div class="run-timer-track"><div class="run-timer-fill" id="runTimerFill"></div></div>
     </div>
-    <div class="pause-overlay hidden" id="pauseOverlay">
+    <div class="pause-overlay hidden" id="pauseOverlay" aria-live="polite">
       <div class="pause-title">⏸️ Paused</div>
-      <div class="pause-buttons">
-        <div class="daily-btn primary" id="pauseResumeBtn">Resume</div>
-        <div class="daily-btn hidden" id="pauseShareBtn">📋 Share</div>
-      </div>
-      <div class="pause-howto" id="pauseHowtoBtn" role="button">❓ How to play</div>
+      <div class="pause-count" id="pauseCount"></div>
+      <div class="pause-hint" id="pauseHint">Back in a moment</div>
     </div>
 
     <div class="half top" id="halfA">
@@ -2845,6 +2832,7 @@
   <div class="split-select-header">
     <div class="logo"><span class="flip">Flip</span><span class="stax">Stax</span></div>
     <div class="split-select-title">Choose your mode</div>
+    <div class="ms-howto">How to play: <span role="button" tabindex="0" data-howto="daily">Daily</span> · <span role="button" tabindex="0" data-howto="infinity">Infinity</span></div>
   </div>
   <div class="ms-divider-ring" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
   <div class="split-divider">OR</div>
@@ -6411,8 +6399,8 @@
     soundToggle: document.getElementById('soundToggle'), backBtn: document.getElementById('backBtn'),
     statusBanner: document.getElementById('statusBanner'),
     roundTimerFill: document.getElementById('roundTimerFill'),
-    pauseBtn: document.getElementById('pauseBtn'), pauseOverlay: document.getElementById('pauseOverlay'),
-    pauseResumeBtn: document.getElementById('pauseResumeBtn'), pauseShareBtn: document.getElementById('pauseShareBtn'),
+    pauseOverlay: document.getElementById('pauseOverlay'), pauseCount: document.getElementById('pauseCount'),
+
     eventOverlay: document.getElementById('eventOverlay'), eventPrompt: document.getElementById('eventPrompt'),
     eventSubtitle: document.getElementById('eventSubtitle'), powerupIcon: document.getElementById('powerupIcon'),
     eventTimerFill: document.getElementById('eventTimerFill'),
@@ -6445,7 +6433,7 @@
     howtoMode: document.getElementById('howtoMode'), howtoCount: document.getElementById('howtoCount'),
     howtoBody: document.getElementById('howtoBody'), howtoDots: document.getElementById('howtoDots'),
     howtoSkip: document.getElementById('howtoSkip'), howtoNext: document.getElementById('howtoNext'),
-    pauseHowtoBtn: document.getElementById('pauseHowtoBtn'),
+
     solveOverlay: document.getElementById('solveOverlay'), solveTimer: document.getElementById('solveTimer'),
     solveCelebrate: document.getElementById('solveCelebrate'), solveConfetti: document.getElementById('solveConfetti'),
     solveCelebrateSub: document.getElementById('solveCelebrateSub'),
@@ -10950,11 +10938,11 @@
            els.modeSelectOverlay.classList.contains('hidden') &&
            !els.readoutOverlay.classList.contains('show');
   }
-  function updatePauseBtnVisibility(){
-    if (isPaused){ els.pauseBtn.classList.add('hidden'); return; }
-    els.pauseBtn.classList.toggle('hidden', !isOnVsScreen());
-    fitTopChip();
-  }
+  // (The Pause button is gone - Oct 2026. Pausing is automatic: the app
+  // going to the background, or the phone turning sideways. Kept as a no-op
+  // so the overlay watchers below can still call it.)
+  function updatePauseBtnVisibility(){}
+
   // The board's layout, from the real positions: the VS badge's centre on the
   // seam between the two cards, the bands each card keeps clear (see .half),
   // and the picture shrinking or hiding when a card's text needs the room.
@@ -10965,12 +10953,8 @@
     const br = board.getBoundingClientRect(), ar = A.getBoundingClientRect(), bRect = B.getBoundingClientRect();
     board.style.setProperty('--seam', ((ar.bottom + bRect.top) / 2 - br.top).toFixed(1) + 'px');
     const vsBand = Math.ceil(vs.offsetHeight / 2 + 6 - (bRect.top - ar.bottom) / 2);
-    // Top card: below the Pause pill (wherever it sits in this mode, shown or
-    // not, so the layout doesn't jump when it comes and goes) and its tag.
-    let top = 12;
-    [els.pauseBtn].forEach(p=>{ const cs = getComputedStyle(p); const t = parseFloat(cs.top) || 0, h = parseFloat(cs.minHeight) || 44;
-      top = Math.max(top, Math.ceil(br.top + t + h - ar.top + 4)); });
-    top = Math.max(top, Math.ceil(8 + els.chipA.offsetHeight + 4));
+    // Top card: below its tag.
+    let top = Math.max(12, Math.ceil(8 + els.chipA.offsetHeight + 4));
     A.style.setProperty('--band-top', top + 'px'); A.style.setProperty('--band-bottom', Math.max(12, vsBand) + 'px');
     B.style.setProperty('--band-top', Math.max(12, vsBand, 8 + els.chipB.offsetHeight + 4) + 'px'); B.style.setProperty('--band-bottom', '12px');
     [A, B].forEach(fitHalf);
@@ -10987,14 +10971,10 @@
   let layoutBoardRaf = 0;
   function queueLayoutBoard(){ cancelAnimationFrame(layoutBoardRaf); layoutBoardRaf = requestAnimationFrame(layoutBoard); }
   window.addEventListener('resize', queueLayoutBoard);
-  // Hide the top category chip when it would touch a visible Pause pill.
-  function fitTopChip(){
-    const c = els.chipA; c.classList.remove('squeezed');
-    const r = c.getBoundingClientRect(); if (!r.width) return;
-    const hits = [els.pauseBtn].some(b=>{ const p = b.getBoundingClientRect();
-      return p.width > 0 && p.left < r.right + 4 && p.right > r.left - 4 && p.top < r.bottom && p.bottom > r.top; });
-    c.classList.toggle('squeezed', hits);
-  }
+  // (The top category chip used to step aside for the Pause pill; nothing
+  // shares its row now.)
+  function fitTopChip(){ els.chipA.classList.remove('squeezed'); }
+
   function pauseGame(){
     if (isPaused || !isOnVsScreen()) return;
     isPaused = true;
@@ -11031,12 +11011,28 @@
     musicPausedByPause = (playingEl && !playingEl.paused) ? playingEl : null;
     pauseAllTracks();
 
-    els.pauseBtn.classList.add('hidden');
-    // Daily Run already has its own dedicated share button on the
-    // run-complete screen; only Infinity Flips needs one here, since
-    // pausing is its only real "checkpoint" moment.
-    els.pauseShareBtn.classList.toggle('hidden', !document.documentElement.classList.contains('mode-infinity'));
     els.pauseOverlay.classList.remove('hidden');
+    startResumeCountdown();
+  }
+  // Coming back resumes by itself after a short countdown (3, 2, 1) - only
+  // while the game is actually visible and upright; going away again holds it.
+  const RESUME_COUNTDOWN_S = 3;
+  let resumeCountdownTimer = null;
+  function canResumeNow(){ return !document.hidden && !(landscapeLockMq && landscapeLockMq.matches); }
+  function startResumeCountdown(){
+    clearTimeout(resumeCountdownTimer);
+    if (!isPaused) return;
+    let n = RESUME_COUNTDOWN_S;
+    const step = ()=>{
+      if (!isPaused) return;
+      if (!canResumeNow()){ els.pauseCount.textContent = ''; document.getElementById('pauseHint').textContent = 'Back in a moment'; resumeCountdownTimer = setTimeout(step, 400); n = RESUME_COUNTDOWN_S; return; }
+      if (n <= 0){ els.pauseCount.textContent = ''; resumeGame(); return; }
+      document.getElementById('pauseHint').textContent = 'Get ready!';
+      els.pauseCount.textContent = n; els.pauseCount.classList.remove('tick'); void els.pauseCount.offsetWidth; els.pauseCount.classList.add('tick');
+      playTone(n === 1 ? 880 : 660, 0, 0.09, 'triangle', 0.04);
+      n--; resumeCountdownTimer = setTimeout(step, 1000);
+    };
+    step();
   }
   // The player can't play right now - the app went to the background, or the
   // phone turned to landscape (the rotate screen covers the board). Pause the
@@ -11057,19 +11053,23 @@
       const el = currentTrackKey && trackEls[currentTrackKey];
       musicPausedByBackground = (el && !el.paused) ? el : null;
       pauseAllTracks();
-    } else if (musicPausedByBackground){
-      const el = musicPausedByBackground; musicPausedByBackground = null;
-      if (soundOn && currentTrackKey && trackEls[currentTrackKey] === el) el.play().catch(()=>{});
+    } else {
+      if (isPaused) startResumeCountdown();
+      if (musicPausedByBackground){
+        const el = musicPausedByBackground; musicPausedByBackground = null;
+        if (soundOn && currentTrackKey && trackEls[currentTrackKey] === el) el.play().catch(()=>{});
+      }
     }
   });
+  let landscapeLockMq = null;
   try{
-    const landscapeLock = matchMedia('(orientation:landscape) and (max-height:500px)');
-    const onRotate = ()=>{ if (landscapeLock.matches) autoPauseIfPlaying(); };
+    const landscapeLock = landscapeLockMq = matchMedia('(orientation:landscape) and (max-height:500px)');
+    const onRotate = ()=>{ if (landscapeLock.matches) autoPauseIfPlaying(); else if (isPaused) startResumeCountdown(); };
     if (landscapeLock.addEventListener) landscapeLock.addEventListener('change', onRotate); else landscapeLock.addListener(onRotate);
   }catch(e){}
   function resumeGame(){
     if (!isPaused) return;
-    isPaused = false;
+    isPaused = false; clearTimeout(resumeCountdownTimer);
 
     if (pausedRoundRemainingMs != null){
       const remaining = pausedRoundRemainingMs;
@@ -11103,9 +11103,6 @@
     els.pauseOverlay.classList.add('hidden');
     updatePauseBtnVisibility();
   }
-  els.pauseBtn.addEventListener('click', pauseGame);
-  els.pauseResumeBtn.addEventListener('click', resumeGame);
-  els.pauseShareBtn.addEventListener('click', shareInfinityResult);
   // Whenever any gameplay overlay's visibility changes - trivia/power-up
   // opening or closing, puzzle or riddle starting or ending - re-check
   // whether the pause button should be showing, instead of having to thread
@@ -12131,13 +12128,6 @@
     const w = copy.firstElementChild; w.classList.add('readout-coffee');
     w.querySelector('a').addEventListener('click', e=> e.stopPropagation());
     els.readoutOverlay.appendChild(w);
-    // And on Infinity's Pause screen - Infinity has no end-of-session screen,
-    // so pausing is its natural checkpoint. Hidden in Daily (see CSS).
-    const pc = document.createElement('div');
-    pc.innerHTML = wrap.outerHTML.replace(/coffeeCup/g, 'coffeeCupP').replace('id="coffeeBtn"', 'id="coffeeBtnPause"');
-    const pw = pc.firstElementChild; pw.classList.add('pause-coffee');
-    pw.querySelector('a').addEventListener('click', e=> e.stopPropagation());
-    els.pauseOverlay.appendChild(pw);
   })();
   document.querySelectorAll('[data-contact-footer]').forEach(el=>{
     el.textContent = 'Questions or feedback? ';
@@ -12378,7 +12368,7 @@
   els.howtoSkip.addEventListener('click', ()=> closeHowTo());
   els.howtoOverlay.addEventListener('click', e=> e.stopPropagation());
   document.addEventListener('keydown', e=>{ if (e.key === 'Escape' && !els.howtoOverlay.classList.contains('hidden')) closeHowTo(); });
-  els.pauseHowtoBtn.addEventListener('click', e=>{ e.stopPropagation(); openHowTo(inInfinity() ? 'infinity' : 'daily'); });
+  document.querySelectorAll('[data-howto]').forEach(b=> b.addEventListener('click', e=>{ e.stopPropagation(); openHowTo(b.dataset.howto); }));
 
   els.modeInfinityBtn.addEventListener('click', ()=>{
     els.modeSelectOverlay.classList.add('hidden');
@@ -12437,7 +12427,7 @@
     runActive = false; runPhase = 'idle';
     voted = false; votedSinceTime = null;
     bonusActive = false;
-    isPaused = false; pausedRoundRemainingMs = null; pausedRunRemainingMs = null; musicPausedByPause = null;
+    isPaused = false; pausedRoundRemainingMs = null; pausedRunRemainingMs = null; musicPausedByPause = null; clearTimeout(resumeCountdownTimer);
 
     els.eventOverlay.classList.add('hidden');
     els.solveOverlay.classList.add('hidden');
@@ -12457,7 +12447,6 @@
     els.readoutOverlay.classList.remove('show');
     els.runTimerWrap.classList.add('hidden');
     els.pauseOverlay.classList.add('hidden');
-    els.pauseBtn.classList.add('hidden');
 
     document.documentElement.classList.remove('mode-daily', 'mode-infinity');
     resetRamp();
