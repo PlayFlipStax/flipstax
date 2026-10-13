@@ -1062,6 +1062,12 @@
   .plinko-board.done .pk-guide, .plinko-board.done .pk-ufo .pk-held{ opacity:0; }
   .plinko-board{ touch-action:none; cursor:grab; -webkit-user-select:none; user-select:none; outline:none; }
   .plinko-board.done{ cursor:default; }
+  /* C4 (Oct 2026): the board in the show look - a chunky gold frame like
+     the style board's screens (the SVG keeps its thin inner line), and it
+     flashes gold when a chip lands in a big slot (FX.flash). */
+  .plinko-board{ border-radius:20px; box-shadow:0 0 0 4px #3d1300, 0 0 0 8px #f5a300, 0 0 22px 8px rgba(255,190,40,0.35), 0 16px 34px rgba(30,0,40,0.5); }
+  .plinko-board.show-flash::after{ border-radius:20px; z-index:5; }
+  .plinko-board .plinko-svg{ clip-path:inset(0 round 20px); }
   .plinko-board:focus-visible{ box-shadow:0 0 0 3px #7df9ff; border-radius:22px; }
   .plinko-svg .pk-jglow{ animation:pkJackGlow 1.1s ease-in-out infinite alternate; }
   @keyframes pkJackGlow{ from{ opacity:0.25; } to{ opacity:1; } }
@@ -3375,7 +3381,7 @@
     <div class="pk-banner" id="pkBanner">ORBIT DROP</div>
     <div class="pk-line" id="pkLine">Drag the UFO, let go to drop. Every chip pays.</div>
     <div class="pk-status"><span class="pk-run" id="pkRunScore"></span><span class="pk-chipno" id="pkChipNo"></span><span class="pk-bonus">Bonus <b id="pkBonus">+0</b></span></div>
-    <div class="plinko-board" id="plinkoBoard" role="slider" tabindex="0" aria-label="Aim the UFO: left and right arrows, Enter to drop" aria-valuemin="0" aria-valuemax="100">
+    <div class="plinko-board show-flash" id="plinkoBoard" role="slider" tabindex="0" aria-label="Aim the UFO: left and right arrows, Enter to drop" aria-valuemin="0" aria-valuemax="100">
       <svg class="plinko-svg" id="plinkoSvg" aria-hidden="true"></svg>
       <i class="pk-guide" id="pkGuide" aria-hidden="true"></i>
       <div class="pk-ufo riddle-ufo" id="pkUfo" aria-hidden="true"><span>🛸</span><i></i><b class="pk-held"></b></div>
@@ -9600,6 +9606,11 @@
     pkLanded.push(i);
     sfx.chipLand(c.kind === 'jackpot' || c.kind === 'x3');
     if (c.kind === 'jackpot' || c.kind === 'x3' || c.kind === '+50') pkLaser(c);
+    // C4: a ripple where it lands; a gold flash and stars for a big slot; coins for the jackpot.
+    { const br = document.getElementById('plinkoBoard').getBoundingClientRect(), k = plinkoScale(), p = restXY(c), x = br.left + p.x * k, y = br.top + p.y * k;
+      FX.ripple(showFx, x, y, c.kind === 'jackpot' ? '#7df9ff' : '#ffd23f', c.kind === 'x1' || c.kind === 'x2' ? 34 : 60);
+      if (c.kind !== 'x1' && c.kind !== 'x2'){ FX.flash(document.getElementById('plinkoBoard'), 'win'); FX.burst(showFx, x, y - 10, { count: c.kind === 'jackpot' ? 18 : 10, spread:90, shapes:['star'], colors:['#ffd23f', '#fff3c4', '#7df9ff'] }); }
+      if (c.kind === 'jackpot') FX.coinShower(showFx, 3); }
     if (c.kind === 'jackpot'){ sfx.jackpot(); showToast('🛸 MOTHERSHIP JACKPOT! +100' + (f.chips.slice(0, f.dropped).filter(x=> x.kind === 'jackpot').length === 1 ? ' and a bonus card' : '')); document.getElementById('finPlinko').classList.add('jackpot'); }
     if (pkLanded.length >= f.chips.length) pkAuto = false;
     renderPlinkoTally();
