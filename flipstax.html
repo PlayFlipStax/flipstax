@@ -8446,6 +8446,15 @@
   // beat N?". Daily's own numbers go in the stat line (trivia correct, the Word
   // Warp's solve time). Built in the background as soon as the results appear.
   let dailySharePre = null;   // { r, done, canvas, blob, promise }
+  // The line under today's personality: its own blurb, except The Perfectionist's, which
+  // states the run's real numbers (the show asks more than six questions now).
+  function dailyPersonalityBlurb(r){
+    if (r.personalityNote) return r.personalityNote;
+    const meta = PERSONALITY_META[r.personalityType] || PERSONALITY_META.fence_sitter;
+    if (r.personalityType === 'perfectionist' && r.triviaTotal)
+      return r.triviaCorrect === r.triviaTotal ? 'Every Brain Beam right: ' + r.triviaCorrect + ' for ' + r.triviaTotal + '.' : 'Your first six Brain Beams, all right (' + r.triviaCorrect + ' of ' + r.triviaTotal + ' overall).';
+    return meta.blurb;
+  }
   function dailyShareAward(r){
     const final = shownScore(r.score), bonus = Math.max(0, Math.min(final, (r.warpPoints || 0) + (r.comboBonus || 0)));
     return { personality: r.personalityType, finalScore: final, runScore: final - bonus, bonus, cards: (r.unlocked || []).filter(k=> PERSONALITY_META[k]), alien: [], badges: [], resultNew: false, jackpot: false };
@@ -8460,7 +8469,7 @@
       header: 'DAILY STAX · RUN COMPLETE',
       runLine: a.runScore + ' run' + (a.bonus ? ' + ' + a.bonus + ' ' + GN.wordWarp + ' & combo' : ''),
       statLine: r.triviaCorrect + '/' + r.triviaTotal + ' trivia · ' + (r.solved ? GN.wordWarp + ' solved in ' + formatRaceTime(r.solveMs) : 'Word not solved'),
-      blurb: r.personalityNote || (PERSONALITY_META[r.personalityType] || {}).blurb || '',
+      blurb: dailyPersonalityBlurb(r),
       pills,
     };
   }
@@ -11944,7 +11953,7 @@
     els.readoutOverlay.classList.toggle('has-secret', secret);
     document.getElementById('readoutTypeIcon').textContent = meta.icon;
     els.readoutTypeName.textContent = meta.name;
-    els.readoutTypeBlurb.textContent = r.personalityNote || meta.blurb;
+    els.readoutTypeBlurb.textContent = dailyPersonalityBlurb(r);
     // The results are the share image (built in the background); the HTML above
     // stays as the fallback and is swapped for the image if it's ready soon.
     const shareImg = document.getElementById('readoutShareImg');
@@ -14059,7 +14068,7 @@
       const word = (runWord && runWord.word) || 'LAUNCH';
       if (!collection.cards.gambler) collection.cards.gambler = { first: todayStr(), count: 1, revealed: false };   // (memory only: nothing is saved)
       return { date: todayStr(), rule: SAVE_RULE, savedAt: Date.now(), score: 187, triviaCorrect: 7, triviaTotal: 9, solved: true, solveMs: 34000, word,
-        personalityType: 'perfectionist', secondChance: null, perfect: false, roundResults: [true, true, false, true, true, true, false, true, true], lastVote: null,
+        personalityType: 'crowd_pleaser', secondChance: null, perfect: false, roundResults: [true, true, false, true, true, true, false, true, true], lastVote: null,
         secretRiddle: false, personalityNote: null, warpPoints: 26, comboBonus: 12, unlocked: ['gambler'] };
     }
     function replayAtStep(step, score, letters, tweakPlan){
