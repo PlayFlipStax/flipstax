@@ -2276,6 +2276,22 @@
   /* Brain Beam answers (B3): the right one rings green, a wrong pick red. */
   .event-tile.is-right{ box-shadow:var(--tile-depth), 0 0 0 4px #7dff9e, 0 0 22px 6px rgba(80,255,140,0.75); z-index:1; }
   .event-tile.is-wrong{ box-shadow:var(--tile-depth), 0 0 0 4px #ff4d4d, 0 0 20px 5px rgba(255,40,40,0.7); opacity:0.85; }
+  /* The combo meter (B4): top right of the board, by the wordmark. Its
+     three pips fill with crowd matches in a row; the glow comes on with a
+     multiplier (an opacity pulse on a pseudo-element). */
+  .combo-meter{ display:none; }
+  :root.mode-daily .combo-meter{ position:absolute; top:3px; right:8px; z-index:6; display:flex; flex-direction:column; align-items:center; gap:1px; min-width:46px; padding:3px 7px 4px; border-radius:12px;
+    background:rgba(28,6,48,0.72); border:2px solid rgba(255,214,90,0.45); color:#fff3c4; pointer-events:none; }
+  .combo-meter span{ display:none; }
+  .combo-meter b{ font:900 17px/1 var(--f-display); letter-spacing:0.5px; }
+  .combo-meter em{ display:flex; gap:3px; } .combo-meter i{ width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,0.22); }
+  .combo-meter i.on{ background:#ffd23f; box-shadow:0 0 6px rgba(255,210,60,0.9); }
+  .combo-meter::after{ content:''; position:absolute; inset:-3px; border-radius:14px; box-shadow:0 0 14px 3px rgba(255,170,40,0.85); opacity:0; pointer-events:none; }
+  .combo-meter.hot{ border-color:#ffd23f; } .combo-meter.hot b{ color:#ffd23f; }
+  .combo-meter.hot::after{ animation:comboGlow 1.1s ease-in-out infinite alternate; }
+  .combo-meter.max::after{ box-shadow:0 0 18px 5px rgba(255,90,40,0.95); }
+  @keyframes comboGlow{ from{ opacity:0.35; } to{ opacity:1; } }
+  @media (prefers-reduced-motion: reduce){ .combo-meter.hot::after{ animation:none; opacity:0.8; } }
   /* Portal Pick (B2/B3): four doors; the picked one swings open (a 3D turn
      on its left hinge - transform only) and its power-up comes out in its
      own colours. */
@@ -2860,6 +2876,7 @@
       </svg>
       <span>FLIPS</span>
     </div>
+    <div class="combo-meter" id="comboMeter" role="status" aria-label="Crowd combo"><span>🔥</span><b>×1</b><em><i></i><i></i><i></i></em></div>
     <div class="inf-floaters" aria-hidden="true">
       <span>⭐</span><span>🔥</span><span>🏆</span><span>⚡</span><span>💎</span><span>🎯</span><span>🚀</span><span>✨</span>
     </div>
@@ -4260,6 +4277,13 @@
   // and ~7:00 with four of BRAIN_BREAK_EST_MS each. The run clock (the 6:00
   // cap) stops while a Brain Break plays.
   const BRAIN_BREAK_SLOTS = [null, null, null, null];
+  // The combo meter (B4): crowd matches in a row raise a small multiplier on
+  // a VS card's points - x1.5 from the 3rd match in a row, x2 from the 6th
+  // (the cap). It applies to a card you match the crowd on; a miss resets
+  // it; a card with too few votes to call leaves it as it was. Fractions
+  // bank up and pay out as whole points.
+  const COMBO_STEP = 3, COMBO_MULT_STEP = 0.5, COMBO_MULT_MAX = 2;
+  function comboMult(streak){ return Math.min(COMBO_MULT_MAX, 1 + Math.floor(streak / COMBO_STEP) * COMBO_MULT_STEP); }
   const BRAIN_BREAK_EST_MS = 40000;
   function showEpisode(date){
     const d = Math.round((Date.parse(date + 'T00:00:00Z') - Date.parse(SHOW_LAUNCH_DATE + 'T00:00:00Z')) / 86400000);
@@ -7646,6 +7670,7 @@
         rack: solveRack, freeHints: solveFreeHints, note: solveBonusNote, solvedAt: runSolvedAt } : null,
       deck: deck.cards.slice(deck.next).map(c=> c.id),
       show: runShow, doors: runPortalDoors, warpBonus: runWarpBonusMs,
+      combo: { streak: runMatchStreak, bank: runComboBank, bonus: runComboBonus, best: runBestStreak },
     };
     try{ localStorage.setItem(RUN_LIVE_KEY, JSON.stringify(snap)); }catch(e){}
   }
@@ -8297,6 +8322,7 @@
     runStartDate = todayStr();
     runWord = dailyWordForPlayer();
     runPlan = buildShowPlan(runStartDate); runShow = { step:0, left:null }; runPortalDoors = null; runWarpBonusMs = 0;
+    runMatchStreak = 0; runComboBank = 0; runComboBonus = 0; runBestStreak = 0; renderComboMeter();
     runEndsAt = Date.now() + RUN_DURATION_MS;
     runClockAddedMs = 0;
     dailySunP = 0;
@@ -8350,6 +8376,8 @@
     runSolvedAt = null;
     runClockAddedMs = snap.clockAdded || 0;
     runPlan = buildShowPlan(runStartDate); runShow = snap.show || { step:0, left:null }; runPortalDoors = snap.doors || null; runWarpBonusMs = snap.warpBonus || 0;
+    runMatchStreak = (snap.combo && snap.combo.streak) || 0; runComboBank = (snap.combo && snap.combo.bank) || 0; runComboBonus = (snap.combo && snap.combo.bonus) || 0; runBestStreak = (snap.combo && snap.combo.best) || 0;
+    renderComboMeter();
     dailySunP = 0;
     runEndsAt = Date.now() + snap.remainMs;
     // The rest of this run's deck, in the same order - no repeats.
@@ -8473,6 +8501,35 @@
     saveRunSnapshot();
     showBumper({ t:'bumper', round:SHOW_ROUNDS }, ()=>{ if (runActive && runPhase === 'finale-bumper') startSolvePhase(); });
   }
+  // ---------- The combo meter (B4) ----------
+  function comboOnVerdict(withCrowd, base){
+    const before = comboMult(runMatchStreak);
+    if (withCrowd){
+      runComboBank += base * (before - 1);
+      const whole = Math.floor(runComboBank + 1e-9);
+      if (whole > 0){ runComboBank -= whole; runComboBonus += whole; addRunScore(whole); }
+      runMatchStreak++; runBestStreak = Math.max(runBestStreak, runMatchStreak);
+      const after = comboMult(runMatchStreak);
+      if (after > before){ sfx.combo(); hostSay(hostLine('combo')); hostMood('cheer'); renderComboMeter(true); }
+      else renderComboMeter();
+    } else {
+      const had = runMatchStreak > 0;
+      runMatchStreak = 0; runComboBank = 0;
+      renderComboMeter(false, had);
+    }
+    saveRunSnapshot();
+  }
+  function renderComboMeter(tierUp, broke){
+    const el = document.getElementById('comboMeter'); if (!el) return;
+    const m = comboMult(runMatchStreak), atMax = m >= COMBO_MULT_MAX, pips = atMax ? COMBO_STEP : runMatchStreak % COMBO_STEP;
+    el.querySelector('b').textContent = '\u00D7' + (m % 1 ? m.toFixed(1) : m);
+    el.querySelectorAll('i').forEach((p, k)=> p.classList.toggle('on', k < pips));
+    el.classList.toggle('hot', m > 1); el.classList.toggle('max', atMax);
+    el.setAttribute('aria-label', 'Crowd combo: ' + runMatchStreak + ' in a row, points times ' + m);
+    if (tierUp && !prefersReducedMotion()) FX.pop(el, 1.3);
+    if (broke) FX.shake(el);
+  }
+
   // ---------- The cold open and the round bumpers ----------
   const showCard = document.getElementById('showCard');
   function showColdOpen(then){
@@ -8534,6 +8591,7 @@
 
   let runPendingTrivia = false;
   let runPlan = null, runShow = { step:0, left:null }, runPortalDoors = null, runWarpBonusMs = 0, runQuizPick = null;
+  let runMatchStreak = 0, runComboBank = 0, runComboBonus = 0, runBestStreak = 0;
   // Set when a Daily run ends; cleared when the player starts playing again
   // from mode select. See loadNextImpl and finishDailySession.
   let sessionHalted = false;
@@ -12208,6 +12266,7 @@
     if (runActive && cv.counted){
       runVotesDecided++;
       if (cv.withCrowd){ runVotesAgreed++; const ph = side === 'A' ? els.halfA : els.halfB; FX.glowSweep(showFx, ph); FX.burstAt(showFx, ph, { count:8, spread:70, shapes:['star'], colors:['#ffd23f', '#fff3c4', '#ffb21f'] }); }
+      comboOnVerdict(cv.withCrowd, points);
       if (underdog) runLowestPctPicks++;
       trackCrowdShape(runCrowd, cv.withCrowd);
     }
@@ -12248,7 +12307,7 @@
     // Every 3rd vote in a row: in Infinity a bonus point (doubled in a Points
     // Zone); in Daily just the cheer - extra Daily points would bring its
     // trivia and power-ups on sooner.
-    if (comboCount % 3 === 0){
+    if (comboCount % 3 === 0 && !runActive){   // (Daily has the crowd-match combo meter instead - B4)
       sfx.combo();
       // (Infinity's combo point is gone with the run re-tune - the cheer stays.)
       showToast('\uD83D\uDD25 Combo x' + comboCount + '!');
@@ -12778,6 +12837,7 @@
       putNext: (name) => { const d = decks[contentPoolKey()]; const i = d.cards.findIndex((c, k)=> k >= d.next && (c.a === name || c.b === name)); if (i >= 0){ const [c] = d.cards.splice(i, 1); d.cards.splice(d.next, 0, c); } return i; },
       showRunTrivia: () => runTriviaQuestion(),
       showPlan: (date) => buildShowPlan(date || runStartDate || todayStr()),
+      comboVerdict: (w, base) => { comboOnVerdict(!!w, base || 1); return { streak: runMatchStreak, mult: comboMult(runMatchStreak), bonus: runComboBonus, bank: runComboBank, score: runScore }; },
       showState: () => ({ step: runShow.step, left: runShow.left, phase: runPhase, episode: showEpisode(runStartDate || todayStr()) }),
       startColdOpenTap: () => showCard.click(),
       showRunPowerUp: () => runPowerUpRoundForRun(),
