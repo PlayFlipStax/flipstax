@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Style Board B · Candy Pop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   DIRECTION B - "CANDY POP" TOKENS (the one block the game would reuse)
+   A sweet-shop arcade: bubblegum, mint, lemon and grape on soft glossy
+   candy shapes. Every screen sits inside a turning peppermint-swirl ring
+   (mint flash = right, cherry flash = wrong), buttons are squishy jellies,
+   type is round and bouncy, bursts are sprinkles and hearts.
+   ===================================================================== */
+:root{
+  /* palette */
+  --gum:#ff5fae; --gum-deep:#c21b72; --mint:#2fe0b4; --mint-deep:#0b8a6a; --lemon:#ffe14d; --lemon-deep:#c99700;
+  --grape:#9b6bff; --grape-deep:#4b23b0; --sky:#5fd0ff; --sky-deep:#1677b8; --cherry:#ff4058; --cherry-deep:#9a0f22;
+  --cream:#fff8fc; --ink:#3b1450; --ink-soft:#6d4a80;
+  --ring-a:#ff5fae; --ring-b:#fff8fc;
+  /* type */
+  --f-display:'Baloo 2', 'Arial Rounded MT Bold', system-ui, sans-serif;
+  --f-body:'Nunito', system-ui, sans-serif;
+  /* surfaces and shadows */
+  --panel:rgba(255,250,253,0.94); --panel-edge:rgba(255,255,255,1);
+  --sh-panel:0 6px 0 rgba(59,20,80,0.12), 0 14px 30px rgba(59,20,80,0.18);
+  --jelly-shine:inset 0 3px 0 rgba(255,255,255,0.55), inset 0 -6px 0 rgba(0,0,0,0.12);
+  --glow-mint:0 0 26px rgba(47,224,180,0.85);
+  /* motion */
+  --ease-squish:cubic-bezier(.34,1.8,.5,1); --ease-out:cubic-bezier(.2,.8,.3,1); --ease-io:cubic-bezier(.45,0,.55,1);
+  --t-fast:150ms; --t-mid:300ms; --ring-turn:26s; --dots-drift:28s; --bulb-gap:26;
+  /* frame */
+  --frame-r:40px; --ring:13px; --frame-w:min(390px, calc(100vw - 32px)); --frame-h:740px;
+}
+/* each screen's flavour */
+.w-entry  { --w1:#ffe3f1; --w2:#ffb4d9; --w3:#ff77bb; --dot:rgba(255,255,255,0.55); --accent:var(--gum);   --ring-a:#ff5fae; }
+.w-vs     { --w1:#e2fbff; --w2:#a8ecff; --w3:#6fc7ff; --dot:rgba(255,255,255,0.6);  --accent:var(--sky);   --ring-a:#5fd0ff; }
+.w-trivia { --w1:#efe6ff; --w2:#cdb6ff; --w3:#a17bff; --dot:rgba(255,255,255,0.55); --accent:var(--grape); --ring-a:#9b6bff; }
+.w-powerup{ --w1:#e6fff6; --w2:#a6f5dc; --w3:#4fe3b7; --dot:rgba(255,255,255,0.6);  --accent:var(--mint);  --ring-a:#2fe0b4; }
+.w-jumble { --w1:#fff8d6; --w2:#ffe98a; --w3:#ffc93f; --dot:rgba(255,255,255,0.65); --accent:var(--lemon); --ring-a:#ffc21a; }
+.w-results{ --w1:#fff0f8; --w2:#ffc9e6; --w3:#c9a6ff; --dot:rgba(255,255,255,0.6);  --accent:var(--gum);   --ring-a:#ff5fae; }
+.w-price  { --w1:#eafff2; --w2:#b8f7cf; --w3:#7fe8a8; --dot:rgba(255,255,255,0.6);  --accent:var(--mint);  --ring-a:#39d98a; }
+.w-odd    { --w1:#f6ecff; --w2:#e2c4ff; --w3:#c792ff; --dot:rgba(255,255,255,0.55); --accent:var(--grape); --ring-a:#b07cff; }
+.w-emoji  { --w1:#fff4e6; --w2:#ffd3a8; --w3:#ff9f8a; --dot:rgba(255,255,255,0.6);  --accent:#ff7a59;    --ring-a:#ff8a6a; }
+.w-first  { --w1:#e6fbff; --w2:#bdeffc; --w3:#ffc0d6; --dot:rgba(255,255,255,0.6);  --accent:var(--sky);   --ring-a:#3fc4e8; }
+.w-hunt   { --w1:#eef1ff; --w2:#c9d2ff; --w3:#93a6ff; --dot:rgba(255,255,255,0.55); --accent:#6b7dff;     --ring-a:#7a8cff; }
+
+/* ---------- page ---------- */
+*{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; }
+body{ margin:0; color:var(--ink); font-family:var(--f-body);
+  background:#fff2f8 radial-gradient(circle at 20px 20px, rgba(255,95,174,0.12) 6px, transparent 7px) 0 0 / 40px 40px; }
+.page-head{ display:flex; flex-wrap:wrap; align-items:center; gap:8px 14px; padding:12px 16px; background:#fff; border-bottom:4px dotted var(--gum); }
+.page-head h1{ margin:0; font:800 28px/1 var(--f-display); color:var(--gum-deep); }
+.page-head h1 small{ display:block; font:800 12.5px/1.5 var(--f-body); color:var(--ink-soft); }
+.page-head .sp{ flex:1; }
+.page-head a, .page-head button{ font:800 13px var(--f-body); color:#fff; background:var(--gum); border:none; border-radius:99px; padding:8px 14px; cursor:pointer; text-decoration:none; box-shadow:0 4px 0 var(--gum-deep); }
+.page-head button[aria-pressed="false"]{ background:var(--grape); box-shadow:0 4px 0 var(--grape-deep); }
+.intro{ max-width:1200px; margin:18px auto 0; padding:0 16px; font-size:14.5px; line-height:1.5; color:var(--ink-soft); font-weight:700; }
+#board{ max-width:1300px; margin:0 auto; padding:18px 16px 60px; display:grid; gap:34px 26px; grid-template-columns:repeat(auto-fill, minmax(var(--frame-w), 1fr)); justify-items:center; }
+.screen{ width:var(--frame-w); }
+.screen-label b{ display:block; font:800 24px/1.1 var(--f-display); color:var(--gum-deep); }
+.screen-label span{ display:block; margin:2px 0 10px; font-size:13px; font-weight:700; color:var(--ink-soft); min-height:34px; }
+.try{ margin:8px 2px 0; font-size:12.5px; font-weight:700; color:var(--ink-soft); }
+
+/* ---------- the frame: peppermint ring, candy sky, dots, sprinkles ---------- */
+.frame{ position:relative; width:100%; height:var(--frame-h); border-radius:var(--frame-r); overflow:hidden; isolation:isolate;
+  box-shadow:0 10px 0 rgba(59,20,80,0.15), 0 20px 40px rgba(59,20,80,0.2); }
+.frame::before{ content:''; position:absolute; left:50%; top:50%; width:1100px; height:1100px; margin:-550px 0 0 -550px; z-index:0;
+  background:repeating-conic-gradient(from 0deg, var(--ring-a) 0deg 9deg, var(--ring-b) 9deg 18deg); animation:ringTurn var(--ring-turn) linear infinite; }
+@keyframes ringTurn{ to{ transform:rotate(360deg); } }
+.bg{ position:absolute; inset:var(--ring); border-radius:calc(var(--frame-r) - var(--ring)); overflow:hidden; z-index:0;
+  background:radial-gradient(130% 85% at 50% 10%, var(--w1) 0%, var(--w2) 45%, var(--w3) 100%); box-shadow:inset 0 0 0 3px rgba(255,255,255,0.9), inset 0 6px 18px rgba(59,20,80,0.15); }
+.bg .rays{ position:absolute; left:-60px; top:-60px; width:calc(100% + 120px); height:calc(100% + 120px);
+  background:radial-gradient(circle at 15px 15px, var(--dot) 7px, transparent 8px) 0 0 / 60px 60px; animation:dotsDrift var(--dots-drift) linear infinite; }
+@keyframes dotsDrift{ to{ transform:translate(60px, 60px); } }
+.bg .glow{ position:absolute; left:50%; top:14%; width:380px; height:380px; margin:-190px 0 0 -190px; border-radius:50%;
+  background:radial-gradient(circle, rgba(255,255,255,0.8), rgba(255,255,255,0) 65%); animation:glowPulse 5s var(--ease-io) infinite alternate; }
+@keyframes glowPulse{ from{ opacity:0.55; transform:scale(0.9); } to{ opacity:0.95; transform:scale(1.08); } }
+.amb{ position:absolute; inset:var(--ring); overflow:hidden; pointer-events:none; z-index:1; border-radius:calc(var(--frame-r) - var(--ring)); }
+.amb .drift{ position:absolute; top:-16px; width:5px; height:14px; border-radius:99px; opacity:0.85; animation:drift var(--dur) linear var(--delay) infinite; }
+@keyframes drift{ from{ transform:translate(0, 0) rotate(0deg); } to{ transform:translate(var(--sway), calc(var(--frame-h) + 30px)) rotate(var(--spin)); } }
+.marquee{ display:none; }   /* B has the peppermint ring instead of bulbs */
+.frame::after{ content:''; position:absolute; inset:0; z-index:4; pointer-events:none; border-radius:inherit; opacity:0;
+  box-shadow:inset 0 0 0 var(--ring) var(--mint), inset 0 0 0 calc(var(--ring) + 4px) #fff, inset 0 0 70px rgba(47,224,180,0.8); }
+.frame.flash-win::after{ animation:ringFlash 1s ease-out; }
+.frame.flash-lose::after{ box-shadow:inset 0 0 0 var(--ring) var(--cherry), inset 0 0 0 calc(var(--ring) + 4px) #fff, inset 0 0 70px rgba(255,64,88,0.7); animation:ringFlash 0.9s ease-out; }
+@keyframes ringFlash{ 0%{ opacity:0; } 15%{ opacity:1; } 35%{ opacity:0.5; } 50%{ opacity:1; } 100%{ opacity:0; } }
+.frame.flash-win .stage{ animation:jelly 0.7s var(--ease-squish); }
+@keyframes jelly{ 0%{ transform:scale(1); } 25%{ transform:scale(1.04, 0.96); } 50%{ transform:scale(0.98, 1.03); } 75%{ transform:scale(1.01, 0.99); } 100%{ transform:scale(1); } }
+.racing.screen .frame::before{ animation-duration:4s; }
+.fx-layer{ position:absolute; inset:0; z-index:6; pointer-events:none; overflow:hidden; }
+
+/* ---------- shared components ---------- */
+.stage{ position:absolute; inset:34px 26px 72px; z-index:2; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; text-align:center; }
+.panel{ background:var(--panel); border:3px solid var(--panel-edge); border-radius:24px; box-shadow:var(--sh-panel); color:var(--ink); padding:10px 16px; }
+.chip{ display:inline-flex; align-items:center; gap:6px; padding:6px 16px; border-radius:99px; background:#fff; color:var(--ink); font:900 12.5px var(--f-body); letter-spacing:0.6px;
+  box-shadow:0 4px 0 rgba(59,20,80,0.15); border:3px solid var(--accent); }
+.num{ font-family:var(--f-display); font-weight:800; }
+.title{ font:800 34px/1.05 var(--f-display); color:var(--ink); }
+.btn{ font:800 21px/1 var(--f-display); color:#fff; border:none; border-radius:99px; padding:14px 22px; cursor:pointer;
+  background:radial-gradient(120% 90% at 50% 0%, #ff9fd0 0%, var(--gum) 55%, #e8338f 100%); box-shadow:var(--jelly-shine), 0 6px 0 var(--gum-deep), 0 12px 20px rgba(194,27,114,0.3);
+  text-shadow:0 2px 0 rgba(120,0,60,0.35); transition:transform var(--t-fast) var(--ease-squish); -webkit-tap-highlight-color:transparent; }
+.btn:active{ transform:scale(1.05, 0.9); }
+.btn.big{ width:100%; display:flex; flex-direction:column; gap:2px; font-size:28px; padding:14px 22px 12px; }
+.btn small{ font:800 12.5px var(--f-body); opacity:0.92; }
+.btn-gold, .btn.btn-gold{ color:var(--ink); text-shadow:0 1px 0 rgba(255,255,255,0.6); background:radial-gradient(120% 90% at 50% 0%, #fff6b3 0%, var(--lemon) 55%, #ffc21a 100%); box-shadow:var(--jelly-shine), 0 6px 0 var(--lemon-deep), 0 12px 20px rgba(201,151,0,0.3); }
+.btn-alt{ background:radial-gradient(120% 90% at 50% 0%, #9ff5df 0%, var(--mint) 55%, #14c08f 100%); box-shadow:var(--jelly-shine), 0 6px 0 var(--mint-deep), 0 12px 20px rgba(11,138,106,0.3); text-shadow:0 2px 0 rgba(0,80,60,0.35); }
+.btn-ghost{ font:900 13.5px var(--f-body); color:var(--ink); background:#fff; box-shadow:0 4px 0 rgba(59,20,80,0.18); text-shadow:none; padding:9px 16px; }
+.btn-row{ display:flex; gap:10px; width:100%; } .btn-row .btn{ flex:1; padding-left:10px; padding-right:10px; }
+.reset{ position:absolute; left:50%; bottom:-50px; transform:translateX(-50%); white-space:nowrap; }
+.reset:active{ transform:translateX(-50%) scale(1.05, 0.9); }
+.verdict{ min-height:40px; font:800 22px/1.15 var(--f-display); color:var(--ink); opacity:0; transform:scale(0.5); }
+.verdict.show{ opacity:1; transform:none; transition:transform 0.4s var(--ease-squish), opacity 0.2s; padding:6px 18px; border-radius:99px; background:#fff; box-shadow:0 4px 0 rgba(59,20,80,0.15); }
+.verdict.good{ color:var(--mint-deep); box-shadow:0 0 0 3px var(--mint), 0 4px 0 var(--mint-deep); } .verdict.bad{ color:var(--cherry-deep); box-shadow:0 0 0 3px var(--cherry), 0 4px 0 var(--cherry-deep); }
+.verdict.bold{ color:var(--gum-deep); box-shadow:0 0 0 3px var(--gum), 0 4px 0 var(--gum-deep); }
+/* the gummy alien */
+.alien{ width:58px; height:66px; flex-shrink:0; animation:alienBob 2s var(--ease-io) infinite alternate; }
+.alien-svg{ width:100%; height:100%; overflow:visible; }
+.al-head{ fill:#c9a6ff; stroke:#5b2bb5; stroke-width:3; } .al-body{ fill:#b48cff; stroke:#5b2bb5; stroke-width:3; } .al-eye{ fill:#2b0f4a; } .al-shine{ fill:#fff; }
+.al-mouth{ fill:none; stroke:#5b2bb5; stroke-width:3; stroke-linecap:round; } .al-ant{ stroke:#5b2bb5; stroke-width:3; } .al-ant-tip{ fill:var(--gum); stroke:var(--gum-deep); stroke-width:2; }
+@keyframes alienBob{ from{ transform:translateY(0) scale(1, 1); } to{ transform:translateY(-5px) scale(0.97, 1.03); } }
+.alien.cheer{ animation:alienCheer 0.5s var(--ease-squish) 3; } .alien.sad{ animation:alienSad 1.3s var(--ease-out); }
+@keyframes alienCheer{ 0%, 100%{ transform:translateY(0) scale(1); } 30%{ transform:translateY(4px) scale(1.15, 0.85); } 60%{ transform:translateY(-24px) scale(0.9, 1.12); } }
+@keyframes alienSad{ 0%{ transform:none; } 30%{ transform:translateY(10px) scale(1.12, 0.84); } 100%{ transform:none; } }
+/* the candy UFO */
+.ufo{ position:absolute; left:0; top:0; width:90px; height:52px; z-index:5; pointer-events:none; }
+.ufo-svg{ width:100%; height:100%; overflow:visible; filter:drop-shadow(0 5px 0 rgba(59,20,80,0.18)); }
+.ufo-dome{ fill:#b8fff0; stroke:#0b8a6a; stroke-width:3; } .ufo-dome-shine{ fill:#fff; }
+.ufo-body{ fill:#ff7ec0; stroke:#c21b72; stroke-width:3; } .ufo-rim{ fill:#ffc0e0; }
+.ufo-light{ animation:ufoLights 0.7s steps(1) infinite; } .ufo-light.l2{ animation-delay:-0.23s; } .ufo-light.l3{ animation-delay:-0.46s; }
+@keyframes ufoLights{ 0%{ fill:#ffe14d; } 33%{ fill:#fff; } 66%{ fill:#2fe0b4; } }
+.ufo-pass{ opacity:0; }
+.ufo .beam{ position:absolute; left:50%; top:40px; width:120px; height:var(--beam-h, 160px); margin-left:-60px; transform-origin:50% 0; transform:scaleY(0); opacity:0;
+  background:repeating-linear-gradient(180deg, rgba(255,255,255,0.75) 0 10px, rgba(255,201,230,0.6) 10px 20px); clip-path:polygon(32% 0, 68% 0, 100% 100%, 0 100%); transition:transform 0.25s var(--ease-out), opacity 0.25s; }
+.ufo.on .beam{ transform:scaleY(1); opacity:0.9; }
+.zap{ position:absolute; top:0; width:6px; margin-left:-3px; transform-origin:50% 0; border-radius:3px; background:repeating-linear-gradient(180deg, #ff5fae 0 6px, #fff 6px 12px); box-shadow:0 0 10px #ff5fae; }
+.fx-p{ position:absolute; width:12px; height:12px; pointer-events:none; }
+.fx-p svg{ width:100%; height:100%; fill:currentColor; display:block; }
+.fx-sprinkle{ width:5px; height:15px; border-radius:99px; }
+.fx-dot{ width:11px; height:11px; border-radius:50%; }
+.fx-coin{ border-radius:50%; width:15px; height:15px; background:radial-gradient(circle at 35% 35%, #fff, #ffe14d 55%, #e0a800) !important; box-shadow:0 0 0 2px #fff; }
+
+/* ---------- screens ---------- */
+/* entry: the logo is a row of candy blocks that squish in */
+.logo{ cursor:pointer; margin-top:8px; }
+.lw{ display:inline-flex; gap:3px; }
+.lw b{ display:inline-grid; place-items:center; width:38px; height:54px; border-radius:14px; font:800 40px/1 var(--f-display); color:#fff;
+  background:radial-gradient(120% 90% at 50% 0%, #ff9fd0, var(--gum)); box-shadow:var(--jelly-shine), 0 5px 0 var(--gum-deep); text-shadow:0 2px 0 rgba(120,0,60,0.3); }
+.lw b:nth-child(4n+2){ background:radial-gradient(120% 90% at 50% 0%, #9ff5df, var(--mint)); box-shadow:var(--jelly-shine), 0 5px 0 var(--mint-deep); }
+.lw b:nth-child(4n+3){ background:radial-gradient(120% 90% at 50% 0%, #fff6b3, var(--lemon)); box-shadow:var(--jelly-shine), 0 5px 0 var(--lemon-deep); color:var(--ink); text-shadow:none; }
+.lw b:nth-child(4n){ background:radial-gradient(120% 90% at 50% 0%, #d6c2ff, var(--grape)); box-shadow:var(--jelly-shine), 0 5px 0 var(--grape-deep); }
+.logo.drop b{ animation:squishIn 0.75s var(--ease-squish) calc(var(--k) * 80ms) both; }
+@keyframes squishIn{ 0%{ opacity:0; transform:translateY(-120px) scale(0.8, 1.2); } 55%{ opacity:1; transform:translateY(0) scale(1.25, 0.75); } 75%{ transform:scale(0.92, 1.08); } 100%{ opacity:1; transform:none; } }
+.tagline{ font-weight:900; font-size:15px; }
+/* VS: two lollipop-bright cards */
+.topbar{ display:flex; justify-content:space-around; width:100%; font:900 11px var(--f-body); letter-spacing:0.8px; padding:8px 10px; }
+.topbar b{ font-size:22px; color:var(--gum-deep); margin-left:3px; vertical-align:-3px; }
+.vs-wrap{ position:relative; width:100%; display:flex; flex-direction:column; gap:14px; }
+.vs-card{ position:relative; height:172px; border-radius:30px; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--ink); font-family:var(--f-body); padding:0;
+  box-shadow:var(--jelly-shine), 0 7px 0 rgba(59,20,80,0.22), 0 14px 26px rgba(59,20,80,0.18); transition:transform var(--t-mid) var(--ease-squish); -webkit-tap-highlight-color:transparent; }
+.vs-card.a{ background:radial-gradient(120% 100% at 50% 0%, #ffd0e8, #ff86c2); } .vs-card.b{ background:radial-gradient(120% 100% at 50% 0%, #d4f8ff, #7ad8ff); }
+.vs-card .tag{ position:absolute; top:12px; left:14px; font:900 11.5px var(--f-body); background:#fff; padding:4px 10px; border-radius:99px; }
+.vs-card .glyph{ font-size:56px; line-height:1; }
+.vs-card .name{ font:800 26px/1 var(--f-display); padding:6px 20px; border-radius:99px; }
+.vs-card .res{ position:absolute; left:16px; right:16px; bottom:10px; display:flex; align-items:center; gap:8px; opacity:0; transform:translateY(8px); transition:opacity 0.3s, transform 0.4s var(--ease-squish); }
+.vs-card .pct{ font:800 28px/1 var(--f-display); min-width:56px; text-align:left; }
+.vs-card .bar{ flex:1; height:14px; border-radius:99px; background:#fff; overflow:hidden; box-shadow:inset 0 2px 3px rgba(59,20,80,0.15); }
+.vs-card .bar u{ display:block; height:100%; border-radius:99px; background:repeating-linear-gradient(-45deg, var(--gum) 0 8px, #ff9fd0 8px 16px); transform-origin:0 50%; transform:scaleX(0); transition:transform 0.7s var(--ease-out); }
+.vs-card.b .bar u{ background:repeating-linear-gradient(-45deg, var(--sky) 0 8px, #b5ecff 8px 16px); }
+.vs-card .res em{ font:900 11px var(--f-body); font-style:normal; background:var(--lemon); color:var(--ink); padding:3px 9px; border-radius:99px; opacity:0; }
+.voted .vs-card .res{ opacity:1; transform:none; } .vs-card.picked .res em{ opacity:1; }
+.vs-card.picked{ transform:scale(1.03); box-shadow:var(--jelly-shine), 0 0 0 5px #fff, 0 0 0 9px var(--lemon), 0 14px 26px rgba(59,20,80,0.2); }
+.vs-badge{ position:absolute; left:50%; top:50%; width:66px; height:66px; margin:-33px 0 0 -33px; z-index:2; border-radius:50%; display:grid; place-items:center;
+  font:800 28px var(--f-display); color:#fff; background:repeating-conic-gradient(var(--gum) 0 30deg, #fff 30deg 60deg); box-shadow:0 0 0 5px #fff, 0 6px 0 rgba(59,20,80,0.2); text-shadow:0 2px 0 var(--gum-deep), 0 0 6px var(--gum-deep); }
+.vs-badge.stamp{ animation:stamp 0.7s var(--ease-squish); }
+@keyframes stamp{ 0%{ transform:scale(0) rotate(-120deg); } 60%{ transform:scale(1.25, 0.8) rotate(10deg); } 100%{ transform:none; } }
+#vs .alien{ position:absolute; right:-6px; bottom:44px; width:46px; height:52px; }
+/* trivia + emoji answers: jelly pills */
+.timer{ width:100%; height:14px; border-radius:99px; background:#fff; overflow:hidden; box-shadow:inset 0 2px 3px rgba(59,20,80,0.15); }
+.timer i{ display:block; height:100%; border-radius:99px; background:repeating-linear-gradient(-45deg, var(--grape) 0 8px, #c6aeff 8px 16px); transform-origin:0 50%; }
+.timer.run i{ animation:timerRun 20s linear forwards; } .answered .timer i{ animation-play-state:paused; }
+@keyframes timerRun{ from{ transform:scaleX(1); } to{ transform:scaleX(0); } }
+.q{ font:900 21px/1.25 var(--f-body); padding:16px 18px; width:100%; }
+.answers{ display:grid; gap:10px; width:100%; }
+.ans{ display:flex; align-items:center; gap:12px; width:100%; padding:12px 16px; border-radius:99px; cursor:pointer; text-align:left; border:none;
+  font:900 18px var(--f-body); color:var(--ink); background:#fff; box-shadow:var(--jelly-shine), 0 5px 0 rgba(59,20,80,0.2);
+  transition:transform var(--t-fast) var(--ease-squish), opacity 0.3s; -webkit-tap-highlight-color:transparent; }
+.ans:active{ transform:scale(1.03, 0.92); }
+.ans-key{ width:32px; height:32px; flex-shrink:0; border-radius:50%; display:grid; place-items:center; font:800 18px var(--f-display); color:#fff; background:var(--accent); box-shadow:inset 0 -3px 0 rgba(0,0,0,0.15); }
+.deal .ans{ animation:popIn 0.55s var(--ease-squish) calc(var(--k) * 100ms) both; }
+@keyframes popIn{ from{ transform:scale(0.3); opacity:0; } to{ transform:none; opacity:1; } }
+.ans.right{ background:radial-gradient(120% 100% at 50% 0%, #c9ffef, var(--mint)); box-shadow:var(--jelly-shine), 0 5px 0 var(--mint-deep), var(--glow-mint); }
+.ans.wrong{ background:radial-gradient(120% 100% at 50% 0%, #ffd0d6, #ff7a8a); box-shadow:var(--jelly-shine), 0 5px 0 var(--cherry-deep); }
+.answered .ans:not(.right):not(.wrong){ opacity:0.45; }
+#trivia .alien{ position:absolute; left:-4px; bottom:-6px; }
+/* power-up: four candy jars with lids that pop off */
+.gift{ font-size:52px; animation:giftBob 1.4s var(--ease-io) infinite alternate; }
+@keyframes giftBob{ from{ transform:translateY(0) scale(1, 1); } to{ transform:translateY(-8px) scale(0.95, 1.05); } }
+.doors{ display:grid; grid-template-columns:1fr 1fr; gap:14px; width:100%; }
+.door{ position:relative; height:138px; padding:0; border:none; background:none; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.door-prize{ position:absolute; inset:14px 0 0; border-radius:26px 26px 30px 30px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+  background:rgba(255,255,255,0.75); box-shadow:inset 0 0 0 4px #fff, inset 0 -10px 20px rgba(59,20,80,0.08), 0 6px 0 rgba(59,20,80,0.15); color:var(--ink); }
+.pu-icon{ font-size:42px; } .pu-label{ font:800 19px var(--f-display); }
+.door-front{ position:absolute; left:-4px; right:-4px; top:0; height:40px; border-radius:16px; display:grid; place-items:center;
+  background:radial-gradient(120% 100% at 50% 0%, #ff9fd0, var(--gum)); box-shadow:var(--jelly-shine), 0 5px 0 var(--gum-deep); transition:transform 0.55s var(--ease-squish), opacity 0.3s 0.3s; }
+.door:nth-child(2) .door-front{ background:radial-gradient(120% 100% at 50% 0%, #9ff5df, var(--mint)); box-shadow:var(--jelly-shine), 0 5px 0 var(--mint-deep); }
+.door:nth-child(3) .door-front{ background:radial-gradient(120% 100% at 50% 0%, #fff6b3, var(--lemon)); box-shadow:var(--jelly-shine), 0 5px 0 var(--lemon-deep); }
+.door:nth-child(4) .door-front{ background:radial-gradient(120% 100% at 50% 0%, #d6c2ff, var(--grape)); box-shadow:var(--jelly-shine), 0 5px 0 var(--grape-deep); }
+.door-num{ font:800 24px/1 var(--f-display); color:#fff; text-shadow:0 2px 0 rgba(0,0,0,0.2); }
+.door:nth-child(3) .door-num{ color:var(--ink); text-shadow:none; }
+.door-knob{ display:none; }
+/* the jar contents stay hidden (frosted) until its lid pops */
+.door-prize > *{ opacity:0.18; filter:blur(0); transition:opacity 0.3s; }
+.door:not(.open) .door-prize{ animation:jarWiggle 2.6s var(--ease-io) infinite; animation-delay:calc(var(--k) * -0.6s); }
+@keyframes jarWiggle{ 0%, 80%, 100%{ transform:rotate(0); } 85%{ transform:rotate(-3deg); } 90%{ transform:rotate(3deg); } 95%{ transform:rotate(-2deg); } }
+.door.open .door-front{ transform:translateY(-70px) rotate(-25deg) scale(0.8); opacity:0; }
+.door.open .door-prize > *{ opacity:1; }
+.door.open .door-prize{ animation:jelly 0.7s var(--ease-squish) 0.2s; }
+.chosen .door:not(.open){ opacity:0.4; transition:opacity 0.4s; }
+.deal .door{ animation:popIn 0.55s var(--ease-squish) calc(var(--k) * 90ms) both; }
+/* jumble: letter candies in a tray */
+.clue{ font-weight:900; font-size:15px; }
+.tray{ display:flex; gap:7px; padding:12px; border-radius:26px; background:#fff; box-shadow:inset 0 4px 10px rgba(59,20,80,0.15), 0 6px 0 rgba(59,20,80,0.12); }
+.slot{ position:relative; width:44px; height:54px; border-radius:16px; display:grid; place-items:center; font:800 32px var(--f-display); color:var(--ink);
+  background:#f7eefc; box-shadow:inset 0 3px 5px rgba(59,20,80,0.15); cursor:pointer; }
+.slot:not(:empty):not(.locked){ background:radial-gradient(120% 100% at 50% 0%, #ffd0e8, #ff86c2); box-shadow:var(--jelly-shine), 0 4px 0 var(--gum-deep); color:#fff; }
+.slot.locked{ background:radial-gradient(120% 100% at 50% 0%, #fff6b3, var(--lemon)); box-shadow:var(--jelly-shine), 0 4px 0 var(--lemon-deep); cursor:default; }
+.slot .lock{ position:absolute; right:-6px; top:-8px; font-size:13px; font-style:normal; }
+.tiles{ display:flex; gap:9px; flex-wrap:wrap; justify-content:center; }
+.tile{ width:52px; height:52px; border-radius:50%; border:none; cursor:pointer; font:800 30px var(--f-display); color:#fff; background:radial-gradient(120% 100% at 40% 20%, #d6c2ff, var(--grape));
+  box-shadow:var(--jelly-shine), 0 5px 0 var(--grape-deep); transition:transform var(--t-fast) var(--ease-squish), opacity 0.25s; -webkit-tap-highlight-color:transparent; }
+.tile:nth-child(2n){ background:radial-gradient(120% 100% at 40% 20%, #9ff5df, var(--mint)); box-shadow:var(--jelly-shine), 0 5px 0 var(--mint-deep); }
+.tile:active{ transform:scale(1.12, 0.86); } .tile.used{ opacity:0.2; pointer-events:none; }
+/* results */
+.score{ font-size:112px; line-height:0.85; color:#fff; text-shadow:0 6px 0 var(--gum-deep), 0 0 0 #000, 0 10px 24px rgba(194,27,114,0.4); -webkit-text-stroke:4px var(--gum-deep); paint-order:stroke fill; }
+.sub{ font:900 13px var(--f-body); color:var(--ink); background:#fff; padding:4px 12px; border-radius:99px; }
+.card-img{ width:42%; border-radius:18px; overflow:hidden; box-shadow:0 0 0 5px #fff, 0 0 0 10px var(--gum), 0 12px 24px rgba(59,20,80,0.25); animation:cardFloat 2.6s var(--ease-io) infinite alternate; }
+.card-img img{ display:block; width:100%; }
+@keyframes cardFloat{ from{ transform:translateY(0) rotate(-2deg); } to{ transform:translateY(-6px) rotate(2deg); } }
+.stat{ font:900 13px var(--f-body); padding:7px 14px; }
+.badges{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; }
+.pill{ font:900 12px var(--f-body); padding:5px 11px; border-radius:99px; background:#fff; color:var(--ink); box-shadow:0 3px 0 rgba(59,20,80,0.15); }
+/* price check: a gumball-machine counter */
+.product{ width:100%; display:flex; flex-direction:column; align-items:center; gap:0; }
+.product .glyph{ font-size:60px; } .pname{ font:800 26px var(--f-display); } .pnote{ font-size:12.5px; font-weight:800; color:var(--ink-soft); }
+.pricetag{ display:flex; align-items:center; gap:5px; padding:10px 16px; border-radius:30px; background:radial-gradient(120% 100% at 50% 0%, #fff, #e9fff3); box-shadow:inset 0 0 0 4px var(--mint), 0 6px 0 var(--mint-deep); }
+.pricetag .cur{ font:800 42px var(--f-display); color:var(--mint-deep); }
+.reel{ width:40px; height:62px; overflow:hidden; border-radius:14px; background:radial-gradient(120% 100% at 50% 0%, #c9ffef, var(--mint)); box-shadow:var(--jelly-shine); }
+.reel .strip{ display:flex; flex-direction:column; transition:transform 0ms cubic-bezier(.2,.75,.25,1); }
+.reel b{ height:62px; flex-shrink:0; display:grid; place-items:center; font:800 46px var(--f-display); color:#fff; text-shadow:0 3px 0 var(--mint-deep); }
+.q2{ font:900 16px/1.35 var(--f-body); color:var(--ink); padding:8px 14px; border-radius:20px; background:rgba(255,255,255,0.85); }
+/* odd one out */
+.odd-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; width:100%; }
+.odd{ height:130px; border-radius:30px; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+  background:#fff; box-shadow:var(--jelly-shine), 0 6px 0 rgba(59,20,80,0.2); transition:opacity 0.4s, transform var(--t-fast) var(--ease-squish); -webkit-tap-highlight-color:transparent; }
+.odd:active{ transform:scale(1.05, 0.92); }
+.odd .glyph{ font-size:52px; } .oname{ font:800 22px var(--f-display); color:var(--ink); }
+.deal .odd{ animation:popIn 0.55s var(--ease-squish) calc(var(--k) * 90ms) both; }
+.odd.wrong{ background:radial-gradient(120% 100% at 50% 0%, #ffd0d6, #ff7a8a); box-shadow:var(--jelly-shine), 0 6px 0 var(--cherry-deep); }
+.odd.right{ box-shadow:var(--jelly-shine), 0 0 0 5px var(--mint), var(--glow-mint); }
+.odd.gone{ opacity:0; }
+/* emoji decode: a speech bubble of emoji */
+.clue-emoji{ position:relative; display:flex; gap:10px; padding:14px 22px; border-radius:36px; background:#fff; box-shadow:0 6px 0 rgba(59,20,80,0.15); }
+.clue-emoji::after{ content:''; position:absolute; left:50%; bottom:-14px; margin-left:-14px; border:14px solid transparent; border-top-color:#fff; border-bottom:0; }
+.em{ font-size:56px; display:inline-block; }
+.clue-emoji.deal .em{ animation:squishIn 0.7s var(--ease-squish) calc(var(--k) * 220ms) both; }
+.clue-emoji.solved .em{ animation:emHop 0.8s var(--ease-squish) calc(var(--k) * 120ms) both; }
+@keyframes emHop{ 0%{ transform:none; } 35%{ transform:translateY(-26px) scale(0.85, 1.2) rotate(-12deg); } 60%{ transform:translateY(0) scale(1.2, 0.85); } 100%{ transform:none; } }
+/* which came first: two cards and a candy-stripe timeline */
+.wcf{ display:flex; align-items:center; gap:8px; width:100%; margin-top:6px; }
+.wcf-card{ position:relative; flex:1; height:196px; border-radius:30px; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  background:radial-gradient(120% 100% at 50% 0%, #fff, #d4f8ff); box-shadow:var(--jelly-shine), 0 6px 0 rgba(22,119,184,0.4); transition:transform 0.5s var(--ease-squish); -webkit-tap-highlight-color:transparent; }
+.wcf-card:nth-of-type(2){ background:radial-gradient(120% 100% at 50% 0%, #fff, #ffd0e0); box-shadow:var(--jelly-shine), 0 6px 0 rgba(194,27,114,0.35); }
+.wcf-card .glyph{ font-size:56px; }
+.year{ position:absolute; bottom:-14px; left:50%; padding:3px 14px; border-radius:99px; font:800 24px var(--f-display); color:var(--ink); background:var(--lemon); box-shadow:0 4px 0 var(--lemon-deep);
+  transform:translateX(-50%) scale(0); opacity:0; }
+.answered .year{ animation:yearPop 0.6s var(--ease-squish) forwards; } .answered .wcf-card[data-k="1"] .year{ animation-delay:0.25s; }
+@keyframes yearPop{ from{ transform:translateX(-50%) scale(0); opacity:0; } to{ transform:translateX(-50%) scale(1); opacity:1; } }
+.answered .wcf-card[data-k="0"]{ transform:rotate(-3deg); } .answered .wcf-card[data-k="1"]{ transform:rotate(3deg); }
+.wcf-card.picked{ box-shadow:var(--jelly-shine), 0 0 0 5px #fff, 0 0 0 9px var(--lemon); }
+.or{ font:800 20px var(--f-display); color:var(--ink); background:#fff; width:38px; height:38px; border-radius:50%; display:grid; place-items:center; flex-shrink:0; box-shadow:0 3px 0 rgba(59,20,80,0.15); }
+.timeline{ position:relative; width:100%; height:66px; margin-top:22px; }
+.timeline .line{ position:absolute; left:4%; right:4%; top:30px; height:12px; border-radius:99px; background:repeating-linear-gradient(-45deg, var(--sky) 0 8px, #fff 8px 16px); box-shadow:0 3px 0 rgba(59,20,80,0.12); }
+.tick{ position:absolute; top:48px; font:900 12px var(--f-body); color:var(--ink); } .tick.t1{ left:2%; } .tick.t2{ right:2%; }
+.timeline::before, .timeline::after{ position:absolute; top:0; padding:2px 10px; border-radius:99px; font:800 15px var(--f-display); color:var(--ink); background:#fff; box-shadow:0 3px 0 rgba(59,20,80,0.15);
+  transform:translateX(-50%) scale(0); opacity:0; }
+.timeline::before{ content:'📘 2004'; left:40%; } .timeline::after{ content:'📺 2005'; left:52%; }
+.answered .timeline::before{ animation:yearPop 0.5s var(--ease-squish) 0.5s forwards; } .answered .timeline::after{ animation:yearPop 0.5s var(--ease-squish) 0.75s forwards; }
+#first .timeline::after{ top:34px; }
+/* word hunt: a board of letter candies */
+.hunt-ufo{ width:76px; height:44px; animation:huntHover 2s var(--ease-io) infinite alternate; }
+.hunt-ufo .ufo-svg{ width:100%; height:100%; }
+.hunt-ufo.firing .ufo-body{ fill:#ffe14d; }
+@keyframes huntHover{ from{ transform:translateX(-30px) rotate(-4deg); } to{ transform:translateX(30px) rotate(4deg); } }
+.grid{ display:grid; grid-template-columns:repeat(6, 1fr); gap:6px; width:100%; padding:10px; border-radius:26px; background:#fff; box-shadow:0 6px 0 rgba(59,20,80,0.15); }
+.cell{ aspect-ratio:1; border-radius:50%; border:none; cursor:pointer; font:800 24px var(--f-display); color:var(--ink); background:#f3ecff;
+  box-shadow:inset 0 -3px 0 rgba(59,20,80,0.12); transition:transform var(--t-fast) var(--ease-squish); -webkit-tap-highlight-color:transparent; padding:0; }
+.cell.start{ background:var(--lemon); transform:scale(1.12); }
+.cell.hit{ background:radial-gradient(120% 100% at 40% 20%, #ffd0e8, var(--gum)); color:#fff; animation:hitPop 0.4s var(--ease-squish); }
+.cell.miss{ background:#ffb3bd; }
+@keyframes hitPop{ 40%{ transform:scale(1.3, 0.8); } 70%{ transform:scale(0.9, 1.15); } }
+.words{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; }
+.word{ font:800 16px var(--f-display); padding:3px 12px; border-radius:99px; background:#fff; color:var(--ink); box-shadow:0 3px 0 rgba(59,20,80,0.15); }
+.word.found{ background:var(--gum); color:#fff; text-decoration:line-through; text-decoration-thickness:3px; }
+
+/* ---------- pause when out of view / hidden; reduced motion ---------- */
+.offscreen *, .offscreen .frame::before, .tab-hidden .screen *, .tab-hidden .frame::before{ animation-play-state:paused !important; }
+.rm .frame::before, .rm .bg .rays, .rm .bg .glow, .rm .alien, .rm .gift, .rm .card-img, .rm .hunt-ufo, .rm .ufo-light, .rm .door-prize{ animation:none !important; }
+.rm .amb{ display:none; }
+.rm *{ transition-duration:0ms !important; animation-duration:0.001ms !important; animation-iteration-count:1 !important; }
+@media (max-width:440px){ .page-head h1{ font-size:24px; } :root{ --frame-h:720px; } }
+</style>
+</head>
+<body>
+<div class="page-head">
+  <h1>FlipStax style board<small>Direction B · Candy Pop: sweet-shop arcade</small></h1>
+  <span class="sp"></span>
+  <a href="a.html">← See Direction A</a>
+  <button id="soundBtn" type="button" aria-pressed="false">🔇 Sound off</button>
+  <button id="motionBtn" type="button" aria-pressed="false">✨ Full motion</button>
+</div>
+<p class="intro">The same screens in a second direction: candy-shop bright instead of TV-studio gold. Shared across all screens: the turning peppermint ring (mint flash when you're right, cherry flash when you're wrong), drifting polka dots and sprinkles, squishy jelly buttons, round Baloo type, a pink-and-mint UFO and a gummy alien. Each screen has its own flavour and one signature move. Not linked from the game.</p>
+<main id="board"></main>
+<script src="fx.js"></script>
+<script>FX.theme = { burst:['#ff5fae', '#2fe0b4', '#ffe14d', '#9b6bff', '#5fd0ff', '#ffffff'], shapes:['sprinkle', 'heart', 'dot', 'sprinkle'] };</script>
+<script>
+  // Direction B's signature move for each screen (the shared file describes A's).
+  window.BOARD_SIG = {
+    entry:'Candy-block letters squish in one by one; the mode buttons squish and burst into sprinkles.',
+    vs:'The swirl-pop VS badge spins in; the candy UFO beams the next matchup down.',
+    trivia:'Answers pop in like bubbles; right turns the ring mint and wobbles the screen, wrong flashes cherry and shakes.',
+    powerup:'Four candy jars wiggle; tap one and its lid pops off to show the prize.',
+    jumble:'Letter candies are beamed into the tray; a solved word is beamed up in sprinkles.',
+    results:'The score counts up under a shower of candy coins while the peppermint ring spins fast.',
+    price:'The price rolls on mint reels, like a gumball counter.',
+    odd:'The candy UFO beams the odd one out right off the board.',
+    emoji:'The emoji squish into a speech bubble; a right answer makes them hop.',
+    first:'Year stickers pop onto both cards and onto the candy-stripe timeline.',
+    hunt:'Found words get zapped by the UFO’s stripy laser and turn into gumdrops.',
+  };
+</script>
+<script src="sections.js"></script>
+<script>document.addEventListener('DOMContentLoaded', ()=>{ const t = document.querySelector('#powerup .title'); if (t) t.textContent = 'Pick a jar!'; });</script>
+</body>
+</html>
