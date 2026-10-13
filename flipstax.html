@@ -520,6 +520,46 @@
      prize - no downside. Same overlay as Coin Flip, its own look. */
   .gift-stage{ display:none; position:relative; width:220px; height:210px; margin:4px auto 0; }
   .event-overlay.gift-mode .gift-stage{ display:block; }
+  /* Cosmic Surprise's mini-games and effects (runCosmic*) - game-show style:
+     chunky gold tiles, a draining timer, one big line saying what happened. */
+  .cosmic-stage{ display:none; flex-direction:column; align-items:center; gap:12px; width:100%; max-width:360px; margin-top:6px; }
+  .event-overlay.cosmic-mode .cosmic-stage{ display:flex; }
+  .event-overlay.cosmic-mode .event-grid, .event-overlay.cosmic-mode .event-timerbar, .event-overlay.cosmic-mode .powerup-icon, .event-overlay.cosmic-mode .gift-stage{ display:none !important; }
+  .cz-title{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:34px; letter-spacing:1px; color:#ffd23f; text-shadow:0 3px 0 #7a3d00, 0 0 18px rgba(255,210,60,0.7); line-height:1; }
+  .cz-line{ font-size:15px; font-weight:800; color:#fff6d8; line-height:1.35; max-width:320px; }
+  .cz-line.result{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:24px; letter-spacing:0.5px; color:#ffe066; text-shadow:0 2px 0 rgba(60,0,40,0.6); animation:czPop 0.4s cubic-bezier(.3,1.6,.5,1) backwards; }
+  .cosmic-stage.riddle .cz-title{ font-size:28px; }
+  .cz-timer{ width:100%; height:12px; border-radius:99px; background:rgba(0,0,0,0.35); overflow:hidden; box-shadow:inset 0 0 0 2px rgba(255,214,90,0.6); }
+  .cz-timer i{ display:block; height:100%; background:linear-gradient(90deg,#ffe24a,#ff8a1f); transform-origin:0 50%; animation:czDrain var(--t, 6s) linear forwards; }
+  @keyframes czDrain{ from{ transform:scaleX(1); } to{ transform:scaleX(0); } }
+  .cz-slots, .cz-tiles{ display:flex; gap:8px; justify-content:center; }
+  .cz-slot{ width:52px; height:60px; border-radius:12px; display:grid; place-items:center; font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:36px; color:#2a1300;
+    background:rgba(255,255,255,0.12); border:2px dashed rgba(255,214,90,0.7); }
+  .cz-slot.full{ background:linear-gradient(180deg,#fffbe6,#ffe08a); border:2px solid #7a3d00; }
+  .cz-tile{ width:62px; height:66px; border-radius:16px; border:3px solid #7a3d00; cursor:pointer; font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:40px; color:#2a1300;
+    background:linear-gradient(180deg,#fff4b8,#ffd23f 45%,#f5a300); box-shadow:0 5px 0 #7a3d00; -webkit-tap-highlight-color:transparent; touch-action:manipulation; animation:czPop 0.4s cubic-bezier(.3,1.6,.5,1) backwards; }
+  .cz-tile:nth-child(2){ animation-delay:0.06s; } .cz-tile:nth-child(3){ animation-delay:0.12s; } .cz-tile:nth-child(4){ animation-delay:0.18s; } .cz-tile:nth-child(5){ animation-delay:0.24s; }
+  .cz-tile.used{ opacity:0.2; pointer-events:none; }
+  .cz-opts{ display:grid; gap:8px; width:100%; }
+  .cz-opt{ padding:9px 14px; border-radius:14px; border:3px solid #7a3d00; cursor:pointer; font-weight:800; font-size:16px; color:#2a1300; text-align:left;
+    background:linear-gradient(180deg,#fffbe6,#ffe9a6); box-shadow:0 4px 0 #7a3d00; -webkit-tap-highlight-color:transparent; animation:czPop 0.4s cubic-bezier(.3,1.6,.5,1) backwards; }
+  .cz-opt.right{ background:linear-gradient(180deg,#b9ffcf,#2fd17a); } .cz-opt.wrong{ background:linear-gradient(180deg,#ffd0d0,#ff5a5a); }
+  .cz-q{ font-size:15.5px; font-weight:800; line-height:1.3; color:#fff; background:rgba(28,6,48,0.75); border:2px solid rgba(255,214,90,0.55); border-radius:14px; padding:12px; }
+  .cz-big{ font-size:76px; line-height:1; animation:czSpin 0.9s cubic-bezier(.3,1.4,.5,1) both; }
+  .cz-amount{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:52px; line-height:1; animation:czPop 0.5s cubic-bezier(.3,1.6,.5,1) 0.3s both; }
+  .cz-amount.good{ color:#7dff9e; text-shadow:0 3px 0 #0b5a2d, 0 0 20px rgba(60,255,140,0.7); } .cz-amount.bad{ color:#ff8a8a; text-shadow:0 3px 0 #7a0d0d, 0 0 20px rgba(255,60,60,0.6); }
+  .cz-amount.ice{ color:#bff4ff; text-shadow:0 3px 0 #155f8a, 0 0 22px rgba(120,220,255,0.9); }
+  .cz-shake{ animation:czShake 0.4s ease-out; }
+  @keyframes czPop{ from{ opacity:0; transform:scale(0.4); } to{ opacity:1; transform:none; } }
+  @keyframes czSpin{ from{ opacity:0; transform:scale(0.3) rotate(-200deg); } to{ opacity:1; transform:none; } }
+  @keyframes czShake{ 20%{ transform:translateX(-9px); } 40%{ transform:translateX(8px); } 60%{ transform:translateX(-6px); } 80%{ transform:translateX(4px); } }
+  /* the run pill: time added / taken (a flash), or frozen (icy, with a snowflake) */
+  .score-pill .sp-clock.bump-good #infClock{ animation:clockBump 0.9s ease-out 2; color:#7dff9e; }
+  .score-pill .sp-clock.bump-bad #infClock{ animation:clockBump 0.9s ease-out 2; color:#ff8a8a; }
+  .score-pill .sp-clock.frozen #infClock{ color:#bff4ff; text-shadow:0 0 8px rgba(120,220,255,0.9); }
+  .score-pill .sp-clock.frozen::after{ content:'\2744\FE0F'; margin-left:2px; font-size:12px; }
+  @keyframes clockBump{ 0%{ transform:scale(1); } 30%{ transform:scale(1.4); } 100%{ transform:scale(1); } }
+  @media (prefers-reduced-motion: reduce){ .cz-tile, .cz-opt, .cz-big, .cz-amount, .cz-shake, .score-pill .sp-clock #infClock{ animation:none !important; } .cz-timer i{ animation-duration:0.001s; animation-delay:var(--t, 6s); } }
   .event-overlay.gift-mode .event-grid, .event-overlay.gift-mode .event-timerbar, .event-overlay.gift-mode .powerup-icon{ display:none !important; }
   .gift-glow{ position:absolute; left:50%; top:58%; width:220px; height:220px; margin:-110px 0 0 -110px; border-radius:50%; opacity:0;
     background:radial-gradient(circle, rgba(255,240,170,0.95), rgba(255,200,40,0.4) 40%, transparent 70%); transition:opacity 0.4s ease; }
@@ -2683,6 +2723,7 @@
         <div class="gift-prize" id="giftPrize"></div>
         <div class="coin-burst gift-burst"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
       </div>
+      <div class="cosmic-stage" id="cosmicStage" aria-live="polite"></div>
       <div class="coin-stage" id="coinStage" aria-hidden="true">
         <div class="coin-shadow"></div>
         <div class="coin-toss" id="coinToss"><div class="coin" id="coinFlip">
@@ -6630,6 +6671,8 @@
     const now = performance.now(), d = Math.min(1000, Math.max(0, now - infClockLast)); infClockLast = now;
     if (!inInfinity()){ clearInterval(infClockTimer); infClockTimer = null; saveInfRun(); return; }
     if (!infClockActive()) return;
+    // Cosmic Surprise's clock freeze: the time is used up from the freeze first.
+    if (infRun.freezeLeftMs > 0){ infRun.freezeLeftMs = Math.max(0, infRun.freezeLeftMs - d); renderInfClock(); return; }
     infRun.clockMs = Math.min(INF_RUN_CLOCK_MS, infRun.clockMs + d);
     renderInfClock();
     if (now - infClockSavedAt > 2000){ infClockSavedAt = now; saveInfRun(); }
@@ -6677,6 +6720,7 @@
     const left = infClockLeftMs();
     c.textContent = formatClock(left);
     c.parentElement.classList.toggle('low', left <= 60000 && !infRun.ended);
+    c.parentElement.classList.toggle('frozen', (infRun.freezeLeftMs || 0) > 0);
   }
 
 
@@ -11753,29 +11797,47 @@
   // (Bonus chip 5% -> 15% and +10 50% -> 40% in the personality calibration,
   // so Vault Cracker - all 6 chips - comes up in a few percent of runs.
   // Average now ~19 points.)
-  const WILD_WEIGHT_POINTS10 = 0.40, WILD_WEIGHT_POINTS20 = 0.30, WILD_WEIGHT_KEY = 0.15, WILD_WEIGHT_CHIP = 0.15;
+  // Cosmic Surprise (Oct 2026 rework): a gift box with a mix of good, bad and
+  // weird inside - each outcome has its own short animation and one line
+  // saying what happened. Weights are relative; never below 0 points.
+  //   gifts: +10, +20, a key, a bonus Orbit Drop chip (one per run)
+  //   scramble: unscramble a 4-5 letter word in COSMIC_SCRAMBLE_MS
+  //   clock: +15 or -15 seconds on the run clock (50/50)
+  //   riddle: double or nothing on a small stake
+  //   freeze: the run clock stands still for COSMIC_FREEZE_MS of play
+  const COSMIC_WEIGHTS = { points10:14, points20:12, key:10, chip:8, scramble:16, clock:16, riddle:12, freeze:12 };
+  const COSMIC_SCRAMBLE_MS = 6000, COSMIC_SCRAMBLE_WIN = 20, COSMIC_SCRAMBLE_MISS = 5;
+  const COSMIC_CLOCK_MS = 15000, COSMIC_FREEZE_MS = 10000, COSMIC_RIDDLE_STAKE = 10, COSMIC_RIDDLE_MS = 15000;
+  // Common words whose scramble has one obvious answer (no everyday anagrams).
+  const COSMIC_WORDS = ['PIZZA', 'TIGER', 'PLANT', 'MOUSE', 'PIANO', 'GHOST', 'QUEEN', 'HONEY', 'CANDY', 'JUICE', 'SHARK', 'CLOCK', 'FROG', 'DUCK', 'CAKE', 'FISH', 'BOOK',
+    'JUMP', 'BUNNY', 'HAPPY', 'APPLE', 'MUSIC', 'SUNNY', 'TRUCK', 'CROWN', 'SNACK', 'CHAIR', 'ROBOT', 'MAGIC', 'MONEY', 'PARTY', 'KING', 'BEACH', 'ZEBRA', 'TRAIN', 'DANCE', 'BIKE'];
   function drawWildPrize(){
-    let r = Math.random() * (WILD_WEIGHT_POINTS10 + WILD_WEIGHT_POINTS20 + WILD_WEIGHT_KEY + WILD_WEIGHT_CHIP);
-    let prize = (r -= WILD_WEIGHT_POINTS10) < 0 ? 'points10' : (r -= WILD_WEIGHT_POINTS20) < 0 ? 'points20' : (r -= WILD_WEIGHT_KEY) < 0 ? 'key' : 'chip';
+    const keys = Object.keys(COSMIC_WEIGHTS);
+    let r = Math.random() * keys.reduce((a, k)=> a + COSMIC_WEIGHTS[k], 0), prize = keys.find(k=> (r -= COSMIC_WEIGHTS[k]) < 0) || 'points10';
     if (DEBUG_FAST && window.__forceWild) prize = window.__forceWild;
     if (prize === 'chip' && (!infRun || infRun.bonusChip)) prize = 'points10';
     if (prize === 'key' && (!infRun || infRun.keys >= INF_KEY_CAP)) prize = 'points10';
     return prize;
   }
+  const COSMIC_INTRO = { scramble:'🔀 SCRAMBLE!', clock:'⏱️ TIME WARP!', riddle:'🧩 DOUBLE OR NOTHING!', freeze:'❄️ CLOCK FREEZE!' };
   function runWildGift(){
     const prize = drawWildPrize(), ov = els.eventOverlay, stage = document.getElementById('giftStage'), label = document.getElementById('giftPrize');
     stage.classList.remove('shaking', 'opened'); label.textContent = '';
-    ov.classList.add('gift-mode');
-    els.eventPrompt.textContent = '\uD83C\uDF81 ' + GN.cosmicSurprise.toUpperCase() + ' \u2014 what\u2019s inside?';
+    ov.classList.remove('cosmic-mode'); ov.classList.add('gift-mode');
+    els.eventPrompt.textContent = '🎁 ' + GN.cosmicSurprise.toUpperCase() + ' — what’s inside?';
     const open = ()=>{
       stage.classList.remove('shaking'); stage.classList.add('opened');
+      if (COSMIC_INTRO[prize]){   // the weird ones: a title in the box, then their own screen
+        label.textContent = COSMIC_INTRO[prize]; sfx.powerUp();
+        setTimeout(()=> runCosmic(prize), prefersReducedMotion() ? 300 : 900); return;
+      }
       let text;
       if (prize === 'points10'){ addRacePoints(10); text = '+10 points'; }
       else if (prize === 'points20'){ addRacePoints(20); text = '+20 points'; }
-      else if (prize === 'key'){ addInfKey('wildcard'); text = '\uD83D\uDD11 +1 key'; }
-      else { infRun.bonusChip = true; saveInfRun(); text = '\uD83E\uDE99 Bonus ' + GN.orbitDrop + ' chip!'; }
+      else if (prize === 'key'){ addInfKey('wildcard'); text = '🔑 +1 key'; }
+      else { infRun.bonusChip = true; saveInfRun(); text = '🪙 Bonus ' + GN.orbitDrop + ' chip!'; }
       label.textContent = text;
-      els.eventPrompt.textContent = '\uD83C\uDF81 ' + GN.cosmicSurprise.toUpperCase() + ': ' + text;
+      els.eventPrompt.textContent = '🎁 ' + GN.cosmicSurprise.toUpperCase() + ': ' + text;
       sfx.correct(); if (prize === 'chip' || prize === 'key') sfx.coins(6);
       setTimeout(finishPowerUp, 500);
     };
@@ -11783,6 +11845,99 @@
     stage.classList.add('shaking');
     let ticks = 0; const t = setInterval(()=>{ sfx.spinTick(ticks++); if (ticks >= 6) clearInterval(t); }, 150);
     setTimeout(open, 1000);
+  }
+  // The weird ones play on the power-up screen, in .cosmic-stage.
+  function runCosmic(kind){
+    const ov = els.eventOverlay, st = document.getElementById('cosmicStage');
+    ov.classList.remove('gift-mode'); ov.classList.add('cosmic-mode');
+    els.eventSubtitle.textContent = '🎁 ' + GN.cosmicSurprise.toUpperCase();
+    els.eventPrompt.textContent = '';
+    // The result replaces the explanation line, so nothing grows or shifts.
+    const done = (line)=>{ const l = st.querySelector('.cz-line'); if (l){ l.textContent = line || ''; l.classList.add('result'); } else els.eventPrompt.textContent = line || '';
+      setTimeout(()=>{ ov.classList.remove('cosmic-mode'); st.className = 'cosmic-stage'; st.innerHTML = ''; finishPowerUp(); }, 1500); };
+    st.className = 'cosmic-stage ' + kind;
+    if (kind === 'scramble') cosmicScramble(st, done);
+    else if (kind === 'clock') cosmicClock(st, done);
+    else if (kind === 'riddle') cosmicRiddle(st, done);
+    else cosmicFreeze(st, done);
+  }
+  function cosmicPenalty(n){ const sc = infRun ? infRun.score : 0; const p = Math.max(0, Math.min(n, sc)); if (p) addRacePoints(-p); return p; }
+  function cosmicScramble(st, done){
+    const word = pick(COSMIC_WORDS); let letters = word.split('');
+    for (let k = 0; k < 8 && letters.join('') === word; k++) letters = shuffle(word.split(''));
+    const ms = dt(COSMIC_SCRAMBLE_MS);
+    st.innerHTML = '<div class="cz-title">SCRAMBLE!</div><div class="cz-line">Tap the letters in order. ' + Math.round(COSMIC_SCRAMBLE_MS / 1000) + ' seconds!</div>' +
+      '<div class="cz-timer" style="--t:' + (ms / 1000) + 's"><i></i></div>' +
+      '<div class="cz-slots">' + letters.map(()=> '<span class="cz-slot"></span>').join('') + '</div>' +
+      '<div class="cz-tiles">' + letters.map((c, k)=> '<button class="cz-tile" type="button" data-k="' + k + '">' + c + '</button>').join('') + '</div>';
+    let typed = '', over = false;
+    const slots = [...st.querySelectorAll('.cz-slot')], tiles = [...st.querySelectorAll('.cz-tile')];
+    const end = (won)=>{
+      if (over) return; over = true; clearTimeout(timer); tiles.forEach(t=> t.disabled = true);
+      if (won){
+        const key = Math.random() < 0.5 && infRun && infRun.keys < INF_KEY_CAP && addInfKey('wildcard');
+        if (!key) addRacePoints(COSMIC_SCRAMBLE_WIN);
+        sfx.correct(); sfx.coins(6);
+        done('✨ ' + word + '! ' + (key ? '🔑 +1 key' : '+' + COSMIC_SCRAMBLE_WIN + ' points'));
+      } else {
+        const lost = cosmicPenalty(COSMIC_SCRAMBLE_MISS); sfx.revealLose();
+        slots.forEach((s, k)=>{ s.textContent = word[k]; s.classList.add('full'); });
+        done('⏰ Time! It was ' + word + (lost ? '. −' + lost + ' points' : '. No harm done'));
+      }
+    };
+    tiles.forEach(t=> t.addEventListener('click', e=>{
+      e.stopPropagation(); if (over) return;
+      typed += t.textContent; t.classList.add('used'); sfx.spinTick(typed.length);
+      const sl = slots[typed.length - 1]; sl.textContent = t.textContent; sl.classList.add('full');
+      if (typed.length < word.length) return;
+      if (typed === word){ end(true); return; }
+      const row = st.querySelector('.cz-slots'); row.classList.remove('cz-shake'); void row.offsetWidth; row.classList.add('cz-shake'); sfx.wrong();
+      typed = ''; setTimeout(()=>{ if (over) return; slots.forEach(s=>{ s.textContent = ''; s.classList.remove('full'); }); tiles.forEach(x=> x.classList.remove('used')); }, 350);
+    }));
+    const timer = setTimeout(()=> end(false), ms);
+  }
+  function cosmicClock(st, done){
+    const good = Math.random() < 0.5 || (DEBUG_FAST && window.__forceWildClock === 'plus');
+    const bad = DEBUG_FAST && window.__forceWildClock === 'minus' ? true : !good;
+    const secs = COSMIC_CLOCK_MS / 1000;
+    st.innerHTML = '<div class="cz-big">⏱️</div><div class="cz-amount ' + (bad ? 'bad' : 'good') + '">' + (bad ? '−' : '+') + secs + ' SECONDS</div>' +
+      '<div class="cz-line">' + (bad ? 'The clock jumps ahead. Hurry up, Earthling!' : 'The clock winds back. Take your time!') + '</div>';
+    if (infRun && !infRun.ended){
+      infRun.clockMs = bad ? Math.min(INF_RUN_CLOCK_MS - 5000, infRun.clockMs + COSMIC_CLOCK_MS) : Math.max(0, infRun.clockMs - COSMIC_CLOCK_MS);
+      saveInfRun(); renderInfClock();
+      const c = document.querySelector('.score-pill .sp-clock');
+      if (c){ c.classList.remove('bump-good', 'bump-bad'); void c.offsetWidth; c.classList.add(bad ? 'bump-bad' : 'bump-good'); setTimeout(()=> c.classList.remove('bump-good', 'bump-bad'), 2200); }
+    }
+    if (bad) sfx.revealLose(); else sfx.correct();
+    setTimeout(()=> done(bad ? '⏱️ −' + secs + ' seconds on the clock' : '⏱️ +' + secs + ' seconds on the clock'), 900);
+  }
+  function cosmicFreeze(st, done){
+    const secs = COSMIC_FREEZE_MS / 1000;
+    st.innerHTML = '<div class="cz-big">❄️</div><div class="cz-amount ice">CLOCK FREEZE</div><div class="cz-line">The next ' + secs + ' seconds of play are on the house.</div>';
+    if (infRun && !infRun.ended){ infRun.freezeLeftMs = (infRun.freezeLeftMs || 0) + COSMIC_FREEZE_MS; saveInfRun(); renderInfClock(); }
+    sfx.powerUp();
+    setTimeout(()=> done('❄️ Clock frozen for ' + secs + ' seconds'), 900);
+  }
+  function cosmicRiddle(st, done){
+    const pool = INFINITY_RIDDLES.filter(r=> !r.hard), rd = pool.length ? pick(pool) : null;
+    if (!rd){ addRacePoints(10); done('+10 points'); return; }
+    const stake = Math.min(COSMIC_RIDDLE_STAKE, Math.max(0, infRun ? infRun.score : 0)), ms = dt(COSMIC_RIDDLE_MS);
+    const opts = shuffle([rd.a].concat(rd.wrong));
+    st.innerHTML = '<div class="cz-title">DOUBLE OR NOTHING</div><div class="cz-line">' + (stake ? 'Your ' + stake + ' points ride on this: right doubles them, wrong loses them.' : 'A free shot: right = +' + COSMIC_RIDDLE_STAKE + ' points.') + '</div>' +
+      '<div class="cz-timer" style="--t:' + (ms / 1000) + 's"><i></i></div><div class="cz-q"></div><div class="cz-opts">' + opts.map(()=> '<button class="cz-opt" type="button"></button>').join('') + '</div>';
+    st.querySelector('.cz-q').textContent = rd.q;
+    const btns = [...st.querySelectorAll('.cz-opt')]; btns.forEach((b, k)=>{ b.textContent = opts[k]; b.style.animationDelay = (k * 0.06) + 's'; });
+    let over = false;
+    const end = (pickedBtn)=>{
+      if (over) return; over = true; clearTimeout(timer);
+      btns.forEach(b=>{ b.disabled = true; if (b.textContent === rd.a) b.classList.add('right'); });
+      const right = pickedBtn && pickedBtn.textContent === rd.a;
+      if (pickedBtn && !right) pickedBtn.classList.add('wrong');
+      if (right){ const win = stake || COSMIC_RIDDLE_STAKE; addRacePoints(win); sfx.correct(); sfx.coins(6); done('🧩 ' + (stake ? 'Doubled! +' + win + ' points' : 'Right! +' + win + ' points')); }
+      else { const lost = cosmicPenalty(stake); sfx.revealLose(); done('🧩 ' + (pickedBtn ? 'Not quite' : 'Time’s up') + ' — it was ' + rd.a + (lost ? '. −' + lost + ' points' : '')); }
+    };
+    btns.forEach(b=> b.addEventListener('click', e=>{ e.stopPropagation(); end(b); }));
+    const timer = setTimeout(()=> end(null), ms);
   }
   function finishPowerUp(){
     setTimeout(()=>{
