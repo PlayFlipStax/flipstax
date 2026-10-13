@@ -4407,7 +4407,8 @@
   // is 4 steps, one per portal - about 1 run in 256 by luck alone.
   const SECRET_UNLOCK_SEQUENCE = ['slowclock', 'points10', 'wildcard', 'hint'];
   const PERFECT_RUN_BONUS = 15;   // points for getting the first six Brain Beams (one per letter) all right
-  const EXTRA_BEAM_POINTS = 10;   // a right Brain Beam after all six letters are in
+  const MAX_EARNED_LETTERS = 4;   // letters the Brain Beams can earn; the Word Warp word is still RUN_WORD_LENGTH (6), so the player works out the rest
+  const EXTRA_BEAM_POINTS = 10;   // a right Brain Beam after the letter cap pays this many points instead
   // ---------- Daily as a game show (B2, Oct 2026) ----------
   // A run is an episode: a cold open with the host, then SHOW_ROUNDS rounds,
   // each opened by a one-second title bumper ("Round 2 of 5: Brain Beam!"):
@@ -9062,8 +9063,8 @@
     els.powerupIcon.classList.add('hidden');
     fitTopChip();
     els.eventSubtitle.textContent = second ? '🔁 SECOND CHANCE · answer right, recover a letter'
-      : q.riddle ? '\uD83E\uDDE9 ' + GN.riddleRound.toUpperCase() + (step && step.extra ? ' \u00B7 BONUS' : '') + ' \u00B7 answer right, ' + (runLetters.length < RUN_WORD_LENGTH ? 'earn a letter' : '+' + EXTRA_BEAM_POINTS + ' points')
-      : '\uD83E\uDDE0 ' + GN.brainBeam.toUpperCase() + (step && step.extra ? ' \u00B7 BONUS' : '') + ' \u00B7 answer right, ' + (runLetters.length < RUN_WORD_LENGTH ? 'earn a letter' : '+' + EXTRA_BEAM_POINTS + ' points');
+      : q.riddle ? '\uD83E\uDDE9 ' + GN.riddleRound.toUpperCase() + (step && step.extra ? ' \u00B7 BONUS' : '') + ' \u00B7 answer right, ' + (runLetters.length < MAX_EARNED_LETTERS ? 'earn a letter' : '+' + EXTRA_BEAM_POINTS + ' points')
+      : '\uD83E\uDDE0 ' + GN.brainBeam.toUpperCase() + (step && step.extra ? ' \u00B7 BONUS' : '') + ' \u00B7 answer right, ' + (runLetters.length < MAX_EARNED_LETTERS ? 'earn a letter' : '+' + EXTRA_BEAM_POINTS + ' points');
     els.eventPrompt.textContent = q.question;
     runQuizPick = null;
     els.eventTiles.forEach((tileEl,i)=>{
@@ -9116,8 +9117,8 @@
       runTriviaCorrect++;
       runTriviaStreak++;
       // The show repeats, so there can be more right answers than letters:
-      // once all RUN_WORD_LENGTH letters are in, a right answer pays points instead.
-      const letterLeft = runLetters.length < RUN_WORD_LENGTH;
+      // once MAX_EARNED_LETTERS letters are in, a right answer pays points instead.
+      const letterLeft = runLetters.length < MAX_EARNED_LETTERS;
       const pos = letterLeft ? letterOrderFor(runStartDate || todayStr())[runLetters.length] : -1, nextLetter = letterLeft ? runWord.word[pos] : '';
       if (letterLeft){
         runLetters.push(nextLetter); runLetterPos.push(pos);
