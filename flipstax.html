@@ -2221,9 +2221,9 @@
      still sunburst. */
   .show-bg, .show-frame, .show-fx, .show-host{ display:none; }
   :root.mode-daily .show-bg{ display:block; position:fixed; z-index:-3; pointer-events:none; }
-  :root.mode-daily .show-frame{ display:block; position:fixed; inset:0; z-index:33; pointer-events:none; border-radius:22px;
+  :root.mode-daily .show-frame, :root.mode-infinity .show-frame{ display:block; position:fixed; inset:0; z-index:33; pointer-events:none; border-radius:22px;
     box-shadow:0 0 0 40px #1c0b3d, inset 0 0 0 3px #ffd23f, inset 0 0 0 5px rgba(122,61,0,0.55), inset 0 0 22px rgba(255,200,60,0.35); }
-  :root.mode-daily .show-fx{ display:block; position:fixed; z-index:34; }
+  :root.mode-daily .show-fx, :root.mode-infinity .show-fx{ display:block; position:fixed; z-index:34; }
   :root.mode-daily body{ background:#1c0b3d; }
   :root.mode-daily body::before{ display:none; }
   :root.mode-daily .daily-sky.sun-layer{ display:none; }
@@ -2287,6 +2287,15 @@
   :root.mode-daily #readoutOverlay{ background:none; }
   #readoutOverlay:not(.show) .warp-bg{ display:none; }   /* (the overlay only fades out, so its rays would keep turning unseen) */
   :root.mode-daily #readoutOverlay .personality-inner{ position:relative; z-index:1; padding:18px 16px; border-radius:22px; background:rgba(32,8,56,0.82); border:2px solid rgba(255,214,90,0.6); box-shadow:0 10px 30px rgba(20,0,40,0.5); }
+  /* Infinity's popups (C1, Oct 2026): the power-up pick, the Cosmic
+     Surprise (its gift and its mini-games) and the bonus Brain Beam sit in
+     their own colour world with turning rays (lib/show.css), like Daily's;
+     the gold screen frame flashes on a prize or a pickle. */
+  .ev-bg{ display:none; z-index:-2; }
+  :root.mode-infinity .ev-bg{ display:block; }
+  :root.mode-infinity .event-overlay{ background:#1c0b3d; animation:none; }
+  :root.mode-infinity .event-overlay .event-subtitle{ color:#fff3c4; background:rgba(28,6,48,0.75); box-shadow:0 0 0 2px rgba(255,214,90,0.55); }
+  :root.mode-infinity .event-overlay .event-prompt{ text-shadow:var(--text-on-busy); }
   /* The letter tray (B5): six blanks in the score pill; an earned letter
      sits in its spot (it flies in from the right answer - .letter-fly). */
   .sp-tray{ display:inline-flex; gap:3px; vertical-align:middle; margin-left:2px; }
@@ -2966,6 +2975,7 @@
     </div>
 
     <div class="event-overlay hidden" id="eventOverlay">
+      <div class="bg ev-bg w-powerup" id="evBg" aria-hidden="true"><i class="rays"></i><i class="glow"></i></div>
       <canvas class="coin-rays" id="coinRays" aria-hidden="true"></canvas>
       <canvas class="event-sky" id="eventSky" aria-hidden="true"></canvas>
       <div class="riddle-ufo event-ufo" aria-hidden="true"><span>🛸</span><i></i></div>
@@ -12090,6 +12100,18 @@
     showBg.classList.toggle('paused', open(els.solveOverlay) || els.readoutOverlay.classList.contains('show') || open(els.finOverlay) || !showCard.classList.contains('hidden'));
   }
   [els.eventOverlay, els.solveOverlay, els.readoutOverlay, els.finOverlay, document.getElementById('showCard')].forEach(ov=> new MutationObserver(syncShowWorld).observe(ov, { attributes:true, attributeFilter:['class'] }));
+  // C1: Infinity's popup world - the power-up pick, a Cosmic Surprise, or
+  // the bonus Brain Beam.
+  const evBg = document.getElementById('evBg');
+  new MutationObserver(()=>{
+    const ov = els.eventOverlay, w = ov.classList.contains('gift-mode') || ov.classList.contains('cosmic-mode') ? 'w-odd' : ov.classList.contains('powerup') ? 'w-powerup' : 'w-trivia';
+    if (!evBg.classList.contains(w)) evBg.className = 'bg ev-bg ' + w;
+  }).observe(els.eventOverlay, { attributes:true, attributeFilter:['class'] });
+  function cosmicFx(good, el){
+    showFlash(good ? 'win' : 'lose');
+    if (good && el) FX.burstAt(showFx, el, { count:14, spread:110, shapes:['star', 'coin'], colors:['#ffd23f', '#c8ff3d', '#ff3c9d', '#7df9ff'] });
+    if (!good) FX.shake(document.getElementById('cosmicStage'));
+  }
   function hostMood(m){ FX.alien(showAlien, m); }
   function showFlash(kind){ FX.flash(showFrame, kind); }
   // The host's speech bubble (B3): a short line from data/game-names.js
@@ -12804,6 +12826,7 @@
       label.textContent = text;
       els.eventPrompt.textContent = '🎁 ' + GN.cosmicSurprise.toUpperCase() + ': ' + text;
       sfx.correct(); if (prize === 'chip' || prize === 'key') sfx.coins(6);
+      cosmicFx(true, label);
       setTimeout(finishPowerUp, 500);
     };
     if (prefersReducedMotion()){ open(); return; }
@@ -12819,6 +12842,7 @@
     els.eventPrompt.textContent = '';
     // The result replaces the explanation line, so nothing grows or shifts.
     const done = (line)=>{ const l = st.querySelector('.cz-line'); if (l){ l.textContent = line || ''; l.classList.add('result'); } else els.eventPrompt.textContent = line || '';
+      if (line) cosmicFx(/\+\d|\u2705|key|chip|frozen/i.test(line) && !/\u2212|-\d|lost|no /i.test(line), l || els.eventPrompt);   // C1: a prize or a pickle
       setTimeout(()=>{ ov.classList.remove('cosmic-mode'); st.className = 'cosmic-stage'; st.innerHTML = ''; finishPowerUp(); }, 1500); };
     st.className = 'cosmic-stage ' + kind;
     if (kind === 'scramble') cosmicScramble(st, done);
