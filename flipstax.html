@@ -10856,9 +10856,12 @@
     roundTimeoutId = setTimeout(onRoundTimeout, durationMs);
     renderSlowdownBtn();
   }
+  // The +5s button (3 free charges a day, shared by both modes) is Daily-only
+  // since Oct 2026: Infinity's cards already have 6.5s, and its slow-time
+  // power-up is Slow-Mo.
   function renderSlowdownBtn(){
     const eventShowing = !els.eventOverlay.classList.contains('hidden');
-    if (eventShowing || voted || !current){
+    if (eventShowing || voted || !current || inInfinity()){
       els.slowdownBtn.classList.add('hidden');
       fitTopChip(); return;
     }
@@ -10868,6 +10871,7 @@
     fitTopChip();
   }
   function addSlowdownTime(){
+    if (inInfinity()) return;
     if (stats.slowdownCharges <= 0 || voted || !current) return;
     stats.slowdownCharges--;
     saveStats();
