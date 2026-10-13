@@ -3,7 +3,7 @@
 // `names` are what players see for each game or round (the code keeps its
 // own internal names). `host` is the one-line, cheeky rule the alien host
 // says in a speech bubble the first time each game shows up in an Infinity
-// run. Keep host lines short (about 60 characters or less) and funny, like a
+// run (a player's first 3 runs; after that just the `quip`). Keep host lines short (about 60 characters or less) and funny, like a
 // 70s game-show host - never techy.
 window.FLIPSTAX_NAMES = {
   names: {
@@ -28,5 +28,13 @@ window.FLIPSTAX_NAMES = {
     cosmicSurprise: 'Could be a prize, could be a pickle. Feeling lucky?',
     orbitDrop:      'A chip for every key, two on the house. Let ’em bounce!',
     vault:          'Crack the vault, grab the coins. Don’t be shy!',
+  },
+  // After a player's first 3 runs the host just quips (a one-liner, about a second).
+  quip: {
+    brainBeam:      'Brain Beam! Think fast.',
+    crowdScan:      'Crowd Scan! Read the room.',
+    cosmicSurprise: 'Ooh, what\u2019s in the box?',
+    orbitDrop:      'Orbit Drop! Aim true.',
+    vault:          'Vault time, baby!',
   },
 };

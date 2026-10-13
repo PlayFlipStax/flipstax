@@ -955,6 +955,10 @@
   .host-bubble::after{ content:''; position:absolute; left:50%; top:-12px; margin-left:-10px; border:10px solid transparent; border-bottom-color:#fff8e6; border-top:0; }
   .host-name{ display:block; font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:30px; letter-spacing:1px; text-transform:uppercase; color:#c2275f; line-height:1; }
   .host-line{ display:block; margin-top:8px; font-size:18px; font-weight:800; line-height:1.3; }
+  /* The quip (after the first few runs): smaller, quicker, no "tap to play". */
+  .host-overlay.quip .host-art{ width:72px; height:72px; }
+  .host-overlay.quip .host-name{ font-size:24px; } .host-overlay.quip .host-line{ font-size:16px; margin-top:4px; }
+  .host-overlay.quip .host-tap{ display:none; }
   .host-tap{ font-size:13px; font-weight:800; letter-spacing:0.5px; color:#fff6d8; text-shadow:0 2px 6px rgba(60,0,40,0.6); animation:hostTap 1s ease-in-out infinite alternate; }
   @keyframes hostPop{ from{ opacity:0; transform:scale(0.4) translateY(30px); } to{ opacity:1; transform:none; } }
   @keyframes hostBob{ from{ transform:translateY(0) rotate(-3deg); } to{ transform:translateY(-8px) rotate(3deg); } }
@@ -3231,6 +3235,8 @@
     zapWords:'Zap Words', priceProbe:'Price Probe', oddballAlert:'Oddball Alert', emojiDecode:'Emoji Decode', timeWarp:'Time Warp', portalPick:'Portal Pick',
     wordWarp:'Word Warp', vault:'The Mothership Vault' }, (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.names) || {});
   const HOST_LINES = (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.host) || {};
+  const HOST_QUIPS = (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.quip) || {};
+  const INF_RUNS_KEY = 'flipstax_inf_runs_v1';
 
   // The game's public address - the one place to change if the domain does.
   // Added to the caption of every shared results image (see
@@ -6757,6 +6763,9 @@
   function ensureInfRun(){
     if (infRun) return infRun;
     infRun = freshInfRun();
+    // This device's run number (the host's full intros are for the first few).
+    let n = 0; try{ n = (parseInt(localStorage.getItem(INF_RUNS_KEY), 10) || 0) + 1; localStorage.setItem(INF_RUNS_KEY, String(n)); }catch(e){ n = 1; }
+    infRun.runNo = n;
     infBlock = freshInfBlock(); saveInfBlock();
     saveInfRun();
     return infRun;
@@ -9095,7 +9104,7 @@
       ov.appendChild(tx);
     }
     let say = pick(VISITOR_LINES);
-    if (HOST_LINES.riddleRound && infRun && !(infRun.hostSeen && infRun.hostSeen.riddleRound)){ say = HOST_LINES.riddleRound; infRun.hostSeen = Object.assign({}, infRun.hostSeen, { riddleRound: true }); saveInfRun(); }
+    if (HOST_LINES.riddleRound && infRun && (infRun.runNo || 1) <= HOST_FULL_RUNS && !(infRun.hostSeen && infRun.hostSeen.riddleRound)){ say = HOST_LINES.riddleRound; infRun.hostSeen = Object.assign({}, infRun.hostSeen, { riddleRound: true }); saveInfRun(); }
     host.querySelector('.ir-host-say').textContent = say;
     if (prefersReducedMotion()) return 0;
     ov.classList.add('intro');
@@ -9498,21 +9507,26 @@
   // a quick intro card with its one-line rule (lines and names in
   // data/game-names.js), then the game. Tap to skip; it moves on by itself
   // after HOST_INTRO_MS. Never again in that run (infRun.hostSeen, saved).
-  const HOST_INTRO_MS = 2600;
+  // The full intro card (the rule) only in a player's first HOST_FULL_RUNS
+  // Infinity runs on this device; after that, a one-line quip on a compact
+  // card for HOST_QUIP_MS (tap skips).
+  const HOST_INTRO_MS = 2600, HOST_FULL_RUNS = 3, HOST_QUIP_MS = 1200;
   function hostIntro(key, then){
-    const line = HOST_LINES[key];
+    const full = (infRun && infRun.runNo || 1) <= HOST_FULL_RUNS;
+    const line = full ? HOST_LINES[key] : (HOST_QUIPS[key] || HOST_LINES[key]);
     if (!line || !inInfinity() || !infRun || (infRun.hostSeen && infRun.hostSeen[key]) || (DEBUG_FAST && window.__noHost)){ then(); return; }   // (__noHost: localhost test runs only)
     infRun.hostSeen = Object.assign({}, infRun.hostSeen, { [key]: true }); saveInfRun();
     const ov = els.hostOverlay, art = ov.querySelector('.host-art');
     if (!art.childElementCount) art.innerHTML = visitorSvg({ green:true });
     document.getElementById('hostName').textContent = GN[key] || '';
     document.getElementById('hostLine').textContent = line;
+    ov.classList.toggle('quip', !full);
     ov.classList.remove('hidden'); updatePauseBtnVisibility();
     playTone(523, 0, 0.12, 'triangle', 0.05); playTone(784, 0.1, 0.16, 'triangle', 0.05);
     const shownAt = performance.now(); let finished = false;
     const done = ()=>{ if (finished) return; finished = true; clearTimeout(t); ov.onclick = null; ov.classList.add('hidden'); noteOverlayClosed(); updatePauseBtnVisibility(); then(); };
-    const t = setTimeout(done, HOST_INTRO_MS);
-    ov.onclick = e=>{ e.stopPropagation(); if (performance.now() - shownAt > 300) done(); };
+    const t = setTimeout(done, full ? HOST_INTRO_MS : HOST_QUIP_MS);
+    ov.onclick = e=>{ e.stopPropagation(); if (performance.now() - shownAt > (full ? 300 : 120)) done(); };
   }
   function startGuessRound(card){
     if (guessState !== 'idle') return false;
