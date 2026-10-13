@@ -2221,9 +2221,9 @@
      still sunburst. */
   .show-bg, .show-frame, .show-fx, .show-host{ display:none; }
   :root.mode-daily .show-bg{ display:block; position:fixed; z-index:-3; pointer-events:none; }
-  :root.mode-daily .show-frame{ display:block; position:fixed; inset:0; z-index:30; pointer-events:none; border-radius:22px;
+  :root.mode-daily .show-frame{ display:block; position:fixed; inset:0; z-index:33; pointer-events:none; border-radius:22px;
     box-shadow:0 0 0 40px #1c0b3d, inset 0 0 0 3px #ffd23f, inset 0 0 0 5px rgba(122,61,0,0.55), inset 0 0 22px rgba(255,200,60,0.35); }
-  :root.mode-daily .show-fx{ display:block; position:fixed; z-index:31; }
+  :root.mode-daily .show-fx{ display:block; position:fixed; z-index:34; }
   :root.mode-daily body{ background:#1c0b3d; }
   :root.mode-daily body::before{ display:none; }
   :root.mode-daily .daily-sky.sun-layer{ display:none; }
@@ -2242,7 +2242,7 @@
   :root.mode-daily .half.picked::after{ border-color:#ffd23f; }
   :root.mode-daily .half.picked::before{ box-shadow:inset 0 0 40px 8px rgba(255,236,150,0.6); animation:none; }
   /* the host: bottom-left, bobbing; a speech bubble for his lines (B9) */
-  :root.mode-daily .show-host{ display:flex; align-items:flex-end; gap:6px; position:fixed; left:12px; bottom:calc(6px + env(safe-area-inset-bottom)); z-index:32; pointer-events:none; }
+  :root.mode-daily .show-host{ display:flex; align-items:flex-end; gap:6px; position:fixed; left:12px; bottom:calc(6px + env(safe-area-inset-bottom)); z-index:36; pointer-events:none; }
   .show-host .alien{ width:36px; height:41px; }
   .show-say{ max-width:min(250px, calc(100vw - 80px)); padding:6px 11px; border-radius:14px 14px 14px 4px; background:#fff; color:#3a1060; font:800 13px/1.25 'Inter', sans-serif;
     box-shadow:0 3px 10px rgba(30,0,40,0.4); opacity:0; transform:translateY(6px) scale(0.9); transform-origin:0 100%; transition:opacity 0.2s, transform 0.25s var(--ease-pop); margin-bottom:22px; }
@@ -2259,7 +2259,7 @@
   .show-card.hidden{ display:none; }
   .show-card .sc-inner{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; gap:12px; max-width:380px; }
   .sc-ep{ font:800 13px var(--f-body); letter-spacing:3px; padding:5px 14px; border-radius:99px; background:rgba(28,6,48,0.75); border:2px solid var(--gold-2); color:#fff3c4; }
-  .sc-title{ font:900 clamp(44px, 14vw, 64px)/0.95 var(--f-display); text-transform:uppercase; letter-spacing:1px; color:#fffbe0; text-shadow:0 4px 0 #7a2e00, 0 0 24px rgba(255,200,40,0.8); animation:scPop 0.6s var(--ease-pop) both; }
+  .show-card .sc-title{ font:900 clamp(44px, 14vw, 64px)/0.95 var(--f-display); text-transform:uppercase; letter-spacing:1px; color:#fffbe0; text-shadow:0 4px 0 #7a2e00, 0 0 24px rgba(255,200,40,0.8); animation:scPop 0.6s var(--ease-pop) both; }
   .sc-host{ width:74px; height:84px; }
   .sc-line{ font:900 22px/1.15 var(--f-display); text-transform:uppercase; letter-spacing:0.5px; text-shadow:var(--text-on-busy); }
   .sc-rules{ font:700 14px/1.4 var(--f-body); color:#fff3dd; text-shadow:var(--text-on-busy); max-width:320px; }
@@ -2271,11 +2271,40 @@
   @keyframes scPop{ from{ opacity:0; transform:scale(0.5) rotate(-4deg); } to{ opacity:1; transform:none; } }
   @keyframes scTap{ from{ transform:scale(1); } to{ transform:scale(1.05); } }
   @keyframes scFlash{ 0%{ opacity:0; } 12%{ opacity:0.85; } 30%{ opacity:0.2; } 45%{ opacity:0.6; } 100%{ opacity:0; } }
-  @media (prefers-reduced-motion: reduce){ .sc-title, .sc-name, .sc-tap{ animation:none; } .sc-flash{ animation:none; display:none; } }
-  @media (max-height:660px){ .sc-title{ font-size:44px; } .sc-host{ width:56px; height:64px; } .show-card .sc-inner{ gap:9px; } .sc-rules{ font-size:13px; } }
+  @media (prefers-reduced-motion: reduce){ .show-card .sc-title, .sc-name, .sc-tap{ animation:none; } .sc-flash{ animation:none; display:none; } }
+  @media (max-height:660px){ .show-card .sc-title{ font-size:44px; } .sc-host{ width:56px; height:64px; } .show-card .sc-inner{ gap:9px; } .sc-rules{ font-size:13px; } }
   /* Brain Beam answers (B3): the right one rings green, a wrong pick red. */
   .event-tile.is-right{ box-shadow:var(--tile-depth), 0 0 0 4px #7dff9e, 0 0 22px 6px rgba(80,255,140,0.75); z-index:1; }
   .event-tile.is-wrong{ box-shadow:var(--tile-depth), 0 0 0 4px #ff4d4d, 0 0 20px 5px rgba(255,40,40,0.7); opacity:0.85; }
+  /* The letter tray (B5): six blanks in the score pill; an earned letter
+     sits in its spot (it flies in from the right answer - .letter-fly). */
+  .sp-tray{ display:inline-flex; gap:3px; vertical-align:middle; margin-left:2px; }
+  .sp-tray i{ width:17px; height:22px; border-radius:5px; display:inline-flex; align-items:center; justify-content:center; font:900 15px/1 var(--f-display); font-style:normal;
+    background:rgba(13,43,94,0.1); box-shadow:inset 0 -2px 0 rgba(13,43,94,0.35); color:#3a1d00; }
+  .sp-tray i.got{ background:linear-gradient(180deg, #fff3a8, #ffcb2b 55%, #ff9900); box-shadow:0 1px 0 #a85500; }
+  .sp-tray i.incoming{ color:transparent; background:rgba(13,43,94,0.1); box-shadow:inset 0 -2px 0 rgba(13,43,94,0.35); }
+  .letter-fly{ position:absolute; left:0; top:0; width:30px; height:36px; margin:-18px 0 0 -15px; border-radius:8px; display:flex; align-items:center; justify-content:center;
+    font:900 24px/1 var(--f-display); color:#3a1d00; background:linear-gradient(180deg, #fff3a8, #ffcb2b 55%, #ff9900); box-shadow:0 0 16px rgba(255,210,60,0.95), 0 2px 0 #a85500; z-index:3; }
+  @media (max-width:370px){ .sp-tray i{ width:15px; height:20px; font-size:13px; } .sp-tray{ gap:2px; } }
+  /* The Word Warp (B5) in the show look: the jumble world's rays behind
+     it, gold slots, the scrambled tiles; no keyboard and no hint button
+     in Daily (it's a jumble; hints come from Portal Picks). */
+  .warp-bg{ display:none; }
+  :root.mode-daily .warp-bg{ display:block; z-index:0; }
+  :root.mode-daily .solve-overlay::before{ display:none; }
+  :root.mode-daily .solve-keyboard, :root.mode-daily #solveHintBtn, :root.mode-daily .solve-section-label:not(#solveRackLabel){ display:none; }
+  :root.mode-daily .solve-title{ font-size:clamp(40px, 13vw, 58px); line-height:0.95; text-transform:uppercase; color:#fffbe0; text-shadow:0 4px 0 #7a2e00, 0 0 22px rgba(255,200,40,0.75); margin-bottom:8px; }
+  .solve-title small{ display:block; font:800 13px/1.4 var(--f-body); letter-spacing:2px; text-transform:uppercase; color:#fff3c4; text-shadow:var(--text-on-busy); }
+  :root.mode-daily .solve-timer{ color:#fff; text-shadow:var(--text-on-busy); font-size:34px; }
+  :root.mode-daily .solve-hint-line{ color:#fff3c4; text-shadow:var(--text-on-busy); }
+  :root.mode-daily .solve-slot{ background:rgba(28,6,48,0.72); border:2px solid rgba(255,214,90,0.6); color:#fff; }
+  :root.mode-daily .solve-slot.locked{ background:linear-gradient(180deg, #fff3a8, #ffcb2b 55%, #ff9900); border-color:#fff3c4; color:#3a1d00; box-shadow:0 0 14px rgba(255,210,60,0.7); }
+  :root.mode-daily .solve-rack{ margin-bottom:16px; }
+  :root.mode-daily .solve-tile{ background:linear-gradient(180deg, #ff9ad1, #ff3c9d 55%, #b0137a); border:2px solid #fff3c4; color:#fff; text-shadow:0 2px 0 rgba(77,6,52,0.6); box-shadow:0 5px 0 #4d0634; }
+  :root.mode-daily .solve-tile.used{ opacity:0.25; box-shadow:none; }
+  :root.mode-daily .solve-attempts, :root.mode-daily .solve-section-label{ color:#fff3c4; text-shadow:var(--text-on-busy); }
+  :root.mode-daily .solve-history-row span{ background:rgba(28,6,48,0.6); color:#fff; }
+  .solve-overlay.missed .solve-slot{ background:linear-gradient(180deg, #ff8080, #e0202a) !important; border-color:#ffd0d0 !important; color:#fff !important; box-shadow:0 0 14px rgba(255,40,40,0.7) !important; }
   /* The combo meter (B4): top right of the board, by the wordmark. Its
      three pips fill with crowd matches in a row; the glow comes on with a
      multiplier (an opacity pulse on a pseudo-element). */
@@ -3205,8 +3234,9 @@
 </div>
 
 <div class="solve-overlay hidden" id="solveOverlay">
+  <div class="bg w-jumble warp-bg" aria-hidden="true"><i class="rays"></i><i class="glow"></i></div>
   <div class="solve-inner">
-    <div class="solve-title" id="solveTitle">🧩 Word Warp: solve today's word</div>
+    <div class="solve-title" id="solveTitle">🌀 Word Warp<small>Unscramble today's word</small></div>
     <div class="solve-header">
       <span class="solve-timer" id="solveTimer">1:00</span>
     </div>
@@ -4201,7 +4231,10 @@
   // non-debug playthrough rather than just the fast-forward.
   const RUN_DURATION_MS = (6 * 60 * 1000) / DEBUG_RUN_SCALE;
   const RUN_WORD_LENGTH = 6;
-  const RUN_SOLVE_MS = (75 * 1000) / DEBUG_TIME_SCALE;
+  const RUN_SOLVE_MS = (60 * 1000) / DEBUG_TIME_SCALE;   // B5: the Word Warp is 60s (was 75s), plus any time banked in Portal Picks
+  // B5: solving the Word Warp scores WARP_SOLVE_POINTS plus a point for
+  // every WARP_SECONDS_PER_POINT seconds left on its clock.
+  const WARP_SOLVE_POINTS = 20, WARP_SECONDS_PER_POINT = 3;
   const RUN_MAX_GUESSES = 5;
   const RUN_HINT_TIME_COST_MS = 5000 / DEBUG_TIME_SCALE;
   const RUN_WARP_BONUS_MS = 15000 / DEBUG_TIME_SCALE;   // B2: the Portal Pick's timer power-up adds this to the Word Warp
@@ -7123,7 +7156,32 @@
     v2LapCache.set(cycle, order);
     return order;
   }
+  // B5 (Oct 2026): the Word Warp is a jumble, so a word must have one
+  // obvious answer - no common anagram. These words have one (GARDEN /
+  // DANGER, SILVER / SLIVER, PLAYER / REPLAY...; checked against the
+  // system dictionary plus plurals and past tenses, rare words ignored),
+  // so from WORDS_V3_FROM_DAY the schedule skips them. Days before keep
+  // their word (today's word never moves). Laps work as in v2, with a
+  // repeat guard over the handover.
+  const WORD_WARP_SKIP = new Set(['GARDEN', 'CASTLE', 'FOREST', 'SPIDER', 'GOLDEN', 'SILVER', 'CANDLE', 'FRIEND', 'DANCER', 'SINGER',
+    'PLAYER', 'SPRINT', 'GLIDER', 'DEPART', 'OYSTER', 'BADGER', 'SHOWER', 'PHRASE', 'BINDER', 'SKATER', 'SPROUT', 'HURDLE', 'FOLDER',
+    'BOWLER', 'UMPIRE', 'NEBULA', 'FLOWER', 'SCYTHE']);
+  const WORDS_V3_FROM_DAY = Date.UTC(2026, 9, 14) / 86400000;   // 14 Oct 2026, 00:00 UTC
+  let v3Pool = null;
+  function v3Indices(){ return v3Pool || (v3Pool = RUN_WORDS.map((w, i)=> WORD_WARP_SKIP.has(w.word) ? -1 : i).filter(i=> i >= 0)); }
+  const v3LapCache = new Map();
+  function v3LapOrder(cycle){
+    if (v3LapCache.has(cycle)) return v3LapCache.get(cycle);
+    const pool = v3Indices(), n = pool.length, gap = Math.min(LAP_GAP, Math.floor(n / 3));
+    let order = shuffle(pool, mulberry32(hashStr('flipstax-word-v3-cycle-' + cycle)));
+    const prevTail = new Set(cycle >= 1 ? v3LapOrder(cycle - 1).slice(n - gap) : Array.from({ length: gap }, (_, k)=> wordIndexForDay(WORDS_V3_FROM_DAY - 1 - k)));
+    const head = order.filter(i=> !prevTail.has(i)).slice(0, gap), inHead = new Set(head);
+    order = head.concat(order.filter(i=> !inHead.has(i)));
+    v3LapCache.set(cycle, order);
+    return order;
+  }
   function wordIndexForDay(day){
+    if (day >= WORDS_V3_FROM_DAY){ const d = day - WORDS_V3_FROM_DAY, n = v3Indices().length; return v3LapOrder(Math.floor(d / n))[d % n]; }
     const v2 = day >= WORDS_V2_FROM_DAY;
     const n = v2 ? RUN_WORDS.length : WORDS_V1_COUNT;
     const d = v2 ? day - WORDS_V2_FROM_DAY : day;
@@ -7149,7 +7207,7 @@
     const day = daysSinceEpoch(), avoid = new Set([seen]);
     for (let d = day - 7; d <= day + 21; d++) avoid.add(RUN_WORDS[wordIndexForDay(d)].word);
     const order = shuffle(RUN_WORDS.map((_, i)=> i), mulberry32(hashStr('flipstax-stand-in-' + day)));
-    const i = order.find(k=> !avoid.has(RUN_WORDS[k].word));
+    const i = order.find(k=> !avoid.has(RUN_WORDS[k].word) && !WORD_WARP_SKIP.has(RUN_WORDS[k].word));
     return i != null ? RUN_WORDS[i] : word;
   }
   function loadRunResult(){
@@ -7671,6 +7729,7 @@
       deck: deck.cards.slice(deck.next).map(c=> c.id),
       show: runShow, doors: runPortalDoors, warpBonus: runWarpBonusMs,
       combo: { streak: runMatchStreak, bank: runComboBank, bonus: runComboBonus, best: runBestStreak },
+      letterPos: runLetterPos,
     };
     try{ localStorage.setItem(RUN_LIVE_KEY, JSON.stringify(snap)); }catch(e){}
   }
@@ -7749,8 +7808,11 @@
       const link = document.getElementById('runShareLink');
       if (link) link.addEventListener('click', shareRunResult);
     } else if (runActive){
+      // B5: the word's letters as a tray of blanks; each earned letter sits in its own spot.
+      const tray = Array.from({ length: RUN_WORD_LENGTH }, (_, p)=>{ const k = runLetterPos.indexOf(p);
+        return '<i data-p="' + p + '"' + (k >= 0 ? ' class="got' + (letterIncoming.has(p) ? ' incoming' : '') + '"' : '') + '>' + (k >= 0 ? runLetters[k] : '') + '</i>'; }).join('');
       els.runBanner.innerHTML = '<span class="sp-mode">\uD83C\uDFAE</span><span class="sp-label">Points</span><b class="sp-num">' + shownScore(runScore) + '</b>' +
-        '<span class="sp-sep">\u00B7</span><span class="sp-label">Letters</span><b class="sp-num">' + runLetters.length + '/' + RUN_WORD_LENGTH + '</b>' + streakTag;
+        '<span class="sp-sep">\u00B7</span><span class="sp-tray" id="letterTray" aria-label="Word Warp letters: ' + runLetters.length + ' of ' + RUN_WORD_LENGTH + '">' + tray + '</span>' + streakTag;
     } else {
       els.runBanner.innerHTML = '<span class="sp-mode">\uD83C\uDFAE</span><span class="sp-label">Daily Stax</span>' + streakTag + ' <span class="run-link" id="runPlayLink">Play</span>';
       const link = document.getElementById('runPlayLink');
@@ -8323,6 +8385,7 @@
     runWord = dailyWordForPlayer();
     runPlan = buildShowPlan(runStartDate); runShow = { step:0, left:null }; runPortalDoors = null; runWarpBonusMs = 0;
     runMatchStreak = 0; runComboBank = 0; runComboBonus = 0; runBestStreak = 0; renderComboMeter();
+    runLetterPos = []; runWarpPoints = 0; letterIncoming.clear();
     runEndsAt = Date.now() + RUN_DURATION_MS;
     runClockAddedMs = 0;
     dailySunP = 0;
@@ -8378,6 +8441,7 @@
     runPlan = buildShowPlan(runStartDate); runShow = snap.show || { step:0, left:null }; runPortalDoors = snap.doors || null; runWarpBonusMs = snap.warpBonus || 0;
     runMatchStreak = (snap.combo && snap.combo.streak) || 0; runComboBank = (snap.combo && snap.combo.bank) || 0; runComboBonus = (snap.combo && snap.combo.bonus) || 0; runBestStreak = (snap.combo && snap.combo.best) || 0;
     renderComboMeter();
+    runLetterPos = Array.isArray(snap.letterPos) ? snap.letterPos : runLetters.map((_, k)=> k); runWarpPoints = 0; letterIncoming.clear();
     dailySunP = 0;
     runEndsAt = Date.now() + snap.remainMs;
     // The rest of this run's deck, in the same order - no repeats.
@@ -8501,6 +8565,19 @@
     saveRunSnapshot();
     showBumper({ t:'bumper', round:SHOW_ROUNDS }, ()=>{ if (runActive && runPhase === 'finale-bumper') startSolvePhase(); });
   }
+  // ---------- A letter flies into the tray (B5) ----------
+  function flyLetter(letter, pos, fromEl){
+    const done = ()=>{ letterIncoming.delete(pos); const s = document.querySelector('#letterTray i[data-p="' + pos + '"]'); if (s){ s.classList.remove('incoming'); FX.pop(s, 1.6); } sfx.letterLand && sfx.letterLand(); };
+    const slot = document.querySelector('#letterTray i[data-p="' + pos + '"]');
+    if (!slot || !fromEl || prefersReducedMotion() || !showFx.animate){ done(); return; }
+    const a = fromEl.getBoundingClientRect(), b = slot.getBoundingClientRect();
+    const f = document.createElement('div'); f.className = 'letter-fly'; f.textContent = letter; showFx.appendChild(f);
+    const x0 = a.left + a.width / 2, y0 = a.top + a.height / 2, x1 = b.left + b.width / 2, y1 = b.top + b.height / 2;
+    f.animate([{ transform:'translate(' + x0 + 'px,' + y0 + 'px) scale(0.6)', opacity:0 },
+               { transform:'translate(' + x0 + 'px,' + (y0 - 40) + 'px) scale(2.4)', opacity:1, offset:0.25 },
+               { transform:'translate(' + x1 + 'px,' + y1 + 'px) scale(1)', opacity:1 }], { duration:950, easing:'cubic-bezier(.5,0,.3,1)' }).onfinish = ()=>{ f.remove(); done(); };
+  }
+
   // ---------- The combo meter (B4) ----------
   function comboOnVerdict(withCrowd, base){
     const before = comboMult(runMatchStreak);
@@ -8592,6 +8669,12 @@
   let runPendingTrivia = false;
   let runPlan = null, runShow = { step:0, left:null }, runPortalDoors = null, runWarpBonusMs = 0, runQuizPick = null;
   let runMatchStreak = 0, runComboBank = 0, runComboBonus = 0, runBestStreak = 0;
+  // B5: earned letters land in the tray at the date's own order of
+  // positions (everyone's first letter is the same, and it isn't always
+  // the word's first letter).
+  let runLetterPos = [], runWarpPoints = 0;
+  const letterIncoming = new Set();
+  function letterOrderFor(date){ return shuffle([0, 1, 2, 3, 4, 5].slice(0, RUN_WORD_LENGTH), mulberry32(hashStr('flipstax-letters-' + date))); }
   // Set when a Daily run ends; cleared when the player starts playing again
   // from mode select. See loadNextImpl and finishDailySession.
   let sessionHalted = false;
@@ -8715,6 +8798,7 @@
   function resolveRunTrivia(correct){
     if (runPhase !== 'trivia' || !runPendingQ) return;
     quizFx(!!correct, runQuizPick, runPendingQ.correctIdx);
+    const runPendingQCorrectIdx = runPendingQ.correctIdx;
     runPendingQ = null;
     clearTimeout(eventTimeoutId);
     els.eventTiles.forEach(t=> t.onclick = null);
@@ -8725,8 +8809,9 @@
       sfx.correct();
       runTriviaCorrect++;
       runTriviaStreak++;
-      const nextLetter = runWord.word[runLetters.length];
-      runLetters.push(nextLetter);
+      const pos = letterOrderFor(runStartDate || todayStr())[runLetters.length], nextLetter = runWord.word[pos];
+      runLetters.push(nextLetter); runLetterPos.push(pos);
+      letterIncoming.add(pos);
       // Accuracy bonus: points (never letters) for back-to-back correct
       // answers - +2, then +4, then +6 from the 4th in a row on. Added
       // directly like the wrong-answer penalty below, so it can't fire a
@@ -8744,6 +8829,8 @@
       els.eventSubtitle.textContent = bannerParts.join(' \u00b7 ');
       els.eventPrompt.textContent = '\u2705 Correct! Letter earned: ' + nextLetter;
       celebrateTriviaCorrect();
+      renderRunBanner();
+      flyLetter(nextLetter, pos, els.eventTiles[runPendingQCorrectIdx]);
     } else {
       sfx.wrong();
       runTriviaStreak = 0;
@@ -8803,8 +8890,8 @@
     els.eventSubtitle.textContent = '';
     if (correct){
       sfx.correct();
-      const nextLetter = runWord.word[runLetters.length];
-      runLetters.push(nextLetter);
+      const pos = letterOrderFor(runStartDate || todayStr())[runLetters.length], nextLetter = runWord.word[pos];
+      runLetters.push(nextLetter); runLetterPos.push(pos);
       runSecondChanceOutcome = 'recovered';
       els.eventPrompt.textContent = '✅ Second chance! Letter recovered: ' + nextLetter;
       celebrateTriviaCorrect();
@@ -11006,12 +11093,15 @@
     // letter for free and make the first hint cost no solve time.
     solveFreeHints = 0;
     solveBonusNote = '';
-    if (runLetters.length === 0){
-      solveLockedLetters[0] = runWord.word[0];
-      solveFreeHints = 1;
-      solveBonusNote = '🎁 No letters earned — first letter revealed, plus one free hint';
-    }
-    solveRack = shuffle(runLetters.slice());
+    // B5: the Word Warp is a jumble. The letters earned in the Brain Beams
+    // are locked in their spots; the rest of the word comes as scrambled
+    // tiles (the date's own scramble, never already in order) to put in
+    // place. No free hint - hints come only from Portal Picks.
+    runLetterPos.forEach((p, k)=>{ solveLockedLetters[p] = runLetters[k]; });
+    const rest = runWord.word.split('').filter((_, p)=> !solveLockedLetters[p]);
+    const rr = mulberry32(hashStr('flipstax-warp-' + (runStartDate || todayStr())));
+    solveRack = shuffle(rest, rr);
+    for (let k = 0; k < 6 && rest.length > 1 && solveRack.join('') === rest.join(''); k++) solveRack = shuffle(rest, rr);
     rackUsedFlags = [];
     buildSolveKeyboard();
     solveEndsAt = Date.now() + RUN_SOLVE_MS + runWarpBonusMs;
@@ -11047,7 +11137,7 @@
     voted = false; votedSinceTime = null;
     const last = solveGuesses[solveGuesses.length - 1];
     if (last && last.join('') === runWord.word){ endRun(true, sv.solvedAt || Date.now()); return; }
-    if (solveGuesses.length >= RUN_MAX_GUESSES || Date.now() >= solveEndsAt){ endRun(false); return; }
+    if (solveGuesses.length >= RUN_MAX_GUESSES || Date.now() >= solveEndsAt){ endRun(false); return; }   // (after a refresh: straight to the results)
     buildSolveKeyboard();
     playTrack('solve');
     renderSolveUI();
@@ -11061,10 +11151,25 @@
     const totalSec = Math.ceil(remain/1000);
     els.solveTimer.textContent = Math.floor(totalSec/60) + ':' + (totalSec%60<10?'0':'') + (totalSec%60);
     els.solveTimer.classList.toggle('danger', remain <= 20000);
-    if (remain <= 0){ clearInterval(solveInterval); endRun(false); }
+    if (remain <= 0){ clearInterval(solveInterval); missWarp(); }
+  }
+  // B5: a missed Word Warp - the word drops into the slots in red, the
+  // frame flashes, a sad trombone, then the results. (~1.8s; reduced motion
+  // skips the shake.)
+  let warpMissing = false;
+  function missWarp(){
+    if (warpMissing || !runActive) return;
+    warpMissing = true;
+    els.solveOverlay.classList.add('missed');
+    solveLockedLetters = runWord.word.split(''); solveCurrentGuess = [];
+    renderSolveUI();
+    showFlash('lose'); hostMood('sad'); hostSay('So close! It was ' + runWord.word + '.', 2000);
+    FX.shake(els.solveSlots);
+    if (sfx.warpMiss) sfx.warpMiss(); else sfx.wrong();
+    setTimeout(()=>{ warpMissing = false; els.solveOverlay.classList.remove('missed'); if (runActive) endRun(false); }, 1800);
   }
   function renderSolveUI(){
-    els.solveHint.textContent = runHintsRevealed > 0 ? runWord.hints.slice(0, runHintsRevealed).join(' \u00B7 ') : '';
+    els.solveHint.textContent = runHintsRevealed > 0 ? '\uD83D\uDCA1 ' + runWord.hints.slice(0, runHintsRevealed).join(' \u00B7 ') : '';
     els.solveHintBtn.textContent = solveFreeHints > 0 ? '\uD83D\uDCA1 Hint (free)' : '\uD83D\uDCA1 Hint (\u22125s)';
     els.solveHintBtn.classList.toggle('disabled', runHintsRevealed >= runWord.hints.length);
     els.solveAttempts.textContent = (RUN_MAX_GUESSES - solveGuesses.length) + ' guesses left';
@@ -11078,7 +11183,7 @@
       if (!solveLockedLetters[i]) div.onclick = ()=> removeFromGuess(i);
       els.solveSlots.appendChild(div);
     }
-    els.solveRackLabel.textContent = solveRack.length > 0 ? 'Your letters' : solveBonusNote;
+    els.solveRackLabel.textContent = solveRack.length > 0 ? (document.documentElement.classList.contains('mode-daily') ? 'Put these in place' : 'Your letters') : solveBonusNote;
     els.solveRackLabel.classList.toggle('hidden', solveRack.length === 0 && !solveBonusNote);
     els.solveRack.innerHTML = '';
     solveRack.forEach((letter,i)=>{
@@ -11144,6 +11249,12 @@
       clearInterval(solveInterval);
       const solvedAt = Date.now();
       runSolvedAt = solvedAt;
+      // B5: the Word Warp pays points (it didn't before): WARP_SOLVE_POINTS,
+      // plus one per WARP_SECONDS_PER_POINT seconds left.
+      runWarpPoints = WARP_SOLVE_POINTS + Math.floor(Math.max(0, solveEndsAt - solvedAt) / 1000 / WARP_SECONDS_PER_POINT);
+      runScore += runWarpPoints;
+      showFlash('win'); hostMood('cheer'); hostSay('You warped it! +' + runWarpPoints, 2200);
+      FX.beamHit(showFx, Array.from(els.solveSlots.children));
       saveRunSnapshot();
       celebrateSolve(solvedAt, ()=>{ if (runActive) endRun(true, solvedAt); });
       return;
@@ -11152,10 +11263,11 @@
     saveRunSnapshot();
     if (solveGuesses.length >= RUN_MAX_GUESSES){
       clearInterval(solveInterval);
-      endRun(false);
+      missWarp();
       return;
     }
     sfx.wrong();
+    FX.shake(els.solveSlots); hostMood('sad');
     renderSolveUI();
   }
   function useSolveHint(){
@@ -11178,7 +11290,7 @@
     els.solveOverlay.classList.add('celebrating');
     renderSolveUI();
     const secs = Math.max(0, Math.round((RUN_SOLVE_MS - Math.max(0, solveEndsAt - solvedAt)) / 1000));
-    els.solveCelebrateSub.textContent = runWord.word + ' · ' + Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0');
+    els.solveCelebrateSub.textContent = runWord.word + ' · ' + Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0') + (runWarpPoints ? ' · +' + runWarpPoints + ' pts' : '');
     els.solveCelebrate.classList.remove('hidden');
     // Banner sits just under the word, over the faded keyboard.
     const slotsBox = els.solveSlots.getBoundingClientRect();
