@@ -8511,6 +8511,12 @@
   }
   function beginShow(){
     if (!runActive) return;
+    // Warm-up while the bumper plays (the cold open's tap is a user
+    // gesture): the audio context, and one invisible particle so the first
+    // vote's sparkle doesn't pay the first-use cost. (4x CPU: the first tap
+    // of a run measured 112ms to paint without it, the rest ~60ms.)
+    if (soundOn) getAudioCtx();
+    (window.requestIdleCallback || ((f)=> setTimeout(f, 200)))(()=>{ FX.burst(showFx, -40, -40, { count:1, spread:1 }); FX.glowSweep(showFx, document.getElementById('board')); });
     runPhase = 'running';
     runEndsAt = Date.now() + RUN_DURATION_MS + runClockAddedMs;
     els.runTimerWrap.classList.remove('hidden');
