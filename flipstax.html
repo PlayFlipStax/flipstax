@@ -436,8 +436,8 @@
      stars from the shared system, and on some screens the riddle's UFO
      zooming past, from either side. */
   .event-sky{ position:absolute; inset:0; width:100%; height:100%; z-index:-1; pointer-events:none; }
-  .event-overlay.ufo-pass .event-ufo{ display:block; z-index:-1; font-size:28px; opacity:0.9; animation: eventUfoPass 3.4s cubic-bezier(.45,0,.55,1) 1.1s both; }
-  .event-overlay.ufo-pass.ufo-rtl .event-ufo{ animation-direction:reverse; }
+  .event-overlay.ev-ufo-pass .event-ufo{ display:block; z-index:-1; font-size:28px; opacity:0.9; animation: eventUfoPass 3.4s cubic-bezier(.45,0,.55,1) 1.1s both; }
+  .event-overlay.ev-ufo-pass.ev-ufo-rtl .event-ufo{ animation-direction:reverse; }
   .event-overlay .event-ufo i{ display:none; }
   @keyframes eventUfoPass{ 0%{ transform:translate(-70px, 13vh) scale(0.8) rotate(-6deg); } 50%{ transform:translate(50vw, 6vh) scale(1) rotate(5deg); } 100%{ transform:translate(calc(100vw + 70px), 10vh) scale(0.8) rotate(-4deg); } }
   @keyframes eventBgDrift{ 0%{ background-position: 0% 10%; } 100%{ background-position: 100% 90%; } }
@@ -9633,8 +9633,8 @@
     const ov = els.eventOverlay, canvas = document.getElementById('eventSky'), ctx = canvas && canvas.getContext('2d');
     if (!ctx) return;
     eventSkyOn = true;
-    ov.classList.remove('ufo-pass', 'ufo-rtl'); void ov.offsetWidth;
-    if (Math.random() < 0.35){ ov.classList.add('ufo-pass'); if (Math.random() < 0.5) ov.classList.add('ufo-rtl'); }
+    ov.classList.remove('ev-ufo-pass', 'ev-ufo-rtl'); void ov.offsetWidth;
+    if (Math.random() < 0.35){ ov.classList.add('ev-ufo-pass'); if (Math.random() < 0.5) ov.classList.add('ev-ufo-rtl'); }
     const dpr = Math.min(2, window.devicePixelRatio || 1), r = ov.getBoundingClientRect(), W = r.width, H = r.height;
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
     let stars = [], next = 350 + Math.random() * 500;
@@ -13354,9 +13354,9 @@
     const win = Math.random() < 0.5, stake = coinStake();
     const ov = els.eventOverlay, coin = document.getElementById('coinFlip'), stage = document.getElementById('coinStage');
     stage.classList.remove('won', 'lost');
-    ov.classList.remove('coin-won', 'coin-lost', 'ufo-pass', 'ufo-rtl'); void ov.offsetWidth;
-    ov.classList.add('coin-mode', 'ufo-pass');
-    if (Math.random() < 0.5) ov.classList.add('ufo-rtl');
+    ov.classList.remove('coin-won', 'coin-lost', 'ev-ufo-pass', 'ev-ufo-rtl'); void ov.offsetWidth;
+    ov.classList.add('coin-mode', 'ev-ufo-pass');
+    if (Math.random() < 0.5) ov.classList.add('ev-ufo-rtl');
     startCoinRays();
     els.eventPrompt.textContent = '\uD83D\uDC7D HEADS +' + stake + ' \u00B7 \uD83D\uDEF8 TAILS \u2212' + stake;
     let reduced = false;
