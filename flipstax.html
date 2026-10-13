@@ -2252,6 +2252,32 @@
   :root.mode-daily.event-open #board .half, :root.mode-daily.event-open #board .divider{ visibility:hidden; }
   :root.mode-daily .event-overlay{ background:none; animation:none; }
   @media (prefers-reduced-motion: reduce){ .show-say{ transition:none; } }
+  /* The cold open and the round bumpers (B2): a full-screen card in its
+     own colour world; the bumper's white light flash is opacity only. */
+  .show-card{ position:fixed; inset:0; z-index:29; display:flex; align-items:center; justify-content:center; text-align:center; color:#fff; cursor:pointer;
+    padding:calc(24px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom)); }
+  .show-card.hidden{ display:none; }
+  .show-card .sc-inner{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; gap:12px; max-width:380px; }
+  .sc-ep{ font:800 13px var(--f-body); letter-spacing:3px; padding:5px 14px; border-radius:99px; background:rgba(28,6,48,0.75); border:2px solid var(--gold-2); color:#fff3c4; }
+  .sc-title{ font:900 clamp(44px, 14vw, 64px)/0.95 var(--f-display); text-transform:uppercase; letter-spacing:1px; color:#fffbe0; text-shadow:0 4px 0 #7a2e00, 0 0 24px rgba(255,200,40,0.8); animation:scPop 0.6s var(--ease-pop) both; }
+  .sc-host{ width:74px; height:84px; }
+  .sc-line{ font:900 22px/1.15 var(--f-display); text-transform:uppercase; letter-spacing:0.5px; text-shadow:var(--text-on-busy); }
+  .sc-rules{ font:700 14px/1.4 var(--f-body); color:#fff3dd; text-shadow:var(--text-on-busy); max-width:320px; }
+  .sc-tap{ margin-top:6px; font:900 22px/1 var(--f-display); letter-spacing:1.5px; text-transform:uppercase; color:var(--show-ink); padding:12px 26px; border-radius:16px; border:3px solid var(--gold-edge);
+    background:linear-gradient(180deg, var(--gold-1), var(--gold-2) 45%, var(--gold-3)); box-shadow:var(--sh-btn); animation:scTap 1.4s ease-in-out infinite alternate; }
+  .sc-round{ font:800 15px var(--f-body); letter-spacing:4px; color:#fff3c4; text-shadow:var(--text-on-busy); }
+  .sc-name{ font:900 clamp(48px, 15vw, 72px)/0.95 var(--f-display); text-transform:uppercase; color:#fffbe0; text-shadow:0 4px 0 rgba(60,0,60,0.6), 0 0 26px rgba(255,255,255,0.7); animation:scPop 0.5s var(--ease-pop) both; }
+  .sc-flash{ position:absolute; inset:0; z-index:1; background:#fff; opacity:0; animation:scFlash 0.7s ease-out; }
+  @keyframes scPop{ from{ opacity:0; transform:scale(0.5) rotate(-4deg); } to{ opacity:1; transform:none; } }
+  @keyframes scTap{ from{ transform:scale(1); } to{ transform:scale(1.05); } }
+  @keyframes scFlash{ 0%{ opacity:0; } 12%{ opacity:0.85; } 30%{ opacity:0.2; } 45%{ opacity:0.6; } 100%{ opacity:0; } }
+  @media (prefers-reduced-motion: reduce){ .sc-title, .sc-name, .sc-tap{ animation:none; } .sc-flash{ animation:none; display:none; } }
+  @media (max-height:660px){ .sc-title{ font-size:44px; } .sc-host{ width:56px; height:64px; } .show-card .sc-inner{ gap:9px; } .sc-rules{ font-size:13px; } }
+  /* Portal Pick doors (B2; B3 dresses them up) */
+  .event-tile.portal .pu-prize{ display:none; }
+  .event-tile.portal.open .pu-prize{ display:inline; } .event-tile.portal.open .pu-door{ display:none; }
+  .event-tile.portal{ background-color:#5a24c8; }
+  .pu-door{ font:900 34px/1 var(--f-display); }
   /* ---- Daily Stax: the sun and the odd UFO ----
      Background only, under everything (the sun behind the clouds, the UFO
      just in front of them) and never takes a tap. The sun follows the run
@@ -2749,6 +2775,7 @@
 <div class="show-bg bg w-vs" id="showBg" aria-hidden="true"><i class="rays"></i><i class="glow"></i><div class="amb" id="showAmb"></div></div>
 <div class="show-frame show-flash" id="showFrame" aria-hidden="true"></div>
 <div class="fx-layer show-fx" id="showFx" aria-hidden="true"></div>
+<div class="show-card hidden" id="showCard"></div>
 <div class="show-host" id="showHost" aria-hidden="true"><div class="alien" id="showAlien"></div><div class="show-say" id="showSay"></div></div>
 <div class="daily-sky sun-layer" aria-hidden="true"><div class="daily-sun" id="dailySun"></div></div>
 <div class="daily-sky ufo-layer" aria-hidden="true">
@@ -4137,6 +4164,7 @@
   const RUN_SOLVE_MS = (75 * 1000) / DEBUG_TIME_SCALE;
   const RUN_MAX_GUESSES = 5;
   const RUN_HINT_TIME_COST_MS = 5000 / DEBUG_TIME_SCALE;
+  const RUN_WARP_BONUS_MS = 15000 / DEBUG_TIME_SCALE;   // B2: the Portal Pick's timer power-up adds this to the Word Warp
   // Re-tuned a second time after a real (non-debug) playthrough showed an
   // attentive, immediately-responding player only reaches ~130 net points
   // in 6 minutes (vote cadence is capped by the ~1.65s reveal pause between
@@ -4165,7 +4193,7 @@
   let runClockAddedMs = 0;
   const RUN_POWERUPS = [
     { key:'points10',  icon:'\u26A1', label:'+10 pts', color:'#f09d00' },
-    { key:'slowclock', icon:'\uD83D\uDC0C', label:'+30s',    color:'#2f7bff' },
+    { key:'slowclock', icon:'\u23F1\uFE0F', label:'+15s Warp', color:'#2f7bff' },   // B2: extra Word Warp time (was +30s on the run clock)
     { key:'wildcard',  icon:'\uD83C\uDF81', label:GN.cosmicSurprise, color:'#f23c5a' },
     { key:'hint',      icon:'\uD83D\uDCA1', label:'Free Hint', color:'#17b86b' },
   ];
@@ -4178,8 +4206,69 @@
   // to be a 4-step sequence that only completed on a 3-answer trivia streak
   // while the player's lifetime vibe read <=49%; both the trivia tie-in and
   // the vibe condition are gone.)
-  const SECRET_UNLOCK_SEQUENCE = ['slowclock', 'slowclock', 'points10', 'wildcard', 'hint'];
-  const PERFECT_RUN_BONUS = 15;   // points for landing all 6 trivia (nothing left for Second Chance to recover)
+  // B2 (Oct 2026): a run has 4 Portal Picks now (blind doors), so the combo
+  // is 4 steps, one per portal - about 1 run in 256 by luck alone.
+  const SECRET_UNLOCK_SEQUENCE = ['slowclock', 'points10', 'wildcard', 'hint'];
+  const PERFECT_RUN_BONUS = 15;   // points for getting every round's Brain Beam right
+  // ---------- Daily as a game show (B2, Oct 2026) ----------
+  // A run is an episode: a cold open with the host, then SHOW_ROUNDS rounds,
+  // each opened by a one-second title bumper ("Round 2 of 5: Brain Beam!"):
+  // 5-6 VS cards, a Brain Beam question (now and then a riddle instead),
+  // 3-4 VS cards, a Portal Pick (four doors, a power-up behind each), and
+  // a Brain Break slot. Round 5 is the Word Warp finale, then the Vault.
+  // The plan - card counts, subjects and questions, the riddle round, what's
+  // behind each door, the deck order - comes from the date, so everyone gets
+  // the same episode that day. The 6:00 run clock stays as a cap: if it runs
+  // out first, the show cuts to the Word Warp.
+  const SHOW_LAUNCH_DATE = '2026-10-01';     // Episode 1 (the episode number is days since, plus one)
+  const SHOW_ROUNDS = 4;                     // rounds before the Word Warp (which is round SHOW_ROUNDS + 1)
+  const SHOW_VS_BEFORE = [5, 6];             // VS cards before a round's Brain Beam (min, max)
+  const SHOW_VS_AFTER = [3, 4];              // VS cards between the Brain Beam and the Portal Pick
+  const SHOW_RIDDLE_CHANCE = 0.5;            // chance an episode swaps one round's Brain Beam for a riddle
+  const SHOW_BUMPER_MS = 1000;               // the round title card with its light flash
+  // Brain Breaks are not built yet: one slot per round, after its Portal
+  // Pick. Put a game in a slot as (done) => { ...; done(); } and the show
+  // runs it there; null slots are skipped. BRAIN_BREAK_EST_MS is the time a
+  // Brain Break should take - the run was calibrated to ~7 minutes with it.
+  // Calibrated Oct 2026 (screenshots/qa/tools/daily_cycle.py, real time): a
+  // VS card takes ~4.15s (2.2s to decide + the 1.65s reveal + the deal), a
+  // Brain Beam ~7s, a Portal Pick ~4s, a bumper 1s, the Word Warp ~45s and
+  // the Vault ~15s, so a typical episode runs ~4:20 without Brain Breaks
+  // and ~7:00 with four of BRAIN_BREAK_EST_MS each. The run clock (the 6:00
+  // cap) stops while a Brain Break plays.
+  const BRAIN_BREAK_SLOTS = [null, null, null, null];
+  const BRAIN_BREAK_EST_MS = 40000;
+  function showEpisode(date){
+    const d = Math.round((Date.parse(date + 'T00:00:00Z') - Date.parse(SHOW_LAUNCH_DATE + 'T00:00:00Z')) / 86400000);
+    return Math.max(1, d + 1);
+  }
+  function showRange(r, rng){ return r[0] + Math.floor(rng() * (r[1] - r[0] + 1)); }
+  function buildShowPlan(date){
+    const rng = mulberry32(hashStr('flipstax-show-' + date));
+    const subjects = shuffle(RUN_CORE_SUBJECTS.concat([pick(RUN_ELECTIVE_SUBJECTS, rng)]), rng);
+    const riddleAt = rng() < SHOW_RIDDLE_CHANCE ? 1 + Math.floor(rng() * (SHOW_ROUNDS - 1)) : -1;
+    const steps = [];
+    for (let r = 0; r < SHOW_ROUNDS; r++){
+      steps.push({ t:'bumper', round:r, riddle: r === riddleAt });
+      steps.push({ t:'vs', n: showRange(SHOW_VS_BEFORE, rng) });
+      steps.push({ t:'quiz', round:r, riddle: r === riddleAt, subject: subjects[r % subjects.length], seed: (rng() * 4294967296) >>> 0 });
+      steps.push({ t:'vs', n: showRange(SHOW_VS_AFTER, rng) });
+      steps.push({ t:'portal', round:r, doors: shuffle(RUN_POWERUPS.map(p=> p.key), rng) });
+      steps.push({ t:'break', round:r });
+    }
+    steps.push({ t:'bumper', round:SHOW_ROUNDS });
+    steps.push({ t:'finale' });
+    return steps;
+  }
+  function showRoundName(st){ return st.round >= SHOW_ROUNDS ? GN.wordWarp : st.riddle ? GN.riddleRound : GN.brainBeam; }
+  // A round's riddle: one of Infinity's multiple-choice riddles, by the date.
+  function showRiddleQuestion(seed){
+    const list = INFINITY_RIDDLES.length ? INFINITY_RIDDLES : null;
+    if (!list) return null;
+    const rng = mulberry32(seed), r = list[Math.floor(rng() * list.length)];
+    const opts = shuffle([r.a].concat(r.wrong), rng);
+    return { category:'riddle', riddle:true, question:r.q, opts, correctIdx: opts.indexOf(r.a) };
+  }
   // The secret-riddle track's length (Velvet Curtain Call, 30.04s).
   const RIDDLE_MS = 30000 / DEBUG_TIME_SCALE;
   const RIDDLE_BONUS_POINTS = 50;
@@ -7533,6 +7622,7 @@
       solve: runPhase === 'solving' ? { endsAt: solveEndsAt, guesses: solveGuesses, locked: solveLockedLetters,
         rack: solveRack, freeHints: solveFreeHints, note: solveBonusNote, solvedAt: runSolvedAt } : null,
       deck: deck.cards.slice(deck.next).map(c=> c.id),
+      show: runShow, doors: runPortalDoors, warpBonus: runWarpBonusMs,
     };
     try{ localStorage.setItem(RUN_LIVE_KEY, JSON.stringify(snap)); }catch(e){}
   }
@@ -8183,24 +8273,33 @@
     runPendingTrivia = false; runPendingPowerUp = false;
     runStartDate = todayStr();
     runWord = dailyWordForPlayer();
+    runPlan = buildShowPlan(runStartDate); runShow = { step:0, left:null }; runPortalDoors = null; runWarpBonusMs = 0;
     runEndsAt = Date.now() + RUN_DURATION_MS;
     runClockAddedMs = 0;
     dailySunP = 0;
-    els.runTimerWrap.classList.remove('hidden');
-    updateRunTimerBar();
-    clearInterval(runTimerInterval);
-    runTimerInterval = setInterval(tickRunTimer, 500);
     // The combo is per run: one carried over from earlier play (Infinity, a
     // previous run) mustn't count toward this run's best.
     comboCount = 0;
     renderRunBanner();
-    showToast('\uD83C\uDFAE Daily Stax started \u2014 tap for points!');
     stopTallyPolling();
     lastWasEvent = true;
-    // Fresh shuffle of the whole Daily pool (329 cards) for every run, so no
-    // matchup can repeat within a run: even a max-speed run is ~155 rounds.
-    // (The deck used to carry over, and could run out mid-run.)
+    // The day's deck (B2: in the date's order, the same for everyone; the
+    // whole Daily pool, so no matchup repeats within a run).
     resetDeck('daily');
+    // The cold open first; the run clock starts on the tap.
+    runPhase = 'coldopen';
+    saveRunSnapshot();
+    showColdOpen(beginShow);
+  }
+  function beginShow(){
+    if (!runActive) return;
+    runPhase = 'running';
+    runEndsAt = Date.now() + RUN_DURATION_MS + runClockAddedMs;
+    els.runTimerWrap.classList.remove('hidden');
+    updateRunTimerBar();
+    clearInterval(runTimerInterval);
+    runTimerInterval = setInterval(tickRunTimer, 500);
+    playTrack('run');
     loadNext();
     saveRunSnapshot();
   }
@@ -8227,6 +8326,7 @@
     currentRiddle = snap.riddle >= 0 ? RIDDLES[snap.riddle] : null; riddleEndsAt = snap.riddleEndsAt;
     runSolvedAt = null;
     runClockAddedMs = snap.clockAdded || 0;
+    runPlan = buildShowPlan(runStartDate); runShow = snap.show || { step:0, left:null }; runPortalDoors = snap.doors || null; runWarpBonusMs = snap.warpBonus || 0;
     dailySunP = 0;
     runEndsAt = Date.now() + snap.remainMs;
     // The rest of this run's deck, in the same order - no repeats.
@@ -8242,6 +8342,9 @@
     lastWasEvent = true;
     renderRunBanner();
     if (runPhase === 'solving' && snap.solve){ resumeSolvePhase(snap.solve); saveRunSnapshot(); return; }
+    if (runPhase === 'coldopen'){ saveRunSnapshot(); showColdOpen(beginShow); return; }
+    if (runPhase === 'finale-bumper'){ runPhase = 'running'; goToFinale(); return; }
+    if (runPhase === 'bumper' || runPhase === 'break') runPhase = 'running';
     els.runTimerWrap.classList.remove('hidden');
     updateRunTimerBar();
     clearInterval(runTimerInterval);
@@ -8270,7 +8373,7 @@
       // The VS board (or a power-up already picked): deal the next round
       // and hold it on the Paused screen until they're ready.
       runPhase = 'running';
-      if (runClockExpired()){ startSolvePhase(); saveRunSnapshot(); return; }
+      if (runClockExpired()){ goToFinale(); return; }
       loadNext();
       if (runPhase === 'running') pauseGame();
     }
@@ -8294,12 +8397,96 @@
       // anyone who hadn't hit all 6 trivia milestones inside the clock.
       // If a trivia/power-up/riddle is on screen, wait: the next tick
       // after it resolves lands here again with runPhase back to 'running'.
-      if (runPhase === 'running') startSolvePhase();
+      if (runPhase === 'running') goToFinale();
       return;
     }
     updateRunTimerBar();
   }
   function runClockExpired(){ return runEndsAt - Date.now() <= 0; }
+  // Where the show is: called by loadNextImpl before it deals a VS card.
+  // Returns true if it took over (a bumper, a question, a Portal Pick, a
+  // Brain Break, the finale) - false means "deal the next VS card".
+  function showAdvance(){
+    if (!runPlan) runPlan = buildShowPlan(runStartDate || todayStr());
+    for (let guard = 0; guard < 99; guard++){
+      const st = runPlan[runShow.step];
+      if (!st){ goToFinale(); return true; }
+      if (st.t === 'vs'){
+        if (runShow.left == null) runShow.left = st.n;
+        if (runShow.left > 0){ runShow.left--; return false; }
+        runShow.step++; runShow.left = null; continue;
+      }
+      runShow.step++; runShow.left = null;
+      if (st.t === 'bumper'){
+        if (st.round >= SHOW_ROUNDS){ goToFinale(); return true; }
+        runPhase = 'bumper'; saveRunSnapshot();
+        showBumper(st, ()=>{ if (!runActive || runPhase !== 'bumper') return; runPhase = 'running'; loadNext(); });
+        return true;
+      }
+      if (st.t === 'quiz'){ runTriviaQuestion(null, null, st); return true; }
+      if (st.t === 'portal'){ runPortalDoors = st.doors; runPowerUpRoundForRun(null); return true; }
+      if (st.t === 'break'){
+        const game = BRAIN_BREAK_SLOTS[st.round];
+        if (typeof game === 'function'){
+          runPhase = 'break'; saveRunSnapshot();
+          const t0 = Date.now();
+          game(()=>{ if (!runActive) return; runEndsAt += Date.now() - t0; runPhase = 'running'; loadNext(); });   // the run clock doesn't count a Brain Break
+          return true;
+        }
+        continue;   // no Brain Break built yet
+      }
+      if (st.t === 'finale'){ goToFinale(); return true; }
+    }
+    return false;
+  }
+  // Round 5's bumper, then the Word Warp. (Also where the show cuts to if
+  // the run clock runs out.)
+  function goToFinale(){
+    if (!runActive || runPhase === 'solving' || runPhase === 'finale-bumper') return;
+    runPhase = 'finale-bumper';
+    stopTallyPolling(); clearRoundTimer();
+    els.eventOverlay.classList.add('hidden');
+    runShow.step = runPlan ? runPlan.length - 1 : 0; runShow.left = null;
+    saveRunSnapshot();
+    showBumper({ t:'bumper', round:SHOW_ROUNDS }, ()=>{ if (runActive && runPhase === 'finale-bumper') startSolvePhase(); });
+  }
+  // ---------- The cold open and the round bumpers ----------
+  const showCard = document.getElementById('showCard');
+  function showColdOpen(then){
+    const ep = showEpisode(runStartDate || todayStr());
+    showCard.className = 'show-card cold-open bg w-entry';
+    showCard.innerHTML = '<i class="rays"></i><i class="glow"></i><div class="sc-inner">' +
+      '<div class="sc-ep">EPISODE ' + ep + '</div>' +
+      '<div class="sc-title">Tonight on<br>FlipStax!</div>' +
+      '<div class="alien sc-host">' + FX.alienSvg() + '</div>' +
+      '<div class="sc-line">Vote with the crowd, outsmart it, win the vault.</div>' +
+      '<div class="sc-rules">' + SHOW_ROUNDS + ' rounds of picks, ' + GN.brainBeam + 's and ' + GN.portalPick + 's. Every right answer wins a letter for the ' + GN.wordWarp + ' finale.</div>' +
+      '<div class="sc-tap">Tap to start ▶</div></div>';
+    showCard.classList.remove('hidden');
+    showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'Episode ' + ep + '. Tap to start');
+    if (typeof hostSay === 'function') hostSay('Tonight on FlipStax!', 1800);
+    const shownAt = performance.now();
+    const go = (e)=>{
+      if (e && e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+      if (performance.now() - shownAt < 400) return;   // not the tap that opened it
+      showCard.removeEventListener('click', go); document.removeEventListener('keydown', go);
+      showCard.classList.add('hidden'); showCard.innerHTML = '';
+      noteOverlayClosed();
+      then();
+    };
+    showCard.addEventListener('click', go); document.addEventListener('keydown', go);
+  }
+  function showBumper(st, then){
+    const last = st.round >= SHOW_ROUNDS, name = showRoundName(st);
+    showCard.className = 'show-card bumper bg ' + (last ? 'w-jumble' : st.riddle ? 'w-odd' : 'w-trivia');
+    showCard.innerHTML = '<i class="rays"></i><i class="sc-flash"></i><div class="sc-inner">' +
+      '<div class="sc-round">ROUND ' + (st.round + 1) + ' OF ' + (SHOW_ROUNDS + 1) + '</div>' +
+      '<div class="sc-name">' + name + '!</div></div>';
+    showCard.removeAttribute('role'); showCard.removeAttribute('aria-label');
+    showCard.classList.remove('hidden');
+    if (sfx.bumper) sfx.bumper(last);
+    setTimeout(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; then(); }, prefersReducedMotion() ? SHOW_BUMPER_MS + 300 : SHOW_BUMPER_MS);
+  }
   // Smoothly blends from green (plenty of time) through yellow/orange to red
   // (running out), instead of jumping between three flat colors at fixed
   // thresholds - reads as a continuous countdown, not a sudden warning.
@@ -8323,6 +8510,7 @@
   }
 
   let runPendingTrivia = false;
+  let runPlan = null, runShow = { step:0, left:null }, runPortalDoors = null, runWarpBonusMs = 0;
   // Set when a Daily run ends; cleared when the player starts playing again
   // from mode select. See loadNextImpl and finishDailySession.
   let sessionHalted = false;
@@ -8345,6 +8533,10 @@
   // every score change and before every round, since a gate can open while
   // the score stands still.
   function checkRunMilestones(){
+    // B2 (Oct 2026): retired - the show plan (showAdvance) decides when the
+    // Brain Beams and Portal Picks come, by cards dealt, not points.
+    return;
+    // eslint-disable-next-line no-unreachable
     if (!runActive || runPendingTrivia || runPendingPowerUp) return;
     for (let i = 0; i < RUN_THRESHOLDS.length; i++){
       const t = RUN_THRESHOLDS[i];
@@ -8380,7 +8572,7 @@
   // `resumeQ`/`resumeEndsAt`: a refresh during this question - show the
   // same one again with whatever time it had left (see resumeDailyRun).
   // Also used for Second Chance's resume (runPhase says which).
-  function runTriviaQuestion(resumeQ, resumeEndsAt){
+  function runTriviaQuestion(resumeQ, resumeEndsAt, step){
     if (!runActive) return;
     const second = !!resumeQ && runPhase === 'secondchance';
     if (!second) runPhase = 'trivia';
@@ -8388,13 +8580,17 @@
     clearRoundTimer();
     let q = resumeQ;
     if (!q){
-      const subject = runSubjectSequence[runTriviaShown] || pick(RUN_CORE_SUBJECTS);
+      // B2: the round's own question, by the date (everyone gets the same one).
+      if (step && step.riddle) q = showRiddleQuestion(step.seed);
+      if (!q){
+        const subject = (step && step.subject) || runSubjectSequence[runTriviaShown] || pick(RUN_CORE_SUBJECTS);
+        q = generateSubjectTrivia(subject, 'daily', step ? mulberry32(step.seed) : null);
+      }
       runTriviaShown++;
-      q = generateSubjectTrivia(subject, 'daily');
       runAskedQuestions.push(q.question);
     }
     const resolve = second ? resolveSecondChance : resolveRunTrivia;
-    runPendingQ = { question: q.question, opts: q.opts, correctIdx: q.correctIdx };
+    runPendingQ = { question: q.question, opts: q.opts, correctIdx: q.correctIdx, riddle: !!q.riddle };
     runPendingQEndsAt = resumeEndsAt || (Date.now() + dt(10000));
     const remain = Math.max(0, runPendingQEndsAt - Date.now());
     if (DEBUG_FAST) window.__debugLastTriviaQ = q;
@@ -8402,9 +8598,11 @@
     els.powerupIcon.classList.add('hidden');
     fitTopChip();
     els.eventSubtitle.textContent = second ? '🔁 SECOND CHANCE · answer right, recover a letter'
+      : q.riddle ? '\uD83E\uDDE9 ' + GN.riddleRound.toUpperCase() + ' \u00B7 answer right, earn a letter'
       : '\uD83E\uDDE0 ' + GN.brainBeam.toUpperCase() + ' \u00B7 answer right, earn a letter';
     els.eventPrompt.textContent = q.question;
     els.eventTiles.forEach((tileEl,i)=>{
+      tileEl.classList.remove('portal', 'open');
       tileEl.textContent = q.opts[i];
       tileEl.style.backgroundColor = TILE_COLORS[i];
       tileEl.onclick = ()=> resolve(i === q.correctIdx);
@@ -8455,7 +8653,7 @@
       const bannerParts = [];
       if (streakBonus) bannerParts.push('\ud83d\udd25 ' + runTriviaStreak + ' in a row \u00b7 +' + streakBonus + ' pts');
       // All six landed: no letter left to recover, so the reward is points.
-      if (runTriviaAttempted >= RUN_THRESHOLDS.length && runLetters.length >= RUN_WORD_LENGTH){
+      if (runTriviaAttempted >= SHOW_ROUNDS && runTriviaCorrect >= SHOW_ROUNDS){
         runPerfect = true;
         runScore += PERFECT_RUN_BONUS; renderRunBanner();
         bannerParts.push('\ud83c\udfc6 PERFECT RUN +' + PERFECT_RUN_BONUS + ' pts');
@@ -8485,12 +8683,9 @@
   // question. This deliberately keys off "all six attempted", not the clock,
   // so everyone who reaches the end of trivia gets it.
   function advanceAfterTrivia(){
-    if (runTriviaAttempted >= RUN_THRESHOLDS.length){
-      if (runLetters.length < RUN_WORD_LENGTH && !runSecondChanceUsed){ startSecondChance(); return; }
-      startSolvePhase();
-      return;
-    }
-    if (runClockExpired()){ startSolvePhase(); return; }
+    // B2: the show plan decides what's next (Second Chance is retired - the
+    // Portal Pick's hint is the help now).
+    if (runClockExpired()){ goToFinale(); return; }
     runPhase = 'running';
     loadNext();
   }
@@ -8552,13 +8747,17 @@
     els.eventOverlay.classList.add('powerup');
     els.powerupIcon.classList.remove('hidden');
     fitTopChip();
-    els.eventSubtitle.textContent = '\uD83C\uDF89 POWER-UP DROPPED';
-    els.eventPrompt.textContent = "Choose one \u2014 it's yours";
+    els.eventSubtitle.textContent = '\uD83C\uDF00 ' + GN.portalPick.toUpperCase();
+    els.eventPrompt.textContent = 'Pick a portal \u2014 a power-up waits behind each';
+    // B2: four doors, a power-up behind each (the plan's order, by the date).
+    const doors = runPortalDoors || RUN_POWERUPS.map(p=> p.key);
     els.eventTiles.forEach((tileEl,i)=>{
-      const pu = RUN_POWERUPS[i];
-      tileEl.innerHTML = '<span class="pu-icon">'+pu.icon+'</span><span class="pu-label">'+pu.label+'</span>';
-      tileEl.style.backgroundColor = pu.color;
-      tileEl.onclick = ()=> resolveRunPowerUp(pu.key);
+      const pu = RUN_POWERUPS.find(p=> p.key === doors[i]) || RUN_POWERUPS[i];
+      tileEl.innerHTML = '<span class="pu-door">' + (i + 1) + '</span><span class="pu-prize"><span class="pu-icon">'+pu.icon+'</span><span class="pu-label">'+pu.label+'</span></span>';
+      tileEl.style.backgroundColor = '';
+      tileEl.dataset.pu = pu.key;
+      tileEl.classList.add('portal'); tileEl.classList.remove('open');
+      tileEl.onclick = ()=>{ tileEl.classList.add('open'); resolveRunPowerUp(pu.key); };
     });
     startEventTimerBar(remain, dt(5000));
     clearTimeout(eventTimeoutId);
@@ -8592,11 +8791,9 @@
       finishRunPowerUp();
     } else if (key === 'slowclock'){
       sfx.powerUp();
-      runEndsAt += 30000 / DEBUG_RUN_SCALE;
-      runClockAddedMs += 30000 / DEBUG_RUN_SCALE;
-      updateRunTimerBar();
+      runWarpBonusMs += RUN_WARP_BONUS_MS;
       saveRunSnapshot();
-      els.eventPrompt.textContent = '\uD83D\uDC0C +30 seconds on the clock';
+      els.eventPrompt.textContent = '\u23F1\uFE0F +' + Math.round(RUN_WARP_BONUS_MS / 1000) + 's banked for the ' + GN.wordWarp;
       finishRunPowerUp();
     } else if (key === 'wildcard'){
       let ticks = 0;
@@ -8646,7 +8843,8 @@
         startRiddleRound();
         return;
       }
-      if (runClockExpired()){ startSolvePhase(); return; }
+      els.eventTiles.forEach(t=>{ t.classList.remove('portal', 'open'); delete t.dataset.pu; });
+      if (runClockExpired()){ goToFinale(); return; }
       runPhase = 'running';
       loadNext();
     }, dt(1100));
@@ -10729,7 +10927,7 @@
     solveRack = shuffle(runLetters.slice());
     rackUsedFlags = [];
     buildSolveKeyboard();
-    solveEndsAt = Date.now() + RUN_SOLVE_MS;
+    solveEndsAt = Date.now() + RUN_SOLVE_MS + runWarpBonusMs;
     // The solve minigame isn't a normal vote-and-reveal round, so the stale
     // voted/votedSinceTime from whichever vote triggered it must be cleared
     // here — otherwise the watchdog thinks the round has been stuck for the
@@ -11193,8 +11391,8 @@
   function shuffle(arr,rng){ rng = rng || Math.random; const a=arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(rng()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
   // Shuffles, then breaks up any run of 3+ same-category cards in a row so
   // one flavor (fashion, sports, whatever) never dominates a stretch of play.
-  function smartShuffle(pool){
-    const arr = shuffle(pool);
+  function smartShuffle(pool, rng){
+    const arr = shuffle(pool, rng);
     for (let i=2;i<arr.length;i++){
       if (arr[i].category === arr[i-1].category && arr[i].category === arr[i-2].category){
         for (let j=i+1;j<arr.length;j++){
@@ -11213,7 +11411,7 @@
     const shaped = Math.pow(base, base < 0.5 ? 1.15 : 0.87);
     return Math.round(18 + shaped * 64);
   }
-  function resetDeck(p){ p = p || contentPoolKey(); decks[p].cards = smartShuffle(CARD_POOLS[p]); decks[p].next = 0; }
+  function resetDeck(p){ p = p || contentPoolKey(); decks[p].cards = smartShuffle(CARD_POOLS[p], p === 'daily' && runActive ? mulberry32(hashStr('flipstax-deck-' + (runStartDate || todayStr()))) : null); decks[p].next = 0; }
   function setScene(el, glyph){
     el.innerHTML = glyph ? '<span class="glyph">'+glyph+'</span>' : '';
     // Same icon on both sides (🏀 vs 🏀, 🎸 vs 🎸): the bottom one faces the
@@ -11568,9 +11766,9 @@
     clearRoundTimer();
 
     if (runActive){
-      checkRunMilestones();   // a time gate may have opened since the last score change
-      if (runPendingTrivia){ runPendingTrivia = false; runTriviaQuestion(); return; }
-      if (runPendingPowerUp){ runPendingPowerUp = false; runPowerUpRoundForRun(); return; }
+      if (runPhase === 'coldopen' || runPhase === 'bumper' || runPhase === 'finale-bumper' || runPhase === 'break') return;
+      if (runClockExpired()){ goToFinale(); return; }
+      if (showAdvance()) return;   // the show's next step (B2) - or deal a VS card
     } else {
       renderStatusBanner();
       // Infinity: a finished run goes to its finale instead of another card.
@@ -11600,7 +11798,7 @@
     current = deckNow.cards[deckNow.next++];
     roundSeq++;
     if (inInfinity() && infRun && !infRun.ended){ infRun.voteRounds++; infRun.sinceGuess++; saveInfRun(); maybeScheduleTapUfo(); }
-    current.bonusPoints = Math.random() < 0.2;
+    current.bonusPoints = runActive ? hashStr((runStartDate || '') + '|' + current.id) % 5 === 0 : Math.random() < 0.2;   // Daily: the same star cards for everyone that day
     rampOnRound();
 
     const meta = CAT_META[current.category] || {};
@@ -12511,6 +12709,9 @@
       layoutBoard: () => layoutBoard(),
       putNext: (name) => { const d = decks[contentPoolKey()]; const i = d.cards.findIndex((c, k)=> k >= d.next && (c.a === name || c.b === name)); if (i >= 0){ const [c] = d.cards.splice(i, 1); d.cards.splice(d.next, 0, c); } return i; },
       showRunTrivia: () => runTriviaQuestion(),
+      showPlan: (date) => buildShowPlan(date || runStartDate || todayStr()),
+      showState: () => ({ step: runShow.step, left: runShow.left, phase: runPhase, episode: showEpisode(runStartDate || todayStr()) }),
+      startColdOpenTap: () => showCard.click(),
       showRunPowerUp: () => runPowerUpRoundForRun(),
       showInfTrivia: () => runWildEvent(),
       showInfPowerUp: () => runPowerUpRound(),
