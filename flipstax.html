@@ -1638,6 +1638,9 @@
   .readout-unlocks .readout-new{ display:block; animation: ccNewPop 0.5s cubic-bezier(.3,1.8,.5,1) 0.3s both; }
   .ru-cards{ display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
   .ru-cell{ width:76px; }
+  .ru-more{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
+  .ru-more > span{ display:grid; place-items:center; width:100%; aspect-ratio:360 / 492; border-radius:10px; border:2px dashed rgba(255,214,90,0.8); background:rgba(28,6,48,0.6);
+    font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:26px; color:#ffd23f; }
   .ru-name{ font-family:'Big Shoulders Display', sans-serif; font-weight:800; font-size:13px; color:#fff; margin-top:5px; line-height:1.1; }
   .readout-new{ display:none; margin-bottom:4px; font-size:11px; font-weight:900; letter-spacing:1px; color:#ffe066; text-shadow:0 0 10px rgba(255,224,102,0.7); }
   .readout-type.has-new .readout-new{ display:block; animation: ccNewPop 0.5s cubic-bezier(.3,1.8,.5,1) 1.45s both; }
@@ -6840,9 +6843,9 @@
   const ALIEN_META = {
     first_contact:      { name:'First Contact', icon:'👽', blurb:'Tapped 3 passing UFOs in one Infinity run.', how:'Tap 3 UFOs in one Infinity run' },
     mothership_jackpot: { name:'Mothership Jackpot', icon:'🛸', blurb:'Hit the Mothership Jackpot in the Vault finale.', how:'Land a Plinko chip in the Mothership Jackpot' },
-    signal_decoded:     { name:'Signal Decoded', icon:'📡', blurb:'Guessed the crowd exactly right.', how:'A Guess the Crowd answer dead on (0 off)' },
-    abduction_survivor: { name:'Abduction Survivor', icon:'🐄', blurb:'Got lifted by the tractor beam and lived to vote again.', how:'5 crowd matches in a row in an Infinity run (the abduction moment)' },
-    riddle_master:      { name:'Riddle Master', icon:'🧩', blurb:'Solved every riddle in an Infinity run (3 or more), the hard ones too.', how:'Solve every riddle round in a run (at least 3, including a hard one)' },
+    signal_decoded:     { name:'Signal Decoded', icon:'📡', blurb:'Read the crowd to within a point, twice.', how:'Two Crowd Scan guesses within 1 point in one Infinity run' },
+    abduction_survivor: { name:'Abduction Survivor', icon:'🐄', blurb:'Rode the tractor beam all the way up and lived to vote again.', how:'16 crowd matches in a row in an Infinity run' },
+    riddle_master:      { name:'Riddle Master', icon:'🧩', blurb:'Cracked three riddles in one run, a hard one among them.', how:'3 riddles right in one Infinity run, including a hard one' },
   };
   Object.keys(ALIEN_META).forEach(k=>{ PERSONALITY_META[k] = Object.assign({ rare:true }, ALIEN_META[k]); });
   function isAlienCard(k){ return ALIEN_ORDER.indexOf(k) !== -1; }
@@ -7160,7 +7163,11 @@
     keys = keys.filter(k=> collection.cards[k] && PERSONALITY_META[k]);
     wrap.classList.toggle('hidden', !keys.length);
     wrap.querySelector('.readout-new').textContent = keys.length > 1 ? '✨ ' + keys.length + ' NEW CARDS UNLOCKED ✨' : '✨ NEW CARD UNLOCKED ✨';
-    keys.forEach((k, i)=>{
+    // At most three cards in the row, then a "+N more" tile (all of them are
+    // in the collection either way).
+    const RU_MAX = 3;
+    keys.slice(RU_MAX).forEach(k=>{ if (reveal) collection.cards[k].revealed = true; });
+    keys.slice(0, RU_MAX).forEach((k, i)=>{
       const owned = collection.cards[k];
       const isNew = reveal && !owned.revealed;
       const cell = document.createElement('div'); cell.className = 'ru-cell';
@@ -7169,6 +7176,7 @@
       cell.appendChild(card); cell.appendChild(name); slot.appendChild(cell);
       if (isNew){ owned.revealed = true; setTimeout(()=> revealCollectionCard(card), 650 + i * 900); }
     });
+    if (keys.length > RU_MAX){ const more = document.createElement('div'); more.className = 'ru-cell ru-more'; more.innerHTML = '<span>+' + (keys.length - RU_MAX) + '</span><div class="ru-name">more in your collection</div>'; slot.appendChild(more); }
     if (keys.length){ saveCollection(); renderCollectionBtn(); }
     if (keys.length) maybeCelebrateCollection(reveal ? 650 + keys.length * 900 + 1500 : 600);
   }
@@ -8645,7 +8653,7 @@
   // transform (no physics engine). Skip lands every remaining chip at once.
   const PLINKO_BASE = 20;
   const PLINKO_SLOTS = ['x2', '+50', 'x1', 'jackpot', 'x3', 'x1', 'x2'];
-  const PLINKO_ODDS = [ ['x1', 0.30], ['x2', 0.30], ['+50', 0.18], ['x3', 0.15], ['jackpot', 0.07] ];
+  const PLINKO_ODDS = [ ['x1', 0.315], ['x2', 0.315], ['+50', 0.18], ['x3', 0.15], ['jackpot', 0.04] ];   // jackpot 7% -> 4% (Close Encounters calibration)
   const PLINKO_ROWS = 6;
   function plinkoPoints(kind){ return kind === 'jackpot' ? 100 : kind === '+50' ? 50 : PLINKO_BASE * +kind.slice(1); }
   function plinkoLabel(kind){ return kind === 'jackpot' ? '🛸' : kind === '+50' ? '+50' : '×' + kind.slice(1); }
@@ -8685,7 +8693,7 @@
     PLINKO_SLOTS.forEach((kind, i)=>{
       const x = PB.cx + (i - 3) * PB.dx;
       g += '<g class="pk-slot" data-i="' + i + '"><rect x="' + (x - 18) + '" y="' + PB.slotY + '" width="36" height="' + PB.slotH + '" rx="8" fill="' + (kind === 'jackpot' ? 'url(#pkJack)' : 'url(#pkSlot)') + '" stroke="' + (kind === 'jackpot' ? '#7df9ff' : '#ffd23f') + '" stroke-width="2"/>' +
-        '<text x="' + x + '" y="' + (PB.slotY + 38) + '" text-anchor="middle" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="' + (kind === 'jackpot' ? 22 : 17) + '" fill="#fff6c2">' + plinkoLabel(kind) + '</text></g>';
+        '<text x="' + x + '" y="' + (PB.slotY + 21) + '" text-anchor="middle" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="' + (kind === 'jackpot' ? 22 : 17) + '" fill="#fff6c2">' + plinkoLabel(kind) + '</text></g>';
     });
     svg.innerHTML = g;
   }
@@ -8723,7 +8731,8 @@
   }
   // Pixels per board unit (the SVG scales with the board's width).
   function plinkoScale(){ return document.getElementById('plinkoBoard').getBoundingClientRect().width / PB.w; }
-  function slotXY(slot){ return { x: PB.cx + (slot - 3) * PB.dx, y: PB.slotY + 20 + 0 }; }
+  // Landed chips rest in the lower half of their slot, under its label.
+  function slotXY(slot){ return { x: PB.cx + (slot - 3) * PB.dx, y: PB.slotY + 44 }; }
   function placeChip(c, i, settled){
     const el = chipEl(i), k = plinkoScale(), p = slotXY(c.slot);
     el.style.transform = 'translate(' + (p.x * k).toFixed(1) + 'px,' + (p.y * k).toFixed(1) + 'px)';
@@ -8980,13 +8989,20 @@
     setTimeout(()=> u.classList.remove('go'), 2000);
   }
   // --- Close Encounters unlocks and alien personality lines (finale only)
+  // Calibrated Oct 2026 (screenshots/qa/tools/close_sim.py, varied simulated
+  // players) so a run rarely unlocks several at once: Mothership Jackpot ~19%
+  // of runs (the jackpot slot, PLINKO_ODDS), Signal Decoded ~15% once Crowd
+  // Scan has data, Abduction Survivor ~12-17%, Riddle Master ~16-21%, First
+  // Contact ~9%. (They used to be ~31%, ~21%, ~65%, ~8% and ~9%.)
+  const SIGNAL_NEAR_GUESSES = 2;        // Crowd Scan guesses within 1 point of the crowd
+  const SURVIVOR_STREAK = 16;           // crowd matches in a row (the abduction itself comes at 5)
+  const RIDDLE_MASTER_RIGHT = 3;        // riddles right in one run, a hard one among them
   function closeEncounterUnlocks(){
     const out = [];
     if ((infRun.ufoTaps || 0) >= 3) out.push('first_contact');
-    // Riddle Master: every riddle of the run solved (3 or more), the hard ones included.
-    if ((infRun.riddles || 0) >= 3 && infRun.riddlesRight === infRun.riddles && (infRun.riddlesHard || 0) >= 1 && infRun.riddlesHardRight === infRun.riddlesHard) out.push('riddle_master');
-    if (infRun.perfectGuess) out.push('signal_decoded');
-    if (infRun.abducted) out.push('abduction_survivor');
+    if ((infRun.riddlesRight || 0) >= RIDDLE_MASTER_RIGHT && (infRun.riddlesHardRight || 0) >= 1) out.push('riddle_master');
+    if ((infRun.nearGuesses || 0) >= SIGNAL_NEAR_GUESSES) out.push('signal_decoded');
+    if ((infRun.maxMatchStreak || 0) >= SURVIVOR_STREAK) out.push('abduction_survivor');
     return out;
   }
   const ALIEN_PERSONALITY_LINES = {
@@ -9329,6 +9345,7 @@
     const off = Math.abs(guess - truth), sc = guessScore(off);
     if (infRun && !infRun.finale){ infRun.guessLocked = (infRun.guessLocked || 0) + 1; infRun.guessErrSum = (infRun.guessErrSum || 0) + off; saveInfRun(); }
     if (off === 0 && infRun && !infRun.finale){ infRun.perfectGuess = true; infRun.deadOns = (infRun.deadOns || 0) + 1; saveInfRun(); }
+    if (off <= 1 && infRun && !infRun.finale){ infRun.nearGuesses = (infRun.nearGuesses || 0) + 1; saveInfRun(); }
     const finish = ()=>{
       if (guessFinish !== finish) return;   // once per round
       guessFinish = null;
@@ -11501,7 +11518,7 @@
       if (cv.counted){
         infRun.crowdN++;
         if (cv.withCrowd){
-          infRun.crowdAgree++; infRun.matchStreak++;
+          infRun.crowdAgree++; infRun.matchStreak++; infRun.maxMatchStreak = Math.max(infRun.maxMatchStreak || 0, infRun.matchStreak);
           if (infRun.matchStreak % INF_MATCHES_PER_KEY === 0 && addInfKey('streak')) showToast('\uD83D\uDD11 ' + infRun.matchStreak + ' crowd matches in a row \u2014 +1 key');
           if (infRun.matchStreak === ABDUCTION_STREAK) abductStack();
         } else infRun.matchStreak = 0;
