@@ -4328,6 +4328,12 @@
   const PRODUCTION_HOSTS = ['flipstax-one.vercel.app', 'playflipstax.com', 'www.playflipstax.com'];
   const IS_PREVIEW_HOST = /\.vercel\.app$/.test(location.hostname) && PRODUCTION_HOSTS.indexOf(location.hostname) === -1;
   const TEST_HOST = IS_LOCAL_HOST || IS_PREVIEW_HOST;
+  // ?replay=1 (localhost and preview URLs only, never the production domain): today's
+  // "already played" record is ignored and cleared, Daily can be replayed without
+  // limit, and nothing it does is saved - no stats, streak, collection, badges, today's
+  // result, or votes/tallies. A pink REPLAY MODE tag and a floating TEST button (a
+  // jump menu to every Daily screen) show; see the "Replay mode" block near the end.
+  const REPLAY = TEST_HOST && new URLSearchParams(location.search).get('replay') === '1';
   const TEST_SWITCHES = (()=>{
     const out = { crowdMin: null, noVotes: false };
     if (!TEST_HOST) return out;
@@ -4339,7 +4345,7 @@
     const cm = parseInt(read('flipstax_test_crowdmin'), 10);
     if (cm >= 1 && cm <= 30) out.crowdMin = cm;
     const nv = read('flipstax_test_novotes');
-    out.noVotes = nv === '1' || (nv === null && IS_PREVIEW_HOST);
+    out.noVotes = nv === '1' || (nv === null && IS_PREVIEW_HOST) || REPLAY;   // (replay mode never writes votes)
     return out;
   })();
   const DEBUG_TIME_SCALE = DEBUG_FAST ? 6 : 1;
@@ -7134,7 +7140,7 @@
       }, { slowdownCharges: undefined, slowdownDate: undefined });   // (the retired +5s button's daily charges: dropped from old saves)
     }catch(e){ return blank; }
   }
-  function saveStats(){ try{ localStorage.setItem('flipstax_stats_v1', JSON.stringify(stats)); }catch(e){} }
+  function saveStats(){ if (REPLAY) return; try{ localStorage.setItem('flipstax_stats_v1', JSON.stringify(stats)); }catch(e){} }
   function bumpStreakIfNeeded(){
     const today = todayStr();
     if (stats.lastDate === today) return;
@@ -7453,8 +7459,10 @@
       return parsed && parsed.date === todayStr() ? parsed : null;
     }catch(e){ return null; }
   }
-  function saveRunResultToday(result){ try{ localStorage.setItem('flipstax_run_v1', JSON.stringify(result)); }catch(e){} }
-  let runResultToday = loadRunResult();
+  function saveRunResultToday(result){ if (REPLAY) return; try{ localStorage.setItem('flipstax_run_v1', JSON.stringify(result)); }catch(e){} }
+  // Replay mode: today's record (and any run left half-played) is cleared, not read.
+  if (REPLAY){ try{ localStorage.removeItem('flipstax_run_v1'); localStorage.removeItem('flipstax_run_live_v1'); }catch(e){} }
+  let runResultToday = REPLAY ? null : loadRunResult();
   // The day can turn over while the game sits open (phones keep tabs alive
   // for days): re-check whenever the game comes back on screen, returns to
   // mode select, or Daily is tapped - not only when the page loads.
@@ -7521,7 +7529,7 @@
     }catch(e){}
     return { v:1, cards:{} };
   }
-  function saveCollection(){ try{ localStorage.setItem(COLLECTION_KEY, JSON.stringify(collection)); }catch(e){} }
+  function saveCollection(){ if (REPLAY) return; try{ localStorage.setItem(COLLECTION_KEY, JSON.stringify(collection)); }catch(e){} }
   let collection = loadCollection();
   // ---------- Close Encounters: rare cards and the Mystery Visitor ----------
   // Original art, drawn here in SVG (nothing traced or borrowed): the
@@ -7703,7 +7711,7 @@
   }
   let badgeStore = loadBadges();
   let badgeVoted = new Set(badgeStore.voted);
-  function saveBadges(){ badgeStore.voted = Array.from(badgeVoted); try{ localStorage.setItem(BADGE_KEY, JSON.stringify(badgeStore)); }catch(e){} }
+  function saveBadges(){ badgeStore.voted = Array.from(badgeVoted); if (REPLAY) return; try{ localStorage.setItem(BADGE_KEY, JSON.stringify(badgeStore)); }catch(e){} }
   function badgeEarned(id){ return id === 'weird_one' ? !!(stats.badges && stats.badges.wild) : !!badgeStore.earned[id]; }
   function earnedBadgeCount(){ return BADGES.filter(b=> badgeEarned(b.id)).length; }
   // Badges earned since the player last looked at the Badges tab: they go
@@ -7783,7 +7791,7 @@
     try{ const p = JSON.parse(localStorage.getItem(PROGRESS_KEY) || 'null'); if (p && p.v === 1) return Object.assign(freshProgress(), p); }catch(e){}
     return freshProgress();
   }
-  function saveProgress(){ try{ localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress)); }catch(e){} }
+  function saveProgress(){ if (REPLAY) return; try{ localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress)); }catch(e){} }
   let progress = loadProgress();
   const UNLOCK = {
     CROWD_MIN_PICKS: 50,        // counted picks before any crowd-agreement card can unlock
@@ -7936,7 +7944,7 @@
   // unfinished run is dropped.
   const RUN_LIVE_KEY = 'flipstax_run_live_v1';
   function saveRunSnapshot(){
-    if (!runActive || !runWord) return;
+    if (!runActive || !runWord || REPLAY) return;
     const deck = decks.daily;
     const snap = {
       date: runStartDate, rule: SAVE_RULE, savedAt: Date.now(), phase: runPhase, word: runWord.word,
@@ -8005,6 +8013,7 @@
       const d = readStreakRecord();
       streak = d.streak || 0; lastDay = d.lastDay || null;
     }catch(e){}
+    if (REPLAY) return streak;   // a replay never counts toward the streak
     if (lastDay === today) return streak;
     streak = (lastDay === dayBefore(today)) ? streak + 1 : 1;
     try{ localStorage.setItem('flipstax_streak', JSON.stringify({ streak, lastDay: today, rule: SAVE_RULE })); }catch(e){}
@@ -8663,7 +8672,7 @@
     // close callback calls startDailyRun again, which then passes this gate.
     // (It replaces the old one-screen intro, runIntroOverlay, which is kept
     // in the markup but no longer shown.)
-    if (!hasSeenHowTo('daily')){ openHowTo('daily', startDailyRun); return; }
+    if (!REPLAY && !hasSeenHowTo('daily')){ openHowTo('daily', startDailyRun); return; }
     runActive = true; runPhase = 'running';
     runScore = 0; runLetters = []; runThresholdsHit = []; runPowerupThresholdsHit = [];
     runTriviaAttempted = 0; runTriviaCorrect = 0; runRoundResults = [];
@@ -13917,6 +13926,7 @@
     if (!hasSeenHowTo('infinity')) openHowTo('infinity');
   });
   els.modeDailyBtn.addEventListener('click', ()=>{
+    if (REPLAY) runResultToday = null;   // replay mode: Daily is never "already done"
     refreshDailyDay();
     els.modeSelectOverlay.classList.add('hidden');
     document.documentElement.classList.add('mode-daily');
@@ -13995,6 +14005,98 @@
     saveRunSnapshot();
     returnToModeSelect();
   });
+
+  // ---------- Replay mode (?replay=1; localhost and preview URLs only) ----------
+  // A pink REPLAY MODE tag and a floating TEST button that opens a jump menu: each item
+  // restarts Daily clean and lands on that screen with sample data (a score, some letters
+  // earned, a clock part-way down). Nothing here is saved (see REPLAY above), and none of
+  // it exists on the production domain.
+  if (REPLAY){
+    const css = document.createElement('style');
+    css.textContent = '.replay-tag{position:fixed;top:calc(2px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:9998;pointer-events:none;background:#ff3c9d;color:#fff;font:800 10px/1.5 Inter,system-ui,sans-serif;letter-spacing:1px;padding:1px 10px;border-radius:99px;box-shadow:0 1px 4px rgba(0,0,0,0.35)}' +
+      '.replay-btn{position:fixed;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:9999;background:#ff3c9d;color:#fff;border:2px solid #fff;border-radius:99px;font:800 12px/1 Inter,system-ui,sans-serif;letter-spacing:1px;padding:8px 12px;opacity:0.92;cursor:pointer}' +
+      '.replay-menu{position:fixed;inset:0;z-index:10000;background:rgba(20,6,40,0.94);display:none;flex-direction:column;align-items:center;padding:calc(14px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom));overflow:auto;color:#fff;font-family:Inter,system-ui,sans-serif}' +
+      '.replay-menu.open{display:flex}.replay-menu h3{margin:4px 0 10px;font-size:15px;letter-spacing:1px}' +
+      '.replay-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:380px}' +
+      '.replay-list button,.replay-close{font:700 13px/1.2 Inter,system-ui,sans-serif;color:#fff;background:#3a1f6e;border:1px solid #b98bf0;border-radius:12px;padding:11px 8px;cursor:pointer}' +
+      '.replay-list button.wide{grid-column:1 / -1}.replay-list button.restart{background:#ff3c9d;border-color:#fff}.replay-close{margin-top:12px;min-width:140px;background:#150f2b}';
+    document.head.appendChild(css);
+    const tag = document.createElement('div'); tag.className = 'replay-tag'; tag.textContent = 'REPLAY MODE'; tag.setAttribute('aria-hidden', 'true'); document.body.appendChild(tag);
+
+    // Everything off, back to mode select, today's record forgotten.
+    function replayTeardown(){
+      returnToModeSelect({ silent:true });
+      runResultToday = null; clearRunSnapshot();
+      showCard.classList.add('hidden'); showCard.innerHTML = '';
+      document.getElementById('showSay').classList.remove('on');
+    }
+    // Daily from the top (the cold open is up); `tweak` runs on the fresh run's state.
+    function replayEnter(tweak, then){
+      replayTeardown();
+      els.homeOverlay.classList.add('hidden');
+      els.modeDailyBtn.click();
+      if (!runActive) return;
+      if (tweak) tweak();
+      if (then) setTimeout(()=>{ if (runActive) then(); }, 450);   // (the cold open ignores a tap in its first 400ms)
+    }
+    // Stand-in progress: a score, `n` letters earned, a clock at 4:12.
+    function replaySample(score, n){
+      runScore = score; runLetters = []; runLetterPos = [];
+      const order = letterOrderFor(runStartDate || todayStr());
+      for (let i = 0; i < n; i++){ runLetters.push(runWord.word[order[i]]); runLetterPos.push(order[i]); }
+      runTriviaAttempted = n + 1; runTriviaCorrect = n; runRoundResults = Array.from({ length:n + 1 }, (_, i)=> i < n);
+      runClockAddedMs = -108000;
+      renderRunBanner();
+    }
+    function replayTap(){ showCard.click(); }   // the cold open's "Tap to start" -> the show begins
+    function replayStop(){
+      runActive = false; runPhase = 'idle';
+      clearInterval(runTimerInterval); clearInterval(solveInterval); clearTimeout(eventTimeoutId); stopTallyPolling(); clearRoundTimer();
+      els.runTimerWrap.classList.add('hidden'); els.eventOverlay.classList.add('hidden'); els.solveOverlay.classList.add('hidden');
+      showCard.classList.add('hidden'); showCard.innerHTML = '';
+    }
+    function replaySampleResult(){
+      const word = (runWord && runWord.word) || 'LAUNCH';
+      if (!collection.cards.gambler) collection.cards.gambler = { first: todayStr(), count: 1, revealed: false };   // (memory only: nothing is saved)
+      return { date: todayStr(), rule: SAVE_RULE, savedAt: Date.now(), score: 187, triviaCorrect: 7, triviaTotal: 9, solved: true, solveMs: 34000, word,
+        personalityType: 'perfectionist', secondChance: null, perfect: false, roundResults: [true, true, false, true, true, true, false, true, true], lastVote: null,
+        secretRiddle: false, personalityNote: null, warpPoints: 26, comboBonus: 12, unlocked: ['gambler'] };
+    }
+    function replayAtStep(step, score, letters, tweakPlan){
+      replayEnter(()=>{ replaySample(score, letters); runShow = { step, left:null, cycle:0 }; if (tweakPlan) tweakPlan(); }, replayTap);
+    }
+    const JUMPS = [
+      { label:'Cold open', go: ()=> replayEnter(null, null) },
+      { label:'Round 1 bumper', go: ()=> replayAtStep(0, 0, 0) },
+      { label:'Round 2 bumper', go: ()=> replayAtStep(6, 42, 1) },
+      { label:'Round 3 bumper', go: ()=> replayAtStep(12, 96, 3) },
+      { label:'VS card', go: ()=> replayAtStep(1, 38, 1) },
+      { label:'Brain Beam', go: ()=> replayAtStep(2, 54, 1) },
+      { label:'Riddle', go: ()=> replayAtStep(2, 54, 1, ()=>{ runPlan[2] = Object.assign({}, runPlan[2], { riddle:true }); }) },
+      { label:'Portal Pick', go: ()=> replayAtStep(4, 71, 2) },
+      { label:'Price Probe', go: ()=> replayAtStep(5, 80, 2, ()=>{ runPlan[5] = { t:'break', round:0, game:'priceProbe', seed:20261013 }; }) },
+      { label:'Oddball Alert', go: ()=> replayAtStep(5, 80, 2, ()=>{ runPlan[5] = { t:'break', round:0, game:'oddballAlert', seed:20261013 }; }) },
+      { label:'Emoji Decode', go: ()=> replayAtStep(5, 80, 2, ()=>{ runPlan[5] = { t:'break', round:0, game:'emojiDecode', seed:20261013 }; }) },
+      { label:'Time Warp', go: ()=> replayAtStep(5, 80, 2, ()=>{ runPlan[5] = { t:'break', round:0, game:'timeWarp', seed:20261013 }; }) },
+      // The clock is set to run out at once, so the show cuts to its finale: the bumper, then the Word Warp with all six letters in.
+      { label:'Word Warp (6 letters)', wide:true, go: ()=> replayEnter(()=>{ replaySample(150, 6); runClockAddedMs = -RUN_DURATION_MS - 1000; }, replayTap) },
+      { label:'Vault', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); runResultToday = replaySampleResult(); playDailyVault(runResultToday, showRunReadout); }) },
+      { label:'Results (sample)', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); runResultToday = replaySampleResult(); showRunReadout(); updatePauseBtnVisibility(); }) },
+      { label:'Restart Daily', wide:true, cls:'restart', go: ()=> replayEnter(null, null) },
+    ];
+    const menu = document.createElement('div'); menu.className = 'replay-menu'; menu.setAttribute('role', 'dialog'); menu.setAttribute('aria-label', 'Replay mode: jump to a screen');
+    const h = document.createElement('h3'); h.textContent = 'JUMP TO…'; menu.appendChild(h);
+    const list = document.createElement('div'); list.className = 'replay-list'; menu.appendChild(list);
+    const closeMenu = ()=> menu.classList.remove('open');
+    JUMPS.forEach(j=>{
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = j.label; if (j.wide) b.classList.add('wide'); if (j.cls) b.classList.add(j.cls);
+      b.addEventListener('click', ()=>{ closeMenu(); setTimeout(j.go, 60); });
+      list.appendChild(b);
+    });
+    const close = document.createElement('button'); close.type = 'button'; close.className = 'replay-close'; close.textContent = 'Close'; close.addEventListener('click', closeMenu); menu.appendChild(close);
+    const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'replay-btn'; btn.textContent = 'TEST'; btn.addEventListener('click', ()=> menu.classList.add('open'));
+    document.body.appendChild(menu); document.body.appendChild(btn);
+  }
 
   if (window.claude && typeof window.claude.use === 'function'){
     window.claude.use('sample').then((ns)=>{ if (ns){ sampleFn = ns; sampleReady = true; } }).catch(()=>{});
