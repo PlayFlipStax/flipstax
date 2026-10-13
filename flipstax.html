@@ -8618,7 +8618,8 @@
   // refresh comes back to the same stage with the same results; the chips'
   // landing slots are drawn once, up front. Awards happen once, in the Vault
   // (see finaleAward).
-  const PLINKO_MAX_CHIPS = 5;   // key chips; a Wild Card bonus chip can make it 6. No keys, no bonus chip: no Plinko.
+  const PLINKO_MAX_CHIPS = 5;   // key chips; a Cosmic Surprise bonus chip can make it 6
+  const ORBIT_MIN_CHIPS = 2;    // Orbit Drop is every run's finale: at least this many chips, keys or not
   let finTapShieldAt = -1000;   // the 250ms tap shield, after a stage or overlay change
   function finTap(fn){ return e=>{ if (e) e.stopPropagation(); if (performance.now() - finTapShieldAt < TAP_SHIELD_MS) return; fn(e); }; }
   function infCrowdPct(r){ return r.crowdN ? Math.round(r.crowdAgree / r.crowdN * 100) : null; }
@@ -8636,7 +8637,7 @@
     showFinStage(infRun.finale.stage);
   }
   function buildInfFinale(){
-    const chips = Math.min(PLINKO_MAX_CHIPS, infRun.keys) + (infRun.bonusChip ? 1 : 0);   // a Wild Card bonus chip on top: 6 at most
+    const chips = Math.max(ORBIT_MIN_CHIPS, Math.min(PLINKO_MAX_CHIPS, infRun.keys)) + (infRun.bonusChip ? 1 : 0);   // one per key (2-5), a bonus chip on top: 6 at most
     return { stage:'complete', chips: drawPlinkoOutcomes(chips), dropped:0, bonus:0, awarded:false, award:null };
   }
   function showFinStage(stage){
@@ -9462,8 +9463,29 @@
   }
   // Infinity run events that take a round's place - a riddle round (one every
   // 26-34 vote rounds, about 3-4 a run) or Guess the Crowd; true if one started.
+  // --- Zap Words hook (the round itself isn't built yet). When a run has
+  // earned WORDHUNT_KEYS keys (every key, kept or not) by the time it's
+  // about three quarters of the way to the finish line, a mid-run Zap Words
+  // round would start here, with the run clock paused while it plays (it
+  // would be its own overlay, so the clock stops as for any popup). Once a
+  // run. Calibrated with personality_sim.py (Oct 2026): 18 keys reaches it
+  // in ~40% of runs once Crowd Scan has data, ~13% with today's little
+  // data - about a quarter on average.
+  const WORDHUNT_KEYS = 18, WORDHUNT_AT = 0.75;
+  function zapWordsDue(){
+    return !!infRun && !infRun.ended && !infRun.zapWordsChecked && infRun.score >= WORDHUNT_AT * FINISH_POINTS;
+  }
+  function startZapWordsRound(){
+    // Not built yet - the round would open here (and return true).
+    return false;
+  }
   function infRunEventDue(){
     if (!infRun || infRun.ended) return false;
+    if (zapWordsDue()){
+      infRun.zapWordsChecked = true;   // the check happens once, at the 3/4 mark
+      infRun.zapWordsEligible = infKeysEarned(infRun) >= WORDHUNT_KEYS; saveInfRun();
+      if (infRun.zapWordsEligible && startZapWordsRound()) return true;
+    }
     if (infRun.voteRounds >= infRun.nextRiddleAt && INFINITY_RIDDLES.length && startInfRiddle()){
       infRun.riddles++; infRun.nextRiddleAt = infRun.voteRounds + RIDDLE_ROUND_GAP[0] + Math.floor(Math.random() * (RIDDLE_ROUND_GAP[1] - RIDDLE_ROUND_GAP[0] + 1)); saveInfRun();
       return true;

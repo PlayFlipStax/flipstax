@@ -26,7 +26,7 @@ window.FLIPSTAX_NAMES = {
     riddleRound:    'Riddle me this! Four answers, one winner. Tick tock!',
     crowdScan:      'Guess how the crowd voted. No peeking, Earthling.',
     cosmicSurprise: 'Could be a prize, could be a pickle. Feeling lucky?',
-    orbitDrop:      'One chip per key. Let ’em drop and watch ’em bounce!',
+    orbitDrop:      'A chip for every key, two on the house. Let ’em bounce!',
     vault:          'Crack the vault, grab the coins. Don’t be shy!',
   },
 };
