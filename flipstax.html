@@ -189,19 +189,8 @@
     .content.pop-in, .board.flash{ animation:none !important; }
   }
   .round-timer-fill{ height:100%; background:var(--pulse); width:100%; }
-  /* +5s and Pause share the top card's top row, one each side of its
-     category chip, so neither sits over the card's text (they used to be
-     stacked down the right edge, flush with the card's corner). */
-  .slowdown-btn{
-    position:absolute; top:12px; left:18px; z-index:6;
-    background:rgba(20,24,31,0.75); border:1px solid rgba(255,255,255,0.2); color:var(--ink);
-    font-size:12px; font-weight:700; padding:5px 14px; border-radius:20px; cursor:pointer;
-    min-height:44px; display:flex; align-items:center;
-  }
-  .slowdown-btn:active{ background:rgba(255,255,255,0.2); }
-  .slowdown-btn.disabled{ opacity:0.35; pointer-events:none; }
-  .slowdown-btn.hidden{ display:none; }
-  /* Same pill chrome as .slowdown-btn, top-right - VS screen only. */
+  /* Pause sits at the right of the top card's top row, beside its category
+     chip - VS screen only. */
   .pause-btn{
     position:absolute; top:12px; right:18px; z-index:6;
     background:rgba(20,24,31,0.75); border:1px solid rgba(255,255,255,0.2); color:var(--ink);
@@ -292,7 +281,7 @@
 
   /* Each card keeps bands clear that its text is never placed in (set by
      layoutBoard from the real layout): at the top of the top card the
-     +5s / Pause pills and its tag, where the cards meet the VS badge, and at
+     Pause pill and its tag, where the cards meet the VS badge, and at
      the top of the bottom card its tag. */
   .half{
     position:relative; flex:1; display:flex; align-items:center; justify-content:center;
@@ -390,7 +379,7 @@
      at the top of that card (see layoutBoard) - it used to sit at the bottom
      and could cover the "N people" line. */
   .half.bottom .cat-chip{ top:8px; bottom:auto; left:10px; transform:none; }
-  /* Narrow phones: a long label would run under the +5s / Pause pills, so the
+  /* Narrow phones: a long label would run under the Pause pill, so the
      top chip steps aside - the bottom chip still shows the same label. */
   .cat-chip.squeezed{ visibility:hidden; }
 
@@ -417,7 +406,7 @@
     max-width:86vw; width:max-content; transition: all 0.35s ease; pointer-events:none; z-index:10;
   }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
-  /* Round feedback ("Too slow", "+5 seconds") sits just under the header, over the
+  /* Round feedback ("Too slow") sits just under the header, over the
      mode-title strip - never over a card's name, result or the helper line.
      In Infinity it sits in the strip below the cards instead (.below-cards). */
   .toast.under-header{ bottom:auto; transform:translateX(-50%) translateY(-12px); padding:6px 14px; white-space:nowrap; }
@@ -1776,7 +1765,7 @@
      width, so the ring lines up with the outer edge). */
   :root.mode-infinity :is(
     .half, .half:not(.revealed):not(.has-glyph) .content, .event-tile, .status-banner,
-    .slowdown-btn, .pause-btn, .daily-btn, .toast
+    .pause-btn, .daily-btn, .toast
   ){
     --ring-w: 1.5px;
     --bi: calc(var(--b) + var(--ring-w) * 0.414);
@@ -1806,27 +1795,27 @@
     box-shadow:inset 0 0 10px rgba(62,194,194,0.30), inset 0 0 20px rgba(122,76,224,0.18);
   }
   /* Buttons are NOT clipped themselves: clip-path also removes the clipped
-     corners from hit-testing, and a tap in the corner of +5s / Pause would
+     corners from hit-testing, and a tap in the corner of Pause would
      fall through to the half underneath and register as a vote. Instead
      the element stays a full transparent rectangle (same tap area as
      before the redesign) and its beveled fill + glow live on ::before. */
-  :root.mode-infinity :is(.slowdown-btn, .pause-btn, .daily-btn){
+  :root.mode-infinity :is(.pause-btn, .daily-btn){
     isolation:isolate; background:transparent; box-shadow:none;
   }
-  :root.mode-infinity :is(.slowdown-btn, .pause-btn, .daily-btn)::before{
+  :root.mode-infinity :is(.pause-btn, .daily-btn)::before{
     content:''; position:absolute; inset:calc(0px - var(--bw, 0px)); z-index:-1; pointer-events:none;
     clip-path:var(--bevel-clip);
     background:var(--btn-fill, rgba(20,24,31,0.75));
     box-shadow:inset 0 0 10px rgba(62,194,194,0.30), inset 0 0 20px rgba(122,76,224,0.18);
   }
-  :root.mode-infinity :is(.slowdown-btn, .pause-btn){ --btn-fill:rgba(20,24,31,0.75); }
-  :root.mode-infinity :is(.slowdown-btn, .pause-btn):active{ --btn-fill:rgba(255,255,255,0.2); }
+  :root.mode-infinity .pause-btn{ --btn-fill:rgba(20,24,31,0.75); }
+  :root.mode-infinity .pause-btn:active{ --btn-fill:rgba(255,255,255,0.2); }
   :root.mode-infinity .daily-btn{ --btn-fill:rgba(255,255,255,0.12); }
   :root.mode-infinity .daily-btn:active{ --btn-fill:rgba(255,255,255,0.25); }
   :root.mode-infinity .daily-btn.primary{ --btn-fill:var(--pulse); }
   :root.mode-infinity :is(
     .half, .half:not(.revealed):not(.has-glyph) .content, .event-tile, .status-banner,
-    .slowdown-btn, .pause-btn, .daily-btn, .toast
+    .pause-btn, .daily-btn, .toast
   )::after{
     content:''; position:absolute; inset:calc(0px - var(--bw, 0px)); pointer-events:none;
     background:linear-gradient(135deg, #3ec2c2, #8a5cf0 60%, #3ec2c2);
@@ -1838,7 +1827,7 @@
   /* overflow:hidden clips at the padding box, so the ring can't extend into
      the border area here - it sits just inside it instead. */
   :root.mode-infinity .status-banner{ --b:7px; --bw:0px; }
-  :root.mode-infinity :is(.slowdown-btn, .pause-btn, .daily-btn){ --b:8px; --bw:1px; }
+  :root.mode-infinity :is(.pause-btn, .daily-btn){ --b:8px; --bw:1px; }
   :root.mode-infinity .toast{ --b:9px; --bw:1px; }
   /* Small labels: bevel only, no edge line. */
   :root.mode-infinity :is(.cat-chip, .you-tag){
@@ -1951,8 +1940,8 @@
     from{ box-shadow:inset 0 0 28px 4px rgba(198,255,0,0.5); }
     to{ box-shadow:inset 0 0 54px 12px rgba(198,255,0,0.9); }
   }
-  /* +5s / Pause sit in the top half's top row, which starts 50px down here. */
-  :root.mode-infinity :is(.slowdown-btn, .pause-btn){ top:58px; }
+  /* Pause sits in the top half's top row, which starts 50px down here. */
+  :root.mode-infinity .pause-btn{ top:58px; }
   :root.mode-infinity .inf-wordmark{
     display:flex; align-items:center; gap:9px; height:26px;
     position:absolute; top:6px; left:50%; transform:translateX(-50%); z-index:5;
@@ -2053,9 +2042,9 @@
   }
   @media (prefers-reduced-motion: reduce){ :root.mode-daily #board .half.picked, :root.mode-daily .half.picked::before{ animation:none !important; } }
   /* The Daily run clock (the green vertical bar) lives in the frame now, and
-     +5s / Pause keep their spot over the top box. */
+     Pause keeps its spot over the top box. */
   :root.mode-daily .run-timer-wrap{ left:2px; width:8px; }
-  :root.mode-daily :is(.slowdown-btn, .pause-btn){ top:46px; }
+  :root.mode-daily .pause-btn{ top:46px; }
   /* Daily Stax wordmark - identical size and placement to Infinity's, with a
      small fan of cards between the words where Infinity has its symbol. */
   .daily-wordmark{ display:none; }
@@ -2624,7 +2613,6 @@
     <div class="inf-floaters" aria-hidden="true">
       <span>⭐</span><span>🔥</span><span>🏆</span><span>⚡</span><span>💎</span><span>🎯</span><span>🚀</span><span>✨</span>
     </div>
-    <div class="slowdown-btn" id="slowdownBtn">⏱️ +5s</div>
     <div class="pause-btn hidden" id="pauseBtn">⏸️ Pause</div>
     <div class="run-timer-wrap hidden" id="runTimerWrap">
       <div class="run-timer-track"><div class="run-timer-fill" id="runTimerFill"></div></div>
@@ -3240,7 +3228,6 @@
   const TILE_COLORS = ['#f23c5a','#2f7bff','#17b86b','#f09d00'];
   const POWERUPS = [
     { key:'flips10',  icon:'\u26A1',      label:'+10 Points', color:'#f09d00' },
-    { key:'slowmo',   icon:'\uD83D\uDC0C', label:'Slow-Mo',    color:'#2f7bff' },
     { key:'coinflip', icon:'\uD83E\uDE99', label:'Coin Flip',  color:'#17b86b' },
     { key:'wildcard', icon:'\uD83C\uDF81', label:'Wild Card',  color:'#f23c5a' },
     { key:'goldkey',  icon:'\uD83D\uDD11', label:'Golden Key', color:'#d99a00' },
@@ -3918,8 +3905,6 @@
   const DAILY_PICK_MS = 5000;
   const INF_PICK_MS = 6500;
   const INF_ZONE_PICK_MS = 4500;              // Infinity's 2x Points Zone rounds
-  const SLOWMO_EXTRA_MS = 3000, SLOWMO_ROUNDS = 3;   // Infinity's Slow-Mo power-up
-  const PLUS5_EXTRA_MS = 5000;                // the +5s button (3 charges a day, both modes)
   const REVEAL_MS = 1650;                     // both modes
   const TOO_SLOW_NEXT_MS = 900;               // after a "Too slow", before the next matchup
   const TOO_SLOW_PENALTY = 1, DAILY_TOO_SLOW_STAR_PENALTY = 3;   // (Infinity star cards: INF_STAR_POINTS)
@@ -6360,7 +6345,6 @@
   let sessionFlips = 0;
   let comboCount = 0;
   let bonusActive = false, bonusEndsAt = 0, bonusInterval = null, lastBonusEnd = 0;
-  let slowMoRoundsLeft = 0;
   let lastWasEvent = false;
   let lastPowerUpMilestone = 0;
   let roundTimeoutId = null;
@@ -6389,7 +6373,7 @@
 
     soundToggle: document.getElementById('soundToggle'), backBtn: document.getElementById('backBtn'),
     statusBanner: document.getElementById('statusBanner'),
-    roundTimerFill: document.getElementById('roundTimerFill'), slowdownBtn: document.getElementById('slowdownBtn'),
+    roundTimerFill: document.getElementById('roundTimerFill'),
     pauseBtn: document.getElementById('pauseBtn'), pauseOverlay: document.getElementById('pauseOverlay'),
     pauseResumeBtn: document.getElementById('pauseResumeBtn'), pauseShareBtn: document.getElementById('pauseShareBtn'),
     eventOverlay: document.getElementById('eventOverlay'), eventPrompt: document.getElementById('eventPrompt'),
@@ -6482,7 +6466,7 @@
   function noteLeftoverWord(word){ if (!word) return; try{ localStorage.setItem('flipstax_leftover_v1', JSON.stringify({ date: todayStr(), word })); }catch(e){} }
   function leftoverWordToday(){ try{ const o = JSON.parse(localStorage.getItem('flipstax_leftover_v1') || 'null'); return o && o.date === todayStr() ? o.word : null; }catch(e){ return null; } }
   function loadStats(){
-    const blank = { flips:0, lastDate:null, streak:0, byCat:{}, badges:{}, agree:0, decided:0, personalityMilestone:0, freezeAvailable:false, slowdownCharges:3, slowdownDate:null };
+    const blank = { flips:0, lastDate:null, streak:0, byCat:{}, badges:{}, agree:0, decided:0, personalityMilestone:0, freezeAvailable:false };
     try{
       const raw = localStorage.getItem('flipstax_stats_v1');
       if (!raw) return blank;
@@ -6492,20 +6476,10 @@
         agree:parsed.agree||0, decided:parsed.decided||0,
         personalityMilestone: parsed.personalityMilestone||0,
         freezeAvailable: !!parsed.freezeAvailable,
-        slowdownCharges: parsed.slowdownCharges != null ? parsed.slowdownCharges : 3,
-        slowdownDate: parsed.slowdownDate || null,
-      });
+      }, { slowdownCharges: undefined, slowdownDate: undefined });   // (the retired +5s button's daily charges: dropped from old saves)
     }catch(e){ return blank; }
   }
   function saveStats(){ try{ localStorage.setItem('flipstax_stats_v1', JSON.stringify(stats)); }catch(e){} }
-  function refreshSlowdownCharges(){
-    const today = todayStr();
-    if (stats.slowdownDate !== today){
-      stats.slowdownDate = today;
-      stats.slowdownCharges = 3;
-      saveStats();
-    }
-  }
   function bumpStreakIfNeeded(){
     const today = todayStr();
     if (stats.lastDate === today) return;
@@ -6525,7 +6499,6 @@
       stats.streak = 1;
     }
     stats.lastDate = today;
-    refreshSlowdownCharges();
     if (stats.streak > 0 && stats.streak % 5 === 0 && !stats.freezeAvailable){
       stats.freezeAvailable = true;
       showToast('\uD83E\uDDCA Streak Freeze earned \u2014 one missed day won\u2019t break your streak');
@@ -6970,7 +6943,7 @@
     // counted toward crowd agreement (see crowdVerdict); agree / low are out
     // of crowd.
     return { votes:0, crowd:0, agree:0, low:0, decisionMs:0, maxCombo:0, points:0, firstHalfPoints:null,
-      trivia:0, triviaCorrect:0, wildCat:0, pu:{ flips10:0, slowmo:0, coinflip:0, wildcard:0, goldkey:0 },
+      trivia:0, triviaCorrect:0, wildCat:0, pu:{ flips10:0, coinflip:0, wildcard:0, goldkey:0 },
       shape: freshRunCrowd() };
   }
   function loadInfBlock(){
@@ -7077,7 +7050,7 @@
       crowdN: b.crowd, crowdPct: b.crowd >= RUN_CROWD_MIN ? b.agree / b.crowd * 100 : null,
       switches: b.shape.switches, maxWith: b.shape.maxWith, maxAgainst: b.shape.maxAgainst,
       triviaN: b.trivia, triviaCorrect: b.triviaCorrect, perfect: b.trivia >= 6 && b.triviaCorrect === b.trivia,
-      allPowerups: ['flips10', 'slowmo', 'coinflip', 'wildcard'].every(k=> b.pu[k] > 0), wildcardPicked: b.pu.wildcard > 0,
+      allPowerups: ['flips10', 'coinflip', 'wildcard', 'goldkey'].every(k=> b.pu[k] > 0), wildcardPicked: b.pu.wildcard > 0,
       comeback: second >= 12 && second >= Math.max(1, first) * 1.8, maxCombo: b.maxCombo, solveLeftMs: null,
       avgDecisionMs: b.votes ? b.decisionMs / b.votes : 0, decisionN: b.votes, swingHistory: progress.swing.slice(),
     };
@@ -8149,7 +8122,7 @@
     if (DEBUG_FAST) window.__debugLastTriviaQ = q;
     els.eventOverlay.classList.remove('hidden', 'powerup');
     els.powerupIcon.classList.add('hidden');
-    renderSlowdownBtn();
+    fitTopChip();
     els.eventSubtitle.textContent = second ? '🔁 SECOND CHANCE · answer right, recover a letter'
       : '\uD83C\uDFAE RUN TRIVIA \u00B7 answer right, earn a letter';
     els.eventPrompt.textContent = q.question;
@@ -8300,7 +8273,7 @@
     els.eventOverlay.classList.remove('hidden');
     els.eventOverlay.classList.add('powerup');
     els.powerupIcon.classList.remove('hidden');
-    renderSlowdownBtn();
+    fitTopChip();
     els.eventSubtitle.textContent = '\uD83C\uDF89 POWER-UP DROPPED';
     els.eventPrompt.textContent = "Choose one \u2014 it's yours";
     els.eventTiles.forEach((tileEl,i)=>{
@@ -8416,7 +8389,6 @@
     els.riddleResult.className = 'riddle-result hidden';
     els.riddleOverlay.classList.remove('hidden');
     startRiddleAmbient();
-    els.slowdownBtn.classList.add('hidden');
     // Not a normal vote-and-reveal round, so clear stale voted/votedSinceTime
     // the same way startSolvePhase does - otherwise the stalled-round
     // watchdog can misread this riddle window as a stuck round.
@@ -8585,7 +8557,6 @@
     stopTallyPolling(); clearRoundTimer(); voted = false; votedSinceTime = null;
     clearTimeout(eventTimeoutId);
     if (!infRun.finale){ infRun.finale = buildInfFinale(); saveInfRun(); }
-    els.slowdownBtn.classList.add('hidden');
     els.eventOverlay.classList.add('hidden');
     const wasHidden = els.finOverlay.classList.contains('hidden');
     els.finOverlay.classList.remove('hidden');
@@ -9325,7 +9296,6 @@
     ov.classList.remove('revealed');
     ov.querySelector('.gr-fill').style.width = '0%';
     ov.classList.remove('hidden');
-    els.slowdownBtn.classList.add('hidden');
     if (infRun){ infRun.guesses = (infRun.guesses || 0) + 1; saveInfRun(); }
     sfx.riddleAppear();
     return true;
@@ -9648,7 +9618,6 @@
     els.irLoseTitle.textContent = ''; els.irLoseAnswer.textContent = '';
     els.irTimer.textContent = '0:' + String(Math.round(INF_RIDDLE_MS / 1000)).padStart(2, '0');
     els.irOverlay.classList.remove('hidden');
-    els.slowdownBtn.classList.add('hidden');
     updatePauseBtnVisibility();
     // The Mystery Visitor's transmission comes in first (skipped with
     // reduced motion); the timer starts once the question is up.
@@ -10172,7 +10141,6 @@
     showUnlockCards(document.getElementById('infAwardUnlocks'), els.infAwardCard, fresh, true);
     infBlock = freshInfBlock(); saveInfBlock();
     renderRunBanner(); renderCollectionBtn();
-    els.slowdownBtn.classList.add('hidden');
     els.infAwardOverlay.classList.remove('hidden');
     updatePauseBtnVisibility();
     sfx.personality();
@@ -10864,46 +10832,8 @@
       els.roundTimerFill.style.width = '0%';
     });
     roundTimeoutId = setTimeout(onRoundTimeout, durationMs);
-    renderSlowdownBtn();
-  }
-  // The +5s button (3 free charges a day, shared by both modes) is Daily-only
-  // since Oct 2026: Infinity's cards already have 6.5s, and its slow-time
-  // power-up is Slow-Mo.
-  function renderSlowdownBtn(){
-    const eventShowing = !els.eventOverlay.classList.contains('hidden');
-    if (eventShowing || voted || !current || inInfinity()){
-      els.slowdownBtn.classList.add('hidden');
-      fitTopChip(); return;
-    }
-    els.slowdownBtn.classList.remove('hidden');
-    els.slowdownBtn.textContent = '\u23F1\uFE0F +' + PLUS5_EXTRA_MS / 1000 + 's (' + stats.slowdownCharges + ')';
-    els.slowdownBtn.classList.toggle('disabled', stats.slowdownCharges <= 0);
     fitTopChip();
   }
-  function addSlowdownTime(){
-    if (inInfinity()) return;
-    if (stats.slowdownCharges <= 0 || voted || !current) return;
-    stats.slowdownCharges--;
-    saveStats();
-    const trackWidth = els.roundTimerFill.parentElement.clientWidth;
-    const currentWidthPx = parseFloat(getComputedStyle(els.roundTimerFill).width) || 0;
-    const currentPct = trackWidth ? (currentWidthPx / trackWidth * 100) : 0;
-    const elapsed = Date.now() - roundStartedAt;
-    const remaining = Math.max(0, roundDurationMs - elapsed) + PLUS5_EXTRA_MS;
-    roundDurationMs = elapsed + remaining;
-    clearTimeout(roundTimeoutId);
-    roundTimeoutId = setTimeout(onRoundTimeout, remaining);
-    els.roundTimerFill.style.transition = 'none';
-    els.roundTimerFill.style.width = currentPct + '%';
-    requestAnimationFrame(()=>{
-      els.roundTimerFill.style.transition = 'width ' + (remaining/1000) + 's linear';
-      els.roundTimerFill.style.width = '0%';
-    });
-    sfx.powerUp();
-    showToast('\u23F1\uFE0F +' + PLUS5_EXTRA_MS / 1000 + ' seconds', true);
-    renderSlowdownBtn();
-  }
-  els.slowdownBtn.addEventListener('click', addSlowdownTime);
   function onRoundTimeout(){
     if (voted || !current) return;
     voted = true;
@@ -10958,10 +10888,10 @@
     const br = board.getBoundingClientRect(), ar = A.getBoundingClientRect(), bRect = B.getBoundingClientRect();
     board.style.setProperty('--seam', ((ar.bottom + bRect.top) / 2 - br.top).toFixed(1) + 'px');
     const vsBand = Math.ceil(vs.offsetHeight / 2 + 6 - (bRect.top - ar.bottom) / 2);
-    // Top card: below the +5s / Pause pills (wherever they sit in this mode,
-    // shown or not, so the layout doesn't jump when they come and go) and its tag.
+    // Top card: below the Pause pill (wherever it sits in this mode, shown or
+    // not, so the layout doesn't jump when it comes and goes) and its tag.
     let top = 12;
-    [els.slowdownBtn, els.pauseBtn].forEach(p=>{ const cs = getComputedStyle(p); const t = parseFloat(cs.top) || 0, h = parseFloat(cs.minHeight) || 44;
+    [els.pauseBtn].forEach(p=>{ const cs = getComputedStyle(p); const t = parseFloat(cs.top) || 0, h = parseFloat(cs.minHeight) || 44;
       top = Math.max(top, Math.ceil(br.top + t + h - ar.top + 4)); });
     top = Math.max(top, Math.ceil(8 + els.chipA.offsetHeight + 4));
     A.style.setProperty('--band-top', top + 'px'); A.style.setProperty('--band-bottom', Math.max(12, vsBand) + 'px');
@@ -10980,11 +10910,11 @@
   let layoutBoardRaf = 0;
   function queueLayoutBoard(){ cancelAnimationFrame(layoutBoardRaf); layoutBoardRaf = requestAnimationFrame(layoutBoard); }
   window.addEventListener('resize', queueLayoutBoard);
-  // Hide the top category chip when it would touch a visible +5s / Pause pill.
+  // Hide the top category chip when it would touch a visible Pause pill.
   function fitTopChip(){
     const c = els.chipA; c.classList.remove('squeezed');
     const r = c.getBoundingClientRect(); if (!r.width) return;
-    const hits = [els.slowdownBtn, els.pauseBtn].some(b=>{ const p = b.getBoundingClientRect();
+    const hits = [els.pauseBtn].some(b=>{ const p = b.getBoundingClientRect();
       return p.width > 0 && p.left < r.right + 4 && p.right > r.left - 4 && p.top < r.bottom && p.bottom > r.top; });
     c.classList.toggle('squeezed', hits);
   }
@@ -10993,8 +10923,7 @@
     isPaused = true;
 
     // Freeze the round's decision countdown - same "read the current visual
-    // width, stop the timeout, pin the bar" trick addSlowdownTime() already
-    // uses to extend it, just stopping instead of extending.
+    // width, stop the timeout, pin the bar" trick.
     if (roundTimeoutId){
       const trackWidth = els.roundTimerFill.parentElement.clientWidth;
       const currentWidthPx = parseFloat(getComputedStyle(els.roundTimerFill).width) || 0;
@@ -11262,7 +11191,6 @@
     voted = false;
     votedSinceTime = null;
     let roundMs = !inInfinity() ? DAILY_PICK_MS : bonusActive ? INF_ZONE_PICK_MS : INF_PICK_MS;
-    if (slowMoRoundsLeft > 0){ roundMs += SLOWMO_EXTRA_MS; slowMoRoundsLeft--; }
     startRoundTimer(roundMs / DEBUG_TIME_SCALE);
     maybeRequestMoreWild();
     queueLayoutBoard();
@@ -11487,7 +11415,7 @@
       if (current.category === 'wild') runWildcardCategoryVotes++;
     }
     clearRoundTimer();
-    renderSlowdownBtn();
+    fitTopChip();
     // Marks the chosen side immediately (before the network round-trip) so
     // the Infinity selection outline appears the instant of the tap.
     els.halfA.classList.toggle('picked', side === 'A');
@@ -11641,7 +11569,7 @@
       tileEl.onclick = ()=> resolveEvent(i === trivia.correctIdx);
     });
     els.eventOverlay.classList.remove('hidden');
-    renderSlowdownBtn();
+    fitTopChip();
     els.eventTimerFill.style.transition = 'none';
     els.eventTimerFill.style.width = '100%';
     requestAnimationFrame(()=>{
@@ -11683,11 +11611,11 @@
     els.eventOverlay.classList.remove('hidden');
     els.eventOverlay.classList.add('powerup');
     els.powerupIcon.classList.remove('hidden');
-    renderSlowdownBtn();
+    fitTopChip();
     els.eventSubtitle.textContent = '\uD83C\uDF89 POWER-UP DROPPED';
     els.eventPrompt.textContent = "Choose one \u2014 it's yours";
-    // Four of the five, one left out at random (the board has four tiles).
-    const skip = Math.floor(Math.random() * POWERUPS.length), offer = POWERUPS.filter((_, i)=> i !== skip);
+    // All four, in a random order (the board has four tiles).
+    const offer = shuffle(POWERUPS.slice());
     if (DEBUG_FAST) window.__debugPowerupOffer = offer.map(p=> p.key);
     els.eventTiles.forEach((tileEl,i)=>{
       const pu = offer[i];
@@ -11726,11 +11654,6 @@
       sfx.powerUp();
       const got = addInfKey('golden');
       els.eventPrompt.textContent = got ? '\uD83D\uDD11 GOLDEN KEY! +1 key' : '\uD83D\uDD11 Your key ring is full (' + INF_KEY_CAP + ' max)';
-      finishPowerUp();
-    } else if (key === 'slowmo'){
-      sfx.powerUp();
-      slowMoRoundsLeft = SLOWMO_ROUNDS;
-      els.eventPrompt.textContent = '\uD83D\uDC0C SLOW-MO: +' + SLOWMO_EXTRA_MS / 1000 + 's on your next ' + SLOWMO_ROUNDS + ' rounds';
       finishPowerUp();
     } else if (key === 'coinflip'){
       runCoinFlip();
@@ -11913,7 +11836,6 @@
   }
 
   resetDeck();
-  refreshSlowdownCharges();
   loadNext();
   renderStats();
   // Sync the 🔊/🔇 icon to whatever was saved from last time. This must ONLY
@@ -12272,9 +12194,9 @@
   }
   // Every power-up named here is read from the game's own definitions, not
   // invented: Daily's are RUN_POWERUPS (+10 pts, +30s on the clock, Wild Card,
-  // Free Hint); Infinity's are POWERUPS (+10 Points, Slow-Mo, Coin Flip, Wild
-  // Card), with the numbers from resolveRunPowerUp / resolvePowerUp /
-  // runCoinFlip / the slow-mo round timer (+3s for 3 rounds) / resolveEvent
+  // Free Hint); Infinity's are POWERUPS (+10 Points, Coin Flip, Wild Card,
+  // Golden Key), with the numbers from resolveRunPowerUp / resolvePowerUp /
+  // runCoinFlip / resolveEvent
   // (Infinity trivia: +25 points, nothing lost on a miss). Daily's screen 3
   // only asks whether you can find the Super Secret Riddle - nothing about
   // how it works or when it appears.
@@ -12293,7 +12215,7 @@
     lines:['The bar up top fills toward ' + FINISH_POINTS + ', and the clock shows your time left (it only runs while you’re voting).',
       'Earn 🔑 keys: match the crowd 3 times in a row, or nail a trivia question or a riddle.'],
     chipsLabel:'Power-ups — pick one when they drop',
-    chips:[ ['⚡ +10 Points', 'Instant points'], ['🐌 Slow-Mo', '+' + SLOWMO_EXTRA_MS / 1000 + 's on your next ' + SLOWMO_ROUNDS + ' rounds'], ['🪙 Coin Flip', 'Heads or tails: win or lose up to 15'],
+    chips:[ ['⚡ +10 Points', 'Instant points'], ['🪙 Coin Flip', 'Heads or tails: win or lose up to 15'],
             ['🎁 Wild Card', 'A mystery prize — never a loss'], ['🔑 Golden Key', 'An extra key'] ] };
   const HOWTO_LAST_INFINITY = { icon:'🛸', lead:'New rounds, then the Vault.',
     lines:['📡 Guess the Crowd: slide to the % you think picked the left card. The closer, the more points.',
