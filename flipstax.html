@@ -446,6 +446,21 @@
   .event-subtitle{ display:inline-block; font-size:12px; letter-spacing:0.4px; color:var(--pulse); font-weight:700; margin-bottom:8px;
     padding:4px 12px; border-radius:99px; background:rgba(14,8,40,0.55); box-shadow:0 0 0 1px rgba(255,255,255,0.12); }
   .event-subtitle:empty{ display:none; }
+  /* Brain Breaks (Price Probe, Oddball Alert, Emoji Decode, Time Warp): the Brain Beam
+     screen with a colored marquee (a chasing row of bulbs in the game's own color, --bb)
+     over the question, a pill in that color, and tiles that hold a glyph, a name and a line. */
+  .bb-marquee{ display:none; width:min(86%, 330px); height:14px; margin:0 auto 10px; border-radius:8px; background-color:rgba(14,8,40,0.6);
+    background-image:radial-gradient(circle, var(--bb, #ffd23f) 0 3px, transparent 3.6px); background-size:18px 14px; background-repeat:repeat-x; background-position:0 50%;
+    box-shadow:0 0 0 2px var(--bb, #ffd23f), 0 0 14px var(--bb, #ffd23f); animation:bbBulbs 0.7s steps(2) infinite; }
+  .event-overlay.brainbreak .bb-marquee{ display:block; }
+  @keyframes bbBulbs{ from{ background-position:0 50%; } to{ background-position:9px 50%; } }
+  .event-overlay.brainbreak .event-subtitle{ background:var(--bb, #ffd23f); color:#1c1006; box-shadow:0 0 0 2px rgba(255,255,255,0.55); }
+  .event-overlay.brainbreak .event-tile{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:12px 8px; min-height:104px; text-align:center; line-height:1.15; }
+  .event-overlay.brainbreak .bb-glyph{ font-size:34px; line-height:1; }
+  .event-overlay.brainbreak .bb-name{ font-weight:800; font-size:clamp(14px, 4vw, 17px); }
+  .event-overlay.brainbreak .bb-sub{ font-size:11.5px; font-weight:700; opacity:0.92; }
+  .event-overlay.bb-emojiDecode .event-prompt{ font-size:clamp(34px, 11vw, 52px); letter-spacing:4px; line-height:1.15; }
+  @media (prefers-reduced-motion: reduce){ .bb-marquee{ animation:none; } }
   .powerup-icon{ font-size:56px; margin-bottom:6px; animation: powerupBounce 1s ease-in-out infinite; }
   .powerup-icon.hidden{ display:none; }
   @keyframes powerupBounce{ 0%,100%{ transform:translateY(0) rotate(-6deg); } 50%{ transform:translateY(-10px) rotate(6deg); } }
@@ -3036,6 +3051,7 @@
       <canvas class="event-sky" id="eventSky" aria-hidden="true"></canvas>
       <div class="riddle-ufo event-ufo" aria-hidden="true"><span>🛸</span><i></i></div>
       <div class="powerup-icon hidden" id="powerupIcon">🎁</div>
+      <div class="bb-marquee" aria-hidden="true"></div>
       <div class="event-subtitle" id="eventSubtitle"></div>
       <div class="event-prompt" id="eventPrompt"></div>
       <div class="event-timerbar" id="eventTimerBar"><div class="event-timerbar-fill" id="eventTimerFill"></div></div>
@@ -3492,6 +3508,10 @@
 
 <script src="data/infinity-riddles.js"></script>
 <script src="data/game-names.js"></script>
+<script src="data/price-probe.js"></script>
+<script src="data/oddball-alert.js"></script>
+<script src="data/emoji-decode.js"></script>
+<script src="data/time-warp.js"></script>
 <script src="lib/orbit-physics.js"></script>
 <script src="lib/show-fx.js"></script>
 <script>
@@ -4427,9 +4447,9 @@
   const SHOW_BUMPER_MS = 1500;               // the round title card ("Round N") with its light flash
   const SHOW_NEW_ROUND_MIN_MS = 10000;       // a new round only starts with at least this much on the clock
   const QUIZ_DRUMROLL_MS = 450;              // B9: the drumroll between tapping an answer (or a portal) and its reveal
-  // Brain Breaks are not built yet: one slot per round, after its Portal
-  // Pick. Put a game in a slot as (done) => { ...; done(); } and the show
-  // runs it there; null slots are skipped. BRAIN_BREAK_EST_MS is the time a
+  // Brain Breaks: one slot per round, after its Portal Pick - a 10-15 second
+  // mini game (Price Probe, Oddball Alert, Emoji Decode, Time Warp; see
+  // BRAIN_BREAKS) from the data/ files. BRAIN_BREAK_EST_MS is the time a
   // Brain Break should take - the run was calibrated to ~7 minutes with it.
   // Calibrated Oct 2026 (screenshots/qa/tools/daily_cycle.py, real time): a
   // VS card takes ~4.15s (2.2s to decide + the 1.65s reveal + the deal), a
@@ -4437,7 +4457,6 @@
   // the Vault ~15s, so a typical episode runs ~4:20 without Brain Breaks
   // and ~7:00 with four of BRAIN_BREAK_EST_MS each. The run clock (the 6:00
   // cap) stops while a Brain Break plays.
-  const BRAIN_BREAK_SLOTS = [null, null, null, null];
   // The combo meter (B4): crowd matches in a row raise a small multiplier on
   // a VS card's points - x1.5 from the 3rd match in a row, x2 from the 6th
   // (the cap). It applies to a card you match the crowd on; a miss resets
@@ -4460,7 +4479,7 @@
     const rng = mulberry32(hashStr('flipstax-show-' + date + (cycle ? '-' + cycle : '')));
     const subjects = shuffle(RUN_CORE_SUBJECTS.concat([pick(RUN_ELECTIVE_SUBJECTS, rng)]), rng);
     const riddleAt = rng() < SHOW_RIDDLE_CHANCE ? 1 + Math.floor(rng() * (SHOW_ROUNDS - 1)) : -1;
-    const steps = [];
+    const steps = [], breakOrder = breakOrderFor(date, cycle);
     for (let r = 0; r < SHOW_ROUNDS; r++){
       const round = cycle * SHOW_ROUNDS + r;
       steps.push({ t:'bumper', round, riddle: r === riddleAt });
@@ -4468,11 +4487,13 @@
       steps.push({ t:'quiz', round, riddle: r === riddleAt, subject: subjects[r % subjects.length], seed: (rng() * 4294967296) >>> 0 });
       steps.push({ t:'vs', n: showRange(SHOW_VS_AFTER, rng) });
       steps.push({ t:'portal', round, doors: shuffle(RUN_POWERUPS.map(p=> p.key), rng) });
-      // A Brain Break slot nobody has built yet is never skipped silently (a
-      // dead moment): it becomes a bonus Brain Beam - every other round a riddle
-      // instead - until a game is put in BRAIN_BREAK_SLOTS.
-      if (typeof BRAIN_BREAK_SLOTS[r] === 'function') steps.push({ t:'break', round: r });
-      else steps.push({ t:'quiz', round, extra:true, riddle: r % 2 === 1 && r !== riddleAt, subject: subjects[(r + 2) % subjects.length], seed: (rng() * 4294967296) >>> 0 });
+      // The round's Brain Break: one of the four games (see BRAIN_BREAKS), in the
+      // date's own order, so no type repeats within a pass. If a game's data file
+      // didn't load there is no game for the slot, and it is never skipped silently
+      // (a dead moment): it becomes a bonus Brain Beam - every other round a riddle.
+      const game = breakOrder[r], seed = (rng() * 4294967296) >>> 0;
+      if (game) steps.push({ t:'break', round, game, seed });
+      else steps.push({ t:'quiz', round, extra:true, riddle: r % 2 === 1 && r !== riddleAt, subject: subjects[(r + 2) % subjects.length], seed });
     }
     return steps;
   }
@@ -8659,7 +8680,7 @@
     runPendingTrivia = false; runPendingPowerUp = false;
     runStartDate = todayStr();
     runWord = dailyWordForPlayer();
-    runPlan = buildShowPlan(runStartDate, 0); runShow = { step:0, left:null, cycle:0 }; runPortalDoors = null; runWarpBonusMs = 0;
+    runPlan = buildShowPlan(runStartDate, 0); runShow = { step:0, left:null, cycle:0 }; runPortalDoors = null; runWarpBonusMs = 0; runBreakSeen = {};
     runMatchStreak = 0; runComboBank = 0; runComboBonus = 0; runBestStreak = 0; renderComboMeter();
     runLetterPos = []; runWarpPoints = 0; letterIncoming.clear();
     runEndsAt = Date.now() + RUN_DURATION_MS;
@@ -8822,20 +8843,149 @@
       if (st.t === 'quiz'){ runTriviaQuestion(null, null, st); return true; }
       if (st.t === 'portal'){ runPortalDoors = st.doors; runPowerUpRoundForRun(null); return true; }
       if (st.t === 'break'){
-        const game = BRAIN_BREAK_SLOTS[st.round];
-        if (typeof game === 'function'){
-          runPhase = 'break'; saveRunSnapshot();
-          const t0 = Date.now();
-          game(()=>{ if (!runActive) return; runEndsAt += Date.now() - t0; runPhase = 'running'; loadNext(); });   // the run clock doesn't count a Brain Break
-          return true;
-        }
-        continue;   // no Brain Break built yet
+        runPhase = 'break'; saveRunSnapshot();
+        const t0 = Date.now();
+        // The run clock doesn't count a Brain Break.
+        if (runBrainBreak(st, ()=>{ if (!runActive) return; runEndsAt += Date.now() - t0; runPhase = 'running'; loadNext(); })) return true;
+        runPhase = 'running';
+        continue;   // (its data turned out unusable: carry on with the show)
       }
     }
     return false;
   }
   // Round 5's bumper, then the Word Warp. (Also where the show cuts to if
   // the run clock runs out.)
+  // ---------- Brain Breaks (Oct 2026) ----------
+  // Four quick tap-the-answer games from the data/ files, one per round, 10 to
+  // 15 seconds each, in the show look (the host's one-line rule in his speech
+  // bubble, a colored marquee over the question, the show's flash on an answer).
+  // Right: +BRAIN_BREAK_POINTS and a combo-style flash. Wrong (or out of time):
+  // no points, a gentle buzz, and the right answer shown for a second. The
+  // date's seed picks the order (so no type repeats within a pass of the show,
+  // and never twice in a row across passes) and the items (never the same item
+  // twice in a run). A game whose data file didn't load is simply not in the
+  // order, and its slot falls back to a bonus Brain Beam / riddle (buildShowPlan).
+  const BRAIN_BREAK_POINTS = 10, BRAIN_BREAK_MS = 12000, BRAIN_BREAK_REVEAL_MS = 1000;
+  const BRAIN_BREAKS = {
+    priceProbe:   { name:()=> GN.priceProbe,   accent:'#ffd23f', rule:'Which costs more? Tap the pricier one!',     list:()=> window.FLIPSTAX_PRICE_PROBE,
+      valid: x=> x && x.a && x.b && x.a.name && x.b.name && (x.more === 0 || x.more === 1) },
+    oddballAlert: { name:()=> GN.oddballAlert, accent:'#ff7ad9', rule:'One of these things is not like the others. Tap it!', list:()=> window.FLIPSTAX_ODDBALL_ALERT,
+      valid: x=> x && Array.isArray(x.items) && x.items.length === 4 && x.items.every(i=> i && i.name) && x.odd >= 0 && x.odd < 4 },
+    emojiDecode:  { name:()=> GN.emojiDecode,  accent:'#7df9ff', rule:'What do these emojis spell out? Tap it!',    list:()=> window.FLIPSTAX_EMOJI_DECODE,
+      valid: x=> x && x.emoji && x.answer && Array.isArray(x.decoys) && x.decoys.length === 3 },
+    timeWarp:     { name:()=> GN.timeWarp,     accent:'#c8ff3d', rule:'Which came first? Tap the earlier one!',     list:()=> window.FLIPSTAX_TIME_WARP,
+      valid: x=> x && x.a && x.b && x.a.event && x.b.event && (x.first === 0 || x.first === 1) },
+  };
+  function breakItems(key){ const d = BRAIN_BREAKS[key], l = d.list(); return Array.isArray(l) ? l.filter(d.valid) : []; }
+  function availableBreakKeys(){ return Object.keys(BRAIN_BREAKS).filter(k=> breakItems(k).length >= 8); }
+  // The date's order of games for one pass of the show (a different order each
+  // pass); the first of a pass is never the last of the pass before.
+  function breakOrderFor(date, cycle){
+    const keys = availableBreakKeys(); if (!keys.length) return [];
+    let prevLast = null, order = [];
+    for (let c = 0; c <= (cycle || 0); c++){
+      order = shuffle(keys, mulberry32(hashStr('flipstax-breaks-' + date + '-' + c)));
+      if (prevLast && order.length > 1 && order[0] === prevLast){ const t = order[0]; order[0] = order[1]; order[1] = t; }
+      prevLast = order[order.length - 1];
+    }
+    return order;
+  }
+  let runBreakSeen = {};   // game -> the item indexes already used this run
+  function pickBreakItem(key, seed){
+    const list = breakItems(key), used = runBreakSeen[key] || (runBreakSeen[key] = new Set());
+    let idx = -1;
+    for (let k = 0; k < 60 && idx < 0; k++){ const i = Math.floor(mulberry32((seed + k * 7919) >>> 0)() * list.length); if (!used.has(i)) idx = i; }
+    if (idx < 0) idx = Math.floor(mulberry32(seed)() * list.length);
+    used.add(idx); return list[idx];
+  }
+  function breakPriceText(p){ return '$' + (p >= 100 ? Math.round(p).toLocaleString() : p % 1 ? p.toFixed(2) : String(p)); }
+  // One round: { prompt, kind, tiles:[{glyph,name,sub}], correct, reveal:(tileEl, i)=>..., why }.
+  function buildBreakRound(key, seed){
+    const x = pickBreakItem(key, seed), rng = mulberry32((seed ^ 0x9e3779b9) >>> 0);
+    if (key === 'priceProbe'){
+      const sw = rng() < 0.5, t = sw ? [x.b, x.a] : [x.a, x.b], correct = sw ? 1 - x.more : x.more;
+      return { prompt:'Which costs more?', tiles:t.map(i=> ({ glyph:i.glyph, name:i.name, sub:i.sub })), correct, revealSub:t.map(i=> breakPriceText(i.price)) };
+    }
+    if (key === 'oddballAlert'){
+      const order = shuffle([0, 1, 2, 3], rng);
+      return { prompt:'Which one doesn’t belong?', tiles:order.map(i=> ({ glyph:x.items[i].glyph, name:x.items[i].name })), correct:order.indexOf(x.odd), why:x.why || '' };
+    }
+    if (key === 'emojiDecode'){
+      const opts = shuffle([x.answer].concat(x.decoys), rng);
+      return { prompt:x.emoji, kind:x.kind || '', tiles:opts.map(o=> ({ name:o })), correct:opts.indexOf(x.answer) };
+    }
+    const sw = rng() < 0.5, t = sw ? [x.b, x.a] : [x.a, x.b], correct = sw ? 1 - x.first : x.first;
+    return { prompt:'Which came first?', tiles:t.map(i=> ({ glyph:i.glyph, name:i.event })), correct, revealSub:t.map(i=> String(i.year)) };
+  }
+  function fillBreakTile(tileEl, t, sub){
+    tileEl.textContent = '';
+    const add = (cls, text)=>{ if (!text) return; const s = document.createElement('span'); s.className = cls; s.textContent = text; tileEl.appendChild(s); };
+    add('bb-glyph', t.glyph); add('bb-name', t.name); add('bb-sub', sub != null ? sub : t.sub);
+  }
+  // Plays one Brain Break in the Brain Beam screen's frame. done() runs when it
+  // has finished; returns false (and plays nothing) if the game's data is unusable.
+  function runBrainBreak(st, done){
+    const key = st.game, def = BRAIN_BREAKS[key];
+    if (!def || breakItems(key).length < 1) return false;
+    const rd = buildBreakRound(key, st.seed), ov = els.eventOverlay, tiles = els.eventTiles, n = rd.tiles.length;
+    runPhase = 'break';
+    stopTallyPolling(); clearRoundTimer(); voted = false; votedSinceTime = null;
+    ov.classList.remove('hidden', 'powerup'); ov.classList.add('brainbreak', 'bb-' + key); ov.style.setProperty('--bb', def.accent);
+    els.powerupIcon.classList.add('hidden');
+    fitTopChip();
+    els.eventSubtitle.textContent = '🎲 BRAIN BREAK · ' + def.name().toUpperCase() + (rd.kind ? ' · ' + rd.kind.toUpperCase() : '');
+    els.eventPrompt.textContent = rd.prompt;
+    tiles.forEach((tileEl, i)=>{
+      tileEl.classList.remove('portal', 'open', 'is-right', 'is-wrong', 'picked-wait');
+      if (i >= n){ tileEl.style.display = 'none'; tileEl.onclick = null; return; }
+      tileEl.style.display = '';
+      tileEl.style.backgroundColor = TILE_COLORS[i];
+      fillBreakTile(tileEl, rd.tiles[i]);
+    });
+    hostSay(HOST_LINES[key] || def.rule, 2600);
+    let settled = false;
+    const finish = ()=>{
+      ov.classList.add('hidden'); ov.classList.remove('brainbreak', 'bb-' + key); ov.style.removeProperty('--bb');
+      tiles.forEach(t=>{ t.style.display = ''; t.classList.remove('is-right', 'is-wrong'); t.onclick = null; });
+      if (runActive) done();
+    };
+    const resolve = (pick)=>{
+      if (settled || !runActive) return; settled = true;
+      clearTimeout(eventTimeoutId); tiles.forEach(t=> t.onclick = null);
+      const right = tiles[rd.correct], ok = pick === rd.correct;
+      tiles.forEach((t, i)=>{ if (i < n && rd.revealSub) fillBreakTile(t, rd.tiles[i], rd.revealSub[i]); });
+      if (right) right.classList.add('is-right');
+      if (ok){
+        addRunScore(BRAIN_BREAK_POINTS);
+        els.eventSubtitle.textContent = '✅ +' + BRAIN_BREAK_POINTS + ' POINTS';
+        if (rd.why) els.eventPrompt.textContent = rd.why;
+        showFlash('win'); hostMood('cheer'); hostSay(hostLine('right')); sfx.combo();
+        if (right){ FX.burstAt(showFx, right, { count:12, spread:100, shapes:['star', 'coin'] }); FX.pop(right, 1.25); }
+      } else {
+        if (pick != null && tiles[pick]) tiles[pick].classList.add('is-wrong');
+        els.eventSubtitle.textContent = pick == null ? '⏱️ OUT OF TIME · 0 POINTS' : '0 POINTS';
+        if (rd.why) els.eventPrompt.textContent = rd.why;
+        hostMood('sad'); hostSay(hostLine(pick == null ? 'slow' : 'wrong'));
+        playTone(150, 0, 0.16, 'triangle', 0.05); playTone(120, 0.14, 0.2, 'triangle', 0.05);   // a gentle buzz
+      }
+      saveRunSnapshot();
+      setTimeout(finish, dt(ok ? 900 : BRAIN_BREAK_REVEAL_MS));
+    };
+    tiles.forEach((tileEl, i)=>{ if (i < n) tileEl.onclick = ()=> resolve(i); });
+    startEventTimerBar(dt(BRAIN_BREAK_MS), dt(BRAIN_BREAK_MS));
+    clearTimeout(eventTimeoutId);
+    eventTimeoutId = setTimeout(()=> resolve(null), dt(BRAIN_BREAK_MS));
+    return true;
+  }
+  // However the Brain Break screen gets hidden (it finishes, or the player leaves
+  // mid-game), it hands the shared Brain Beam screen back clean.
+  new MutationObserver(()=>{
+    const ov = els.eventOverlay;
+    if (!ov.classList.contains('hidden') || !ov.classList.contains('brainbreak')) return;
+    Array.from(ov.classList).filter(c=> c === 'brainbreak' || c.indexOf('bb-') === 0).forEach(c=> ov.classList.remove(c));
+    ov.style.removeProperty('--bb');
+    els.eventTiles.forEach(t=>{ t.style.display = ''; t.classList.remove('is-right', 'is-wrong'); });
+  }).observe(els.eventOverlay, { attributes:true, attributeFilter:['class'] });
   function goToFinale(){
     if (!runActive || runPhase === 'solving' || runPhase === 'finale-bumper') return;
     runPhase = 'finale-bumper';
@@ -9139,7 +9289,7 @@
         bannerParts.push('\ud83c\udfc6 PERFECT RUN +' + PERFECT_RUN_BONUS + ' pts');
       }
       els.eventSubtitle.textContent = bannerParts.join(' \u00b7 ');
-      els.eventPrompt.textContent = letterLeft ? '\u2705 Correct! Letter earned: ' + nextLetter : '\u2705 Correct! All letters found \u2014 +' + EXTRA_BEAM_POINTS + ' points';
+      els.eventPrompt.textContent = letterLeft ? '\u2705 Correct! Letter earned: ' + nextLetter : '\u2705 Correct! Letter limit reached \u2014 +' + EXTRA_BEAM_POINTS + ' points';
       celebrateTriviaCorrect();
       renderRunBanner();
       if (letterLeft) flyLetter(nextLetter, pos, els.eventTiles[runPendingQCorrectIdx]);
@@ -12304,7 +12454,7 @@
     if (!document.documentElement.classList.contains('mode-daily')) return;
     if (els.readoutOverlay.classList.contains('show')) setShowWorld('results');
     else if (open(els.solveOverlay)) setShowWorld('jumble');
-    else if (open(els.eventOverlay)) setShowWorld(els.eventOverlay.classList.contains('powerup') || runPhase === 'powerup' ? 'powerup' : 'trivia');
+    else if (open(els.eventOverlay)) setShowWorld(els.eventOverlay.classList.contains('powerup') || runPhase === 'powerup' ? 'powerup' : els.eventOverlay.classList.contains('brainbreak') ? 'odd' : 'trivia');
     else setShowWorld('vs');
     // Pause the background's motion while a full-screen layer covers it
     // (the Word Warp and results have their own; the Vault is on top).

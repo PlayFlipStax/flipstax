@@ -27,7 +27,11 @@ window.FLIPSTAX_NAMES = {
     crowdScan:      'Guess how the crowd voted. No peeking, Earthling.',
     cosmicSurprise: 'Could be a prize, could be a pickle. Feeling lucky?',
     orbitDrop:      'Aim for the glowing slot, Earthling.',
-    vault:          'Crack the vault, grab the coins. Don’t be shy!',
+    priceProbe:     'Which costs more? Tap the pricier one!',
+    oddballAlert:   'One of these is not like the others. Tap it!',
+    emojiDecode:    'Read the emojis. What do they spell out?',
+    timeWarp:       'Which came first? Tap the earlier one!',
+    vault:         'Crack the vault, grab the coins. Don’t be shy!',
   },
   // After a player's first 3 runs the host just quips (a one-liner, about a second).
   quip: {
