@@ -531,6 +531,10 @@
      chunky gold tiles, a draining timer, one big line saying what happened. */
   .cosmic-stage{ display:none; flex-direction:column; align-items:center; gap:12px; width:100%; max-width:360px; margin-top:6px; }
   .event-overlay.cosmic-mode .cosmic-stage{ display:flex; }
+  /* Its content can be tall (the riddle): it starts at the top of the board,
+     so it never rides up over the crowd line in the header. */
+  .event-overlay.cosmic-mode{ justify-content:flex-start; padding-top:14px; }
+  :root.event-open .hint{ visibility:hidden; }
   .event-overlay.cosmic-mode .event-grid, .event-overlay.cosmic-mode .event-timerbar, .event-overlay.cosmic-mode .powerup-icon, .event-overlay.cosmic-mode .gift-stage{ display:none !important; }
   .cz-title{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:34px; letter-spacing:1px; color:#ffd23f; text-shadow:0 3px 0 #7a3d00, 0 0 18px rgba(255,210,60,0.7); line-height:1; }
   .cz-line{ font-size:15px; font-weight:800; color:#fff6d8; line-height:1.35; max-width:320px; }
@@ -11318,7 +11322,10 @@
   // Any gameplay overlay closing starts the 250ms tap shield (noteOverlayClosed).
   [els.eventOverlay, els.irOverlay, els.guessOverlay, els.finOverlay, els.pauseOverlay].forEach(ov=>{
     let open = !ov.classList.contains('hidden');
-    new MutationObserver(()=>{ const now = !ov.classList.contains('hidden'); if (open && !now) noteOverlayClosed(); open = now; updatePauseBtnVisibility(); }).observe(ov, { attributes:true, attributeFilter:['class'] });
+    new MutationObserver(()=>{ const now = !ov.classList.contains('hidden'); if (open && !now) noteOverlayClosed(); open = now; updatePauseBtnVisibility();
+      // The board's footer ("Tap the one you'd pick") doesn't apply while a popup covers the board.
+      if (ov === els.eventOverlay) document.documentElement.classList.toggle('event-open', now);
+    }).observe(ov, { attributes:true, attributeFilter:['class'] });
   });
 
   // Noon Rush: a per-timezone local event, not a global one - every player's
