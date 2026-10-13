@@ -57,7 +57,7 @@ window.FLIPSTAX_INFINITY_RIDDLES = [
   { q: 'Every fall I get a face carved into me and a light in my belly, and I grin at everyone who walks by. What am I?',
     a: 'A jack-o’-lantern', wrong: ['A scarecrow', 'A ghost', 'A snowman'] },
   { q: 'I have rings you can count but never wear, and I only tell my age after I’ve been cut down. What am I?',
-    a: 'A tree', wrong: ['An onion', 'Saturn', 'A clock'] },
+    a: 'A tree', wrong: ['A bell', 'Saturn', 'A clock'] },
   { q: 'I wear a tuxedo every single day, I can’t fly but I’m a champion swimmer, and I live where it’s freezing. What am I?',
     a: 'A penguin', wrong: ['A seal', 'A puffin', 'A polar bear'] },
   { q: 'I have two rows of tiny teeth that lock together when you pull my little tab. What am I?',
