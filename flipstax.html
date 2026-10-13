@@ -12781,6 +12781,15 @@
     el.classList.add('hidden');
     void el.offsetWidth; // force a reflow so display:none->flex restarts the child CSS animations
     el.classList.remove('hidden');
+    // "YOU GOT IT!" sits in the free band above the question's first line
+    // (never over the answers): its box is placed from where the subtitle is.
+    try{
+      const board = el.parentElement.getBoundingClientRect();
+      let ref = els.eventSubtitle.getBoundingClientRect();
+      if (!ref.height) ref = els.eventPrompt.getBoundingClientRect();   // (no subtitle line right now: sit above the prompt instead)
+      const h = 56, top = Math.max(4, Math.round(ref.top - board.top - h - 6));
+      el.style.inset = 'auto'; el.style.left = '0'; el.style.right = '0'; el.style.top = top + 'px'; el.style.height = h + 'px';
+    }catch(e){}
     clearTimeout(celebrateTriviaCorrect._t);
     celebrateTriviaCorrect._t = setTimeout(()=> el.classList.add('hidden'), 800);
   }
