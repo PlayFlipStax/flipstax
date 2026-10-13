@@ -2273,11 +2273,33 @@
   @keyframes scFlash{ 0%{ opacity:0; } 12%{ opacity:0.85; } 30%{ opacity:0.2; } 45%{ opacity:0.6; } 100%{ opacity:0; } }
   @media (prefers-reduced-motion: reduce){ .sc-title, .sc-name, .sc-tap{ animation:none; } .sc-flash{ animation:none; display:none; } }
   @media (max-height:660px){ .sc-title{ font-size:44px; } .sc-host{ width:56px; height:64px; } .show-card .sc-inner{ gap:9px; } .sc-rules{ font-size:13px; } }
-  /* Portal Pick doors (B2; B3 dresses them up) */
-  .event-tile.portal .pu-prize{ display:none; }
-  .event-tile.portal.open .pu-prize{ display:inline; } .event-tile.portal.open .pu-door{ display:none; }
-  .event-tile.portal{ background-color:#5a24c8; }
-  .pu-door{ font:900 34px/1 var(--f-display); }
+  /* Brain Beam answers (B3): the right one rings green, a wrong pick red. */
+  .event-tile.is-right{ box-shadow:var(--tile-depth), 0 0 0 4px #7dff9e, 0 0 22px 6px rgba(80,255,140,0.75); z-index:1; }
+  .event-tile.is-wrong{ box-shadow:var(--tile-depth), 0 0 0 4px #ff4d4d, 0 0 20px 5px rgba(255,40,40,0.7); opacity:0.85; }
+  /* Portal Pick (B2/B3): four doors; the picked one swings open (a 3D turn
+     on its left hinge - transform only) and its power-up comes out in its
+     own colours. */
+  .event-tile.portal{ background-color:#3a1478 !important; perspective:600px; padding:0; min-height:86px; overflow:visible; display:flex; align-items:center; justify-content:center; }
+  .event-tile.portal .pu-prize{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:inherit; opacity:0; transform:scale(0.6); }
+  .event-tile.portal .pu-door{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; border-radius:inherit; transform-origin:0 50%; backface-visibility:hidden;
+    font:900 38px/1 var(--f-display); color:#fff3c4; text-shadow:0 2px 0 rgba(40,0,60,0.6);
+    background:radial-gradient(circle at 82% 52%, #ffe680 0 4px, #b06a00 5px, transparent 6px), linear-gradient(160deg, #a86bff, #6a1fb0 55%, #3d0f7a); box-shadow:inset 0 0 0 3px rgba(255,230,160,0.55), inset 0 -6px 0 rgba(0,0,0,0.2); }
+  .event-tile.portal.open .pu-door{ transform:rotateY(-105deg); opacity:0; transition:transform 0.5s cubic-bezier(.3,.7,.3,1), opacity 0.5s 0.15s; }
+  .event-tile.portal.open .pu-prize{ opacity:1; transform:none; transition:transform 0.45s 0.12s var(--ease-pop), opacity 0.2s 0.12s; }
+  .event-tile.portal:not(.open) .pu-door{ animation:doorShimmer 2.4s ease-in-out infinite; animation-delay:calc(var(--k, 0) * 0.3s); }
+  .event-tile.portal:nth-child(2){ --k:1; } .event-tile.portal:nth-child(3){ --k:2; } .event-tile.portal:nth-child(4){ --k:3; }
+  @keyframes doorShimmer{ 0%, 100%{ opacity:1; } 50%{ opacity:0.82; } }
+  .event-tile.pu-points10 .pu-prize{ background:linear-gradient(180deg, #fff3a8, #ffc928 50%, #f09d00); color:#3a1d00; text-shadow:none; }
+  .event-tile.pu-slowclock .pu-prize{ background:linear-gradient(180deg, #9fdcff, #2f7bff 55%, #173f9e); }
+  .event-tile.pu-slowclock.open .pu-icon{ animation:puSpin 0.9s var(--ease-out) 0.2s; }
+  .event-tile.pu-wildcard .pu-prize{ background:conic-gradient(from 0deg, #ff3c9d, #8d2ad6, #7df9ff, #ffd23f, #ff3c9d); }
+  .event-tile.pu-wildcard.open .pu-icon{ animation:puWobble 0.6s var(--ease-pop) 0.2s 2; }
+  .event-tile.pu-hint .pu-prize{ background:linear-gradient(180deg, #c8ff7a, #22c56b 55%, #0f7a6b); }
+  .event-tile.pu-hint.open .pu-icon{ animation:puGlow 0.8s ease-in-out 0.2s 2 alternate; }
+  @keyframes puSpin{ from{ transform:rotate(-360deg) scale(0.6); } to{ transform:none; } }
+  @keyframes puWobble{ 0%, 100%{ transform:none; } 30%{ transform:rotate(-14deg) scale(1.2); } 60%{ transform:rotate(10deg) scale(1.1); } }
+  @keyframes puGlow{ from{ transform:scale(1); opacity:0.8; } to{ transform:scale(1.25); opacity:1; } }
+  @media (prefers-reduced-motion: reduce){ .event-tile.portal .pu-door, .event-tile.portal .pu-prize, .event-tile.portal .pu-icon{ animation:none !important; transition:none !important; } }
   /* ---- Daily Stax: the sun and the odd UFO ----
      Background only, under everything (the sun behind the clouds, the UFO
      just in front of them) and never takes a tap. The sun follows the run
@@ -3344,6 +3366,7 @@
     wordWarp:'Word Warp', vault:'The Mothership Vault' }, (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.names) || {});
   const HOST_LINES = (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.host) || {};
   const HOST_QUIPS = (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.quip) || {};
+  const HOST_CAMEO = (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.cameo) || {};
   const INF_RUNS_KEY = 'flipstax_inf_runs_v1';
 
   // The game's public address - the one place to change if the domain does.
@@ -8510,7 +8533,7 @@
   }
 
   let runPendingTrivia = false;
-  let runPlan = null, runShow = { step:0, left:null }, runPortalDoors = null, runWarpBonusMs = 0;
+  let runPlan = null, runShow = { step:0, left:null }, runPortalDoors = null, runWarpBonusMs = 0, runQuizPick = null;
   // Set when a Daily run ends; cleared when the player starts playing again
   // from mode select. See loadNextImpl and finishDailySession.
   let sessionHalted = false;
@@ -8601,11 +8624,12 @@
       : q.riddle ? '\uD83E\uDDE9 ' + GN.riddleRound.toUpperCase() + ' \u00B7 answer right, earn a letter'
       : '\uD83E\uDDE0 ' + GN.brainBeam.toUpperCase() + ' \u00B7 answer right, earn a letter';
     els.eventPrompt.textContent = q.question;
+    runQuizPick = null;
     els.eventTiles.forEach((tileEl,i)=>{
-      tileEl.classList.remove('portal', 'open');
+      tileEl.classList.remove('portal', 'open', 'is-right', 'is-wrong');
       tileEl.textContent = q.opts[i];
       tileEl.style.backgroundColor = TILE_COLORS[i];
-      tileEl.onclick = ()=> resolve(i === q.correctIdx);
+      tileEl.onclick = ()=>{ runQuizPick = i; resolve(i === q.correctIdx); };
     });
     startEventTimerBar(remain, dt(10000));
     clearTimeout(eventTimeoutId);
@@ -8632,6 +8656,7 @@
   }
   function resolveRunTrivia(correct){
     if (runPhase !== 'trivia' || !runPendingQ) return;
+    quizFx(!!correct, runQuizPick, runPendingQ.correctIdx);
     runPendingQ = null;
     clearTimeout(eventTimeoutId);
     els.eventTiles.forEach(t=> t.onclick = null);
@@ -8671,10 +8696,12 @@
     }
     saveRunSnapshot();
     setTimeout(()=>{
+      if (DEBUG_FAST && window.__holdResult) return;   // tests: keep the result on screen
       els.eventOverlay.classList.add('hidden');
+      els.eventTiles.forEach(t=> t.classList.remove('is-right', 'is-wrong'));
       if (!runActive) return;
       advanceAfterTrivia();
-    }, dt(runPerfect ? 1900 : 1100));   // a little longer so the Perfect Run banner can be read
+    }, dt(runPerfect ? 1900 : 1400));   // (B3: a beat longer, for the UFO's beam)   // a little longer so the Perfect Run banner can be read
   }
   // Where the run goes after a trivia (or the riddle that can follow one).
   // Once all six trivia shots have been taken the solve phase is next -
@@ -8756,9 +8783,10 @@
       tileEl.innerHTML = '<span class="pu-door">' + (i + 1) + '</span><span class="pu-prize"><span class="pu-icon">'+pu.icon+'</span><span class="pu-label">'+pu.label+'</span></span>';
       tileEl.style.backgroundColor = '';
       tileEl.dataset.pu = pu.key;
-      tileEl.classList.add('portal'); tileEl.classList.remove('open');
-      tileEl.onclick = ()=>{ tileEl.classList.add('open'); resolveRunPowerUp(pu.key); };
+      tileEl.classList.add('portal'); tileEl.classList.remove('open', 'is-right', 'is-wrong');
+      tileEl.onclick = ()=>{ tileEl.classList.add('open'); portalFx(tileEl, pu.key); resolveRunPowerUp(pu.key); };
     });
+    hostSay(hostLine('portal'), 1500);
     startEventTimerBar(remain, dt(5000));
     clearTimeout(eventTimeoutId);
     eventTimeoutId = setTimeout(()=> resolveRunPowerUp(null), remain);
@@ -8833,6 +8861,7 @@
   }
   function finishRunPowerUp(){
     setTimeout(()=>{
+      if (DEBUG_FAST && window.__holdResult) return;   // tests: keep the result on screen
       els.eventOverlay.classList.add('hidden');
       if (!runActive) return;
       // The secret's trigger lives here now, not in trivia: check right
@@ -8843,7 +8872,7 @@
         startRiddleRound();
         return;
       }
-      els.eventTiles.forEach(t=>{ t.classList.remove('portal', 'open'); delete t.dataset.pu; });
+      els.eventTiles.forEach(t=>{ t.classList.remove('portal', 'open', 'pu-points10', 'pu-slowclock', 'pu-wildcard', 'pu-hint'); delete t.dataset.pu; });
       if (runClockExpired()){ goToFinale(); return; }
       runPhase = 'running';
       loadNext();
@@ -11703,6 +11732,45 @@
   [els.eventOverlay, els.solveOverlay, els.readoutOverlay].forEach(ov=> new MutationObserver(syncShowWorld).observe(ov, { attributes:true, attributeFilter:['class'] }));
   function hostMood(m){ FX.alien(showAlien, m); }
   function showFlash(kind){ FX.flash(showFrame, kind); }
+  // The host's speech bubble (B3): a short line from data/game-names.js
+  // (cameo), about a second and a half. B9 adds his voice blips.
+  let hostSayT = null;
+  function hostLine(key){ const v = HOST_CAMEO[key]; return Array.isArray(v) ? v[Math.floor(Math.random() * v.length)] : (v || ''); }
+  function hostSay(text, ms){
+    if (!text || !document.documentElement.classList.contains('mode-daily')) return;
+    const b = document.getElementById('showSay');
+    b.textContent = text; b.classList.add('on');
+    clearTimeout(hostSayT); hostSayT = setTimeout(()=> b.classList.remove('on'), ms || 1600);
+    if (sfx.hostVoice) sfx.hostVoice(text);
+  }
+  // A Brain Beam's answer, the full show treatment (B3): right = the gold
+  // frame glows round the screen, the UFO beams down on the right answer
+  // and the host cheers; wrong = a red flash and a shake, the right answer
+  // lights up green and the host winces. Transforms and opacity only.
+  function quizFx(correct, pickIdx, correctIdx){
+    const tiles = els.eventTiles, right = tiles[correctIdx], picked = tiles[pickIdx];
+    if (right) right.classList.add('is-right');
+    if (correct){
+      showFlash('win'); hostMood('cheer'); hostSay(hostLine('right'));
+      if (right){ FX.beamHit(showFx, [right]); FX.glowSweep(showFx, right); }
+    } else {
+      showFlash('lose'); hostMood('sad'); hostSay(hostLine(pickIdx == null ? 'slow' : 'wrong'));
+      if (picked) picked.classList.add('is-wrong');
+      FX.shake(document.getElementById('eventGrid'));
+    }
+  }
+  // Portal Pick (B3): the picked door swings open and its power-up comes out
+  // with its own look - coins for +10, a spinning clock for Word Warp time,
+  // a cosmic swirl for the Cosmic Surprise, a glowing bulb for the hint.
+  function portalFx(tile, key){
+    if (!tile) return;
+    tile.classList.add('pu-' + key);
+    hostSay(hostLine(key), 1800);
+    if (key === 'points10'){ FX.burstAt(showFx, tile, { count:12, spread:100, shapes:['coin'] }); FX.sound('coin'); }
+    else if (key === 'slowclock'){ const r = tile.getBoundingClientRect(); FX.ripple(showFx, r.left + r.width / 2, r.top + r.height / 2, '#9fdcff', 120); setTimeout(()=> FX.ripple(showFx, r.left + r.width / 2, r.top + r.height / 2, '#9fdcff', 170), 140); }
+    else if (key === 'wildcard'){ FX.burstAt(showFx, tile, { count:16, spread:120, shapes:['star', 'strip'], colors:['#ff3c9d', '#7df9ff', '#ffd23f', '#c792ff'] }); }
+    else if (key === 'hint'){ FX.glowSweep(showFx, tile); FX.burstAt(showFx, tile, { count:8, spread:60, shapes:['star'], colors:['#c8ff7a', '#fff6c2'] }); }
+  }
 
   // Noon Rush: a per-timezone local event, not a global one - every player's
   // OWN device clock decides their own noon. No server coordination needed.
