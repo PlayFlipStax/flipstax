@@ -32,6 +32,7 @@
 
 <!-- Vercel Web Analytics -->
 <script defer src="/_vercel/insights/script.js"></script>
+<link rel="stylesheet" href="lib/show.css">
 <style>
   :root{
     --bg: #1a1442; --panel: #241b5c;
@@ -2209,6 +2210,48 @@
   }
   @media (prefers-reduced-motion: reduce){ :root.mode-daily .daily-wordmark{ animation:none !important; } }
   @media (prefers-reduced-motion: reduce){ :root.mode-daily body::before{ animation:none; } }
+  /* ---- Daily: the game show (B1, Oct 2026) ----
+     The sky gives way to the shared show look (lib/show.css): each screen's
+     colour world with its turning rays (VS, Brain Beam, power-ups, Word
+     Warp, results - setShowWorld), a gold frame round the whole screen that
+     flashes on a win or a miss, the alien host in the corner, and the UFO's
+     cameos (the existing daily-ufo passes, in front of the rays). The VS
+     cards get more room between them and bigger names. Transforms and
+     opacity only; motion stops while the tab is hidden; reduced motion: a
+     still sunburst. */
+  .show-bg, .show-frame, .show-fx, .show-host{ display:none; }
+  :root.mode-daily .show-bg{ display:block; position:fixed; z-index:-3; pointer-events:none; }
+  :root.mode-daily .show-frame{ display:block; position:fixed; inset:0; z-index:30; pointer-events:none; border-radius:22px;
+    box-shadow:0 0 0 40px #1c0b3d, inset 0 0 0 3px #ffd23f, inset 0 0 0 5px rgba(122,61,0,0.55), inset 0 0 22px rgba(255,200,60,0.35); }
+  :root.mode-daily .show-fx{ display:block; position:fixed; z-index:31; }
+  :root.mode-daily body{ background:#1c0b3d; }
+  :root.mode-daily body::before{ display:none; }
+  :root.mode-daily .daily-sky.sun-layer{ display:none; }
+  :root.mode-daily .logo .flip{ color:#fff; } :root.mode-daily .logo .stax{ color:#ffd23f; }
+  :root.mode-daily header .logo{ text-shadow:var(--text-on-busy); }
+  :root.mode-daily .me-chip, :root.mode-daily .tier, :root.mode-daily .vibe-label, :root.mode-daily .back-btn, :root.mode-daily .hint{ color:#fff; text-shadow:var(--text-on-busy); }
+  :root.mode-daily .sound-toggle{ filter:none; }
+  :root.mode-daily .round-timer{ background:rgba(28,6,48,0.35); }
+  :root.mode-daily .daily-wordmark{ color:#fff; text-shadow:var(--text-on-busy); animation:none; }
+  :root.mode-daily .daily-sym g{ stroke:#3d1300; }
+  /* the VS cards: more space between them, bigger names, gold when picked */
+  :root.mode-daily .board{ gap:22px; --board-gap:22px; }
+  :root.mode-daily .take{ font-size:clamp(26px, 7.8vw, 42px); font-weight:800; }
+  :root.mode-daily .half{ --frame-ring:#fff3c4; box-shadow:0 6px 0 rgba(40,0,60,0.45), 0 12px 24px rgba(30,0,40,0.35); }
+  :root.mode-daily #board .half.picked{ box-shadow:0 0 0 4px #ffd23f, 0 0 22px 6px rgba(255,210,60,0.85), 0 0 48px 14px rgba(255,170,0,0.45); animation:none; }
+  :root.mode-daily .half.picked::after{ border-color:#ffd23f; }
+  :root.mode-daily .half.picked::before{ box-shadow:inset 0 0 40px 8px rgba(255,236,150,0.6); animation:none; }
+  /* the host: bottom-left, bobbing; a speech bubble for his lines (B9) */
+  :root.mode-daily .show-host{ display:flex; align-items:flex-end; gap:6px; position:fixed; left:12px; bottom:calc(6px + env(safe-area-inset-bottom)); z-index:32; pointer-events:none; }
+  .show-host .alien{ width:36px; height:41px; }
+  .show-say{ max-width:min(250px, calc(100vw - 80px)); padding:6px 11px; border-radius:14px 14px 14px 4px; background:#fff; color:#3a1060; font:800 13px/1.25 'Inter', sans-serif;
+    box-shadow:0 3px 10px rgba(30,0,40,0.4); opacity:0; transform:translateY(6px) scale(0.9); transform-origin:0 100%; transition:opacity 0.2s, transform 0.25s var(--ease-pop); margin-bottom:22px; }
+  .show-say.on{ opacity:1; transform:none; }
+  :root.mode-daily .hint{ padding-left:52px; padding-right:52px; }
+  /* popups over the board (Brain Beam, power-ups) show the world's rays, not the cards */
+  :root.mode-daily.event-open #board .half, :root.mode-daily.event-open #board .divider{ visibility:hidden; }
+  :root.mode-daily .event-overlay{ background:none; animation:none; }
+  @media (prefers-reduced-motion: reduce){ .show-say{ transition:none; } }
   /* ---- Daily Stax: the sun and the odd UFO ----
      Background only, under everything (the sun behind the clouds, the UFO
      just in front of them) and never takes a tap. The sun follows the run
@@ -2700,6 +2743,13 @@
 </style>
 </head>
 <body>
+<!-- The game-show look (B1, lib/show.css): the screen's colour world and its
+     turning rays, behind everything; the gold frame round the screen (it
+     flashes on a win or a miss); a layer for bursts; the alien host. -->
+<div class="show-bg bg w-vs" id="showBg" aria-hidden="true"><i class="rays"></i><i class="glow"></i><div class="amb" id="showAmb"></div></div>
+<div class="show-frame show-flash" id="showFrame" aria-hidden="true"></div>
+<div class="fx-layer show-fx" id="showFx" aria-hidden="true"></div>
+<div class="show-host" id="showHost" aria-hidden="true"><div class="alien" id="showAlien"></div><div class="show-say" id="showSay"></div></div>
 <div class="daily-sky sun-layer" aria-hidden="true"><div class="daily-sun" id="dailySun"></div></div>
 <div class="daily-sky ufo-layer" aria-hidden="true">
   <div class="daily-abductee" id="dailyAbductee"></div>
@@ -3256,6 +3306,7 @@
 <script src="data/infinity-riddles.js"></script>
 <script src="data/game-names.js"></script>
 <script src="lib/orbit-physics.js"></script>
+<script src="lib/show-fx.js"></script>
 <script>
 (function(){
 
@@ -11427,6 +11478,34 @@
     }).observe(ov, { attributes:true, attributeFilter:['class'] });
   });
 
+  // ---------- The show look (B1): colour worlds, frame flash, host ----------
+  // Daily's background is the screen's colour world (lib/show.css), switched
+  // from what's on screen: the VS cards, a Brain Beam, a power-up, the Word
+  // Warp, the results. FX (lib/show-fx.js) plays its sounds through the
+  // game's mixer, so mute covers it.
+  const showBg = document.getElementById('showBg'), showFrame = document.getElementById('showFrame'), showFx = document.getElementById('showFx');
+  const showAlien = document.getElementById('showAlien');
+  showAlien.innerHTML = FX.alienSvg();
+  FX.confetti(document.getElementById('showAmb'), 8);
+  FX.soundHook = (kind)=>{
+    if (kind === 'beam') sfx.ufoBeam(); else if (kind === 'zap') playTone(1400, 0, 0.05, 'square', 0.03);
+    else if (kind === 'coin'){ playTone(1568, 0, 0.08, 'square', 0.03); playTone(2093, 0.06, 0.12, 'square', 0.03); }
+    else if (kind === 'tick') playTone(1200, 0, 0.025, 'square', 0.02);
+  };
+  let showWorldNow = 'vs';
+  function setShowWorld(w){ if (w === showWorldNow) return; showWorldNow = w; showBg.className = 'show-bg bg w-' + w; }
+  function syncShowWorld(){
+    if (!document.documentElement.classList.contains('mode-daily')) return;
+    const open = el=> el && !el.classList.contains('hidden');
+    if (els.readoutOverlay.classList.contains('show')) setShowWorld('results');
+    else if (open(els.solveOverlay)) setShowWorld('jumble');
+    else if (open(els.eventOverlay)) setShowWorld(els.eventOverlay.classList.contains('powerup') || runPhase === 'powerup' ? 'powerup' : 'trivia');
+    else setShowWorld('vs');
+  }
+  [els.eventOverlay, els.solveOverlay, els.readoutOverlay].forEach(ov=> new MutationObserver(syncShowWorld).observe(ov, { attributes:true, attributeFilter:['class'] }));
+  function hostMood(m){ FX.alien(showAlien, m); }
+  function showFlash(kind){ FX.flash(showFrame, kind); }
+
   // Noon Rush: a per-timezone local event, not a global one - every player's
   // OWN device clock decides their own noon. No server coordination needed.
   function isNoonRush(){ return new Date().getHours() === 12; }
@@ -11862,7 +11941,7 @@
     saveProgress();
     if (runActive && cv.counted){
       runVotesDecided++;
-      if (cv.withCrowd) runVotesAgreed++;
+      if (cv.withCrowd){ runVotesAgreed++; const ph = side === 'A' ? els.halfA : els.halfB; FX.glowSweep(showFx, ph); FX.burstAt(showFx, ph, { count:8, spread:70, shapes:['star'], colors:['#ffd23f', '#fff3c4', '#ffb21f'] }); }
       if (underdog) runLowestPctPicks++;
       trackCrowdShape(runCrowd, cv.withCrowd);
     }
