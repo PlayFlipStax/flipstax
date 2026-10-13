@@ -116,13 +116,12 @@
   .score-pill .sp-clock #infClock{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:15px; letter-spacing:0.3px; min-width:30px; text-align:left; }
   .score-pill .sp-keys b{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:16px; color:#ffd23f; text-shadow:0 0 6px rgba(255,190,0,0.7); display:inline-block; }
   .score-pill .sp-keys b.pop{ animation: keyPop 0.6s cubic-bezier(.3,1.8,.5,1); }
-  .score-pill .sp-chips{ display:inline-flex; gap:2px; margin-left:3px; }
+  .score-pill .sp-chips{ display:inline-flex; gap:2px; margin-right:4px; }
   .score-pill .sp-chips i{ width:7px; height:7px; border-radius:50%; box-shadow:inset 0 0 0 1.5px rgba(255,214,90,0.7); }
   .score-pill .sp-chips i.on{ background:radial-gradient(circle at 35% 35%, #fff6c2, #ffc21a 60%, #b86a00); box-shadow:0 0 4px rgba(255,200,40,0.8); }
-  .score-pill .sp-chips i.on.free{ opacity:0.7; }
-  .score-pill .sp-zap{ position:absolute; z-index:1; left:10px; bottom:2px; height:3px; max-width:calc(100% - 34px); border-radius:2px; background:linear-gradient(90deg,#19e0ff,#ff3cac); transition:width 0.6s ease; }
-  .score-pill .sp-zapflag{ position:absolute; z-index:1; right:9px; bottom:-3px; font-size:9px; line-height:1; opacity:0.45; }
-  .score-pill .sp-zap.full{ box-shadow:0 0 6px #ff3cac; } .score-pill .sp-zapflag.full{ opacity:1; text-shadow:0 0 6px #ffe066; }
+  .score-pill .sp-keys .sp-of{ font-size:11px; }
+  .score-pill .sp-chips{ align-items:center; } .score-pill .sp-chips em{ font-style:normal; font-size:11px; margin-right:1px; }
+  .score-pill .sp-keys.done b{ color:#ff9ad1; text-shadow:0 0 8px #ff3cac; }
   @keyframes keyPop{ 0%{ transform:scale(1); } 40%{ transform:scale(1.7); color:#fff6c2; } 100%{ transform:scale(1); } }
   .score-pill .sp-clock.low #infClock{ color:#ffe066; animation: runTimerPulse 0.8s ease-in-out infinite; }
   .pill-row{ position:relative; }
@@ -6798,15 +6797,16 @@
   // Keys earned this run, including any that came while the ring was full.
   // (A run saved before keysEarned existed counts at least what it holds.)
   function infKeysEarned(r){ return Math.max(r.keysEarned || 0, r.keys || 0); }
-  // The key meter in the run pill: Orbit Drop chips so far (one per key on
-  // the ring, ORBIT_MIN_CHIPS to PLINKO_MAX_CHIPS), and a thin line along the
-  // pill's foot filling toward the Zap Words milestone (WORDHUNT_KEYS keys
-  // earned). Decorative and inside the pill - never near the cards.
+  // The key meter in the run pill (Oct 2026, made readable): the chip dots
+  // are the Orbit Drop chips this run has so far (one per key on the ring,
+  // ORBIT_MIN_CHIPS to PLINKO_MAX_CHIPS), and "🔑 9/18" is keys earned this
+  // run out of WORDHUNT_KEYS (the Zap Words milestone - every key counts,
+  // even one earned while the ring is full), lit with ⚡ once reached.
   function keyMeterHtml(){
-    const chips = Math.max(ORBIT_MIN_CHIPS, Math.min(PLINKO_MAX_CHIPS, infRun.keys)), earned = infKeysEarned(infRun), pct = Math.min(100, earned / WORDHUNT_KEYS * 100);
-    let dots = ''; for (let i = 0; i < PLINKO_MAX_CHIPS; i++) dots += '<i class="' + (i < chips ? 'on' : '') + (i < ORBIT_MIN_CHIPS ? ' free' : '') + '"></i>';
-    return '<span class="sp-chips" title="' + GN.orbitDrop + ' chips: ' + chips + '">' + dots + '</span>' +
-      '<i class="sp-zap' + (pct >= 100 ? ' full' : '') + '" style="width:' + pct.toFixed(1) + '%" title="' + earned + ' of ' + WORDHUNT_KEYS + ' keys toward ' + GN.zapWords + '"></i><b class="sp-zapflag' + (pct >= 100 ? ' full' : '') + '" aria-hidden="true">\u26A1</b>';
+    const chips = Math.max(ORBIT_MIN_CHIPS, Math.min(PLINKO_MAX_CHIPS, infRun.keys)), earned = infKeysEarned(infRun), done = earned >= WORDHUNT_KEYS;
+    let dots = ''; for (let i = 0; i < PLINKO_MAX_CHIPS; i++) dots += '<i class="' + (i < chips ? 'on' : '') + '"></i>';
+    return '<span class="sp-chips" title="' + GN.orbitDrop + ' chips: ' + chips + '" aria-label="' + chips + ' ' + GN.orbitDrop + ' chips"><em>\uD83E\uDE99</em>' + dots + '</span>' +
+      '<span class="sp-keys' + (done ? ' done' : '') + '" title="Keys earned this run, toward ' + GN.zapWords + '">\uD83D\uDD11<b id="infKeyCount">' + earned + '</b><span class="sp-of">/' + WORDHUNT_KEYS + '</span>' + (done ? '\u26A1' : '') + '</span>';
   }
   function addInfKey(source){
     if (!infRun || infRun.ended) return false;
@@ -7508,7 +7508,7 @@
       els.runBanner.innerHTML = '<i class="sp-bar" style="width:' + pct.toFixed(1) + '%"></i>' +
         '<span class="sp-mode">\u267E\uFE0F</span><b class="sp-num">' + Math.max(0, sc) + '</b><span class="sp-of">/ ' + FINISH_POINTS + '</span>' +
         '<span class="sp-sep">\u00B7</span><span class="sp-clock">\u23F1\uFE0F<span id="infClock"></span></span>' +
-        '<span class="sp-sep">\u00B7</span><span class="sp-keys" title="Keys">\uD83D\uDD11<b id="infKeyCount">' + infRun.keys + '</b></span>' + keyMeterHtml();
+        '<span class="sp-sep">\u00B7</span>' + keyMeterHtml();
       renderInfClock();
       return;
     }
