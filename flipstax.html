@@ -1050,7 +1050,10 @@
   .fin-vault.open .vault-glow{ opacity:1; }
   .vault-door{ position:absolute; inset:18px; border-radius:50%; transform-origin:0% 50%; transition:transform 0.9s cubic-bezier(.5,0,.3,1);
     background:radial-gradient(circle at 38% 32%, #fff6c2 0%, #ffd23f 22%, #e0a000 55%, #9a6200 100%); box-shadow:inset 0 0 0 7px #b87a00, inset 0 0 0 10px #ffe58a, 0 6px 16px rgba(0,0,0,0.45); }
-  .fin-vault.open .vault-door{ transform:rotateY(-112deg); }
+  /* Hinged on the frame's outer left edge (18px out from the door), so the
+     open door swings clear of the vault instead of lying across its edge. */
+  .fin-vault.open .vault-door{ transform-origin:-18px 50%; transform:rotateY(-104deg); }
+  .fin-vault.open:not(.shown) .vault-body{ transform:translateX(44px); }   /* the vault and its open door, centred together */
   .vault-dial{ position:absolute; left:50%; top:50%; width:84px; height:84px; margin:-42px 0 0 -42px; border-radius:50%;
     background:radial-gradient(circle at 40% 35%, #fffbe0, #c9c9c9 45%, #7a7a7a); box-shadow:0 0 0 5px #9a6200, 0 3px 8px rgba(0,0,0,0.5); }
   .vault-dial i{ position:absolute; left:50%; top:50%; width:8px; height:60px; margin:-30px 0 0 -4px; border-radius:4px; background:#6b4400; }
@@ -1068,8 +1071,11 @@
   .vault-beam-card svg, .vault-beam-card img{ width:100%; height:100%; display:block; }
   .fin-vault.jackpot .vault-beam-card{ animation: beamCardDown 2.2s ease-in-out 0.6s both; }
   @keyframes beamCardDown{ 0%{ opacity:0; transform:translateY(-10px) scale(0.4) rotate(-8deg); } 25%{ opacity:1; } 80%{ opacity:1; transform:translateY(110px) scale(1) rotate(4deg); } 100%{ opacity:0; transform:translateY(130px) scale(0.6); } }
-  .vault-rewards{ width:100%; display:flex; flex-direction:column; align-items:center; gap:10px; opacity:0; transform:translateY(10px); transition:opacity 0.6s ease, transform 0.6s ease; pointer-events:none; }
-  .fin-vault.shown .vault-rewards{ opacity:1; transform:none; pointer-events:auto; }
+  /* Out of the layout until it's shown, so the vault and its coins sit in the
+     middle of the screen (it used to hold the space below them, empty). */
+  .vault-rewards{ width:100%; display:none; flex-direction:column; align-items:center; gap:10px; }
+  .fin-vault.shown .vault-rewards{ display:flex; animation: rewardsIn 0.6s ease both; }
+  @keyframes rewardsIn{ from{ opacity:0; } to{ opacity:1; } }   /* opacity only: an animated transform would make this the fixed button bar's containing block */
   .vr-score{ display:flex; flex-direction:column; align-items:center; }
   .vr-score span{ font-size:12px; font-weight:900; letter-spacing:2px; color:#fff3c4; }
   .vr-score b{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:clamp(60px, 20vw, 86px); line-height:1; color:#fff; text-shadow:0 0 22px rgba(255,210,60,0.95), 0 4px 0 #b05a00; }
@@ -1091,6 +1097,7 @@
      results fit one phone screen; the three buttons are a bar along the
      bottom; new cards and badges sit below. */
   .fin-vault{ margin-top:0; }
+  .fin-vault:not(.shown){ margin:auto 0; }   /* opening and coins: centred on the screen */
   .fin-vault.shown{ padding-bottom:84px; animation:none; transform:none; }   /* no transform: the fixed button bar must anchor to the screen */
   .fin-vault.shown .vault-scene{ height:72px; }
   .fin-vault.shown .vault-body{ transform:translateY(-30px) scale(0.32); }
@@ -1119,7 +1126,7 @@
   .fin-vault .vrp-blurb{ font-size:13px; }
   @media (prefers-reduced-motion: reduce){ .vault-scene, .vault-body{ transition:none; } }
   @media (prefers-reduced-motion: reduce){
-    .vault-door, .vault-glow, .vault-rewards{ transition:none !important; } .fin-vault.dial .vault-dial, .fin-vault.jackpot .vault-ufo.riddle-ufo, .fin-vault.jackpot .vault-beam-card,
+    .vault-door, .vault-glow{ transition:none !important; } .fin-vault.shown .vault-rewards{ animation:none !important; } .fin-vault.dial .vault-dial, .fin-vault.jackpot .vault-ufo.riddle-ufo, .fin-vault.jackpot .vault-beam-card,
     .plinko-svg .pk-peg.ping, .fin-plinko.jackpot .plinko-board{ animation:none !important; }
     .fin-vault.jackpot .vault-ufo.riddle-ufo{ display:block; }
   }
