@@ -4688,7 +4688,7 @@
     // Daily Stax: loops from the top every time it ends, for the whole run
     // (~2:57; the file's tail silence is trimmed to ~0.65s so the loop
     // doesn't leave a gap). -11.9 LUFS, in line with the intro.
-    run:      'audio/top-score-carousel-trimmed.mp3',
+    run:      'audio/top-score-carousel-trimmed.mp3',   // (each Daily run picks from DAILY_PLAYLIST)
     solve:    'audio/final-buzzer.mp3',
     // Daily results screen, looping until Done: one for a solved word, one
     // for an unsolved one (59.4s / 58.3s; -10.9 / -11.4 LUFS, near the
@@ -4732,6 +4732,21 @@
     { src:'audio/victory-lap-trimmed.mp3',      bpm:120,    beat1:0.071, out:177.071, gain:0.989 },
   ];
   const INFINITY_LEAD = 0.15;
+  // Daily Stax's gameplay music: one track today (Top Score Carousel). Add
+  // more files here and each Daily run takes the next one from a shuffled
+  // bag - every track once before any repeats (pickDailyTrack). The track
+  // loops for the whole run.
+  const DAILY_PLAYLIST = ['audio/top-score-carousel-trimmed.mp3'];
+  const DAILY_MUSIC_BAG_KEY = 'flipstax_daily_music_bag_v1';
+  function pickDailyTrack(){
+    if (DAILY_PLAYLIST.length < 2) return;
+    let bag = []; try{ bag = JSON.parse(localStorage.getItem(DAILY_MUSIC_BAG_KEY) || '[]').filter(i=> i >= 0 && i < DAILY_PLAYLIST.length); }catch(e){}
+    const last = TRACK_SRC.run;
+    if (!bag.length){ bag = shuffle(DAILY_PLAYLIST.map((_, i)=> i)); if (DAILY_PLAYLIST[bag[bag.length - 1]] === last) bag.reverse(); }
+    const src = DAILY_PLAYLIST[bag.pop()];
+    try{ localStorage.setItem(DAILY_MUSIC_BAG_KEY, JSON.stringify(bag)); }catch(e){}
+    if (src !== TRACK_SRC.run){ TRACK_SRC.run = src; if (trackEls.run){ try{ trackEls.run.pause(); }catch(e){} delete trackEls.run; } }
+  }
   const MUSIC_VOLUME = 0.55;
   // Which gameplay track fits the current mode - Infinity has its own,
   // everything else that used to hardcode 'run' goes through this.
@@ -4768,6 +4783,21 @@
   const infEls = [];
   const infUnlocked = [];
   let infIdx = 0, infHandoffTimer = null;
+  // Infinity's songs come from a shuffled bag: each song once before any
+  // repeats, and a new bag never opens with the song that just played. The
+  // next song is always known ahead (infNextIdx) so it can be buffered,
+  // parked and unlocked for the beat-matched handoff, as before.
+  let infBag = [], infBagPos = 0;
+  function infNewBag(avoid){
+    let b = shuffle(INFINITY_PLAYLIST.map((_, i)=> i));
+    if (b.length > 1 && b[0] === avoid){ const k = 1 + Math.floor(Math.random() * (b.length - 1)); [b[0], b[k]] = [b[k], b[0]]; }
+    return b;
+  }
+  function infNextIdx(){
+    if (infBagPos + 1 >= infBag.length){ infBag = infBag.slice(0, infBagPos + 1).concat(infNewBag(infIdx)); }
+    return infBag[infBagPos + 1];
+  }
+  function infStartFresh(){ infBag = infNewBag(infIdx); infBagPos = 0; infIdx = infBag[0]; }
   // An <audio> element takes a moment to actually get going after play()
   // (~60ms in Chrome), which would land the incoming downbeat that much
   // late. So the incoming song is started this far ahead of the cut - inside
@@ -4797,7 +4827,7 @@
   // the outgoing song's `out`.
   function infLead(i){ return Math.min(INFINITY_LEAD, INFINITY_PLAYLIST[i].beat1); }
   function infStartAt(i){ return INFINITY_PLAYLIST[i].beat1 - infLead(i); }
-  function infCutAt(i){ return INFINITY_PLAYLIST[i].out - infLead((i + 1) % INFINITY_PLAYLIST.length); }
+  function infCutAt(i){ return INFINITY_PLAYLIST[i].out - infLead(i === infIdx ? infNextIdx() : (i + 1) % INFINITY_PLAYLIST.length); }
   // Called on every timeupdate (~4x/sec) of the active song. Starts
   // buffering the next song half a minute out, and inside the last half
   // second arms a timer for the exact cut point - timeupdate alone is far
@@ -4806,7 +4836,7 @@
     const el = infEls[infIdx];
     if (!el || el.paused) return;
     const left = infCutAt(infIdx) - el.currentTime;
-    const next = (infIdx + 1) % INFINITY_PLAYLIST.length;
+    const next = infNextIdx();
     if (left < 30 && !infEls[next]) infinityEl(next).load();
     // Park the next song at its start point ahead of time, so the handoff
     // doesn't have to wait on a seek (it can be parked at its old end).
@@ -4824,7 +4854,7 @@
     if (currentTrackKey !== 'infinity') return;
     early = early || 0;
     const prev = infEls[infIdx];
-    infIdx = (infIdx + 1) % INFINITY_PLAYLIST.length;
+    infIdx = infNextIdx(); infBagPos++;
     const idx = infIdx, el = getTrackEl('infinity');
     if (!soundOn){ if (prev && prev !== el) try{ prev.pause(); }catch(e){} return; }
     el.muted = false;
@@ -4858,7 +4888,7 @@
   // use those taps to start the next song silently for a moment and stop it
   // again, well before it's needed.
   function infUnlockNext(){
-    const next = (infIdx + 1) % INFINITY_PLAYLIST.length;
+    const next = infNextIdx();
     if (infUnlocked[next] || next === infIdx) return;
     infUnlocked[next] = true;
     const a = infinityEl(next);
@@ -4900,11 +4930,11 @@
       if (key === 'infinity') infUnlockNext();
       return;
     }
-    // (Re)starting Infinity always begins the playlist from its first song.
-    if (key === 'infinity'){ pauseInfinityPlaylist(); infIdx = 0; }
+    // (Re)starting Infinity begins a freshly shuffled bag of its songs.
+    if (key === 'infinity'){ pauseInfinityPlaylist(); infStartFresh(); }
     const el = getTrackEl(key);
     el.muted = false;
-    try{ el.currentTime = key === 'infinity' ? infStartAt(0) : 0; }catch(e){}
+    try{ el.currentTime = key === 'infinity' ? infStartAt(infIdx) : 0; }catch(e){}
     el.play().catch(()=>{});
   }
   // The secret riddle has its own track: the Daily theme stops (keeping its
@@ -8028,6 +8058,7 @@
   }
 
   function startDailyRun(){
+    if (!runResultToday && !runActive) pickDailyTrack();
     if (runResultToday || runActive || levelUpActive || personalityActive) return;
     const saved = loadRunSnapshot();
     if (saved){ resumeDailyRun(saved); return; }
@@ -12308,6 +12339,7 @@
       shareText: () => buildRunShareText(runResultToday),
       shareCardScore: () => buildDailyShareData(runResultToday).score,
       shareCardDataUrl: (kind) => renderShareCard(kind, kind === 'daily' ? buildDailyShareData(runResultToday) : buildInfinityShareData()).toDataURL('image/png'),
+      infShuffleSample: (n) => { const saved = [infBag, infBagPos, infIdx]; infStartFresh(); const out = [infIdx]; for (let i = 1; i < (n || 12); i++){ infIdx = infNextIdx(); infBagPos++; out.push(infIdx); } [infBag, infBagPos, infIdx] = saved; return out; },
       getInfinityPlaylist: () => ({ idx: infIdx, els: infEls.slice(), songs: INFINITY_PLAYLIST, lead: INFINITY_LEAD, cutAt: infCutAt(infIdx), startAt: infStartAt(infIdx) }),
       getTrackEl: (k) => getTrackEl(k),
       getProgress: () => progress,
