@@ -2531,7 +2531,10 @@
   .ms-divider-ring span:nth-child(4){ transform:translateX(-38px); }
   @keyframes msDividerSpin{ from{ transform:translate(-50%,-50%) rotate(0deg); } to{ transform:translate(-50%,-50%) rotate(360deg); } }
   /* Short phones: drop the blurb so nothing crowds the horizon. */
-  @media (max-height:640px){ .ms-desc{ display:none; } }
+  /* Short phones: the full blurb gives way to a one-liner, so nothing crowds the horizon. */
+  .ms-desc-short{ display:none; font-size:13px; font-weight:700; margin-top:6px; white-space:nowrap; }
+  .ms-body-daily .ms-desc-short{ color:#0d2b5e; } .ms-body-inf .ms-desc-short{ color:#3d2c00; }
+  @media (max-height:640px){ .ms-desc{ display:none; } .ms-desc-short{ display:block; } }
   @media (prefers-reduced-motion: reduce){
     .ms-sky, .ms-seam, .ms-sky .ms-bg::before, .ms-gold .ms-bg::before, .ms-gold .ms-bg::after, .ms-wm,
     .ms-cta, .split-divider, .ms-divider-ring{ animation:none !important; }
@@ -2906,6 +2909,7 @@
       </div>
       <div class="ms-tag">Race to the finish line.</div>
       <div class="ms-desc" id="msInfDesc">Vote, scan the crowd, crack riddles, drop chips in Orbit Drop and open The Mothership Vault.</div>
+      <div class="ms-desc-short" id="msInfDescShort">Vote, scan, crack riddles, open the vault.</div>
       <div class="ms-cta">START FLIPPING &#9654;</div>
     </div>
   </div>
@@ -2922,6 +2926,7 @@
       </div>
       <div class="ms-tag">One run. Once a day.</div>
       <div class="ms-desc">Tap your pick for points, answer trivia, collect letters, and solve today's hidden word before time runs out.</div>
+      <div class="ms-desc-short">Vote, answer trivia, solve today's word.</div>
       <div class="ms-cta">PLAY TODAY &#9654;</div>
     </div>
   </div>
