@@ -8802,6 +8802,7 @@
       '<div class="sc-name">' + name + '!</div></div>';
     showCard.removeAttribute('role'); showCard.removeAttribute('aria-label');
     showCard.classList.remove('hidden');
+    clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on');   // (no stale line over the title card)
     if (sfx.bumper) sfx.bumper(last);
     setTimeout(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; then(); }, prefersReducedMotion() ? SHOW_BUMPER_MS + 300 : SHOW_BUMPER_MS);
   }
