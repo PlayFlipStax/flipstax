@@ -1077,7 +1077,7 @@
   .vault-scene{ position:relative; width:min(100%, 340px); height:250px; transition:height 0.6s cubic-bezier(.4,0,.2,1); }
   /* Coin collecting (collectVaultCoins): the tally above the open vault
      counts up as each coin is tapped. */
-  .fin-vault:not(.shown) .vault-scene{ height:320px; }   /* a floor below the vault for the coins to land on */
+  .fin-vault:not(.shown) .vault-scene{ height:360px; }   /* a floor below the vault for the coins to land on */
   .vault-tally{ display:flex; flex-direction:column; align-items:center; line-height:1; animation: tallyIn 0.35s ease-out both; }
   .fin-vault.shown .vault-tally{ display:none; }
   .vault-tally span{ font-size:12px; font-weight:900; letter-spacing:2px; color:#fff3c4; }
@@ -1103,7 +1103,47 @@
   /* Hinged on the frame's outer left edge (18px out from the door), so the
      open door swings clear of the vault instead of lying across its edge. */
   .fin-vault.open .vault-door{ transform-origin:-18px 50%; transform:rotateY(-104deg); }
-  .fin-vault.open:not(.shown) .vault-body{ transform:translateX(44px); }   /* the vault and its open door, centred together */
+  .fin-vault.open:not(.shown) .vault-body{ transform:translateX(calc(var(--vb) * 0.18)); }   /* the vault and its open door, centred together */
+  /* The big moment (Oct 2026): the vault is as large as the phone allows
+     (--vb), the combination dial spins right-left-right with clicks, three
+     bolts pull back with a clunk each, the door swings open with a boom, a
+     short shake and light rays bursting out from inside, then the coins.
+     Transforms and opacity only. */
+  .vault-scene{ --vb:min(250px, 60vw); }
+  .fin-vault:not(.shown) .vault-body{ top:26px; width:var(--vb); height:var(--vb); margin-left:calc(var(--vb) / -2); }
+  .fin-vault:not(.shown) .vault-door{ inset:calc(var(--vb) * 0.085); }
+  .fin-vault:not(.shown) .vault-inside{ inset:calc(var(--vb) * 0.11); }
+  .fin-vault:not(.shown) .vault-dial{ width:calc(var(--vb) * 0.46); height:calc(var(--vb) * 0.46); margin:calc(var(--vb) * -0.23) 0 0 calc(var(--vb) * -0.23);
+    background:radial-gradient(circle, #fffbe0 0 30%, #d7d7d7 31% 54%, transparent 55%), repeating-conic-gradient(#3a2a00 0deg 1.6deg, transparent 1.6deg 9deg), radial-gradient(circle at 40% 35%, #fffbe0, #c9c9c9 45%, #7a7a7a);
+    box-shadow:0 0 0 calc(var(--vb) * 0.022) #9a6200, 0 0 0 calc(var(--vb) * 0.03) #ffe58a, 0 4px 12px rgba(0,0,0,0.5); }
+  .fin-vault:not(.shown) .vault-dial i{ height:62%; margin-top:-31%; width:7%; margin-left:-3.5%; background:#5a3a00; opacity:0.85; }
+  .fin-vault:not(.shown) .vault-dial b{ width:22%; height:22%; margin:-11% 0 0 -11%; }
+  .vault-mark{ position:absolute; left:50%; top:calc(50% - var(--vb) * 0.27); width:0; height:0; margin-left:-7px; border:7px solid transparent; border-top:11px solid #b3121f; border-bottom:0; filter:drop-shadow(0 1px 1px rgba(0,0,0,0.5)); }
+  .fin-vault.shown .vault-mark, .fin-vault.shown .vault-bolts{ display:none; }
+  .fin-vault.dial .vault-dial{ animation: dialCombo 2.3s cubic-bezier(.45,0,.3,1) both; }
+  @keyframes dialCombo{ 0%{ transform:rotate(0); } 38%{ transform:rotate(560deg); } 44%{ transform:rotate(540deg); } 70%{ transform:rotate(250deg); } 76%{ transform:rotate(270deg); } 96%{ transform:rotate(450deg); } 100%{ transform:rotate(440deg); } }
+  .vault-bolts{ position:absolute; right:calc(var(--vb, 210px) * -0.09); top:50%; width:calc(var(--vb, 210px) * 0.16); height:0; }
+  .vault-bolts i{ position:absolute; left:0; width:100%; height:calc(var(--vb, 210px) * 0.055); margin-top:calc(var(--vb, 210px) * -0.0275); border-radius:6px;
+    background:linear-gradient(180deg,#fff6c2,#e0a000 55%,#8a5200); box-shadow:0 2px 4px rgba(0,0,0,0.45); transition:transform 0.25s cubic-bezier(.5,0,.3,1.3); }
+  .vault-bolts i:nth-child(1){ top:calc(var(--vb, 210px) * -0.2); } .vault-bolts i:nth-child(3){ top:calc(var(--vb, 210px) * 0.2); }
+  .fin-vault.unbolt .vault-bolts i{ transform:translateX(-105%); }
+  .fin-vault.open .vault-bolts{ opacity:0; transition:opacity 0.2s; }
+  .fin-vault.unbolt .vault-bolts i:nth-child(2){ transition-delay:0.18s; } .fin-vault.unbolt .vault-bolts i:nth-child(3){ transition-delay:0.36s; }
+  .vault-rays{ position:absolute; left:50%; top:calc(26px + var(--vb) / 2); width:760px; height:760px; margin:-380px 0 0 -380px; z-index:0; pointer-events:none; opacity:0; transform:scale(0.15);
+    -webkit-mask-image:radial-gradient(circle, #000 18%, transparent 68%); mask-image:radial-gradient(circle, #000 18%, transparent 68%); }
+  .vault-rays i{ position:absolute; inset:0; background:repeating-conic-gradient(from 0deg, rgba(255,252,220,0.98) 0deg 7deg, rgba(255,252,220,0) 7deg 13deg); animation:vaultRaysTurn 26s linear infinite; }
+  .vault-rays::after{ content:''; position:absolute; left:50%; top:50%; width:300px; height:300px; margin:-150px 0 0 -150px; border-radius:50%; opacity:0;
+    background:radial-gradient(circle, #ffffff 0%, rgba(255,250,200,0.9) 30%, rgba(255,230,120,0) 70%); }
+  .fin-vault.open:not(.shown) .vault-rays::after{ animation:vaultFlash 1.1s ease-out forwards; }
+  @keyframes vaultFlash{ 0%{ opacity:0; transform:scale(0.3); } 20%{ opacity:1; transform:scale(1.2); } 100%{ opacity:0.35; transform:scale(1); } }
+  .fin-vault.open:not(.shown) .vault-rays{ left:calc(50% + var(--vb) * 0.18); animation:vaultRaysIn 0.9s cubic-bezier(.2,.9,.3,1.1) forwards; }
+  .fin-vault.shown .vault-rays{ display:none; }
+  @keyframes vaultRaysIn{ from{ opacity:0; transform:scale(0.15); } to{ opacity:1; transform:scale(1); } }
+  @keyframes vaultRaysTurn{ to{ transform:rotate(360deg); } }
+  .vault-body{ z-index:1; }
+  .fin-vault.slam .vault-scene{ animation:vaultShake 0.5s ease-out; }
+  @keyframes vaultShake{ 15%{ transform:translate(-6px, 3px); } 30%{ transform:translate(6px, -3px); } 45%{ transform:translate(-4px, 2px); } 60%{ transform:translate(3px, -1px); } 100%{ transform:none; } }
+  @media (prefers-reduced-motion: reduce){ .fin-vault.dial .vault-dial, .vault-rays, .vault-rays i, .vault-rays::after, .fin-vault.slam .vault-scene{ animation:none !important; } .vault-bolts i{ transition:none !important; } }
   .vault-dial{ position:absolute; left:50%; top:50%; width:84px; height:84px; margin:-42px 0 0 -42px; border-radius:50%;
     background:radial-gradient(circle at 40% 35%, #fffbe0, #c9c9c9 45%, #7a7a7a); box-shadow:0 0 0 5px #9a6200, 0 3px 8px rgba(0,0,0,0.5); }
   .vault-dial i{ position:absolute; left:50%; top:50%; width:8px; height:60px; margin:-30px 0 0 -4px; border-radius:4px; background:#6b4400; }
@@ -3102,11 +3142,12 @@
   <div class="fin-stage fin-vault hidden" id="finVault">
     <div class="vault-tally" id="vaultTally" aria-live="polite"><span>FINAL SCORE</span><b id="vaultTallyNum">0</b><em id="vaultTallyHint">Tap the coins!</em></div>
     <div class="vault-scene" id="vaultScene">
+      <i class="vault-rays" aria-hidden="true"><i></i></i>
       <div class="vault-ufo riddle-ufo" id="vaultUfo" aria-hidden="true"><span>🛸</span><i></i></div>
       <div class="vault-beam-card" id="vaultBeamCard" aria-hidden="true"></div>
       <div class="vault-body" aria-hidden="true">
         <div class="vault-inside"><div class="vault-glow"></div></div>
-        <div class="vault-door" id="vaultDoor"><div class="vault-dial" id="vaultDial"><i></i><i></i><i></i><i></i><b></b></div><div class="vault-bolts"></div></div>
+        <div class="vault-door" id="vaultDoor"><div class="vault-dial" id="vaultDial"><i></i><i></i><i></i><i></i><b></b></div><div class="vault-mark"></div><div class="vault-bolts"><i></i><i></i><i></i></div></div>
       </div>
       <canvas class="vault-coins" id="vaultCoins" aria-hidden="true"></canvas>
       <div class="vault-alien" id="vaultAlien" aria-hidden="true"><div class="va-art"></div><div class="va-say" id="vaultAlienSay"></div></div>
@@ -4571,6 +4612,9 @@
     coins: (n)=> withSfxCtx((ctx, t)=>{ for (let i = 0; i < (n || 14); i++) coinPing(ctx, t + i * 0.07 + Math.random() * 0.04, 0.045 + Math.random() * 0.03, 1100 + Math.random() * 900); }),
     vaultClick: (i)=> withSfxCtx((ctx, t)=> coinTap(ctx, t, 0.35, 900 + (i % 3) * 150)),
     vaultOpen: ()=>{ playTone(98, 0, 0.5, 'triangle', 0.12); playTone(147, 0.05, 0.6, 'sine', 0.08); haptic([30,40,60]); },
+    boltClunk: (i)=>{ playTone(130 - i * 12, 0, 0.12, 'square', 0.07); playTone(65, 0.02, 0.16, 'triangle', 0.09); },
+    vaultBoom: ()=>{ playTone(55, 0, 0.9, 'sine', 0.16); playTone(82, 0.02, 0.7, 'triangle', 0.1); haptic([60, 40, 90]); },
+    vaultFanfare: ()=> withSfxCtx(()=>{ [392, 523, 659, 784].forEach((f, i)=> playTone(f, i * 0.09, 0.22, 'triangle', 0.09)); [523, 659, 784, 1047].forEach(f=> playTone(f, 0.42, 0.9, 'triangle', 0.06)); }),
     jackpot: ()=>{ [523, 659, 784, 1047, 1319, 1568].forEach((f, i)=> playTone(f, i * 0.07, 0.3, 'triangle', 0.1)); playTone(2093, 0.5, 0.7, 'sine', 0.07); haptic([20,30,20,30,80]); },
     ufoTap: ()=>{ playTone(880, 0, 0.08, 'sine', 0.09); playTone(1320, 0.06, 0.1, 'sine', 0.09); playTone(1760, 0.13, 0.14, 'triangle', 0.08); },
     lockIn: ()=>{ playTone(520, 0, 0.08, 'square', 0.06); playTone(780, 0.07, 0.12, 'square', 0.06); },
@@ -9154,11 +9198,15 @@
     if (prefersReducedMotion() || f.vaultSeen){ showAll(); return; }
     // dial -> door -> (jackpot: the gold UFO beams the bonus card) -> coins to collect -> rewards
     document.getElementById('vaultTallyNum').textContent = a.bonus > 0 ? a.runScore : 0;
+    stage.classList.remove('unbolt', 'slam');
     stage.classList.add('dial');
-    for (let i = 0; i < 6; i++) vaultTimers.push(setTimeout(()=> sfx.vaultClick(i), 120 + i * 150));
-    let t = 1100;
-    vaultTimers.push(setTimeout(()=>{ stage.classList.add('open'); sfx.vaultOpen(); }, t));
-    t += 900;
+    // the combination: clicks while the dial turns right, left, right (dialCombo, 2.3s)
+    [100, 220, 330, 430, 520, 600, 670, 1020, 1160, 1300, 1430, 1550, 1800, 1930, 2050, 2160].forEach((ms, i)=> vaultTimers.push(setTimeout(()=> sfx.vaultClick(i), ms)));
+    let t = 2350;
+    vaultTimers.push(setTimeout(()=>{ stage.classList.add('unbolt'); [0, 1, 2].forEach(i=> vaultTimers.push(setTimeout(()=> sfx.boltClunk(i), i * 180))); }, t));
+    t += 800;
+    vaultTimers.push(setTimeout(()=>{ stage.classList.add('open', 'slam'); sfx.vaultOpen(); sfx.vaultBoom(); sfx.vaultFanfare(); }, t));
+    t += 1000;
     if (a.jackpot){
       vaultTimers.push(setTimeout(()=>{ stage.classList.add('jackpot'); sfx.jackpot(); const bc = document.getElementById('vaultBeamCard'); bc.innerHTML = cardArtHtml('mothership_jackpot'); }, t));
       t += 2600;
