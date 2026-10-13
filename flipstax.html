@@ -413,6 +413,7 @@
   .toast.under-header.show{ transform:translateX(-50%) translateY(0); }
   .toast.under-header.below-cards{ top:auto; bottom:calc(5px + env(safe-area-inset-bottom)); transform:translateX(-50%) translateY(10px); padding:5px 14px; line-height:20px; }
   .toast.under-header.below-cards.show{ transform:translateX(-50%) translateY(0); }
+  .hint{ transition:opacity 0.2s ease; } :root.toast-below-cards .hint{ opacity:0; }
 
   .event-overlay{
     position:absolute; inset:0; z-index:8; display:flex; flex-direction:column;
@@ -11376,11 +11377,12 @@
     // header it covered the INFINITY FLIPS title (Oct 2026).
     const belowCards = !!underHeader && inInfinity();
     els.toast.classList.toggle('below-cards', belowCards);
+    document.documentElement.classList.toggle('toast-below-cards', belowCards);   // the helper line steps aside while it shows
     if (underHeader && !belowCards){ const h = document.querySelector('.app > header'); els.toast.style.top = (h ? Math.round(h.getBoundingClientRect().bottom) + 4 : 8) + 'px'; }
     else els.toast.style.top = '';
     els.toast.classList.add('show');
     clearTimeout(showToast._t);
-    showToast._t = setTimeout(()=> els.toast.classList.remove('show'), 1700);
+    showToast._t = setTimeout(()=>{ els.toast.classList.remove('show'); document.documentElement.classList.remove('toast-below-cards'); }, 1700);
   }
 
   async function vote(side){
