@@ -52,10 +52,9 @@
 
   // ---------- bursts ----------
   // Particles fly out from (x, y) in the layer's coordinates. Shapes come from
-  // the direction's theme: star, coin, strip (A), sprinkle, heart, dot (B).
+  // the theme: star (svg), coin and strip (styled boxes).
   const SHAPES = {
     star:'<svg viewBox="0 0 20 20"><path d="M10 0l3 7 7 .6-5.3 4.6L16.3 20 10 16.3 3.7 20l1.6-7.8L0 7.6 7 7z"/></svg>',
-    heart:'<svg viewBox="0 0 20 18"><path d="M10 18S0 11.5 0 5.4C0 2.4 2.3 0 5.1 0 7.1 0 8.9 1.2 10 2.9 11.1 1.2 12.9 0 14.9 0 17.7 0 20 2.4 20 5.4 20 11.5 10 18 10 18z"/></svg>',
   };
   FX.burst = (layer, x, y, opts)=>{
     if (FX.reduced() || !layer || !layer.animate) return;
@@ -144,7 +143,26 @@
     }, 380);
     setTimeout(()=>{ u.classList.remove('on'); u.animate([{ transform:at }, { transform:'translate(' + (cx - 45) + 'px,-110px)' }], { duration:420, easing:'ease-in', fill:'forwards' }).onfinish = ()=>{ u.remove(); res(); }; }, 1250);
   });
-  // A quick laser zap from the UFO to each element (Word Hunt).
+  // The UFO flies over a set of elements (a word in Word Hunt), shines its
+  // beam down over all of them, and each one bursts in turn. Resolves when
+  // it has gone; with reduced motion it resolves at once.
+  FX.beamHit = (layer, els)=> new Promise(res=>{
+    if (FX.reduced() || !layer.animate || !els.length){ res(); return; }
+    const l = layer.getBoundingClientRect(), rs = els.map(e=> e.getBoundingClientRect());
+    const left = Math.min(...rs.map(r=> r.left)) - l.left, right = Math.max(...rs.map(r=> r.right)) - l.left;
+    const topY = Math.min(...rs.map(r=> r.top)) - l.top, botY = Math.max(...rs.map(r=> r.bottom)) - l.top;
+    const cx = (left + right) / 2, top = Math.max(4, topY - 70);
+    const u = document.createElement('div'); u.className = 'ufo ufo-beamer'; u.innerHTML = FX.ufoSvg() + '<i class="beam"></i>';
+    u.style.setProperty('--beam-h', Math.max(40, botY - top - 36) + 'px');
+    u.style.setProperty('--beam-w', Math.max(90, right - left + 40) + 'px');
+    layer.appendChild(u); FX.sound('beam');
+    const at = 'translate(' + (cx - 45) + 'px,' + top + 'px)';
+    u.animate([{ transform:'translate(' + (cx - 45) + 'px,-90px)' }, { transform:at }], { duration:380, easing:'cubic-bezier(.2,.9,.3,1.1)', fill:'forwards' });
+    setTimeout(()=> u.classList.add('on'), 340);
+    els.forEach((e, k)=> setTimeout(()=>{ FX.burstAt(layer, e, { count:7, spread:44 }); FX.sound('zap'); }, 560 + k * 80));
+    setTimeout(()=>{ res(); u.classList.remove('on'); u.animate([{ transform:at }, { transform:'translate(' + (cx - 45) + 'px,-110px)' }], { duration:380, easing:'ease-in', fill:'forwards' }).onfinish = ()=> u.remove(); }, 640 + els.length * 80);
+  });
+  // A quick laser zap from the UFO to each element.
   FX.blast = (layer, els)=>{
     if (FX.reduced()) return;
     const l = layer.getBoundingClientRect();
