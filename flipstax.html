@@ -11271,10 +11271,17 @@
   // The minimum in use: CROWD_DATA_MIN, unless a test session lowered it
   // (?crowdmin=, localhost / preview only - see TEST_SWITCHES).
   const CROWD_DATA_MIN_NOW = TEST_SWITCHES.crowdMin || CROWD_DATA_MIN;
+  // The TEST tag also shows how long the last vote took from tap to result
+  // and how much of that was the tallies request (the reveal waits for it),
+  // so a slow tap on a phone can be told apart from a slow network.
+  let testTagEl = null, testTagBase = '';
   if (TEST_SWITCHES.crowdMin || TEST_SWITCHES.noVotes){
     const tag = document.createElement('div'); tag.className = 'test-tag'; tag.setAttribute('aria-hidden', 'true');
-    tag.textContent = 'TEST' + (TEST_SWITCHES.noVotes ? ' \u00B7 votes not saved' : ' \u00B7 votes saved') + (TEST_SWITCHES.crowdMin ? ' \u00B7 crowdmin ' + TEST_SWITCHES.crowdMin : '');
-    document.body.appendChild(tag);
+    tag.textContent = testTagBase = 'TEST' + (TEST_SWITCHES.noVotes ? ' \u00B7 votes not saved' : ' \u00B7 votes saved') + (TEST_SWITCHES.crowdMin ? ' \u00B7 crowdmin ' + TEST_SWITCHES.crowdMin : '');
+    document.body.appendChild(tag); testTagEl = tag;
+  }
+  function noteTapTiming(totalMs, talliesMs){
+    if (testTagEl) testTagEl.textContent = testTagBase + ' \u00B7 tap\u2192result ' + (totalMs / 1000).toFixed(2) + 's (tallies ' + (talliesMs / 1000).toFixed(2) + 's)';
   }
   // Item counts already fetched for reveals (slug -> count), so Guess the
   // Crowd can often find a qualifying card without another request.
@@ -11403,6 +11410,7 @@
   async function voteImpl(side){
     if (voted || !current) return;
     voted = true;
+    const tapAt = performance.now();
     const mySeq = roundSeq;
     // True if this vote's round is no longer the live one: another card has
     // been dealt (watchdog, new round) or voted was cleared by something that
@@ -11430,7 +11438,9 @@
     const slugA = slugify(current.a), slugB = slugify(current.b);
     const myVote = await castVote(side === 'A' ? slugA : slugB);
     if (roundMovedOn()) return;
+    const tTallies = performance.now();
     const tallyData = await fetchTallies([slugA, slugB]);
+    const talliesMs = performance.now() - tTallies;
     if (roundMovedOn()) return;
     let counts = tallyData
       ? { a: tallyData.counts[slugA] || 0, b: tallyData.counts[slugB] || 0 }
@@ -11438,6 +11448,7 @@
     if (tallyData) cacheTallies(tallyData.counts);
 
     const { pctA, pctB } = reveal(counts);
+    if (testTagEl) requestAnimationFrame(()=> noteTapTiming(performance.now() - tapAt, talliesMs));
     // Keep the result ticking live while it's on screen, in case other
     // players vote on this same pairing in the meantime.
     startTallyPolling([slugA, slugB], (data)=>{
