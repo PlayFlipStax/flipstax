@@ -418,9 +418,12 @@
   }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
   /* Round feedback ("Too slow", "+5 seconds") sits just under the header, over the
-     mode-title strip - never over a card's name, result or the helper line. */
+     mode-title strip - never over a card's name, result or the helper line.
+     In Infinity it sits in the strip below the cards instead (.below-cards). */
   .toast.under-header{ bottom:auto; transform:translateX(-50%) translateY(-12px); padding:6px 14px; white-space:nowrap; }
   .toast.under-header.show{ transform:translateX(-50%) translateY(0); }
+  .toast.under-header.below-cards{ top:auto; bottom:calc(5px + env(safe-area-inset-bottom)); transform:translateX(-50%) translateY(10px); padding:5px 14px; line-height:20px; }
+  .toast.under-header.below-cards.show{ transform:translateX(-50%) translateY(0); }
 
   .event-overlay{
     position:absolute; inset:0; z-index:8; display:flex; flex-direction:column;
@@ -10905,7 +10908,9 @@
     // used to drain the run's score before anyone had played.
     const inRound = runActive || (inInfinity() && isOnVsScreen());
     if (inRound){
-      const penalty = current.bonusPoints ? (runActive ? DAILY_TOO_SLOW_STAR_PENALTY : INF_STAR_POINTS) : TOO_SLOW_PENALTY;
+      // (Infinity: always TOO_SLOW_PENALTY - a star card used to cost its full
+      // value, 2. Daily's star cards still cost DAILY_TOO_SLOW_STAR_PENALTY.)
+      const penalty = current.bonusPoints && runActive ? DAILY_TOO_SLOW_STAR_PENALTY : TOO_SLOW_PENALTY;
       if (runActive) addRunScore(-penalty); else addRacePoints(-penalty);
       showToast('\u23F1\uFE0F Too slow \u2014 \u2212' + penalty + ' point' + (penalty>1?'s':''), true);
     }
@@ -11431,7 +11436,12 @@
   function showToast(msg, underHeader){
     els.toast.textContent = msg;
     els.toast.classList.toggle('under-header', !!underHeader);
-    if (underHeader){ const h = document.querySelector('.app > header'); els.toast.style.top = (h ? Math.round(h.getBoundingClientRect().bottom) + 4 : 8) + 'px'; }
+    // Round feedback: Daily's sits just under the header; Infinity's goes in
+    // the strip below the cards (the helper line's spot), because under the
+    // header it covered the INFINITY FLIPS title (Oct 2026).
+    const belowCards = !!underHeader && inInfinity();
+    els.toast.classList.toggle('below-cards', belowCards);
+    if (underHeader && !belowCards){ const h = document.querySelector('.app > header'); els.toast.style.top = (h ? Math.round(h.getBoundingClientRect().bottom) + 4 : 8) + 'px'; }
     else els.toast.style.top = '';
     els.toast.classList.add('show');
     clearTimeout(showToast._t);
