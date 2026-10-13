@@ -9097,7 +9097,7 @@
   // and each new one lands at 3% or more.
   const STARSEEKER_UFO_TAPS = 3;          // all of a run's UFOs (UFO_MAX_PASSES), or...
   const STARSEEKER_ABDUCTIONS = 6;        // ...this many abductions (5-match streaks) in one run
-  const LUCKY_PLINKO_MIN = 280;           // Plinko bonus - about the top 10% of runs
+  const LUCKY_PLINKO_MIN = 280;           // Orbit Drop bonus - about the top 10% of runs (A2: 9-10% with random drops on the aimed board; was ~7%)
   const WHISPERER_MIN_GUESSES = 2, WHISPERER_MAX_AVG_ERROR = 8, WHISPERER_DEAD_ONS = 2;
   const WHISPERER_MATCH_RATE = 0.82, CROWD_RATE_MIN_ROUNDS = 15;    // rounds with a crowd result
   const SAGE_MIN_RIDDLES = 3, SAGE_MIN_ACCURACY = 0.80;
@@ -9279,8 +9279,10 @@
   }
   // --- Close Encounters unlocks and alien personality lines (finale only)
   // Calibrated Oct 2026 (screenshots/qa/tools/close_sim.py, varied simulated
-  // players) so a run rarely unlocks several at once: Mothership Jackpot ~19%
-  // of runs (the jackpot slot, PLINKO_ODDS), Signal Decoded ~15% once Crowd
+  // players) so a run rarely unlocks several at once: Mothership Jackpot ~24%
+  // of runs with random drops (A2, a2_sim.py: the jackpot slot's width and
+  // guard pegs in lib/orbit-physics.js - about 5% a random chip; it was ~19%
+  // on the old board; good aimers get it more), Signal Decoded ~15% once Crowd
   // Scan has data, Abduction Survivor ~12-17%, Riddle Master ~16-21%, First
   // Contact ~9%. (They used to be ~31%, ~21%, ~65%, ~8% and ~9%.)
   const SIGNAL_NEAR_GUESSES = 2;        // Crowd Scan guesses within 1 point of the crowd
