@@ -1478,6 +1478,20 @@
   /* Daily Stax results get a solid screen of their own - the board used to
      show through the translucent overlay behind the text. */
   #readoutOverlay{ background: radial-gradient(circle at 50% 28%, #3a1f6e, #150f2b 62%, #0b0917); padding-bottom:44px; }
+  /* Daily's results are the share image itself (renderInfinityRunShare with Daily's
+     header, stat line and pills) - the same celebration layout as Infinity's results,
+     sized to fit above a bar with Share and Done. If the image can't be made, the HTML
+     layout above is shown instead. */
+  .ro-shareimg{ display:none; }
+  #readoutOverlay.as-image .ro-shareimg{ display:block; width:min(100%, calc((100dvh - 118px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 0.5625)); height:auto; aspect-ratio:9 / 16;
+    margin:0 auto; border-radius:16px; box-shadow:0 10px 30px rgba(20,0,40,0.55), 0 0 0 2px rgba(255,214,90,0.6); }
+  #readoutOverlay.as-image{ padding:calc(10px + env(safe-area-inset-top)) 12px 76px; align-items:center; }
+  #readoutOverlay.as-image .personality-inner{ max-width:none; width:100%; padding:0 !important; background:none !important; border:none !important; box-shadow:none !important; }
+  #readoutOverlay.as-image .personality-inner > :not(.ro-shareimg):not(.solve-buttons){ display:none !important; }
+  #readoutOverlay.as-image .solve-buttons{ position:fixed; left:0; right:0; bottom:0; z-index:6; margin:0 !important; gap:8px; flex-wrap:nowrap; justify-content:center; flex-direction:row-reverse;
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom)); background:linear-gradient(180deg, rgba(28,11,61,0), rgba(28,11,61,0.92) 30%); }
+  #readoutOverlay.as-image .solve-buttons .daily-btn{ flex:1 1 0; max-width:150px; padding:10px 8px; font-size:14px; white-space:nowrap; }
+  #readoutOverlay.as-image .contact-footer{ display:none; }
   /* The vibe reveal (showPersonalityReveal) gets the same solid screen. */
   #personalityOverlay{ background: radial-gradient(circle at 50% 28%, #3a1f6e, #150f2b 62%, #0b0917); }
   /* Infinity's every-50-votes personality award: same look as the Daily
@@ -3341,6 +3355,7 @@
 <div class="personality-overlay" id="readoutOverlay">
   <div class="bg w-results warp-bg" aria-hidden="true"><i class="rays"></i><i class="glow"></i></div>
   <div class="personality-inner">
+    <img class="ro-shareimg" id="readoutShareImg" alt="">
     <div class="readout-secret hidden" id="readoutSecret">YOU DISCOVERED THE SUPER SECRET RIDDLE!!!</div>
     <div class="readout-riddler hidden" id="readoutRiddler" aria-label="The Secret Riddler">
       <div class="rr-card" aria-hidden="true"><span class="rr-planet">🪐</span><span class="rr-label">SECRET<br>RIDDLER</span></div>
@@ -3370,7 +3385,7 @@
     </div>
     <div class="solve-buttons" style="margin-top:14px;">
       <div class="daily-btn" id="readoutDone">Done</div>
-      <div class="daily-btn primary" id="readoutShare">📋 Share</div>
+      <div class="daily-btn primary" id="readoutShare">📤 Share</div>
     </div>
     <a class="readout-support" id="readoutSupport" href="https://ko-fi.com/flipstax" target="_blank" rel="noopener noreferrer">Enjoying FlipStax? ❤️ Support it</a>
   </div>
@@ -8395,13 +8410,61 @@
     document.body.appendChild(a); a.click(); a.remove();
     URL.revokeObjectURL(url);
   }
+  // Daily's results are the same celebration picture as Infinity's (see
+  // renderInfinityRunShare): big score, today's personality card, badges, "Can you
+  // beat N?". Daily's own numbers go in the stat line (trivia correct, the Word
+  // Warp's solve time). Built in the background as soon as the results appear.
+  let dailySharePre = null;   // { r, done, canvas, blob, promise }
+  function dailyShareAward(r){
+    const final = shownScore(r.score), bonus = Math.max(0, Math.min(final, (r.warpPoints || 0) + (r.comboBonus || 0)));
+    return { personality: r.personalityType, finalScore: final, runScore: final - bonus, bonus, cards: (r.unlocked || []).filter(k=> PERSONALITY_META[k]), alien: [], badges: [], resultNew: false, jackpot: false };
+  }
+  function dailyShareOpts(r, a){
+    const pills = [];
+    (a.cards || []).forEach(k=> pills.push('✨ New card: ' + PERSONALITY_META[k].name));
+    if (r.perfect) pills.push('🏆 Perfect Run');
+    if (r.secretRiddle) pills.push('🪐 Secret Riddle');
+    if (dailyRunStreak > 1) pills.push('🔥 ' + dailyRunStreak + '-day streak');
+    return {
+      header: 'DAILY STAX · RUN COMPLETE',
+      runLine: a.runScore + ' run' + (a.bonus ? ' + ' + a.bonus + ' ' + GN.wordWarp + ' & combo' : ''),
+      statLine: r.triviaCorrect + '/' + r.triviaTotal + ' trivia · ' + (r.solved ? GN.wordWarp + ' solved in ' + formatRaceTime(r.solveMs) : 'Word not solved'),
+      blurb: r.personalityNote || (PERSONALITY_META[r.personalityType] || {}).blurb || '',
+      pills,
+    };
+  }
+  function prebuildDailyShare(r){
+    if (!r) return null;
+    if (dailySharePre && dailySharePre.r === r) return dailySharePre;
+    const a = dailyShareAward(r), opts = dailyShareOpts(r, a);
+    const p = { r, done:false, canvas:null, blob:null, promise:null, a };
+    p.promise = (PERSONALITY_CARD_ART[a.personality] ? buildRunShareCanvas(a, opts) : Promise.resolve(null)).then(canvas=>{
+      if (canvas){ try{ p.blob = dataUrlToBlob(canvas.toDataURL('image/png')); p.canvas = canvas; }catch(e){ console.warn('FlipStax: daily share image could not be encoded', e); } }
+      p.done = true; return p;
+    });
+    dailySharePre = p; return p;
+  }
+  let dailyShareBusy = false;
   async function shareRunResult(){
-    if (!runResultToday) return;
-    const canvas = renderShareCard('daily', buildDailyShareData(runResultToday));
-    await exportAndShareCard(canvas, 'flipstax-daily-run.png', buildRunShareText(runResultToday));
-    // The run is over: once the share sheet closes (or the download
-    // starts), the music stops with it.
-    pauseAllTracks();
+    if (!runResultToday || dailyShareBusy) return;
+    dailyShareBusy = true;
+    const btn = els.readoutShare, label = btn ? btn.textContent : '';
+    try{
+      const r = runResultToday, pre = prebuildDailyShare(r);
+      if (!pre.done){   // not ready yet: a short "Preparing..." state, then share
+        if (btn){ btn.textContent = '⏳ Preparing…'; btn.classList.add('disabled'); }
+        await pre.promise;
+      }
+      let canvas = pre.canvas, blob = pre.blob;
+      if (!canvas){ canvas = renderShareCard('daily', buildDailyShareData(r)); blob = null; }
+      await exportAndShareCard(canvas, 'flipstax-daily-run.png', buildRunShareText(r), blob);
+      // The run is over: once the share sheet closes (or the download
+      // starts), the music stops with it.
+      pauseAllTracks();
+    } finally {
+      dailyShareBusy = false;
+      if (btn){ btn.textContent = label; btn.classList.remove('disabled'); }
+    }
   }
   // ---------- Infinity run share image: the celebration screen, in one picture ----------
   // 1080 x 1920: the results screen's gradient and ray burst, the logo and
@@ -8434,7 +8497,10 @@
       a.keys + ' key' + (a.keys === 1 ? '' : 's'),
       a.ended === 'clock' ? 'Time\u2019s up at 10:00' : 'Finished in ' + formatClock(a.clockMs)].filter(Boolean).join(' \u00B7 ');
   }
-  function renderInfinityRunShare(a){
+  // `opts` lets Daily use the same picture (renderDailyRunShare...): its own
+  // header, run line, stat line, blurb and badge pills. Without it: Infinity's.
+  function renderInfinityRunShare(a, opts){
+    opts = opts || {};
     if (DEBUG_FAST && window.__failRunShare) throw new Error('forced failure (test)');
     const img = shareArtImg(a.personality);
     if (!img) throw new Error('card art not loaded');
@@ -8455,15 +8521,16 @@
     ctx.save(); ctx.translate(cx, 140); ctx.scale(1.3, 1.3); ctx.translate(-cx, -140); drawWordmark(ctx, cx, 140); ctx.restore();
     ctx.font = '800 32px ' + SHARE_FONT_T; ctx.fillStyle = '#fff3c4';
     ctx.shadowColor = 'rgba(70,8,45,0.9)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 2;   // a tight, darker shadow: pale text on bright orange stays readable
-    shareSpacedText(ctx, 'INFINITY FLIPS \u00B7 RUN COMPLETE', cx, 210, 5);
-    shareSpacedText(ctx, 'INFINITY FLIPS \u00B7 RUN COMPLETE', cx, 210, 5);   // twice: the shadow doubles up
+    const headerText = opts.header || 'INFINITY FLIPS \u00B7 RUN COMPLETE';
+    shareSpacedText(ctx, headerText, cx, 210, 5);
+    shareSpacedText(ctx, headerText, cx, 210, 5);   // twice: the shadow doubles up
     ctx.restore();
     // score (POINTS and the run + Plinko line get the same soft dark shadow, drawn twice)
     ctx.font = '900 210px ' + SHARE_FONT_D; ctx.fillStyle = '#fff'; shareGlowText(ctx, String(a.finalScore), cx, 430, 'rgba(255,210,60,0.95)', 50);
     ctx.save(); ctx.shadowColor = 'rgba(80,10,40,0.9)'; ctx.shadowBlur = 9; ctx.shadowOffsetY = 2;
     ctx.font = '800 36px ' + SHARE_FONT_T; ctx.fillStyle = '#fff1c2'; ctx.fillText('POINTS', cx, 482); ctx.fillText('POINTS', cx, 482);
     ctx.font = '600 34px ' + SHARE_FONT_T; ctx.fillStyle = '#fff8e6';
-    const runLine = a.runScore + ' run' + (a.bonus ? ' + ' + a.bonus + ' ' + GN.orbitDrop + ' bonus' : '');
+    const runLine = opts.runLine || (a.runScore + ' run' + (a.bonus ? ' + ' + a.bonus + ' ' + GN.orbitDrop + ' bonus' : ''));
     ctx.fillText(runLine, cx, 534); ctx.fillText(runLine, cx, 534);
     ctx.restore();
     // the personality's full card
@@ -8473,17 +8540,20 @@
     let y = cy + ch + 70;
     const pm = PERSONALITY_META[a.personality] || {};
     ctx.font = '600 32px ' + SHARE_FONT_T; ctx.fillStyle = 'rgba(255,243,214,0.9)';
-    const cap = shareWrapLines(ctx, pm.blurb || '', W - 240).slice(0, 2); cap.forEach((l, i)=> ctx.fillText(l, cx, y + i * 40)); y += cap.length * 40 + 30;
+    const cap = shareWrapLines(ctx, opts.blurb || pm.blurb || '', W - 240).slice(0, 2); cap.forEach((l, i)=> ctx.fillText(l, cx, y + i * 40)); y += cap.length * 40 + 30;
     // one stat line
-    ctx.font = '700 38px ' + SHARE_FONT_T; ctx.fillStyle = '#fff'; ctx.fillText(runShareStatLine(a), cx, y); y += 70;
+    ctx.font = '700 38px ' + SHARE_FONT_T; ctx.fillStyle = '#fff'; ctx.fillText(opts.statLine || runShareStatLine(a), cx, y); y += 70;
     // badge row
-    const badges = [];
-    const newCard = (a.cards || []).concat(a.alien || []).filter(k=> k !== a.personality)[0];
-    if (a.resultNew) badges.push('\u2728 New card: ' + (pm.name || ''));
-    else if (newCard && PERSONALITY_META[newCard] && !(a.jackpot && newCard === 'mothership_jackpot')) badges.push('\u2728 New card: ' + PERSONALITY_META[newCard].name);   // (the jackpot pill says it already)
-    if (a.jackpot) badges.push('\uD83D\uDEF8 Mothership Jackpot');
-    // (Oct 2026: the results screen is this image, so the run's badges are here too.)
-    (a.badges || []).forEach(id=>{ const bd = BADGES.find(x=> x.id === id); if (bd) badges.push(bd.icon + ' ' + bd.name); });
+    let badges = [];
+    if (opts.pills){ badges = opts.pills.slice(); }
+    else {
+      const newCard = (a.cards || []).concat(a.alien || []).filter(k=> k !== a.personality)[0];
+      if (a.resultNew) badges.push('\u2728 New card: ' + (pm.name || ''));
+      else if (newCard && PERSONALITY_META[newCard] && !(a.jackpot && newCard === 'mothership_jackpot')) badges.push('\u2728 New card: ' + PERSONALITY_META[newCard].name);   // (the jackpot pill says it already)
+      if (a.jackpot) badges.push('\uD83D\uDEF8 Mothership Jackpot');
+      // (Oct 2026: the results screen is this image, so the run's badges are here too.)
+      (a.badges || []).forEach(id=>{ const bd = BADGES.find(x=> x.id === id); if (bd) badges.push(bd.icon + ' ' + bd.name); });
+    }
     if (badges.length){
       ctx.font = '800 30px ' + SHARE_FONT_T;
       // centred rows of pills, at most two (anything that doesn't fit is left off)
@@ -8514,11 +8584,11 @@
   // comes too long after the tap. Waits up to ~3s for the card art and fonts,
   // draws; if that fails, one more try (a failed image is requested again);
   // null means the simple card is the last resort (with a console warning).
-  async function buildRunShareCanvas(a){
+  async function buildRunShareCanvas(a, opts){
     let canvas = null, why = '';
     for (let attempt = 1; attempt <= 2 && !canvas; attempt++){
       try{
-        if (await waitRunShareAssets(a, 3000)) canvas = renderInfinityRunShare(a);
+        if (await waitRunShareAssets(a, 3000)) canvas = renderInfinityRunShare(a, opts);
         else why = 'card art or fonts not ready after 3s (attempt ' + attempt + ')';
       }catch(e){ why = (e && e.message) || String(e); canvas = null; }
     }
@@ -11715,6 +11785,18 @@
     document.getElementById('readoutTypeIcon').textContent = meta.icon;
     els.readoutTypeName.textContent = meta.name;
     els.readoutTypeBlurb.textContent = r.personalityNote || meta.blurb;
+    // The results are the share image (built in the background); the HTML above
+    // stays as the fallback and is swapped for the image if it's ready soon.
+    const shareImg = document.getElementById('readoutShareImg');
+    els.readoutOverlay.classList.remove('as-image'); if (shareImg.src.startsWith('blob:')) URL.revokeObjectURL(shareImg.src); shareImg.removeAttribute('src');
+    const pre = prebuildDailyShare(r), shownAt = performance.now();
+    const asImage = (p)=>{
+      if (!p || !p.canvas || dailySharePre !== p) return false;
+      try{ shareImg.src = p.blob ? URL.createObjectURL(p.blob) : p.canvas.toDataURL('image/png'); }catch(e){ return false; }
+      shareImg.alt = 'Daily Stax complete: ' + shownScore(r.score) + ' points. ' + meta.name + '. ' + r.triviaCorrect + ' of ' + r.triviaTotal + ' trivia correct. ' + (r.solved ? 'Word Warp solved in ' + formatRaceTime(r.solveMs) + '.' : 'Word not solved.');
+      els.readoutOverlay.classList.add('as-image'); return true;
+    };
+    if (!(pre.done && asImage(pre))) pre.promise.then(p=>{ if (performance.now() - shownAt < 4000 && els.readoutOverlay.classList.contains('show')) asImage(p); });
     els.readoutOverlay.classList.add('show');
     updatePauseBtnVisibility();
     sfx.personality();
@@ -13300,7 +13382,9 @@
       layoutBoard: () => layoutBoard(),
       putNext: (name) => { const d = decks[contentPoolKey()]; const i = d.cards.findIndex((c, k)=> k >= d.next && (c.a === name || c.b === name)); if (i >= 0){ const [c] = d.cards.splice(i, 1); d.cards.splice(d.next, 0, c); } return i; },
       showRunTrivia: () => runTriviaQuestion(),
-      showPlan: (date) => buildShowPlan(date || runStartDate || todayStr()),
+      showPlan: (date, cycle) => buildShowPlan(date || runStartDate || todayStr(), cycle || 0),
+      showReadout: () => { els.finOverlay.classList.add('hidden'); showRunReadout(); return !!runResultToday; },
+      setResult: (o) => { runResultToday = Object.assign({}, runResultToday || { date: todayStr(), rule: SAVE_RULE, savedAt: Date.now(), score: 0, triviaCorrect: 0, triviaTotal: 0, solved: false, solveMs: null, word: 'LAUNCH', personalityType: 'fence_sitter', unlocked: [] }, o); return runResultToday; },
       comboVerdict: (w, base) => { comboOnVerdict(!!w, base || 1); return { streak: runMatchStreak, mult: comboMult(runMatchStreak), bonus: runComboBonus, bank: runComboBank, score: runScore }; },
       showState: () => ({ step: runShow.step, left: runShow.left, phase: runPhase, episode: showEpisode(runStartDate || todayStr()) }),
       startColdOpenTap: () => showCard.click(),
