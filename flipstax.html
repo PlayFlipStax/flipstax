@@ -165,6 +165,11 @@
   .status-banner.noon{ background:linear-gradient(90deg,#5b3ec7,#3e6bc7); color:#fff; }
   .status-banner.hidden{ display:none; }
   .status-banner.solo{ flex:1 1 100%; }
+  /* Daily's points pill (points, the show clock, the six-letter tray) is wide: when the
+     Noon Rush pill is up too they stack, each on its own full-width row, so neither is clipped. */
+  :root.mode-daily .pill-row{ flex-wrap:wrap; }
+  :root.mode-daily .status-banner{ flex:1 1 100%; }
+  @media (max-width:400px){ :root.mode-infinity .status-banner.noon{ font-size:10px; padding:5px 6px; } }
   /* Sharing the row with a 2x Points Zone / Noon Rush pill: the mode pill
      drops its name and keeps the icon + progress so neither gets cut off. */
   #runBanner:not(.solo) .ml-text{ display:none; }
@@ -11729,7 +11734,7 @@
     }
     if (isNoonRush()){
       els.statusBanner.className = 'status-banner noon';
-      els.statusBanner.textContent = '\uD83D\uDD14 NOON RUSH \u2014 bonus rounds supercharged';
+      els.statusBanner.textContent = '\uD83D\uDD14 NOON RUSH \u00B7 more 2x zones';   // (2x Points Zones come 2.5x as often between 12:00 and 12:59 on your clock)
       els.runBanner.classList.remove('solo');
       return;
     }
