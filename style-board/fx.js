@@ -78,6 +78,40 @@
   };
   FX.burstAt = (layer, el, opts)=>{ const l = layer.getBoundingClientRect(), r = el.getBoundingClientRect(); FX.burst(layer, r.left - l.left + r.width / 2, r.top - l.top + r.height / 2, opts); };
 
+  // ---------- tap effects (A5: varied, by weight of the moment) ----------
+  //   routine tap   -> FX.ripple (a ring) or FX.spark (a few dots) - each game picks its own (FX.tapFx)
+  //   correct       -> FX.glowSweep (a gold sweep across the thing) + a star burst
+  //   streak / big  -> coins (FX.burst shapes:['coin'])
+  //   biggest       -> FX.confetti burst (results, end of a game) - nothing else uses confetti
+  //   wrong         -> FX.flash(frame, 'lose') (soft shake + red edge)
+  FX.ripple = (layer, x, y, color, size)=>{
+    if (FX.reduced() || !layer.animate) return;
+    const r = document.createElement('i'); r.className = 'fx-ripple'; r.style.left = x + 'px'; r.style.top = y + 'px';
+    r.style.borderColor = color || '#fff3c4'; r.style.width = r.style.height = (size || 70) + 'px'; r.style.margin = (-(size || 70) / 2) + 'px 0 0 ' + (-(size || 70) / 2) + 'px';
+    layer.appendChild(r);
+    r.animate([{ transform:'scale(0.2)', opacity:0.95 }, { transform:'scale(1)', opacity:0 }], { duration:460, easing:'cubic-bezier(.2,.8,.3,1)' }).onfinish = ()=> r.remove();
+  };
+  FX.spark = (layer, x, y, color)=> FX.burst(layer, x, y, { count:6, spread:30, colors:[color || '#fff3c4'], shapes:['dot'] });
+  FX.glowSweep = (layer, el)=>{
+    if (FX.reduced() || !layer.animate) return;
+    const l = layer.getBoundingClientRect(), r = el.getBoundingClientRect();
+    const w = document.createElement('i'); w.className = 'fx-sweep';
+    w.style.left = (r.left - l.left) + 'px'; w.style.top = (r.top - l.top) + 'px'; w.style.width = r.width + 'px'; w.style.height = r.height + 'px'; w.style.borderRadius = getComputedStyle(el).borderRadius;
+    w.innerHTML = '<b></b>'; layer.appendChild(w);
+    w.firstChild.animate([{ transform:'translateX(-120%) skewX(-20deg)' }, { transform:'translateX(260%) skewX(-20deg)' }], { duration:650, easing:'ease-in-out' }).onfinish = ()=> w.remove();
+  };
+  FX.winBurst = (layer, el)=>{ FX.glowSweep(layer, el); FX.burstAt(layer, el, { count:14, spread:110, shapes:['star'], colors:['#ffd23f', '#fff3c4', '#ffb21f'] }); };
+  FX.coinShower = (layer, n)=>{ const W = layer.clientWidth; for (let k = 0; k < (n || 3); k++) setTimeout(()=>{ FX.burst(layer, W * (0.25 + 0.25 * k), 30, { count:9, spread:90, shapes:['coin'] }); FX.sound('coin'); }, k * 220); };
+  FX.confettiBurst = (layer)=>{ const W = layer.clientWidth; [0.2, 0.5, 0.8].forEach((f, k)=> setTimeout(()=> FX.burst(layer, W * f, 20, { count:18, spread:140, shapes:['strip', 'star'] }), k * 160)); };
+  // One signature tap per game (name -> effect), for routine taps.
+  FX.tapFx = (kind, layer, x, y)=>{
+    const t = { ring:()=> FX.ripple(layer, x, y), pink:()=> FX.ripple(layer, x, y, '#ff7cc4', 80), blue:()=> FX.spark(layer, x, y, '#9fdcff'), gold:()=>{ FX.ripple(layer, x, y, '#ffd23f', 60); FX.spark(layer, x, y, '#ffe680'); },
+      orange:()=> FX.ripple(layer, x, y, '#ffb35f', 54), coin:()=> FX.burst(layer, x, y, { count:3, spread:34, shapes:['coin'] }), purple:()=> FX.ripple(layer, x, y, '#c792ff', 76),
+      sparkle:()=> FX.burst(layer, x, y, { count:5, spread:40, shapes:['star'], colors:['#fff6c2', '#ffe24a'] }), teal:()=>{ FX.ripple(layer, x, y, '#7ff5ea', 56); setTimeout(()=> FX.ripple(layer, x, y, '#7ff5ea', 84), 90); },
+      zap:()=> FX.spark(layer, x, y, '#5ff8ff') };
+    (t[kind] || t.ring)();
+  };
+
   // ---------- ambient confetti ----------
   // A few slow drifting pieces per screen (CSS keyframes on transform);
   // they stop with the screen's other motion when it's out of view.

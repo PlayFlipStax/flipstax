@@ -89,13 +89,23 @@
   // (The entry screen - the game's mode picker - has no marquee bulbs; the game screens do.)
   function layout(){ $$('.screen:not(#entry) .frame').forEach(f=> FX.marquee(f, getComputedStyle(document.documentElement).getPropertyValue('--bulb-gap') ? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bulb-gap')) : 26)); }
 
-  const win = (sc, el, msg)=>{ const f = $('.frame', sc); FX.flash(f, 'win'); if (el) FX.burstAt($('.fx-layer', sc), el); FX.sound('win'); FX.alien($('.alien', sc), 'cheer'); say(sc, msg, 'good'); };
+  const win = (sc, el, msg, big)=>{ const f = $('.frame', sc), layer = $('.fx-layer', sc); FX.flash(f, 'win'); if (el) FX.winBurst(layer, el); if (big === 'coins') FX.coinShower(layer, 3); if (big === 'confetti'){ FX.confettiBurst(layer); FX.coinShower(layer, 2); }
+    FX.sound('win'); FX.alien($('.alien', sc), 'cheer'); say(sc, msg, 'good'); };
   const lose = (sc, msg)=>{ FX.flash($('.frame', sc), 'lose'); FX.sound('lose'); FX.alien($('.alien', sc), 'sad'); say(sc, msg, 'bad'); };
   const say = (sc, msg, kind)=>{ const v = $('.verdict', sc); if (!v) return; v.className = 'verdict show ' + (kind || ''); v.textContent = msg; };
   const unsay = (sc)=>{ const v = $('.verdict', sc); if (v){ v.className = 'verdict'; v.textContent = ''; } };
   const replay = (el, cls)=>{ el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
 
+  // Routine taps: each game's own little effect where the finger lands (A5).
+  const TAP_SIG = { entry:'gold', vs:'pink', trivia:'blue', powerup:'gold', jumble:'orange', results:'coin', price:'coin', odd:'purple', emoji:'sparkle', first:'teal', hunt:'zap' };
+  function wireTaps(){
+    $$('.screen').forEach(sc=> $('.stage', sc).addEventListener('pointerdown', e=>{
+      if (!e.target.closest('button, [role=button]')) return;
+      const l = $('.fx-layer', sc).getBoundingClientRect(); FX.tapFx(TAP_SIG[sc.id], $('.fx-layer', sc), e.clientX - l.left, e.clientY - l.top);
+    }));
+  }
   function wire(){
+    wireTaps();
     // entry: the mode picker - a tap on either half
     const en = $('#entry');
     $$('[data-mode]', en).forEach(b=> b.addEventListener('click', ()=>{ const cta = $('.ms-cta', b); FX.pop(cta, 1.08); FX.flash($('.frame', en), 'win'); FX.burstAt($('.fx-layer', en), cta); FX.sound('win'); }));
@@ -149,7 +159,7 @@
     $('.check', ju).addEventListener('click', async ()=>{
       const ok = slots().every(s=> s.textContent === s.dataset.want);
       if (!slots().every(s=> s.textContent)){ say(ju, 'Fill every gap first'); FX.shake($('.tray', ju)); return; }
-      if (ok){ win(ju, $('.tray', ju), 'COMEDY! Solved'); ju.classList.add('busy'); await FX.beam($('.fx-layer', ju), $('.tray', ju), true); $('.tray', ju).getAnimations().forEach(a=> a.cancel()); ju.classList.remove('busy'); }
+      if (ok){ win(ju, $('.tray', ju), 'COMEDY! Solved', 'coins'); ju.classList.add('busy'); await FX.beam($('.fx-layer', ju), $('.tray', ju), true); $('.tray', ju).getAnimations().forEach(a=> a.cancel()); ju.classList.remove('busy'); }
       else { lose(ju, 'Not the word. Try again'); FX.shake($('.tray', ju)); setTimeout(clear, 500); }
     });
     (async ()=>{ await new Promise(r=> setTimeout(r, 900)); ju.classList.add('busy'); await FX.beam($('.fx-layer', ju), $('.tiles', ju), false); ju.classList.remove('busy'); })();
@@ -159,7 +169,7 @@
       FX.countUp($('.score', rs), 462, 1600); rs.classList.add('racing'); setTimeout(()=> rs.classList.remove('racing'), 1800);
       const layer = $('.fx-layer', rs), W = layer.clientWidth;
       for (let k = 0; k < 4; k++) setTimeout(()=>{ FX.burst(layer, W * (0.2 + 0.2 * k), 30, { count:10, spread:90, shapes:['coin'] }); FX.sound('coin'); }, k * 280);
-      setTimeout(()=> FX.flash($('.frame', rs), 'win'), 1600);
+      setTimeout(()=>{ FX.flash($('.frame', rs), 'win'); FX.confettiBurst(layer); }, 1600);
     };
     $('.reset', rs).addEventListener('click', runResults); setTimeout(runResults, 700);
     // price check: which costs more? (each tag's reels: '?', then 0-9 twice)
@@ -200,7 +210,7 @@
     const clearPath = ()=>{ path.forEach(c=> c.classList.remove('sel')); path = []; showWord(); };
     const fmt = (t)=> Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0');
     const tick = ()=>{ if (!FX.awake(hu)) return; timeLeft--; $('.h-time', hu).textContent = fmt(Math.max(0, timeLeft)); if (timeLeft <= 10) $('.h-time', hu).classList.add('low');
-      if (timeLeft <= 0){ clearInterval(timer); over = true; clearPath(); hu.classList.add('over'); showWord('Time! ' + found.size + ' words · ' + score + ' points'); FX.flash($('.frame', hu), 'win'); FX.sound('win'); } };
+      if (timeLeft <= 0){ clearInterval(timer); over = true; clearPath(); hu.classList.add('over'); showWord('Time! ' + found.size + ' words · ' + score + ' points'); FX.flash($('.frame', hu), 'win'); FX.confettiBurst($('.fx-layer', hu)); FX.sound('win'); } };
     const start = ()=>{ if (!timer && !over) timer = setInterval(tick, 1000); };
     async function play(){
       if (busy || over) return;
@@ -215,6 +225,7 @@
       cells.forEach(c=>{ c.classList.remove('sel'); c.style.setProperty('--hue', hue); c.classList.remove('found'); void c.offsetWidth; c.classList.add('found'); });
       score += pts; FX.countUp($('.h-score', hu), score, 400, score - pts); $('.h-words', hu).textContent = found.size; FX.pop($('.h-score', hu).parentElement);
       path = []; showWord(w.toUpperCase() + '  +' + pts); FX.sound('win'); busy = false;
+      if (w.length >= 6) FX.coinShower($('.fx-layer', hu), 2);   // a long word is a big win
     }
     $$('.cell', hu).forEach(c=> c.addEventListener('click', ()=>{
       if (busy || over) return; start(); FX.sound('tap');
