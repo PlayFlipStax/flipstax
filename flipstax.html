@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>FlipStax - Flip, Vote, Jumble & Solve</title>
-<meta name="description" content="FlipStax is a free daily browser game combining opinion-based versus matchups, trivia challenges, and a word-solving puzzle - flip, vote, jumble, and solve.">
+<meta name="description" content="FlipStax: Daily Stax: one run, once a day. Infinity Flips: race to the finish line - vote, scan the crowd, crack riddles, drop chips, open the vault.">
 
 <!-- Open Graph -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="FlipStax">
 <meta property="og:url" content="https://flipstax-one.vercel.app/">
 <meta property="og:title" content="FlipStax - Flip, Vote, Jumble & Solve">
-<meta property="og:description" content="A free daily browser game combining opinion-based versus matchups, trivia challenges, and a word-solving puzzle.">
+<meta property="og:description" content="Daily Stax: one run, once a day. Infinity Flips: race to the finish line - vote, scan the crowd, crack riddles, drop chips, open the vault.">
 <meta property="og:image" content="https://flipstax-one.vercel.app/images/og-preview-v2.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -19,7 +19,7 @@
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="FlipStax - Flip, Vote, Jumble & Solve">
-<meta name="twitter:description" content="A free daily browser game combining opinion-based versus matchups, trivia challenges, and a word-solving puzzle.">
+<meta name="twitter:description" content="Daily Stax: one run, once a day. Infinity Flips: race to the finish line - vote, scan the crowd, crack riddles, drop chips, open the vault.">
 <meta name="twitter:image" content="https://flipstax-one.vercel.app/images/og-preview-v2.jpg">
 
 <!-- Favicon / home-screen icons -->
@@ -2904,8 +2904,8 @@
         <svg viewBox="0 0 64 32" width="44" height="22"><defs><linearGradient id="msInfGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ff2f9e"/><stop offset="1" stop-color="#19b6e6"/></linearGradient></defs><path d="M32 16 C26 7 18 5 12 8 C4 12 4 20 12 24 C18 27 26 25 32 16 C38 7 46 5 52 8 C60 12 60 20 52 24 C46 27 38 25 32 16 Z" fill="none" stroke="url(#msInfGrad)" stroke-width="5.5" stroke-linejoin="round"/></svg>
         <span>FLIPS</span>
       </div>
-      <div class="ms-tag">No clock. No limit.</div>
-      <div class="ms-desc">Endless flipping. Vote on opinions forever, climb the tiers, and chase streaks and bonus rounds.</div>
+      <div class="ms-tag">Race to the finish line.</div>
+      <div class="ms-desc" id="msInfDesc">Vote, scan the crowd, crack riddles, drop chips in Orbit Drop and open The Mothership Vault.</div>
       <div class="ms-cta">START FLIPPING &#9654;</div>
     </div>
   </div>
@@ -12637,6 +12637,8 @@
   els.howtoSkip.addEventListener('click', ()=> closeHowTo());
   els.howtoOverlay.addEventListener('click', e=> e.stopPropagation());
   document.addEventListener('keydown', e=>{ if (e.key === 'Escape' && !els.howtoOverlay.classList.contains('hidden')) closeHowTo(); });
+  // Infinity's line on the mode picker, with the names from data/game-names.js.
+  { const d = document.getElementById('msInfDesc'); if (d) d.textContent = 'Vote, scan the crowd, crack riddles, drop chips in ' + GN.orbitDrop + ' and open ' + GN.vault + '.'; }
   document.querySelectorAll('[data-howto]').forEach(b=> b.addEventListener('click', e=>{ e.stopPropagation(); openHowTo(b.dataset.howto); }));
 
   els.modeInfinityBtn.addEventListener('click', ()=>{
