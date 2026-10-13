@@ -49,6 +49,19 @@
 .w-emoji  { --w1:#fff27a; --w2:#ffb21f; --w3:#ff3c9d; --w4:#5a1052; --accent:#ffffff; }
 .w-first  { --w1:#9ff5ea; --w2:#1fc7c1; --w3:#ff6b5a; --w4:#3a0f3d; --accent:#ffd23f; }
 .w-hunt   { --w1:#9fb8ff; --w2:#5468ff; --w3:#2a1ea8; --w4:#0e0a33; --accent:#5ff8ff; }
+/* each game's own rays: colour, ray width (--ray-on) and spacing (--ray-period,
+   so the count is 360 / period), speed and direction - one family, different
+   worlds. The entry keeps its own two-tone burst (.ms-rays). */
+.w-vs     { --ray-c:rgba(255,236,250,0.26); --ray-on:6deg;  --ray-period:12deg; --ray-speed:40s; --ray-dir:normal; }
+.w-trivia { --ray-c:rgba(220,236,255,0.22); --ray-on:4deg;  --ray-period:10deg; --ray-speed:56s; --ray-dir:reverse; }
+.w-powerup{ --ray-c:rgba(240,255,200,0.24); --ray-on:9deg;  --ray-period:20deg; --ray-speed:34s; --ray-dir:normal; }
+.w-jumble { --ray-c:rgba(255,232,190,0.24); --ray-on:5deg;  --ray-period:12deg; --ray-speed:44s; --ray-dir:reverse; }
+.w-results{ --ray-c:rgba(255,246,200,0.28); --ray-on:7deg;  --ray-period:15deg; --ray-speed:30s; --ray-dir:normal; }
+.w-price  { --ray-c:rgba(220,255,225,0.22); --ray-on:8deg;  --ray-period:18deg; --ray-speed:50s; --ray-dir:reverse; }
+.w-odd    { --ray-c:rgba(240,220,255,0.24); --ray-on:3deg;  --ray-period:9deg;  --ray-speed:62s; --ray-dir:normal; }
+.w-emoji  { --ray-c:rgba(255,250,200,0.26); --ray-on:10deg; --ray-period:24deg; --ray-speed:38s; --ray-dir:reverse; }
+.w-first  { --ray-c:rgba(220,255,250,0.22); --ray-on:6deg;  --ray-period:14deg; --ray-speed:46s; --ray-dir:normal; }
+.w-hunt   { --ray-c:rgba(200,240,255,0.22); --ray-on:4deg;  --ray-period:11deg; --ray-speed:52s; --ray-dir:reverse; }
 
 /* ---------- page ---------- */
 *{ box-sizing:border-box; }
@@ -73,8 +86,8 @@ body{ margin:0; background:#160832; color:var(--cream); font-family:var(--f-body
   box-shadow:0 0 0 5px #3d1300, 0 0 0 9px var(--gold-3), 0 18px 40px rgba(0,0,0,0.5); }
 .bg{ position:absolute; inset:0; background:radial-gradient(120% 75% at 50% 20%, var(--w1) 0%, var(--w2) 26%, var(--w3) 58%, var(--w4) 100%); }
 .bg .rays{ position:absolute; left:50%; top:22%; width:1320px; height:1320px; margin:-660px 0 0 -660px;
-  background:repeating-conic-gradient(from 0deg, rgba(255,250,220,0.22) 0deg 7deg, rgba(255,250,220,0) 7deg 15deg);
-  animation:rayTurn var(--ray-turn) linear infinite; }
+  background:repeating-conic-gradient(from 0deg, var(--ray-c, rgba(255,250,220,0.22)) 0deg var(--ray-on, 7deg), transparent var(--ray-on, 7deg) var(--ray-period, 15deg));
+  animation:rayTurn var(--ray-speed, var(--ray-turn)) linear infinite; animation-direction:var(--ray-dir, normal); }
 .bg .glow{ position:absolute; left:50%; top:20%; width:420px; height:420px; margin:-210px 0 0 -210px; border-radius:50%;
   background:radial-gradient(circle, rgba(255,255,230,0.55), rgba(255,255,230,0) 65%); animation:glowPulse 4s var(--ease-io) infinite alternate; }
 @keyframes rayTurn{ to{ transform:rotate(360deg); } }
