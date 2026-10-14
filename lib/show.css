@@ -84,8 +84,6 @@
 /* ---------- the host (alien) ---------- */
 .alien{ width:58px; height:66px; flex-shrink:0; animation:alienBob 2.4s var(--ease-io) infinite alternate; }
 .alien-svg{ width:100%; height:100%; overflow:visible; }
-.al-head{ fill:#7cf06a; stroke:#1d5a12; stroke-width:3; } .al-body{ fill:#5fd34d; stroke:#1d5a12; stroke-width:3; } .al-eye{ fill:#1b1033; } .al-shine{ fill:#fff; }
-.al-mouth{ fill:none; stroke:#1d5a12; stroke-width:3; stroke-linecap:round; } .al-ant{ stroke:#1d5a12; stroke-width:3; } .al-ant-tip{ fill:var(--gold-2); stroke:#7a3d00; stroke-width:2; }
 @keyframes alienBob{ from{ transform:translateY(0); } to{ transform:translateY(-6px); } }
 .alien.cheer{ animation:alienCheer 0.5s var(--ease-pop) 3; } .alien.sad{ animation:alienSad 1.4s var(--ease-out); }
 @keyframes alienCheer{ 0%, 100%{ transform:translateY(0) scale(1); } 40%{ transform:translateY(-22px) scale(1.12) rotate(-6deg); } }

@@ -3677,6 +3677,7 @@
 <script src="data/emoji-decode.js"></script>
 <script src="data/time-warp.js"></script>
 <script src="lib/orbit-physics.js"></script>
+<script src="lib/host-alien.js"></script>
 <script src="lib/show-fx.js"></script>
 <script>
 (function(){
@@ -7734,27 +7735,9 @@
   };
   Object.keys(RUN_CARD_META).forEach(k=>{ PERSONALITY_META[k] = Object.assign({ run:true }, RUN_CARD_META[k]); });
   function isRunCard(k){ return RUN_CARD_ORDER.indexOf(k) !== -1; }
-  function visitorSvg(opts){
-    opts = opts || {};
-    const id = 'v' + Math.random().toString(36).slice(2, 7);
-    return '<svg class="' + (opts.cls || '') + '" viewBox="0 0 120 120" aria-hidden="true">' +
-      (opts.green ? '<defs><radialGradient id="' + id + 'h" cx="0.42" cy="0.35" r="0.7"><stop offset="0" stop-color="#d8ffc9"/><stop offset="0.55" stop-color="#5fe08a"/><stop offset="1" stop-color="#1f9a4a"/></radialGradient>'
-        : '<defs><radialGradient id="' + id + 'h" cx="0.42" cy="0.35" r="0.7"><stop offset="0" stop-color="#d9c6ff"/><stop offset="0.55" stop-color="#9f7bff"/><stop offset="1" stop-color="#5a3bd6"/></radialGradient>') +
-      '<radialGradient id="' + id + 'e" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#2a6a7a"/><stop offset="0.6" stop-color="#0b2a3a"/><stop offset="1" stop-color="#061820"/></radialGradient></defs>' +
-      // antennae with star tips
-      '<g stroke="#ffd23f" stroke-width="3" stroke-linecap="round" fill="none"><path d="M44 30 Q38 14 30 10"/><path d="M60 26 L60 6"/><path d="M76 30 Q82 14 90 10"/></g>' +
-      '<g fill="#fff3a8" stroke="#ffb000" stroke-width="1.5"><path d="M30 4 l2.2 4.4 4.8 .7-3.5 3.4.8 4.8-4.3-2.3-4.3 2.3.8-4.8-3.5-3.4 4.8-.7z"/><path d="M60 0 l2.2 4.4 4.8 .7-3.5 3.4.8 4.8-4.3-2.3-4.3 2.3.8-4.8-3.5-3.4 4.8-.7z"/><path d="M90 4 l2.2 4.4 4.8 .7-3.5 3.4.8 4.8-4.3-2.3-4.3 2.3.8-4.8-3.5-3.4 4.8-.7z"/></g>' +
-      // head: a wide rounded bean, teal cheeks, gold freckles
-      '<path d="M60 26 C92 26 106 46 104 68 C102 92 84 108 60 108 C36 108 18 92 16 68 C14 46 28 26 60 26 Z" fill="url(#' + id + 'h)" stroke="#ffd23f" stroke-width="3"/>' +
-      '<ellipse cx="30" cy="80" rx="9" ry="6" fill="#2dd4c4" opacity="0.55"/><ellipse cx="90" cy="80" rx="9" ry="6" fill="#2dd4c4" opacity="0.55"/>' +
-      '<g fill="#ffd23f"><circle cx="36" cy="88" r="1.8"/><circle cx="41" cy="92" r="1.4"/><circle cx="84" cy="88" r="1.8"/><circle cx="79" cy="92" r="1.4"/></g>' +
-      // eyes: big round glossy, with a teal glint
-      '<g class="vis-eyes"><circle cx="43" cy="64" r="15" fill="url(#' + id + 'e)" stroke="#1a0b40" stroke-width="2"/><circle cx="77" cy="64" r="15" fill="url(#' + id + 'e)" stroke="#1a0b40" stroke-width="2"/>' +
-      '<circle cx="38" cy="58" r="5" fill="#fff"/><circle cx="72" cy="58" r="5" fill="#fff"/><circle cx="47" cy="69" r="2.2" fill="#7df9ff"/><circle cx="81" cy="69" r="2.2" fill="#7df9ff"/></g>' +
-      // a small, friendly smile
-      '<path d="M50 90 Q60 98 70 90" stroke="#1a0b40" stroke-width="3" fill="none" stroke-linecap="round"/>' +
-      '</svg>';
-  }
+  // The host alien (the riddle's Mystery Visitor, the Vault's helper, the alien card art): one picture, drawn in
+  // lib/host-alien.js, whatever the options (the old green / purple variants are gone).
+  function visitorSvg(opts){ return window.HostAlien.svg((opts && opts.cls) || ''); }
   function mothershipSvg(){
     return '<svg viewBox="0 0 160 110" aria-hidden="true"><defs><linearGradient id="msb" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fff3a8"/><stop offset="0.5" stop-color="#ffc928"/><stop offset="1" stop-color="#b86a00"/></linearGradient>' +
       '<linearGradient id="msd" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#d6fbff"/><stop offset="1" stop-color="#5fd4e6"/></linearGradient>' +
