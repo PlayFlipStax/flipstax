@@ -501,6 +501,9 @@
   :root.mode-daily .event-overlay.stack.brainbreak .bb-glyph{ font-size:96px; line-height:1; filter:drop-shadow(0 4px 4px rgba(0,0,0,0.3)); }
   :root.mode-daily .event-overlay.stack.brainbreak .bb-name{ font-size:clamp(22px, 6.4vw, 28px); line-height:1.1; }
   :root.mode-daily .event-overlay.stack.brainbreak .bb-sub{ font-size:14px; font-weight:700; opacity:0.95; }
+  :root.mode-daily .event-overlay.stack.bb-two .event-tile:nth-child(1){ padding-bottom:38px; }
+  :root.mode-daily .event-overlay.stack.bb-two .event-tile:nth-child(2){ padding-top:38px; }
+  :root.mode-daily .event-overlay.stack.bb-two .bb-glyph{ font-size:clamp(52px, 11dvh, 96px); }
   :root.mode-daily .event-overlay.stack.bb-two .bb-sub.flip{ font:900 34px/1 var(--f-display); letter-spacing:1px; opacity:1; }
   .bb-sub.flip{ display:inline-block; animation:bbFlip 0.55s cubic-bezier(.3,1.4,.5,1) both; }
   @keyframes bbFlip{ from{ transform:rotateX(90deg) scale(0.6); opacity:0; } to{ transform:none; opacity:1; } }
@@ -514,6 +517,16 @@
   @media (prefers-reduced-motion: reduce){ :root.mode-daily .event-overlay.stack .event-prompt::before, :root.mode-daily .event-overlay.stack .event-prompt::after, .bb-sub.flip,
     :root.mode-daily .event-overlay.stack .event-tile.is-wrong, :root.mode-daily .event-overlay.stack .event-tile.bb-press{ animation:none !important; } }
   @media (max-height:700px){ :root.mode-daily .event-overlay.stack.brainbreak .bb-glyph{ font-size:84px; } }
+  /* short phones: the two-card games shrink their art and the VS badge so the badge never touches the text */
+  @media (max-height:700px){
+    :root.mode-daily .event-overlay.stack.bb-two .bb-glyph{ font-size:34px; }
+    :root.mode-daily .event-overlay.stack.bb-two .bb-name{ font-size:20px; }
+    :root.mode-daily .event-overlay.stack.bb-two .bb-sub{ font-size:13px; }
+    :root.mode-daily .event-overlay.stack.bb-two .bb-sub.flip{ font-size:24px; }
+    :root.mode-daily .event-overlay.stack.bb-two .event-tile:nth-child(1){ padding-bottom:24px; }
+    :root.mode-daily .event-overlay.stack.bb-two .event-tile:nth-child(2){ padding-top:24px; }
+    .bb-vs{ width:46px; height:46px; margin:-23px 0 0 -23px; font-size:20px; border-width:3px; }
+  }
   .powerup-icon{ font-size:56px; margin-bottom:6px; animation: powerupBounce 1s ease-in-out infinite; }
   .powerup-icon.hidden{ display:none; }
   @keyframes powerupBounce{ 0%,100%{ transform:translateY(0) rotate(-6deg); } 50%{ transform:translateY(-10px) rotate(6deg); } }
@@ -2357,8 +2370,15 @@
   .show-host .alien{ width:36px; height:41px; }
   /* On the results screen the host steps out of the way: it used to sit on the Share button. */
   :root.results-open .show-host{ display:none !important; }
-  .show-say{ max-width:min(250px, calc(100vw - 80px)); padding:6px 11px; border-radius:14px 14px 14px 4px; background:#fff; color:#3a1060; font:800 13px/1.25 'Inter', sans-serif;
-    box-shadow:0 3px 10px rgba(30,0,40,0.4); opacity:0; transform:translateY(6px) scale(0.9); transform-origin:0 100%; transition:opacity 0.2s, transform 0.25s var(--ease-pop); margin-bottom:22px; }
+  /* The host and his bubble live in a reserved strip at the bottom (HOST_STRIP tall): the screens keep that
+     strip clear (the board's hint line, the popups' bottom padding), so the bubble never covers an answer,
+     a card or its text. One line, and it hides itself after 2.5s. */
+  .show-say{ max-width:calc(100vw - 84px); padding:5px 12px; border-radius:14px 14px 14px 4px; background:#fff; color:#3a1060; font:800 13px/1.25 'Inter', sans-serif; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    box-shadow:0 3px 10px rgba(30,0,40,0.4); opacity:0; transform:translateY(6px) scale(0.9); transform-origin:0 100%; transition:opacity 0.2s, transform 0.25s var(--ease-pop); margin-bottom:10px; }
+  :root.host-say .hint{ visibility:hidden; }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay{ padding-bottom:calc(54px + env(safe-area-inset-bottom)); }
+  :root.mode-daily .event-overlay.stack{ padding-bottom:calc(54px + env(safe-area-inset-bottom)); }
+  :root.mode-daily .solve-overlay{ padding-bottom:calc(56px + env(safe-area-inset-bottom)); }
   .show-say.on{ opacity:1; transform:none; }
   :root.mode-daily .hint{ padding-left:52px; padding-right:52px; }
   /* popups over the board (Brain Beam, power-ups) show the world's rays, not the cards */
@@ -9181,7 +9201,7 @@
       '<div class="sc-name">' + name + '!</div></div>';
     showCard.removeAttribute('role'); showCard.removeAttribute('aria-label');
     showCard.classList.remove('hidden');
-    clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on');   // (no stale line over the title card)
+    clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');   // (no stale line over the title card)
     if (sfx.bumper) sfx.bumper(last);
     setTimeout(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; then(); }, prefersReducedMotion() ? SHOW_BUMPER_MS + 300 : SHOW_BUMPER_MS);
   }
@@ -12593,13 +12613,15 @@
   function showFlash(kind){ FX.flash(showFrame, kind); }
   // The host's speech bubble (B3): a short line from data/game-names.js
   // (cameo), about a second and a half. B9 adds his voice blips.
+  const HOST_SAY_MAX_MS = 2500;   // a speech bubble never stays longer than this
   let hostSayT = null;
   function hostLine(key){ const v = HOST_CAMEO[key]; return Array.isArray(v) ? v[Math.floor(Math.random() * v.length)] : (v || ''); }
   function hostSay(text, ms){
     if (!text || !document.documentElement.classList.contains('mode-daily') && !document.documentElement.classList.contains('mode-infinity')) return;
     const b = document.getElementById('showSay');
     b.textContent = text; b.classList.add('on');
-    clearTimeout(hostSayT); hostSayT = setTimeout(()=> b.classList.remove('on'), ms || 1600);
+    document.documentElement.classList.add('host-say');
+    clearTimeout(hostSayT); hostSayT = setTimeout(()=>{ b.classList.remove('on'); document.documentElement.classList.remove('host-say'); }, Math.min(ms || 1600, HOST_SAY_MAX_MS));
     if (sfx.hostVoice) sfx.hostVoice(text);
   }
   // A Brain Beam's answer, the full show treatment (B3): right = the gold
@@ -13649,6 +13671,8 @@
       layoutBoard: () => layoutBoard(),
       putNext: (name) => { const d = decks[contentPoolKey()]; const i = d.cards.findIndex((c, k)=> k >= d.next && (c.a === name || c.b === name)); if (i >= 0){ const [c] = d.cards.splice(i, 1); d.cards.splice(d.next, 0, c); } return i; },
       showRunTrivia: () => runTriviaQuestion(),
+      showBreakNow: (game) => { runActive = true; runPhase = 'running'; return runBrainBreak({ t:'break', game, seed: 20261013 }, ()=>{}); },
+      hostSayNow: (t, ms) => hostSay(t, ms),
       showQuizNow: (riddle) => { runActive = true; runPhase = 'running'; runTriviaQuestion(null, null, { t:'quiz', riddle: !!riddle, subject:'science', seed: 12345 }); return window.__debugLastTriviaQ; },
       showPlan: (date, cycle) => buildShowPlan(date || runStartDate || todayStr(), cycle || 0),
       showReadout: () => { els.finOverlay.classList.add('hidden'); showRunReadout(); return !!runResultToday; },
