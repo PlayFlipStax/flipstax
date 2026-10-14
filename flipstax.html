@@ -3056,6 +3056,29 @@
     :root.mode-daily .sp-tray{ gap:2px; }
     :root.mode-daily .status-banner.score-pill{ gap:3px; padding-left:9px; }
   }
+
+  /* ---- Infinity Riddle Round, vivid again (Oct 2026) ----
+     Each riddle gets its own colour world (green, purple, orange, pink, teal
+     or blue - startInfRiddle sets --ir-p1/--ir-p2 and the rays' stops): the
+     question sits in a big glossy colour panel with large text, over four big
+     coloured answer buttons (2x2, tall). The hard riddles keep their badge. */
+  .ir-overlay{ padding:calc(42px + env(safe-area-inset-top)) 42px calc(84px + env(safe-area-inset-bottom)); }   /* (the overlay bleeds 30px past each edge) */
+  .ir-overlay .ir-panel{ max-width:410px; padding:16px 14px 16px; border-radius:26px; border:4px solid #fff3c4;
+    background:linear-gradient(160deg, var(--ir-p1, #43e28c), var(--ir-p2, #0f9f55));
+    box-shadow:0 0 0 4px rgba(20,0,40,0.35), 0 18px 46px rgba(10,0,30,0.5), inset 0 0 44px rgba(255,255,255,0.28), inset 0 -8px 0 rgba(0,0,0,0.12); }
+  .ir-overlay .ir-eyebrow{ color:#fff; text-shadow:0 2px 0 rgba(0,0,0,0.3); font-size:13px; }
+  .ir-overlay .ir-timer{ font-size:38px; color:#fff; text-shadow:0 3px 0 rgba(0,0,0,0.3); margin:2px 0 6px; }
+  .ir-overlay .ir-q{ font:900 clamp(25px, 7.4vw, 32px)/1.14 'Big Shoulders Display', sans-serif; letter-spacing:0.3px; color:#fff; text-shadow:0 3px 0 rgba(0,0,0,0.28), 0 0 18px rgba(255,255,255,0.35);
+    margin:4px 0 10px; padding:14px 10px; border-radius:18px; background:rgba(20,6,50,0.34); box-shadow:inset 0 0 0 2px rgba(255,255,255,0.35); }
+  .ir-overlay .ir-len{ color:#fff; font-size:11.5px; text-shadow:0 1px 0 rgba(0,0,0,0.3); opacity:0.95; margin-bottom:10px; }
+  .ir-overlay .ir-opts{ gap:11px; }
+  .ir-overlay .ir-opt{ min-height:clamp(70px, 11.5dvh, 96px); padding:10px 8px; border:3px solid rgba(255,255,255,0.85); border-radius:20px; font:900 clamp(19px, 5.6vw, 24px)/1.12 'Big Shoulders Display', sans-serif; letter-spacing:0.3px; color:#fff;
+    text-shadow:0 2px 0 rgba(0,0,0,0.28); background-image:linear-gradient(180deg, rgba(255,255,255,0.34), rgba(255,255,255,0.08) 45%, rgba(0,0,0,0.22)); box-shadow:0 5px 0 rgba(20,10,60,0.4), 0 10px 18px rgba(20,10,60,0.35), inset 0 2px 0 rgba(255,255,255,0.45); }
+  .ir-overlay .ir-opt:nth-child(1){ background-color:#f23c5a; } .ir-overlay .ir-opt:nth-child(2){ background-color:#2f7bff; }
+  .ir-overlay .ir-opt:nth-child(3){ background-color:#17b86b; } .ir-overlay .ir-opt:nth-child(4){ background-color:#f09d00; }
+  .ir-overlay .ir-opt.right{ background-color:#2fbf62; background-image:linear-gradient(180deg,#e2ffbd,#6ce38f 60%,#2fbf62); color:#06331a; text-shadow:none; box-shadow:0 5px 0 #1d7a3c, 0 0 22px rgba(120,255,160,0.9); }
+  .ir-overlay .ir-opt.wrong{ background-color:#ff7b7b; background-image:linear-gradient(180deg,#ffd0d0,#ff7b7b); color:#4a0000; text-shadow:none; box-shadow:0 5px 0 #9c2a2a; }
+  @media (max-height:700px){ .ir-overlay .ir-panel{ padding:12px 12px 12px; } .ir-overlay .ir-q{ padding:10px 8px; font-size:clamp(22px, 6.6vw, 27px); } .ir-overlay .ir-timer{ font-size:30px; margin:0 0 4px; } }
 </style>
 </head>
 <body>
@@ -11054,12 +11077,24 @@
       field.appendChild(m);
     }
   }
+  // Each Infinity riddle gets one of these colour worlds: the panel's two colours (p) and the rays' background stops (w).
+  const IR_PALETTES = [
+    { p:['#43e28c', '#0f9f55'], w:['#c8ff7a', '#22c56b', '#0f7a6b', '#0b2c3d'] },   // green
+    { p:['#b46bff', '#6a1fb0'], w:['#e6b3ff', '#a34dff', '#5a1aa8', '#1e0a3d'] },   // purple
+    { p:['#ff9a3d', '#e0371f'], w:['#ffd08a', '#ff6a2b', '#d81b4a', '#3d0b2b'] },   // orange
+    { p:['#ff5fb0', '#b0137a'], w:['#ff9ad1', '#ff3c9d', '#8d2ad6', '#26105c'] },   // pink
+    { p:['#33d6cd', '#1670c2'], w:['#9ff5ea', '#1fc7c1', '#2a6fd6', '#0b1c4d'] },   // teal
+    { p:['#5aa0ff', '#3a2fc0'], w:['#8fd0ff', '#3b7bff', '#5a24c8', '#170a45'] },   // blue
+  ];
   function startInfRiddle(forceIdx){
     if (infRiddleState !== 'idle' || !INFINITY_RIDDLES.length) return false;
     infRiddle = INFINITY_RIDDLES[typeof forceIdx === 'number' ? forceIdx : nextInfRiddleIdx(infRiddleIsHardNext())];
     infRiddleState = 'intro';
     if (infRiddle.hard && infRun && !infRun.finale){ infRun.riddlesHard = (infRun.riddlesHard || 0) + 1; saveInfRun(); }
     els.irOverlay.classList.toggle('hard', !!infRiddle.hard);
+    { const pal = IR_PALETTES[(INFINITY_RIDDLES.indexOf(infRiddle) + (infRiddle.hard ? 1 : 0) + 6) % IR_PALETTES.length], bg = els.irOverlay.querySelector('.ir-bg');
+      els.irOverlay.style.setProperty('--ir-p1', pal.p[0]); els.irOverlay.style.setProperty('--ir-p2', pal.p[1]);
+      if (bg) pal.w.forEach((c, k)=> bg.style.setProperty('--w' + (k + 1), c)); }
     stopTallyPolling(); clearRoundTimer();
     // Not a vote round - keep the stalled-round watchdog out of it.
     voted = false; votedSinceTime = null;
