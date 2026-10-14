@@ -1336,6 +1336,13 @@
   .fin-vault.as-image .vr-shareimg{ display:block; width:min(100%, calc((100dvh - 118px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 0.5625)); height:auto; aspect-ratio:9 / 16;
     border-radius:16px; box-shadow:0 10px 30px rgba(20,0,40,0.55), 0 0 0 2px rgba(255,214,90,0.6); }
   .fin-vault.as-image .vault-scene, .fin-vault.as-image .vault-rewards > :not(.vr-shareimg):not(.vault-buttons){ display:none !important; }
+  /* The button bar is its own row at the bottom with room round it; the corner host steps aside on the finale
+     (and, in replay-test mode, a strip is kept free for the TEST button). */
+  :root.fin-open .show-host{ display:none !important; }
+  .fin-vault.shown .vault-buttons{ padding-top:14px; }
+  :root.replay .fin-vault.shown .vault-buttons, :root.replay #readoutOverlay.as-image .solve-buttons{ padding-bottom:calc(58px + env(safe-area-inset-bottom)); }
+  :root.replay .fin-vault.as-image.shown{ padding-bottom:124px; }
+  :root.replay .fin-vault.as-image .vr-shareimg{ width:min(100%, calc((100dvh - 190px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 0.5625)); }
   .fin-vault.as-image.shown{ padding-bottom:76px; min-height:calc(100dvh - 36px - env(safe-area-inset-top) - env(safe-area-inset-bottom)); justify-content:center; }
   .fin-vault.shown .vault-buttons{ position:fixed; left:0; right:0; bottom:0; z-index:6; margin:0; gap:8px; flex-wrap:nowrap; justify-content:center;
     padding:10px 12px calc(10px + env(safe-area-inset-bottom)); background:linear-gradient(180deg, rgba(28,11,61,0), rgba(28,11,61,0.92) 30%); }
@@ -8700,6 +8707,15 @@
     if (!canvas) console.warn('FlipStax: run share image fell back to the simple card - ' + why);
     return canvas;
   }
+  // Swap the results' HTML layout for the share image only once the image has
+  // really loaded (it used to be swapped when its src was set, so a slow or
+  // failed load left an empty orange frame); a failure keeps the HTML layout.
+  function swapInShareImage(img, box, url){
+    img.onload = ()=>{ box.classList.add('as-image'); };
+    img.onerror = ()=>{ box.classList.remove('as-image'); console.warn('FlipStax: the results image failed to load; showing the plain results layout'); };
+    img.src = url;
+    return true;
+  }
   let runSharePre = null;   // { a, done, canvas, blob, promise } for the current run's award
   function prebuildRunShare(a){
     if (!a) return null;
@@ -10333,10 +10349,10 @@
     stage.classList.remove('as-image'); if (shareImg.src.startsWith('blob:')) URL.revokeObjectURL(shareImg.src); shareImg.removeAttribute('src');
     const asImage = (pre)=>{
       if (!pre || !pre.canvas || infRun.finale.award !== a) return false;
-      try{ shareImg.src = pre.blob ? URL.createObjectURL(pre.blob) : pre.canvas.toDataURL('image/png'); }catch(e){ return false; }
+      try{ swapInShareImage(shareImg, stage, pre.blob ? URL.createObjectURL(pre.blob) : pre.canvas.toDataURL('image/png')); }catch(e){ return false; }
       shareImg.alt = 'Run complete: ' + a.finalScore + ' points (' + a.runScore + ' run' + (a.bonus ? ' + ' + a.bonus + ' ' + GN.orbitDrop + ' bonus' : '') + '). ' + pm.name + '. ' + runShareStatLine(a) + '.' +
         (a.badges.length ? ' Badges: ' + a.badges.map(id=> (BADGES.find(x=> x.id === id) || { name:id }).name).join(', ') + '.' : '') + (newCards.length ? ' New card unlocked.' : '');
-      stage.classList.add('as-image'); return true;
+      return true;
     };
     const showAll = ()=>{
       stage.classList.remove('collect'); coinRun = null;
@@ -12041,9 +12057,9 @@
     const pre = prebuildDailyShare(r), shownAt = performance.now();
     const asImage = (p)=>{
       if (!p || !p.canvas || dailySharePre !== p) return false;
-      try{ shareImg.src = p.blob ? URL.createObjectURL(p.blob) : p.canvas.toDataURL('image/png'); }catch(e){ return false; }
+      try{ swapInShareImage(shareImg, els.readoutOverlay, p.blob ? URL.createObjectURL(p.blob) : p.canvas.toDataURL('image/png')); }catch(e){ return false; }
       shareImg.alt = 'Daily Stax complete: ' + shownScore(r.score) + ' points. ' + meta.name + '. ' + r.triviaCorrect + ' of ' + r.triviaTotal + ' trivia correct. ' + (r.solved ? 'Word Warp solved in ' + formatRaceTime(r.solveMs) + '.' : 'Word not solved.');
-      els.readoutOverlay.classList.add('as-image'); return true;
+      return true;
     };
     if (!(pre.done && asImage(pre))) pre.promise.then(p=>{ if (performance.now() - shownAt < 4000 && els.readoutOverlay.classList.contains('show')) asImage(p); });
     els.readoutOverlay.classList.add('show');
@@ -12543,6 +12559,7 @@
   function setShowWorld(w){ if (w === showWorldNow) return; showWorldNow = w; showBg.className = 'show-bg bg w-' + w; }
   function syncShowWorld(){
     const open = el=> el && !el.classList.contains('hidden');
+    document.documentElement.classList.toggle('fin-open', open(els.finOverlay) && !els.finOverlay.classList.contains('daily-vault'));
     if (document.documentElement.classList.contains('mode-infinity')){
       // C5: Infinity's VS world; paused under its full-screen layers.
       setShowWorld('entry');
@@ -14103,6 +14120,7 @@
   // earned, a clock part-way down). Nothing here is saved (see REPLAY above), and none of
   // it exists on the production domain.
   if (REPLAY){
+    document.documentElement.classList.add('replay');
     const css = document.createElement('style');
     css.textContent = '.replay-tag{position:fixed;top:calc(2px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);z-index:9998;pointer-events:none;background:#ff3c9d;color:#fff;font:800 10px/1.5 Inter,system-ui,sans-serif;letter-spacing:1px;padding:1px 10px;border-radius:99px;box-shadow:0 1px 4px rgba(0,0,0,0.35)}' +
       '.replay-btn{position:fixed;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));z-index:9999;background:#ff3c9d;color:#fff;border:2px solid #fff;border-radius:99px;font:800 12px/1 Inter,system-ui,sans-serif;letter-spacing:1px;padding:8px 12px;opacity:0.92;cursor:pointer}' +
