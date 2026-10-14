@@ -7407,20 +7407,21 @@
       milestones:[], pendingBadges:[], ended:null, endedAt:null, finale:null };
   }
   function loadInfRun(){
+    if (REPLAY) return null;   // replay mode never reads a saved run
     try{
       const r = JSON.parse(localStorage.getItem(INF_RUN_KEY) || 'null');
       if (r && r.v === 1 && typeof r.score === 'number' && typeof r.clockMs === 'number') return Object.assign(freshInfRun(), r);
     }catch(e){}
     return null;
   }
-  function saveInfRun(){ if (!infRun) return; try{ localStorage.setItem(INF_RUN_KEY, JSON.stringify(infRun)); }catch(e){} }
+  function saveInfRun(){ if (!infRun || REPLAY) return; try{ localStorage.setItem(INF_RUN_KEY, JSON.stringify(infRun)); }catch(e){} }
   let infRun = loadInfRun();
   // A new run also starts a new personality block: the finale judges the run.
   function ensureInfRun(){
     if (infRun) return infRun;
     infRun = freshInfRun();
     // This device's run number (the host's full intros are for the first few).
-    let n = 0; try{ n = (parseInt(localStorage.getItem(INF_RUNS_KEY), 10) || 0) + 1; localStorage.setItem(INF_RUNS_KEY, String(n)); }catch(e){ n = 1; }
+    let n = 0; try{ n = (parseInt(localStorage.getItem(INF_RUNS_KEY), 10) || 0) + 1; if (!REPLAY) localStorage.setItem(INF_RUNS_KEY, String(n)); }catch(e){ n = 1; }
     infRun.runNo = n;
     infBlock = freshInfBlock(); saveInfBlock();
     saveInfRun();
@@ -7820,7 +7821,7 @@
     }catch(e){}
     return freshInfBlock();
   }
-  function saveInfBlock(){ try{ localStorage.setItem(INF_BLOCK_KEY, JSON.stringify(infBlock)); }catch(e){} }
+  function saveInfBlock(){ if (REPLAY) return; try{ localStorage.setItem(INF_BLOCK_KEY, JSON.stringify(infBlock)); }catch(e){} }
   let infBlock = loadInfBlock();
 
   // ---------- Infinity badges ----------
@@ -9914,7 +9915,7 @@
   function closeInfFinaleView(){ els.finOverlay.classList.add('hidden'); stopFinSky(); }
   // After the Vault: the run is done - a fresh run starts on the board.
   function startNewInfRun(){
-    infRun = null; runSharePre = null; try{ localStorage.removeItem(INF_RUN_KEY); }catch(e){}
+    infRun = null; runSharePre = null; if (!REPLAY) try{ localStorage.removeItem(INF_RUN_KEY); }catch(e){}
     ensureInfRun();
     closeInfFinaleView();
     infSession = freshInfSession(); comboCount = 0; lastWasEvent = false;
@@ -11051,7 +11052,7 @@
     if (!bag.length) bag = shuffle(pool.slice());
     const idx = bag.pop();
     st[k] = { n, bag };
-    try{ localStorage.setItem(INF_RIDDLE_BAG_KEY, JSON.stringify(st)); }catch(e){}
+    if (!REPLAY) try{ localStorage.setItem(INF_RIDDLE_BAG_KEY, JSON.stringify(st)); }catch(e){}
     return idx;
   }
   // About a third of a run's riddle rounds are hard: one in every three, at
@@ -13388,7 +13389,7 @@
   function drawWildPrize(){
     const keys = Object.keys(COSMIC_WEIGHTS);
     let r = Math.random() * keys.reduce((a, k)=> a + COSMIC_WEIGHTS[k], 0), prize = keys.find(k=> (r -= COSMIC_WEIGHTS[k]) < 0) || 'points10';
-    if (DEBUG_FAST && window.__forceWild) prize = window.__forceWild;
+    if ((DEBUG_FAST || REPLAY) && window.__forceWild) prize = window.__forceWild;   // (tests, and the replay menu's Cosmic Surprise jumps)
     if (prize === 'chip' && (!infRun || infRun.bonusChip)) prize = 'points10';
     if (prize === 'key' && (!infRun || infRun.keys >= INF_KEY_CAP)) prize = 'points10';
     return prize;
@@ -14133,7 +14134,7 @@
     // First time in Infinity Flips: the walkthrough. (No timer to hold here -
     // Infinity's run clock is stopped while it's open, and rounds that expire behind it cost nothing
     // because isOnVsScreen() is false while it's open.)
-    if (!hasSeenHowTo('infinity')) openHowTo('infinity');
+    if (!REPLAY && !hasSeenHowTo('infinity')) openHowTo('infinity');
   });
   els.modeDailyBtn.addEventListener('click', ()=>{
     if (REPLAY) runResultToday = null;   // replay mode: Daily is never "already done"
@@ -14230,7 +14231,7 @@
       '.replay-menu.open{display:flex}.replay-menu h3{margin:4px 0 10px;font-size:15px;letter-spacing:1px}' +
       '.replay-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:380px}' +
       '.replay-list button,.replay-close{font:700 13px/1.2 Inter,system-ui,sans-serif;color:#fff;background:#3a1f6e;border:1px solid #b98bf0;border-radius:12px;padding:11px 8px;cursor:pointer}' +
-      '.replay-list button.wide{grid-column:1 / -1}.replay-list button.restart{background:#ff3c9d;border-color:#fff}.replay-close{margin-top:12px;min-width:140px;background:#150f2b}';
+      '.replay-head{grid-column:1 / -1;margin:8px 0 0;font:800 12px/1 Inter,system-ui,sans-serif;letter-spacing:2px;color:#ffd23f}.replay-list button.wide{grid-column:1 / -1}.replay-list button.restart{background:#ff3c9d;border-color:#fff}.replay-close{margin-top:12px;min-width:140px;background:#150f2b}';
     document.head.appendChild(css);
     const tag = document.createElement('div'); tag.className = 'replay-tag'; tag.textContent = 'REPLAY MODE'; tag.setAttribute('aria-hidden', 'true'); document.body.appendChild(tag);
 
@@ -14295,17 +14296,70 @@
       { label:'Results (sample)', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); runResultToday = replaySampleResult(); showRunReadout(); updatePauseBtnVisibility(); }) },
       { label:'Restart Daily', wide:true, cls:'restart', go: ()=> replayEnter(null, null) },
     ];
+    // ----- Infinity jumps: each starts a fresh Infinity run with stand-in numbers and lands on its screen.
+    function infReplayTeardown(){
+      replayTeardown();
+      try{ closeInfRiddle(); }catch(e){}
+      [els.guessOverlay, els.irOverlay, els.finOverlay, els.eventOverlay].forEach(o=> o.classList.add('hidden'));
+      stopFinSky(); clearTimeout(eventTimeoutId); clearRoundTimer(); stopTallyPolling();
+      window.__forceWild = null; infRun = null; runSharePre = null; infRiddleState = 'idle';
+    }
+    // sample: fields to put on the fresh run; then(): what to show (run once the board is up).
+    function infReplayEnter(sample, then){
+      infReplayTeardown();
+      els.homeOverlay.classList.add('hidden');
+      els.modeInfinityBtn.click();
+      if (!infRun) return;
+      Object.assign(infRun, { runNo: 99 }, sample || {});   // (a high run number: the host just quips)
+      renderRunBanner();
+      if (then) setTimeout(then, 450);
+    }
+    const INF_SAMPLE = { score:251, keys:15, keysEarned:15, crowdN:30, crowdAgree:21, votes:60, voteRounds:60, matchStreak:4, maxMatchStreak:9, riddles:3, riddlesAnswered:3, riddlesRight:2, guesses:2, ufoTaps:1, clockMs:380000,
+      boldest:{ pick:'Pineapple on Pizza', other:'Pepperoni', against:78, n:50 } };
+    const INF_MID = { score:120, keys:3, keysEarned:3, crowdN:14, crowdAgree:9, votes:28, voteRounds:28, clockMs:150000 };
+    // The finale at a given stage (run ended on points, the sample chips already dropped for the Vault and Results).
+    function infReplayFinale(stage, chips){
+      infRun.ended = 'points'; infRun.endedAt = Date.now();
+      openInfFinale();
+      const f = infRun.finale;
+      if (chips){ f.chips = chips; f.dropped = chips.length; }
+      f.stage = stage; showFinStage(stage);
+    }
+    const SAMPLE_CHIPS = [ { kind:'x2', slot:2, pts:40, x:95, aim:96, seed:11 }, { kind:'+50', slot:3, pts:50, x:138, aim:140, seed:12 }, { kind:'x3', slot:1, pts:60, x:54, aim:56, seed:13 },
+      { kind:'x1', slot:0, pts:20, x:18, aim:20, seed:14 }, { kind:'x2', slot:6, pts:40, x:265, aim:262, seed:15 } ];
+    const cosmicJump = (label, prize)=> ({ mode:'infinity', label:'Cosmic: ' + label, go: ()=> infReplayEnter(INF_MID, ()=>{ window.__forceWild = prize; runPowerUpRound(); setTimeout(()=> resolvePowerUp('wildcard'), 600); }) });
+    JUMPS.forEach(j=>{ j.mode = 'daily'; });
+    JUMPS.push(
+      { mode:'infinity', head:'INFINITY' },
+      { mode:'infinity', label:'Orbit Drop (5 chips)', go: ()=> infReplayEnter(INF_SAMPLE, ()=> infReplayFinale('plinko')) },
+      { mode:'infinity', label:'Orbit Drop (2 chips)', go: ()=> infReplayEnter({ score:120, keys:1, keysEarned:1, crowdN:14, crowdAgree:8 }, ()=> infReplayFinale('plinko')) },
+      { mode:'infinity', label:'Vault', go: ()=> infReplayEnter(INF_SAMPLE, ()=> infReplayFinale('vault', SAMPLE_CHIPS)) },
+      { mode:'infinity', label:'Results (251 pts)', go: ()=> infReplayEnter(INF_SAMPLE, ()=>{ infRun.finale = null; infRun.ended = 'points'; infRun.endedAt = Date.now(); openInfFinale(); infRun.finale.chips = SAMPLE_CHIPS; infRun.finale.dropped = SAMPLE_CHIPS.length; infRun.finale.vaultSeen = true; infRun.finale.stage = 'vault'; showFinStage('vault'); }) },
+      { mode:'infinity', label:'Riddle', go: ()=> infReplayEnter(INF_MID, ()=> startInfRiddle()) },
+      { mode:'infinity', label:'Brain Beam', go: ()=> infReplayEnter(INF_MID, ()=> runWildEvent()) },
+      { mode:'infinity', label:'Crowd Scan', go: ()=> infReplayEnter(INF_MID, ()=>{ const c = upcomingCards(1)[0]; tallyCache.set(slugify(c.a), 70); tallyCache.set(slugify(c.b), 30); startGuessRound(c); }) },
+      cosmicJump('+10 points', 'points10'), cosmicJump('+20 points', 'points20'), cosmicJump('a key', 'key'), cosmicJump('bonus chip', 'chip'),
+      cosmicJump('Scramble', 'scramble'), cosmicJump('Time Warp', 'clock'), cosmicJump('Double or nothing', 'riddle'), cosmicJump('Clock freeze', 'freeze'),
+      { mode:'infinity', label:'Restart Infinity', wide:true, cls:'restart', go: ()=> infReplayEnter(null, null) }
+    );
     const menu = document.createElement('div'); menu.className = 'replay-menu'; menu.setAttribute('role', 'dialog'); menu.setAttribute('aria-label', 'Replay mode: jump to a screen');
     const h = document.createElement('h3'); h.textContent = 'JUMP TO…'; menu.appendChild(h);
     const list = document.createElement('div'); list.className = 'replay-list'; menu.appendChild(list);
     const closeMenu = ()=> menu.classList.remove('open');
     JUMPS.forEach(j=>{
-      const b = document.createElement('button'); b.type = 'button'; b.textContent = j.label; if (j.wide) b.classList.add('wide'); if (j.cls) b.classList.add(j.cls);
+      if (j.head){ const hd = document.createElement('div'); hd.className = 'replay-head'; hd.dataset.mode = j.mode; hd.textContent = j.head; list.appendChild(hd); return; }
+      const b = document.createElement('button'); b.type = 'button'; b.textContent = j.label; b.dataset.mode = j.mode || 'daily'; if (j.wide) b.classList.add('wide'); if (j.cls) b.classList.add(j.cls);
       b.addEventListener('click', ()=>{ closeMenu(); setTimeout(j.go, 60); });
       list.appendChild(b);
     });
+    // The menu lists the screens of the mode you are in (both on the mode picker).
+    const showMenu = ()=>{
+      const m = inInfinity() ? 'infinity' : document.documentElement.classList.contains('mode-daily') ? 'daily' : '';
+      list.querySelectorAll('[data-mode]').forEach(e=>{ e.style.display = (!m || e.dataset.mode === m) ? '' : 'none'; });
+      menu.classList.add('open');
+    };
     const close = document.createElement('button'); close.type = 'button'; close.className = 'replay-close'; close.textContent = 'Close'; close.addEventListener('click', closeMenu); menu.appendChild(close);
-    const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'replay-btn'; btn.textContent = 'TEST'; btn.addEventListener('click', ()=> menu.classList.add('open'));
+    const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'replay-btn'; btn.textContent = 'TEST'; btn.addEventListener('click', showMenu);
     document.body.appendChild(menu); document.body.appendChild(btn);
   }
 
