@@ -1123,11 +1123,11 @@
   .pk-status > span{ padding:4px 10px; border-radius:99px; background:rgba(40,10,70,0.55); box-shadow:inset 0 0 0 1.5px rgba(255,225,140,0.5); }
   .pk-status .pk-chipno{ color:#fff3c4; } .pk-status .pk-run{ color:rgba(255,243,214,0.85); font-weight:700; }
   .pk-status .pk-bonus b{ color:#ffe066; font-size:15px; }
-  .plinko-board{ margin-top:30px; }
+  .plinko-board{ margin-top:38px; }
   /* Aiming (Oct 2026): the UFO hovers over the board and follows the
      player's thumb (transform only); let go and the chip drops from it. */
-  .pk-ufo.riddle-ufo{ display:block; left:0; top:-38px; z-index:3; width:52px; margin-left:-26px; font-size:44px; line-height:1; filter:none; pointer-events:none; transform:translateX(var(--aim-px, 50%)); }
-  .pk-ufo .pk-held{ position:absolute; left:50%; top:100%; width:var(--pk-chip, 14px); height:var(--pk-chip, 14px); margin:-8px 0 0 calc(var(--pk-chip, 14px) / -2); border-radius:50%;
+  .pk-ufo.riddle-ufo{ display:block; left:0; top:-52px; z-index:3; width:80px; margin-left:-40px; font-size:70px; line-height:1; text-align:center; filter:none; pointer-events:none; transform:translateX(var(--aim-px, 50%)); }
+  .pk-ufo .pk-held{ position:absolute; left:50%; top:calc(100% - 12px); width:var(--pk-chip, 24px); height:var(--pk-chip, 24px); margin:0 0 0 calc(var(--pk-chip, 24px) / -2); border-radius:50%;
     background:radial-gradient(circle at 35% 30%, #fffbe0, #ffc928 55%, #b86a00); box-shadow:0 0 8px rgba(255,210,60,0.9); transition:opacity 0.15s; }
   .pk-ufo.empty .pk-held{ opacity:0; }
   .pk-guide{ position:absolute; left:0; top:0; width:0; height:var(--guide-h, 70%); border-left:2px dotted rgba(255,246,190,0.45); pointer-events:none; z-index:2; transform:translate(-1px, var(--guide-y, 12px)) translateX(var(--aim-px, 50%)); transition:opacity 0.2s; }
@@ -1168,9 +1168,14 @@
     75%{ opacity:1; transform:translateY(-8px) scale(1); } 100%{ opacity:0; transform:translateY(40px) scale(0.6); } }
   /* Also limited by the screen's height (300px = everything else on this stage) so
      the whole board and Auto-drop are on screen without scrolling, even at 360x640. */
-  .plinko-board{ position:relative; width:max(200px, min(100%, 340px, calc((100dvh - 320px) * 0.762))); aspect-ratio:320 / 420; }
+  .plinko-board{ position:relative; width:max(200px, min(100%, 420px, calc((100dvh - 300px) * 0.643))); aspect-ratio:360 / 560; }
   /* Short phones: a tighter header and tally, so the board, the tally and
      the Vault button all fit without scrolling. */
+  @media (max-height:780px){
+    .fin-plinko .pk-banner, .fin-plinko .plinko-tally{ display:none; }   /* the board gets the height (the slots show where chips landed) */
+    .plinko-board{ width:max(200px, min(100%, 420px, calc((100dvh - 190px) * 0.643))); margin-top:30px; }
+    .pk-ufo.riddle-ufo{ top:-44px; font-size:60px; }
+  }
   @media (max-height:700px){
     .fin-plinko{ gap:6px; }
     .fin-plinko .pk-banner{ font-size:30px; padding:4px 16px 2px; }
@@ -1188,7 +1193,7 @@
   @keyframes pegPing{ 0%{ transform:scale(1); filter:none; } 40%{ transform:scale(1.7); filter:drop-shadow(0 0 6px #fff6a8); } 100%{ transform:scale(1); } }
   .plinko-svg .pk-slot.hit rect{ filter:drop-shadow(0 0 8px rgba(255,220,90,0.95)); }
   .plinko-chip-layer{ position:absolute; inset:0; pointer-events:none; }
-  .pk-chip{ position:absolute; left:0; top:0; width:var(--pk-chip, 14px); height:var(--pk-chip, 14px); margin:calc(var(--pk-chip, 14px) / -2) 0 0 calc(var(--pk-chip, 14px) / -2); border-radius:50%;
+  .pk-chip{ position:absolute; left:0; top:0; width:var(--pk-chip, 24px); height:var(--pk-chip, 24px); margin:calc(var(--pk-chip, 24px) / -2) 0 0 calc(var(--pk-chip, 24px) / -2); border-radius:50%;
     background:radial-gradient(circle at 35% 30%, #fffbe0, #ffc928 55%, #b86a00); border:1.5px solid #fff3a8; box-shadow:0 2px 6px rgba(0,0,0,0.45), 0 0 10px rgba(255,210,60,0.8); will-change:transform; }
   .plinko-tally{ display:flex; flex-wrap:wrap; justify-content:center; gap:6px; min-height:28px; }
   .pt-chip{ padding:4px 10px; border-radius:99px; font-size:13px; font-weight:800; background:rgba(40,10,70,0.55); box-shadow:inset 0 0 0 1.5px rgba(255,225,140,0.6); }
@@ -9883,19 +9888,23 @@
     const svg = document.getElementById('plinkoSvg'), W = OP.C.W, H = OP.C.H, top = OP.C.SLOT_TOP, floor = OP.C.FLOOR_Y, e = OP.slotEdges;
     svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
     let g = '<defs><radialGradient id="pkPeg" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#fffbe0"/><stop offset="0.6" stop-color="#ffc928"/><stop offset="1" stop-color="#b86a00"/></radialGradient>' +
+      '<radialGradient id="pkHalo"><stop offset="0" stop-color="rgba(255,214,90,0.55)"/><stop offset="1" stop-color="rgba(255,214,90,0)"/></radialGradient>' +
+      '<radialGradient id="pkHaloG"><stop offset="0" stop-color="rgba(125,249,255,0.6)"/><stop offset="1" stop-color="rgba(125,249,255,0)"/></radialGradient>' +
       '<radialGradient id="pkGuard" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#ffffff"/><stop offset="0.6" stop-color="#7df9ff"/><stop offset="1" stop-color="#2a5fb8"/></radialGradient>' +
       '<linearGradient id="pkSlot" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="rgba(255,255,255,0.22)"/><stop offset="1" stop-color="rgba(255,255,255,0.04)"/></linearGradient>' +
       '<linearGradient id="pkJack" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7df9ff"/><stop offset="1" stop-color="#3b1d8f"/></linearGradient>' +
       '<linearGradient id="pkBeamUp" x1="0" x2="0" y1="1" y2="0"><stop offset="0" stop-color="rgba(125,249,255,0.55)"/><stop offset="1" stop-color="rgba(125,249,255,0)"/></linearGradient></defs>';
     g += '<rect x="2" y="2" width="' + (W - 4) + '" height="' + (H - 4) + '" rx="20" fill="rgba(30,8,60,0.55)" stroke="#ffd23f" stroke-width="3"/>';
     OP.SLOTS.forEach(([kind], i)=>{
-      const l = e[i], r = e[i + 1], w = r - l, cx = (l + r) / 2, jack = kind === 'jackpot';
+      const l = e[i], r = e[i + 1], w = r - l, cx = (l + r) / 2, jack = kind === 'jackpot', big = kind === 'x3' || kind === '+50';
       if (jack) g += '<rect class="pk-jglow" x="' + (l + 1) + '" y="' + (top - 120) + '" width="' + (w - 2) + '" height="120" fill="url(#pkBeamUp)"/>';
       g += '<g class="pk-slot" data-i="' + i + '"><rect x="' + (l + 1.5) + '" y="' + top + '" width="' + (w - 3) + '" height="' + (floor - top) + '" rx="5" fill="' + (jack ? 'url(#pkJack)' : 'url(#pkSlot)') + '" stroke="' + (jack ? '#7df9ff' : '#ffd23f') + '" stroke-width="1.5"' + (jack ? ' class="pk-jglow"' : '') + '/>' +
-        '<text x="' + cx + '" y="' + (top + 20) + '" text-anchor="middle" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="' + (jack ? 16 : w < 32 ? 13 : 16) + '" fill="#fff6c2">' + plinkoLabel(kind) + '</text></g>';
+        '<text x="' + cx + '" y="' + (top + 34) + '" text-anchor="middle" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="' + (jack ? 34 : kind === '+50' ? 22 : kind === 'x3' ? 28 : 26) + '" fill="' + (jack ? '#e6fdff' : '#fff6c2') + '" stroke="rgba(40,0,60,0.55)" stroke-width="3" paint-order="stroke">' + plinkoLabel(kind) + '</text>' +
+        '<text x="' + cx + '" y="' + (top + 58) + '" text-anchor="middle" font-family="Inter, Arial" font-weight="800" font-size="13" fill="rgba(255,246,194,0.8)">' + (kind === '+50' ? '' : '+' + OP.SLOT_POINTS[kind]) + '</text></g>';
     });
     OP.pegs.forEach((p, i)=>{
-      g += '<circle class="pk-peg' + (p.guard ? ' pk-guardpeg' : '') + '" data-p="' + i + '" cx="' + p.x.toFixed(1) + '" cy="' + p.y + '" r="' + OP.C.PEG_R + '" fill="url(#' + (p.guard ? 'pkGuard' : 'pkPeg') + ')"/>';
+      g += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y + '" r="' + (OP.C.PEG_R * 2.2) + '" fill="url(#' + (p.guard ? 'pkHaloG' : 'pkHalo') + ')"/>' +
+        '<circle class="pk-peg' + (p.guard ? ' pk-guardpeg' : '') + '" data-p="' + i + '" cx="' + p.x.toFixed(1) + '" cy="' + p.y + '" r="' + OP.C.PEG_R + '" fill="url(#' + (p.guard ? 'pkGuard' : 'pkPeg') + ')" stroke="rgba(255,255,255,0.7)" stroke-width="1.2"/>';
     });
     svg.innerHTML = g;
   }
@@ -9938,7 +9947,7 @@
     pkAim = Math.max(OP.AIM_MIN, Math.min(OP.AIM_MAX, x));
     const board = document.getElementById('plinkoBoard'), k = plinkoScale();
     board.style.setProperty('--aim-px', (pkAim * k).toFixed(1) + 'px');
-    board.style.setProperty('--pk-chip', Math.max(10, OP.C.BALL_R * 2 * k + 2).toFixed(1) + 'px');
+    board.style.setProperty('--pk-chip', Math.max(18, OP.C.BALL_R * 2 * k).toFixed(1) + 'px');
     board.style.setProperty('--guide-y', (OP.C.DROP_Y * k).toFixed(1) + 'px');
     board.style.setProperty('--guide-h', ((OP.C.SLOT_TOP - OP.C.DROP_Y) * k).toFixed(1) + 'px');
     board.setAttribute('aria-valuenow', Math.round((pkAim - OP.AIM_MIN) / (OP.AIM_MAX - OP.AIM_MIN) * 100));
