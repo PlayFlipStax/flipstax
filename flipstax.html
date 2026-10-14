@@ -4505,7 +4505,7 @@
   const SHOW_ROUNDS = 4;                     // rounds before the Word Warp (which is round SHOW_ROUNDS + 1)
   const SHOW_VS_BEFORE = [5, 6];             // VS cards before a round's Brain Beam (min, max)
   const SHOW_VS_AFTER = [3, 4];              // VS cards between the Brain Beam and the Portal Pick
-  const SHOW_RIDDLE_CHANCE = 0.5;            // chance an episode swaps one round's Brain Beam for a riddle
+  const SHOW_RIDDLE_CHANCE = 1;              // chance a pass swaps one round's Brain Beam for a riddle (1 = every pass; it was 0.5, so about half the days had none)
   const SHOW_BUMPER_MS = 1500;               // the round title card ("Round N") with its light flash
   const SHOW_NEW_ROUND_MIN_MS = 10000;       // a new round only starts with at least this much on the clock
   const QUIZ_DRUMROLL_MS = 450;              // B9: the drumroll between tapping an answer (or a portal) and its reveal
@@ -4563,7 +4563,11 @@
   // A round's riddle: one of Infinity's multiple-choice riddles, by the date.
   function showRiddleQuestion(seed){
     const list = INFINITY_RIDDLES.length ? INFINITY_RIDDLES : null;
-    if (!list) return null;
+    if (!list){
+      // Riddle slots must show a riddle; if the data didn't load the caller falls back to a Brain Beam - say why.
+      if (!showRiddleQuestion.warned){ showRiddleQuestion.warned = true; console.warn('FlipStax: no Daily riddle - data/infinity-riddles.js ' + (Array.isArray(window.FLIPSTAX_INFINITY_RIDDLES) ? 'loaded but no entry has q, a and exactly 3 wrong answers' : 'did not load (window.FLIPSTAX_INFINITY_RIDDLES is missing)') + '; showing a Brain Beam instead'); }
+      return null;
+    }
     const rng = mulberry32(seed), r = list[Math.floor(rng() * list.length)];
     const opts = shuffle([r.a].concat(r.wrong), rng);
     return { category:'riddle', riddle:true, question:r.q, opts, correctIdx: opts.indexOf(r.a) };
@@ -13619,6 +13623,7 @@
       layoutBoard: () => layoutBoard(),
       putNext: (name) => { const d = decks[contentPoolKey()]; const i = d.cards.findIndex((c, k)=> k >= d.next && (c.a === name || c.b === name)); if (i >= 0){ const [c] = d.cards.splice(i, 1); d.cards.splice(d.next, 0, c); } return i; },
       showRunTrivia: () => runTriviaQuestion(),
+      showQuizNow: (riddle) => { runActive = true; runPhase = 'running'; runTriviaQuestion(null, null, { t:'quiz', riddle: !!riddle, subject:'science', seed: 12345 }); return window.__debugLastTriviaQ; },
       showPlan: (date, cycle) => buildShowPlan(date || runStartDate || todayStr(), cycle || 0),
       showReadout: () => { els.finOverlay.classList.add('hidden'); showRunReadout(); return !!runResultToday; },
       setResult: (o) => { runResultToday = Object.assign({}, runResultToday || { date: todayStr(), rule: SAVE_RULE, savedAt: Date.now(), score: 0, triviaCorrect: 0, triviaTotal: 0, solved: false, solveMs: null, word: 'LAUNCH', personalityType: 'fence_sitter', unlocked: [] }, o); return runResultToday; },
