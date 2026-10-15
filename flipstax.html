@@ -4668,7 +4668,15 @@
     }
     return steps;
   }
-  function showRoundName(st){ return st.finale ? GN.wordWarp : st.riddle ? GN.riddleRound : GN.brainBeam; }
+  // The title on a round's bumper card: a show-style name (data/game-names.js roundTitles), not a game's name.
+  const ROUND_TITLES = (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.roundTitles) || {};
+  function showRoundName(st){
+    if (st.finale) return ROUND_TITLES.finale || 'GRAND FINALE';
+    if (st.round === 0) return ROUND_TITLES.opener || 'THE OPENER';
+    if (st.riddle) return ROUND_TITLES.riddle || 'HEAD SCRATCHER';
+    const list = ROUND_TITLES.list && ROUND_TITLES.list.length ? ROUND_TITLES.list : ['CROWD SHOWDOWN'];
+    return list[(st.round - 1) % list.length];
+  }
   // A round's riddle: one of Infinity's multiple-choice riddles, by the date.
   function showRiddleQuestion(seed){
     const list = INFINITY_RIDDLES.length ? INFINITY_RIDDLES : null;
@@ -9257,7 +9265,7 @@
     const last = !!st.finale, name = showRoundName(st);
     showCard.className = 'show-card bumper bg ' + (last ? 'w-jumble' : st.riddle ? 'w-odd' : 'w-trivia');
     showCard.innerHTML = '<i class="rays"></i><i class="sc-flash"></i><div class="sc-inner">' +
-      '<div class="sc-round">' + (last ? 'THE FINALE' : 'ROUND ' + (st.round + 1)) + '</div>' +
+      '<div class="sc-round">' + (last ? GN.wordWarp.toUpperCase() : 'ROUND ' + (st.round + 1)) + '</div>' +
       '<div class="sc-name">' + name + '!</div></div>';
     showCard.removeAttribute('role'); showCard.removeAttribute('aria-label');
     showCard.classList.remove('hidden');

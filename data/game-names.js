@@ -41,6 +41,17 @@ window.FLIPSTAX_NAMES = {
     orbitDrop:      'Orbit Drop! Aim true.',
     vault:          'Vault time, baby!',
   },
+  // The titles on Daily's round bumper cards (the one-second title card before each round):
+  // show-style names, never the name of a game (Brain Beam is the trivia game only).
+  // Round 1 is the opener, a riddle round is the head scratcher, the finale is the grand
+  // finale, and the rounds in between take these in turn (round numbers keep counting up
+  // when the show repeats).
+  roundTitles: {
+    opener:  'THE OPENER',
+    riddle:  'HEAD SCRATCHER',
+    finale:  'GRAND FINALE',
+    list:    ['CROWD SHOWDOWN', 'THE HOT SEAT', 'TWIST OF FATE', 'BIG MONEY ROUND', 'DOUBLE TROUBLE', 'TOP OF THE SHOW'],
+  },
   // Daily's host cameos (the speech bubble in the corner, about a second
   // each): one is picked at random for the moment.
   cameo: {
