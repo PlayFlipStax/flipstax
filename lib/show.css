@@ -38,7 +38,7 @@
 .w-entry  { --w1:#ffd64a; --w2:#ff8a1f; --w3:#c2275f; --w4:#3a0f6b; --show-accent:var(--gold-2); }
 .w-vs     { --w1:#ff9ad1; --w2:#ff3c9d; --w3:#8d2ad6; --w4:#26105c; --show-accent:#7df9ff; }
 .w-trivia { --w1:#8fd0ff; --w2:#3b7bff; --w3:#5a24c8; --w4:#170a45; --show-accent:#ffd23f; }
-.w-powerup{ --w1:#c8ff7a; --w2:#22c56b; --w3:#0f7a6b; --w4:#0b2c3d; --show-accent:#ffd23f; }
+.w-powerup{ --w1:#a7f3e0; --w2:#14b8a6; --w3:#047857; --w4:#022c22; --show-accent:#ffd23f; }   /* Portal Pick: teal and emerald (Brain Beam is blue and violet) */
 .w-jumble { --w1:#ffd08a; --w2:#ff6a2b; --w3:#d81b4a; --w4:#3d0b2b; --show-accent:#ffd23f; }
 .w-results{ --w1:#ffe27a; --w2:#ff8a1f; --w3:#c2275f; --w4:#4a1478; --show-accent:var(--gold-2); }
 .w-price  { --w1:#d4ff9a; --w2:#2fd17a; --w3:#0e8f6a; --w4:#06323a; --show-accent:#ffe066; }
@@ -48,7 +48,7 @@
 .w-hunt   { --w1:#9fb8ff; --w2:#5468ff; --w3:#2a1ea8; --w4:#0e0a33; --show-accent:#5ff8ff; }
 .w-vs     { --ray-c:rgba(255,236,250,0.26); --ray-on:6deg;  --ray-period:12deg; --ray-speed:40s; --ray-dir:normal; }
 .w-trivia { --ray-c:rgba(220,236,255,0.22); --ray-on:4deg;  --ray-period:10deg; --ray-speed:56s; --ray-dir:reverse; }
-.w-powerup{ --ray-c:rgba(240,255,200,0.24); --ray-on:9deg;  --ray-period:20deg; --ray-speed:34s; --ray-dir:normal; }
+.w-powerup{ --ray-c:rgba(200,255,240,0.26); --ray-on:9deg;  --ray-period:20deg; --ray-speed:34s; --ray-dir:normal; }
 .w-jumble { --ray-c:rgba(255,232,190,0.24); --ray-on:5deg;  --ray-period:12deg; --ray-speed:44s; --ray-dir:reverse; }
 .w-results{ --ray-c:rgba(255,246,200,0.28); --ray-on:7deg;  --ray-period:15deg; --ray-speed:30s; --ray-dir:normal; }
 .w-price  { --ray-c:rgba(220,255,225,0.22); --ray-on:8deg;  --ray-period:18deg; --ray-speed:50s; --ray-dir:reverse; }

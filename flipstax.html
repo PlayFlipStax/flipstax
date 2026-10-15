@@ -2503,11 +2503,11 @@
   /* Portal Pick (B2/B3): four doors; the picked one swings open (a 3D turn
      on its left hinge - transform only) and its power-up comes out in its
      own colours. */
-  .event-tile.portal{ background-color:#3a1478 !important; perspective:600px; padding:0; min-height:86px; overflow:visible; display:flex; align-items:center; justify-content:center; }
+  .event-tile.portal{ background-color:#0f766e !important; perspective:600px; padding:0; min-height:86px; overflow:visible; display:flex; align-items:center; justify-content:center; }
   .event-tile.portal .pu-prize{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; border-radius:inherit; opacity:0; transform:scale(0.6); }
   .event-tile.portal .pu-door{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; border-radius:inherit; transform-origin:0 50%; backface-visibility:hidden;
     font:900 38px/1 var(--f-display); color:#fff3c4; text-shadow:0 2px 0 rgba(40,0,60,0.6);
-    background:radial-gradient(circle at 82% 52%, #ffe680 0 4px, #b06a00 5px, transparent 6px), linear-gradient(160deg, #a86bff, #6a1fb0 55%, #3d0f7a); box-shadow:inset 0 0 0 3px rgba(255,230,160,0.55), inset 0 -6px 0 rgba(0,0,0,0.2); }
+    background:radial-gradient(circle at 82% 52%, #ffe680 0 4px, #b06a00 5px, transparent 6px), linear-gradient(160deg, #5eead4, #0d9488 52%, #065f46); box-shadow:inset 0 0 0 3px rgba(255,230,160,0.55), inset 0 -6px 0 rgba(0,0,0,0.2); }
   .event-tile.portal.open .pu-door{ transform:rotateY(-105deg); opacity:0; transition:transform 0.5s cubic-bezier(.3,.7,.3,1), opacity 0.5s 0.15s; }
   .event-tile.portal.open .pu-prize{ opacity:1; transform:none; transition:transform 0.45s 0.12s var(--ease-pop), opacity 0.2s 0.12s; }
   .event-tile.portal:not(.open) .pu-door{ animation:doorShimmer 2.4s ease-in-out infinite; animation-delay:calc(var(--k, 0) * 0.3s); }
