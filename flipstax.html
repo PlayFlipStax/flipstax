@@ -3249,6 +3249,28 @@
   .cosmic-stage.scramble .cz-tile:nth-child(5n+1){ background:linear-gradient(180deg,#ff9ab0,#f23c5a); } .cosmic-stage.scramble .cz-tile:nth-child(5n+2){ background:linear-gradient(180deg,#9cc8ff,#2f7bff); }
   .cosmic-stage.scramble .cz-tile:nth-child(5n+3){ background:linear-gradient(180deg,#8ff0b8,#17b86b); } .cosmic-stage.scramble .cz-tile:nth-child(5n+4){ background:linear-gradient(180deg,#ffd77a,#f09d00); }
   .cosmic-stage.scramble .cz-tile:nth-child(5n){ background:linear-gradient(180deg,#e0b3ff,#a34dff); }
+
+  /* ---- The Vault, premium (Oct 2026) ----
+     Deep midnight navy, brushed gold. The vault is a brushed-gold body and door (fine grain lines over a gold
+     gradient), a navy combination dial with gold ticks, a navy hollow that fills with gold light; the door swings
+     open slowly with a spill of light, then a cascade of gold coins pours out. */
+  .fin-overlay.vault-stage{ background:radial-gradient(90% 62% at 50% 36%, #17306e 0%, #0b1537 46%, #040716 100%); }
+  .fin-overlay.vault-stage .fin-rays{ opacity:0.16; }
+  .fin-vault .vault-body{ background:repeating-linear-gradient(90deg, rgba(255,255,255,0.1) 0 1px, rgba(255,255,255,0) 1px 3px), linear-gradient(145deg, #f8e59a 0%, #d4a02c 30%, #8a6416 58%, #e9c860 82%, #a47a1a 100%);
+    box-shadow:inset 0 0 0 5px #fbe9a8, inset 0 0 0 9px #7a560f, 0 16px 40px rgba(0,0,0,0.65), 0 0 40px rgba(255,205,80,0.22); }
+  .fin-vault .vault-inside{ background:radial-gradient(circle, #0c1a4a 0%, #040a22 72%); }
+  .fin-vault .vault-door{ background:repeating-radial-gradient(circle at 50% 50%, rgba(255,255,255,0.09) 0 1px, rgba(255,255,255,0) 1px 4px), conic-gradient(from 20deg, #fbe7a0, #c99622, #f6dc86, #a87a14, #fbe7a0, #c99622, #f6dc86, #a87a14, #fbe7a0);
+    box-shadow:inset 0 0 0 7px #a87a14, inset 0 0 0 10px #fbe9a8, 0 8px 20px rgba(0,0,0,0.55); }
+  .fin-vault:not(.shown) .vault-dial{ background:radial-gradient(circle, #0b1740 0 30%, #14306e 31% 54%, transparent 55%), repeating-conic-gradient(#f2d27a 0deg 1.6deg, transparent 1.6deg 9deg), radial-gradient(circle at 40% 35%, #2a4a9a, #0b1740 62%);
+    box-shadow:0 0 0 calc(var(--vb) * 0.022) #8a6416, 0 0 0 calc(var(--vb) * 0.03) #fbe9a8, 0 4px 14px rgba(0,0,0,0.6); }
+  .fin-vault:not(.shown) .vault-dial i{ background:#f2d27a; opacity:0.9; }
+  .fin-vault:not(.shown) .vault-dial b{ background:radial-gradient(circle at 35% 30%, #fff6c2, #d4a02c); box-shadow:0 0 0 3px #7a560f; }
+  .vault-body::before{ content:''; position:absolute; inset:-34%; border-radius:50%; z-index:-1; pointer-events:none; background:radial-gradient(circle, rgba(255,226,140,0.7), rgba(255,200,60,0) 62%); opacity:0; transition:opacity 1.1s ease 0.2s; }
+  .fin-vault.open:not(.shown) .vault-body::before{ opacity:1; }
+  .fin-vault.open .vault-door{ transition:transform 1.35s cubic-bezier(.3,.6,.25,1.12); }
+  .vault-tally span{ background:rgba(8,16,48,0.82); color:#f6dc86; box-shadow:0 0 0 1.5px rgba(246,220,134,0.55); }
+  .vault-tally b{ background:linear-gradient(180deg, #fff6c2 0%, #f2c94c 52%, #b8860b 100%); -webkit-background-clip:text; background-clip:text; color:transparent; text-shadow:none; filter:drop-shadow(0 0 14px rgba(255,200,60,0.65)); }
+  @media (prefers-reduced-motion: reduce){ .vault-body::before{ transition:none; } .fin-vault.open .vault-door{ transition:none; } }
 </style>
 </head>
 <body>
@@ -10068,6 +10090,7 @@
   function showFinStage(stage){
     ['finComplete', 'finPlinko', 'finVault'].forEach(id=> document.getElementById(id).classList.add('hidden'));
     finTapShieldAt = performance.now();
+    els.finOverlay.classList.toggle('vault-stage', stage === 'vault');   // the Vault's midnight look
     if (stage === 'complete') renderFinComplete();
     else if (stage === 'plinko') renderPlinko();
     else renderVault();
@@ -10676,14 +10699,14 @@
     ['finComplete', 'finPlinko'].forEach(id=> document.getElementById(id).classList.add('hidden'));
     vaultTimers.forEach(clearTimeout); vaultTimers = [];
     stage.classList.remove('hidden', 'open', 'dial', 'jackpot', 'shown', 'collect', 'unbolt', 'slam', 'has-jackpot', 'as-image');
-    els.finOverlay.classList.add('daily-vault');
+    els.finOverlay.classList.add('daily-vault', 'vault-stage');
     els.finOverlay.classList.remove('hidden');
     finTapShieldAt = performance.now(); startFinSky();
     document.getElementById('vaultTallyHint').textContent = '';
     hostSay(HOST_QUIPS.vault || 'Vault time, baby!', 1600);
     let closed = false;
     const close = ()=>{ if (closed) return; closed = true; vaultTimers.forEach(clearTimeout); vaultTimers = []; coinRun = null;
-      els.finOverlay.classList.add('hidden'); els.finOverlay.classList.remove('daily-vault'); stage.classList.remove('collect'); stopFinSky(); then(); };
+      els.finOverlay.classList.add('hidden'); els.finOverlay.classList.remove('daily-vault', 'vault-stage'); stage.classList.remove('collect'); stopFinSky(); then(); };
     vaultDrama(stage, a, ()=> vaultTimers.push(setTimeout(close, 900)));
     dailyVaultClose = close;
   }
@@ -10730,8 +10753,9 @@
     num.textContent = start; hint.textContent = '';
     stage.classList.add('collect');
     const base = Math.floor(total / n), extra = total - base * n;
-    const burst = Array.from({ length: 30 }, ()=> ({ x: W * 0.5 + (Math.random() - 0.5) * 30, y: H * 0.42, vx: (Math.random() - 0.5) * 7, vy: -3 - Math.random() * 6,
-      s: 6 + Math.random() * 5, a: Math.random() * 6, va: (Math.random() - 0.5) * 0.4, d: Math.random() * 300 }));
+    // the cascade: ~90 gold coins pour out of the open vault over the first second and a half
+    const burst = Array.from({ length: 90 }, ()=> ({ x: W * 0.5 + (Math.random() - 0.5) * 44, y: H * 0.36, vx: (Math.random() - 0.5) * 10, vy: -4 - Math.random() * 8,
+      s: 5 + Math.random() * 6, a: Math.random() * 6, va: (Math.random() - 0.5) * 0.45, d: Math.random() * 1000 }));
     const coins = Array.from({ length: n }, (_, i)=> ({ v: base + (i < extra ? 1 : 0), x: W * 0.5 + (Math.random() - 0.5) * 24, y: H * 0.45,
       vx: (i / (n - 1 || 1) - 0.5) * 13 + (Math.random() - 0.5) * 1.5, vy: -5 - Math.random() * 4, s: 15, a: Math.random() * 6, va: (Math.random() - 0.5) * 0.3,
       d: 60 + i * 45, state: 'loose', ft: 0 }));
@@ -10768,11 +10792,11 @@
       if (coinRun !== me || els.finOverlay.classList.contains('hidden')){ ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); return; }
       const t = now - t0;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
-      if (t < 2600) burst.forEach(c=>{
+      if (t < 3400) burst.forEach(c=>{
         if (t < c.d) return;
         c.vy += 0.35; c.x += c.vx; c.y += c.vy; c.a += c.va;
         if (c.y > H - 8){ c.y = H - 8; c.vy *= -0.35; c.vx *= 0.8; }
-        drawCoin(c.x, c.y, c.s, c.a, Math.min(1, (2600 - t) / 500));
+        drawCoin(c.x, c.y, c.s, c.a, Math.min(1, (3400 - t) / 500));
       });
       coins.forEach(c=>{
         if (t < c.d) return;
@@ -14428,7 +14452,7 @@
   // every gameplay overlay so nothing is left showing underneath.
   function returnToModeSelect(opts){
     opts = opts || {};
-    if (els.finOverlay.classList.contains('daily-vault')){ vaultTimers.forEach(clearTimeout); vaultTimers = []; coinRun = null; els.finOverlay.classList.add('hidden'); els.finOverlay.classList.remove('daily-vault'); stopFinSky(); }
+    if (els.finOverlay.classList.contains('daily-vault')){ vaultTimers.forEach(clearTimeout); vaultTimers = []; coinRun = null; els.finOverlay.classList.add('hidden'); els.finOverlay.classList.remove('daily-vault', 'vault-stage'); stopFinSky(); }
     setTimeout(refreshDailyDay, 0);   // once the run is torn down
     stopTallyPolling();
     clearRoundTimer();
