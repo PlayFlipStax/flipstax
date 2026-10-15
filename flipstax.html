@@ -2444,7 +2444,7 @@
      answer (and the UFO beams it), red on a miss. */
   .ir-overlay{ background:#0e0a33; }
   .ir-bg{ z-index:0; }
-  .ir-overlay .ir-mark{ color:rgba(200,240,255,var(--o)); text-shadow:0 0 18px rgba(95,248,255,0.5); }
+  .ir-overlay .ir-field{ display:none; }   /* (the green world's own flying question marks replace the drifting ones) */
   .ir-overlay .ir-panel{ background:rgba(32,8,56,0.8); border:2px solid rgba(255,214,90,0.6); box-shadow:0 18px 50px rgba(10,0,40,0.55), 0 0 30px rgba(95,248,255,0.18) inset; }
   .ir-overlay .ir-eyebrow{ color:#5ff8ff; }
   .ir-overlay.win .ir-verdict-big{ text-shadow:0 0 20px #fff6a8, 0 0 50px rgba(255,210,60,0.95), 0 0 90px rgba(95,248,255,0.6), 0 6px 0 #7a3d00; }
@@ -3291,7 +3291,7 @@
   </div>
 </div>
 <div class="ir-overlay hidden" id="irOverlay" role="dialog" aria-label="Riddle round">
-  <div class="bg w-hunt ir-bg" aria-hidden="true"><i class="rays"></i><i class="glow"></i></div>
+  <div class="bg w-riddle ir-bg" aria-hidden="true"><i class="rays"></i><i class="glow"></i></div>
   <div class="ir-field" id="irField" aria-hidden="true"></div>
   <div class="ir-flash" aria-hidden="true"></div>
   <div class="ir-rings" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -11136,7 +11136,7 @@
     els.irOverlay.classList.toggle('hard', !!infRiddle.hard);
     { const pal = IR_PALETTES[(INFINITY_RIDDLES.indexOf(infRiddle) + (infRiddle.hard ? 1 : 0) + 6) % IR_PALETTES.length], bg = els.irOverlay.querySelector('.ir-bg');
       els.irOverlay.style.setProperty('--ir-p1', pal.p[0]); els.irOverlay.style.setProperty('--ir-p2', pal.p[1]);
-      if (bg) pal.w.forEach((c, k)=> bg.style.setProperty('--w' + (k + 1), c)); }
+ }
     stopTallyPolling(); clearRoundTimer();
     // Not a vote round - keep the stalled-round watchdog out of it.
     voted = false; votedSinceTime = null;
@@ -12687,6 +12687,11 @@
     else if (kind === 'coin'){ playTone(1568, 0, 0.08, 'square', 0.03); playTone(2093, 0.06, 0.12, 'square', 0.03); }
     else if (kind === 'tick') playTone(1200, 0, 0.025, 'square', 0.02);
   };
+  // The riddle world's flying question marks: the same markup in each background that can turn into it.
+  function qmFieldHtml(){ let h = '<div class="qm-field" aria-hidden="true">'; for (let k = 0; k < 11; k++) h += '<span style="--y:' + (4 + (k * 9.1) % 88).toFixed(0) + '%;--s:' + (44 + (k * 37) % 70) + 'px;--d:' + (11 + (k * 5) % 9) + 's;--dl:-' + ((k * 3.7) % 14).toFixed(1) + 's;--x:' + ((k * 17) % 90) + '">?</span>'; return h + '</div>'; }
+  document.getElementById('showBg').insertAdjacentHTML('beforeend', qmFieldHtml());
+  document.getElementById('evBg').insertAdjacentHTML('beforeend', qmFieldHtml());
+  document.querySelector('#irOverlay .ir-bg').insertAdjacentHTML('beforeend', qmFieldHtml());
   let showWorldNow = 'vs';
   function setShowWorld(w){ if (w === showWorldNow) return; showWorldNow = w; showBg.className = 'show-bg bg w-' + w; }
   function syncShowWorld(){
@@ -12702,7 +12707,7 @@
     if (!document.documentElement.classList.contains('mode-daily')) return;
     if (els.readoutOverlay.classList.contains('show')) setShowWorld('results');
     else if (open(els.solveOverlay)) setShowWorld('jumble');
-    else if (open(els.eventOverlay)) setShowWorld(els.eventOverlay.classList.contains('powerup') || runPhase === 'powerup' ? 'powerup' : els.eventOverlay.classList.contains('brainbreak') ? 'odd' : 'trivia');
+    else if (open(els.eventOverlay)) setShowWorld(els.eventOverlay.classList.contains('powerup') || runPhase === 'powerup' ? 'powerup' : els.eventOverlay.classList.contains('brainbreak') ? 'odd' : (runPendingQ && runPendingQ.riddle) ? 'riddle' : 'trivia');
     else setShowWorld('vs');
     // Pause the background's motion while a full-screen layer covers it
     // (the Word Warp and results have their own; the Vault is on top).
@@ -12713,7 +12718,7 @@
   // the bonus Brain Beam.
   const evBg = document.getElementById('evBg');
   new MutationObserver(()=>{
-    const ov = els.eventOverlay, w = ov.classList.contains('gift-mode') || ov.classList.contains('cosmic-mode') ? 'w-odd' : ov.classList.contains('powerup') ? 'w-powerup' : 'w-trivia';
+    const ov = els.eventOverlay, w = ov.classList.contains('cosmic-mode') && document.getElementById('cosmicStage').classList.contains('riddle') ? 'w-riddle' : ov.classList.contains('gift-mode') || ov.classList.contains('cosmic-mode') ? 'w-odd' : ov.classList.contains('powerup') ? 'w-powerup' : 'w-trivia';
     if (!evBg.classList.contains(w)) evBg.className = 'bg ev-bg ' + w;
   }).observe(els.eventOverlay, { attributes:true, attributeFilter:['class'] });
   function cosmicFx(good, el){

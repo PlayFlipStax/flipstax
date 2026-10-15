@@ -46,6 +46,7 @@
 .w-emoji  { --w1:#fff27a; --w2:#ffb21f; --w3:#ff3c9d; --w4:#5a1052; --show-accent:#ffffff; }
 .w-first  { --w1:#9ff5ea; --w2:#1fc7c1; --w3:#ff6b5a; --w4:#3a0f3d; --show-accent:#ffd23f; }
 .w-scan   { --w1:#ffb4a8; --w2:#ef4444; --w3:#9f1239; --w4:#2a0613; --show-accent:#ffd23f; }   /* Crowd Scan: crimson */
+.w-riddle  { --w1:#e2ff8f; --w2:#3ddc4f; --w3:#0e9a33; --w4:#04380f; --show-accent:#fff3a8; }   /* riddles: vivid green, with question marks flying across */
 .w-hunt   { --w1:#9fb8ff; --w2:#5468ff; --w3:#2a1ea8; --w4:#0e0a33; --show-accent:#5ff8ff; }
 .w-vs     { --ray-c:rgba(255,236,250,0.26); --ray-on:6deg;  --ray-period:12deg; --ray-speed:40s; --ray-dir:normal; }
 .w-trivia { --ray-c:rgba(220,236,255,0.22); --ray-on:4deg;  --ray-period:10deg; --ray-speed:56s; --ray-dir:reverse; }
@@ -57,6 +58,7 @@
 .w-emoji  { --ray-c:rgba(255,250,200,0.26); --ray-on:10deg; --ray-period:24deg; --ray-speed:38s; --ray-dir:reverse; }
 .w-first  { --ray-c:rgba(220,255,250,0.22); --ray-on:6deg;  --ray-period:14deg; --ray-speed:46s; --ray-dir:normal; }
 .w-scan   { --ray-c:rgba(255,226,214,0.24); --ray-on:5deg;  --ray-period:15deg; --ray-speed:48s; --ray-dir:reverse; }
+.w-riddle  { --ray-c:rgba(240,255,200,0.26); --ray-on:7deg;  --ray-period:16deg; --ray-speed:42s; --ray-dir:normal; }
 .w-hunt   { --ray-c:rgba(200,240,255,0.22); --ray-on:4deg;  --ray-period:11deg; --ray-speed:52s; --ray-dir:reverse; }
 
 /* ---------- the sunburst (a world's background) ---------- */
@@ -122,3 +124,13 @@
   .amb .drift{ display:none; }
 }
 :root.rm .bg .rays, :root.rm .bg .glow, :root.rm .amb .drift, :root.rm .alien, :root.rm .ufo-light{ animation:none !important; }
+
+/* ---------- flying question marks (the riddle world) ---------- */
+/* <div class="qm-field"><span style="--y:..;--s:..;--d:..;--dl:.."></span>...</div> inside a .bg.w-riddle; transform only. */
+.qm-field{ display:none; position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:1; }
+.bg.w-riddle .qm-field{ display:block; }
+.qm-field span{ position:absolute; left:0; top:var(--y); font:900 var(--s) 'Big Shoulders Display', Arial Black, sans-serif; line-height:1; color:rgba(255,255,255,0.5); text-shadow:0 0 18px rgba(255,255,255,0.6), 0 3px 0 rgba(0,70,20,0.35);
+  transform:translateX(-25vw); animation:qmFly var(--d) linear var(--dl) infinite; will-change:transform; }
+@keyframes qmFly{ from{ transform:translateX(-25vw) rotate(-14deg); } 50%{ transform:translateX(52vw) rotate(10deg); } to{ transform:translateX(125vw) rotate(-14deg); } }
+.paused .qm-field span, :root.tab-hidden .qm-field span{ animation-play-state:paused !important; }
+@media (prefers-reduced-motion: reduce){ .qm-field span{ animation:none; transform:translateX(calc(var(--x, 30) * 1vw)); } }
