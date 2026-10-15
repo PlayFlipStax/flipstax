@@ -3097,6 +3097,15 @@
       repeating-linear-gradient(135deg, rgba(255,255,255,0.055) 0 7px, rgba(255,255,255,0) 7px 14px); }
   :root:is(.mode-daily, .mode-infinity) .half.has-glyph .scene .glyph{ font-size:clamp(80px, 14dvh, 124px); opacity:1; filter:drop-shadow(0 6px 5px rgba(0,0,0,0.35)) drop-shadow(0 0 16px rgba(255,255,255,0.4)); }
   :root:is(.mode-daily, .mode-infinity) .half.has-glyph.fit-tight .scene .glyph{ font-size:80px; }
+
+  /* Double or Nothing's four answers: one colour each (red, blue, green, orange), not all yellow. */
+  .cz-opts .cz-opt{ color:#fff; text-shadow:0 2px 0 rgba(0,0,0,0.28); border-color:rgba(255,255,255,0.85); box-shadow:0 4px 0 rgba(20,10,60,0.45), inset 0 2px 0 rgba(255,255,255,0.4); }
+  .cz-opts .cz-opt:nth-child(1){ background:linear-gradient(180deg,#ff7a8e,#f23c5a 55%,#b81b3a); }
+  .cz-opts .cz-opt:nth-child(2){ background:linear-gradient(180deg,#7db2ff,#2f7bff 55%,#1a4ab8); }
+  .cz-opts .cz-opt:nth-child(3){ background:linear-gradient(180deg,#5fe3a0,#17b86b 55%,#0b7a47); }
+  .cz-opts .cz-opt:nth-child(4){ background:linear-gradient(180deg,#ffc95a,#f09d00 55%,#b86a00); }
+  .cz-opts .cz-opt.right{ background:linear-gradient(180deg,#b9ffcf,#2fd17a); color:#063a1c; text-shadow:none; }
+  .cz-opts .cz-opt.wrong{ background:linear-gradient(180deg,#ffd0d0,#ff5a5a); color:#4a0000; text-shadow:none; }
 </style>
 </head>
 <body>
