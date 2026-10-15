@@ -3194,6 +3194,22 @@
   .event-overlay.bb-oddballAlert .event-tile.is-right .bb-spot{ opacity:1; }
   .event-overlay.bb-oddballAlert .event-tile.is-right{ box-shadow:var(--tile-depth), 0 0 0 4px #fff3c4, 0 0 40px 14px rgba(255,255,220,0.8); }
   .event-overlay.bb-oddballAlert.bb-revealed .event-tile:not(.is-right){ opacity:0.2; filter:grayscale(0.7); transition:opacity 0.4s ease; }
+
+  /* ---- Emoji Decode (Oct 2026): a neon cinema ----
+     The emoji clue sits in a glowing neon-sign frame (a cyan tube inside a pink one, with a faint flicker) under the
+     marquee bulbs; the four answers are neon signs, each in its own tube colour. */
+  .event-overlay.bb-emojiDecode .event-prompt{ background:#07020f; border:4px solid #7df9ff; outline:3px solid #ff5fd2; outline-offset:-13px; border-radius:22px;
+    box-shadow:0 0 8px #7df9ff, 0 0 26px #7df9ff, 0 0 46px rgba(125,249,255,0.5), inset 0 0 22px rgba(125,249,255,0.45), 0 0 0 3px rgba(5,0,15,0.8); text-shadow:0 0 14px rgba(255,255,255,0.7), 0 0 30px #ff5fd2;
+    animation:neonFlicker 4.2s linear infinite; }
+  @keyframes neonFlicker{ 0%, 18%, 22%, 62%, 64%, 100%{ opacity:1; } 20%, 63%{ opacity:0.78; } 21%{ opacity:0.95; } }
+  .event-overlay.bb-emojiDecode .event-tile{ background-color:#0a0420 !important; background-image:none; border:3px solid var(--nc, #7df9ff); border-radius:18px; color:#fff;
+    box-shadow:0 0 10px var(--nc, #7df9ff), 0 0 24px var(--nc, #7df9ff), inset 0 0 16px rgba(255,255,255,0.12); text-shadow:0 0 10px var(--nc, #7df9ff), 0 0 22px var(--nc, #7df9ff); }
+  .event-overlay.bb-emojiDecode .event-tile:nth-child(1){ --nc:#7df9ff; } .event-overlay.bb-emojiDecode .event-tile:nth-child(2){ --nc:#ff5fd2; }
+  .event-overlay.bb-emojiDecode .event-tile:nth-child(3){ --nc:#c8ff3d; } .event-overlay.bb-emojiDecode .event-tile:nth-child(4){ --nc:#ffb21f; }
+  .event-overlay.bb-emojiDecode .event-tile::after{ display:none; }
+  .event-overlay.bb-emojiDecode .event-tile.is-right{ box-shadow:0 0 0 4px #fff, 0 0 20px #fff, 0 0 44px var(--nc, #7df9ff); }
+  .event-overlay.bb-emojiDecode .event-tile.is-wrong{ box-shadow:none; }
+  @media (prefers-reduced-motion: reduce){ .event-overlay.bb-emojiDecode .event-prompt{ animation:none; } }
 </style>
 </head>
 <body>
