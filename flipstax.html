@@ -2475,7 +2475,9 @@
   .sp-tray{ display:inline-flex; gap:3px; vertical-align:middle; margin-left:2px; }
   .sp-tray i{ width:17px; height:22px; border-radius:5px; display:inline-flex; align-items:center; justify-content:center; font:900 15px/1 var(--f-display); font-style:normal;
     background:rgba(13,43,94,0.1); box-shadow:inset 0 -2px 0 rgba(13,43,94,0.35); color:#3a1d00; }
-  .sp-tray i.got{ background:linear-gradient(180deg, #fff3a8, #ffcb2b 55%, #ff9900); box-shadow:0 1px 0 #a85500; }
+  .sp-tray i.got{ background:linear-gradient(180deg, #fff3a8, #ffcb2b 55%, #ff9900); box-shadow:0 1px 0 #a85500, 0 0 8px rgba(255,200,40,0.85); color:#5a2a00; }
+  /* the prize track: a missed Brain Beam is a red X (letters stay hidden until the Word Warp) */
+  .sp-tray i.miss{ background:linear-gradient(180deg, #ff8a8a, #e0262f); box-shadow:0 1px 0 #7a0010; color:#fff; font-size:12px; }
   .sp-tray i.incoming{ color:transparent; background:rgba(13,43,94,0.1); box-shadow:inset 0 -2px 0 rgba(13,43,94,0.35); }
   .letter-fly{ position:absolute; left:0; top:0; width:30px; height:36px; margin:-18px 0 0 -15px; border-radius:8px; display:flex; align-items:center; justify-content:center;
     font:900 24px/1 var(--f-display); color:#3a1d00; background:linear-gradient(180deg, #fff3a8, #ffcb2b 55%, #ff9900); box-shadow:0 0 16px rgba(255,210,60,0.95), 0 2px 0 #a85500; z-index:3; }
@@ -8318,7 +8320,7 @@
       deck: deck.cards.slice(deck.next).map(c=> c.id),
       show: runShow, doors: runPortalDoors, warpBonus: runWarpBonusMs,
       combo: { streak: runMatchStreak, bank: runComboBank, bonus: runComboBonus, best: runBestStreak },
-      letterPos: runLetterPos,
+      letterPos: runLetterPos, tray: runTrayMarks,
     };
     try{ localStorage.setItem(RUN_LIVE_KEY, JSON.stringify(snap)); }catch(e){}
   }
@@ -8408,8 +8410,10 @@
       if (link) link.addEventListener('click', shareRunResult);
     } else if (runActive){
       // B5: the word's letters as a tray of blanks; each earned letter sits in its own spot.
-      const tray = Array.from({ length: RUN_WORD_LENGTH }, (_, p)=>{ const k = runLetterPos.indexOf(p);
-        return '<i data-p="' + p + '"' + (k >= 0 ? ' class="got' + (letterIncoming.has(p) ? ' incoming' : '') + '"' : '') + '>' + (k >= 0 ? runLetters[k] : '') + '</i>'; }).join('');
+      // The prize track: six face-down tiles, one per Brain Beam - earned glows gold with a "?", missed shows a
+      // red X. The letters themselves are never shown before the Word Warp (DIRECTION.md).
+      const tray = Array.from({ length: RUN_WORD_LENGTH }, (_, i)=>{ const m = runTrayMarks[i];
+        return '<i data-t="' + i + '"' + (m ? ' class="' + m + (m === 'got' && trayIncoming.has(i) ? ' incoming' : '') + '"' : '') + '>' + (m === 'got' ? '?' : m === 'miss' ? '✕' : '') + '</i>'; }).join('');
       els.runBanner.innerHTML = '<span class="sp-mode">\uD83C\uDFAE</span><span class="sp-label">Points</span><b class="sp-num">' + shownScore(runScore) + '</b>' +
         '<span class="sp-sep">\u00B7</span><span class="sp-clock">\u23F1\uFE0F<span id="dailyClock"></span></span>' +
         '<span class="sp-sep">\u00B7</span><span class="sp-tray" id="letterTray" aria-label="Word Warp letters: ' + runLetters.length + ' of ' + RUN_WORD_LENGTH + '">' + tray + '</span>' + streakTag;
@@ -9059,7 +9063,7 @@
     runWord = dailyWordForPlayer();
     runPlan = buildShowPlan(runStartDate, 0); runShow = { step:0, left:null, cycle:0 }; runPortalDoors = null; runWarpBonusMs = 0; runBreakSeen = {};
     runMatchStreak = 0; runComboBank = 0; runComboBonus = 0; runBestStreak = 0; renderComboMeter();
-    runLetterPos = []; runWarpPoints = 0; letterIncoming.clear();
+    runLetterPos = []; runWarpPoints = 0; letterIncoming.clear(); runTrayMarks = []; trayIncoming.clear();
     runEndsAt = Date.now() + RUN_DURATION_MS;
     runClockAddedMs = 0;
     dailySunP = 0;
@@ -9122,6 +9126,7 @@
     runMatchStreak = (snap.combo && snap.combo.streak) || 0; runComboBank = (snap.combo && snap.combo.bank) || 0; runComboBonus = (snap.combo && snap.combo.bonus) || 0; runBestStreak = (snap.combo && snap.combo.best) || 0;
     renderComboMeter();
     runLetterPos = Array.isArray(snap.letterPos) ? snap.letterPos : runLetters.map((_, k)=> k); runWarpPoints = 0; letterIncoming.clear();
+    runTrayMarks = Array.isArray(snap.tray) ? snap.tray : runLetters.map(()=> 'got'); trayIncoming.clear();
     dailySunP = 0;
     runEndsAt = Date.now() + snap.remainMs;
     // The rest of this run's deck, in the same order - no repeats.
@@ -9407,10 +9412,11 @@
     saveRunSnapshot();
     showBumper({ t:'bumper', finale:true }, ()=>{ if (runActive && runPhase === 'finale-bumper') startSolvePhase(); });
   }
-  // ---------- A letter flies into the tray (B5) ----------
+  // ---------- A face-down "?" tile flies up to the prize track (the letter stays hidden until the Word Warp) ----------
+  function flyTrayMark(i, fromEl){ flyLetter('?', i, fromEl); }
   function flyLetter(letter, pos, fromEl){
-    const done = ()=>{ letterIncoming.delete(pos); const s = document.querySelector('#letterTray i[data-p="' + pos + '"]'); if (s){ s.classList.remove('incoming'); FX.pop(s, 1.6); } sfx.letterLand && sfx.letterLand(); };
-    const slot = document.querySelector('#letterTray i[data-p="' + pos + '"]');
+    const done = ()=>{ trayIncoming.delete(pos); renderRunBanner(); const s = document.querySelector('#letterTray i[data-t="' + pos + '"]'); if (s){ s.classList.remove('incoming'); FX.pop(s, 1.6); } sfx.letterLand && sfx.letterLand(); };
+    const slot = document.querySelector('#letterTray i[data-t="' + pos + '"]');
     if (!slot || !fromEl || prefersReducedMotion() || !showFx.animate){ done(); return; }
     const a = fromEl.getBoundingClientRect(), b = slot.getBoundingClientRect();
     const f = document.createElement('div'); f.className = 'letter-fly'; f.textContent = letter; showFx.appendChild(f);
@@ -9524,6 +9530,9 @@
   // positions (everyone's first letter is the same, and it isn't always
   // the word's first letter).
   let runLetterPos = [], runWarpPoints = 0;
+  // The prize track (DIRECTION.md): one mark per Brain Beam, "got" (gold ?) or "miss" (red X).
+  let runTrayMarks = [];
+  const trayIncoming = new Set();
   const letterIncoming = new Set();
   function letterOrderFor(date){ return shuffle([0, 1, 2, 3, 4, 5].slice(0, RUN_WORD_LENGTH), mulberry32(hashStr('flipstax-letters-' + date))); }
   // Set when a Daily run ends; cleared when the player starts playing again
@@ -9682,9 +9691,10 @@
       // once MAX_EARNED_LETTERS letters are in, a right answer pays points instead.
       const letterLeft = runLetters.length < MAX_EARNED_LETTERS;
       const pos = letterLeft ? letterOrderFor(runStartDate || todayStr())[runLetters.length] : -1, nextLetter = letterLeft ? runWord.word[pos] : '';
+      let trayAt = -1;
       if (letterLeft){
         runLetters.push(nextLetter); runLetterPos.push(pos);
-        letterIncoming.add(pos);
+        if (runTrayMarks.length < RUN_WORD_LENGTH){ trayAt = runTrayMarks.length; runTrayMarks.push('got'); trayIncoming.add(trayAt); }
       } else { runScore += EXTRA_BEAM_POINTS; }
       // Accuracy bonus: points (never letters) for back-to-back correct
       // answers - +2, then +4, then +6 from the 4th in a row on. Added
@@ -9701,13 +9711,14 @@
         bannerParts.push('\ud83c\udfc6 PERFECT RUN +' + PERFECT_RUN_BONUS + ' pts');
       }
       els.eventSubtitle.textContent = bannerParts.join(' \u00b7 ');
-      els.eventPrompt.textContent = letterLeft ? '\u2705 Correct! Letter earned: ' + nextLetter : '\u2705 Correct! Letter limit reached \u2014 +' + EXTRA_BEAM_POINTS + ' points';
+      els.eventPrompt.textContent = letterLeft ? '\u2705 Correct! A Word Warp letter is yours' : '\u2705 Correct! Letter limit reached \u2014 +' + EXTRA_BEAM_POINTS + ' points';
       celebrateTriviaCorrect();
       renderRunBanner();
-      if (letterLeft) flyLetter(nextLetter, pos, els.eventTiles[runPendingQCorrectIdx]);
+      if (trayAt >= 0) flyTrayMark(trayAt, els.eventTiles[runPendingQCorrectIdx]);
     } else {
       sfx.wrong();
       runTriviaStreak = 0;
+      if (runTrayMarks.length < RUN_WORD_LENGTH) runTrayMarks.push('miss');   // the prize track: a red X
       runScore -= 5; // trivia carries real stakes too, applied directly since we're deliberately in the 'trivia' phase
       renderRunBanner();
       els.eventSubtitle.textContent = '';
@@ -9767,7 +9778,7 @@
       const pos = letterOrderFor(runStartDate || todayStr())[runLetters.length], nextLetter = runWord.word[pos];
       runLetters.push(nextLetter); runLetterPos.push(pos);
       runSecondChanceOutcome = 'recovered';
-      els.eventPrompt.textContent = '✅ Second chance! Letter recovered: ' + nextLetter;
+      els.eventPrompt.textContent = '✅ Second chance! A letter recovered';
       celebrateTriviaCorrect();
     } else {
       sfx.wrong();
@@ -14559,6 +14570,7 @@
       runScore = score; runLetters = []; runLetterPos = [];
       const order = letterOrderFor(runStartDate || todayStr());
       for (let i = 0; i < n; i++){ runLetters.push(runWord.word[order[i]]); runLetterPos.push(order[i]); }
+      runTrayMarks = runLetters.map(()=> 'got'); if (n < RUN_WORD_LENGTH && n > 0) runTrayMarks.push('miss');
       runTriviaAttempted = n + 1; runTriviaCorrect = n; runRoundResults = Array.from({ length:n + 1 }, (_, i)=> i < n);
       runClockAddedMs = -108000;
       renderRunBanner();
