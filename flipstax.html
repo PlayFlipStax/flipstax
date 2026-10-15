@@ -1561,6 +1561,7 @@
   .et-clock{ font:700 24px/1 'Courier New', monospace; letter-spacing:1px; color:#7dff9e; background:#000; padding:6px 8px; border-radius:6px; text-shadow:0 0 8px rgba(125,255,158,0.7); font-variant-numeric:tabular-nums; }
   .et-tease{ margin-top:6px; font:700 12px/1.3 var(--f-body); color:#e9dcff; }
   #readoutOverlay.ep .solve-buttons{ margin-top:10px !important; }
+  #readoutOverlay:not(.ep) .ep-only{ display:none !important; }
   #readoutOverlay.ep #readoutShare{ flex:2; font-family:var(--f-display); font-size:20px; letter-spacing:0.5px; }
   @media (max-height:700px){ .epr-score > b{ font-size:48px; } .ec-star, .ec-fire{ font-size:30px; } .epr-ribbon b{ font-size:28px; } }
   @media (prefers-reduced-motion: reduce){ #readoutOverlay.ep::before{ animation:none; } }
@@ -3943,6 +3944,7 @@
     <div class="solve-buttons" style="margin-top:14px;">
       <div class="daily-btn" id="readoutDone">Done</div>
       <div class="daily-btn primary" id="readoutShare">📤 Share</div>
+      <div class="daily-btn ep-only" id="readoutCopy" role="button" tabindex="0">📋 Copy</div>
     </div>
     <a class="readout-support" id="readoutSupport" href="https://ko-fi.com/flipstax" target="_blank" rel="noopener noreferrer">Enjoying FlipStax? ❤️ Support it</a>
   </div>
@@ -8620,7 +8622,7 @@
       deck: deck.cards.slice(deck.next).map(c=> c.id),
       show: runShow, doors: runPortalDoors, warpBonus: runWarpBonusMs,
       combo: { streak: runMatchStreak, bank: runComboBank, bonus: runComboBonus, best: runBestStreak },
-      letterPos: runLetterPos, tray: runTrayMarks, act: runActIdx, actPts: runActPts, best: runBestMoment, keys: runKeys, bonusChips: runBonusChips,
+      letterPos: runLetterPos, tray: runTrayMarks, act: runActIdx, actPts: runActPts, best: runBestMoment, keys: runKeys, bonusChips: runBonusChips, vsMarks: runVsMarks,
     };
     try{ localStorage.setItem(RUN_LIVE_KEY, JSON.stringify(snap)); }catch(e){}
   }
@@ -8652,23 +8654,32 @@
     if (d.lastDay && isLeftoverSave({ rule: d.rule, date: d.lastDay })) d.lastDay = dayBefore(today);
     return d;
   }
+  // A streak freeze (DIRECTION.md): earned at every 7 days in a row (one held at a time); a
+  // missed day is then forgiven once - the streak carries on and the freeze is used up.
+  const STREAK_FREEZE_EVERY = 7;
+  let dailyFreezeNote = '';   // what happened to the freeze on today's run (for the results' streak card)
   function peekDailyStreak(){
     try{
       const d = readStreakRecord(), today = todayStr();
-      return d.lastDay === today || d.lastDay === dayBefore(today) ? (d.streak || 0) : 0;
+      return d.lastDay === today || d.lastDay === dayBefore(today) || (d.freeze && d.lastDay === dayBefore(dayBefore(today))) ? (d.streak || 0) : 0;
     }catch(e){ return 0; }
   }
+  function hasStreakFreeze(){ try{ return !!readStreakRecord().freeze; }catch(e){ return false; } }
   function updateDailyStreak(runDate){
     const today = runDate || todayStr();
-    let streak = 0, lastDay = null;
+    let streak = 0, lastDay = null, freeze = false;
     try{
       const d = readStreakRecord();
-      streak = d.streak || 0; lastDay = d.lastDay || null;
+      streak = d.streak || 0; lastDay = d.lastDay || null; freeze = !!d.freeze;
     }catch(e){}
+    dailyFreezeNote = '';
     if (REPLAY) return streak;   // a replay never counts toward the streak
     if (lastDay === today) return streak;
-    streak = (lastDay === dayBefore(today)) ? streak + 1 : 1;
-    try{ localStorage.setItem('flipstax_streak', JSON.stringify({ streak, lastDay: today, rule: SAVE_RULE })); }catch(e){}
+    if (lastDay === dayBefore(today)) streak++;
+    else if (freeze && lastDay === dayBefore(dayBefore(today))){ streak++; freeze = false; dailyFreezeNote = 'used'; }
+    else streak = 1;
+    if (streak % STREAK_FREEZE_EVERY === 0 && !freeze){ freeze = true; dailyFreezeNote = 'earned'; }
+    try{ localStorage.setItem('flipstax_streak', JSON.stringify({ streak, lastDay: today, rule: SAVE_RULE, freeze })); }catch(e){}
     return streak;
   }
   dailyRunStreak = peekDailyStreak();
@@ -8679,6 +8690,7 @@
     const n = peekDailyStreak(), done = !!runResultToday;
     el.innerHTML = n > 0 ? '\uD83D\uDD25 <b>' + n + '</b>-day streak' + (done ? ' \u00B7 \u2705 today\u2019s done' : ' \u00B7 keep it going!')
       : '\uD83D\uDD25 Start a streak today';
+    if (n > 0 && hasStreakFreeze()) el.innerHTML += ' \u00B7 \uD83E\uDDCA';   // (a streak freeze held)
     el.setAttribute('aria-label', n > 0 ? 'Daily streak: ' + n + ' days' + (done ? ', today done' : '') : 'No Daily streak yet');
   }
 
@@ -8730,7 +8742,26 @@
   // (The run itself can dip negative - idle rounds and missed trivia cost
   // points - and the game and the stored result keep the real number.)
   function shownScore(n){ return Math.max(0, Math.round(n || 0)); }
+  // The copy-text share (DIRECTION.md): "FlipStax #<episode> · <score>", a row of green /
+  // red squares per act (matched the crowd or not), the letters won, the Word Warp time,
+  // a UFO for THE MOTHERSHIP jackpot, and (for the clipboard) the link.
+  function episodeShareText(r, withLink){
+    const lines = ['FlipStax #' + (r.episode || showEpisode(r.date || todayStr())) + ' · ' + shownScore(r.score)];
+    (r.vsMarks || []).forEach(m=>{ if (m) lines.push(m.split('').map(c=> c === 'g' ? '🟩' : '🟥').join('')); });
+    lines.push('🔤 ' + (r.letters != null ? r.letters : r.triviaCorrect) + '/' + RUN_WORD_LENGTH + ' · ' + (r.solved ? '⏱️ ' + formatRaceTime(r.solveMs) : '❌') + (r.jackpot ? ' · 🛸' : ''));
+    if (withLink) lines.push(GAME_URL);
+    return lines.join('\n');
+  }
+  async function copyEpisodeShare(){
+    const r = runResultToday; if (!r) return;
+    const text = episodeShareText(r, true);
+    let ok = false;
+    try{ if (navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(text); ok = true; } }catch(e){}
+    if (!ok){ try{ const ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); ok = document.execCommand('copy'); ta.remove(); }catch(e){} }
+    showToast(ok ? '📋 Copied! Paste it anywhere.' : 'Couldn’t copy - try the Share button');
+  }
   function buildRunShareText(r){
+    if (r.actPts || r.orbit) return episodeShareText(r, false);   // (the share sheet adds the link)
     const p = PERSONALITY_META[r.personalityType];
     return 'FlipStax Daily Stax\n' + shownScore(r.score) + ' pts \u00B7 ' + (p ? p.icon + ' ' + p.name + ' \u00B7 ' : '') + r.triviaCorrect + '/' + r.triviaTotal + ' trivia \u00B7 ' +
       (r.solved ? ('solved in ' + formatRaceTime(r.solveMs)) : 'word not solved') +
@@ -9129,9 +9160,94 @@
       pills,
     };
   }
+  // ---------- The episode's share image (refs/results.jpg, minus the extra aliens) ----------
+  // 1080 x 1920, the results screen in one picture: the bulb frame, CONGRATULATIONS!, the
+  // final score with its breakdown, the three cards (best moment, personality card,
+  // streak), the VS squares, and Tomorrow on FlipStax.
+  function renderEpisodeShare(r){
+    const W = SHARE_CARD_W, H = SHARE_CARD_H, c = document.createElement('canvas'); c.width = W; c.height = H;
+    const ctx = c.getContext('2d'), D = SHARE_FONT_D, T = SHARE_FONT_T;
+    const bg = ctx.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#4a1680'); bg.addColorStop(0.55, '#2c0b52'); bg.addColorStop(1, '#1c0636');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    // the ray burst behind the score
+    ctx.save(); ctx.translate(W / 2, 760); ctx.fillStyle = 'rgba(255,214,90,0.07)';
+    for (let k = 0; k < 18; k++){ ctx.rotate(Math.PI / 9); ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-90, -1500); ctx.lineTo(90, -1500); ctx.closePath(); ctx.fill(); }
+    ctx.restore();
+    // the bulb frame
+    roundRectPath(ctx, 26, 26, W - 52, H - 52, 60); ctx.lineWidth = 22; ctx.strokeStyle = '#c98a12'; ctx.stroke();
+    ctx.lineWidth = 4; ctx.strokeStyle = '#ffe27a'; ctx.stroke();
+    const bulb = (x, y)=>{ const g = ctx.createRadialGradient(x - 3, y - 3, 1, x, y, 13); g.addColorStop(0, '#ffffff'); g.addColorStop(0.5, '#fff3b0'); g.addColorStop(1, 'rgba(255,210,63,0.2)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 11, 0, Math.PI * 2); ctx.fill(); };
+    for (let x = 96; x <= W - 96; x += 56){ bulb(x, 37); bulb(x, H - 37); }
+    for (let y = 96; y <= H - 96; y += 56){ bulb(37, y); bulb(W - 37, y); }
+    const center = (text, y, font, fill, stroke, sw)=>{ ctx.font = font; ctx.textAlign = 'center'; if (stroke){ ctx.lineWidth = sw || 8; ctx.strokeStyle = stroke; ctx.lineJoin = 'round'; ctx.strokeText(text, W / 2, y); } ctx.fillStyle = fill; ctx.fillText(text, W / 2, y); };
+    const goldFill = (y0, y1)=>{ const g = ctx.createLinearGradient(0, y0, 0, y1); g.addColorStop(0, '#fff3b0'); g.addColorStop(0.5, '#ffd23f'); g.addColorStop(1, '#e09a10'); return g; };
+    // FLIPSTAX tab + CONGRATULATIONS! ribbon
+    roundRectPath(ctx, W / 2 - 150, 110, 300, 70, 16); ctx.fillStyle = goldFill(110, 180); ctx.fill();
+    center('FLIPSTAX', 166, '900 52px ' + D, '#3a1a00');
+    roundRectPath(ctx, 90, 178, W - 180, 150, 22); ctx.fillStyle = '#3a0d66'; ctx.fill(); ctx.lineWidth = 8; ctx.strokeStyle = '#ffd23f'; ctx.stroke();
+    center('CONGRATULATIONS!', 290, '900 106px ' + D, goldFill(200, 300), '#7a3a00', 12);
+    center('EPISODE ' + (r.episode || showEpisode(r.date || todayStr())) + ' · ' + GAME_URL.replace(/^https?:\/\//, ''), 384, '700 30px ' + T, '#e9dcff');
+    // the score panel and its breakdown
+    const rows = [], acts = RUNDOWN.acts; let listed = 0;
+    acts.forEach((a, i)=>{ if (a.ad || a.id === 'finale') return; const p = Math.round((r.actPts || [])[i] || 0); listed += p; rows.push([(a.sub || '').split(' · ')[0] + ' · ' + a.title + (a.mult > 1 ? ' ×' + a.mult : ''), p]); });
+    listed += r.warpPoints || 0; rows.push([GN.wordWarp + (r.solved ? ' · ' + formatRaceTime(r.solveMs) : ' · not solved'), r.warpPoints || 0]);
+    const other = Math.round(r.score - (r.orbitPoints || 0) - listed); if (other) rows.push([other > 0 ? 'Bonuses' : 'Misses', other]);
+    rows.push([GN.orbitDrop + (r.jackpot ? ' · THE MOTHERSHIP!' : ''), r.orbitPoints || 0]);
+    const pTop = 410, pH = 240 + rows.length * 46;
+    roundRectPath(ctx, 110, pTop, W - 220, pH, 34); ctx.fillStyle = '#240845'; ctx.fill(); ctx.lineWidth = 10; ctx.strokeStyle = '#ffd23f'; ctx.stroke();
+    center('FINAL SCORE', pTop + 70, '900 46px ' + D, '#ffd23f');
+    center(shownScore(r.score).toLocaleString(), pTop + 220, '900 170px ' + D, goldFill(pTop + 90, pTop + 230), '#8a4a00', 10);
+    ctx.font = '700 34px ' + T;
+    rows.forEach(([label, pts], k)=>{ const y = pTop + 275 + k * 46; ctx.textAlign = 'left'; ctx.fillStyle = k === rows.length - 1 ? '#7df9ff' : '#e9dcff'; ctx.fillText(label, 160, y); ctx.textAlign = 'right'; ctx.fillText((pts > 0 ? '+' : '') + pts, W - 160, y); });
+    // the three cards
+    const cTop = pTop + pH + 50, cw = 270, gap = 30, cx0 = (W - (cw * 3 + gap * 2)) / 2, ch = 380;
+    const cardBox = (x, gold)=>{ roundRectPath(ctx, x, cTop, cw, ch, 26); const g = ctx.createLinearGradient(0, cTop, 0, cTop + ch); if (gold){ g.addColorStop(0, '#ffe27a'); g.addColorStop(1, '#d99a1a'); } else { g.addColorStop(0, '#4a1680'); g.addColorStop(1, '#2c0b52'); } ctx.fillStyle = g; ctx.fill(); ctx.lineWidth = 6; ctx.strokeStyle = '#ffd23f'; ctx.stroke(); };
+    const wrap = (text, x, y, maxW, lh, maxLines)=>{ const words = String(text).split(' '); let line = '', n = 0; for (const w of words){ const t = line ? line + ' ' + w : w; if (ctx.measureText(t).width > maxW && line){ ctx.fillText(line, x, y + n * lh); n++; line = w; if (n >= maxLines - 1){ line = words.slice(words.indexOf(w)).join(' '); break; } } else line = t; } if (line) ctx.fillText(line, x, y + n * lh); };
+    // best moment
+    cardBox(cx0, false); ctx.textAlign = 'center';
+    ctx.fillStyle = '#fff'; ctx.font = '900 40px ' + D; ctx.fillText('YOUR BEST', cx0 + cw / 2, cTop + 58); ctx.fillText('MOMENT', cx0 + cw / 2, cTop + 100);
+    ctx.font = '96px sans-serif'; ctx.fillText('⭐', cx0 + cw / 2, cTop + 200);
+    ctx.font = '700 26px ' + T; ctx.fillStyle = '#e9dcff'; wrap(r.best ? r.best.text : 'Showing up!', cx0 + cw / 2, cTop + 250, cw - 30, 30, 3);
+    if (r.best){ ctx.font = '900 36px ' + D; ctx.fillStyle = '#ffd23f'; ctx.fillText('+' + Math.round(r.best.pts) + ' PTS', cx0 + cw / 2, cTop + ch - 24); }
+    // personality card
+    const px = cx0 + cw + gap, type = PERSONALITY_META[r.personalityType] ? r.personalityType : 'fence_sitter', meta = PERSONALITY_META[type] || {};
+    cardBox(px, true);
+    ctx.fillStyle = '#3a1a00'; ctx.font = '900 34px ' + D; ctx.fillText(String(meta.name || '').toUpperCase(), px + cw / 2, cTop + 50);
+    const img = shareArtImg(type), ix = px + 22, iy = cTop + 70, iw = cw - 44, ih = ch - 130;
+    ctx.save(); roundRectPath(ctx, ix, iy, iw, ih, 16); ctx.clip();
+    if (img){ const s = Math.max(iw / img.naturalWidth, ih / img.naturalHeight), dw = img.naturalWidth * s, dh = img.naturalHeight * s; ctx.drawImage(img, ix + (iw - dw) / 2, iy + (ih - dh) / 2, dw, dh); }
+    else { ctx.fillStyle = '#3a0d66'; ctx.fillRect(ix, iy, iw, ih); ctx.font = '110px sans-serif'; ctx.fillStyle = '#fff'; ctx.fillText(meta.icon || '✨', px + cw / 2, iy + ih / 2 + 40); }
+    ctx.restore();
+    ctx.fillStyle = '#3a1a00'; ctx.font = '800 22px ' + T; ctx.fillText("TODAY'S PERSONALITY", px + cw / 2, cTop + ch - 22);
+    // streak
+    const sx = px + cw + gap, n = Math.max(1, r.streak || dailyRunStreak || 1);
+    cardBox(sx, false);
+    ctx.fillStyle = '#fff'; ctx.font = '900 40px ' + D; ctx.fillText(n + ' DAY', sx + cw / 2, cTop + 58); ctx.fillText('STREAK!', sx + cw / 2, cTop + 100);
+    ctx.font = '110px sans-serif'; ctx.fillText('🔥', sx + cw / 2, cTop + 235);
+    ctx.font = '900 36px ' + D; ctx.fillStyle = '#ffd23f'; ctx.fillText('STREAK ' + n, sx + cw / 2, cTop + ch - 24);
+    // the VS squares, a row per act
+    let y = cTop + ch + 70;
+    const marks = (r.vsMarks || []).filter(Boolean), sq = 38, sg = 8;
+    marks.forEach(m=>{ const w = m.length * (sq + sg) - sg; let x = (W - w) / 2; for (const ch2 of m){ roundRectPath(ctx, x, y, sq, sq, 8); ctx.fillStyle = ch2 === 'g' ? '#3ddc4f' : '#ff4b5c'; ctx.fill(); x += sq + sg; } y += sq + sg; });
+    // Tomorrow on FlipStax
+    const tY = Math.max(y + 40, H - 300);
+    roundRectPath(ctx, 150, tY, W - 300, 130, 28); ctx.fillStyle = '#1c0636'; ctx.fill(); ctx.lineWidth = 8; ctx.strokeStyle = '#ffd23f'; ctx.stroke();
+    center('TOMORROW ON FLIPSTAX', tY + 52, '900 40px ' + D, '#fff');
+    center('EPISODE ' + showEpisode(dayAfter(r.date || todayStr())), tY + 108, '900 50px ' + D, '#7dff9e');
+    return c;
+  }
   function prebuildDailyShare(r){
     if (!r) return null;
     if (dailySharePre && dailySharePre.r === r) return dailySharePre;
+    if (r.actPts || r.orbit){   // an episode: the results screen's own picture
+      const p = { r, done:false, canvas:null, blob:null, promise:null };
+      const type = PERSONALITY_META[r.personalityType] ? r.personalityType : 'fence_sitter';
+      p.promise = waitRunShareAssets({ personality: type }, 3000).then(()=>{
+        try{ const canvas = renderEpisodeShare(r); p.blob = dataUrlToBlob(canvas.toDataURL('image/png')); p.canvas = canvas; }catch(e){ console.warn('FlipStax: episode share image failed', e); }
+        p.done = true; return p;
+      });
+      dailySharePre = p; return p;
+    }
     const a = dailyShareAward(r), opts = dailyShareOpts(r, a);
     const p = { r, done:false, canvas:null, blob:null, promise:null, a };
     p.promise = (PERSONALITY_CARD_ART[a.personality] ? buildRunShareCanvas(a, opts) : Promise.resolve(null)).then(canvas=>{
@@ -9153,7 +9269,7 @@
       }
       let canvas = pre.canvas, blob = pre.blob;
       if (!canvas){ canvas = renderShareCard('daily', buildDailyShareData(r)); blob = null; }
-      await exportAndShareCard(canvas, 'flipstax-daily-run.png', buildRunShareText(r), blob);
+      await exportAndShareCard(canvas, (r.actPts || r.orbit) ? 'flipstax-episode-' + (r.episode || '') + '.png' : 'flipstax-daily-run.png', buildRunShareText(r), blob);
       // The run is over: once the share sheet closes (or the download
       // starts), the music stops with it.
       pauseAllTracks();
@@ -9363,7 +9479,7 @@
     runPendingTrivia = false; runPendingPowerUp = false;
     runStartDate = todayStr();
     runWord = dailyWordForPlayer();
-    runPlan = buildShowPlan(runStartDate); runShow = { step:0, left:null }; runActIdx = 0; runActPts = []; runBestMoment = null; runKeys = 0; runBonusChips = 0; runPortalDoors = null; runWarpBonusMs = 0; runBreakSeen = {};
+    runPlan = buildShowPlan(runStartDate); runShow = { step:0, left:null }; runActIdx = 0; runActPts = []; runBestMoment = null; runKeys = 0; runBonusChips = 0; runVsMarks = []; runPortalDoors = null; runWarpBonusMs = 0; runBreakSeen = {};
     runMatchStreak = 0; runComboBank = 0; runComboBonus = 0; runBestStreak = 0; renderComboMeter();
     runLetterPos = []; runWarpPoints = 0; letterIncoming.clear(); runTrayMarks = []; trayIncoming.clear();
     runEndsAt = Date.now() + RUN_DURATION_MS;
@@ -9423,7 +9539,7 @@
     currentRiddle = snap.riddle >= 0 ? RIDDLES[snap.riddle] : null; riddleEndsAt = snap.riddleEndsAt;
     runSolvedAt = null;
     runClockAddedMs = snap.clockAdded || 0;
-    runShow = snap.show || { step:0, left:null }; runPlan = buildShowPlan(runStartDate); runActIdx = snap.act || 0; runActPts = Array.isArray(snap.actPts) ? snap.actPts : []; runBestMoment = snap.best || null; runKeys = snap.keys || 0; runBonusChips = snap.bonusChips || 0; runPortalDoors = snap.doors || null; runWarpBonusMs = snap.warpBonus || 0;
+    runShow = snap.show || { step:0, left:null }; runPlan = buildShowPlan(runStartDate); runActIdx = snap.act || 0; runActPts = Array.isArray(snap.actPts) ? snap.actPts : []; runBestMoment = snap.best || null; runKeys = snap.keys || 0; runBonusChips = snap.bonusChips || 0; runVsMarks = Array.isArray(snap.vsMarks) ? snap.vsMarks : []; runPortalDoors = snap.doors || null; runWarpBonusMs = snap.warpBonus || 0;
     runMatchStreak = (snap.combo && snap.combo.streak) || 0; runComboBank = (snap.combo && snap.combo.bank) || 0; runComboBonus = (snap.combo && snap.combo.bonus) || 0; runBestStreak = (snap.combo && snap.combo.best) || 0;
     renderComboMeter();
     runLetterPos = Array.isArray(snap.letterPos) ? snap.letterPos : runLetters.map((_, k)=> k); runWarpPoints = 0; letterIncoming.clear();
@@ -10132,6 +10248,7 @@
     if (!runBestMoment || d > runBestMoment.pts){ const a = runAct(); runBestMoment = { pts: d, text: (runQuizMystery ? GN.riddleRound : GN.brainBeam) + (a.mult > 1 ? ' in ' + a.title.toLowerCase().replace(/\b\w/g, c=> c.toUpperCase()) : '') }; }
   }
   let runBestMoment = null;   // { text, pts } - the run's single biggest win, for the results' "Your best moment"
+  let runVsMarks = [];   // per act: a string of g (matched the crowd) / r (didn't), one per VS pick
   let runActPts = [];   // points won in each act (by its index in the rundown), for the results breakdown   // the question on screen is a rundown Brain Beam (it earns a prize-track tile)
   let runPlan = null, runShow = { step:0, left:null }, runPortalDoors = null, runWarpBonusMs = 0, runQuizPick = null;
   let runMatchStreak = 0, runComboBank = 0, runComboBonus = 0, runBestStreak = 0;
@@ -13042,10 +13159,12 @@
     } });
     saveRunResultToday(runResultToday);
     dailyRunStreak = updateDailyStreak(runResultToday.date);
+    runResultToday.streak = dailyRunStreak; saveRunResultToday(runResultToday);
     renderRunBanner();
     voted = false; votedSinceTime = null;
     playRunEndMusic(!!solved);
     // The grand prize: Orbit Drop (the Vault is retired from Daily), then today's results.
+    runResultToday.vsMarks = runVsMarks.slice(); runResultToday.letters = runLetters.length;
     runResultToday.keys = runKeys; runResultToday.bonusChips = runBonusChips; runResultToday.warpChip = !!solved;
     runResultToday.orbitChips = dailyChipsFor(runKeys, runBonusChips, !!solved);
     openDailyOrbit(runResultToday);
@@ -13086,7 +13205,10 @@
     document.getElementById('eprPersArt').innerHTML = cardArtHtml(PERSONALITY_META[r.personalityType] ? r.personalityType : 'fence_sitter');
     const n = dailyRunStreak || 1;
     document.getElementById('eprStreakH').textContent = n + ' DAY STREAK!';
-    document.getElementById('eprStreakNote').textContent = n > 1 ? 'Back tomorrow keeps it alive' : 'Come back tomorrow for day 2';
+    document.getElementById('eprStreakNote').textContent = dailyFreezeNote === 'earned' ? '🧊 Streak freeze earned! It saves one missed day.'
+      : dailyFreezeNote === 'used' ? '🧊 Your streak freeze saved the streak!'
+      : hasStreakFreeze() ? '🧊 Freeze ready · ' + (STREAK_FREEZE_EVERY - n % STREAK_FREEZE_EVERY) + ' days to the next'
+      : (STREAK_FREEZE_EVERY - n % STREAK_FREEZE_EVERY) + ' more day' + (STREAK_FREEZE_EVERY - n % STREAK_FREEZE_EVERY === 1 ? '' : 's') + ' for a streak freeze';
     document.getElementById('eprStreakFoot').textContent = 'STREAK ' + n;
     // Tomorrow on FlipStax: the next episode, its countdown and a tease of its Mystery Games.
     const tomorrow = dayAfter(r.date || todayStr());
@@ -14191,6 +14313,7 @@
     if (cv.counted) setTimeout(maybeShowVibeReveal, 0);
     progress.decisionMs += Math.max(0, votedSinceTime - roundStartedAt); progress.decisionN++;
     saveProgress();
+    if (runActive) runVsMarks[runActIdx] = (runVsMarks[runActIdx] || '') + (cv.withCrowd ? 'g' : 'r');   // (the share text's squares)
     if (runActive && cv.counted){
       runVotesDecided++;
       if (cv.withCrowd){ runVotesAgreed++; const ph = side === 'A' ? els.halfA : els.halfB; FX.glowSweep(showFx, ph); FX.burstAt(showFx, ph, { count:8, spread:70, shapes:['star'], colors:['#ffd23f', '#fff3c4', '#ffb21f'] }); }
@@ -14725,6 +14848,7 @@
   renderRunBanner();
   els.readoutDone.addEventListener('click', finishDailySession);
   els.readoutShare.addEventListener('click', shareRunResult);
+  document.getElementById('readoutCopy').addEventListener('click', copyEpisodeShare);
   els.solveSubmit.addEventListener('click', submitSolveGuess);
   els.solveClearBtn.addEventListener('click', ()=>{ solveCurrentGuess = []; solveCurrentGuessSource = []; rackUsedFlags = []; renderSolveUI(); });
   els.solveHintBtn.addEventListener('click', useSolveHint);
@@ -15296,6 +15420,7 @@
       '.replay-menu{position:fixed;inset:0;z-index:10000;background:rgba(20,6,40,0.94);display:none;flex-direction:column;align-items:center;padding:calc(14px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom));overflow:auto;color:#fff;font-family:Inter,system-ui,sans-serif}' +
       '.replay-menu.open{display:flex}.replay-menu h3{margin:4px 0 10px;font-size:15px;letter-spacing:1px}' +
       '.replay-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;max-width:380px}' +
+      '.replay-shareview{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.92);overflow:auto;padding:12px;display:flex;flex-direction:column;align-items:center;gap:10px}.replay-shareview img{width:100%;max-width:360px;border-radius:12px}.replay-shareview pre{color:#fff;font:14px/1.4 system-ui;white-space:pre-wrap;margin:0}' +
       '.replay-list button,.replay-close{font:700 13px/1.2 Inter,system-ui,sans-serif;color:#fff;background:#3a1f6e;border:1px solid #b98bf0;border-radius:12px;padding:11px 8px;cursor:pointer}' +
       '.replay-head{grid-column:1 / -1;margin:8px 0 0;font:800 12px/1 Inter,system-ui,sans-serif;letter-spacing:2px;color:#ffd23f}.replay-list button.wide{grid-column:1 / -1}.replay-list button.restart{background:#ff3c9d;border-color:#fff}.replay-close{margin-top:12px;min-width:140px;background:#150f2b}';
     document.head.appendChild(css);
@@ -15355,7 +15480,8 @@
     function replaySampleEpisode(){
       const r = replaySampleResult();
       return Object.assign(r, { score: 412, actPts: [64, 0, 128, 141], best: { pts: 45, text: 'Read the crowd on Pizza vs Tacos in Lightning Round' }, episode: showEpisode(todayStr()),
-        orbit: { stage:'done', done:true, chips:[], dropped:0, base: 368 }, orbitPoints: 44, jackpot: false });
+        orbit: { stage:'done', done:true, chips:[], dropped:0, base: 368 }, orbitPoints: 44, jackpot: true, letters: 5, streak: 7,
+        vsMarks: ['ggrggrggg', '', 'grggrgggr', 'ggrgrg'] });
     }
     const JUMPS = [
       { label:'Cold open', go: ()=> replayEnter(null, null) },
@@ -15379,6 +15505,8 @@
       { label:'Grand finale (6 letters)', wide:true, go: atType(s=> s.t === 'act' && s.finale, 0, 210, 6) },
       { label:'Orbit Drop', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); const r = replaySampleEpisode(); delete r.orbit; delete r.orbitPoints; r.score = 368; r.keys = 2; r.bonusChips = 1; r.warpChip = true; r.orbitChips = dailyChipsFor(2, 1, true); runResultToday = r; openDailyOrbit(r); }) },
       { label:'Results (sample)', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); runResultToday = replaySampleEpisode(); showRunReadout(); updatePauseBtnVisibility(); }) },
+      { label:'Share image', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); runResultToday = replaySampleEpisode(); showRunReadout(); updatePauseBtnVisibility();
+        prebuildDailyShare(runResultToday).promise.then(p=>{ if (!p.canvas) return; const v = document.createElement('div'); v.className = 'replay-shareview'; v.innerHTML = '<img alt="Share image"><pre></pre>'; v.querySelector('img').src = p.canvas.toDataURL('image/png'); v.querySelector('pre').textContent = episodeShareText(runResultToday, true); v.onclick = ()=> v.remove(); document.body.appendChild(v); }); }) },
       { label:'Restart Daily', wide:true, cls:'restart', go: ()=> replayEnter(null, null) },
     ];
     // ----- Infinity jumps: each starts a fresh Infinity run with stand-in numbers and lands on its screen.
