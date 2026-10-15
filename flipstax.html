@@ -9969,7 +9969,7 @@
   const PK_AUTO_GAP_MS = 420;   // Auto-drop: the gap between chips
   const PK_PLAY_SPEED = 1.15;   // playback speed of the simulated fall (1 = real time)
   function plinkoPoints(kind){ return OP.SLOT_POINTS[kind] || 0; }
-  function plinkoLabel(kind){ return kind === 'jackpot' ? '🛸' : kind === '+50' ? '+50' : '×' + kind.slice(1); }
+  function plinkoLabel(kind){ return kind === 'jackpot' ? '⭐' : kind === '+50' ? '+50' : '×' + kind.slice(1); }
   // The finale starts with n chips still to aim (results come at the drop).
   function drawPlinkoOutcomes(n){ return Array.from({ length: n }, ()=> ({ kind:null })); }
   // One drop's result, simulated now. (Tests can force a slot: the search
