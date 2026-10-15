@@ -1204,7 +1204,7 @@
   .plinko-svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
   .plinko-svg .pk-peg{ transform-box:fill-box; transform-origin:center; }
   .plinko-svg .pk-peg.ping{ animation: pegPing 0.35s ease-out; }
-  @keyframes pegPing{ 0%{ transform:scale(1); filter:none; } 40%{ transform:scale(1.7); filter:drop-shadow(0 0 6px #fff6a8); } 100%{ transform:scale(1); } }
+  @keyframes pegPing{ 0%{ transform:scale(1); filter:none; } 40%{ transform:scale(1.7); filter:drop-shadow(0 0 6px #5ff8ff); } 100%{ transform:scale(1); } }
   .plinko-svg .pk-slot.hit rect{ filter:drop-shadow(0 0 8px rgba(255,220,90,0.95)); }
   .plinko-chip-layer{ position:absolute; inset:0; pointer-events:none; }
   .pk-chip{ position:absolute; left:0; top:0; width:var(--pk-chip, 24px); height:var(--pk-chip, 24px); margin:calc(var(--pk-chip, 24px) / -2) 0 0 calc(var(--pk-chip, 24px) / -2); border-radius:50%;
@@ -9991,10 +9991,10 @@
   function buildPlinkoBoard(){
     const svg = document.getElementById('plinkoSvg'), W = OP.C.W, H = OP.C.H, top = OP.C.SLOT_TOP, floor = OP.C.FLOOR_Y, e = OP.slotEdges;
     svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
-    let g = '<defs><radialGradient id="pkPeg" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#fffbe0"/><stop offset="0.6" stop-color="#ffc928"/><stop offset="1" stop-color="#b86a00"/></radialGradient>' +
-      '<radialGradient id="pkHalo"><stop offset="0" stop-color="rgba(255,214,90,0.55)"/><stop offset="1" stop-color="rgba(255,214,90,0)"/></radialGradient>' +
-      '<radialGradient id="pkHaloG"><stop offset="0" stop-color="rgba(125,249,255,0.6)"/><stop offset="1" stop-color="rgba(125,249,255,0)"/></radialGradient>' +
-      '<radialGradient id="pkGuard" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#ffffff"/><stop offset="0.6" stop-color="#7df9ff"/><stop offset="1" stop-color="#2a5fb8"/></radialGradient>' +
+    let g = '<defs><radialGradient id="pkPeg" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#ffffff"/><stop offset="0.55" stop-color="#7df9ff"/><stop offset="1" stop-color="#1a7fa8"/></radialGradient>' +
+      '<radialGradient id="pkHalo"><stop offset="0" stop-color="rgba(95,248,255,0.6)"/><stop offset="1" stop-color="rgba(95,248,255,0)"/></radialGradient>' +
+      '<radialGradient id="pkHaloG"><stop offset="0" stop-color="rgba(255,95,210,0.65)"/><stop offset="1" stop-color="rgba(255,95,210,0)"/></radialGradient>' +
+      '<radialGradient id="pkGuard" cx="0.35" cy="0.3" r="0.8"><stop offset="0" stop-color="#ffffff"/><stop offset="0.55" stop-color="#ff7ae0"/><stop offset="1" stop-color="#9c1a8f"/></radialGradient>' +
       '<linearGradient id="pkSlot" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="rgba(255,255,255,0.22)"/><stop offset="1" stop-color="rgba(255,255,255,0.04)"/></linearGradient>' +
       '<linearGradient id="pkJack" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7df9ff"/><stop offset="1" stop-color="#3b1d8f"/></linearGradient>' +
       '<linearGradient id="pkBeamUp" x1="0" x2="0" y1="1" y2="0"><stop offset="0" stop-color="rgba(125,249,255,0.55)"/><stop offset="1" stop-color="rgba(125,249,255,0)"/></linearGradient></defs>';
