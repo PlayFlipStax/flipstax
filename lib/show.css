@@ -45,6 +45,7 @@
 .w-odd    { --w1:#e6b3ff; --w2:#a34dff; --w3:#5a1aa8; --w4:#1e0a3d; --show-accent:#c8ff3d; }
 .w-emoji  { --w1:#fff27a; --w2:#ffb21f; --w3:#ff3c9d; --w4:#5a1052; --show-accent:#ffffff; }
 .w-first  { --w1:#9ff5ea; --w2:#1fc7c1; --w3:#ff6b5a; --w4:#3a0f3d; --show-accent:#ffd23f; }
+.w-scan   { --w1:#ffb4a8; --w2:#ef4444; --w3:#9f1239; --w4:#2a0613; --show-accent:#ffd23f; }   /* Crowd Scan: crimson */
 .w-hunt   { --w1:#9fb8ff; --w2:#5468ff; --w3:#2a1ea8; --w4:#0e0a33; --show-accent:#5ff8ff; }
 .w-vs     { --ray-c:rgba(255,236,250,0.26); --ray-on:6deg;  --ray-period:12deg; --ray-speed:40s; --ray-dir:normal; }
 .w-trivia { --ray-c:rgba(220,236,255,0.22); --ray-on:4deg;  --ray-period:10deg; --ray-speed:56s; --ray-dir:reverse; }
@@ -55,6 +56,7 @@
 .w-odd    { --ray-c:rgba(240,220,255,0.24); --ray-on:3deg;  --ray-period:9deg;  --ray-speed:62s; --ray-dir:normal; }
 .w-emoji  { --ray-c:rgba(255,250,200,0.26); --ray-on:10deg; --ray-period:24deg; --ray-speed:38s; --ray-dir:reverse; }
 .w-first  { --ray-c:rgba(220,255,250,0.22); --ray-on:6deg;  --ray-period:14deg; --ray-speed:46s; --ray-dir:normal; }
+.w-scan   { --ray-c:rgba(255,226,214,0.24); --ray-on:5deg;  --ray-period:15deg; --ray-speed:48s; --ray-dir:reverse; }
 .w-hunt   { --ray-c:rgba(200,240,255,0.22); --ray-on:4deg;  --ray-period:11deg; --ray-speed:52s; --ray-dir:reverse; }
 
 /* ---------- the sunburst (a world's background) ---------- */

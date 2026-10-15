@@ -989,6 +989,8 @@
      the read. */
   .guess-overlay{ background:#1d0a2e; }
   .guess-bg{ position:fixed; z-index:0; }
+  .scan-ufo{ width:64px; height:37px; opacity:0; will-change:transform; z-index:1; }
+  @media (prefers-reduced-motion: reduce){ .scan-ufo{ display:none; } }
   .guess-overlay .guess-inner{ z-index:1; text-shadow:var(--text-on-busy); }
   .guess-inner{ position:relative; width:100%; max-width:420px; display:flex; flex-direction:column; align-items:center; gap:10px; animation: finIn 0.45s cubic-bezier(.2,.9,.3,1.2) both; }
   .guess-eyebrow{ font-size:12px; font-weight:900; letter-spacing:2.5px; color:#7df9ff; padding:4px 12px; border-radius:99px; background:rgba(0,0,0,0.35); box-shadow:0 0 0 1px rgba(125,249,255,0.4), 0 0 14px rgba(125,249,255,0.35); }
@@ -10683,7 +10685,7 @@
     let ticks = '';
     for (let i = 0; i <= 10; i++){ const a = Math.PI * (1 - i / 10), r1 = 92, r2 = i % 5 ? 82 : 76;
       ticks += '<line x1="' + (110 + Math.cos(a) * r1).toFixed(1) + '" y1="' + (112 - Math.sin(a) * r1).toFixed(1) + '" x2="' + (110 + Math.cos(a) * r2).toFixed(1) + '" y2="' + (112 - Math.sin(a) * r2).toFixed(1) + '"/>'; }
-    ov.innerHTML = '<div class="bg w-first guess-bg" aria-hidden="true"><i class="rays"></i><i class="glow"></i></div><canvas class="guess-sky" aria-hidden="true"></canvas><div class="guess-inner">' +
+    ov.innerHTML = '<div class="bg w-scan guess-bg" aria-hidden="true"><i class="rays"></i><i class="glow"></i><div class="ufo scan-ufo"></div></div><canvas class="guess-sky" aria-hidden="true"></canvas><div class="guess-inner">' +
       '<div class="guess-eyebrow">📡 ' + GN.crowdScan.toUpperCase() + '</div>' +
       '<div class="guess-q">What percent picked the <b>LEFT</b> card?</div>' +
       '<div class="guess-cards"><div class="guess-card gc-left"><span class="gc-tag">LEFT</span><span class="gc-glyph"></span><span class="gc-name"></span></div>' +
@@ -10729,12 +10731,29 @@
     document.getElementById('hostName').textContent = GN[key] || '';
     document.getElementById('hostLine').textContent = line;
     ov.classList.toggle('quip', !full);
-    ov.classList.remove('hidden'); updatePauseBtnVisibility();
+    ov.classList.remove('hidden'); updatePauseBtnVisibility(); scanUfoFlights(ov);
     playTone(523, 0, 0.12, 'triangle', 0.05); playTone(784, 0.1, 0.16, 'triangle', 0.05);
     const shownAt = performance.now(); let finished = false;
     const done = ()=>{ if (finished) return; finished = true; clearTimeout(t); ov.onclick = null; ov.classList.add('hidden'); noteOverlayClosed(); updatePauseBtnVisibility(); then(); };
     const t = setTimeout(done, full ? HOST_INTRO_MS : HOST_QUIP_MS);
     ov.onclick = e=>{ e.stopPropagation(); if (performance.now() - shownAt > (full ? 300 : 120)) done(); };
+  }
+  // Crowd Scan: a small silver UFO crosses the screen now and then (transform and opacity only; it stops
+  // with the overlay, with a hidden tab, and with reduced motion).
+  function scanUfoFlights(ov){
+    const u = ov.querySelector('.scan-ufo'); if (!u) return;
+    u.innerHTML = FX.ufoSvg();
+    const go = ()=>{
+      if (!ov.contains(u) || ov.classList.contains('hidden')) return;
+      if (!document.hidden && !prefersReducedMotion() && u.animate){
+        const W = ov.clientWidth, H = ov.clientHeight, ltr = Math.random() < 0.5, y = H * (0.06 + Math.random() * 0.2);
+        u.animate([{ transform:'translate(' + (ltr ? -80 : W + 16) + 'px,' + y + 'px) rotate(' + (ltr ? 6 : -6) + 'deg)', opacity:1 },
+                   { transform:'translate(' + (W / 2 - 32) + 'px,' + (y - 12) + 'px) rotate(0deg)', opacity:1, offset:0.5 },
+                   { transform:'translate(' + (ltr ? W + 16 : -80) + 'px,' + y + 'px) rotate(' + (ltr ? -6 : 6) + 'deg)', opacity:1 }], { duration:4800, easing:'ease-in-out' });
+      }
+      setTimeout(go, 6000 + Math.random() * 5000);
+    };
+    setTimeout(go, 1500);
   }
   function startGuessRound(card){
     if (guessState !== 'idle') return false;
