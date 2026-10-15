@@ -134,3 +134,30 @@
 @keyframes qmFly{ from{ transform:translateX(-25vw) rotate(-14deg); } 50%{ transform:translateX(52vw) rotate(10deg); } to{ transform:translateX(125vw) rotate(-14deg); } }
 .paused .qm-field span, :root.tab-hidden .qm-field span{ animation-play-state:paused !important; }
 @media (prefers-reduced-motion: reduce){ .qm-field span{ animation:none; transform:translateX(calc(var(--x, 30) * 1vw)); } }
+
+/* ---------- the galaxy world (Infinity's background, Oct 2026) ----------
+   Deep space: a nebula (soft magenta, blue and teal clouds in the gradient), two layers of stars that twinkle
+   (opacity only), and sun rays slanting through from the top corner (the .rays layer, turning very slowly,
+   plus a warm glow at the sun). Different from Daily's sunburst on purpose. */
+.w-galaxy{ --w1:#2a1a6b; --w2:#150a42; --w3:#0a0426; --w4:#04010f; --show-accent:#ffd23f; }
+.bg.w-galaxy{ background:
+  radial-gradient(60% 38% at 22% 28%, rgba(255,60,172,0.34), rgba(255,60,172,0) 70%),
+  radial-gradient(55% 42% at 82% 62%, rgba(40,140,255,0.32), rgba(40,140,255,0) 72%),
+  radial-gradient(50% 30% at 30% 86%, rgba(30,220,200,0.24), rgba(30,220,200,0) 70%),
+  radial-gradient(40% 26% at 68% 18%, rgba(160,90,255,0.3), rgba(160,90,255,0) 70%),
+  radial-gradient(120% 75% at 50% 20%, var(--w1) 0%, var(--w2) 30%, var(--w3) 62%, var(--w4) 100%); }
+.bg.w-galaxy .rays{ left:96%; top:-6%; --ray-c:rgba(255,226,150,0.17); --ray-on:5deg; --ray-period:26deg; --ray-speed:150s; --ray-dir:normal;
+  -webkit-mask-image:radial-gradient(circle, #000 0, rgba(0,0,0,0.85) 22%, transparent 62%); mask-image:radial-gradient(circle, #000 0, rgba(0,0,0,0.85) 22%, transparent 62%); }
+.bg.w-galaxy .glow{ left:96%; top:-2%; width:340px; height:340px; margin:-170px 0 0 -170px; background:radial-gradient(circle, rgba(255,236,170,0.75), rgba(255,200,90,0.25) 38%, rgba(255,200,90,0) 68%); }
+.bg.w-galaxy::before, .bg.w-galaxy::after{ content:''; position:absolute; inset:0; pointer-events:none; }
+.bg.w-galaxy::before{ background-image:
+  radial-gradient(1.4px 1.4px at 14px 22px, #fff, transparent), radial-gradient(1px 1px at 61px 88px, #fff, transparent), radial-gradient(1.6px 1.6px at 98px 41px, #cfe6ff, transparent),
+  radial-gradient(1px 1px at 33px 119px, #fff, transparent), radial-gradient(1.2px 1.2px at 126px 105px, #ffe9c4, transparent);
+  background-size:140px 140px; opacity:0.9; animation:starTwinkle 3.4s ease-in-out infinite alternate; }
+.bg.w-galaxy::after{ background-image:
+  radial-gradient(1.8px 1.8px at 40px 30px, #fff, transparent), radial-gradient(1.2px 1.2px at 130px 70px, #ffd9f2, transparent), radial-gradient(1.5px 1.5px at 78px 150px, #d8ecff, transparent),
+  radial-gradient(1px 1px at 160px 12px, #fff, transparent), radial-gradient(1.4px 1.4px at 12px 96px, #fff, transparent);
+  background-size:190px 190px; background-position:37px 53px; opacity:0.5; animation:starTwinkle 4.6s ease-in-out -1.8s infinite alternate; }
+@keyframes starTwinkle{ from{ opacity:0.35; } to{ opacity:1; } }
+.paused::before, .paused::after, :root.tab-hidden .bg.w-galaxy::before, :root.tab-hidden .bg.w-galaxy::after{ animation-play-state:paused !important; }
+@media (prefers-reduced-motion: reduce){ .bg.w-galaxy::before, .bg.w-galaxy::after{ animation:none; } }

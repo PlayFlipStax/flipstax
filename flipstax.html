@@ -3130,6 +3130,15 @@
   .cz-opts .cz-opt.right{ animation:answerGlow 0.7s ease-in-out 2 alternate; }
   .cz-opts .cz-opt.wrong{ animation:bbShake 0.4s ease both; opacity:0.55; }
   @media (prefers-reduced-motion: reduce){ .event-tile.is-right, .ir-overlay .ir-opt.right, .ir-overlay .ir-opt.wrong, .cz-opts .cz-opt.right, .cz-opts .cz-opt.wrong{ animation:none !important; } }
+
+  /* Infinity on a galaxy (the world is drawn in lib/show.css, .w-galaxy): the header's text goes light for the dark sky. */
+  :root.mode-infinity body{ background:#04010f; }
+  :root.mode-infinity .logo .flip{ color:#fff; } :root.mode-infinity .logo .stax{ color:#ffd23f; }
+  :root.mode-infinity header .logo, :root.mode-infinity .me-chip, :root.mode-infinity .tier, :root.mode-infinity .hint{ color:#fff; text-shadow:var(--text-on-busy); }
+  :root.mode-infinity .back-btn{ color:#fff; text-shadow:var(--text-on-busy); }
+  :root.mode-infinity .sound-toggle{ filter:none; }
+  :root.mode-infinity header{ border-bottom-color:rgba(255,210,63,0.45); }
+  :root.mode-infinity header::before{ display:none; }
 </style>
 </head>
 <body>
@@ -12703,7 +12712,7 @@
   };
   // ---------- The marquee frame ----------
   const marquee = document.getElementById('showMarquee');
-  const BULB_COLORS = { vs:'#ffb0dc', trivia:'#9fd0ff', powerup:'#7ff5d0', jumble:'#ffc07a', riddle:'#d4ff6a', odd:'#e6b8ff', entry:'#ffe27a', results:'#ffe27a', first:'#9ff5ea', scan:'#ffb4a8' };
+  const BULB_COLORS = { vs:'#ffb0dc', trivia:'#9fd0ff', powerup:'#7ff5d0', jumble:'#ffc07a', riddle:'#d4ff6a', odd:'#e6b8ff', entry:'#ffe27a', galaxy:'#ffe27a', results:'#ffe27a', first:'#9ff5ea', scan:'#ffb4a8' };
   function buildMarquee(){
     const W = innerWidth, H = innerHeight, inset = 8, gap = 26, pts = [];
     const nx = Math.max(4, Math.round((W - 2 * inset) / gap)), ny = Math.max(4, Math.round((H - 2 * inset) / gap));
@@ -12723,7 +12732,7 @@
     marquee.classList.toggle('off', off);
     if (off) return;
     let key = showWorldNow;
-    if (inf) key = open(els.irOverlay) ? 'riddle' : open(els.eventOverlay) ? ((evBg.className.match(/w-(\w+)/g) || ['w-entry']).pop().slice(2)) : 'entry';
+    if (inf) key = open(els.irOverlay) ? 'riddle' : open(els.eventOverlay) ? ((evBg.className.match(/w-(\w+)/g) || ['w-galaxy']).pop().slice(2)) : 'galaxy';
     marquee.style.setProperty('--bulb', BULB_COLORS[key] || '#ffe9a0');
   }
   // The riddle world's flying question marks: the same markup in each background that can turn into it.
@@ -12738,7 +12747,7 @@
     document.documentElement.classList.toggle('fin-open', open(els.finOverlay) && !els.finOverlay.classList.contains('daily-vault'));
     if (document.documentElement.classList.contains('mode-infinity')){
       // C5: Infinity's VS world; paused under its full-screen layers.
-      setShowWorld('entry');
+      setShowWorld('galaxy');
       showBg.classList.toggle('paused', open(els.finOverlay) || open(els.irOverlay) || open(els.guessOverlay));
       return;
     }
