@@ -58,7 +58,7 @@ window.FLIPSTAX_NAMES = {
     right:   ['Ding ding ding!', 'Out of this world!', 'Big brain energy!', 'Give that Earthling a letter!'],
     wrong:   ['Ooh, so close!', 'The crowd groans!', 'Not quite, Earthling.', 'Shake it off!'],
     slow:    ['Tick tock, Earthling!', 'Time’s up, folks!'],
-    portal:  ['Pick a portal, any portal!', 'What’s behind door number…?'],
+    portal:  ['Pick a portal, any portal!', 'Which portal hides the prize?'],
     points10:  'Ten shiny points!',
     slowclock: 'Fifteen extra seconds for the Word Warp!',
     wildcard:  'Ooh, a Cosmic Surprise!',

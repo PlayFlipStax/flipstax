@@ -8714,9 +8714,11 @@
       // red X. The letters themselves are never shown before the Word Warp (DIRECTION.md).
       const tray = Array.from({ length: RUN_WORD_LENGTH }, (_, i)=>{ const m = runTrayMarks[i];
         return '<i data-t="' + i + '"' + (m ? ' class="' + m + (m === 'got' && trayIncoming.has(i) ? ' incoming' : '') + '"' : '') + '>' + (m === 'got' ? '?' : m === 'miss' ? '✕' : '') + '</i>'; }).join('');
-      els.runBanner.innerHTML = '<span class="sp-mode">\uD83C\uDFAE</span><span class="sp-label">Points</span><b class="sp-num">' + shownScore(runScore) + '</b>' +
+      // (Mid-show the pill is tight - points, act, six tiles, keys - so no game-pad icon and "PTS".)
+      els.runBanner.innerHTML = '<span class="sp-label">Pts</span><b class="sp-num">' + shownScore(runScore) + '</b>' +
         '<span class="sp-sep">\u00B7</span><span class="sp-act" id="dailyClock"></span>' +
-        '<span class="sp-sep">\u00B7</span><span class="sp-tray" id="letterTray" aria-label="Word Warp letters: ' + runLetters.length + ' of ' + RUN_WORD_LENGTH + '">' + tray + '</span>' + streakTag;
+        '<span class="sp-sep">\u00B7</span><span class="sp-tray" id="letterTray" aria-label="Word Warp letters: ' + runLetters.length + ' of ' + RUN_WORD_LENGTH + '">' + tray + '</span>' +
+        (runKeys ? '<span class="sp-sep">·</span><span class="sp-keys" aria-label="' + runKeys + ' keys: extra Orbit Drop chips">🔑<b>' + runKeys + '</b></span>' : '') + streakTag;
       renderDailyClock();
     } else {
       els.runBanner.innerHTML = '<span class="sp-mode">\uD83C\uDFAE</span><span class="sp-label">Daily Stax</span>' + streakTag + ' <span class="run-link" id="runPlayLink">Play</span>';
@@ -9839,6 +9841,7 @@
       ov.classList.add('bb-revealed');   // Oddball Alert: the spotlight finds the odd one out and the lineup dims
       if (ok){
         addRunScore(BRAIN_BREAK_POINTS);
+        if (runActive) addRunKey('mystery');   // a Mystery Game win: a key (an Orbit Drop chip)
         els.eventSubtitle.textContent = '✅ +' + BRAIN_BREAK_POINTS + ' POINTS';
         if (rd.why) els.eventPrompt.textContent = rd.why;
         showFlash('win'); hostMood('cheer'); hostSay(hostLine('right')); sfx.combo(); ov.classList.add('flash-win');
@@ -10120,6 +10123,14 @@
 
   let runPendingTrivia = false;
   let runQuizBeam = false;
+  let runQuizMystery = false;   // the question on screen is the day's Mystery Game (a riddle): a right answer wins a key
+  // Points won on a question (addRunScore holds off while one is on screen): the act's
+  // multiplier applies, and they count toward the act's points and the best moment.
+  function quizScore(x){
+    const d = x * runActMult(); runScore += d;
+    runActPts[runActIdx] = (runActPts[runActIdx] || 0) + d;
+    if (!runBestMoment || d > runBestMoment.pts){ const a = runAct(); runBestMoment = { pts: d, text: (runQuizMystery ? GN.riddleRound : GN.brainBeam) + (a.mult > 1 ? ' in ' + a.title.toLowerCase().replace(/\b\w/g, c=> c.toUpperCase()) : '') }; }
+  }
   let runBestMoment = null;   // { text, pts } - the run's single biggest win, for the results' "Your best moment"
   let runActPts = [];   // points won in each act (by its index in the rundown), for the results breakdown   // the question on screen is a rundown Brain Beam (it earns a prize-track tile)
   let runPlan = null, runShow = { step:0, left:null }, runPortalDoors = null, runWarpBonusMs = 0, runQuizPick = null;
@@ -10240,8 +10251,8 @@
     }
     const resolve = second ? resolveSecondChance : resolveRunTrivia;
     // A Brain Beam from the rundown earns a prize-track tile (right: a hidden letter; wrong: a red X).
-    if (!resumeQ || !second) runQuizBeam = !!(step ? step.beam : (resumeQ && resumeQ.beam));
-    runPendingQ = { question: q.question, opts: q.opts, correctIdx: q.correctIdx, riddle: !!q.riddle, beam: runQuizBeam };
+    if (!resumeQ || !second){ runQuizBeam = !!(step ? step.beam : (resumeQ && resumeQ.beam)); runQuizMystery = !!(step ? step.mystery : (resumeQ && resumeQ.mystery)); }
+    runPendingQ = { question: q.question, opts: q.opts, correctIdx: q.correctIdx, riddle: !!q.riddle, beam: runQuizBeam, mystery: runQuizMystery };
     runPendingQEndsAt = resumeEndsAt || (Date.now() + dt(10000));
     const remain = Math.max(0, runPendingQEndsAt - Date.now());
     if (DEBUG_FAST) window.__debugLastTriviaQ = q;
@@ -10310,19 +10321,20 @@
       if (letterLeft){
         runLetters.push(nextLetter); runLetterPos.push(pos);
         if (runTrayMarks.length < RUN_WORD_LENGTH){ trayAt = runTrayMarks.length; runTrayMarks.push('got'); trayIncoming.add(trayAt); }
-      } else { runScore += EXTRA_BEAM_POINTS; }
+      } else { quizScore(EXTRA_BEAM_POINTS); }
+      if (runQuizMystery) addRunKey('mystery');   // a Mystery Game win (the riddle): a key
       // Accuracy bonus: points (never letters) for back-to-back correct
       // answers - +2, then +4, then +6 from the 4th in a row on. Added
       // directly like the wrong-answer penalty below, so it can't fire a
       // trivia mid-question; the next vote's threshold check picks it up.
       const streakBonus = runTriviaStreak >= 2 ? Math.min(runTriviaStreak - 1, 3) * 2 : 0;
-      if (streakBonus){ runScore += streakBonus; renderRunBanner(); }
+      if (streakBonus){ quizScore(streakBonus); renderRunBanner(); }
       const bannerParts = [];
       if (streakBonus) bannerParts.push('\ud83d\udd25 ' + runTriviaStreak + ' in a row \u00b7 +' + streakBonus + ' pts');
       // A perfect run: the first RUN_WORD_LENGTH Brain Beams, every one right.
       if (runTriviaAttempted === RUN_WORD_LENGTH && runTriviaCorrect === RUN_WORD_LENGTH){
         runPerfect = true;
-        runScore += PERFECT_RUN_BONUS; renderRunBanner();
+        quizScore(PERFECT_RUN_BONUS); renderRunBanner();
         bannerParts.push('\ud83c\udfc6 PERFECT RUN +' + PERFECT_RUN_BONUS + ' pts');
       }
       els.eventSubtitle.textContent = bannerParts.join(' \u00b7 ');
@@ -11362,7 +11374,12 @@
   // Orbit Drop board; the jackpot slot is THE MOTHERSHIP. The winnings roll into the final
   // score on the results screen's count-up. The drop's state lives in the day's result
   // (r.orbit), saved at every drop, so a refresh comes back to the board.
-  function dailyOrbitChips(r){ return Math.max(ORBIT_MIN_CHIPS, Math.min(PLINKO_MAX_CHIPS + 1, r.orbitChips || ORBIT_MIN_CHIPS)); }
+  // The economy (DIRECTION.md): every key (a Mystery Game win, Lucky Lights, a Cosmic Surprise)
+  // and every Lucky Lights chip is an Orbit Drop chip, solving the Word Warp adds a bonus
+  // chip, and there are always 2 to 6.
+  const DAILY_ORBIT_MAX = 6;
+  function dailyChipsFor(keys, chips, solved){ return Math.max(ORBIT_MIN_CHIPS, Math.min(DAILY_ORBIT_MAX, (keys || 0) + (chips || 0) + (solved ? 1 : 0))); }
+  function dailyOrbitChips(r){ return Math.max(ORBIT_MIN_CHIPS, Math.min(DAILY_ORBIT_MAX, r.orbitChips || ORBIT_MIN_CHIPS)); }
   function saveDailyOrbit(){ if (runResultToday && runResultToday.orbit === dailyOrbit) saveRunResultToday(runResultToday); }
   function openDailyOrbit(r){
     if (!r.orbit) r.orbit = { stage:'plinko', chips: drawPlinkoOutcomes(dailyOrbitChips(r)), dropped:0, base: r.score, done:false };
@@ -11377,7 +11394,8 @@
     updatePauseBtnVisibility();
     finTapShieldAt = performance.now(); startFinSky();
     document.getElementById('pkBanner').textContent = 'ORBIT DROP';
-    document.getElementById('pkLine').textContent = 'The grand prize! Drag the UFO, let go to drop. Aim for THE MOTHERSHIP.';
+    const from = [(r.keys ? r.keys + ' 🔑' : ''), (r.bonusChips ? r.bonusChips + ' 🪙' : ''), (r.warpChip ? '+1 ' + GN.wordWarp : '')].filter(Boolean).join(', ');
+    document.getElementById('pkLine').textContent = r.orbit.chips.length + ' chips' + (from ? ' (' + from + ')' : '') + '. Drag the UFO, let go to drop.';
     hostIntro('orbitDrop', ()=>{ if (dailyOrbit === r.orbit) renderPlinko(); });
   }
   function finishDailyOrbit(){
@@ -11702,7 +11720,7 @@
       guessFinish = null;
       real.textContent = truth + '%'; fill.style.transition = 'none'; fill.style.width = truth + '%';
       if (sc.pts){ if (dailyScanDone) addRunScore(sc.pts); else addRacePoints(sc.pts); }
-      const key = sc.key && !dailyScanDone ? addInfKey('guess') : false;
+      const key = dailyScanDone ? (sc.win ? addRunKey('mystery') : false) : sc.key ? addInfKey('guess') : false;
       res.querySelector('.gr-verdict').textContent = (off === 0 ? '🎯 Dead on! ' : 'You said ' + guess + '% — ' + off + ' off. ') +
         (sc.pts ? '+' + sc.pts + ' points' + (key ? ' · 🔑 +1 key' : '') : 'No points this time');
       if (sc.pts >= 15) sfx.correct(); else if (sc.pts) sfx.revealWin(); else sfx.revealLose();
@@ -13028,7 +13046,8 @@
     voted = false; votedSinceTime = null;
     playRunEndMusic(!!solved);
     // The grand prize: Orbit Drop (the Vault is retired from Daily), then today's results.
-    runResultToday.orbitChips = ORBIT_MIN_CHIPS;
+    runResultToday.keys = runKeys; runResultToday.bonusChips = runBonusChips; runResultToday.warpChip = !!solved;
+    runResultToday.orbitChips = dailyChipsFor(runKeys, runBonusChips, !!solved);
     openDailyOrbit(runResultToday);
   }
   // ---------- The episode's results screen (refs/results.jpg) ----------
@@ -15308,6 +15327,7 @@
       runTrayMarks = runLetters.map(()=> 'got'); if (n < RUN_WORD_LENGTH && n > 0) runTrayMarks.push('miss');
       runTriviaAttempted = n + 1; runTriviaCorrect = n; runRoundResults = Array.from({ length:n + 1 }, (_, i)=> i < n);
       runClockAddedMs = -108000;
+      runKeys = Math.min(3, Math.floor(n / 2));
       renderRunBanner();
     }
     function replayTap(){ showCard.click(); }   // the cold open's "Tap to start" -> the show begins
@@ -15357,7 +15377,7 @@
       { label:'Time Warp', go: mysteryAs('timeWarp') },
       // The finale's cue card, then the Word Warp with all six letters in.
       { label:'Grand finale (6 letters)', wide:true, go: atType(s=> s.t === 'act' && s.finale, 0, 210, 6) },
-      { label:'Orbit Drop', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); const r = replaySampleEpisode(); delete r.orbit; delete r.orbitPoints; r.score = 368; r.orbitChips = 3; runResultToday = r; openDailyOrbit(r); }) },
+      { label:'Orbit Drop', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); const r = replaySampleEpisode(); delete r.orbit; delete r.orbitPoints; r.score = 368; r.keys = 2; r.bonusChips = 1; r.warpChip = true; r.orbitChips = dailyChipsFor(2, 1, true); runResultToday = r; openDailyOrbit(r); }) },
       { label:'Results (sample)', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); runResultToday = replaySampleEpisode(); showRunReadout(); updatePauseBtnVisibility(); }) },
       { label:'Restart Daily', wide:true, cls:'restart', go: ()=> replayEnter(null, null) },
     ];
