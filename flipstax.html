@@ -3106,6 +3106,17 @@
   .cz-opts .cz-opt:nth-child(4){ background:linear-gradient(180deg,#ffc95a,#f09d00 55%,#b86a00); }
   .cz-opts .cz-opt.right{ background:linear-gradient(180deg,#b9ffcf,#2fd17a); color:#063a1c; text-shadow:none; }
   .cz-opts .cz-opt.wrong{ background:linear-gradient(180deg,#ffd0d0,#ff5a5a); color:#4a0000; text-shadow:none; }
+
+  /* Answer feedback (Daily and Infinity): a right answer glows, bursts and flashes the bulbs; a wrong one shakes and
+     dims while the right answer stays lit. */
+  .event-tile.is-right{ animation:answerGlow 0.7s ease-in-out 2 alternate; }
+  .event-tile.is-wrong{ opacity:0.5; }
+  @keyframes answerGlow{ from{ filter:brightness(1); } to{ filter:brightness(1.35) saturate(1.2); } }
+  .ir-overlay .ir-opt.right{ animation:answerGlow 0.7s ease-in-out 2 alternate; }
+  .ir-overlay .ir-opt.wrong{ animation:bbShake 0.4s ease both; opacity:0.55; }
+  .cz-opts .cz-opt.right{ animation:answerGlow 0.7s ease-in-out 2 alternate; }
+  .cz-opts .cz-opt.wrong{ animation:bbShake 0.4s ease both; opacity:0.55; }
+  @media (prefers-reduced-motion: reduce){ .event-tile.is-right, .ir-overlay .ir-opt.right, .ir-overlay .ir-opt.wrong, .cz-opts .cz-opt.right, .cz-opts .cz-opt.wrong{ animation:none !important; } }
 </style>
 </head>
 <body>
@@ -12734,7 +12745,8 @@
     if (right) right.classList.add('is-right');
     if (correct){
       showFlash('win'); hostMood('cheer'); hostSay(hostLine('right'));
-      if (right){ FX.beamHit(showFx, [right]); FX.glowSweep(showFx, right); }
+      els.eventOverlay.classList.add('flash-win');   // the marquee bulbs flash
+      if (right){ FX.beamHit(showFx, [right]); FX.glowSweep(showFx, right); FX.burstAt(showFx, right, { count:14, spread:110, shapes:['star', 'coin'] }); FX.pop(right, 1.12); }
     } else {
       showFlash('lose'); hostMood('sad'); hostSay(hostLine(pickIdx == null ? 'slow' : 'wrong')); sfx.crowdOoh();
       if (picked) picked.classList.add('is-wrong');
@@ -13311,6 +13323,7 @@
     if (correctIdx != null && els.eventTiles[correctIdx]) els.eventTiles[correctIdx].classList.add('is-right');
     if (wasCorrect === false && pickIdx != null && els.eventTiles[pickIdx]) els.eventTiles[pickIdx].classList.add('is-wrong');
     showFlash(wasCorrect === true ? 'win' : 'lose');
+    if (wasCorrect === true) els.eventOverlay.classList.add('flash-win');   // the marquee bulbs flash
     if (wasCorrect === true && els.eventTiles[correctIdx]) FX.burstAt(showFx, els.eventTiles[correctIdx], { count:12, spread:100, shapes:['star', 'coin'] });
     if (inInfinity()){
       infBlock.trivia++; if (wasCorrect === true) infBlock.triviaCorrect++; saveInfBlock();
@@ -13539,6 +13552,7 @@
       btns.forEach(b=>{ b.disabled = true; if (b.textContent === rd.a) b.classList.add('right'); });
       const right = pickedBtn && pickedBtn.textContent === rd.a;
       if (pickedBtn && !right) pickedBtn.classList.add('wrong');
+      { const rb = btns.find(b=> b.classList.contains('right')); if (right && rb){ FX.burstAt(showFx, rb, { count:14, spread:100, shapes:['star', 'coin'] }); FX.pop(rb, 1.1); } }
       if (right){ const win = stake || COSMIC_RIDDLE_STAKE; addRacePoints(win); sfx.correct(); sfx.coins(6); done('🧩 ' + (stake ? 'Doubled! +' + win + ' points' : 'Right! +' + win + ' points')); }
       else { const lost = cosmicPenalty(stake); sfx.revealLose(); done('🧩 ' + (pickedBtn ? 'Not quite' : 'Time’s up') + ' — it was ' + rd.a + (lost ? '. −' + lost + ' points' : '')); }
     };
