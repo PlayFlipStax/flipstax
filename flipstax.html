@@ -3139,6 +3139,31 @@
   :root.mode-infinity .sound-toggle{ filter:none; }
   :root.mode-infinity header{ border-bottom-color:rgba(255,210,63,0.45); }
   :root.mode-infinity header::before{ display:none; }
+
+  /* ---- Price Probe (Oct 2026): price tags and lit cards ----
+     Each item sits on a card with an animated chasing light border; below its name hangs a price tag ("$ ?") that
+     flips over to the price when you answer, one after the other; the pricier card glows gold. */
+  .bb-tag{ position:relative; display:block; flex:0 0 auto; width:132px; height:44px; margin:4px auto 0; perspective:600px; filter:drop-shadow(0 3px 0 rgba(0,0,0,0.32)); }
+  .bb-tag .tag-in{ position:absolute; inset:0; transform-style:preserve-3d; transition:transform 0.8s cubic-bezier(.3,1.35,.5,1) var(--fd, 0s); }
+  .bb-tag.flipped .tag-in{ transform:rotateY(180deg); }
+  .bb-tag b{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding-left:16px; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    font:900 26px/1 var(--f-display); letter-spacing:1px; color:#3a1a00; background:radial-gradient(circle at 17px 50%, transparent 0 4.5px, #fff1b0 5.5px);
+    clip-path:polygon(16px 0, 100% 0, 100% 100%, 16px 100%, 0 50%); }
+  .bb-tag .tb{ transform:rotateY(180deg); background:radial-gradient(circle at 17px 50%, transparent 0 4.5px, #ffd23f 5.5px); }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.brainbreak .event-tile::after{ content:''; position:absolute; left:5px; right:5px; top:10px; bottom:0; pointer-events:none;
+    background-image:radial-gradient(circle, #fff6c0 0 2.6px, rgba(255,214,90,0) 3.4px), radial-gradient(circle, #fff6c0 0 2.6px, rgba(255,214,90,0) 3.4px);
+    background-size:12px 20px, 12px 20px; background-position:0 0, 100% 0; background-repeat:repeat-y; animation:bulbA 0.5s steps(1) infinite; }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-priceProbe .event-tile.is-right{ box-shadow:var(--tile-depth), 0 0 0 4px #ffd23f, 0 0 36px 12px rgba(255,210,63,0.85); animation:answerGlow 0.7s ease-in-out 3 alternate; }
+  .event-overlay.bb-priceProbe .event-tile.is-right .bb-tag{ filter:drop-shadow(0 0 8px #ffd23f) drop-shadow(0 0 20px #ffd23f); }
+  @media (prefers-reduced-motion: reduce){ .bb-tag .tag-in{ transition:none; } :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.brainbreak .event-tile::after{ animation:none; } }
+  /* short phones: the two-card games lay each card out as a row (art left; name, note and tag right) so the tag fits */
+  @media (max-height:700px){
+    .bb-tag{ width:112px; height:34px; margin:2px 0 0; } .bb-tag b{ font-size:20px; }
+    :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-two .event-tile{ display:grid; grid-template-columns:84px minmax(0, 1fr); column-gap:12px; align-content:center; text-align:left; padding-left:30px; padding-right:24px; }
+    .event-overlay.bb-two .event-tile .bb-glyph{ grid-column:1; grid-row:1 / span 3; align-self:center; }
+    .event-overlay.bb-two .event-tile .bb-name, .event-overlay.bb-two .event-tile .bb-sub, .event-overlay.bb-two .event-tile .bb-tag{ grid-column:2; }
+    .event-overlay.bb-two .event-tile .bb-tag{ justify-self:start; }
+  }
 </style>
 </head>
 <body>
@@ -9151,11 +9176,17 @@
   }
   // `sub` replaces the tile's small line (the price / the year revealed after the
   // answer); `flip` plays the flip-in on it.
-  function fillBreakTile(tileEl, t, sub, flip){
+  function fillBreakTile(tileEl, t, sub, flip, key, back){
     tileEl.textContent = '';
     const add = (cls, text)=>{ if (!text) return null; const s = document.createElement('span'); s.className = cls; s.textContent = text; tileEl.appendChild(s); return s; };
     add('bb-glyph', t.glyph); add('bb-name', t.name);
     const s = add('bb-sub', sub != null ? sub : t.sub); if (s && flip) s.classList.add('flip');
+    // Price Probe: a price tag ("$ ?") that flips over to the price; Time Warp: a clock plate that flips to the year.
+    if (key === 'priceProbe' || key === 'timeWarp'){
+      const tag = document.createElement('span'); tag.className = 'bb-tag';
+      tag.innerHTML = '<span class="tag-in"><b class="tf">' + (key === 'priceProbe' ? '$ ?' : '\uD83D\uDD70\uFE0F ?') + '</b><b class="tb"></b></span>';
+      tag.querySelector('.tb').textContent = back || ''; tileEl.appendChild(tag);
+    }
   }
   // A Brain Beam / riddle answer bar: its letter key, then the text.
   function fillQuizTile(tileEl, i, text){
@@ -9183,7 +9214,7 @@
       if (i >= n){ tileEl.style.display = 'none'; tileEl.onclick = null; return; }
       tileEl.style.display = '';
       tileEl.style.backgroundColor = TILE_COLORS[i];
-      fillBreakTile(tileEl, rd.tiles[i]);
+      fillBreakTile(tileEl, rd.tiles[i], undefined, false, key, rd.revealSub && rd.revealSub[i]);
     });
     hostSay(HOST_LINES[key] || def.rule, 2600);
     let settled = false;
@@ -9196,7 +9227,12 @@
       if (settled || !runActive) return; settled = true;
       clearTimeout(eventTimeoutId); tiles.forEach(t=> t.onclick = null);
       const right = tiles[rd.correct], ok = pick === rd.correct;
-      tiles.forEach((t, i)=>{ if (i < n && rd.revealSub) fillBreakTile(t, rd.tiles[i], rd.revealSub[i], true); });
+      tiles.forEach((t, i)=>{
+        if (i >= n || !rd.revealSub) return;
+        const tag = t.querySelector('.bb-tag');
+        if (tag){ tag.style.setProperty('--fd', (i * 0.35) + 's'); tag.classList.add('flipped'); }   // the tags flip over, one after the other
+        else fillBreakTile(t, rd.tiles[i], rd.revealSub[i], true);
+      });
       if (right) right.classList.add('is-right');
       if (ok){
         addRunScore(BRAIN_BREAK_POINTS);
@@ -12712,7 +12748,7 @@
   };
   // ---------- The marquee frame ----------
   const marquee = document.getElementById('showMarquee');
-  const BULB_COLORS = { vs:'#ffb0dc', trivia:'#9fd0ff', powerup:'#7ff5d0', jumble:'#ffc07a', riddle:'#d4ff6a', odd:'#e6b8ff', entry:'#ffe27a', galaxy:'#ffe27a', results:'#ffe27a', first:'#9ff5ea', scan:'#ffb4a8' };
+  const BULB_COLORS = { vs:'#ffb0dc', trivia:'#9fd0ff', powerup:'#7ff5d0', jumble:'#ffc07a', riddle:'#d4ff6a', odd:'#e6b8ff', entry:'#ffe27a', galaxy:'#ffe27a', cash:'#ffe066', timewarp:'#c8ff3d', stage:'#fff3c4', neon:'#7df9ff', results:'#ffe27a', first:'#9ff5ea', scan:'#ffb4a8' };
   function buildMarquee(){
     const W = innerWidth, H = innerHeight, inset = 8, gap = 26, pts = [];
     const nx = Math.max(4, Math.round((W - 2 * inset) / gap)), ny = Math.max(4, Math.round((H - 2 * inset) / gap));
@@ -12741,6 +12777,8 @@
   document.getElementById('evBg').insertAdjacentHTML('beforeend', qmFieldHtml());
   document.querySelector('#irOverlay .ir-bg').insertAdjacentHTML('beforeend', qmFieldHtml());
   let showWorldNow = 'vs';
+  // Each Brain Break game has its own colour world.
+  const BB_WORLDS = { priceProbe:'cash', timeWarp:'timewarp', oddballAlert:'stage', emojiDecode:'neon' };
   function setShowWorld(w){ if (w === showWorldNow) return; showWorldNow = w; showBg.className = 'show-bg bg w-' + w; }
   function syncShowWorld(){
     const open = el=> el && !el.classList.contains('hidden');
@@ -12755,7 +12793,7 @@
     if (!document.documentElement.classList.contains('mode-daily')) return;
     if (els.readoutOverlay.classList.contains('show')) setShowWorld('results');
     else if (open(els.solveOverlay)) setShowWorld('jumble');
-    else if (open(els.eventOverlay)) setShowWorld(els.eventOverlay.classList.contains('powerup') || runPhase === 'powerup' ? 'powerup' : els.eventOverlay.classList.contains('brainbreak') ? 'odd' : (runPendingQ && runPendingQ.riddle) ? 'riddle' : 'trivia');
+    else if (open(els.eventOverlay)) setShowWorld(els.eventOverlay.classList.contains('powerup') || runPhase === 'powerup' ? 'powerup' : els.eventOverlay.classList.contains('brainbreak') ? (BB_WORLDS[(Array.from(els.eventOverlay.classList).find(c=> c.indexOf('bb-') === 0 && BB_WORLDS[c.slice(3)]) || '').slice(3)] || 'odd') : (runPendingQ && runPendingQ.riddle) ? 'riddle' : 'trivia');
     else setShowWorld('vs');
     // Pause the background's motion while a full-screen layer covers it
     // (the Word Warp and results have their own; the Vault is on top).
