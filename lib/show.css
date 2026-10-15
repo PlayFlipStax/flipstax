@@ -174,3 +174,13 @@
 .bg.w-timewarp::after{ width:5px; height:34vmin; margin:-34vmin 0 0 -2.5px; border-radius:3px; transform-origin:50% 100%; background:linear-gradient(180deg, rgba(220,255,120,0), rgba(220,255,120,0.55)); animation:rayTurn 12s linear infinite; }
 .paused.w-timewarp::before, .paused.w-timewarp::after{ animation-play-state:paused !important; }
 @media (prefers-reduced-motion: reduce){ .bg.w-timewarp::before, .bg.w-timewarp::after{ animation:none; } }
+
+/* ---------- Oddball Alert's world: a spotlit lineup stage ---------- */
+.w-stage{ --w1:#2b1650; --w2:#150833; --w3:#0a0418; --w4:#030108; --show-accent:#fff3c4; }
+.bg.w-stage{ background:radial-gradient(90% 28% at 50% 104%, rgba(255,95,210,0.38), rgba(255,95,210,0) 70%), linear-gradient(180deg, #05020d 0%, #140730 58%, #2a0e52 100%); }
+.bg.w-stage .rays{ left:50%; top:-3%; --ray-c:rgba(255,248,214,0.3);
+  background:conic-gradient(from 160deg at 50% 50%, transparent 0deg, var(--ray-c) 0deg 6deg, transparent 6deg 16deg, rgba(255,214,240,0.26) 16deg 23deg, transparent 23deg 33deg, var(--ray-c) 33deg 38deg, transparent 38deg 360deg);
+  animation:spotSweep 7s ease-in-out infinite alternate; -webkit-mask-image:linear-gradient(180deg, #000 0, rgba(0,0,0,0.75) 46%, transparent 62%); mask-image:linear-gradient(180deg, #000 0, rgba(0,0,0,0.75) 46%, transparent 62%); }
+.bg.w-stage .glow{ top:-4%; background:radial-gradient(circle, rgba(255,250,225,0.5), rgba(255,250,225,0) 62%); }
+@keyframes spotSweep{ from{ transform:rotate(-16deg); } to{ transform:rotate(16deg); } }
+@media (prefers-reduced-motion: reduce){ .bg.w-stage .rays{ animation:none; } }

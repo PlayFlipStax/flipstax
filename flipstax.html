@@ -3183,6 +3183,17 @@
   .event-overlay.bb-timeWarp .bb-tag .tb{ background:radial-gradient(circle at 35% 30%, #fffbe0, #ffe066 50%, #c98a00); font-size:26px; }
   @media (max-height:700px){ .bb-timeline{ height:38px; margin-bottom:6px; } .tl-m{ width:44px; height:44px; margin:-22px 0 0 -22px; } .tl-m b{ font-size:14px; } .event-overlay.bb-timeWarp .bb-tag{ width:56px; height:56px; } .event-overlay.bb-timeWarp .bb-tag b{ font-size:15px; } }
   @media (prefers-reduced-motion: reduce){ .tl-m{ transition:none; } }
+
+  /* ---- Oddball Alert (Oct 2026): a spotlit lineup ----
+     Numbered suspect cards on a dark stage under sweeping spotlights; on the reveal a spotlight drops on the odd one
+     out and the rest of the lineup goes dark. */
+  .bb-num{ position:absolute; left:10px; top:8px; padding:2px 9px; border-radius:99px; background:#fff3c4; color:#2a1300; font:900 14px/1.2 var(--f-display); letter-spacing:1px; box-shadow:0 2px 0 rgba(0,0,0,0.4); }
+  .bb-spot{ position:absolute; inset:0; border-radius:inherit; pointer-events:none; opacity:0; transition:opacity 0.45s ease;
+    background:radial-gradient(ellipse 70% 90% at 50% -8%, rgba(255,255,225,0.95), rgba(255,255,225,0.4) 42%, rgba(255,255,225,0) 76%); }
+  .event-overlay.bb-oddballAlert .event-tile{ background-color:#1a0a38 !important; border-color:#ffe9a0; }
+  .event-overlay.bb-oddballAlert .event-tile.is-right .bb-spot{ opacity:1; }
+  .event-overlay.bb-oddballAlert .event-tile.is-right{ box-shadow:var(--tile-depth), 0 0 0 4px #fff3c4, 0 0 40px 14px rgba(255,255,220,0.8); }
+  .event-overlay.bb-oddballAlert.bb-revealed .event-tile:not(.is-right){ opacity:0.2; filter:grayscale(0.7); transition:opacity 0.4s ease; }
 </style>
 </head>
 <body>
@@ -9201,6 +9212,11 @@
     const add = (cls, text)=>{ if (!text) return null; const s = document.createElement('span'); s.className = cls; s.textContent = text; tileEl.appendChild(s); return s; };
     add('bb-glyph', t.glyph); add('bb-name', t.name);
     const s = add('bb-sub', sub != null ? sub : t.sub); if (s && flip) s.classList.add('flip');
+    // Oddball Alert: a numbered lineup card with a spotlight that lights up on the reveal.
+    if (key === 'oddballAlert'){
+      const num = document.createElement('span'); num.className = 'bb-num'; num.textContent = '#' + (back || ''); tileEl.insertBefore(num, tileEl.firstChild);
+      const spot = document.createElement('i'); spot.className = 'bb-spot'; tileEl.appendChild(spot);
+    }
     // Price Probe: a price tag ("$ ?") that flips over to the price; Time Warp: a clock plate that flips to the year.
     if (key === 'priceProbe' || key === 'timeWarp'){
       const tag = document.createElement('span'); tag.className = 'bb-tag';
@@ -9234,7 +9250,7 @@
       if (i >= n){ tileEl.style.display = 'none'; tileEl.onclick = null; return; }
       tileEl.style.display = '';
       tileEl.style.backgroundColor = TILE_COLORS[i];
-      fillBreakTile(tileEl, rd.tiles[i], undefined, false, key, rd.revealSub && rd.revealSub[i]);
+      fillBreakTile(tileEl, rd.tiles[i], undefined, false, key, key === 'oddballAlert' ? i + 1 : rd.revealSub && rd.revealSub[i]);
     });
     hostSay(HOST_LINES[key] || def.rule, 2600);
     const tl = ov.querySelector('.bb-timeline');
@@ -9261,6 +9277,7 @@
         else fillBreakTile(t, rd.tiles[i], rd.revealSub[i], true);
       });
       if (right) right.classList.add('is-right');
+      ov.classList.add('bb-revealed');   // Oddball Alert: the spotlight finds the odd one out and the lineup dims
       if (ok){
         addRunScore(BRAIN_BREAK_POINTS);
         els.eventSubtitle.textContent = '✅ +' + BRAIN_BREAK_POINTS + ' POINTS';
