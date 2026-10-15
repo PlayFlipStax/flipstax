@@ -10819,7 +10819,7 @@
           drawCoin(c.x, c.y, c.s, c.a, 1);
         } else if (c.state === 'flying'){
           const k = Math.min(1, (now - c.ft) / 380);
-          drawCoin(c.x, c.y - k * 120, c.s * (1 + k * 0.3), c.a + k * 8, 1 - k);
+          drawCoin(c.x, c.y, c.s * (1 + k * 0.6), c.a, 1 - k);   // (collected: the coin swells and fades where it lies - it used to fly up, back into the vault, which read as a glitch)
           if (k >= 1) c.state = 'done';
         }
       });
