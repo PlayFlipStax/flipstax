@@ -3164,6 +3164,25 @@
     .event-overlay.bb-two .event-tile .bb-name, .event-overlay.bb-two .event-tile .bb-sub, .event-overlay.bb-two .event-tile .bb-tag{ grid-column:2; }
     .event-overlay.bb-two .event-tile .bb-tag{ justify-self:start; }
   }
+
+  /* ---- Time Warp (Oct 2026): a timeline strip, clock plates that flip to the year ---- */
+  .bb-timeline{ display:none; position:relative; flex:0 0 auto; height:46px; margin:0 6px 10px; }
+  .event-overlay.bb-timeWarp .bb-timeline{ display:block; }
+  .tl-line{ position:absolute; left:0; right:0; top:50%; height:6px; margin-top:-3px; border-radius:4px; background:linear-gradient(90deg, rgba(200,255,61,0.2), #c8ff3d 50%, rgba(200,255,61,0.2)); box-shadow:0 0 12px rgba(200,255,61,0.7); }
+  .tl-t{ position:absolute; top:50%; width:3px; height:16px; margin:-8px 0 0 -1.5px; background:rgba(255,255,255,0.7); border-radius:2px; }
+  .tl-t.t1{ left:12.5%; } .tl-t.t2{ left:37.5%; } .tl-t.t3{ left:62.5%; } .tl-t.t4{ left:87.5%; }
+  .tl-m{ position:absolute; top:50%; left:50%; width:54px; height:54px; margin:-27px 0 0 -27px; border-radius:50%; display:grid; place-items:center; z-index:2;
+    background:radial-gradient(circle at 35% 30%, #f6ffd0, #c8ff3d 55%, #6a9a00); border:3px solid #fff; box-shadow:0 0 16px rgba(200,255,61,0.9); transition:transform 0.8s cubic-bezier(.3,1.4,.5,1); }
+  .tl-m b{ font:900 17px/1 var(--f-display); color:#233300; }
+  .bb-timeline .tl-m.e{ transform:translateX(-14px); } .bb-timeline .tl-m.l{ transform:translateX(14px); }
+  .bb-timeline.on .tl-m.e{ transform:translateX(calc(var(--span, 100px) * -1)); } .bb-timeline.on .tl-m.l{ transform:translateX(var(--span, 100px)); }
+  .tl-gap{ position:absolute; left:50%; top:100%; transform:translateX(-50%); margin-top:-3px; font:800 12px/1 var(--f-body); letter-spacing:1px; color:#e9ffa8; white-space:nowrap; text-shadow:0 1px 0 rgba(0,0,0,0.5); }
+  /* the clock plates: round, not a tag */
+  .event-overlay.bb-timeWarp .bb-tag{ width:84px; height:84px; margin-top:2px; filter:drop-shadow(0 0 10px rgba(200,255,61,0.55)); }
+  .event-overlay.bb-timeWarp .bb-tag b{ padding:0; border-radius:50%; clip-path:none; font-size:24px; background:radial-gradient(circle at 35% 30%, #fff, #e6ffa0 45%, #8dbb1c); border:4px solid #3b4a00; color:#1c2600; }
+  .event-overlay.bb-timeWarp .bb-tag .tb{ background:radial-gradient(circle at 35% 30%, #fffbe0, #ffe066 50%, #c98a00); font-size:26px; }
+  @media (max-height:700px){ .bb-timeline{ height:38px; margin-bottom:6px; } .tl-m{ width:44px; height:44px; margin:-22px 0 0 -22px; } .tl-m b{ font-size:14px; } .event-overlay.bb-timeWarp .bb-tag{ width:56px; height:56px; } .event-overlay.bb-timeWarp .bb-tag b{ font-size:15px; } }
+  @media (prefers-reduced-motion: reduce){ .tl-m{ transition:none; } }
 </style>
 </head>
 <body>
@@ -3288,6 +3307,7 @@
       <div class="event-subtitle" id="eventSubtitle"></div>
       <div class="event-prompt" id="eventPrompt"></div>
       <div class="event-timerbar" id="eventTimerBar"><div class="event-timerbar-fill" id="eventTimerFill"></div></div>
+      <div class="bb-timeline" aria-hidden="true"><i class="tl-line"></i><i class="tl-t t1"></i><i class="tl-t t2"></i><i class="tl-t t3"></i><i class="tl-t t4"></i><span class="tl-m e"><b>?</b></span><span class="tl-m l"><b>?</b></span><em class="tl-gap"></em></div>
       <div class="event-grid" id="eventGrid">
         <div class="event-tile" data-i="0"></div>
         <div class="event-tile" data-i="1"></div>
@@ -9217,6 +9237,8 @@
       fillBreakTile(tileEl, rd.tiles[i], undefined, false, key, rd.revealSub && rd.revealSub[i]);
     });
     hostSay(HOST_LINES[key] || def.rule, 2600);
+    const tl = ov.querySelector('.bb-timeline');
+    if (tl){ tl.classList.remove('on'); tl.querySelectorAll('.tl-m b').forEach(b=> b.textContent = '?'); tl.querySelector('.tl-gap').textContent = ''; }
     let settled = false;
     const finish = ()=>{
       ov.classList.add('hidden'); ov.classList.remove('brainbreak', 'stack', 'bb-two', 'flash-win', 'bb-' + key); ov.style.removeProperty('--bb');
@@ -9227,6 +9249,11 @@
       if (settled || !runActive) return; settled = true;
       clearTimeout(eventTimeoutId); tiles.forEach(t=> t.onclick = null);
       const right = tiles[rd.correct], ok = pick === rd.correct;
+      if (key === 'timeWarp' && tl && rd.revealSub){   // the timeline: the earlier year slides to the left end, the later to the right
+        const ys = rd.revealSub.map(Number), lo = Math.min.apply(null, ys), hi = Math.max.apply(null, ys);
+        tl.querySelector('.tl-m.e b').textContent = lo; tl.querySelector('.tl-m.l b').textContent = hi;
+        tl.querySelector('.tl-gap').textContent = (hi - lo) + ' years apart'; tl.style.setProperty('--span', Math.round(tl.clientWidth * 0.38) + 'px'); tl.classList.add('on');
+      }
       tiles.forEach((t, i)=>{
         if (i >= n || !rd.revealSub) return;
         const tag = t.querySelector('.bb-tag');

@@ -163,3 +163,14 @@
 @keyframes starTwinkle{ from{ opacity:0.35; } to{ opacity:1; } }
 .paused::before, .paused::after, :root.tab-hidden .bg.w-galaxy::before, :root.tab-hidden .bg.w-galaxy::after{ animation-play-state:paused !important; }
 @media (prefers-reduced-motion: reduce){ .bg.w-galaxy::before, .bg.w-galaxy::after{ animation:none; } }
+
+/* ---------- Time Warp's world: a time tunnel / clock vortex ---------- */
+.w-timewarp{ --w1:#7a2bd8; --w2:#2a0e6e; --w3:#0b0430; --w4:#02010f; --show-accent:#c8ff3d; }
+.bg.w-timewarp .rays{ top:38%; background:repeating-radial-gradient(circle, rgba(200,255,61,0.2) 0 3px, rgba(200,255,61,0) 3px 38px), repeating-conic-gradient(from 0deg, rgba(200,255,61,0.2) 0deg 5deg, rgba(200,255,61,0) 5deg 20deg); animation-duration:26s; animation-direction:reverse;
+  -webkit-mask-image:radial-gradient(circle, #000 0, rgba(0,0,0,0.8) 30%, transparent 68%); mask-image:radial-gradient(circle, #000 0, rgba(0,0,0,0.8) 30%, transparent 68%); }
+.bg.w-timewarp .glow{ top:38%; background:radial-gradient(circle, rgba(220,255,120,0.7), rgba(200,255,61,0) 62%); }
+.bg.w-timewarp::before, .bg.w-timewarp::after{ content:''; position:absolute; left:50%; top:38%; pointer-events:none; }
+.bg.w-timewarp::before{ width:78vmin; height:78vmin; margin:-39vmin 0 0 -39vmin; border-radius:50%; border:8px dotted rgba(200,255,61,0.28); animation:rayTurn 70s linear infinite; }
+.bg.w-timewarp::after{ width:5px; height:34vmin; margin:-34vmin 0 0 -2.5px; border-radius:3px; transform-origin:50% 100%; background:linear-gradient(180deg, rgba(220,255,120,0), rgba(220,255,120,0.55)); animation:rayTurn 12s linear infinite; }
+.paused.w-timewarp::before, .paused.w-timewarp::after{ animation-play-state:paused !important; }
+@media (prefers-reduced-motion: reduce){ .bg.w-timewarp::before, .bg.w-timewarp::after{ animation:none; } }
