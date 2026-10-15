@@ -176,6 +176,7 @@
 @media (prefers-reduced-motion: reduce){ .bg.w-timewarp::before, .bg.w-timewarp::after{ animation:none; } }
 
 /* ---------- Oddball Alert's world: a spotlit lineup stage ---------- */
+.w-orange{ --w1:#ffe0a8; --w2:#ff9a2e; --w3:#e2560f; --w4:#4a1606; --show-accent:#fff3c4; --ray-c:rgba(255,244,214,0.26); --ray-on:7deg; --ray-period:16deg; --ray-speed:44s; --ray-dir:normal; }   /* Oddball Alert */
 .w-stage{ --w1:#2b1650; --w2:#150833; --w3:#0a0418; --w4:#030108; --show-accent:#fff3c4; }
 .bg.w-stage{ background:radial-gradient(90% 28% at 50% 104%, rgba(255,95,210,0.38), rgba(255,95,210,0) 70%), linear-gradient(180deg, #05020d 0%, #140730 58%, #2a0e52 100%); }
 .bg.w-stage .rays{ left:50%; top:-3%; --ray-c:rgba(255,248,214,0.3);
