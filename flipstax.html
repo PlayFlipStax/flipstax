@@ -3609,7 +3609,7 @@
     </div>
   </div>
   <div class="fin-stage fin-vault hidden" id="finVault">
-    <div class="vault-tally" id="vaultTally" aria-live="polite"><span>FINAL SCORE</span><b id="vaultTallyNum">0</b><em id="vaultTallyHint">Tap the coins!</em></div>
+    <div class="vault-tally" id="vaultTally" aria-live="polite"><span>FINAL SCORE</span><b id="vaultTallyNum">0</b><em id="vaultTallyHint"></em></div>
     <div class="vault-scene" id="vaultScene">
       <i class="vault-rays" aria-hidden="true"><i></i></i>
       <div class="vault-ufo riddle-ufo" id="vaultUfo" aria-hidden="true"><span>🛸</span><i></i></div>
@@ -10498,7 +10498,7 @@
     els.finOverlay.classList.add('daily-vault');
     els.finOverlay.classList.remove('hidden');
     finTapShieldAt = performance.now(); startFinSky();
-    document.getElementById('vaultTallyHint').textContent = 'Tap the coins!';
+    document.getElementById('vaultTallyHint').textContent = '';
     hostSay(HOST_QUIPS.vault || 'Vault time, baby!', 1600);
     let closed = false;
     const close = ()=>{ if (closed) return; closed = true; vaultTimers.forEach(clearTimeout); vaultTimers = []; coinRun = null;
@@ -10529,9 +10529,9 @@
   // tally above the vault up. The coins carry the Plinko bonus on top of the
   // run score (with no bonus, the run score itself), so the tally always ends
   // on the final score: collecting shows what was won, it doesn't change it.
-  // Coins nobody taps sweep in by themselves after VAULT_COIN_IDLE_MS, then
-  // the results appear.
-  const VAULT_COINS = 10, VAULT_COIN_IDLE_MS = 3500, VAULT_COIN_MAX_MS = 9000;
+  // (Oct 2026: no tapping any more - the coins collect themselves after VAULT_AUTO_COLLECT_MS, then
+  // the results appear.)
+  const VAULT_COINS = 10, VAULT_AUTO_COLLECT_MS = 1300, VAULT_COIN_GAP_MS = 110;   // no tapping: the coins land, then collect themselves one by one while the score counts up
   let coinRun = null;
   function collectVaultCoins(a, done){
     const stage = document.getElementById('finVault'), canvas = document.getElementById('vaultCoins'), ctx = canvas && canvas.getContext('2d');
@@ -10546,7 +10546,7 @@
     // the tally
     const num = document.getElementById('vaultTallyNum'), hint = document.getElementById('vaultTallyHint');
     let shown = start, target = start, animFrom = start, animAt = 0;
-    num.textContent = start; hint.textContent = 'Tap the coins!';
+    num.textContent = start; hint.textContent = '';
     stage.classList.add('collect');
     const base = Math.floor(total / n), extra = total - base * n;
     const burst = Array.from({ length: 30 }, ()=> ({ x: W * 0.5 + (Math.random() - 0.5) * 30, y: H * 0.42, vx: (Math.random() - 0.5) * 7, vy: -3 - Math.random() * 6,
@@ -10577,21 +10577,14 @@
       const pop = document.createElement('div'); pop.className = 'coin-pop'; pop.textContent = '+' + c.v;
       const cr = canvas.getBoundingClientRect(); pop.style.left = (cr.left + c.x) + 'px'; pop.style.top = (cr.top + c.y) + 'px';
       document.body.appendChild(pop); setTimeout(()=> pop.remove(), 800);
-      if (collected >= n){ hint.textContent = sweeping ? '' : 'All collected! ✨'; finish(); }
+      if (collected >= n){ hint.textContent = ''; finish(); }
     }
-    canvas.onpointerdown = e=>{
-      if (coinRun !== me || finished) return;
-      const cr = canvas.getBoundingClientRect(), px = e.clientX - cr.left, py = e.clientY - cr.top;
-      let best = null, bd = 30 * 30;   // a generous finger-sized target
-      coins.forEach(c=>{ if (c.state !== 'loose' || performance.now() - t0 < c.d) return; const d = (c.x - px) ** 2 + (c.y - py) ** 2; if (d < bd){ bd = d; best = c; } });
-      if (best){ lastTap = performance.now(); collect(best); }
-    };
     const sweep = ()=>{
       if (sweeping || finished) return; sweeping = true; hint.textContent = '';
-      coins.filter(c=> c.state === 'loose').forEach((c, k)=> vaultTimers.push(setTimeout(()=>{ if (coinRun === me) collect(c); }, k * 110)));
+      coins.filter(c=> c.state === 'loose').forEach((c, k)=> vaultTimers.push(setTimeout(()=>{ if (coinRun === me) collect(c); }, k * VAULT_COIN_GAP_MS)));
     };
     (function frame(now){
-      if (coinRun !== me || els.finOverlay.classList.contains('hidden')){ ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); canvas.onpointerdown = null; return; }
+      if (coinRun !== me || els.finOverlay.classList.contains('hidden')){ ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, canvas.width, canvas.height); return; }
       const t = now - t0;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
       if (t < 2600) burst.forEach(c=>{
@@ -10616,7 +10609,7 @@
       });
       // the tally eases toward its target
       if (shown !== target){ const k = Math.min(1, (now - animAt) / 260); shown = Math.round(animFrom + (target - animFrom) * k); num.textContent = shown; }
-      if (!finished && !sweeping && (now - lastTap > VAULT_COIN_IDLE_MS + (lastTap === t0 ? 1200 : 0) || t > VAULT_COIN_MAX_MS)) sweep();
+      if (!finished && !sweeping && t > VAULT_AUTO_COLLECT_MS) sweep();   // the coins have landed: they collect themselves
       requestAnimationFrame(frame);
     })(t0);
   }
