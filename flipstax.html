@@ -2502,6 +2502,25 @@
   .cue-card .cc-title{ margin-top:6px; font:900 clamp(38px, 12vw, 54px)/0.95 var(--f-display); text-transform:uppercase; }
   .cue-host{ width:70px; height:80px; margin-top:-14px; z-index:3; }
   .cue-out .cue-card, .cue-out .cue-host{ transition:transform .25s ease-in, opacity .25s; transform:translateY(40px) scale(0.9); opacity:0; }
+  /* The Mystery Game wheel (refs/wheel.jpg without its buttons). */
+  .show-card.wheel{ overflow:hidden; cursor:default; }
+  .mw-bg{ position:absolute; inset:0; z-index:0; }
+  .show-card.wheel .sc-inner{ gap:14px; }
+  .mw-title{ font:900 clamp(34px, 11vw, 46px)/1 var(--f-display); letter-spacing:1px; color:#fffbe0; padding:8px 18px; border-radius:12px; border:3px solid var(--gold-2);
+    background:linear-gradient(180deg, #5a1a8f, #3a0d66); text-shadow:0 3px 0 #8a4a00, 0 0 16px rgba(255,210,63,0.6); box-shadow:0 6px 0 #1c0636; }
+  .mw-wrap{ position:relative; width:min(84vw, 330px); aspect-ratio:1; }
+  .mw-wrap svg{ position:absolute; inset:0; width:100%; height:100%; }
+  .mw-wheel{ transform-origin:50% 50%; filter:drop-shadow(0 6px 10px rgba(0,0,0,0.45)); }
+  .mw-rim circle.mw-b0, .mw-rim circle.mw-b1{ fill:#fff6c4; stroke:#ffd23f; stroke-width:1.5; animation:mwChase 0.5s steps(1) infinite; }
+  .mw-rim circle.mw-b1{ animation-delay:0.25s; }
+  @keyframes mwChase{ 0%{ opacity:1; } 50%{ opacity:0.3; } }
+  .landed .mw-rim circle[class]{ animation:mwFlash 0.2s steps(1) 4; fill:#fff; }
+  @keyframes mwFlash{ 50%{ opacity:0.2; } }
+  .mw-pointer{ position:absolute; left:50%; top:-6px; width:30px; height:38px; margin-left:-15px; z-index:3;
+    background:linear-gradient(180deg, #fff, #ff7ad9 40%, #c2187a); clip-path:polygon(0 0, 100% 0, 50% 100%); filter:drop-shadow(0 3px 2px rgba(0,0,0,0.5)); }
+  .mw-name{ min-height:44px; font:900 clamp(34px, 11vw, 48px)/1 var(--f-display); color:#fffbe0; text-shadow:0 4px 0 rgba(60,0,60,0.6), 0 0 22px rgba(255,255,255,0.7); opacity:0; transform:scale(0.5); }
+  .mw-name.on{ opacity:1; transform:none; transition:transform .35s var(--ease-pop), opacity .2s; }
+  @media (prefers-reduced-motion: reduce){ .mw-rim circle{ animation:none !important; } .mw-name.on{ transition:none; } }
   /* The commercial break: a 3-second fake 70s ad with a VHS wobble. Skippable. */
   .show-card.ad{ background:#000; overflow:hidden; }
   .ad-screen{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
@@ -3343,6 +3362,9 @@
      A lit frame with buzzing bulbs; the prize icons blur past (a strip moved with transform), slow down and land
      with a slam (a quick scale-down, a flash ring, a screen shake). The old gift box is gone. */
   .event-overlay.gift-mode .gift-box{ display:none; }
+  /* The show (Daily): a real gift box that shakes and opens - no slot reel. */
+  .event-overlay.gift-mode.daily-gift .gift-box{ display:block; } .event-overlay.gift-mode.daily-gift .reel-wrap{ display:none; }
+  .event-overlay.gift-mode.daily-gift .gift-prize{ bottom:auto; top:4px; }
   .event-overlay.gift-mode .gift-stage{ height:236px; }
   .reel-wrap{ position:absolute; left:50%; top:6px; width:158px; height:128px; margin-left:-79px; padding:12px; border-radius:24px; border:5px solid #ffd23f; box-sizing:border-box;
     background:linear-gradient(180deg, #5a1aa8, #2a0a5c); box-shadow:0 0 0 4px #3d1300, 0 0 26px 6px rgba(255,210,60,0.55), inset 0 0 22px rgba(0,0,0,0.5); }
@@ -4981,11 +5003,41 @@
   function seedOf(rng){ return (rng() * 4294967296) >>> 0; }
   // The day's two Mystery Games (see pickMysteryGames).
   function showMysteryGames(date){ return pickMysteryGames(date); }
+  // The day's two Mystery Games (DIRECTION.md): drawn by the date from the rundown's pool,
+  // by weight; never a game that played the day before, at most one price game an
+  // episode. The days are walked from Episode 1, so "not two days in a row" holds for
+  // every pair of days. A game whose data didn't load is left out of the pool.
+  const MYSTERY_POOL = (RUNDOWN.mystery && Array.isArray(RUNDOWN.mystery.pool)) ? RUNDOWN.mystery.pool : [];
+  function mysteryAvailable(g){
+    if (g === 'riddle') return INFINITY_RIDDLES.length >= 8;
+    if (g === 'crowdScan') return !!(CARD_POOLS.daily && CARD_POOLS.daily.length);
+    return availableBreakKeys().indexOf(g) >= 0;
+  }
+  const mysteryCache = {};
+  function pickMysteryDay(date, prev, pool){
+    const rng = mulberry32(hashStr('flipstax-mystery-' + date)), out = [];
+    const isPrice = g=> !!(pool.find(p=> p.game === g) || {}).price;
+    for (let k = 0; k < 2; k++){
+      let cand = pool.filter(p=> out.indexOf(p.game) < 0 && prev.indexOf(p.game) < 0 && !(p.price && out.some(isPrice)));
+      if (!cand.length) cand = pool.filter(p=> out.indexOf(p.game) < 0 && !(p.price && out.some(isPrice)));
+      if (!cand.length) cand = pool.filter(p=> out.indexOf(p.game) < 0);
+      if (!cand.length) break;
+      let r = rng() * cand.reduce((a, p)=> a + (p.weight || 1), 0);
+      out.push((cand.find(p=> (r -= (p.weight || 1)) < 0) || cand[cand.length - 1]).game);
+    }
+    return out;
+  }
   function pickMysteryGames(date){
-    const avail = availableBreakKeys();
-    const rng = mulberry32(hashStr('flipstax-mystery-' + date));
-    const pool = shuffle(avail, rng);
-    return [pool[0] || null, pool[1] || pool[0] || null];
+    if (mysteryCache[date]) return mysteryCache[date];
+    const pool = MYSTERY_POOL.filter(p=> p && p.game && mysteryAvailable(p.game));
+    let d = date < SHOW_LAUNCH_DATE ? date : SHOW_LAUNCH_DATE, prev = [];
+    for (let guard = 0; guard < 4000; guard++){
+      prev = mysteryCache[d] || (mysteryCache[d] = pickMysteryDay(d, prev, pool));
+      if (d >= date) break;
+      d = dayAfter(d);
+    }
+    const out = mysteryCache[date] || prev;
+    return [out[0] || null, out[1] || out[0] || null];
   }
   function showAd(date){
     const ads = (RUNDOWN.commercial && RUNDOWN.commercial.ads) || [];
@@ -5008,6 +5060,22 @@
         // (orbitDrop: the Word Warp's finish opens it - see endRun)
       });
     });
+    // About one episode in three, a Cosmic Surprise takes one random VS card's place.
+    if (rng() < (RUNDOWN.cosmicSurpriseChance || 0)){
+      const blocks = steps.map((s, i)=> s.t === 'vs' && s.n > 0 ? i : -1).filter(i=> i >= 0);
+      const total = blocks.reduce((a, i)=> a + steps[i].n, 0);
+      let at = Math.floor(rng() * total);
+      for (const i of blocks){
+        const s = steps[i];
+        if (at >= s.n){ at -= s.n; continue; }
+        const parts = [];
+        if (at > 0) parts.push({ t:'vs', n:at, act:s.act });
+        parts.push({ t:'cosmic', act:s.act, seed:seedOf(rng) });
+        if (s.n - at - 1 > 0) parts.push({ t:'vs', n:s.n - at - 1, act:s.act });
+        steps.splice(i, 1, ...parts);
+        break;
+      }
+    }
     return steps;
   }
   // The act the show is in (its multiplier and VS timer).
@@ -8501,7 +8569,7 @@
       deck: deck.cards.slice(deck.next).map(c=> c.id),
       show: runShow, doors: runPortalDoors, warpBonus: runWarpBonusMs,
       combo: { streak: runMatchStreak, bank: runComboBank, bonus: runComboBonus, best: runBestStreak },
-      letterPos: runLetterPos, tray: runTrayMarks, act: runActIdx, actPts: runActPts, best: runBestMoment,
+      letterPos: runLetterPos, tray: runTrayMarks, act: runActIdx, actPts: runActPts, best: runBestMoment, keys: runKeys,
     };
     try{ localStorage.setItem(RUN_LIVE_KEY, JSON.stringify(snap)); }catch(e){}
   }
@@ -9242,7 +9310,7 @@
     runPendingTrivia = false; runPendingPowerUp = false;
     runStartDate = todayStr();
     runWord = dailyWordForPlayer();
-    runPlan = buildShowPlan(runStartDate); runShow = { step:0, left:null }; runActIdx = 0; runActPts = []; runBestMoment = null; runPortalDoors = null; runWarpBonusMs = 0; runBreakSeen = {};
+    runPlan = buildShowPlan(runStartDate); runShow = { step:0, left:null }; runActIdx = 0; runActPts = []; runBestMoment = null; runKeys = 0; runPortalDoors = null; runWarpBonusMs = 0; runBreakSeen = {};
     runMatchStreak = 0; runComboBank = 0; runComboBonus = 0; runBestStreak = 0; renderComboMeter();
     runLetterPos = []; runWarpPoints = 0; letterIncoming.clear(); runTrayMarks = []; trayIncoming.clear();
     runEndsAt = Date.now() + RUN_DURATION_MS;
@@ -9302,7 +9370,7 @@
     currentRiddle = snap.riddle >= 0 ? RIDDLES[snap.riddle] : null; riddleEndsAt = snap.riddleEndsAt;
     runSolvedAt = null;
     runClockAddedMs = snap.clockAdded || 0;
-    runShow = snap.show || { step:0, left:null }; runPlan = buildShowPlan(runStartDate); runActIdx = snap.act || 0; runActPts = Array.isArray(snap.actPts) ? snap.actPts : []; runBestMoment = snap.best || null; runPortalDoors = snap.doors || null; runWarpBonusMs = snap.warpBonus || 0;
+    runShow = snap.show || { step:0, left:null }; runPlan = buildShowPlan(runStartDate); runActIdx = snap.act || 0; runActPts = Array.isArray(snap.actPts) ? snap.actPts : []; runBestMoment = snap.best || null; runKeys = snap.keys || 0; runPortalDoors = snap.doors || null; runWarpBonusMs = snap.warpBonus || 0;
     runMatchStreak = (snap.combo && snap.combo.streak) || 0; runComboBank = (snap.combo && snap.combo.bank) || 0; runComboBonus = (snap.combo && snap.combo.bonus) || 0; runBestStreak = (snap.combo && snap.combo.best) || 0;
     renderComboMeter();
     runLetterPos = Array.isArray(snap.letterPos) ? snap.letterPos : runLetters.map((_, k)=> k); runWarpPoints = 0; letterIncoming.clear();
@@ -9406,6 +9474,12 @@
         runPhase = 'running';
         continue;   // (its data turned out unusable: carry on with the show)
       }
+      if (st.t === 'cosmic'){
+        runPhase = 'break'; saveRunSnapshot();
+        if (runDailyCosmic(st, ()=>{ if (!runActive) return; runPhase = 'running'; loadNext(); })) return true;
+        runPhase = 'running';
+        continue;
+      }
       if (st.t === 'lucky'){
         runPhase = 'break'; saveRunSnapshot();
         if (typeof runLuckyLights === 'function' && runLuckyLights(st, ()=>{ if (!runActive) return; runPhase = 'running'; loadNext(); })) return true;
@@ -9417,10 +9491,55 @@
     return false;
   }
   // The day's Mystery Game in its slot.
+  // The Mystery Game wheel spins and lands on the game's name, then the game plays.
   function runMysteryGame(st, done){
-    if (!st.game) return false;
+    if (!st.game || !mysteryAvailable(st.game)) return false;
     runCurrentGame = mysteryName(st.game);
-    return runBrainBreak({ game: st.game, seed: st.seed }, done);
+    showMysteryWheel(st.game, ()=>{
+      if (!runActive) return;
+      const ok = st.game === 'riddle' ? (runTriviaQuestion(null, null, { t:'quiz', riddle:true, mystery:true, seed: st.seed }), true)
+        : st.game === 'crowdScan' ? runDailyCrowdScan(st, done)
+        : runBrainBreak({ game: st.game, seed: st.seed }, done);
+      if (!ok){ runPhase = 'running'; loadNext(); }
+    });
+    return true;
+  }
+  // Crowd Scan in the show: the next card from the day's deck; guess what share picked
+  // the left one. The split is the card's live tally when there is one, or else the
+  // same stand-in split the VS reveal would show.
+  const DAILY_SCAN_SCORING = [ { within:5, pts:10, win:true }, { within:10, pts:6, win:true }, { within:20, pts:3 } ];
+  let dailyScanDone = null;
+  function runDailyCrowdScan(st, done){
+    const d = decks.daily; if (!d || d.next >= d.cards.length) return false;
+    const card = d.cards[d.next];
+    dailyScanDone = done;
+    if (!startGuessRound(card, true)){ dailyScanDone = null; return false; }
+    return true;
+  }
+  // A key won in the show (a Mystery Game win, Lucky Lights, a Cosmic Surprise): each
+  // one is an extra Orbit Drop chip in the finale.
+  let runKeys = 0;
+  function addRunKey(src){
+    if (!runActive) return false;
+    runKeys++; renderRunBanner(); saveRunSnapshot();
+    if (sfx.key) sfx.key();
+    showToast('🔑 +1 key · an extra ' + GN.orbitDrop + ' chip');
+    return true;
+  }
+  // Cosmic Surprise in the show: the gift box (no slot reel - never a casino look).
+  let cosmicDaily = null;
+  function runDailyCosmic(st, done){
+    const ov = els.eventOverlay;
+    stopTallyPolling(); clearRoundTimer(); voted = false; votedSinceTime = null;
+    ov.classList.remove('hidden', 'powerup', 'brainbreak', 'stack');
+    els.powerupIcon.classList.add('hidden');
+    fitTopChip();
+    els.eventSubtitle.textContent = '🎁 ' + GN.cosmicSurprise.toUpperCase();
+    cosmicDaily = done; runCurrentGame = GN.cosmicSurprise;
+    ov.classList.add('daily-gift');
+    hostSay(HOST_LINES.cosmicSurprise || 'Could be a prize, could be a pickle!', 2200);
+    runWildGift();
+    return true;
   }
   // Round 5's bumper, then the Word Warp. (Also where the show cuts to if
   // the run clock runs out.)
@@ -9740,6 +9859,62 @@
     };
     t = setTimeout(go, ms);
     showCard.addEventListener('click', go);
+  }
+  // The Mystery Game wheel (refs/wheel.jpg, without the casino buttons): a glossy wheel of
+  // the pool's games in their colour worlds, a gold rim with a ring of chasing bulbs and a
+  // pointer on top. It spins by itself and lands on the day's game, whose name then pops.
+  const MYSTERY_COLORS = { riddle:['#7dff8a', '#18a83a'], emojiDecode:['#8ff3ff', '#0ea5c6'], crowdScan:['#ff9ad1', '#e11d74'],
+    priceProbe:['#ffe680', '#e0a100'], timeWarp:['#d6b4ff', '#7c3aed'], oddballAlert:['#ffc27a', '#f06b0f'] };
+  function showMysteryWheel(game, then){
+    const games = MYSTERY_POOL.map(p=> p.game).filter(g=> MYSTERY_COLORS[g]);
+    if (games.indexOf(game) < 0) games.push(game);
+    const n = games.length, seg = 360 / n, R = 128, C = 150;
+    const pt = (a, r)=> [(C + r * Math.sin(a * Math.PI / 180)).toFixed(1), (C - r * Math.cos(a * Math.PI / 180)).toFixed(1)];
+    let defs = '<defs><radialGradient id="mwGloss" cx="0.5" cy="0.3" r="0.75"><stop offset="0" stop-color="rgba(255,255,255,0.35)"/><stop offset="0.6" stop-color="rgba(255,255,255,0)"/></radialGradient>' +
+      '<radialGradient id="mwHub" cx="0.4" cy="0.35" r="0.7"><stop offset="0" stop-color="#fff"/><stop offset="0.45" stop-color="#ff7ad9"/><stop offset="1" stop-color="#9c1a8f"/></radialGradient>';
+    let segs = '';
+    games.forEach((g, i)=>{
+      const a0 = i * seg - seg / 2, a1 = a0 + seg, c = MYSTERY_COLORS[g] || ['#ffd23f', '#c2275f'];
+      defs += '<linearGradient id="mwS' + i + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + c[0] + '"/><stop offset="1" stop-color="' + c[1] + '"/></linearGradient>';
+      const p0 = pt(a0, R), p1 = pt(a1, R);
+      segs += '<path d="M' + C + ' ' + C + ' L' + p0[0] + ' ' + p0[1] + ' A' + R + ' ' + R + ' 0 0 1 ' + p1[0] + ' ' + p1[1] + ' Z" fill="url(#mwS' + i + ')" stroke="#ffe27a" stroke-width="2.5"/>';
+      const words = mysteryName(g).toUpperCase().split(' '), mid = i * seg;
+      segs += '<g transform="rotate(' + mid + ' ' + C + ' ' + C + ')">' + words.map((w, k)=> '<text x="' + C + '" y="' + (C - 92 + k * 17 - (words.length - 1) * 8) + '" text-anchor="middle" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="16" fill="#fffbe0" stroke="rgba(40,0,40,0.55)" stroke-width="3" paint-order="stroke">' + w + '</text>').join('') + '</g>';
+    });
+    defs += '</defs>';
+    let bulbs = '';
+    for (let k = 0; k < 24; k++){ const p = pt(k * 15, R + 11); bulbs += '<circle class="mw-b' + (k % 2) + '" cx="' + p[0] + '" cy="' + p[1] + '" r="4.2"/>'; }
+    showCard.className = 'show-card wheel';
+    showCard.innerHTML = '<i class="bg w-odd mw-bg"><i class="rays"></i></i><div class="sc-inner">' +
+      '<div class="mw-title">MYSTERY GAME</div>' +
+      '<div class="mw-wrap"><svg class="mw-rim" viewBox="0 0 300 300" aria-hidden="true"><circle cx="150" cy="150" r="146" fill="#2a0b4e" stroke="#ffd23f" stroke-width="5"/>' + bulbs + '</svg>' +
+      '<svg class="mw-wheel" viewBox="0 0 300 300" aria-hidden="true">' + defs + segs + '<circle cx="150" cy="150" r="' + R + '" fill="url(#mwGloss)"/></svg>' +
+      '<svg class="mw-hub" viewBox="0 0 300 300" aria-hidden="true"><circle cx="150" cy="150" r="24" fill="#ffd23f"/><circle cx="150" cy="150" r="19" fill="url(#mwHub)"/></svg>' +
+      '<i class="mw-pointer" aria-hidden="true"></i></div>' +
+      '<div class="mw-name" aria-live="polite"></div></div>';
+    showCard.removeAttribute('role'); showCard.setAttribute('aria-label', 'Mystery game wheel');
+    showCard.classList.remove('hidden');
+    clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
+    const wheel = showCard.querySelector('.mw-wheel'), name = showCard.querySelector('.mw-name');
+    const i = games.indexOf(game), jitter = (Math.random() - 0.5) * seg * 0.5, end = 360 * 5 - i * seg + jitter;
+    const rm = prefersReducedMotion(), spinMs = rm ? 0 : 2600;
+    const land = ()=>{
+      name.textContent = mysteryName(game).toUpperCase() + '!';
+      name.classList.add('on'); showCard.classList.add('landed');
+      playTone(70, 0, 0.4, 'sine', 0.2); playTone(523, 0.05, 0.12, 'triangle', 0.08); playTone(784, 0.15, 0.25, 'triangle', 0.08);
+      setTimeout(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; then(); }, rm ? 1400 : 1100);
+    };
+    if (rm){ wheel.style.transform = 'rotate(' + end + 'deg)'; land(); return; }
+    const anim = wheel.animate([{ transform:'rotate(0deg)' }, { transform:'rotate(' + end + 'deg)' }], { duration: spinMs, easing:'cubic-bezier(.12,.6,.2,1)', fill:'forwards' });
+    // A tick for each segment passing the pointer: fast at first, slowing with the wheel.
+    let lastSeg = 0;
+    (function tick(){
+      if (anim.playState === 'finished') return;
+      const t = Math.min(1, (anim.currentTime || 0) / spinMs), m = Math.floor((end * (1 - Math.pow(1 - t, 3))) / seg);
+      if (m !== lastSeg){ lastSeg = m; sfx.spinTick(m % 8); }
+      requestAnimationFrame(tick);
+    })();
+    anim.onfinish = land;
   }
   function showBumper(st, then){
     const last = !!st.finale, name = showRoundName(st);
@@ -11306,9 +11481,11 @@
     };
     setTimeout(go, 1500);
   }
-  function startGuessRound(card){
+  function startGuessRound(card, daily){
     if (guessState !== 'idle') return false;
-    const counts = guessCounts(card); if (!counts) return false;
+    let counts = guessCounts(card);
+    if (!counts && daily){ const p = mockPercentA(card.id, card.a); counts = { a:p, b:100 - p }; }   // (the show: the split the VS reveal would show)
+    if (!counts) return false;
     // Taken out of this lap of the deck: once its split has been seen, it
     // shouldn't come back as an ordinary vote.
     const d = decks[contentPoolKey()], at = d.cards.indexOf(card);
@@ -11357,7 +11534,7 @@
     res.querySelector('.gr-mark-guess').style.left = guess + '%';
     res.querySelector('.gr-verdict').textContent = '';
     res.classList.remove('hidden'); ov.classList.add('revealed');
-    const off = Math.abs(guess - truth), sc = guessScore(off);
+    const off = Math.abs(guess - truth), sc = dailyScanDone ? (DAILY_SCAN_SCORING.find(s=> off <= s.within) || { pts:0 }) : guessScore(off);
     if (infRun && !infRun.finale){ infRun.guessLocked = (infRun.guessLocked || 0) + 1; infRun.guessErrSum = (infRun.guessErrSum || 0) + off; saveInfRun(); }
     if (off === 0 && infRun && !infRun.finale){ infRun.perfectGuess = true; infRun.deadOns = (infRun.deadOns || 0) + 1; saveInfRun(); }
     if (off <= 1 && infRun && !infRun.finale){ infRun.nearGuesses = (infRun.nearGuesses || 0) + 1; saveInfRun(); }
@@ -11365,8 +11542,8 @@
       if (guessFinish !== finish) return;   // once per round
       guessFinish = null;
       real.textContent = truth + '%'; fill.style.transition = 'none'; fill.style.width = truth + '%';
-      if (sc.pts) addRacePoints(sc.pts);
-      const key = sc.key ? addInfKey('guess') : false;
+      if (sc.pts){ if (dailyScanDone) addRunScore(sc.pts); else addRacePoints(sc.pts); }
+      const key = sc.key && !dailyScanDone ? addInfKey('guess') : false;
       res.querySelector('.gr-verdict').textContent = (off === 0 ? '🎯 Dead on! ' : 'You said ' + guess + '% — ' + off + ' off. ') +
         (sc.pts ? '+' + sc.pts + ' points' + (key ? ' · 🔑 +1 key' : '') : 'No points this time');
       if (sc.pts >= 15) sfx.correct(); else if (sc.pts) sfx.revealWin(); else sfx.revealLose();
@@ -11389,7 +11566,8 @@
     clearTimeout(guessCloseTimer); guessCloseTimer = null; guessFinish = null;
     guessState = 'idle'; guessTruth = null; guessCard = null;
     els.guessOverlay.classList.add('hidden');
-    if (inInfinity()) scheduleNext(0);
+    if (dailyScanDone){ const d = dailyScanDone; dailyScanDone = null; noteOverlayClosed(); d(); }
+    else if (inInfinity()) scheduleNext(0);
   }
   // Infinity run events that take a round's place - a riddle round (one every
   // 26-34 vote rounds, about 3-4 a run) or Guess the Crowd; true if one started.
@@ -13337,7 +13515,7 @@
     if (!document.documentElement.classList.contains('mode-daily')) return;
     if (els.readoutOverlay.classList.contains('show')) setShowWorld('results');
     else if (open(els.solveOverlay)) setShowWorld('jumble');
-    else if (open(els.eventOverlay)) setShowWorld(els.eventOverlay.classList.contains('powerup') || runPhase === 'powerup' ? 'powerup' : els.eventOverlay.classList.contains('brainbreak') ? (BB_WORLDS[(Array.from(els.eventOverlay.classList).find(c=> c.indexOf('bb-') === 0 && BB_WORLDS[c.slice(3)]) || '').slice(3)] || 'odd') : (runPendingQ && runPendingQ.riddle) ? 'riddle' : 'trivia');
+    else if (open(els.eventOverlay)) setShowWorld(els.eventOverlay.classList.contains('powerup') || runPhase === 'powerup' ? 'powerup' : (els.eventOverlay.classList.contains('gift-mode') || els.eventOverlay.classList.contains('cosmic-mode')) ? 'odd' : els.eventOverlay.classList.contains('brainbreak') ? (BB_WORLDS[(Array.from(els.eventOverlay.classList).find(c=> c.indexOf('bb-') === 0 && BB_WORLDS[c.slice(3)]) || '').slice(3)] || 'odd') : (runPendingQ && runPendingQ.riddle) ? 'riddle' : 'trivia');
     else setShowWorld('vs');
     // Pause the background's motion while a full-screen layer covers it
     // (the Word Warp and results have their own; the Vault is on top).
@@ -14073,6 +14251,11 @@
     const keys = Object.keys(COSMIC_WEIGHTS);
     let r = Math.random() * keys.reduce((a, k)=> a + COSMIC_WEIGHTS[k], 0), prize = keys.find(k=> (r -= COSMIC_WEIGHTS[k]) < 0) || 'points10';
     if ((DEBUG_FAST || REPLAY) && window.__forceWild) prize = window.__forceWild;   // (tests, and the replay menu's Cosmic Surprise jumps)
+    if (cosmicDaily){   // the show has no clock, and a key is its chip
+      if (prize === 'clock' || prize === 'freeze') prize = 'points20';
+      if (prize === 'chip') prize = 'key';
+      return prize;
+    }
     if (prize === 'chip' && (!infRun || infRun.bonusChip)) prize = 'points10';
     if (prize === 'key' && (!infRun || infRun.keys >= INF_KEY_CAP)) prize = 'points10';
     return prize;
@@ -14090,9 +14273,9 @@
         setTimeout(()=> runCosmic(prize), prefersReducedMotion() ? 300 : 900); return;
       }
       let text;
-      if (prize === 'points10'){ addRacePoints(10); text = '+10 points'; }
-      else if (prize === 'points20'){ addRacePoints(20); text = '+20 points'; }
-      else if (prize === 'key'){ addInfKey('wildcard'); text = '🔑 +1 key'; }
+      if (prize === 'points10'){ cosmicPts(10); text = '+10 points'; }
+      else if (prize === 'points20'){ cosmicPts(20); text = '+20 points'; }
+      else if (prize === 'key'){ cosmicKey(); text = '🔑 +1 key'; }
       else { infRun.bonusChip = true; saveInfRun(); text = '🪙 Bonus ' + GN.orbitDrop + ' chip!'; }
       label.textContent = text;
       els.eventPrompt.textContent = '🎁 ' + GN.cosmicSurprise.toUpperCase() + ': ' + text;
@@ -14101,6 +14284,7 @@
       setTimeout(finishPowerUp, 500);
     };
     if (prefersReducedMotion() || !stage.animate){ open(); return; }
+    if (cosmicDaily){ stage.classList.add('shaking'); sfx.drumroll(1000); setTimeout(open, 1100); return; }   // (the show: the box shakes, then opens)
     // The reveal is a slot-machine reel (Oct 2026): the icons blur past with buzzing lights, slow down, and the
     // result lands with a slam. (The reel is a strip moved with transform; the lights are opacity.)
     const wrap = document.getElementById('reelWrap'), strip = document.getElementById('reelStrip'), keys = Object.keys(COSMIC_REEL);
@@ -14134,7 +14318,9 @@
     else if (kind === 'riddle') cosmicRiddle(st, done);
     else cosmicFreeze(st, done);
   }
-  function cosmicPenalty(n){ const sc = infRun ? infRun.score : 0; const p = Math.max(0, Math.min(n, sc)); if (p) addRacePoints(-p); return p; }
+  function cosmicPenalty(n){ const sc = cosmicDaily ? runScore : infRun ? infRun.score : 0; const p = Math.max(0, Math.min(n, sc)); if (p) cosmicPts(-p); return p; }
+  function cosmicPts(n){ if (cosmicDaily) addRunScore(n); else addRacePoints(n); }
+  function cosmicKey(){ return cosmicDaily ? addRunKey('cosmic') : addInfKey('wildcard'); }
   function cosmicScramble(st, done){
     const word = pick(COSMIC_WORDS); let letters = word.split('');
     for (let k = 0; k < 8 && letters.join('') === word; k++) letters = shuffle(word.split(''));
@@ -14148,8 +14334,8 @@
     const end = (won)=>{
       if (over) return; over = true; clearTimeout(timer); tiles.forEach(t=> t.disabled = true);
       if (won){
-        const key = Math.random() < 0.5 && infRun && infRun.keys < INF_KEY_CAP && addInfKey('wildcard');
-        if (!key) addRacePoints(COSMIC_SCRAMBLE_WIN);
+        const key = Math.random() < 0.5 && (cosmicDaily || (infRun && infRun.keys < INF_KEY_CAP)) && cosmicKey();
+        if (!key) cosmicPts(COSMIC_SCRAMBLE_WIN);
         sfx.correct(); sfx.coins(6);
         done('✨ ' + word + '! ' + (key ? '🔑 +1 key' : '+' + COSMIC_SCRAMBLE_WIN + ' points'));
       } else {
@@ -14193,8 +14379,8 @@
   }
   function cosmicRiddle(st, done){
     const pool = INFINITY_RIDDLES.filter(r=> !r.hard), rd = pool.length ? pick(pool) : null;
-    if (!rd){ addRacePoints(10); done('+10 points'); return; }
-    const stake = Math.min(COSMIC_RIDDLE_STAKE, Math.max(0, infRun ? infRun.score : 0)), ms = dt(COSMIC_RIDDLE_MS);
+    if (!rd){ cosmicPts(10); done('+10 points'); return; }
+    const stake = Math.min(COSMIC_RIDDLE_STAKE, Math.max(0, cosmicDaily ? runScore : infRun ? infRun.score : 0)), ms = dt(COSMIC_RIDDLE_MS);
     const opts = shuffle([rd.a].concat(rd.wrong));
     st.innerHTML = '<div class="cz-title">DOUBLE OR NOTHING</div><div class="cz-line">' + (stake ? 'Your ' + stake + ' points ride on this: right doubles them, wrong loses them.' : 'A free shot: right = +' + COSMIC_RIDDLE_STAKE + ' points.') + '</div>' +
       '<div class="cz-timer" style="--t:' + (ms / 1000) + 's"><i></i></div><div class="cz-q"></div><div class="cz-opts">' + opts.map(()=> '<button class="cz-opt" type="button"></button>').join('') + '</div>';
@@ -14207,7 +14393,7 @@
       const right = pickedBtn && pickedBtn.textContent === rd.a;
       if (pickedBtn && !right) pickedBtn.classList.add('wrong');
       { const rb = btns.find(b=> b.classList.contains('right')); if (right && rb){ FX.burstAt(showFx, rb, { count:14, spread:100, shapes:['star', 'coin'] }); FX.pop(rb, 1.1); } }
-      if (right){ const win = stake || COSMIC_RIDDLE_STAKE; addRacePoints(win); sfx.correct(); sfx.coins(6); done('🧩 ' + (stake ? 'Doubled! +' + win + ' points' : 'Right! +' + win + ' points')); }
+      if (right){ const win = stake || COSMIC_RIDDLE_STAKE; cosmicPts(win); sfx.correct(); sfx.coins(6); done('🧩 ' + (stake ? 'Doubled! +' + win + ' points' : 'Right! +' + win + ' points')); }
       else { const lost = cosmicPenalty(stake); sfx.revealLose(); done('🧩 ' + (pickedBtn ? 'Not quite' : 'Time’s up') + ' — it was ' + rd.a + (lost ? '. −' + lost + ' points' : '')); }
     };
     btns.forEach(b=> b.addEventListener('click', e=>{ e.stopPropagation(); end(b); }));
@@ -14217,6 +14403,8 @@
     setTimeout(()=>{
       els.eventOverlay.classList.add('hidden');
       els.eventOverlay.classList.remove('coin-mode', 'coin-won', 'coin-lost', 'gift-mode');
+      els.eventOverlay.classList.remove('daily-gift');
+      if (cosmicDaily){ const d = cosmicDaily; cosmicDaily = null; d(); return; }
       scheduleNext(0);
     }, 1100);
   }
@@ -14451,6 +14639,7 @@
       hostSayNow: (t, ms) => hostSay(t, ms),
       showQuizNow: (riddle) => { runActive = true; runPhase = 'running'; runTriviaQuestion(null, null, { t:'quiz', riddle: !!riddle, subject:'science', seed: 12345 }); return window.__debugLastTriviaQ; },
       showPlan: (date) => buildShowPlan(date || runStartDate || todayStr()),
+      mysteryGames: (date) => pickMysteryGames(date),
       showReadout: () => { els.finOverlay.classList.add('hidden'); showRunReadout(); return !!runResultToday; },
       setResult: (o) => { runResultToday = Object.assign({}, runResultToday || { date: todayStr(), rule: SAVE_RULE, savedAt: Date.now(), score: 0, triviaCorrect: 0, triviaTotal: 0, solved: false, solveMs: null, word: 'LAUNCH', personalityType: 'fence_sitter', unlocked: [] }, o); return runResultToday; },
       comboVerdict: (w, base) => { comboOnVerdict(!!w, base || 1); return { streak: runMatchStreak, mult: comboMult(runMatchStreak), bonus: runComboBonus, bank: runComboBank, score: runScore }; },
@@ -14938,6 +15127,7 @@
     function replayTeardown(){
       returnToModeSelect({ silent:true });
       runResultToday = null; clearRunSnapshot();
+      dailyScanDone = null; cosmicDaily = null; try{ closeGuessRound(); }catch(e){}
       showCard.classList.add('hidden'); showCard.innerHTML = '';
       document.getElementById('showSay').classList.remove('on');
     }
@@ -14992,7 +15182,9 @@
       { label:'Act 1 card', go: actCard(0) },
       { label:'VS card', go: atType(s=> s.t === 'vs', 0, 12, 0) },
       { label:'Brain Beam', go: atType(s=> s.t === 'quiz', 0, 24, 0) },
-      { label:'Riddle', go: atType(s=> s.t === 'quiz', 0, 24, 0, (i)=>{ runPlan[i] = Object.assign({}, runPlan[i], { riddle:true }); }) },
+      { label:'Riddle', go: mysteryAs('riddle') },
+      { label:'Crowd Scan', go: mysteryAs('crowdScan') },
+      { label:'Cosmic Surprise', go: atType(s=> s.t === 'vs', 0, 30, 1, (i)=>{ runPlan.splice(i, 0, { t:'cosmic', act:0, seed:7 }); }) },
       { label:'Commercial', go: atType(s=> s.t === 'ad', 0, 70, 2) },
       { label:'Act 2 card', go: actCard(2) },
       { label:'Portal Pick', go: atType(s=> s.t === 'portal', 0, 96, 3) },
