@@ -124,6 +124,8 @@
   .score-pill .sp-chips{ align-items:center; } .score-pill .sp-chips em{ font-style:normal; font-size:11px; margin-right:1px; }
   .score-pill .sp-keys.done b{ color:#ff9ad1; text-shadow:0 0 8px #ff3cac; }
   @keyframes keyPop{ 0%{ transform:scale(1); } 40%{ transform:scale(1.7); color:#fff6c2; } 100%{ transform:scale(1); } }
+  .score-pill .sp-act{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:13px; letter-spacing:0.6px; white-space:nowrap; color:#2a1300; }
+  .score-pill .sp-act.hot{ color:#d81b60; }
   .score-pill .sp-clock.low #infClock, .score-pill .sp-clock.low #dailyClock{ color:#ffe066; animation: runTimerPulse 0.8s ease-in-out infinite; }
   .pill-row{ position:relative; }
   .inf-milestone{ position:absolute; left:50%; top:100%; z-index:20; pointer-events:none; white-space:nowrap; opacity:0;
@@ -1516,6 +1518,52 @@
      the game after the results closed). */
   .personality-overlay:not(.show) *, .levelup-overlay:not(.show) *{ pointer-events:none !important; }
   .personality-inner{ text-align:center; max-width:340px; animation: popIn 0.5s cubic-bezier(.2,1.4,.4,1); }
+  /* The episode's results (refs/results.jpg): a bulb-framed purple stage, the ribbon, the
+     score panel, three cards, the Tomorrow on FlipStax board. Only in .ep (Daily). */
+  .ep-results{ display:none; }
+  #readoutOverlay.ep{ padding:calc(10px + env(safe-area-inset-top)) 12px calc(10px + env(safe-area-inset-bottom)); align-items:flex-start; overflow-y:auto; background:#2a0b4e; }
+  #readoutOverlay.ep::before{ content:''; position:fixed; inset:6px; z-index:0; pointer-events:none; border-radius:26px; border:10px solid transparent;
+    background:radial-gradient(circle, #fff6c4 0 3px, #ffd23f 3.5px, transparent 4.5px) 0 0/16px 16px border-box;
+    -webkit-mask:linear-gradient(#000 0 0) border-box, linear-gradient(#000 0 0) padding-box; -webkit-mask-composite:xor; mask-composite:exclude;
+    box-shadow:inset 0 0 0 2px rgba(255,210,63,0.5); animation:eprBulbs 1.6s steps(2) infinite; }
+  @keyframes eprBulbs{ 50%{ background-position:8px 0; } }
+  #readoutOverlay.ep .personality-inner{ position:relative; z-index:1; max-width:380px; width:100%; margin:auto; padding:10px 8px 6px; }
+  #readoutOverlay.ep .personality-inner > *:not(.ep-results):not(.solve-buttons):not(.readout-unlocks):not(.readout-support){ display:none !important; }
+  #readoutOverlay.ep .ep-results{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .epr-ribbon{ position:relative; display:flex; flex-direction:column; align-items:center; margin-top:6px; }
+  .epr-tab{ font:900 15px/1 var(--f-display); letter-spacing:1.5px; color:#3a1a00; padding:5px 16px 4px; border-radius:8px 8px 0 0; background:linear-gradient(180deg, var(--gold-1), var(--gold-2)); }
+  .epr-ribbon b{ font:900 clamp(28px, 9.4vw, 40px)/1 var(--f-display); letter-spacing:0.5px; padding:8px 16px; border-radius:8px; border:3px solid var(--gold-2);
+    background:linear-gradient(180deg, #5a1a8f, #3a0d66); color:#ffe27a; text-shadow:0 3px 0 #8a4a00, 0 0 16px rgba(255,210,63,0.6); box-shadow:0 6px 0 #1c0636, 0 10px 22px rgba(0,0,0,0.45); }
+  .epr-score{ width:100%; padding:10px 12px 10px; border-radius:16px; border:4px solid var(--gold-2); background:#2a0b4e; box-shadow:0 0 0 3px #7a4a00 inset, 0 10px 24px rgba(0,0,0,0.45); }
+  .epr-label{ display:block; font:900 16px/1 var(--f-display); letter-spacing:2px; color:#ffd23f; }
+  .epr-score > b{ display:block; font:900 clamp(52px, 17vw, 72px)/1 var(--f-display); color:#ffe27a; text-shadow:0 4px 0 #8a4a00, 0 0 20px rgba(255,210,63,0.55); font-variant-numeric:tabular-nums; }
+  .epr-break{ display:grid; grid-template-columns:1fr auto; gap:2px 10px; margin-top:6px; font:700 12.5px/1.3 var(--f-body); color:#e9dcff; text-align:left; }
+  .epr-break b{ font-weight:900; color:#fff; text-align:right; font-variant-numeric:tabular-nums; }
+  .epr-break .roll{ color:#7df9ff; } .epr-break .roll b{ color:#7df9ff; }
+  .epr-cards{ display:grid; grid-template-columns:1fr 1.1fr 1fr; gap:8px; width:100%; align-items:stretch; }
+  .epr-card{ display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:4px; padding:8px 6px 6px; border-radius:12px; min-width:0;
+    border:2px solid var(--gold-2); background:linear-gradient(180deg, #4a1680, #2c0b52); box-shadow:0 6px 14px rgba(0,0,0,0.4); }
+  .epr-card.pers{ border-width:3px; background:linear-gradient(180deg, #ffe27a, #d99a1a); padding:6px; transform:translateY(-4px); }
+  .ec-h{ font:900 14px/1 var(--f-display); color:#fff; text-transform:uppercase; }
+  .epr-card.pers .ec-h{ color:#3a1a00; }
+  .ec-star, .ec-fire{ font-size:40px; line-height:1; filter:drop-shadow(0 3px 0 rgba(0,0,0,0.3)); }
+  .ec-what{ font:700 11px/1.2 var(--f-body); color:#e9dcff; }
+  .ec-foot{ font:900 12px/1 var(--f-display); letter-spacing:0.5px; color:#ffd23f; }
+  .epr-card.pers .ec-foot{ color:#3a1a00; font-size:10px; }
+  .ec-art{ width:100%; aspect-ratio:3/4; border-radius:8px; overflow:hidden; background:#3a0d66; display:flex; align-items:center; justify-content:center; }
+  .ec-art img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .ec-art .cc-stand{ display:flex; flex-direction:column; align-items:center; } .ec-art .cs-icon{ font-size:40px; } .ec-art .cs-soon, .ec-art .cs-name{ display:none; }
+  .epr-tomorrow{ display:flex; flex-direction:column; align-items:center; width:100%; }
+  .et-h{ font:900 15px/1 var(--f-display); letter-spacing:1px; color:#fff; padding:6px 14px 4px; border-radius:10px 10px 0 0; background:#3a0d66; border:2px solid var(--gold-2); border-bottom:0; }
+  .et-board{ display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; padding:8px 12px; border-radius:14px; border:3px solid var(--gold-2); background:#1c0636;
+    box-shadow:0 0 0 4px #1c0636, 0 0 0 6px rgba(255,210,63,0.55); }
+  .et-board b{ font:900 24px/1 var(--f-display); color:#fff3dd; }
+  .et-clock{ font:700 24px/1 'Courier New', monospace; letter-spacing:1px; color:#7dff9e; background:#000; padding:6px 8px; border-radius:6px; text-shadow:0 0 8px rgba(125,255,158,0.7); font-variant-numeric:tabular-nums; }
+  .et-tease{ margin-top:6px; font:700 12px/1.3 var(--f-body); color:#e9dcff; }
+  #readoutOverlay.ep .solve-buttons{ margin-top:10px !important; }
+  #readoutOverlay.ep #readoutShare{ flex:2; font-family:var(--f-display); font-size:20px; letter-spacing:0.5px; }
+  @media (max-height:700px){ .epr-score > b{ font-size:48px; } .ec-star, .ec-fire{ font-size:30px; } .epr-ribbon b{ font-size:28px; } }
+  @media (prefers-reduced-motion: reduce){ #readoutOverlay.ep::before{ animation:none; } }
   .personality-mask{ font-size:52px; }
   .readout-stack{ line-height:0; filter:drop-shadow(0 0 14px rgba(157,95,214,0.55)); }
   .personality-eyebrow{ color:#b98bf0; font-size:12px; font-weight:700; letter-spacing:0.6px; margin-top:4px; }
@@ -2409,6 +2457,64 @@
   @keyframes scFlash{ 0%{ opacity:0; } 12%{ opacity:0.85; } 30%{ opacity:0.2; } 45%{ opacity:0.6; } 100%{ opacity:0; } }
   @media (prefers-reduced-motion: reduce){ .show-card .sc-title, .sc-name, .sc-tap{ animation:none; } .sc-flash{ animation:none; display:none; } }
   @media (max-height:660px){ .show-card .sc-title{ font-size:44px; } .sc-host{ width:56px; height:64px; } .show-card .sc-inner{ gap:9px; } .sc-rules{ font-size:13px; } }
+  /* The cold open (DIRECTION.md): red velvet curtain, the EPISODE plate, the curtain parts,
+     FLIPSTAX lights up letter by letter on a marquee, the host slides in, three cue cards fan out. */
+  .show-card.curtain{ background:radial-gradient(120% 80% at 50% 40%, #3a0d1c, #12030a 70%); overflow:hidden; }
+  .co-drape{ position:absolute; top:0; bottom:0; width:51%; z-index:5; pointer-events:none;
+    background:repeating-linear-gradient(90deg, #7a0a1e 0 14px, #b0122e 14px 30px, #8c0c22 30px 40px, #5c0716 40px 52px);
+    box-shadow:inset 0 -40px 60px rgba(0,0,0,0.5), 0 0 30px rgba(0,0,0,0.6); transition:transform 1.4s cubic-bezier(.6,0,.3,1); }
+  .co-drape.l{ left:0; transform-origin:left; } .co-drape.r{ right:0; transform-origin:right; }
+  .co-valance{ position:absolute; left:0; right:0; top:0; height:58px; z-index:6; pointer-events:none;
+    background:linear-gradient(180deg, #5c0716, #a3102b 60%, #6e0a1b); border-bottom:4px solid var(--gold-2); box-shadow:0 6px 18px rgba(0,0,0,0.5); }
+  .co-plate{ position:absolute; z-index:7; top:42%; left:50%; transform:translate(-50%, -50%); font:900 22px/1 var(--f-display); letter-spacing:4px; color:#3a1a00; padding:12px 22px;
+    border-radius:10px; border:3px solid #fff3c4; background:linear-gradient(180deg, var(--gold-1), var(--gold-2) 50%, var(--gold-3)); box-shadow:0 8px 24px rgba(0,0,0,0.55); transition:opacity .4s, transform .4s; }
+  .curtain.open .co-drape.l{ transform:translateX(-92%) scaleX(0.6); }
+  .curtain.open .co-drape.r{ transform:translateX(92%) scaleX(0.6); }
+  .curtain.open .co-plate{ opacity:0; transform:translate(-50%, -80%) scale(0.8); }
+  .curtain .sc-inner{ gap:16px; }
+  .co-marquee{ display:flex; gap:4px; padding:12px 14px; border-radius:14px; background:#1a0610; border:3px solid var(--gold-2);
+    box-shadow:0 0 0 3px #1a0610, 0 0 26px rgba(255,190,40,0.35); }
+  .co-marquee b{ font:900 clamp(34px, 11vw, 50px)/1 var(--f-display); color:#4a2a1a; text-shadow:none; transition:color .18s, text-shadow .18s; }
+  .co-marquee b.on{ color:#fffbe0; text-shadow:0 0 10px #ffd23f, 0 0 26px rgba(255,160,40,0.9); }
+  .co-host{ width:80px; height:90px; transform:translateX(130vw); transition:transform .7s cubic-bezier(.3,1.4,.5,1); }
+  .curtain.host .co-host{ transform:none; }
+  .co-cards{ position:relative; height:120px; width:300px; }
+  .co-cards span{ position:absolute; left:50%; bottom:0; width:96px; height:116px; margin-left:-48px; display:flex; align-items:center; justify-content:center; text-align:center;
+    font:900 17px/1.05 var(--f-display); color:#2a1030; padding:8px; border-radius:10px; background:linear-gradient(180deg, #fffdf2, #f3e6c4); border:3px solid #fff;
+    box-shadow:0 8px 18px rgba(0,0,0,0.5); transform-origin:50% 120%; transform:scale(0.4); opacity:0; transition:transform .5s var(--ease-pop), opacity .3s; }
+  .co-cards span.q{ font-size:54px; color:#ff3c9d; }
+  .curtain.fan .co-cards span{ opacity:1; }
+  .curtain.fan .co-cards span:nth-child(1){ transform:translateX(-96px) rotate(-14deg); }
+  .curtain.fan .co-cards span:nth-child(2){ transform:translateY(-16px); transition-delay:.12s; z-index:2; }
+  .curtain.fan .co-cards span:nth-child(3){ transform:translateX(96px) rotate(14deg); transition-delay:.24s; }
+  /* One host per screen: the corner host steps out while the curtain or a cue card is up. */
+  :root:has(.show-card.curtain:not(.hidden)) .show-host, :root:has(.show-card.cue:not(.hidden)) .show-host{ display:none !important; }
+  .co-skip{ position:absolute; z-index:8; right:16px; bottom:calc(18px + env(safe-area-inset-bottom)); font:800 12px var(--f-body); letter-spacing:2px; color:rgba(255,255,255,0.75); }
+  /* The act cue card (reusable): the host holds up a card that flips in, over a colour sweep in the act's world. */
+  .show-card.cue{ background:transparent; overflow:hidden; }
+  .cue-sweep{ position:absolute; inset:0; z-index:0; transform:translateX(-101%); animation:cueSweep 1.5s cubic-bezier(.7,0,.3,1) forwards; }
+  @keyframes cueSweep{ 0%{ transform:translateX(-101%); } 22%{ transform:none; } 82%{ transform:none; } 100%{ transform:translateX(101%); } }
+  .cue-hold{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; perspective:700px; }
+  .cue-card{ position:relative; width:min(300px, 80vw); padding:18px 16px 20px; border-radius:16px; background:linear-gradient(180deg, #fffdf2, #f1e3bd); border:4px solid #fff;
+    box-shadow:0 14px 30px rgba(0,0,0,0.5); color:#2a1030; transform:rotateY(-90deg); animation:cueFlip .5s .15s var(--ease-pop) forwards; }
+  @keyframes cueFlip{ to{ transform:rotateY(0deg) rotate(-2deg); } }
+  .cue-card .cc-sub{ font:800 13px var(--f-body); letter-spacing:3px; color:#a3102b; }
+  .cue-card .cc-title{ margin-top:6px; font:900 clamp(38px, 12vw, 54px)/0.95 var(--f-display); text-transform:uppercase; }
+  .cue-host{ width:70px; height:80px; margin-top:-14px; z-index:3; }
+  .cue-out .cue-card, .cue-out .cue-host{ transition:transform .25s ease-in, opacity .25s; transform:translateY(40px) scale(0.9); opacity:0; }
+  /* The commercial break: a 3-second fake 70s ad with a VHS wobble. Skippable. */
+  .show-card.ad{ background:#000; overflow:hidden; }
+  .ad-screen{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+    background:linear-gradient(160deg, var(--ad1), var(--ad2)); animation:vhsWobble .22s steps(2) infinite; }
+  .ad-screen::after{ content:''; position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg, rgba(0,0,0,0.16) 0 2px, transparent 2px 4px); }
+  @keyframes vhsWobble{ 0%{ transform:translateX(0) skewX(0); filter:saturate(1.3); } 50%{ transform:translateX(2px) skewX(-0.6deg); } 100%{ transform:translateX(-1px); } }
+  .ad-glyph{ font-size:84px; filter:drop-shadow(0 6px 0 rgba(0,0,0,0.25)); animation:adBob .8s ease-in-out infinite alternate; }
+  @keyframes adBob{ to{ transform:translateY(-8px) rotate(4deg); } }
+  .ad-brand{ font:900 clamp(40px, 13vw, 58px)/0.95 var(--f-display); color:#fff; text-shadow:4px 4px 0 rgba(0,0,0,0.35); padding:0 14px; }
+  .ad-line{ font:800 italic 20px/1.2 var(--f-body); color:#fff; text-shadow:2px 2px 0 rgba(0,0,0,0.35); padding:0 20px; }
+  .ad-tag{ position:absolute; top:calc(16px + env(safe-area-inset-top)); left:16px; font:800 11px var(--f-body); letter-spacing:2px; color:#fff; background:rgba(0,0,0,0.45); padding:4px 8px; border-radius:6px; }
+  .ad-skip{ position:absolute; right:16px; bottom:calc(18px + env(safe-area-inset-bottom)); font:800 12px var(--f-body); letter-spacing:2px; color:#fff; background:rgba(0,0,0,0.45); padding:6px 10px; border-radius:8px; }
+  @media (prefers-reduced-motion: reduce){ .co-drape, .co-host, .co-cards span{ transition:none; } .cue-sweep{ animation:none; transform:none; } .cue-card{ animation:none; transform:none; } .ad-screen, .ad-glyph{ animation:none; } }
   /* B9: the tapped answer / door rattles while the drumroll plays. */
   .event-tile.picked-wait{ animation:tileRattle 0.12s linear infinite !important; box-shadow:var(--tile-depth), 0 0 0 4px #fff3c4, 0 0 18px rgba(255,240,180,0.8); }
   @keyframes tileRattle{ 0%, 100%{ transform:rotate(0); } 25%{ transform:rotate(-1.5deg); } 75%{ transform:rotate(1.5deg); } }
@@ -3727,6 +3833,21 @@
 <div class="personality-overlay" id="readoutOverlay">
   <div class="bg w-results warp-bg" aria-hidden="true"><i class="rays"></i><i class="glow"></i></div>
   <div class="personality-inner">
+    <!-- The episode's results (DIRECTION.md, style-board/refs/results.jpg): the ribbon, the final
+         score counting up, the breakdown, three cards and the Tomorrow on FlipStax tease. -->
+    <div class="ep-results" id="epResults">
+      <div class="epr-ribbon"><span class="epr-tab">FLIPSTAX</span><b>CONGRATULATIONS!</b></div>
+      <div class="epr-score"><span class="epr-label">FINAL SCORE</span><b id="eprScore">0</b>
+        <div class="epr-break" id="eprBreak"></div></div>
+      <div class="epr-cards">
+        <div class="epr-card best"><span class="ec-h">YOUR BEST<br>MOMENT</span><span class="ec-star" aria-hidden="true">⭐</span><span class="ec-what" id="eprBest"></span><span class="ec-foot" id="eprBestPts"></span></div>
+        <div class="epr-card pers"><span class="ec-h" id="eprPersName"></span><span class="ec-art" id="eprPersArt" aria-hidden="true"></span><span class="ec-foot">TODAY'S PERSONALITY</span></div>
+        <div class="epr-card streak"><span class="ec-h" id="eprStreakH"></span><span class="ec-fire" aria-hidden="true">🔥</span><span class="ec-what" id="eprStreakNote"></span><span class="ec-foot" id="eprStreakFoot"></span></div>
+      </div>
+      <div class="epr-tomorrow"><span class="et-h">TOMORROW ON FLIPSTAX</span>
+        <div class="et-board"><b id="eprNextEp"></b><span class="et-clock" id="eprCountdown" aria-label="Time until the next episode">00:00:00</span></div>
+        <span class="et-tease" id="eprTease"></span></div>
+    </div>
     <img class="ro-shareimg" id="readoutShareImg" alt="">
     <div class="readout-secret hidden" id="readoutSecret">YOU DISCOVERED THE SUPER SECRET RIDDLE!!!</div>
     <div class="readout-riddler hidden" id="readoutRiddler" aria-label="The Secret Riddler">
@@ -3868,6 +3989,8 @@
 <script src="data/oddball-alert.js"></script>
 <script src="data/emoji-decode.js"></script>
 <script src="data/time-warp.js"></script>
+<script src="data/rundown.js"></script>
+<script src="data/beam-levels.js"></script>
 <script src="lib/orbit-physics.js"></script>
 <script src="lib/host-alien.js"></script>
 <script src="lib/show-fx.js"></script>
@@ -4790,7 +4913,7 @@
   // is 4 steps, one per portal - about 1 run in 256 by luck alone.
   const SECRET_UNLOCK_SEQUENCE = ['slowclock', 'points10', 'wildcard', 'hint'];
   const PERFECT_RUN_BONUS = 15;   // points for getting the first six Brain Beams (one per letter) all right
-  const MAX_EARNED_LETTERS = 4;   // letters the Brain Beams can earn; the Word Warp word is still RUN_WORD_LENGTH (6), so the player works out the rest
+  const MAX_EARNED_LETTERS = 6;   // one letter per rundown Brain Beam (six in an episode): the Word Warp word is RUN_WORD_LENGTH (6)
   const EXTRA_BEAM_POINTS = 10;   // a right Brain Beam after the letter cap pays this many points instead
   // ---------- Daily as a game show (B2, Oct 2026) ----------
   // A run is an episode: a cold open with the host, then SHOW_ROUNDS rounds,
@@ -4837,28 +4960,86 @@
   // 2, ... are further passes, each reshuffled from the date's seed (so it is
   // the same for everyone on a given day) - until the run clock reaches zero
   // (see showAdvance). Round numbers keep counting up across passes.
-  function buildShowPlan(date, cycle){
-    cycle = cycle || 0;
-    const rng = mulberry32(hashStr('flipstax-show-' + date + (cycle ? '-' + cycle : '')));
-    const subjects = shuffle(RUN_CORE_SUBJECTS.concat([pick(RUN_ELECTIVE_SUBJECTS, rng)]), rng);
-    const riddleAt = rng() < SHOW_RIDDLE_CHANCE ? 1 + Math.floor(rng() * (SHOW_ROUNDS - 1)) : -1;
-    const steps = [], breakOrder = breakOrderFor(date, cycle);
-    for (let r = 0; r < SHOW_ROUNDS; r++){
-      const round = cycle * SHOW_ROUNDS + r;
-      steps.push({ t:'bumper', round, riddle: r === riddleAt });
-      steps.push({ t:'vs', n: showRange(SHOW_VS_BEFORE, rng) });
-      steps.push({ t:'quiz', round, riddle: r === riddleAt, subject: subjects[r % subjects.length], seed: (rng() * 4294967296) >>> 0 });
-      steps.push({ t:'vs', n: showRange(SHOW_VS_AFTER, rng) });
-      steps.push({ t:'portal', round, doors: shuffle(RUN_POWERUPS.map(p=> p.key), rng) });
-      // The round's Brain Break: one of the four games (see BRAIN_BREAKS), in the
-      // date's own order, so no type repeats within a pass. If a game's data file
-      // didn't load there is no game for the slot, and it is never skipped silently
-      // (a dead moment): it becomes a bonus Brain Beam - every other round a riddle.
-      const game = breakOrder[r], seed = (rng() * 4294967296) >>> 0;
-      if (game) steps.push({ t:'break', round, game, seed });
-      else steps.push({ t:'quiz', round, extra:true, riddle: r % 2 === 1 && r !== riddleAt, subject: subjects[(r + 2) % subjects.length], seed });
-    }
+  // ---------- The episode (DIRECTION.md): one fixed show, run from data/rundown.js ----------
+  // The rundown lists the acts and their steps; buildShowPlan turns it into the day's
+  // plan (the same for everyone on a date: every seed comes from the date). There is no
+  // run clock any more: the show plays its plan through to the Grand Finale.
+  const RUNDOWN = (window.FLIPSTAX_RUNDOWN && Array.isArray(window.FLIPSTAX_RUNDOWN.acts)) ? window.FLIPSTAX_RUNDOWN : {
+    coldOpen: { firstMs: 12000, returningMs: 3000 },
+    acts: [
+      { id:'act1', title:'THE OPENER', sub:'ACT 1', mult:1, vsTimerMs:7000, world:'vs', steps:[ { vs:5 }, { beam:'easy' }, { vs:4 }, { mystery:1 }, { beam:'easy' } ] },
+      { ad:true },
+      { id:'act2', title:'DOUBLE TROUBLE', sub:'ACT 2 · POINTS x2', mult:2, vsTimerMs:7000, world:'powerup', steps:[ { vs:5 }, { beam:'medium' }, { portal:true }, { vs:4 }, { mystery:2 }, { beam:'medium' } ] },
+      { id:'act3', title:'LIGHTNING ROUND', sub:'ACT 3 · POINTS x3', mult:3, vsTimerMs:5000, world:'jumble', steps:[ { vs:6 }, { beam:'hard' }, { beam:'hard' }, { lucky:true } ] },
+      { id:'finale', title:'GRAND FINALE', sub:'PLAY FOR THE GRAND PRIZE', mult:1, world:'results', steps:[ { wordWarp:true }, { orbitDrop:true } ] },
+    ],
+    mystery: { pool: [ { game:'emojiDecode', weight:2 }, { game:'priceProbe', weight:1, price:true }, { game:'timeWarp', weight:1 }, { game:'oddballAlert', weight:1 } ] },
+    cosmicSurpriseChance: 0,
+    commercial: { ms:3000, ads:[ { brand:'GLORP COLA', line:'Tastes like tomorrow!', glyph:'🥤', colors:['#ff3c9d', '#ffd23f'] } ] },
+  };
+  const ACT_DEFAULT_VS_MS = 7000;
+  function seedOf(rng){ return (rng() * 4294967296) >>> 0; }
+  // The day's two Mystery Games (see pickMysteryGames).
+  function showMysteryGames(date){ return pickMysteryGames(date); }
+  function pickMysteryGames(date){
+    const avail = availableBreakKeys();
+    const rng = mulberry32(hashStr('flipstax-mystery-' + date));
+    const pool = shuffle(avail, rng);
+    return [pool[0] || null, pool[1] || pool[0] || null];
+  }
+  function showAd(date){
+    const ads = (RUNDOWN.commercial && RUNDOWN.commercial.ads) || [];
+    return ads.length ? ads[hashStr('flipstax-ad-' + date) % ads.length] : null;
+  }
+  function buildShowPlan(date){
+    const rng = mulberry32(hashStr('flipstax-show-' + date));
+    const mystery = showMysteryGames(date);
+    const steps = [];
+    RUNDOWN.acts.forEach((act, ai)=>{
+      if (act.ad){ steps.push({ t:'ad', ad: showAd(date) }); return; }
+      steps.push({ t:'act', act:ai, title:act.title, sub:act.sub || '', world:act.world || 'vs', finale: act.id === 'finale' });
+      (act.steps || []).forEach(s=>{
+        if (s.vs) steps.push({ t:'vs', n:s.vs, act:ai });
+        else if (s.beam) steps.push({ t:'quiz', beam:true, level:s.beam, act:ai, seed:seedOf(rng) });
+        else if (s.mystery) steps.push({ t:'mystery', k:s.mystery, game:mystery[s.mystery - 1], act:ai, seed:seedOf(rng) });
+        else if (s.portal) steps.push({ t:'portal', act:ai, doors: shuffle(RUN_POWERUPS.map(p=> p.key), rng) });
+        else if (s.lucky) steps.push({ t:'lucky', act:ai, seed:seedOf(rng) });
+        else if (s.wordWarp) steps.push({ t:'finale', act:ai });
+        // (orbitDrop: the Word Warp's finish opens it - see endRun)
+      });
+    });
     return steps;
+  }
+  // The act the show is in (its multiplier and VS timer).
+  let runActIdx = 0;
+  function runAct(){ return RUNDOWN.acts[runActIdx] || {}; }
+  function runActMult(){ return runActive ? (runAct().mult || 1) : 1; }
+  function runVsTimerMs(){ return runAct().vsTimerMs || ACT_DEFAULT_VS_MS; }
+  // ---------- Brain Beam levels (data/beam-levels.js): easy, medium or hard ----------
+  const BEAM_LEVELS = (()=>{
+    const L = window.FLIPSTAX_BEAM_LEVELS || {}, norm = t=> String(t).toLowerCase().replace(/[^a-z0-9]+/g, '');
+    return { easy: new Set((L.easy || []).map(norm)), hard: new Set((L.hard || []).map(norm)), norm };
+  })();
+  function beamLevelOf(text){ const k = BEAM_LEVELS.norm(text); return BEAM_LEVELS.hard.has(k) ? 'hard' : BEAM_LEVELS.easy.has(k) ? 'easy' : 'medium'; }
+  // Daily's banked questions at a level (any subject), as { subject, set }.
+  function beamPool(level){
+    const banks = { geography:GEOGRAPHY_SETS, english:ENGLISH_SETS, history:HISTORY_SETS, science:SCIENCE_SETS, art:ART_SETS, music:MUSIC_SETS, health:HEALTH_SETS };
+    const out = [];
+    Object.keys(banks).forEach(sub=> (banks[sub].daily || []).forEach(set=>{ if (set.q && beamLevelOf(set.q) === level) out.push({ subject:sub, set }); }));
+    return out;
+  }
+  // A Brain Beam at a level, by the seed, never one already asked this episode.
+  function pickBeamQuestion(level, seed, seen){
+    const pool = beamPool(level);
+    for (let k = 0; k < 80 && pool.length; k++){
+      const rng = mulberry32((seed + k * 7919) >>> 0), it = pool[Math.floor(rng() * pool.length)];
+      if (seen(it.set.q)) continue;
+      const opts = shuffle([it.set.correct].concat(it.set.wrongs), rng);
+      return { category: it.subject, question: it.set.q, opts, correctIdx: opts.indexOf(it.set.correct) };
+    }
+    // (none left at that level, or medium: the generated maths questions)
+    for (let k = 0; k < 40; k++){ const q = generateSubjectTrivia('math', 'daily', mulberry32((seed + k * 104729) >>> 0)); if (!seen(q.question)) return q; }
+    return generateSubjectTrivia('math', 'daily', null);
   }
   // The title on a round's bumper card: a show-style name (data/game-names.js roundTitles), not a game's name.
   const ROUND_TITLES = (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.roundTitles) || {};
@@ -8320,7 +8501,7 @@
       deck: deck.cards.slice(deck.next).map(c=> c.id),
       show: runShow, doors: runPortalDoors, warpBonus: runWarpBonusMs,
       combo: { streak: runMatchStreak, bank: runComboBank, bonus: runComboBonus, best: runBestStreak },
-      letterPos: runLetterPos, tray: runTrayMarks,
+      letterPos: runLetterPos, tray: runTrayMarks, act: runActIdx, actPts: runActPts, best: runBestMoment,
     };
     try{ localStorage.setItem(RUN_LIVE_KEY, JSON.stringify(snap)); }catch(e){}
   }
@@ -8415,7 +8596,7 @@
       const tray = Array.from({ length: RUN_WORD_LENGTH }, (_, i)=>{ const m = runTrayMarks[i];
         return '<i data-t="' + i + '"' + (m ? ' class="' + m + (m === 'got' && trayIncoming.has(i) ? ' incoming' : '') + '"' : '') + '>' + (m === 'got' ? '?' : m === 'miss' ? '✕' : '') + '</i>'; }).join('');
       els.runBanner.innerHTML = '<span class="sp-mode">\uD83C\uDFAE</span><span class="sp-label">Points</span><b class="sp-num">' + shownScore(runScore) + '</b>' +
-        '<span class="sp-sep">\u00B7</span><span class="sp-clock">\u23F1\uFE0F<span id="dailyClock"></span></span>' +
+        '<span class="sp-sep">\u00B7</span><span class="sp-act" id="dailyClock"></span>' +
         '<span class="sp-sep">\u00B7</span><span class="sp-tray" id="letterTray" aria-label="Word Warp letters: ' + runLetters.length + ' of ' + RUN_WORD_LENGTH + '">' + tray + '</span>' + streakTag;
       renderDailyClock();
     } else {
@@ -9061,7 +9242,7 @@
     runPendingTrivia = false; runPendingPowerUp = false;
     runStartDate = todayStr();
     runWord = dailyWordForPlayer();
-    runPlan = buildShowPlan(runStartDate, 0); runShow = { step:0, left:null, cycle:0 }; runPortalDoors = null; runWarpBonusMs = 0; runBreakSeen = {};
+    runPlan = buildShowPlan(runStartDate); runShow = { step:0, left:null }; runActIdx = 0; runActPts = []; runBestMoment = null; runPortalDoors = null; runWarpBonusMs = 0; runBreakSeen = {};
     runMatchStreak = 0; runComboBank = 0; runComboBonus = 0; runBestStreak = 0; renderComboMeter();
     runLetterPos = []; runWarpPoints = 0; letterIncoming.clear(); runTrayMarks = []; trayIncoming.clear();
     runEndsAt = Date.now() + RUN_DURATION_MS;
@@ -9091,7 +9272,6 @@
     (window.requestIdleCallback || ((f)=> setTimeout(f, 200)))(()=>{ FX.burst(showFx, -40, -40, { count:1, spread:1 }); FX.glowSweep(showFx, document.getElementById('board')); });
     runPhase = 'running';
     runEndsAt = Date.now() + RUN_DURATION_MS + runClockAddedMs;
-    els.runTimerWrap.classList.remove('hidden');
     updateRunTimerBar();
     clearInterval(runTimerInterval);
     runTimerInterval = setInterval(tickRunTimer, 500);
@@ -9122,7 +9302,7 @@
     currentRiddle = snap.riddle >= 0 ? RIDDLES[snap.riddle] : null; riddleEndsAt = snap.riddleEndsAt;
     runSolvedAt = null;
     runClockAddedMs = snap.clockAdded || 0;
-    runShow = snap.show || { step:0, left:null, cycle:0 }; runPlan = buildShowPlan(runStartDate, runShow.cycle || 0); runPortalDoors = snap.doors || null; runWarpBonusMs = snap.warpBonus || 0;
+    runShow = snap.show || { step:0, left:null }; runPlan = buildShowPlan(runStartDate); runActIdx = snap.act || 0; runActPts = Array.isArray(snap.actPts) ? snap.actPts : []; runBestMoment = snap.best || null; runPortalDoors = snap.doors || null; runWarpBonusMs = snap.warpBonus || 0;
     runMatchStreak = (snap.combo && snap.combo.streak) || 0; runComboBank = (snap.combo && snap.combo.bank) || 0; runComboBonus = (snap.combo && snap.combo.bonus) || 0; runBestStreak = (snap.combo && snap.combo.best) || 0;
     renderComboMeter();
     runLetterPos = Array.isArray(snap.letterPos) ? snap.letterPos : runLetters.map((_, k)=> k); runWarpPoints = 0; letterIncoming.clear();
@@ -9145,7 +9325,6 @@
     if (runPhase === 'coldopen'){ saveRunSnapshot(); showColdOpen(beginShow); return; }
     if (runPhase === 'finale-bumper'){ runPhase = 'running'; goToFinale(); return; }
     if (runPhase === 'bumper' || runPhase === 'break') runPhase = 'running';
-    els.runTimerWrap.classList.remove('hidden');
     updateRunTimerBar();
     clearInterval(runTimerInterval);
     runTimerInterval = setInterval(tickRunTimer, 500);
@@ -9185,55 +9364,63 @@
     // (first-half vs second-half scoring pace). Read off the run clock, so
     // paused time doesn't count - this used to be a real-time timer, which
     // fired early whenever the run was paused.
-    if (runScoreAtHalfway == null && runElapsedMs() >= RUN_DURATION_MS / 2) runScoreAtHalfway = runScore;
     saveRunSnapshot();
     // At zero the clock only stops: the card (or question, riddle, Portal
     // Pick) in progress finishes, and the next thing the show would deal is
     // the Word Warp finale instead (see showAdvance).
     updateRunTimerBar();
   }
-  function runClockExpired(){ return (pausedRunRemainingMs != null ? pausedRunRemainingMs : runEndsAt - Date.now()) <= 0; }
+  function runClockExpired(){ return false; }   // (no run clock: the show plays its rundown through)
   // Where the show is: called by loadNextImpl before it deals a VS card.
   // Returns true if it took over (a bumper, a question, a Portal Pick, a
   // Brain Break, the finale) - false means "deal the next VS card".
   function showAdvance(){
-    if (!runPlan) runPlan = buildShowPlan(runStartDate || todayStr(), runShow.cycle || 0);
+    if (!runPlan) runPlan = buildShowPlan(runStartDate || todayStr());
     for (let guard = 0; guard < 99; guard++){
-      // The clock is out: the card that was in progress has finished (we are
-      // between cards), so the show cuts to the Word Warp.
-      if (runClockExpired()){ goToFinale(); return true; }
       const st = runPlan[runShow.step];
-      if (!st){
-        // The pass is done and there is still time: the show repeats, reshuffled by the date's seed.
-        runShow.cycle = (runShow.cycle || 0) + 1; runShow.step = 0; runShow.left = null;
-        runPlan = buildShowPlan(runStartDate || todayStr(), runShow.cycle);
-        continue;
-      }
+      if (!st){ goToFinale(); return true; }   // (the plan always ends at the finale; a safety net)
       if (st.t === 'vs'){
         if (runShow.left == null) runShow.left = st.n;
         if (runShow.left > 0){ runShow.left--; return false; }
         runShow.step++; runShow.left = null; continue;
       }
       runShow.step++; runShow.left = null;
-      if (st.t === 'bumper'){
-        // Too little clock left to play a round: no new title card, straight to the finale.
-        if (runEndsAt - Date.now() < SHOW_NEW_ROUND_MIN_MS / DEBUG_RUN_SCALE){ goToFinale(); return true; }
+      if (st.t === 'act'){
+        // An act opens: the host holds up its cue card; its multiplier and VS timer apply from here.
+        runActIdx = st.act; renderRunBanner();
+        if (runScoreAtHalfway == null && st.act >= 2) runScoreAtHalfway = runScore;   // (for the comeback check: points before Act 2 vs after)
         runPhase = 'bumper'; saveRunSnapshot();
-        showBumper(st, ()=>{ if (!runActive || runPhase !== 'bumper') return; runPhase = 'running'; loadNext(); });
+        showActCard(st, ()=>{ if (!runActive || runPhase !== 'bumper') return; runPhase = 'running'; loadNext(); });
+        return true;
+      }
+      if (st.t === 'ad'){
+        runPhase = 'bumper'; saveRunSnapshot();
+        showCommercial(st.ad, ()=>{ if (!runActive || runPhase !== 'bumper') return; runPhase = 'running'; loadNext(); });
         return true;
       }
       if (st.t === 'quiz'){ runTriviaQuestion(null, null, st); return true; }
       if (st.t === 'portal'){ runPortalDoors = st.doors; runPowerUpRoundForRun(null); return true; }
-      if (st.t === 'break'){
+      if (st.t === 'mystery' || st.t === 'break'){
         runPhase = 'break'; saveRunSnapshot();
-        const t0 = Date.now();
-        // The run clock doesn't count a Brain Break.
-        if (runBrainBreak(st, ()=>{ if (!runActive) return; runEndsAt += Date.now() - t0; runPhase = 'running'; loadNext(); })) return true;
+        if (runMysteryGame(st, ()=>{ if (!runActive) return; runPhase = 'running'; loadNext(); })) return true;
         runPhase = 'running';
         continue;   // (its data turned out unusable: carry on with the show)
       }
+      if (st.t === 'lucky'){
+        runPhase = 'break'; saveRunSnapshot();
+        if (typeof runLuckyLights === 'function' && runLuckyLights(st, ()=>{ if (!runActive) return; runPhase = 'running'; loadNext(); })) return true;
+        runPhase = 'running';
+        continue;
+      }
+      if (st.t === 'finale'){ goToFinale(); return true; }
     }
     return false;
+  }
+  // The day's Mystery Game in its slot.
+  function runMysteryGame(st, done){
+    if (!st.game) return false;
+    runCurrentGame = mysteryName(st.game);
+    return runBrainBreak({ game: st.game, seed: st.seed }, done);
   }
   // Round 5's bumper, then the Word Warp. (Also where the show cuts to if
   // the run clock runs out.)
@@ -9403,14 +9590,23 @@
     ov.style.removeProperty('--bb');
     els.eventTiles.forEach(t=>{ t.style.display = ''; t.classList.remove('is-right', 'is-wrong'); });
   }).observe(els.eventOverlay, { attributes:true, attributeFilter:['class'] });
+  // The Grand Finale: the Word Warp (its cue card has already played - the finale act opens
+  // with one - unless the show is cutting straight here, e.g. from a resume or the TEST menu).
   function goToFinale(){
     if (!runActive || runPhase === 'solving' || runPhase === 'finale-bumper') return;
-    runPhase = 'finale-bumper';
     stopTallyPolling(); clearRoundTimer();
     els.eventOverlay.classList.add('hidden');
     runShow.left = null;
-    saveRunSnapshot();
-    showBumper({ t:'bumper', finale:true }, ()=>{ if (runActive && runPhase === 'finale-bumper') startSolvePhase(); });
+    const fi = RUNDOWN.acts.findIndex(a=> a.id === 'finale');
+    if (fi >= 0 && runActIdx !== fi){
+      runActIdx = fi; renderRunBanner();
+      const a = RUNDOWN.acts[fi];
+      runPhase = 'finale-bumper'; saveRunSnapshot();
+      showActCard({ title:a.title, sub:a.sub, world:a.world, finale:true }, ()=>{ if (runActive && runPhase === 'finale-bumper') startSolvePhase(); });
+      return;
+    }
+    runPhase = 'finale-bumper'; saveRunSnapshot();
+    startSolvePhase();
   }
   // ---------- A face-down "?" tile flies up to the prize track (the letter stays hidden until the Word Warp) ----------
   function flyTrayMark(i, fromEl){ flyLetter('?', i, fromEl); }
@@ -9457,29 +9653,93 @@
 
   // ---------- The cold open and the round bumpers ----------
   const showCard = document.getElementById('showCard');
+  // The cold open (DIRECTION.md): a red velvet curtain with the EPISODE plate; the curtain
+  // parts, FLIPSTAX lights up letter by letter on the marquee, the host slides in and three
+  // cue cards fan out. 12 s the first time, 3 s for a returning player; a tap skips it.
+  const COLD_OPEN_SEEN_KEY = 'flipstax_coldopen_seen_v1';
   function showColdOpen(then){
     const ep = showEpisode(runStartDate || todayStr());
-    showCard.className = 'show-card cold-open bg w-entry';
-    showCard.innerHTML = '<i class="rays"></i><i class="glow"></i><div class="sc-inner">' +
-      '<div class="sc-ep">EPISODE ' + ep + '</div>' +
-      '<div class="sc-title">Tonight on<br>FlipStax!</div>' +
-      '<div class="alien sc-host">' + FX.alienSvg() + '</div>' +
-      '<div class="sc-line">Vote with the crowd, outsmart it, win the vault.</div>' +
-      '<div class="sc-rules">' + Math.round(DAILY_SHOW_SECONDS / 60) + ' minutes of picks, ' + GN.brainBeam + 's and ' + GN.portalPick + 's. Every right answer wins a letter for the ' + GN.wordWarp + ' finale.</div>' +
-      '<div class="sc-tap">Tap to start ▶</div></div>';
+    let seen = false; try{ seen = !!localStorage.getItem(COLD_OPEN_SEEN_KEY); }catch(e){}
+    const co = RUNDOWN.coldOpen || {}, total = seen ? (co.returningMs || 3000) : (co.firstMs || 12000);
+    // The beats, scaled to the length: the curtain parts, the marquee lights, the host, the cards.
+    const k = total / 12000, at = (ms)=> Math.round(ms * (seen ? Math.max(k, 0.25) : k));
+    showCard.className = 'show-card curtain';
+    showCard.innerHTML = '<i class="co-drape l"></i><i class="co-drape r"></i><i class="co-valance"></i>' +
+      '<div class="co-plate">EPISODE ' + ep + '</div>' +
+      '<div class="sc-inner"><div class="co-marquee" aria-hidden="true">' + 'FLIPSTAX'.split('').map(c=> '<b>' + c + '</b>').join('') + '</div>' +
+      '<div class="alien co-host">' + FX.alienSvg() + '</div>' +
+      '<div class="co-cards" aria-hidden="true"><span>VS SHOW&shy;DOWN</span><span class="q">?</span><span>GRAND PRIZE</span></div></div>' +
+      '<div class="co-skip">TAP TO SKIP</div>';
     showCard.classList.remove('hidden');
-    showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'Episode ' + ep + '. Tap to start');
-    if (typeof hostSay === 'function') hostSay('Tonight on FlipStax!', 1800);
+    showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'Episode ' + ep + ' of FlipStax. Tap to skip');
+    const timers = [], later = (ms, f)=> timers.push(setTimeout(f, ms));
+    const letters = showCard.querySelectorAll('.co-marquee b');
+    const rm = prefersReducedMotion();
+    later(rm ? 0 : at(seen ? 900 : 2200), ()=>{ showCard.classList.add('open'); if (sfx.bumper) sfx.bumper(false); });
+    letters.forEach((b, i)=> later(rm ? 0 : at(seen ? 1300 : 3800) + i * at(seen ? 90 : 260), ()=>{ b.classList.add('on'); playTone(523 + i * 66, 0, 0.08, 'triangle', 0.05); }));
+    later(rm ? 0 : at(seen ? 2000 : 6400), ()=>{ showCard.classList.add('host'); });
+    later(rm ? 0 : at(seen ? 2300 : 7600), ()=>{ showCard.classList.add('fan'); playTone(784, 0, 0.1, 'triangle', 0.06); playTone(988, 0.1, 0.1, 'triangle', 0.06); playTone(1319, 0.2, 0.3, 'triangle', 0.06); });
+    let gone = false;
     const shownAt = performance.now();
     const go = (e)=>{
+      if (gone) return;
       if (e && e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
-      if (performance.now() - shownAt < 400) return;   // not the tap that opened it
+      if (e && performance.now() - shownAt < 400) return;   // not the tap that opened it
+      gone = true; timers.forEach(clearTimeout);
+      try{ localStorage.setItem(COLD_OPEN_SEEN_KEY, '1'); }catch(err){}
       showCard.removeEventListener('click', go); document.removeEventListener('keydown', go);
-      showCard.classList.add('hidden'); showCard.innerHTML = '';
+      showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden';
       noteOverlayClosed();
       then();
     };
+    later(total, ()=> go());
     showCard.addEventListener('click', go); document.addEventListener('keydown', go);
+  }
+  // The act cue card (reusable): the host holds up a cue card that flips in over a colour
+  // sweep in the act's world, for about 1.5 s. `st` is { title, sub, world }.
+  function showActCard(st, then){
+    showCard.className = 'show-card cue';
+    showCard.innerHTML = '<i class="cue-sweep bg w-' + (st.world || 'vs') + '"><i class="rays"></i></i>' +
+      '<div class="cue-hold"><div class="cue-card"><div class="cc-sub"></div><div class="cc-title"></div></div>' +
+      '<div class="alien cue-host">' + FX.alienSvg() + '</div></div>';
+    showCard.querySelector('.cc-sub').textContent = st.sub || '';
+    showCard.querySelector('.cc-title').textContent = st.title || '';
+    showCard.removeAttribute('role'); showCard.setAttribute('aria-label', (st.sub ? st.sub + ': ' : '') + (st.title || ''));
+    showCard.classList.remove('hidden');
+    clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
+    if (sfx.bumper) sfx.bumper(!!st.finale);
+    const ms = prefersReducedMotion() ? 1800 : 1500;
+    setTimeout(()=> showCard.classList.add('cue-out'), ms - 250);
+    setTimeout(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; then(); }, ms);
+  }
+  // The commercial break: a 3 s fake 70s ad, skippable. Built as one component (an ad in,
+  // done() out) so a real ad can take its place later.
+  function showCommercial(ad, done){
+    if (!ad){ done(); return; }
+    const ms = (RUNDOWN.commercial && RUNDOWN.commercial.ms) || 3000;
+    showCard.className = 'show-card ad';
+    showCard.innerHTML = '<div class="ad-screen"><div class="ad-glyph"></div><div class="ad-brand"></div><div class="ad-line"></div></div>' +
+      '<div class="ad-tag">WE’LL BE RIGHT BACK</div><div class="ad-skip">SKIP ▶</div>';
+    const scr = showCard.querySelector('.ad-screen');
+    scr.style.setProperty('--ad1', (ad.colors && ad.colors[0]) || '#ff3c9d'); scr.style.setProperty('--ad2', (ad.colors && ad.colors[1]) || '#ffd23f');
+    showCard.querySelector('.ad-glyph').textContent = ad.glyph || '';
+    showCard.querySelector('.ad-brand').textContent = ad.brand || '';
+    showCard.querySelector('.ad-line').textContent = ad.line || '';
+    showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'Commercial break: ' + (ad.brand || '') + '. Tap to skip');
+    showCard.classList.remove('hidden');
+    playTone(392, 0, 0.12, 'square', 0.04); playTone(523, 0.12, 0.12, 'square', 0.04); playTone(659, 0.24, 0.25, 'square', 0.04);
+    const shownAt = performance.now();
+    let gone = false, t = null;
+    const go = (e)=>{
+      if (gone || (e && performance.now() - shownAt < 300)) return;
+      gone = true; clearTimeout(t);
+      showCard.removeEventListener('click', go);
+      showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden';
+      noteOverlayClosed();
+      done();
+    };
+    t = setTimeout(go, ms);
+    showCard.addEventListener('click', go);
   }
   function showBumper(st, then){
     const last = !!st.finale, name = showRoundName(st);
@@ -9508,11 +9768,12 @@
     return lerpColor(TIMER_RED, TIMER_AMBER, pct / 50);
   }
   // The show clock in the HUD pill: M:SS left of the DAILY_SHOW_SECONDS.
+  // (The episode has no clock any more: the HUD shows the act and its multiplier instead.)
   function renderDailyClock(){
     const el = document.getElementById('dailyClock'); if (!el || !runActive) return;
-    const remain = Math.max(0, pausedRunRemainingMs != null ? pausedRunRemainingMs : runEndsAt - Date.now());
-    el.textContent = formatClock(remain * DEBUG_RUN_SCALE);
-    el.parentNode.classList.toggle('low', remain <= 30000 / DEBUG_RUN_SCALE);
+    const a = runAct(), m = a.mult || 1;
+    el.textContent = a.id === 'finale' ? 'FINALE' : (a.sub || '').split(' ')[0] === 'ACT' ? 'ACT ' + (a.sub.split(' ')[1] || '') + (m > 1 ? ' ×' + m : '') : (a.title || '');
+    el.classList.toggle('hot', m > 1);
   }
   function updateRunTimerBar(){
     renderDailyClock();
@@ -9524,6 +9785,9 @@
   }
 
   let runPendingTrivia = false;
+  let runQuizBeam = false;
+  let runBestMoment = null;   // { text, pts } - the run's single biggest win, for the results' "Your best moment"
+  let runActPts = [];   // points won in each act (by its index in the rundown), for the results breakdown   // the question on screen is a rundown Brain Beam (it earns a prize-track tile)
   let runPlan = null, runShow = { step:0, left:null }, runPortalDoors = null, runWarpBonusMs = 0, runQuizPick = null;
   let runMatchStreak = 0, runComboBank = 0, runComboBonus = 0, runBestStreak = 0;
   // B5: earned letters land in the tray at the date's own order of
@@ -9538,10 +9802,23 @@
   // Set when a Daily run ends; cleared when the player starts playing again
   // from mode select. See loadNextImpl and finishDailySession.
   let sessionHalted = false;
+  // What just scored, in a few words (for the results' "Your best moment").
+  function runMomentLabel(){
+    const act = runAct(), inAct = act.mult > 1 ? ' in ' + act.title.toLowerCase().replace(/\b\w/g, c=> c.toUpperCase()) : '';
+    if (runPhase === 'break' && runCurrentGame) return runCurrentGame + inAct;
+    if (runPhase === 'powerup') return GN.portalPick + inAct;
+    if (lastVoteSummary && lastVoteSummary.itemA) return 'Read the crowd on ' + lastVoteSummary.itemA + ' vs ' + lastVoteSummary.itemB;
+    return 'A big pick' + inAct;
+  }
+  let runCurrentGame = null;   // the Mystery Game / Lucky Lights on screen, by name
   function addRunScore(delta){
     if (!runActive) return;
     if (runPhase === 'trivia' || runPhase === 'secondchance' || runPhase === 'solving') return;
+    // Every point won in an act is multiplied by the act's multiplier (DIRECTION.md).
+    if (delta > 0) delta *= runActMult();
     runScore += delta;
+    if (delta > 0) runActPts[runActIdx] = (runActPts[runActIdx] || 0) + delta;
+    if (delta > 0 && (!runBestMoment || delta > runBestMoment.pts)) runBestMoment = { pts: delta, text: runMomentLabel() };
     checkRunMilestones();
     renderRunBanner();
     saveRunSnapshot();
@@ -9610,6 +9887,8 @@
       // (so it is still the same for everyone on a given day), then from
       // another subject if a subject runs dry.
       const seen = text=> runAskedQuestions.indexOf(text) !== -1;
+      // The rundown's Brain Beams come at a level (easy, medium, hard).
+      if (step && step.beam && step.level) q = pickBeamQuestion(step.level, step.seed, seen);
       if (step && step.riddle){
         for (let k = 0; k < 40 && (!q || seen(q.question)); k++) q = showRiddleQuestion((step.seed + k * 7919) >>> 0);
         if (q && seen(q.question)) q = null;
@@ -9626,7 +9905,9 @@
       runAskedQuestions.push(q.question);
     }
     const resolve = second ? resolveSecondChance : resolveRunTrivia;
-    runPendingQ = { question: q.question, opts: q.opts, correctIdx: q.correctIdx, riddle: !!q.riddle };
+    // A Brain Beam from the rundown earns a prize-track tile (right: a hidden letter; wrong: a red X).
+    if (!resumeQ || !second) runQuizBeam = !!(step ? step.beam : (resumeQ && resumeQ.beam));
+    runPendingQ = { question: q.question, opts: q.opts, correctIdx: q.correctIdx, riddle: !!q.riddle, beam: runQuizBeam };
     runPendingQEndsAt = resumeEndsAt || (Date.now() + dt(10000));
     const remain = Math.max(0, runPendingQEndsAt - Date.now());
     if (DEBUG_FAST) window.__debugLastTriviaQ = q;
@@ -9634,8 +9915,8 @@
     els.powerupIcon.classList.add('hidden');
     fitTopChip();
     els.eventSubtitle.textContent = second ? '🔁 SECOND CHANCE · answer right, recover a letter'
-      : q.riddle ? '\uD83E\uDDE9 ' + GN.riddleRound.toUpperCase() + (step && step.extra ? ' \u00B7 BONUS' : '') + ' \u00B7 answer right, ' + (runLetters.length < MAX_EARNED_LETTERS ? 'earn a letter' : '+' + EXTRA_BEAM_POINTS + ' points')
-      : '\uD83E\uDDE0 ' + GN.brainBeam.toUpperCase() + (step && step.extra ? ' \u00B7 BONUS' : '') + ' \u00B7 answer right, ' + (runLetters.length < MAX_EARNED_LETTERS ? 'earn a letter' : '+' + EXTRA_BEAM_POINTS + ' points');
+      : q.riddle ? '🧩 ' + GN.riddleRound.toUpperCase() + (runQuizBeam ? ' · win a prize-track tile' : '')
+      : '🧠 ' + GN.brainBeam.toUpperCase() + (step && step.level ? ' · ' + step.level.toUpperCase() : '') + (runQuizBeam ? ' · win a prize-track tile' : '');
     els.eventPrompt.textContent = q.question; els.eventPrompt.classList.toggle('long', q.question.length > 90);
     runQuizPick = null;
     els.eventTiles.forEach((tileEl,i)=>{
@@ -9689,7 +9970,7 @@
       runTriviaStreak++;
       // The show repeats, so there can be more right answers than letters:
       // once MAX_EARNED_LETTERS letters are in, a right answer pays points instead.
-      const letterLeft = runLetters.length < MAX_EARNED_LETTERS;
+      const letterLeft = runQuizBeam && runLetters.length < MAX_EARNED_LETTERS;
       const pos = letterLeft ? letterOrderFor(runStartDate || todayStr())[runLetters.length] : -1, nextLetter = letterLeft ? runWord.word[pos] : '';
       let trayAt = -1;
       if (letterLeft){
@@ -9711,14 +9992,14 @@
         bannerParts.push('\ud83c\udfc6 PERFECT RUN +' + PERFECT_RUN_BONUS + ' pts');
       }
       els.eventSubtitle.textContent = bannerParts.join(' \u00b7 ');
-      els.eventPrompt.textContent = letterLeft ? '\u2705 Correct! A Word Warp letter is yours' : '\u2705 Correct! Letter limit reached \u2014 +' + EXTRA_BEAM_POINTS + ' points';
+      els.eventPrompt.textContent = letterLeft ? '✅ Correct! A Word Warp letter is yours' : '✅ Correct! +' + EXTRA_BEAM_POINTS + ' points';
       celebrateTriviaCorrect();
       renderRunBanner();
       if (trayAt >= 0) flyTrayMark(trayAt, els.eventTiles[runPendingQCorrectIdx]);
     } else {
       sfx.wrong();
       runTriviaStreak = 0;
-      if (runTrayMarks.length < RUN_WORD_LENGTH) runTrayMarks.push('miss');   // the prize track: a red X
+      if (runQuizBeam && runTrayMarks.length < RUN_WORD_LENGTH) runTrayMarks.push('miss');   // the prize track: a red X
       runScore -= 5; // trivia carries real stakes too, applied directly since we're deliberately in the 'trivia' phase
       renderRunBanner();
       els.eventSubtitle.textContent = '';
@@ -10146,7 +10427,7 @@
   }));
   // Hides the finale without changing it (leaving to mode select): it comes
   // back on the same stage next time Infinity is picked.
-  function closeInfFinaleView(){ els.finOverlay.classList.add('hidden'); stopFinSky(); }
+  function closeInfFinaleView(){ els.finOverlay.classList.add('hidden'); els.finOverlay.classList.remove('daily-orbit'); dailyOrbit = null; stopFinSky(); }
   // After the Vault: the run is done - a fresh run starts on the board.
   function startNewInfRun(){
     infRun = null; runSharePre = null; if (!REPLAY) try{ localStorage.removeItem(INF_RUN_KEY); }catch(e){}
@@ -10227,7 +10508,8 @@
     g += '<rect x="2" y="2" width="' + (W - 4) + '" height="' + (H - 4) + '" rx="20" fill="rgba(30,8,60,0.55)" stroke="#ffd23f" stroke-width="3"/>';
     OP.SLOTS.forEach(([kind], i)=>{
       const l = e[i], r = e[i + 1], w = r - l, cx = (l + r) / 2, jack = kind === 'jackpot', big = kind === 'x3' || kind === '+50';
-      if (jack) g += '<rect class="pk-jglow" x="' + (l + 1) + '" y="' + (top - 120) + '" width="' + (w - 2) + '" height="120" fill="url(#pkBeamUp)"/>';
+      if (jack) g += '<rect class="pk-jglow" x="' + (l + 1) + '" y="' + (top - 120) + '" width="' + (w - 2) + '" height="120" fill="url(#pkBeamUp)"/>' +
+        '<text x="' + cx + '" y="' + (top - 38) + '" text-anchor="middle" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="12" letter-spacing="0.5" fill="#e6fdff" stroke="rgba(20,0,50,0.7)" stroke-width="3" paint-order="stroke">THE MOTHERSHIP</text>';
       g += '<g class="pk-slot" data-i="' + i + '"><rect x="' + (l + 1.5) + '" y="' + top + '" width="' + (w - 3) + '" height="' + (floor - top) + '" rx="5" fill="' + (jack ? 'url(#pkJack)' : 'url(#pkSlot)') + '" stroke="' + (jack ? '#7df9ff' : '#ffd23f') + '" stroke-width="1.5"' + (jack ? ' class="pk-jglow"' : '') + '/>' +
         '<text x="' + cx + '" y="' + (top + 34) + '" text-anchor="middle" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="' + (jack ? 34 : kind === '+50' ? 22 : kind === 'x3' ? 28 : 26) + '" fill="' + (jack ? '#e6fdff' : '#fff6c2') + '" stroke="rgba(40,0,60,0.55)" stroke-width="3" paint-order="stroke">' + plinkoLabel(kind) + '</text>' +
         '<text x="' + cx + '" y="' + (top + 58) + '" text-anchor="middle" font-family="Inter, Arial" font-weight="800" font-size="13" fill="rgba(255,246,194,0.8)">' + (kind === '+50' ? '' : '+' + OP.SLOT_POINTS[kind]) + '</text></g>';
@@ -10238,10 +10520,16 @@
     });
     svg.innerHTML = g;
   }
+  // Orbit Drop plays for Infinity's finale (infRun.finale) or as Daily's grand prize
+  // (dailyOrbit, see openDailyOrbit): the board code reads its state through these.
+  let dailyOrbit = null;
+  function pkF(){ return dailyOrbit || (infRun && infRun.finale) || null; }
+  function pkSave(){ if (dailyOrbit){ saveDailyOrbit(); return; } saveInfRun(); }
+  function pkRunScore(){ return dailyOrbit ? shownScore(dailyOrbit.base) : Math.max(0, infRun.score); }
   let pkLaunched = 0, pkAuto = false, pkAim = OP.C.W / 2, pkLanded = [], pkLastDrop = -1e9, pkDragging = false;
   const pkFalling = new Map();   // chip index -> its animation (in flight)
   function renderPlinko(){
-    const f = infRun.finale;
+    const f = pkF();
     document.getElementById('finPlinko').classList.remove('hidden', 'jackpot');
     buildPlinkoBoard();
     pkFalling.forEach(a=>{ try{ a.cancel(); }catch(e){} }); pkFalling.clear();
@@ -10254,17 +10542,17 @@
     setAim(OP.C.W / 2);
     renderPlinkoTally();
   }
-  function plinkoAllLanded(){ const f = infRun.finale; return f.dropped >= f.chips.length && pkLanded.length >= f.chips.length; }
+  function plinkoAllLanded(){ const f = pkF(); return f.dropped >= f.chips.length && pkLanded.length >= f.chips.length; }
   function renderPlinkoTally(){
-    const f = infRun.finale, n = f.chips.length, left = n - f.dropped;
+    const f = pkF(), n = f.chips.length, left = n - f.dropped;
     const landed = pkLanded.map(i=> f.chips[i]), won = landed.reduce((a, c)=> a + c.pts, 0);
-    document.getElementById('pkRunScore').textContent = 'Run score: ' + Math.max(0, infRun.score);
+    document.getElementById('pkRunScore').textContent = 'Run score: ' + pkRunScore();
     document.getElementById('pkChipNo').textContent = left > 0 ? 'Chip ' + (f.dropped + 1) + ' of ' + n : 'All ' + n + ' chips in';
     document.getElementById('pkBonus').textContent = '+' + won;
     document.getElementById('plinkoTally').innerHTML = landed.map(c=> '<span class="pt-chip' + (c.kind === 'jackpot' ? ' jack' : '') + '">' + plinkoLabel(c.kind) + ' <b>+' + c.pts + '</b></span>').join('');
     const drop = document.getElementById('plinkoDrop'), all = document.getElementById('plinkoAll'), board = document.getElementById('plinkoBoard');
     const done = plinkoAllLanded();
-    drop.textContent = '🔐 Open ' + GN.vault + ' ▶';
+    drop.textContent = dailyOrbit ? '🏆 See your results ▶' : '🔐 Open ' + GN.vault + ' ▶';
     drop.classList.toggle('hidden', !done);
     all.classList.toggle('hidden', left <= 0 || pkAuto);
     board.classList.toggle('done', left <= 0);
@@ -10317,13 +10605,13 @@
   // One chip out of the UFO's beam at x, down the pegs. The result is saved
   // at the drop (a refresh mid-fall finds it in its slot).
   function launchChip(aimX){
-    const f = infRun.finale;
+    const f = pkF();
     if (f.dropped >= f.chips.length) return;
     const i = f.dropped, c = simulateChip(i, aimX);
     if (!c.kind) return;
     const path = c.path, hits = c.hits; delete c.path; delete c.hits;
-    f.chips[i] = c; f.dropped++; pkLaunched = f.dropped; saveInfRun();
-    pkLastDrop = performance.now(); setTimeout(()=>{ if (infRun && infRun.finale === f) renderPlinkoTally(); }, PK_DROP_GAP_MS + 20);
+    f.chips[i] = c; f.dropped++; pkLaunched = f.dropped; pkSave();
+    pkLastDrop = performance.now(); setTimeout(()=>{ if (pkF() === f) renderPlinkoTally(); }, PK_DROP_GAP_MS + 20);
     if (prefersReducedMotion()){ landChip(i); return; }
     const ufo = document.getElementById('pkUfo'); ufo.classList.remove('spin'); void ufo.offsetWidth; ufo.classList.add('beaming', 'spin'); sfx.ufoBeam(); setTimeout(()=> ufo.classList.remove('beaming'), 420);
     const el = chipEl(i), k = plinkoScale(), T = path[path.length - 1] || 1, frames = [];
@@ -10337,7 +10625,7 @@
     renderPlinkoTally();
   }
   function landChip(i){
-    const f = infRun.finale;
+    const f = pkF();
     if (pkLanded.indexOf(i) >= 0) return;   // landed already
     const c = f.chips[i];
     placeChip(c, i, true);
@@ -10349,23 +10637,24 @@
       FX.ripple(showFx, x, y, c.kind === 'jackpot' ? '#7df9ff' : '#ffd23f', c.kind === 'x1' || c.kind === 'x2' ? 34 : 60);
       if (c.kind !== 'x1' && c.kind !== 'x2'){ FX.flash(document.getElementById('plinkoBoard'), 'win'); FX.burst(showFx, x, y - 10, { count: c.kind === 'jackpot' ? 18 : 10, spread:90, shapes:['star'], colors:['#ffd23f', '#fff3c4', '#7df9ff'] }); }
       if (c.kind === 'jackpot') FX.coinShower(showFx, 3); }
-    if (c.kind === 'jackpot'){ sfx.jackpot(); showToast('🛸 MOTHERSHIP JACKPOT! +100' + (f.chips.slice(0, f.dropped).filter(x=> x.kind === 'jackpot').length === 1 ? ' and a bonus card' : '')); document.getElementById('finPlinko').classList.add('jackpot'); }
+    if (c.kind === 'jackpot' && dailyOrbit){ sfx.jackpot(); showToast('🛸 THE MOTHERSHIP! +' + c.pts); document.getElementById('finPlinko').classList.add('jackpot'); }
+    else if (c.kind === 'jackpot'){ sfx.jackpot(); showToast('🛸 MOTHERSHIP JACKPOT! +100' + (f.chips.slice(0, f.dropped).filter(x=> x.kind === 'jackpot').length === 1 ? ' and a bonus card' : '')); document.getElementById('finPlinko').classList.add('jackpot'); }
     if (pkLanded.length >= f.chips.length) pkAuto = false;
     renderPlinkoTally();
   }
   function canDropNow(){
-    const f = infRun && infRun.finale;
+    const f = pkF();
     return !!f && f.stage === 'plinko' && !pkAuto && f.dropped < f.chips.length && performance.now() - pkLastDrop >= PK_DROP_GAP_MS && performance.now() - finTapShieldAt >= TAP_SHIELD_MS;
   }
   // Auto-drop: the rest fall from random spots (the random dropper's odds).
   function dropAllChips(){
-    const f = infRun.finale;
+    const f = pkF();
     if (pkAuto || f.dropped >= f.chips.length) return;
     pkAuto = true;
     const randomAim = ()=> OP.AIM_MIN + Math.random() * (OP.AIM_MAX - OP.AIM_MIN);
     if (prefersReducedMotion()){ while (f.dropped < f.chips.length) launchChip(randomAim()); return; }
     const go = ()=>{
-      if (!infRun || infRun.finale !== f || f.stage !== 'plinko' || f.dropped >= f.chips.length) return;
+      if (pkF() !== f || f.stage !== 'plinko' || f.dropped >= f.chips.length) return;
       const x = randomAim(); setAim(x); launchChip(x); setTimeout(go, PK_AUTO_GAP_MS);
     };
     go();
@@ -10375,7 +10664,7 @@
   (function(){
     const board = document.getElementById('plinkoBoard');
     const toUnits = e=>{ const r = board.getBoundingClientRect(); return (e.clientX - r.left) / r.width * OP.C.W; };
-    const live = ()=>{ const f = infRun && infRun.finale; return f && f.stage === 'plinko' && !pkAuto && f.dropped < f.chips.length; };
+    const live = ()=>{ const f = pkF(); return f && f.stage === 'plinko' && !pkAuto && f.dropped < f.chips.length; };
     board.addEventListener('pointerdown', e=>{
       if (!live()) return;
       e.preventDefault(); pkDragging = true;
@@ -10394,18 +10683,19 @@
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight'){ e.preventDefault(); setAim(pkAim + (e.key === 'ArrowLeft' ? -8 : 8)); }
       else if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); if (canDropNow()) launchChip(pkAim); }
     });
-    addEventListener('resize', ()=>{ if (infRun && infRun.finale && infRun.finale.stage === 'plinko' && !document.getElementById('finPlinko').classList.contains('hidden')){ setAim(pkAim); renderPlinko(); } });
+    addEventListener('resize', ()=>{ if (pkF() && pkF().stage === 'plinko' && !document.getElementById('finPlinko').classList.contains('hidden')){ setAim(pkAim); renderPlinko(); } });
   })();
   function goToVault(){
-    const f = infRun.finale;
+    const f = pkF();
     if (f.stage !== 'plinko' || f.dropped < f.chips.length) return;
     pkFalling.forEach(a=>{ try{ a.cancel(); }catch(e){} }); pkFalling.clear();
-    f.stage = 'vault'; saveInfRun();
+    if (dailyOrbit){ finishDailyOrbit(); return; }
+    f.stage = 'vault'; pkSave();
     hostIntro('vault', ()=> showFinStage('vault'));
   }
-  document.getElementById('plinkoAll').addEventListener('click', finTap(()=>{ if (infRun && infRun.finale && infRun.finale.stage === 'plinko') dropAllChips(); }));
+  document.getElementById('plinkoAll').addEventListener('click', finTap(()=>{ if (pkF() && pkF().stage === 'plinko') dropAllChips(); }));
   document.getElementById('plinkoDrop').addEventListener('click', finTap(()=>{
-    const f = infRun && infRun.finale; if (!f || f.stage !== 'plinko') return;
+    const f = pkF(); if (!f || f.stage !== 'plinko') return;
     if (f.dropped >= f.chips.length){ if (plinkoAllLanded() || !pkFalling.size) goToVault(); return; }
     if (canDropNow()) launchChip(pkAim);   // (hidden while chips are left; a keyboard or test path)
   }));
@@ -10733,6 +11023,42 @@
     dailyVaultClose = close;
   }
   let dailyVaultClose = null;
+  // ---------- Daily's grand prize: Orbit Drop (DIRECTION.md) ----------
+  // After the Word Warp the player drops their chips (ORBIT_MIN_CHIPS at least) on the
+  // Orbit Drop board; the jackpot slot is THE MOTHERSHIP. The winnings roll into the final
+  // score on the results screen's count-up. The drop's state lives in the day's result
+  // (r.orbit), saved at every drop, so a refresh comes back to the board.
+  function dailyOrbitChips(r){ return Math.max(ORBIT_MIN_CHIPS, Math.min(PLINKO_MAX_CHIPS + 1, r.orbitChips || ORBIT_MIN_CHIPS)); }
+  function saveDailyOrbit(){ if (runResultToday && runResultToday.orbit === dailyOrbit) saveRunResultToday(runResultToday); }
+  function openDailyOrbit(r){
+    if (!r.orbit) r.orbit = { stage:'plinko', chips: drawPlinkoOutcomes(dailyOrbitChips(r)), dropped:0, base: r.score, done:false };
+    if (r.orbit.done){ showRunReadout(); return; }
+    saveRunResultToday(r);
+    dailyOrbit = r.orbit;
+    els.eventOverlay.classList.add('hidden');
+    ['finComplete', 'finVault'].forEach(id=> document.getElementById(id).classList.add('hidden'));
+    els.finOverlay.classList.remove('vault-stage', 'daily-vault');
+    els.finOverlay.classList.add('daily-orbit');
+    els.finOverlay.classList.remove('hidden');
+    updatePauseBtnVisibility();
+    finTapShieldAt = performance.now(); startFinSky();
+    document.getElementById('pkBanner').textContent = 'ORBIT DROP';
+    document.getElementById('pkLine').textContent = 'The grand prize! Drag the UFO, let go to drop. Aim for THE MOTHERSHIP.';
+    hostIntro('orbitDrop', ()=>{ if (dailyOrbit === r.orbit) renderPlinko(); });
+  }
+  function finishDailyOrbit(){
+    const r = runResultToday, o = dailyOrbit; if (!r || !o) return;
+    const won = o.chips.reduce((a, c)=> a + (c.pts || 0), 0);
+    o.done = true; o.stage = 'done';
+    r.orbitPoints = won; r.jackpot = o.chips.some(c=> c.kind === 'jackpot');
+    r.score = o.base + won;
+    saveRunResultToday(r);
+    dailyOrbit = null;
+    document.getElementById('pkLine').textContent = 'Drag the UFO, let go to drop. Every chip pays.';
+    els.finOverlay.classList.add('hidden'); els.finOverlay.classList.remove('daily-orbit'); stopFinSky();
+    renderRunBanner();
+    showRunReadout(true);
+  }
   // The little green alien: up out of the vault, a quick reaction, back down.
   function vaultAlienPop(a){
     if (prefersReducedMotion()) return;
@@ -12346,7 +12672,8 @@
       lastVote: lastVoteSummary ? Object.assign({}, lastVoteSummary) : null,
       secretRiddle: !!runRiddleSolved,
       personalityNote: personality.note,
-      warpPoints: runWarpPoints, comboBonus: runComboBonus,   // B5/B6: the Word Warp's points and the combo meter's (in the score already)
+      warpPoints: runWarpPoints, comboBonus: runComboBonus,
+      actPts: runActPts.slice(), best: runBestMoment, episode: showEpisode(runStartDate || todayStr()),   // B5/B6: the Word Warp's points and the combo meter's (in the score already)
     };
     // Collection unlocks for this checkpoint (today's personality above is
     // just a label - it isn't collected).
@@ -12363,12 +12690,68 @@
     renderRunBanner();
     voted = false; votedSinceTime = null;
     playRunEndMusic(!!solved);
-    // B6: the Vault opens on the score first, then today's results.
-    playDailyVault(runResultToday, showRunReadout);
+    // The grand prize: Orbit Drop (the Vault is retired from Daily), then today's results.
+    runResultToday.orbitChips = ORBIT_MIN_CHIPS;
+    openDailyOrbit(runResultToday);
   }
-  function showRunReadout(){
+  // ---------- The episode's results screen (refs/results.jpg) ----------
+  function mysteryName(key){
+    if (BRAIN_BREAKS[key]) return BRAIN_BREAKS[key].name();
+    return key === 'riddle' ? GN.riddleRound : key === 'crowdScan' ? GN.crowdScan : key || '';
+  }
+  function dayAfter(dateStr){ const p = dateStr.split('-').map(Number); return localDateStr(new Date(p[0], p[1] - 1, p[2] + 1)); }
+  let eprClockT = null;
+  function fillEpisodeResults(r, fromOrbit){
+    const final = shownScore(r.score), orbit = r.orbitPoints || 0;
+    // The breakdown: each act (with its multiplier), the Word Warp, the Orbit Drop.
+    const rows = [], acts = RUNDOWN.acts;
+    let listed = 0;
+    acts.forEach((a, i)=>{ if (a.ad || a.id === 'finale') return; const p = Math.round((r.actPts || [])[i] || 0); listed += p;
+      rows.push([(a.sub || '').split(' · ')[0] + ' · ' + a.title + (a.mult > 1 ? ' ×' + a.mult : ''), p]); });
+    const warp = r.warpPoints || 0; listed += warp;
+    rows.push([GN.wordWarp + (r.solved ? ' · ' + formatRaceTime(r.solveMs) : ' · not solved'), warp]);
+    const other = Math.round(r.score - orbit - listed);
+    if (other) rows.push([other > 0 ? 'Bonuses' : 'Misses', other]);
+    rows.push([GN.orbitDrop + (r.jackpot ? ' · THE MOTHERSHIP!' : ''), orbit, 'roll']);
+    const br = document.getElementById('eprBreak'); br.textContent = '';
+    rows.forEach(([label, pts, cls])=>{ const s = document.createElement('span'), b = document.createElement('b'); s.textContent = label; b.textContent = (pts > 0 ? '+' : '') + pts; if (cls){ s.className = cls; b.className = cls; } br.appendChild(s); br.appendChild(b); });
+    // The score counts up; straight from the Orbit Drop, the winnings roll in on top.
+    const el = document.getElementById('eprScore'), from = fromOrbit ? Math.max(0, final - orbit) : 0;
+    el.textContent = from.toLocaleString();
+    if (prefersReducedMotion()) el.textContent = final.toLocaleString();
+    else { const t0 = performance.now() + (fromOrbit ? 500 : 200), ms = fromOrbit ? 1300 : 1600;
+      (function step(now){ const t = Math.max(0, Math.min(1, (now - t0) / ms)), e = 1 - Math.pow(1 - t, 3); el.textContent = Math.round(from + (final - from) * e).toLocaleString(); if (t < 1) requestAnimationFrame(step); else if (fromOrbit && orbit) FX.pop(el, 1.15); })(performance.now()); }
+    // The three cards: the best moment, today's personality card, the streak.
+    const best = r.best;
+    document.getElementById('eprBest').textContent = best ? best.text : 'Showing up! Every episode counts.';
+    document.getElementById('eprBestPts').textContent = best ? '+' + Math.round(best.pts) + ' PTS' : '';
+    const meta = PERSONALITY_META[r.personalityType] || PERSONALITY_META.fence_sitter;
+    document.getElementById('eprPersName').textContent = meta.name;
+    document.getElementById('eprPersArt').innerHTML = cardArtHtml(PERSONALITY_META[r.personalityType] ? r.personalityType : 'fence_sitter');
+    const n = dailyRunStreak || 1;
+    document.getElementById('eprStreakH').textContent = n + ' DAY STREAK!';
+    document.getElementById('eprStreakNote').textContent = n > 1 ? 'Back tomorrow keeps it alive' : 'Come back tomorrow for day 2';
+    document.getElementById('eprStreakFoot').textContent = 'STREAK ' + n;
+    // Tomorrow on FlipStax: the next episode, its countdown and a tease of its Mystery Games.
+    const tomorrow = dayAfter(r.date || todayStr());
+    document.getElementById('eprNextEp').textContent = 'EPISODE ' + showEpisode(tomorrow);
+    const g = pickMysteryGames(tomorrow).filter(Boolean).map(mysteryName);
+    document.getElementById('eprTease').textContent = g.length ? 'Mystery Games: ' + g.join(' and ') + '. Plus a new crowd, new Brain Beams and a new word.' : '';
+    const clock = document.getElementById('eprCountdown');
+    const tick = (first)=>{
+      if (!first && !els.readoutOverlay.classList.contains('show')){ clearInterval(eprClockT); eprClockT = null; return; }
+      const now = new Date(), next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1), s = Math.max(0, Math.floor((next - now) / 1000));
+      clock.textContent = [Math.floor(s / 3600), Math.floor(s / 60) % 60, s % 60].map(v=> String(v).padStart(2, '0')).join(':');
+    };
+    clearInterval(eprClockT); tick(true); eprClockT = setInterval(tick, 1000);
+    document.getElementById('readoutShare').textContent = '📤 SHARE YOUR GLORY';
+  }
+  function showRunReadout(fromOrbit){
     const r = runResultToday;
     preloadShareArt(r);
+    const ep = !!(r.actPts || r.orbit);   // an episode result (the rundown show): the new results screen
+    els.readoutOverlay.classList.toggle('ep', ep);
+    if (ep) fillEpisodeResults(r, !!fromOrbit);
     els.readoutScore.textContent = shownScore(r.score) + ' pts';
     els.readoutTrivia.textContent = r.triviaCorrect + '/' + r.triviaTotal + ' trivia correct'
       + (r.perfect ? ' · 🏆 Perfect Run' : '')
@@ -12400,7 +12783,7 @@
       shareImg.alt = 'Daily Stax complete: ' + shownScore(r.score) + ' points. ' + meta.name + '. ' + r.triviaCorrect + ' of ' + r.triviaTotal + ' trivia correct. ' + (r.solved ? 'Word Warp solved in ' + formatRaceTime(r.solveMs) + '.' : 'Word not solved.');
       return true;
     };
-    if (!(pre.done && asImage(pre))) pre.promise.then(p=>{ if (performance.now() - shownAt < 4000 && els.readoutOverlay.classList.contains('show')) asImage(p); });
+    if (!ep && !(pre.done && asImage(pre))) pre.promise.then(p=>{ if (performance.now() - shownAt < 4000 && els.readoutOverlay.classList.contains('show')) asImage(p); });
     els.readoutOverlay.classList.add('show');
     updatePauseBtnVisibility();
     sfx.personality();
@@ -13156,7 +13539,7 @@
     renderUnvoted();
     voted = false;
     votedSinceTime = null;
-    let roundMs = !inInfinity() ? DAILY_PICK_MS : bonusActive ? INF_ZONE_PICK_MS : INF_PICK_MS;
+    let roundMs = !inInfinity() ? (runActive ? runVsTimerMs() : DAILY_PICK_MS) : bonusActive ? INF_ZONE_PICK_MS : INF_PICK_MS;
     startRoundTimer(roundMs / DEBUG_TIME_SCALE);
     maybeRequestMoreWild();
     queueLayoutBoard();
@@ -14067,11 +14450,11 @@
       showBreakNow: (game) => { runActive = true; runPhase = 'running'; return runBrainBreak({ t:'break', game, seed: 20261013 }, ()=>{}); },
       hostSayNow: (t, ms) => hostSay(t, ms),
       showQuizNow: (riddle) => { runActive = true; runPhase = 'running'; runTriviaQuestion(null, null, { t:'quiz', riddle: !!riddle, subject:'science', seed: 12345 }); return window.__debugLastTriviaQ; },
-      showPlan: (date, cycle) => buildShowPlan(date || runStartDate || todayStr(), cycle || 0),
+      showPlan: (date) => buildShowPlan(date || runStartDate || todayStr()),
       showReadout: () => { els.finOverlay.classList.add('hidden'); showRunReadout(); return !!runResultToday; },
       setResult: (o) => { runResultToday = Object.assign({}, runResultToday || { date: todayStr(), rule: SAVE_RULE, savedAt: Date.now(), score: 0, triviaCorrect: 0, triviaTotal: 0, solved: false, solveMs: null, word: 'LAUNCH', personalityType: 'fence_sitter', unlocked: [] }, o); return runResultToday; },
       comboVerdict: (w, base) => { comboOnVerdict(!!w, base || 1); return { streak: runMatchStreak, mult: comboMult(runMatchStreak), bonus: runComboBonus, bank: runComboBank, score: runScore }; },
-      showState: () => ({ step: runShow.step, left: runShow.left, phase: runPhase, episode: showEpisode(runStartDate || todayStr()) }),
+      showState: () => ({ step: runShow.step, left: runShow.left, phase: runPhase, act: runActIdx, score: runScore, actPts: runActPts.slice(), t: runPlan && runPlan[runShow.step] && runPlan[runShow.step].t, episode: showEpisode(runStartDate || todayStr()) }),
       startColdOpenTap: () => showCard.click(),
       playSfx: (name, arg) => { const errs = []; try{ sfx[name](arg); }catch(e){ errs.push(String(e)); } return { name, on: soundOn, ctx: audioCtx ? audioCtx.state : null, errs }; },
       dailyVault: (score, bonus) => { playDailyVault({ score, warpPoints: bonus || 0, comboBonus: 0 }, ()=>{ window.__dailyVaultDone = true; }); return 'ok'; },
@@ -14316,7 +14699,7 @@
   // closes (see startDailyRun's gate), and the pause screen reopens it.
   // Infinity's walkthrough moved to v3 with the run finale (Oct 2026), so returning
   // players see the new one once; Daily's is unchanged.
-  const HOWTO_KEYS = { daily:'flipstax_howto_daily_v2', infinity:'flipstax_howto_infinity_v3' };
+  const HOWTO_KEYS = { daily:'flipstax_howto_daily_v3', infinity:'flipstax_howto_infinity_v3' };
   const howtoSeenThisPage = { daily:false, infinity:false };
   function hasSeenHowTo(mode){
     if (howtoSeenThisPage[mode]) return true;
@@ -14339,8 +14722,9 @@
   // Screen 3 differs: the secret riddle lives in Daily Stax only, and Infinity
   // has no results screen - there the payoff is the personality (every
   // INF_AWARD_VOTES votes), its collectible card (16 in all) and the badges.
-  const HOWTO_LAST_DAILY = { icon:'✨', lead:'At the end of your run, your picks reveal your personality.',
-    lines:['And somewhere in there... can you find the Super Secret Riddle?', 'Cards are personality types you unlock by how you play. Badges are earned for finishing categories.'] };
+  const HOWTO_LAST_DAILY = { icon:'🛸', lead:'The Grand Finale.',
+    lines:['Your tiles turn into letters: unscramble the ' + GN.wordWarp + '.', 'Then drop your chips in ' + GN.orbitDrop + ' for the grand prize. Aim for THE MOTHERSHIP!',
+      'Your picks reveal your personality card. And somewhere in there... can you find the Super Secret Riddle?'] };
   // Infinity's screens 2-3 (v3): the run's finish line, keys and power-ups,
   // then the new round types and the Vault finale. Numbers from the code:
   // FINISH_POINTS / INF_RUN_CLOCK_MS, INF_MATCHES_PER_KEY, POWERUPS,
@@ -14358,11 +14742,12 @@
   const HOWTO_SCREENS = {
     daily: [
       HOWTO_PICK,
-      { icon:'🧩', lead:'Points unlock trivia.',
-        lines:["Each right answer reveals a letter of today's secret word.", 'Then unscramble it before time runs out.'],
-        chipsLabel:'Power-ups — pick one when they drop',
+      { icon:'🎬', lead:'One show a day, in three acts.',
+        lines:['Act 1: THE OPENER. Act 2: DOUBLE TROUBLE, points ×2. Act 3: LIGHTNING ROUND, points ×3 and faster cards.',
+          'Each ' + GN.brainBeam + ' you get right wins a face-down tile on the prize track. Two Mystery Games change every day.'],
+        chipsLabel:GN.portalPick + ' — pick a portal',
         chips:[ ['⚡ +10 pts', 'Instant points'], ['🐌 +30s', 'More time on the clock'],
-                ['🎁 ' + GN.cosmicSurprise, '50/50: +25 or −25 points'], ['💡 Free Hint', 'A clue for the word'] ] },
+                ['🎁 ' + GN.cosmicSurprise, 'A gamble: +25 or −25 points'], ['💡 Free Hint', 'A clue for the word'] ] },
       HOWTO_LAST_DAILY,
     ],
     infinity: [
@@ -14460,7 +14845,7 @@
     renderRunBanner();
     // Today's run is already done: show its results (and Share) again rather
     // than a frozen board. Done goes back to mode select, as after the run.
-    if (runResultToday){ showRunReadout(); updatePauseBtnVisibility(); startDailySky(); return; }
+    if (runResultToday){ if (runResultToday.orbit && !runResultToday.orbit.done) openDailyOrbit(runResultToday); else showRunReadout(); updatePauseBtnVisibility(); startDailySky(); return; }
     sessionHalted = false;
     playTrack('run');
     startDailyRun();
@@ -14590,25 +14975,37 @@
         secretRiddle: false, personalityNote: null, warpPoints: 26, comboBonus: 12, unlocked: ['gambler'] };
     }
     function replayAtStep(step, score, letters, tweakPlan){
-      replayEnter(()=>{ replaySample(score, letters); runShow = { step, left:null, cycle:0 }; if (tweakPlan) tweakPlan(); }, replayTap);
+      replayEnter(()=>{ replaySample(score, letters); runShow = { step, left:null }; const st = runPlan[step]; runActIdx = st && st.act != null ? st.act : 0; if (tweakPlan) tweakPlan(step); renderRunBanner(); }, replayTap);
+    }
+    // The rundown's steps move when data/rundown.js is tuned, so the jumps find their step by type.
+    function planIndex(pred, nth){ const plan = buildShowPlan(todayStr()); let k = 0; for (let i = 0; i < plan.length; i++) if (pred(plan[i]) && k++ === (nth || 0)) return i; return 0; }
+    const atType = (pred, nth, score, letters, tweak)=> ()=> replayAtStep(planIndex(pred, nth), score, letters, tweak);
+    const actCard = (a)=> atType(s=> s.t === 'act' && s.act === a);
+    const mysteryAs = (game)=> atType(s=> s.t === 'mystery', 0, 60, 1, (i)=>{ runPlan[i] = Object.assign({}, runPlan[i], { game, seed:20261013 }); });
+    function replaySampleEpisode(){
+      const r = replaySampleResult();
+      return Object.assign(r, { score: 412, actPts: [64, 0, 128, 141], best: { pts: 45, text: 'Read the crowd on Pizza vs Tacos in Lightning Round' }, episode: showEpisode(todayStr()),
+        orbit: { stage:'done', done:true, chips:[], dropped:0, base: 368 }, orbitPoints: 44, jackpot: false });
     }
     const JUMPS = [
       { label:'Cold open', go: ()=> replayEnter(null, null) },
-      { label:'Round 1 bumper', go: ()=> replayAtStep(0, 0, 0) },
-      { label:'Round 2 bumper', go: ()=> replayAtStep(6, 42, 1) },
-      { label:'Round 3 bumper', go: ()=> replayAtStep(12, 96, 3) },
-      { label:'VS card', go: ()=> replayAtStep(1, 38, 1) },
-      { label:'Brain Beam', go: ()=> replayAtStep(2, 54, 1) },
-      { label:'Riddle', go: ()=> replayAtStep(2, 54, 1, ()=>{ runPlan[2] = Object.assign({}, runPlan[2], { riddle:true }); }) },
-      { label:'Portal Pick', go: ()=> replayAtStep(4, 71, 2) },
-      { label:'Price Probe', go: ()=> replayAtStep(5, 80, 2, ()=>{ runPlan[5] = { t:'break', round:0, game:'priceProbe', seed:20261013 }; }) },
-      { label:'Oddball Alert', go: ()=> replayAtStep(5, 80, 2, ()=>{ runPlan[5] = { t:'break', round:0, game:'oddballAlert', seed:20261013 }; }) },
-      { label:'Emoji Decode', go: ()=> replayAtStep(5, 80, 2, ()=>{ runPlan[5] = { t:'break', round:0, game:'emojiDecode', seed:20261013 }; }) },
-      { label:'Time Warp', go: ()=> replayAtStep(5, 80, 2, ()=>{ runPlan[5] = { t:'break', round:0, game:'timeWarp', seed:20261013 }; }) },
-      // The clock is set to run out at once, so the show cuts to its finale: the bumper, then the Word Warp with all six letters in.
-      { label:'Word Warp (6 letters)', wide:true, go: ()=> replayEnter(()=>{ replaySample(150, 6); runClockAddedMs = -RUN_DURATION_MS - 1000; }, replayTap) },
-      { label:'Vault', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); runResultToday = replaySampleResult(); playDailyVault(runResultToday, showRunReadout); }) },
-      { label:'Results (sample)', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); runResultToday = replaySampleResult(); showRunReadout(); updatePauseBtnVisibility(); }) },
+      { label:'Act 1 card', go: actCard(0) },
+      { label:'VS card', go: atType(s=> s.t === 'vs', 0, 12, 0) },
+      { label:'Brain Beam', go: atType(s=> s.t === 'quiz', 0, 24, 0) },
+      { label:'Riddle', go: atType(s=> s.t === 'quiz', 0, 24, 0, (i)=>{ runPlan[i] = Object.assign({}, runPlan[i], { riddle:true }); }) },
+      { label:'Commercial', go: atType(s=> s.t === 'ad', 0, 70, 2) },
+      { label:'Act 2 card', go: actCard(2) },
+      { label:'Portal Pick', go: atType(s=> s.t === 'portal', 0, 96, 3) },
+      { label:'Act 3 card', go: actCard(3) },
+      { label:'Lucky Lights', go: atType(s=> s.t === 'lucky', 0, 180, 5) },
+      { label:'Price Probe', go: mysteryAs('priceProbe') },
+      { label:'Oddball Alert', go: mysteryAs('oddballAlert') },
+      { label:'Emoji Decode', go: mysteryAs('emojiDecode') },
+      { label:'Time Warp', go: mysteryAs('timeWarp') },
+      // The finale's cue card, then the Word Warp with all six letters in.
+      { label:'Grand finale (6 letters)', wide:true, go: atType(s=> s.t === 'act' && s.finale, 0, 210, 6) },
+      { label:'Orbit Drop', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); const r = replaySampleEpisode(); delete r.orbit; delete r.orbitPoints; r.score = 368; r.orbitChips = 3; runResultToday = r; openDailyOrbit(r); }) },
+      { label:'Results (sample)', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); runResultToday = replaySampleEpisode(); showRunReadout(); updatePauseBtnVisibility(); }) },
       { label:'Restart Daily', wide:true, cls:'restart', go: ()=> replayEnter(null, null) },
     ];
     // ----- Infinity jumps: each starts a fresh Infinity run with stand-in numbers and lands on its screen.
