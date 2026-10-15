@@ -2752,6 +2752,11 @@
     background:#ffc400; font-family:'Inter', system-ui, sans-serif;
   }
   .split-select-overlay.hidden{ display:none; }
+  /* One show (DIRECTION.md): Daily Stax fills the whole menu; Infinity Flips is hidden
+     (its code stays). */
+  .one-show .ms-gold, .one-show .ms-seam, .one-show .split-divider, .one-show .ms-divider-ring, .one-show .ms-howto [data-howto="infinity"], .one-show .ms-howto-sep{ display:none !important; }
+  .one-show .ms-sky{ clip-path:none; animation:none; }
+  .one-show .ms-body-daily{ top:calc(70px + env(safe-area-inset-top)); bottom:calc(96px + env(safe-area-inset-bottom)); }
   .ms-gold, .ms-sky{ position:absolute; inset:0; cursor:pointer; -webkit-tap-highlight-color:transparent; }
   .ms-gold{
     background:linear-gradient(135deg,#ffe36a 0%,#ffc400 30%,#fff3a6 48%,#ffb800 66%,#ffd93a 100%);
@@ -3524,7 +3529,7 @@
   </div>
 </div>
 
-<div class="split-select-overlay hidden" id="modeSelectOverlay">
+<div class="split-select-overlay one-show hidden" id="modeSelectOverlay">
   <!-- Infinity: the gold world underneath; takes every tap the sky doesn't. -->
   <div class="ms-gold" id="modeInfinityBtn" role="button" aria-label="Play Infinity Flips">
     <div class="ms-bg" id="msGoldSparks"></div>
@@ -3551,17 +3556,17 @@
         <svg viewBox="0 0 48 34" width="40" height="28"><g stroke="#0d2b5e" stroke-width="2" stroke-linejoin="round"><rect x="7" y="6" width="17" height="24" rx="3" fill="#ff7a59" transform="rotate(-18 15.5 18)"/><rect x="24" y="6" width="17" height="24" rx="3" fill="#2dd4c4" transform="rotate(18 32.5 18)"/><rect x="15.5" y="3" width="17" height="24" rx="3" fill="#ffd93d"/></g><path d="M24 9.5 l1.9 4.2 4.6.5-3.4 3.1 1 4.5-4.1-2.4-4.1 2.4 1-4.5-3.4-3.1 4.6-.5z" fill="#fff" stroke="#0d2b5e" stroke-width="0.8" stroke-linejoin="round"/></svg>
         <span>STAX</span>
       </div>
-      <div class="ms-tag">One run. Once a day.</div>
-      <div class="ms-desc">Tap your pick for points, answer trivia, collect letters, and solve today's hidden word before time runs out.</div>
-      <div class="ms-desc-short">Vote, answer trivia, solve today's word.</div>
+      <div class="ms-tag">Today's episode is on!</div>
+      <div class="ms-desc">Pick with the crowd, beat the Brain Beams, crack two mystery games and play for the grand prize. The same show for everyone, new every day.</div>
+      <div class="ms-desc-short">Pick, answer, play for the grand prize.</div>
       <div class="ms-cta">PLAY TODAY &#9654;</div>
       <div class="ms-streak" id="msStreak" aria-live="polite"></div>
     </div>
   </div>
   <div class="split-select-header">
     <div class="logo"><span class="flip">Flip</span><span class="stax">Stax</span></div>
-    <div class="split-select-title">Choose your mode</div>
-    <div class="ms-howto">How to play: <span role="button" tabindex="0" data-howto="daily">Daily</span> · <span role="button" tabindex="0" data-howto="infinity">Infinity</span></div>
+    <div class="split-select-title">A new episode every day</div>
+    <div class="ms-howto">How to play: <span role="button" tabindex="0" data-howto="daily">Daily</span><span class="ms-howto-sep"> · </span><span role="button" tabindex="0" data-howto="infinity">Infinity</span></div>
   </div>
   <div class="ms-divider-ring" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
   <div class="split-divider">OR</div>
