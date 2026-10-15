@@ -2521,6 +2521,48 @@
   .mw-name{ min-height:44px; font:900 clamp(34px, 11vw, 48px)/1 var(--f-display); color:#fffbe0; text-shadow:0 4px 0 rgba(60,0,60,0.6), 0 0 22px rgba(255,255,255,0.7); opacity:0; transform:scale(0.5); }
   .mw-name.on{ opacity:1; transform:none; transition:transform .35s var(--ease-pop), opacity .2s; }
   @media (prefers-reduced-motion: reduce){ .mw-rim circle{ animation:none !important; } .mw-name.on{ transition:none; } }
+  /* Lucky Lights (refs/showcase.jpg): gold and black, two swaying spotlights, a ring of 12 squares. */
+  .lucky-overlay{ position:fixed; inset:0; z-index:28; display:flex; align-items:center; justify-content:center; overflow:hidden; color:#fff; text-align:center;
+    background:radial-gradient(120% 80% at 50% 45%, #3a2a08, #0d0904 62%, #000); padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom)); }
+  .lucky-overlay.hidden{ display:none; }
+  .ll-spot{ position:absolute; top:-10%; width:46%; height:120%; pointer-events:none; opacity:0.55; transform-origin:50% 0;
+    background:linear-gradient(180deg, rgba(255,236,170,0.65), rgba(255,220,120,0) 80%); clip-path:polygon(42% 0, 58% 0, 100% 100%, 0 100%); animation:llSway 4s ease-in-out infinite alternate; }
+  .ll-spot.l{ left:-6%; --s0:-14deg; --s1:8deg; } .ll-spot.r{ right:-6%; --s0:14deg; --s1:-8deg; animation-delay:-2s; }
+  @keyframes llSway{ from{ transform:rotate(var(--s0)); } to{ transform:rotate(var(--s1)); } }
+  .ll-inner{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; gap:10px; width:100%; max-width:380px; }
+  .ll-title{ font:900 clamp(40px, 13vw, 56px)/1 var(--f-display); letter-spacing:1px; color:#ffe27a; padding:6px 16px; border-radius:12px; border:3px solid var(--gold-2); background:#120c02;
+    text-shadow:0 3px 0 #8a4a00, 0 0 18px rgba(255,210,63,0.7); box-shadow:0 0 0 3px #120c02, 0 0 24px rgba(255,190,40,0.35); }
+  .ll-bank{ font:800 13px var(--f-body); letter-spacing:1px; color:#ffe9a8; padding:5px 12px; border-radius:99px; border:1.5px solid rgba(255,210,63,0.6); background:rgba(0,0,0,0.55); }
+  .ll-ring{ --r:min(35vw, 132px); position:relative; width:calc(var(--r) * 2 + 74px); aspect-ratio:1; margin:6px 0; border-radius:50%;
+    background:radial-gradient(circle, #1c1405 40%, #0a0702 62%, transparent 63%); box-shadow:0 0 0 6px #2a1e06, 0 0 0 9px var(--gold-2), 0 0 40px rgba(255,190,40,0.35); }
+  .ll-sq{ position:absolute; left:50%; top:50%; width:58px; height:50px; margin:-25px 0 0 -29px; display:flex; align-items:center; justify-content:center; border-radius:10px;
+    transform:rotate(var(--a)) translateY(calc(var(--r) * -1)); background:linear-gradient(180deg, #2a1e06, #120c02); border:2.5px solid #8a6a1a; color:#ffe27a;
+    font:900 19px/1 var(--f-display); transition:background .08s, border-color .08s, box-shadow .08s; }
+  .ll-sq span{ display:block; transform:rotate(calc(var(--a) * -1)); }
+  .ll-sq.glorp{ color:#7dff5a; font-size:14px; border-color:#3a7a1a; }
+  .ll-sq.dbl{ color:#fff; }
+  .ll-sq.on{ background:linear-gradient(180deg, #fff6c4, #ffd23f); border-color:#fff; color:#3a1a00; box-shadow:0 0 18px 4px rgba(255,220,90,0.9); }
+  .ll-sq.glorp.on{ background:linear-gradient(180deg, #c8ff9a, #39d42a); color:#0d3a05; box-shadow:0 0 18px 4px rgba(120,255,90,0.85); }
+  .ll-sq.hit{ animation:llHit 0.25s steps(1) 4; }
+  @keyframes llHit{ 50%{ background:#fff; box-shadow:0 0 26px 8px #fff; } }
+  .ll-hub{ position:absolute; left:50%; top:50%; width:calc(var(--r) * 1.12); aspect-ratio:1; transform:translate(-50%, -50%); border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+    background:radial-gradient(circle at 40% 35%, #3a2a08, #0a0702 70%); border:4px solid var(--gold-2); box-shadow:inset 0 0 24px rgba(255,190,40,0.35); padding:10px; }
+  .ll-hub-t{ font:900 clamp(24px, 8vw, 32px)/1 var(--f-display); color:#ffe27a; text-shadow:0 0 12px rgba(255,210,63,0.8); }
+  .ll-hub-s{ font:700 11.5px/1.25 var(--f-body); color:#ffe9a8; }
+  .ll-buttons{ display:flex; gap:10px; justify-content:center; min-height:56px; }
+  .ll-btn{ font:900 24px/1 var(--f-display); letter-spacing:1px; padding:14px 26px; border-radius:16px; border:3px solid #fff3c4; cursor:pointer; color:#fff; text-shadow:0 2px 0 rgba(0,0,0,0.35); box-shadow:0 5px 0 rgba(0,0,0,0.5); }
+  .ll-btn.hidden{ display:none; }
+  .ll-btn.stop{ background:linear-gradient(180deg, #ff6b6b, #c81e1e); min-width:170px; }
+  .ll-btn.bank{ background:linear-gradient(180deg, #5ee08a, #148a3c); }
+  .ll-btn.again{ background:linear-gradient(180deg, var(--gold-1), var(--gold-3)); color:#3a1a00; text-shadow:none; }
+  .ll-btn:active{ transform:translateY(3px); box-shadow:0 2px 0 rgba(0,0,0,0.5); }
+  .ll-note{ min-height:18px; font:700 13px var(--f-body); color:#ffe9a8; }
+  .ll-slime{ position:absolute; inset:0; z-index:3; pointer-events:none; opacity:0; transform-origin:50% 40%; }
+  .ll-slime svg{ width:100%; height:100%; display:block; }
+  .slimed .ll-slime{ animation:llSlime 2.2s ease-out forwards; }
+  @keyframes llSlime{ 0%{ opacity:0; transform:scale(0.3); } 12%{ opacity:1; transform:scale(1.08); } 20%{ transform:scale(1); } 75%{ opacity:1; transform:translateY(14px) scaleY(1.06); } 100%{ opacity:0.85; transform:translateY(30px) scaleY(1.12); } }
+  .slimed .ll-hub-t{ color:#7dff5a; text-shadow:0 0 12px rgba(120,255,90,0.8); }
+  @media (prefers-reduced-motion: reduce){ .ll-spot, .ll-sq.hit{ animation:none; } .slimed .ll-slime{ animation:none; opacity:0.85; } }
   /* The commercial break: a 3-second fake 70s ad with a VHS wobble. Skippable. */
   .show-card.ad{ background:#000; overflow:hidden; }
   .ad-screen{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
@@ -5734,6 +5776,15 @@
     }),
   };
   const sfx = {
+    // GLORP: a sad trombone - three steps down, the last one sagging with a wobble.
+    wahwah: ()=> withSfxCtx((ctx, t)=>{
+      [[392, 0], [370, 0.32], [349, 0.64]].forEach(([f, s])=> playTone(f, s, 0.28, 'sawtooth', 0.05));
+      const o = ctx.createOscillator(), g = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
+      o.type = 'sawtooth'; o.frequency.setValueAtTime(330, t + 0.96); o.frequency.linearRampToValueAtTime(262, t + 1.9);
+      lfo.frequency.value = 6; lg.gain.value = 9; lfo.connect(lg).connect(o.frequency);
+      g.gain.setValueAtTime(0.0001, t + 0.96); g.gain.exponentialRampToValueAtTime(0.06, t + 1.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.95);
+      o.connect(g).connect(ctx.destination); o.start(t + 0.96); lfo.start(t + 0.96); o.stop(t + 2); lfo.stop(t + 2);
+    }),
     hostVoice: showSfx.hostVoice, drumroll: showSfx.drumroll, crowdOoh: showSfx.crowdOoh, bumper: showSfx.bumper, letterLand: showSfx.letterLand, warpMiss: showSfx.warpMiss,
     key: ()=> withSfxCtx((ctx, t)=>{ coinPing(ctx, t, 0.09, 1568); coinPing(ctx, t + 0.09, 0.08, 2093); haptic([8,20,8]); }),
     milestone: ()=>{ [659, 784, 988, 1319].forEach((f, i)=> playTone(f, i * 0.08, 0.18, 'triangle', 0.1)); haptic([12,30,12]); },
@@ -8569,7 +8620,7 @@
       deck: deck.cards.slice(deck.next).map(c=> c.id),
       show: runShow, doors: runPortalDoors, warpBonus: runWarpBonusMs,
       combo: { streak: runMatchStreak, bank: runComboBank, bonus: runComboBonus, best: runBestStreak },
-      letterPos: runLetterPos, tray: runTrayMarks, act: runActIdx, actPts: runActPts, best: runBestMoment, keys: runKeys,
+      letterPos: runLetterPos, tray: runTrayMarks, act: runActIdx, actPts: runActPts, best: runBestMoment, keys: runKeys, bonusChips: runBonusChips,
     };
     try{ localStorage.setItem(RUN_LIVE_KEY, JSON.stringify(snap)); }catch(e){}
   }
@@ -9310,7 +9361,7 @@
     runPendingTrivia = false; runPendingPowerUp = false;
     runStartDate = todayStr();
     runWord = dailyWordForPlayer();
-    runPlan = buildShowPlan(runStartDate); runShow = { step:0, left:null }; runActIdx = 0; runActPts = []; runBestMoment = null; runKeys = 0; runPortalDoors = null; runWarpBonusMs = 0; runBreakSeen = {};
+    runPlan = buildShowPlan(runStartDate); runShow = { step:0, left:null }; runActIdx = 0; runActPts = []; runBestMoment = null; runKeys = 0; runBonusChips = 0; runPortalDoors = null; runWarpBonusMs = 0; runBreakSeen = {};
     runMatchStreak = 0; runComboBank = 0; runComboBonus = 0; runBestStreak = 0; renderComboMeter();
     runLetterPos = []; runWarpPoints = 0; letterIncoming.clear(); runTrayMarks = []; trayIncoming.clear();
     runEndsAt = Date.now() + RUN_DURATION_MS;
@@ -9370,7 +9421,7 @@
     currentRiddle = snap.riddle >= 0 ? RIDDLES[snap.riddle] : null; riddleEndsAt = snap.riddleEndsAt;
     runSolvedAt = null;
     runClockAddedMs = snap.clockAdded || 0;
-    runShow = snap.show || { step:0, left:null }; runPlan = buildShowPlan(runStartDate); runActIdx = snap.act || 0; runActPts = Array.isArray(snap.actPts) ? snap.actPts : []; runBestMoment = snap.best || null; runKeys = snap.keys || 0; runPortalDoors = snap.doors || null; runWarpBonusMs = snap.warpBonus || 0;
+    runShow = snap.show || { step:0, left:null }; runPlan = buildShowPlan(runStartDate); runActIdx = snap.act || 0; runActPts = Array.isArray(snap.actPts) ? snap.actPts : []; runBestMoment = snap.best || null; runKeys = snap.keys || 0; runBonusChips = snap.bonusChips || 0; runPortalDoors = snap.doors || null; runWarpBonusMs = snap.warpBonus || 0;
     runMatchStreak = (snap.combo && snap.combo.streak) || 0; runComboBank = (snap.combo && snap.combo.bank) || 0; runComboBonus = (snap.combo && snap.combo.bonus) || 0; runBestStreak = (snap.combo && snap.combo.best) || 0;
     renderComboMeter();
     runLetterPos = Array.isArray(snap.letterPos) ? snap.letterPos : runLetters.map((_, k)=> k); runWarpPoints = 0; letterIncoming.clear();
@@ -9524,6 +9575,114 @@
     runKeys++; renderRunBanner(); saveRunSnapshot();
     if (sfx.key) sfx.key();
     showToast('🔑 +1 key · an extra ' + GN.orbitDrop + ' chip');
+    return true;
+  }
+  // ---------- Lucky Lights (DIRECTION.md, refs/showcase.jpg): the end of Act 3 ----------
+  // A ring of 12 squares in gold and black under swaying spotlights. A light races round;
+  // tap STOP and it slows to a square. Prizes go in the bank: +20, +50, x2 (doubles the
+  // Act 3 points), a key or an Orbit Drop chip. Two GLORP squares lose the whole Lucky
+  // Lights bonus (green slime, wah-wah). After a prize: BANK it or SPIN AGAIN, up to 3 spins.
+  // Prizes are at face value (the act's x3 isn't applied on top).
+  const LUCKY_SQUARES = ['+20', 'KEY', '+50', 'GLORP', '+20', 'x2', 'CHIP', '+20', 'GLORP', '+50', 'KEY', 'CHIP'];
+  const LUCKY_SPINS = 3, LUCKY_STEP_MS = 70, LUCKY_AUTO_STOP_MS = 8000, LUCKY_AUTO_BANK_MS = 7000;
+  let runBonusChips = 0;   // Orbit Drop chips won outright (Lucky Lights' CHIP square)
+  let luckyOv = null, luckyGen = 0;   // (luckyGen: a game left early never calls back into a newer run)
+  // The GLORP splat: two lumpy blobs of green slime with drips (an SVG, scaled in and sliding down).
+  const GLORP_SVG = (()=>{
+    const blob = (cx, cy, r, k)=>{ let s = ''; for (let i = 0; i < 9; i++){ const a = i / 9 * Math.PI * 2 + k, rr = r * (0.42 + ((i * 37 + k * 11) % 7) / 18); s += '<circle cx="' + (cx + Math.cos(a) * r * 0.62).toFixed(1) + '" cy="' + (cy + Math.sin(a) * r * 0.62).toFixed(1) + '" r="' + rr.toFixed(1) + '"/>'; }
+      return s + '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r * 0.8) + '"/>'; };
+    const drip = (x, y, h, w)=> '<rect x="' + (x - w / 2) + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="' + (w / 2) + '"/>';
+    return '<svg viewBox="0 0 400 700" preserveAspectRatio="xMidYMid slice"><g fill="#6fe63c" stroke="#3aa81a" stroke-width="3" paint-order="stroke">' +
+      blob(110, 210, 64, 0.3) + blob(300, 470, 74, 1.1) + drip(92, 240, 120, 18) + drip(132, 250, 70, 12) + drip(286, 500, 150, 20) + drip(326, 510, 90, 14) + drip(258, 505, 60, 10) +
+      '<circle cx="190" cy="120" r="12"/><circle cx="350" cy="350" r="9"/><circle cx="60" cy="380" r="10"/><circle cx="220" cy="590" r="8"/></g>' +
+      '<g fill="rgba(255,255,255,0.45)"><ellipse cx="92" cy="186" rx="16" ry="9"/><ellipse cx="282" cy="440" rx="18" ry="10"/></g></svg>';
+  })();
+  function luckyLabel(k){ return k === 'KEY' ? '🔑' : k === 'CHIP' ? '🪙' : k === 'x2' ? '×2' : k; }
+  function runLuckyLights(st, done){
+    if (!luckyOv){ luckyOv = document.createElement('div'); luckyOv.className = 'lucky-overlay hidden'; luckyOv.id = 'luckyOverlay'; luckyOv.setAttribute('role', 'dialog'); luckyOv.setAttribute('aria-label', 'Lucky Lights'); document.body.appendChild(luckyOv); }
+    stopTallyPolling(); clearRoundTimer(); voted = false; votedSinceTime = null;
+    runCurrentGame = 'Lucky Lights';
+    const act3 = Math.round(runActPts[runActIdx] || 0), gen = ++luckyGen;
+    let bank = 0, dbl = false, keys = 0, chips = 0, spins = 0, pos = 0, timer = null, autoT = null, state = 'idle';
+    const n = LUCKY_SQUARES.length;
+    luckyOv.innerHTML = '<i class="ll-spot l"></i><i class="ll-spot r"></i><div class="ll-inner">' +
+      '<div class="ll-title">LUCKY LIGHTS</div><div class="ll-bank" aria-live="polite"></div>' +
+      '<div class="ll-ring">' + LUCKY_SQUARES.map((k, i)=> '<div class="ll-sq' + (k === 'GLORP' ? ' glorp' : k === 'x2' ? ' dbl' : '') + '" style="--a:' + (i * 360 / n) + 'deg"><span>' + luckyLabel(k) + '</span></div>').join('') +
+      '<div class="ll-hub"><b class="ll-hub-t">READY?</b><span class="ll-hub-s"></span></div></div>' +
+      '<div class="ll-buttons"><button type="button" class="ll-btn stop">STOP</button><button type="button" class="ll-btn bank hidden">BANK</button><button type="button" class="ll-btn again hidden">SPIN AGAIN</button></div>' +
+      '<div class="ll-note"></div></div><div class="ll-slime" aria-hidden="true">' + GLORP_SVG + '</div>';
+    const sqs = [...luckyOv.querySelectorAll('.ll-sq')], hubT = luckyOv.querySelector('.ll-hub-t'), hubS = luckyOv.querySelector('.ll-hub-s');
+    const bStop = luckyOv.querySelector('.stop'), bBank = luckyOv.querySelector('.bank'), bAgain = luckyOv.querySelector('.again'), note = luckyOv.querySelector('.ll-note');
+    const renderBank = ()=>{ luckyOv.querySelector('.ll-bank').textContent = 'BANK +' + bank + (dbl ? ' · ×2 ACT 3' : '') + (keys ? ' · 🔑' + keys : '') + (chips ? ' · 🪙' + chips : '') + ' · SPIN ' + Math.min(LUCKY_SPINS, spins + (state === 'spinning' ? 1 : 0)) + '/' + LUCKY_SPINS; };
+    const light = (i)=>{ sqs.forEach((s, k)=> s.classList.toggle('on', k === i)); };
+    const show = (btns)=>{ bStop.classList.toggle('hidden', btns.indexOf('stop') < 0); bBank.classList.toggle('hidden', btns.indexOf('bank') < 0); bAgain.classList.toggle('hidden', btns.indexOf('again') < 0); };
+    const finish = (banked)=>{
+      clearTimeout(timer); clearTimeout(autoT); state = 'done'; show([]); note.textContent = '';
+      if (banked){
+        const extra = dbl ? act3 : 0, total = bank + extra;
+        if (total) addRunScore(total, true);
+        for (let k = 0; k < keys; k++) addRunKey('lucky');
+        if (chips){ runBonusChips += chips; saveRunSnapshot(); }
+        hubT.textContent = 'BANKED!'; hubS.textContent = [total ? '+' + total + ' points' : '', keys ? '🔑 ' + keys : '', chips ? '🪙 ' + chips + ' chip' + (chips > 1 ? 's' : '') : ''].filter(Boolean).join(' · ') || 'Nothing ventured!';
+        if (total || keys || chips){ sfx.jackpot(); FX.burstAt(showFx, luckyOv.querySelector('.ll-hub'), { count:18, spread:130, shapes:['star', 'coin'] }); }
+      }
+      setTimeout(()=>{ if (gen !== luckyGen) return; luckyOv.classList.add('hidden'); luckyOv.innerHTML = ''; noteOverlayClosed(); updatePauseBtnVisibility(); done(); }, banked ? 1700 : 2300);
+    };
+    const land = ()=>{
+      const k = LUCKY_SQUARES[pos], sq = sqs[pos];
+      spins++; state = 'landed';
+      sq.classList.add('hit');
+      if (k === 'GLORP'){
+        bank = 0; dbl = false; keys = 0; chips = 0; renderBank();
+        hubT.textContent = 'GLORP!'; hubS.textContent = 'The Lucky Lights bonus got slimed';
+        luckyOv.classList.add('slimed'); sfx.wahwah(); haptic([60, 40, 60]);
+        finish(false); return;
+      }
+      if (k === '+20' || k === '+50') bank += +k.slice(1);
+      else if (k === 'x2'){ if (dbl) bank += 50; dbl = true; }
+      else if (k === 'KEY') keys++;
+      else if (k === 'CHIP') chips++;
+      sfx.correct(); FX.pop(sq, 1.25);
+      hubT.textContent = k === 'KEY' ? '🔑 KEY' : k === 'CHIP' ? '🪙 CHIP' : luckyLabel(k);
+      hubS.textContent = k === 'x2' ? 'Act 3 points doubled: +' + act3 : k === 'KEY' ? 'An extra Orbit Drop chip' : k === 'CHIP' ? 'An Orbit Drop chip' : 'into the bank';
+      renderBank();
+      if (spins >= LUCKY_SPINS){ setTimeout(()=>{ if (gen === luckyGen) finish(true); }, 700); return; }
+      note.textContent = 'Bank it, or spin again and risk the GLORP?';
+      show(['bank', 'again']);
+      autoT = setTimeout(()=>{ if (gen === luckyGen) finish(true); }, dt(LUCKY_AUTO_BANK_MS));
+    };
+    const gone = ()=> gen !== luckyGen || luckyOv.classList.contains('hidden') || !runActive;   // (left mid-spin: stop the light)
+    const step = ()=>{ if (gone()) return; pos = (pos + 1) % n; light(pos); sfx.spinTick(pos % 8); timer = setTimeout(step, LUCKY_STEP_MS); };
+    const spin = ()=>{
+      clearTimeout(autoT); sqs.forEach(s=> s.classList.remove('hit'));
+      state = 'spinning'; note.textContent = 'Tap STOP!'; show(['stop']); renderBank();
+      hubT.textContent = 'SPINNING!'; hubS.textContent = '';
+      step();
+      autoT = setTimeout(stop, dt(LUCKY_AUTO_STOP_MS));
+    };
+    // STOP: the light slows over a few more squares (4 to 9), so the stop is a feel, not a pick.
+    const stop = ()=>{
+      if (state !== 'spinning') return;
+      clearTimeout(timer); clearTimeout(autoT); state = 'stopping'; show([]); note.textContent = '';
+      let left = 4 + Math.floor(Math.random() * 6), gap = LUCKY_STEP_MS;
+      if ((REPLAY || DEBUG_FAST) && window.__forceLucky){ const want = LUCKY_SQUARES.indexOf(window.__forceLucky); if (want >= 0) left = ((want - pos + n) % n) || n; }   // (the TEST menu's GLORP jump)
+      const slow = ()=>{
+        if (gone()) return;
+        pos = (pos + 1) % n; light(pos); sfx.spinTick(pos % 8);
+        if (--left <= 0){ setTimeout(()=>{ if (!gone()) land(); }, 250); return; }
+        gap += 32; timer = setTimeout(slow, gap);
+      };
+      slow();
+    };
+    bStop.onclick = e=>{ e.stopPropagation(); stop(); };
+    bBank.onclick = e=>{ e.stopPropagation(); if (state === 'landed') finish(true); };
+    bAgain.onclick = e=>{ e.stopPropagation(); if (state === 'landed') spin(); };
+    luckyOv.classList.remove('hidden', 'slimed');
+    updatePauseBtnVisibility();
+    hostSay('Lucky Lights! Tap STOP, Earthling!', 2000);
+    renderBank(); light(0);
+    if (prefersReducedMotion()){ state = 'spinning'; stop(); return true; }
+    setTimeout(()=>{ if (!gone()) spin(); }, 700);
     return true;
   }
   // Cosmic Surprise in the show: the gift box (no slot reel - never a casino look).
@@ -9986,11 +10145,11 @@
     return 'A big pick' + inAct;
   }
   let runCurrentGame = null;   // the Mystery Game / Lucky Lights on screen, by name
-  function addRunScore(delta){
+  function addRunScore(delta, raw){
     if (!runActive) return;
     if (runPhase === 'trivia' || runPhase === 'secondchance' || runPhase === 'solving') return;
     // Every point won in an act is multiplied by the act's multiplier (DIRECTION.md).
-    if (delta > 0) delta *= runActMult();
+    if (delta > 0 && !raw) delta *= runActMult();   // (raw: a prize at face value - Lucky Lights)
     runScore += delta;
     if (delta > 0) runActPts[runActIdx] = (runActPts[runActIdx] || 0) + delta;
     if (delta > 0 && (!runBestMoment || delta > runBestMoment.pts)) runBestMoment = { pts: delta, text: runMomentLabel() };
@@ -15128,6 +15287,7 @@
       returnToModeSelect({ silent:true });
       runResultToday = null; clearRunSnapshot();
       dailyScanDone = null; cosmicDaily = null; try{ closeGuessRound(); }catch(e){}
+      if (luckyOv){ luckyGen++; luckyOv.classList.add('hidden'); luckyOv.innerHTML = ''; }
       showCard.classList.add('hidden'); showCard.innerHTML = '';
       document.getElementById('showSay').classList.remove('on');
     }
@@ -15189,7 +15349,8 @@
       { label:'Act 2 card', go: actCard(2) },
       { label:'Portal Pick', go: atType(s=> s.t === 'portal', 0, 96, 3) },
       { label:'Act 3 card', go: actCard(3) },
-      { label:'Lucky Lights', go: atType(s=> s.t === 'lucky', 0, 180, 5) },
+      { label:'Lucky Lights', go: atType(s=> s.t === 'lucky', 0, 180, 5, ()=>{ window.__forceLucky = null; }) },
+      { label:'Lucky: GLORP', go: atType(s=> s.t === 'lucky', 0, 180, 5, ()=>{ window.__forceLucky = 'GLORP'; }) },
       { label:'Price Probe', go: mysteryAs('priceProbe') },
       { label:'Oddball Alert', go: mysteryAs('oddballAlert') },
       { label:'Emoji Decode', go: mysteryAs('emojiDecode') },
