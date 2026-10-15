@@ -2457,6 +2457,19 @@
   :root.mode-infinity .event-overlay{ background:#1c0b3d; animation:none; }
   :root.mode-infinity .event-overlay .event-subtitle{ color:#fff3c4; background:rgba(28,6,48,0.75); box-shadow:0 0 0 2px rgba(255,214,90,0.55); }
   :root.mode-infinity .event-overlay .event-prompt{ text-shadow:var(--text-on-busy); }
+  /* ---- The marquee frame (Oct 2026): a ring of chasing bulbs round the main play screens in Daily and
+     Infinity (VS cards, Brain Beam, riddles, Brain Breaks, Portal Pick, Word Warp), in the colour of that screen's
+     world (--bulb on the ring). Bulbs are placed with transform; the chase is an opacity-only step animation
+     (three of every four bulbs dim in turn); a win or a miss makes the ring blink fast. Paused with the tab. */
+  .show-marquee{ display:none; position:fixed; inset:0; z-index:71; pointer-events:none; --bulb:#ffe9a0; }
+  :root:is(.mode-daily, .mode-infinity) .show-marquee:not(.off){ display:block; }
+  .show-marquee i{ position:absolute; left:0; top:0; width:9px; height:9px; margin:-4.5px 0 0 -4.5px; border-radius:50%; background:var(--bulb);
+    box-shadow:0 0 7px var(--bulb), 0 0 0 1.5px rgba(40,10,70,0.55); animation:bulbChase 0.9s steps(1) infinite; animation-delay:calc(var(--k) * -0.225s); will-change:opacity; }
+  @keyframes bulbChase{ 0%{ opacity:1; } 25%{ opacity:0.25; } 50%{ opacity:0.25; } 75%{ opacity:0.25; } }
+  .show-marquee.blink i{ animation:bulbBlink 0.16s steps(1) 6; }
+  @keyframes bulbBlink{ 0%{ opacity:1; } 50%{ opacity:0.15; } }
+  :root.tab-hidden .show-marquee i{ animation-play-state:paused; }
+  @media (prefers-reduced-motion: reduce){ .show-marquee i{ animation:none; opacity:0.9; } }
   /* The letter tray (B5): six blanks in the score pill; an earned letter
      sits in its spot (it flies in from the right answer - .letter-fly). */
   .sp-tray{ display:inline-flex; gap:3px; vertical-align:middle; margin-left:2px; }
@@ -3125,6 +3138,7 @@
      flashes on a win or a miss); a layer for bursts; the alien host. -->
 <div class="show-bg bg w-vs" id="showBg" aria-hidden="true"><i class="rays"></i><i class="glow"></i><div class="amb" id="showAmb"></div></div>
 <div class="show-frame show-flash" id="showFrame" aria-hidden="true"></div>
+<div class="show-marquee off" id="showMarquee" aria-hidden="true"></div>
 <div class="fx-layer show-fx" id="showFx" aria-hidden="true"></div>
 <div class="show-card hidden" id="showCard"></div>
 <div class="show-host" id="showHost" aria-hidden="true"><div class="alien" id="showAlien"></div><div class="show-say" id="showSay"></div></div>
@@ -12687,6 +12701,31 @@
     else if (kind === 'coin'){ playTone(1568, 0, 0.08, 'square', 0.03); playTone(2093, 0.06, 0.12, 'square', 0.03); }
     else if (kind === 'tick') playTone(1200, 0, 0.025, 'square', 0.02);
   };
+  // ---------- The marquee frame ----------
+  const marquee = document.getElementById('showMarquee');
+  const BULB_COLORS = { vs:'#ffb0dc', trivia:'#9fd0ff', powerup:'#7ff5d0', jumble:'#ffc07a', riddle:'#d4ff6a', odd:'#e6b8ff', entry:'#ffe27a', results:'#ffe27a', first:'#9ff5ea', scan:'#ffb4a8' };
+  function buildMarquee(){
+    const W = innerWidth, H = innerHeight, inset = 8, gap = 26, pts = [];
+    const nx = Math.max(4, Math.round((W - 2 * inset) / gap)), ny = Math.max(4, Math.round((H - 2 * inset) / gap));
+    for (let i = 0; i < nx; i++) pts.push([inset + (W - 2 * inset) * i / nx, inset]);
+    for (let i = 0; i < ny; i++) pts.push([W - inset, inset + (H - 2 * inset) * i / ny]);
+    for (let i = 0; i < nx; i++) pts.push([W - inset - (W - 2 * inset) * i / nx, H - inset]);
+    for (let i = 0; i < ny; i++) pts.push([inset, H - inset - (H - 2 * inset) * i / ny]);
+    marquee.innerHTML = pts.map(([x, y], k)=> '<i style="--k:' + (k % 4) + ';transform:translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)"></i>').join('');
+  }
+  buildMarquee(); addEventListener('resize', buildMarquee);
+  function syncMarquee(){
+    const open = el=> el && !el.classList.contains('hidden');
+    const html = document.documentElement, daily = html.classList.contains('mode-daily'), inf = html.classList.contains('mode-infinity');
+    // The ring shows on the play screens only - not on the cold open or a round bumper, the results, the Vault or
+    // the finale, nor Crowd Scan and the mode picker.
+    const off = !(daily || inf) || !showCard.classList.contains('hidden') || els.readoutOverlay.classList.contains('show') || open(els.finOverlay) || open(els.guessOverlay) || open(els.pauseOverlay);
+    marquee.classList.toggle('off', off);
+    if (off) return;
+    let key = showWorldNow;
+    if (inf) key = open(els.irOverlay) ? 'riddle' : open(els.eventOverlay) ? ((evBg.className.match(/w-(\w+)/g) || ['w-entry']).pop().slice(2)) : 'entry';
+    marquee.style.setProperty('--bulb', BULB_COLORS[key] || '#ffe9a0');
+  }
   // The riddle world's flying question marks: the same markup in each background that can turn into it.
   function qmFieldHtml(){ let h = '<div class="qm-field" aria-hidden="true">'; for (let k = 0; k < 11; k++) h += '<span style="--y:' + (4 + (k * 9.1) % 88).toFixed(0) + '%;--s:' + (44 + (k * 37) % 70) + 'px;--d:' + (11 + (k * 5) % 9) + 's;--dl:-' + ((k * 3.7) % 14).toFixed(1) + 's;--x:' + ((k * 17) % 90) + '">?</span>'; return h + '</div>'; }
   document.getElementById('showBg').insertAdjacentHTML('beforeend', qmFieldHtml());
@@ -12714,6 +12753,7 @@
     showBg.classList.toggle('paused', open(els.solveOverlay) || els.readoutOverlay.classList.contains('show') || open(els.finOverlay) || !showCard.classList.contains('hidden'));
   }
   [els.eventOverlay, els.solveOverlay, els.readoutOverlay, els.finOverlay, els.irOverlay, els.guessOverlay, document.getElementById('showCard'), document.documentElement].forEach(ov=> new MutationObserver(syncShowWorld).observe(ov, { attributes:true, attributeFilter:['class'] }));
+  [els.eventOverlay, els.solveOverlay, els.readoutOverlay, els.finOverlay, els.irOverlay, els.guessOverlay, els.pauseOverlay, document.getElementById('showCard'), document.documentElement].forEach(ov=> new MutationObserver(syncMarquee).observe(ov, { attributes:true, attributeFilter:['class'] }));
   // C1: Infinity's popup world - the power-up pick, a Cosmic Surprise, or
   // the bonus Brain Beam.
   const evBg = document.getElementById('evBg');
@@ -12727,7 +12767,7 @@
     if (!good) FX.shake(document.getElementById('cosmicStage'));
   }
   function hostMood(m){ FX.alien(showAlien, m); }
-  function showFlash(kind){ FX.flash(showFrame, kind); }
+  function showFlash(kind){ FX.flash(showFrame, kind); marquee.classList.remove('blink'); void marquee.offsetWidth; marquee.classList.add('blink'); clearTimeout(showFlash._t); showFlash._t = setTimeout(()=> marquee.classList.remove('blink'), 1100); }
   // The host's speech bubble (B3): a short line from data/game-names.js
   // (cameo), about a second and a half. B9 adds his voice blips.
   const HOST_SAY_MAX_MS = 2500;   // a speech bubble never stays longer than this
