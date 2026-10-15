@@ -877,9 +877,9 @@
   .riddle-continue.hidden{ display:none; }
   /* UFOs: two glide across the sky, wobbling, beams flickering. */
   .riddle-ufo{ position:absolute; z-index:2; top:0; left:0; display:none; pointer-events:none; font-size:44px; line-height:1;
-    filter:drop-shadow(0 0 10px rgba(125,255,176,0.8)); }
+    filter:drop-shadow(0 0 10px rgba(95,235,255,0.8)); }
   .riddle-ufo i{ position:absolute; left:50%; top:80%; width:46px; height:90px; transform:translateX(-50%);
-    background:linear-gradient(to bottom, rgba(125,255,176,0.55), rgba(125,255,176,0)); clip-path:polygon(35% 0, 65% 0, 100% 100%, 0 100%);
+    background:linear-gradient(to bottom, rgba(95,235,255,0.6), rgba(95,235,255,0)); clip-path:polygon(35% 0, 65% 0, 100% 100%, 0 100%);
     animation: ufoBeam 0.5s ease-in-out infinite alternate; }
   .riddle-ufo span{ display:inline-block; animation: ufoWobble 0.9s ease-in-out infinite alternate; }
   /* They keep flying for as long as the celebration lasts: each crosses,
@@ -952,7 +952,7 @@
   @keyframes irtDots{ 0%{ opacity:0.3; } 50%{ opacity:1; } 100%{ opacity:0.3; } }
   .tap-ufo{ position:fixed; left:0; z-index:12; width:52px; height:44px; padding:0; border:0; background:none; cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
   .tap-ufo span{ display:inline-block; font-size:34px; line-height:44px; animation: ufoWobble 0.7s ease-in-out infinite alternate;
-    filter:sepia(0.6) saturate(3) hue-rotate(-10deg) var(--ufo-pop); }
+    filter:var(--ufo-pop); }
   /* Infinity's UFOs fly over gold and orange backgrounds, where a gold UFO
      disappeared (Oct 2026 phone playthrough): a crisp white outline, a cyan
      glow and a soft dark halo behind make them stand out on any background.
@@ -967,7 +967,7 @@
   @keyframes ufoPop{ 0%{ opacity:0; transform:translateY(0) scale(0.6); } 20%{ opacity:1; transform:translateY(-10px) scale(1.1); } 100%{ opacity:0; transform:translateY(-40px) scale(1); } }
   .riddle-ufo.abduct-ufo{ position:fixed; z-index:11; font-size:42px; pointer-events:none !important; filter:none; }
   .abduct-ufo span{ filter:var(--ufo-pop); }
-  .riddle-ufo.abduct-ufo i{ width:150px; height:120px; top:70%; background:linear-gradient(to bottom, rgba(255,240,170,0.75), rgba(255,240,170,0)); }
+  .riddle-ufo.abduct-ufo i{ width:150px; height:120px; top:70%; background:linear-gradient(to bottom, rgba(95,235,255,0.75), rgba(95,235,255,0)); }
   .riddle-ufo.abduct-ufo.go{ display:block; animation: abductIn 1.9s ease-in-out both; }
   @keyframes abductIn{ 0%{ opacity:0; transform:translateY(-40px) scale(0.6); } 20%{ opacity:1; transform:none; } 80%{ opacity:1; transform:none; } 100%{ opacity:0; transform:translate(80px,-40px) scale(0.6); } }
   @media (prefers-reduced-motion: reduce){ .ir-host-art, .ir-overlay:not(.intro) .ir-host, .irt-static, .irt-text, .irt-text b, .tap-ufo span{ animation:none !important; } .tap-ufo, .abduct-ufo{ display:none !important; } }
@@ -1160,13 +1160,13 @@
   @keyframes pkJackGlow{ from{ opacity:0.25; } to{ opacity:1; } }
   .plinko-svg .pk-guardpeg{ }
   @media (prefers-reduced-motion: reduce){ .plinko-svg .pk-jglow{ animation:none; opacity:0.8; } }
-  .pk-ufo span{ filter:sepia(0.7) saturate(4) hue-rotate(-12deg) brightness(1.1) var(--ufo-pop); }
-  .pk-ufo.riddle-ufo i{ width:46px; height:40px; top:70%; background:linear-gradient(to bottom, rgba(255,240,170,0.85), rgba(255,240,170,0)); opacity:0.2; animation:none; transition:opacity 0.2s; }
+  .pk-ufo span{ filter:var(--ufo-pop); }
+  .pk-ufo.riddle-ufo i{ width:46px; height:40px; top:70%; background:linear-gradient(to bottom, rgba(95,235,255,0.85), rgba(95,235,255,0)); opacity:0.2; animation:none; transition:opacity 0.2s; }
   .pk-ufo.beaming i{ opacity:1; height:70px; }
   .pk-ufo.spin span, .vault-ufo.spin span{ animation:ufoSpin 0.6s cubic-bezier(.3,1.4,.5,1); }
   @keyframes ufoSpin{ 0%{ transform:rotate(0) scale(1); } 40%{ transform:rotate(-14deg) scale(1.18); } 70%{ transform:rotate(12deg) scale(1.05); } 100%{ transform:none; } }
   .pk-laser, .vault-laser{ position:absolute; z-index:4; width:5px; margin-left:-2.5px; transform-origin:50% 0; pointer-events:none; border-radius:3px;
-    background:linear-gradient(180deg,#ffffff,#ff3cac 30%,#ffe24a); box-shadow:0 0 10px #ff3cac, 0 0 18px rgba(255,226,74,0.9); }
+    background:linear-gradient(180deg,#ffffff,#5ff8ff 30%,#1fa7ff); box-shadow:0 0 10px #38d8ff, 0 0 18px rgba(31,167,255,0.9); }
   .pk-buttons{ align-items:center; }
   .pk-drop{ min-width:200px; font-size:18px; padding:14px 32px; }
   .pk-all{ font-size:13px; padding:8px 16px; min-height:40px !important; }
@@ -1297,8 +1297,8 @@
   @keyframes dialSpin{ 0%{ transform:rotate(0); } 45%{ transform:rotate(250deg); } 75%{ transform:rotate(130deg); } 100%{ transform:rotate(360deg); } }
   .vault-coins{ z-index:3; }
   .vault-ufo.riddle-ufo{ display:none; left:50%; top:0; z-index:4; font-size:56px; margin-left:-30px; filter:none; }
-  .vault-ufo span{ filter:sepia(1) saturate(5) hue-rotate(-14deg) brightness(1.15) var(--ufo-pop); }
-  .vault-ufo.riddle-ufo i{ width:70px; height:150px; top:72%; background:linear-gradient(to bottom, rgba(255,240,170,0.85), rgba(255,240,170,0)); }
+  .vault-ufo span{ filter:var(--ufo-pop); }
+  .vault-ufo.riddle-ufo i{ width:70px; height:150px; top:72%; background:linear-gradient(to bottom, rgba(95,235,255,0.85), rgba(95,235,255,0)); }
   .fin-vault.jackpot .vault-ufo.riddle-ufo, .fin-vault.dial .vault-ufo.riddle-ufo, .fin-vault.open .vault-ufo.riddle-ufo{ display:block; animation: vaultUfoIn 0.9s cubic-bezier(.2,.9,.3,1.1) both; }
   /* The UFO cracks the vault: laser pulses at the dial with each click, then
      its tractor beam shines into the open vault as the coins come out. */
@@ -2821,7 +2821,7 @@
     margin-top:16px; font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:21px; letter-spacing:2.5px;
     padding:12px 30px; min-height:48px; display:inline-flex; align-items:center; gap:8px; transition:transform 0.15s ease;
   }
-  /* B8: the gold UFO prop glides across the entry screen's sky now and then,
+  /* B8: the silver UFO prop glides across the entry screen's sky now and then,
      behind the words and buttons (transform only; the sky clips it, so
      nothing ever overflows). */
   .ms-ufo{ z-index:auto; width:76px; height:44px; opacity:0; will-change:transform; }
@@ -7742,7 +7742,7 @@
   function mothershipSvg(){
     return '<svg viewBox="0 0 160 110" aria-hidden="true"><defs><linearGradient id="msb" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fff3a8"/><stop offset="0.5" stop-color="#ffc928"/><stop offset="1" stop-color="#b86a00"/></linearGradient>' +
       '<linearGradient id="msd" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#d6fbff"/><stop offset="1" stop-color="#5fd4e6"/></linearGradient>' +
-      '<linearGradient id="msbeam" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="rgba(255,240,170,0.85)"/><stop offset="1" stop-color="rgba(255,240,170,0)"/></linearGradient></defs>' +
+      '<linearGradient id="msbeam" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="rgba(95,235,255,0.85)"/><stop offset="1" stop-color="rgba(95,235,255,0)"/></linearGradient></defs>' +
       '<path d="M60 58 L100 58 L132 110 L28 110 Z" fill="url(#msbeam)"/>' +
       '<ellipse cx="80" cy="36" rx="28" ry="22" fill="url(#msd)" stroke="#fff" stroke-width="2"/>' +
       '<ellipse cx="80" cy="50" rx="74" ry="17" fill="url(#msb)" stroke="#7a3d00" stroke-width="2.5"/>' +
@@ -10450,7 +10450,7 @@
     vaultDrama(stage, a, showAll);
   }
   // The Vault's big moment, shared by Infinity's finale and (B6) Daily's
-  // reward: dial -> bolts -> door -> (jackpot: the gold UFO beams the bonus
+  // reward: dial -> bolts -> door -> (jackpot: the silver UFO beams the bonus
   // card) -> coins to collect -> done(). The coins carry a.bonus on top of
   // a.runScore (or the whole a.finalScore with no bonus).
   function vaultDrama(stage, a, done){
@@ -12600,7 +12600,7 @@
   // UFO's passes (B8) run only while it's on screen.
   new MutationObserver(()=>{ const on = !els.modeSelectOverlay.classList.contains('hidden'); if (on) renderEntryStreak(); entryUfo(on); }).observe(els.modeSelectOverlay, { attributes:true, attributeFilter:['class'] });
   renderEntryStreak();
-  // B8: the gold UFO crosses the entry screen every ENTRY_UFO_GAP_MS (a
+  // B8: the silver UFO crosses the entry screen every ENTRY_UFO_GAP_MS (a
   // random time in the range, counted from one pass's start to the next),
   // high over the sky, one way or the other. Not while the tab is hidden,
   // not with reduced motion.
