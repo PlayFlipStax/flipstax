@@ -1119,6 +1119,25 @@
     padding:calc(18px + env(safe-area-inset-top)) 16px calc(18px + env(safe-area-inset-bottom)); text-align:center; font-family:'Inter', system-ui, sans-serif;
     background: radial-gradient(120% 70% at 50% 18%, #ffcf4a 0%, #ff8a1f 18%, #c2275f 42%, #4a1478 70%, #1c0b3d 100%); color:#fff; }
   .fin-overlay.hidden{ display:none; }
+  /* Orbit Drop's world (DIRECTION.md: deep-space neon): deep space - a dark sky, two faint nebulae (pink and blue),
+     two layers of stars (the near one twinkles slowly) - instead of the finale's sunburst. */
+  .fin-overlay:has(.fin-plinko:not(.hidden)){ background:
+      radial-gradient(55% 38% at 80% 20%, rgba(255,60,172,0.30), rgba(255,60,172,0) 70%),
+      radial-gradient(60% 42% at 14% 66%, rgba(90,110,255,0.30), rgba(90,110,255,0) 70%),
+      radial-gradient(42% 30% at 62% 88%, rgba(125,249,255,0.16), rgba(125,249,255,0) 70%),
+      radial-gradient(120% 90% at 50% 40%, #150b3c 0%, #08061f 55%, #020110 100%); }
+  .fin-overlay:has(.fin-plinko:not(.hidden)) .fin-rays{ display:none; }
+  .fin-overlay:has(.fin-plinko:not(.hidden))::before, .fin-overlay:has(.fin-plinko:not(.hidden))::after{ content:''; position:fixed; inset:0; z-index:-1; pointer-events:none; }
+  .fin-overlay:has(.fin-plinko:not(.hidden))::before{ opacity:0.75; background-size:260px 240px;
+    background-image:radial-gradient(1px 1px at 22px 34px, #fff, rgba(255,255,255,0)), radial-gradient(1px 1px at 96px 128px, rgba(220,235,255,0.9), rgba(255,255,255,0)),
+      radial-gradient(1.4px 1.4px at 168px 58px, #fff, rgba(255,255,255,0)), radial-gradient(1px 1px at 236px 178px, rgba(200,230,255,0.9), rgba(255,255,255,0)),
+      radial-gradient(1.2px 1.2px at 54px 210px, #fff, rgba(255,255,255,0)), radial-gradient(1px 1px at 140px 222px, rgba(255,220,240,0.85), rgba(255,255,255,0)); }
+  .fin-overlay:has(.fin-plinko:not(.hidden))::after{ background-size:410px 370px; animation:starTwinkle 5s ease-in-out infinite alternate;
+    background-image:radial-gradient(1.8px 1.8px at 70px 90px, #fff, rgba(255,255,255,0)), radial-gradient(2px 2px at 300px 40px, rgba(190,250,255,1), rgba(255,255,255,0)),
+      radial-gradient(1.6px 1.6px at 210px 260px, #fff, rgba(255,255,255,0)), radial-gradient(2.2px 2.2px at 380px 330px, rgba(255,214,240,1), rgba(255,255,255,0)); }
+  @keyframes starTwinkle{ from{ opacity:0.45; } to{ opacity:1; } }
+  @media (prefers-reduced-motion: reduce){ .fin-overlay:has(.fin-plinko:not(.hidden))::after{ animation:none; opacity:0.8; } }
+  :root.lite .fin-overlay::after{ animation:none !important; }
   .fin-sky, .vault-coins{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
   .fin-sky{ position:fixed; z-index:0; }
   .fin-rays{ position:fixed; left:50%; top:22%; width:180vmax; height:180vmax; margin:-90vmax 0 0 -90vmax; z-index:0; pointer-events:none; opacity:0.35;
@@ -11325,10 +11344,17 @@
       '<linearGradient id="pkJack" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7df9ff"/><stop offset="1" stop-color="#3b1d8f"/></linearGradient>' +
       '<linearGradient id="pkBeamUp" x1="0" x2="0" y1="1" y2="0"><stop offset="0" stop-color="rgba(125,249,255,0.55)"/><stop offset="1" stop-color="rgba(125,249,255,0)"/></linearGradient></defs>';
     g += '<rect x="2" y="2" width="' + (W - 4) + '" height="' + (H - 4) + '" rx="20" fill="rgba(30,8,60,0.55)" stroke="#ffd23f" stroke-width="3"/>';
+    let jackSign = '';
     OP.SLOTS.forEach(([kind], i)=>{
       const l = e[i], r = e[i + 1], w = r - l, cx = (l + r) / 2, jack = kind === 'jackpot', big = kind === 'x3' || kind === '+50';
-      if (jack) g += '<rect class="pk-jglow" x="' + (l + 1) + '" y="' + (top - 120) + '" width="' + (w - 2) + '" height="120" fill="url(#pkBeamUp)"/>' +
-        '<text x="' + cx + '" y="' + (top - 38) + '" text-anchor="middle" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="12" letter-spacing="0.5" fill="#e6fdff" stroke="rgba(20,0,50,0.7)" stroke-width="3" paint-order="stroke">THE MOTHERSHIP</text>';
+      if (jack){
+        g += '<rect class="pk-jglow" x="' + (l + 1) + '" y="' + (top - 120) + '" width="' + (w - 2) + '" height="120" fill="url(#pkBeamUp)"/>';
+        // THE MOTHERSHIP's sign: drawn after the pegs (nothing covers it), on a dark pill in the clear gap between the last
+        // peg row's glow and the guard pegs' glow.
+        const gy = OP.C.SLOT_TOP - OP.C.GUARD_DY - OP.C.PEG_R * 2.2, ry = OP.C.PEG_ROW_Y0 + (OP.C.PEG_ROWS - 1) * OP.C.PEG_ROW_DY + OP.C.PEG_R * 2.2, my = (gy + ry) / 2;
+        jackSign = '<g class="pk-jsign"><rect x="' + (cx - 47) + '" y="' + (my - 8.5) + '" width="94" height="17" rx="8.5" fill="rgba(12,4,34,0.88)" stroke="#7df9ff" stroke-width="1.2"/>' +
+          '<text x="' + cx + '" y="' + (my + 4.2) + '" text-anchor="middle" font-family="Big Shoulders Display, Arial Narrow, Arial" font-weight="900" font-size="11.5" letter-spacing="0.6" fill="#e6fdff">THE MOTHERSHIP</text></g>';
+      }
       g += '<g class="pk-slot" data-i="' + i + '"><rect x="' + (l + 1.5) + '" y="' + top + '" width="' + (w - 3) + '" height="' + (floor - top) + '" rx="5" fill="' + (jack ? 'url(#pkJack)' : 'url(#pkSlot)') + '" stroke="' + (jack ? '#7df9ff' : '#ffd23f') + '" stroke-width="1.5"' + (jack ? ' class="pk-jglow"' : '') + '/>' +
         '<text x="' + cx + '" y="' + (top + 34) + '" text-anchor="middle" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="' + (jack ? 34 : kind === '+50' ? 22 : kind === 'x3' ? 28 : 26) + '" fill="' + (jack ? '#e6fdff' : '#fff6c2') + '" stroke="rgba(40,0,60,0.55)" stroke-width="3" paint-order="stroke">' + plinkoLabel(kind) + '</text>' +
         '<text x="' + cx + '" y="' + (top + 58) + '" text-anchor="middle" font-family="Inter, Arial" font-weight="800" font-size="13" fill="rgba(255,246,194,0.8)">' + (kind === '+50' ? '' : '+' + OP.SLOT_POINTS[kind]) + '</text></g>';
@@ -11337,7 +11363,7 @@
       g += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y + '" r="' + (OP.C.PEG_R * 2.2) + '" fill="url(#' + (p.guard ? 'pkHaloG' : 'pkHalo') + ')"/>' +
         '<circle class="pk-peg' + (p.guard ? ' pk-guardpeg' : '') + '" data-p="' + i + '" cx="' + p.x.toFixed(1) + '" cy="' + p.y + '" r="' + OP.C.PEG_R + '" fill="url(#' + (p.guard ? 'pkGuard' : 'pkPeg') + ')" stroke="rgba(255,255,255,0.7)" stroke-width="1.2"/>';
     });
-    svg.innerHTML = g;
+    svg.innerHTML = g + jackSign;
   }
   // Orbit Drop plays for Infinity's finale (infRun.finale) or as Daily's grand prize
   // (dailyOrbit, see openDailyOrbit): the board code reads its state through these.
