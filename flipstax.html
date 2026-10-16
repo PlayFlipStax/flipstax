@@ -4567,6 +4567,7 @@
 <script src="data/beam-levels.js"></script>
 <script src="data/peak-or-plunge.js"></script>
 <script src="data/snap-sort.js"></script>
+<script src="data/fact-or-fib.js"></script>
 <script src="lib/mini-games.js"></script>
 <script src="lib/orbit-physics.js"></script>
 <script src="lib/host-alien.js"></script>
@@ -10390,7 +10391,7 @@
   // The day's Mystery Game in its slot.
   // The Mystery Game wheel spins and lands on the game's name, then the game plays.
   function runMysteryGame(st, done){
-    if (!st.game || !mysteryAvailable(st.game)) return false;
+    if (!st.game || !(mysteryAvailable(st.game) || (st.forced && miniGame(st.game)))) return false;   // (TEST jumps can force a game not yet in the rotation)
     runCurrentGame = mysteryName(st.game);
     showMysteryReveal(st.game, ()=>{
       if (!runActive) return;
@@ -16661,7 +16662,7 @@
     function planIndex(pred, nth){ const plan = buildShowPlan(todayStr()); let k = 0; for (let i = 0; i < plan.length; i++) if (pred(plan[i]) && k++ === (nth || 0)) return i; return 0; }
     const atType = (pred, nth, score, letters, tweak)=> ()=> replayAtStep(planIndex(pred, nth), score, letters, tweak);
     const actCard = (a)=> atType(s=> s.t === 'act' && s.act === a);
-    const mysteryAs = (game)=> atType(s=> s.t === 'mystery', 0, 60, 1, (i)=>{ runPlan[i] = Object.assign({}, runPlan[i], { game, seed:20261013 }); });
+    const mysteryAs = (game)=> atType(s=> s.t === 'mystery', 0, 60, 1, (i)=>{ runPlan[i] = Object.assign({}, runPlan[i], { game, seed:20261013, forced:true }); });
     function replaySampleEpisode(){
       const r = replaySampleResult();
       return Object.assign(r, { score: 412, actPts: [64, 0, 128, 141], missPts: 10, goopLost: 28, best: { pts: 45, text: 'Read the crowd on Pizza vs Tacos in Lightning Round' }, episode: showEpisode(todayStr()),
@@ -16690,6 +16691,7 @@
       { label:'Snap Sort', go: mysteryAs('snapSort') },
       { label:'Zap Words', go: mysteryAs('zapWords') },
       { label:'Twin Flip', go: mysteryAs('twinFlip') },
+      { label:'Fact or Fib (unreviewed)', go: mysteryAs('factOrFib') },
       // The finale's cue card, then the Word Warp with all six letters in.
       { label:'Grand finale (6 letters)', wide:true, go: atType(s=> s.t === 'act' && s.finale, 0, 210, 6) },
       { label:'Orbit Drop', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); const r = replaySampleEpisode(); delete r.orbit; delete r.orbitPoints; r.score = 368; r.keys = 2; r.bonusChips = 1; r.warpChip = true; r.orbitChips = dailyChipsFor(2, 1, true); runResultToday = r; openDailyOrbit(r); }) },

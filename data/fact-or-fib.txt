@@ -1,0 +1,124 @@
+FlipStax - Fact or Fib statements
+NOT FACT-CHECKED - please check every line before setting FACT_OR_FIB_REVIEWED = true in data/fact-or-fib.js.
+Format: number. TRUE/FIB | statement | host follow-up
+
+1. TRUE | A group of flamingos is called a flamboyance. | Fabulous name for a fabulous bird.
+2. TRUE | Octopuses have three hearts. | Two for the gills, one for everything else.
+3. TRUE | Botanically, bananas are berries but strawberries are not. | Botany is a wild ride, Earthling.
+4. TRUE | Honey found in ancient Egyptian tombs was still edible. | Honey basically never goes off.
+5. TRUE | Wombats make cube-shaped poop. | Nature's building blocks!
+6. TRUE | Sea otters hold hands while they sleep so they don't drift apart. | The cutest anchor in the ocean.
+7. TRUE | A day on Venus is longer than a year on Venus. | It spins slower than it orbits the Sun.
+8. TRUE | The Eiffel Tower gets a little taller in summer. | Hot metal expands, by up to about 15 cm.
+9. TRUE | Sharks have been around longer than trees. | Sharks are older than trees by tens of millions of years.
+10. TRUE | Scotland's national animal is the unicorn. | Official since the 1300s. Very majestic.
+11. TRUE | Some turtles can breathe through their rear ends. | It helps them stay underwater all winter.
+12. TRUE | A shrimp's heart is in its head. | Head over heart, literally.
+13. TRUE | The dot over a lowercase i is called a tittle. | Tittle! Say it five times fast.
+14. TRUE | Koala fingerprints look almost like human fingerprints. | Crime scene twist: it was the koala.
+15. TRUE | There are more possible chess games than atoms in the observable universe. | Good luck memorizing them all.
+16. TRUE | Butterflies taste with their feet. | Every landing is a snack check.
+17. TRUE | Cleopatra lived closer in time to the Moon landing than to the building of the Great Pyramid. | The pyramids were already ancient to her.
+18. TRUE | A bolt of lightning is hotter than the surface of the Sun. | Around five times hotter, for a split second.
+19. TRUE | An ostrich's eye is bigger than its brain. | Big eyes, tiny thoughts.
+20. TRUE | Some penguins give a pebble to the mate they want. | The original engagement rock.
+21. TRUE | A pineapple plant takes about two years to grow one pineapple. | Worth the wait? You tell me.
+22. TRUE | Venus spins in the opposite direction to most planets. | On Venus the Sun rises in the west.
+23. TRUE | A fluffy white cloud can weigh more than a million pounds. | That's a lot of floating water droplets.
+24. TRUE | Saturn is less dense than water. | In a big enough bathtub, it would float.
+25. TRUE | Bees can learn to recognize human faces. | Bees: excellent at faces, terrible at names.
+26. TRUE | Cats can't taste sweetness. | No sweet tooth at all. More tuna, please.
+27. TRUE | A group of crows is called a murder. | Spooky name, smart birds.
+28. TRUE | Goats have rectangular pupils. | Great for spotting trouble all around them.
+29. TRUE | The shortest war in history lasted less than an hour. | The Anglo-Zanzibar War, 1896. Blink and you missed it.
+30. TRUE | Polar bears have black skin under their white fur. | Black skin soaks up the sunshine.
+31. TRUE | The longest recorded flight by a chicken lasted 13 seconds. | Thirteen glorious seconds of glory.
+32. TRUE | Peanuts aren't nuts - they're legumes, like peas and beans. | Nutty, but not a nut.
+33. TRUE | Astronauts get a little taller in space. | No gravity squishing their spines down.
+34. TRUE | Hummingbirds can fly backwards. | They're the only birds that really can.
+35. TRUE | Sloths can hold their breath longer than dolphins. | Up to about 40 minutes. Slow and steady!
+36. TRUE | Rats make laughing sounds when they're tickled. | Too high-pitched for us to hear, though.
+37. TRUE | A jiffy is a real unit of time. | Back in a jiffy - scientifically!
+38. TRUE | The Moon has moonquakes. | Even the Moon gets the jitters.
+39. TRUE | Some cats are allergic to humans. | Achoo! Talk about a role reversal.
+40. TRUE | There's a basketball court on the top floor of the U.S. Supreme Court building. | They call it the highest court in the land.
+41. TRUE | Ketchup was sold as a medicine in the 1830s. | Take two fries and call me in the morning.
+42. TRUE | Early cultivated carrots were purple or yellow, not orange. | Orange carrots came along later.
+43. TRUE | In the Middle Ages, a 'moment' meant about 90 seconds. | Got a moment? That'll be 90 seconds.
+44. TRUE | Dolphins can sleep with half their brain at a time. | One half naps, the other keeps watch.
+45. TRUE | Botanically, an avocado is a fruit. | A big berry with one huge seed.
+46. TRUE | A hummingbird's heart can beat more than 1,000 times a minute. | That's one busy little heart.
+47. TRUE | Jellyfish have no brain. | And they've done fine for 500 million years.
+48. TRUE | A group of owls is called a parliament. | Order! Order in the parliament!
+49. TRUE | Snails can have thousands of tiny teeth. | Tiny teeth on a ribbon-like tongue.
+50. TRUE | Starfish don't have blood. | They pump seawater around instead.
+51. TRUE | Platypuses glow under ultraviolet light. | A blue-green glow. Party animal!
+52. TRUE | The Statue of Liberty was copper-coloured before it turned green. | Shiny copper, then decades of weather.
+53. TRUE | Tomatoes are fruits, botanically. | Still not going in the fruit salad.
+54. TRUE | Honeybees do a 'waggle dance' to tell other bees where flowers are. | Directions by dance move.
+55. TRUE | A blue whale's tongue can weigh as much as an elephant. | Heaviest tongue on the planet.
+56. TRUE | Cows can sleep standing up, but they lie down for deep sleep. | Moo-ve over, I need a nap.
+57. TRUE | Bananas are slightly radioactive. | A tiny bit, from potassium. Totally safe!
+58. TRUE | Sea cucumbers are animals, not plants. | Not great in a salad.
+59. TRUE | Male seahorses carry the babies. | Dad does the pregnancy. Nice work, Dad.
+60. TRUE | An octopus can taste with its arms. | Every hug is a taste test.
+61. FIB | Goldfish only remember things for three seconds. | Fib! Goldfish can remember things for months.
+62. FIB | Bulls get angry when they see the colour red. | Fib! It's the cape's movement, not the colour.
+63. FIB | You can see the Great Wall of China from the Moon with your eyes. | Fib! It's far too narrow to spot from there.
+64. FIB | Lightning never strikes the same place twice. | Fib! Tall towers get hit again and again.
+65. FIB | Bats are blind. | Fib! Bats can see - they just use sound too.
+66. FIB | Humans only use 10% of their brains. | Fib! You use all of it, just not all at once.
+67. FIB | Ostriches bury their heads in the sand when scared. | Fib! They lie low, but heads stay out.
+68. FIB | Camels store water in their humps. | Fib! The humps are mostly fat.
+69. FIB | A penny dropped from a skyscraper could seriously hurt someone. | Fib! Air slows it down to a harmless speed.
+70. FIB | Chameleons change colour mainly to blend into the background. | Fib! Mostly it's mood and temperature.
+71. FIB | Sharks can't get cancer. | Fib! Sadly, they can.
+72. FIB | Napoleon was unusually short. | Fib! He was about average for his time.
+73. FIB | Vikings wore horned helmets into battle. | Fib! That idea came from 1800s costumes.
+74. FIB | Your hair and nails keep growing after death. | Fib! The skin shrinks back, so it just looks that way.
+75. FIB | Dogs only see in black and white. | Fib! They see some colours, mostly blues and yellows.
+76. FIB | If you touch a baby bird, its mother will reject it. | Fib! Most birds have a weak sense of smell.
+77. FIB | Mount Everest is the tallest mountain from base to peak. | Fib! Mauna Kea wins, most of it underwater.
+78. FIB | Your tongue has separate zones for sweet, sour, salty and bitter. | Fib! The whole tongue tastes them all.
+79. FIB | Toilets flush the opposite way in the Southern Hemisphere. | Fib! The bowl's shape decides the swirl.
+80. FIB | Old window glass is thicker at the bottom because glass slowly flows. | Fib! Old glass was just made unevenly.
+81. FIB | Cracking your knuckles causes arthritis. | Fib! Annoying, maybe. Harmful, no.
+82. FIB | A duck's quack doesn't echo. | Fib! It echoes just fine.
+83. FIB | Cut an earthworm in half and you get two worms. | Fib! At best, one half survives.
+84. FIB | Daddy longlegs are super venomous but their fangs are too short to bite. | Fib! A total myth.
+85. FIB | You lose most of your body heat through your head. | Fib! No more than any other uncovered part.
+86. FIB | Bananas grow on trees. | Fib! The banana plant is a giant herb.
+87. FIB | Seen from space, the Sun looks yellow. | Fib! It's actually white.
+88. FIB | Sugar makes kids hyperactive. | Fib! Studies keep finding no real link.
+89. FIB | Mice love cheese more than any other food. | Fib! They'd rather have grains and sweets.
+90. FIB | Pluto is still officially a planet. | Fib! It's been a dwarf planet since 2006.
+91. FIB | One side of the Moon never gets any sunlight. | Fib! The far side gets sunshine too.
+92. FIB | Venus is the closest planet to the Sun. | Fib! That's Mercury.
+93. FIB | Spinach has far more iron than almost any other food. | Fib! That idea came from a misread number.
+94. FIB | Diamonds are made from squashed coal. | Fib! Most formed far deeper than coal.
+95. FIB | Owls can turn their heads all the way around. | Fib! About 270 degrees - still impressive.
+96. FIB | A dog's mouth is cleaner than a human's. | Fib! Different germs, not fewer.
+97. FIB | We have seasons because Earth gets closer to the Sun in summer. | Fib! It's Earth's tilt that does it.
+98. FIB | Penguins live at the North Pole. | Fib! Wild penguins live in the south.
+99. FIB | Fortune cookies were invented in China. | Fib! They're from Japan and the USA.
+100. FIB | Albert Einstein failed maths at school. | Fib! He was great at maths.
+101. FIB | Christopher Columbus proved the Earth was round. | Fib! People knew that for centuries before him.
+102. FIB | Elephants are the only mammals that can't jump. | Fib! Hippos and rhinos can't jump either.
+103. FIB | Scientifically, a tomato is a vegetable. | Fib! It's a fruit - a berry, in fact.
+104. FIB | Octopuses have ten arms. | Fib! Eight arms - octo means eight.
+105. FIB | Flamingos are born pink. | Fib! Chicks are grey; their food makes them pink.
+106. FIB | Koalas are a kind of bear. | Fib! They're marsupials, like kangaroos.
+107. FIB | Peanuts are a type of nut. | Fib! They're legumes, like peas.
+108. FIB | A carrot is a rabbit's favourite natural food. | Fib! Wild rabbits mostly eat grass.
+109. FIB | The capital of Australia is Sydney. | Fib! It's Canberra.
+110. FIB | Shaving makes hair grow back thicker. | Fib! The blunt tip just feels coarser.
+111. FIB | Bats always turn left when they fly out of a cave. | Fib! Bats go whichever way they like.
+112. FIB | Lobsters are biologically immortal. | Fib! They age and die like everyone else.
+113. FIB | Touching a toad gives you warts. | Fib! Warts come from a human virus.
+114. FIB | Every kind of bee dies after it stings. | Fib! Only honeybees, and only when stinging mammals.
+115. FIB | The Sahara is the biggest desert on Earth. | Fib! Antarctica is a bigger desert.
+116. FIB | Humans have five senses and no more. | Fib! Balance, temperature and more count too.
+117. FIB | Water conducts electricity because pure water is a great conductor. | Fib! It's the stuff dissolved in it that conducts.
+118. FIB | Hair turns white overnight from a sudden fright. | Fib! Hair colour can't change that fast.
+119. FIB | The Great Pyramid of Giza was built about 1,000 years ago. | Fib! More like 4,500 years ago.
+120. FIB | Hummingbirds migrate by riding on the backs of geese. | Fib! They fly the whole way themselves.
