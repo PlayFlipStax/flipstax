@@ -2704,8 +2704,16 @@
     text-shadow:0 0 12px var(--bulb); }
   .mg-sign span{ position:relative; z-index:3; }
   .mg-rule{ min-height:22px; font:800 16px/1.3 var(--f-body); color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.6); padding:0 6px; }
+  /* I2: the template - header (plate + act pill), host zone, play area, footer (timer + score). */
+  .mg-overlay{ background:var(--game-bg, none) center / cover no-repeat, radial-gradient(120% 75% at 50% 25%, var(--mg-a) 0%, var(--mg-b) 48%, var(--mg-c) 100%); }
+  .mg-overlay.has-art .mg-bg{ display:none; }
+  .mg-head{ display:flex; flex-direction:column; align-items:center; gap:6px; margin-top:30px; }
+  .mg-head .mg-sign{ margin-top:0; }
+  .mg-act{ --c:var(--bulb); color:#fff; background:rgba(0,0,0,0.5); box-shadow:inset 0 0 0 1.5px var(--bulb); }
+  .mg-host-zone{ width:100%; min-height:24px; display:flex; align-items:center; justify-content:center; padding:0 var(--sp-2); }
+  .mg-foot{ display:flex; align-items:center; gap:var(--sp-3); width:100%; padding-top:var(--sp-1); }
   .mg-hud{ display:flex; align-items:center; gap:10px; width:100%; }
-  .mg-timer{ flex:1; height:10px; border-radius:6px; overflow:hidden; background:rgba(0,0,0,0.35); box-shadow:inset 0 0 0 1.5px rgba(255,255,255,0.35); }
+  .mg-timer{ flex:1; height:12px; border-radius:var(--r-pill); overflow:hidden; background:rgba(0,0,0,0.35); box-shadow:inset 0 0 0 1.5px rgba(255,255,255,0.35); }
   .mg-timer i{ display:block; height:100%; background:linear-gradient(90deg, #fff6c2, var(--bulb)); transform-origin:0 50%; transform:scaleX(1); }
   .mg-score{ min-width:56px; min-height:34px; display:inline-flex; align-items:center; justify-content:center; padding:4px 14px; border-radius:var(--r-pill); font:900 22px/1 var(--f-display); color:var(--c-ink); background:linear-gradient(180deg, var(--c-gold-hi), var(--c-gold)); box-shadow:0 0 0 2px rgba(122,74,0,0.5); }
   .mg-stage{ position:relative; flex:1; width:100%; min-height:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; }
@@ -10529,6 +10537,22 @@
   // timer bar (the last 3 seconds tick), a score pill, then the result (a gold +N or a red MISSED), points through the
   // act's multiplier and a key for a win (a Mystery Game win = an Orbit Drop chip). The game calls api.finish().
   function miniGame(key){ return window.MiniGames && window.MiniGames.games && window.MiniGames.games[key]; }
+  // A mini-game's background art (style-board/assets/bg-<game>.png) is used only once it has loaded; until the file
+  // exists the game keeps its designed gradient + pattern. Each file is checked once a page load.
+  const GAME_BG_FILE = { peakOrPlunge:'bg-peak', snapSort:'bg-snap', zapWords:'bg-zap', twinFlip:'bg-twin', factOrFib:'bg-fact', saucerShuffle:'bg-saucer' };
+  const gameBgState = {};
+  function gameBgFor(key, ov){
+    const f = GAME_BG_FILE[key]; if (!f) return;
+    const url = 'style-board/assets/' + f + '.png';
+    const apply = ()=>{ ov.style.setProperty('--game-bg', 'url("' + url + '")'); ov.classList.add('has-art'); };
+    if (gameBgState[key] === 'ok'){ apply(); return; }
+    if (gameBgState[key]) return;   // (missing, or still checking)
+    gameBgState[key] = 'checking';
+    const img = new Image();
+    img.onload = ()=>{ gameBgState[key] = 'ok'; if (ov.isConnected) apply(); };
+    img.onerror = ()=>{ gameBgState[key] = 'missing'; };
+    img.src = url;
+  }
   let mgOpen = null;
   function runMiniGame(key, st, done){
     const g = miniGame(key); if (!g) return false;
@@ -10536,9 +10560,18 @@
     const c = g.colors || ['#ffd23f', '#c2275f', '#2a0b4e'];
     const ov = document.createElement('div'); ov.id = 'mgOverlay'; ov.className = 'mg-overlay mg-' + key; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', mysteryName(key));
     ov.style.setProperty('--mg-a', c[0]); ov.style.setProperty('--mg-b', c[1]); ov.style.setProperty('--mg-c', c[2] || '#12062a'); ov.style.setProperty('--bulb', g.bulb || c[0]);
-    ov.innerHTML = '<div class="mg-bg" aria-hidden="true"><i class="rays"></i></div><div class="mg-inner"><div class="mg-sign"><div class="sign-bulbs" aria-hidden="true"></div><span></span></div>' +
-      '<div class="mg-rule"></div><div class="mg-hud"><div class="mg-timer" aria-hidden="true"><i></i></div><div class="mg-score" aria-live="polite">0</div></div>' +
-      '<div class="mg-stage"></div><div class="mg-result" aria-live="polite"></div></div>';
+    // I2: one template for every mini-game - header plate (name + act), host zone (the rule, or the game's own host),
+    // play area, footer (timer + score). The background is --game-bg: the game's art file when it exists, else a
+    // gradient and pattern in its colour world (.mg-<game> .mg-bg in lib/mini-games.css).
+    const act = runActive ? runAct() : null, actTag = act && act.sub ? act.sub.split(' \u00B7 ')[0] + (act.mult > 1 ? ' \u00B7 \u00D7' + act.mult : '') : 'MYSTERY GAME';
+    ov.innerHTML = '<div class="mg-bg" aria-hidden="true"><i class="rays"></i></div><div class="mg-inner">' +
+      '<div class="mg-head"><div class="mg-sign ds-plate"><div class="sign-bulbs" aria-hidden="true"></div><span></span></div><span class="mg-act ds-pill"></span></div>' +
+      '<div class="mg-host-zone"><div class="mg-rule"></div></div>' +
+      '<div class="mg-stage"></div>' +
+      '<div class="mg-foot"><div class="mg-timer" aria-hidden="true"><i></i></div><div class="mg-score" aria-live="polite">0</div></div>' +
+      '<div class="mg-result" aria-live="polite"></div></div>';
+    ov.querySelector('.mg-act').textContent = actTag;
+    gameBgFor(key, ov);
     ov.querySelector('.mg-sign span').textContent = mysteryName(key).toUpperCase();
     ov.querySelector('.mg-rule').textContent = g.rule || '';
     document.body.appendChild(ov);

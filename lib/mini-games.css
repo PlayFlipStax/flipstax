@@ -159,3 +159,38 @@
 .ff-dots i{ width:16px; height:16px; }
 /* (games without their own stage host leave the bottom corner to the corner host and his bubble) */
 .mg-overlay:not(:has(.host-full)) .mg-inner{ padding-bottom:calc(50px + env(safe-area-inset-bottom)); }
+
+/* ---- I2: each game's designed background, used until its art file (style-board/assets/bg-<game>.png) exists.
+   A static pattern in the game's colour world over its gradient (no animation: cheap, and lite-safe). ---- */
+.mg-bg::after{ content:''; position:absolute; inset:0; pointer-events:none; }
+/* Peak or Plunge: navy mountain peaks along the bottom under a coral sky, a few stars */
+.mg-peakOrPlunge .mg-bg::after{
+  background:
+    radial-gradient(1.5px 1.5px at 12% 18%, #fff 99%, transparent), radial-gradient(1.5px 1.5px at 78% 12%, #fff 99%, transparent), radial-gradient(1.2px 1.2px at 52% 26%, #ffe0d0 99%, transparent),
+    linear-gradient(135deg, transparent 49.5%, #16123f 50%) 0 100% / 50% 34% no-repeat,
+    linear-gradient(225deg, transparent 49.5%, #16123f 50%) 100% 100% / 50% 34% no-repeat,
+    linear-gradient(135deg, transparent 49.5%, #2a2366 50%) 22% 100% / 38% 24% no-repeat,
+    linear-gradient(225deg, transparent 49.5%, #2a2366 50%) 60% 100% / 38% 24% no-repeat; opacity:0.9; }
+/* Snap Sort: camera-flash dots on near-black, brighter toward the top */
+.mg-snapSort .mg-bg::after{ background:radial-gradient(circle, rgba(228,255,122,0.22) 2px, transparent 2.5px) 0 0 / 26px 26px;
+  -webkit-mask-image:linear-gradient(180deg, #000, transparent 90%); mask-image:linear-gradient(180deg, #000, transparent 90%); }
+/* Zap Words: faint diagonal lightning stripes */
+.mg-zapWords .mg-bg::after{ background:repeating-linear-gradient(115deg, transparent 0 46px, rgba(255,242,122,0.08) 46px 52px, transparent 52px 92px); }
+/* Twin Flip: the neon grid floor is its own pattern (above); a magenta horizon glow on top */
+.mg-twinFlip .mg-bg::after{ background:radial-gradient(80% 30% at 50% 62%, rgba(255,95,210,0.25), transparent 70%); }
+/* Fact or Fib: cream polka dots like a game-show backdrop */
+.mg-factOrFib .mg-bg::after{ background:radial-gradient(circle, rgba(255,240,210,0.16) 6px, transparent 6.5px) 0 0 / 40px 40px, radial-gradient(circle, rgba(255,240,210,0.1) 6px, transparent 6.5px) 20px 20px / 40px 40px; }
+/* Saucer Shuffle: a starfield with soft orbit rings */
+.mg-saucerShuffle .mg-bg::after{ background:
+    radial-gradient(1.4px 1.4px at 8% 14%, #fff 99%, transparent), radial-gradient(1.4px 1.4px at 30% 40%, #e9e4ff 99%, transparent), radial-gradient(1.2px 1.2px at 70% 22%, #fff 99%, transparent),
+    radial-gradient(1.2px 1.2px at 88% 52%, #fff 99%, transparent), radial-gradient(1.4px 1.4px at 46% 8%, #fff 99%, transparent),
+    repeating-radial-gradient(circle at 50% 36%, transparent 0 58px, rgba(233,228,255,0.07) 58px 60px); }
+
+/* ---- I2: fill the play area (no empty halves at 360-390 px) ---- */
+.zw-stage{ justify-content:center !important; }
+.zw-grid{ width:min(100%, 380px, 56vh); }
+.tf-grid{ width:min(100%, 400px, 58vh); }
+.mg-twinFlip .mg-stage{ justify-content:center; }
+.su-stage{ justify-content:center !important; }
+.su-play{ height:min(64vh, 470px); }
+.su-table{ height:15%; }

@@ -85,7 +85,7 @@ NEXT: H1 (needs the machine with the old test suites); set STATS_KEY in the Verc
 
 - [x] I0. ORBIT_MIN_CHIPS 2 -> 3. Re-simulated (1,000 episodes each): average player 3 chips 83%, 4 chips 12%, 5 chips 4%, 6 chips 1% (avg 3.22, was 2.72); weak player 3 chips 96%, 4 chips 3% (avg 3.05, was 2.24). Nobody gets 2 any more; most players now sit on the new floor of 3, so the earned chips only show up from 4 up
 - [x] I1. Design system: lib/design.css tokens + shared components, DESIGN.md
-- [ ] I2. One mini-game template for the six new games, --game-bg with gradient + pattern fallbacks, 360/390 px checks
+- [x] I2. One mini-game template for the six new games, --game-bg with gradient + pattern fallbacks, 360/390 px checks
 - [ ] I3. Motion standards + frame-time check script (tools/), numbers here, worst offenders fixed
 - [ ] I4. Host pose system (lib/host.js), PNG poses with SVG fallback, callers migrated, events mapped to poses
 - [ ] I5. Landing / menu and cold open polish with the tokens
