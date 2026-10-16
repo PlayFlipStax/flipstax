@@ -12,7 +12,12 @@ window.FLIPSTAX_NAMES = {
     crowdScan:      'Crowd Scan',            // guess the crowd's split (was Guess the Crowd)
     brainBeam:      'Brain Beam',            // trivia
     riddleRound:    'Riddle Round',
-    zapWords:       'Zap Words',             // word hunt (not built yet)
+    zapWords:       'Zap Words',             // swipe words in a letter grid (a Mystery Game)
+    peakOrPlunge:   'Peak or Plunge',        // higher or lower (a Mystery Game)
+    snapSort:       'Snap Sort',             // tap the words that fit the category
+    twinFlip:       'Twin Flip',             // memory match
+    factOrFib:      'Fact or Fib',           // true or false
+    saucerShuffle:  'Saucer Shuffle',        // follow the star under the saucers
     priceProbe:     'Price Probe',
     oddballAlert:   'Oddball Alert',
     emojiDecode:    'Emoji Decode',

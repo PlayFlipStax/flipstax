@@ -1,0 +1,28 @@
+/* FlipStax - the Part E Mystery Games' own pieces (the shared stage is in flipstax.html, .mg-*).
+   Transform and opacity motion only; lite mode / reduced motion keep things still. */
+
+/* ---- E1 Peak or Plunge: coral sunset over navy peaks ---- */
+.pp-stage{ justify-content:flex-start !important; padding-top:6px; }
+.pp-card{ position:relative; width:100%; padding:12px 14px 14px; border-radius:18px; display:flex; flex-direction:column; align-items:center; gap:4px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,236,226,0.95)); color:#2a0f3a; border:3px solid #fff;
+  box-shadow:0 6px 0 rgba(60,10,40,0.45), 0 10px 22px rgba(0,0,0,0.3); }
+.pp-next{ background:linear-gradient(180deg, #2a2366, #16123f); color:#fff; border-color:#ffc2a8; }
+.pp-glyph{ font-size:40px; line-height:1; }
+.pp-name{ font:800 clamp(16px, 4.6vw, 19px)/1.2 var(--f-body); }
+.pp-val{ font:900 clamp(32px, 10vw, 44px)/1 var(--f-display); letter-spacing:0.5px; }
+.pp-val b{ display:inline-block; }
+.pp-val small{ font:800 15px var(--f-body); opacity:0.75; }
+.pp-q{ color:#ffc2a8; text-shadow:0 0 14px rgba(255,180,150,0.9); }
+.pp-next.right{ border-color:#8dff9c; box-shadow:0 0 0 3px #19a33d, 0 0 26px rgba(120,255,140,0.7); }
+.pp-next.wrong{ border-color:#ff8a9a; box-shadow:0 0 0 3px #a3102b, 0 0 22px rgba(255,60,90,0.6); }
+.pp-vs{ font:900 15px/1 var(--f-display); letter-spacing:3px; color:#ffe9a0; text-shadow:0 0 10px rgba(255,200,120,0.8); }
+.pp-btns{ display:flex; gap:10px; width:100%; margin-top:4px; }
+.pp-btn{ flex:1; min-height:62px; border-radius:18px; border:3px solid #fff; cursor:pointer; font:900 clamp(22px, 7vw, 28px)/1 var(--f-display); letter-spacing:1px; color:#fff;
+  text-shadow:0 2px 0 rgba(0,0,0,0.3); box-shadow:0 5px 0 rgba(0,0,0,0.4); -webkit-tap-highlight-color:transparent; }
+.pp-btn.hi{ background:linear-gradient(180deg, #5ee08a, #148a3c); }
+.pp-btn.lo{ background:linear-gradient(180deg, #ff8a6b, #c2386a); }
+.pp-btn:active{ transform:translateY(3px); box-shadow:0 2px 0 rgba(0,0,0,0.4); }
+.pp-btn:disabled{ opacity:0.55; }
+.pp-dots{ display:flex; gap:8px; margin-top:4px; }
+.pp-dots i{ width:14px; height:14px; border-radius:50%; background:rgba(255,255,255,0.25); box-shadow:inset 0 0 0 2px rgba(255,255,255,0.5); }
+.pp-dots i.right{ background:#5ee08a; } .pp-dots i.wrong{ background:#ff5a6e; }

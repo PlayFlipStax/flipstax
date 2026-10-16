@@ -34,11 +34,11 @@ new fonts, original art, no real brand or show names, every new game gets a TEST
 - [x] D5. Lucky Lights: deep red and white marquee bulbs on a dark teal stage; DIRECTION.md colour table updated
 - [x] D6. Word Warp: the UFO hovers over the tiles; a correct letter/word beams the letters up with an animal (cow, or one picked by the date seed); a wrong guess makes the beam flicker and miss
 - [x] D7. Disco celebration on THE MOTHERSHIP (max once an episode): disco ball lowered from the UFO, lights dim, mirror spots, a second alien hops out, ~4s dance with bulb flashes, tap to skip; lite mode = static ball + sparkles; noted in DIRECTION.md as the one exception to "one host per screen"; audio-sting hook (silent)
-- [ ] D8. (lowest priority) The commercial break as a retro TV ad: scanlines, curved TV frame, flat 80s product art, announcer tagline, "We'll be right back" 3-2-1 bumper; invented brands only; a "Brought to you by" field for a future sponsor
+- [ ] D8. (deferred: lowest priority, done after Part E if time remains) (lowest priority) The commercial break as a retro TV ad: scanlines, curved TV frame, flat 80s product art, announcer tagline, "We'll be right back" 3-2-1 bumper; invented brands only; a "Brought to you by" field for a future sponsor
 
 ## E. New Mystery Games (20-45s, tap-based, own colour world, bulbs, sounds, lite-safe, names in data/game-names.js, TEST-menu jump each)
 
-- [ ] E1. Peak or Plunge (higher/lower): 5 rounds, +10 each; data file of ~60 items, every number sourced in a comment
+- [x] E1. Peak or Plunge (higher/lower): 5 rounds, +10 each; data file of ~60 items, every number sourced in a comment
 - [ ] E2. Snap Sort: a category, 8-10 words fly by, tap the ones that belong (a wrong tap costs a second), 15s, ~40 categories
 - [ ] E3. Zap Words: 6x6 grid, swipe neighbouring letters, longer words score more, ZAP_SECONDS = 20, a hint, good phone swiping, a plain word list in the repo, grids with guaranteed words
 - [ ] E4. Twin Flip: 4x4 memory match, original 70s/80s neon icons, 25s, stage look after refs/memory-match

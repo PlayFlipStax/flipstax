@@ -33,6 +33,7 @@
 <!-- Vercel Web Analytics -->
 <script defer src="/_vercel/insights/script.js"></script>
 <link rel="stylesheet" href="lib/show.css">
+<link rel="stylesheet" href="lib/mini-games.css">
 <style>
   :root{
     --bg: #1a1442; --panel: #241b5c;
@@ -2682,6 +2683,32 @@
     background:radial-gradient(circle at 40% 35%, #c4ffa8, #66d85d 60%, #2f9a36); box-shadow:0 3px 6px rgba(0,0,0,0.35); }
   .cue-hand.l{ left:-8px; transform:rotate(18deg); } .cue-hand.r{ right:-8px; transform:rotate(-18deg); }
   .cue-host{ width:70px; height:80px; margin-top:-2px; z-index:3; }
+  /* ---- The Part E games' stage (runMiniGame): each game's own colour world (--mg-a/b/c), a bulb-lit sign, a rule
+     line, a timer bar and a score pill, the game's stage, and the result pill. Transform and opacity motion only. ---- */
+  .mg-overlay{ position:fixed; inset:0; z-index:28; overflow:hidden; color:#fff; text-align:center; -webkit-user-select:none; user-select:none;
+    padding:calc(14px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom));
+    background:radial-gradient(120% 75% at 50% 25%, var(--mg-a) 0%, var(--mg-b) 48%, var(--mg-c) 100%); }
+  .mg-bg{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+  .mg-bg .rays{ position:absolute; left:50%; top:20%; width:1300px; height:1300px; margin:-650px 0 0 -650px; opacity:0.18; will-change:transform;
+    background:repeating-conic-gradient(from 0deg, rgba(255,255,255,0.5) 0deg 6deg, rgba(255,255,255,0) 6deg 18deg); animation:stRays 90s linear infinite; }
+  :root.lite .mg-bg .rays{ animation:none; }
+  .mg-inner{ position:relative; z-index:1; height:100%; max-width:440px; margin:0 auto; display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .mg-sign{ position:relative; margin-top:34px; padding:10px 22px 11px; border-radius:16px; font:900 clamp(26px, 8vw, 34px)/1 var(--f-display); letter-spacing:2.5px; color:#fff;
+    background:linear-gradient(180deg, rgba(20,4,36,0.86), rgba(10,2,22,0.92)); border:3px solid var(--bulb); box-shadow:0 0 0 3px rgba(0,0,0,0.35), 0 0 26px var(--bulb);
+    text-shadow:0 0 12px var(--bulb); }
+  .mg-sign span{ position:relative; z-index:3; }
+  .mg-rule{ min-height:20px; font:800 14px/1.3 var(--f-body); color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.6); padding:0 6px; }
+  .mg-hud{ display:flex; align-items:center; gap:10px; width:100%; }
+  .mg-timer{ flex:1; height:10px; border-radius:6px; overflow:hidden; background:rgba(0,0,0,0.35); box-shadow:inset 0 0 0 1.5px rgba(255,255,255,0.35); }
+  .mg-timer i{ display:block; height:100%; background:linear-gradient(90deg, #fff6c2, var(--bulb)); transform-origin:0 50%; transform:scaleX(1); }
+  .mg-score{ min-width:52px; padding:5px 12px; border-radius:99px; font:900 20px/1 var(--f-display); color:#3a1500; background:linear-gradient(180deg, #fff6c2, #ffd23f); box-shadow:0 0 0 2px rgba(122,74,0,0.5); }
+  .mg-stage{ position:relative; flex:1; width:100%; min-height:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; }
+  .mg-result{ position:absolute; left:50%; top:46%; z-index:5; padding:10px 28px 12px; border-radius:999px; font:900 clamp(40px, 12vw, 56px)/1 var(--f-display); letter-spacing:1px;
+    transform:translate(-50%, -50%) scale(0.4); opacity:0; pointer-events:none; transition:transform .4s cubic-bezier(.2,1.6,.4,1), opacity .2s; }
+  .mg-result.on{ transform:translate(-50%, -50%) scale(1); opacity:1; }
+  .mg-result.win{ background:linear-gradient(180deg, #fff6c2, #ffd23f 50%, #e9a100); color:#3a1f00; box-shadow:0 0 0 3px #fff3c4, 0 0 30px rgba(255,210,63,0.9); }
+  .mg-result.miss{ background:linear-gradient(180deg, #ff6a7d, #d61f3c 55%, #a3102b); color:#fff; box-shadow:0 0 0 3px #ffc2cb, 0 0 24px rgba(255,40,70,0.7); }
+  @media (prefers-reduced-motion: reduce){ .mg-result{ transition:none; } .mg-bg .rays{ animation:none; } }
   /* The Mystery Game reveal (D3): the host beside a curtained door in a bulb frame; the curtains open on the name. */
   .show-card.mreveal{ background:#1d0636; overflow:hidden; cursor:default; }
   .mr-studio{ z-index:0; }
@@ -4538,6 +4565,8 @@
 <script src="data/time-warp.js"></script>
 <script src="data/rundown.js"></script>
 <script src="data/beam-levels.js"></script>
+<script src="data/peak-or-plunge.js"></script>
+<script src="lib/mini-games.js"></script>
 <script src="lib/orbit-physics.js"></script>
 <script src="lib/host-alien.js"></script>
 <script src="lib/show-fx.js"></script>
@@ -4547,7 +4576,7 @@
   // Player-facing game names and the alien host's lines live in
   // data/game-names.js (the defaults here are only a fallback if it fails).
   const GN = Object.assign({ orbitDrop:'Orbit Drop', cosmicSurprise:'Cosmic Surprise', crowdScan:'Crowd Scan', brainBeam:'Brain Beam', riddleRound:'Riddle Round',
-    zapWords:'Zap Words', priceProbe:'Price Probe', oddballAlert:'Oddball Alert', emojiDecode:'Emoji Decode', timeWarp:'Time Warp', portalPick:'Portal Pick',
+    zapWords:'Zap Words', peakOrPlunge:'Peak or Plunge', snapSort:'Snap Sort', twinFlip:'Twin Flip', factOrFib:'Fact or Fib', saucerShuffle:'Saucer Shuffle', priceProbe:'Price Probe', oddballAlert:'Oddball Alert', emojiDecode:'Emoji Decode', timeWarp:'Time Warp', portalPick:'Portal Pick',
     wordWarp:'Word Warp', vault:'The Mothership Vault' }, (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.names) || {});
   const HOST_LINES = (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.host) || {};
   const HOST_QUIPS = (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.quip) || {};
@@ -5534,6 +5563,7 @@
   // every pair of days. A game whose data didn't load is left out of the pool.
   const MYSTERY_POOL = (RUNDOWN.mystery && Array.isArray(RUNDOWN.mystery.pool)) ? RUNDOWN.mystery.pool : [];
   function mysteryAvailable(g){
+    if (miniGame(g)) return !miniGame(g).available || !!miniGame(g).available();   // the Part E games (lib/mini-games.js)
     if (g === 'riddle') return INFINITY_RIDDLES.length >= 8;
     if (g === 'crowdScan') return !!(CARD_POOLS.daily && CARD_POOLS.daily.length);
     return availableBreakKeys().indexOf(g) >= 0;
@@ -10291,6 +10321,71 @@
     }
     return false;
   }
+  // ---------- Part E: the new Mystery Games (lib/mini-games.js) ----------
+  // Each game registers in window.MiniGames.games[key] = { name, colors:[a, b, c], bulb, rule, available(), run(api) }.
+  // runMiniGame gives it a full-screen stage in its own colour world: a bulb-lit sign with its name, a rule line, a
+  // timer bar (the last 3 seconds tick), a score pill, then the result (a gold +N or a red MISSED), points through the
+  // act's multiplier and a key for a win (a Mystery Game win = an Orbit Drop chip). The game calls api.finish().
+  function miniGame(key){ return window.MiniGames && window.MiniGames.games && window.MiniGames.games[key]; }
+  let mgOpen = null;
+  function runMiniGame(key, st, done){
+    const g = miniGame(key); if (!g) return false;
+    if (mgOpen) mgOpen.close(true);
+    const c = g.colors || ['#ffd23f', '#c2275f', '#2a0b4e'];
+    const ov = document.createElement('div'); ov.id = 'mgOverlay'; ov.className = 'mg-overlay mg-' + key; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', mysteryName(key));
+    ov.style.setProperty('--mg-a', c[0]); ov.style.setProperty('--mg-b', c[1]); ov.style.setProperty('--mg-c', c[2] || '#12062a'); ov.style.setProperty('--bulb', g.bulb || c[0]);
+    ov.innerHTML = '<div class="mg-bg" aria-hidden="true"><i class="rays"></i></div><div class="mg-inner"><div class="mg-sign"><div class="sign-bulbs" aria-hidden="true"></div><span></span></div>' +
+      '<div class="mg-rule"></div><div class="mg-hud"><div class="mg-timer" aria-hidden="true"><i></i></div><div class="mg-score" aria-live="polite">0</div></div>' +
+      '<div class="mg-stage"></div><div class="mg-result" aria-live="polite"></div></div>';
+    ov.querySelector('.mg-sign span').textContent = mysteryName(key).toUpperCase();
+    ov.querySelector('.mg-rule').textContent = g.rule || '';
+    document.body.appendChild(ov);
+    ringBulbs(ov.querySelector('.mg-sign .sign-bulbs'), 18, 6);
+    marquee.style.setProperty('--bulb', g.bulb || c[0]);
+    const stage = ov.querySelector('.mg-stage'), fill = ov.querySelector('.mg-timer i'), scoreEl = ov.querySelector('.mg-score'), resEl = ov.querySelector('.mg-result');
+    let timerT = null, timerEnd = 0, timerCb = null, over = false, tickSeq = 0;
+    const stopTimer = ()=>{ clearTimeout(timerT); timerT = null; tickSeq++; const now = getComputedStyle(fill).transform; fill.style.transition = 'none'; if (now && now !== 'none') fill.style.transform = now; };   // (freezes where it is)
+    const startTimer = (ms, cb)=>{
+      stopTimer(); timerCb = cb; timerEnd = Date.now() + ms; const seq = tickSeq;
+      fill.style.transition = 'none'; fill.style.transform = 'scaleX(1)'; void fill.offsetWidth;
+      fill.style.transition = 'transform ' + (ms / 1000) + 's linear'; fill.style.transform = 'scaleX(0)';
+      timerT = setTimeout(()=>{ timerT = null; if (!over && timerCb) timerCb(); }, ms);
+      scheduleLastTicks(ms, ()=> !over && seq === tickSeq && !!timerT);
+    };
+    const api = {
+      key, stage, overlay: ov, seed: (st && st.seed) || ((Math.random() * 4294967296) >>> 0),
+      sfx, FX, fxLayer: showFx, lite: isLite(), reduced: prefersReducedMotion(), mult: runActive ? runActMult() : 1,
+      rng: null, shuffle: null,
+      setRule: (t)=>{ ov.querySelector('.mg-rule').textContent = t || ''; },
+      timer: (ms, cb)=>{ startTimer(ms, cb); return { stop: stopTimer, left: ()=> Math.max(0, timerEnd - Date.now()), add: (d)=>{ const left = Math.max(0, timerEnd - Date.now()) + d; startTimer(Math.max(0, left), timerCb); } }; },
+      score: (n)=>{ scoreEl.textContent = n; FX.pop(scoreEl, 1.2); },
+      say: (t, ms)=> hostSay(t, ms), mood: (m)=> hostMood(m),
+      flash: (kind)=>{ if (kind === 'win'){ marquee.classList.remove('unison', 'miss'); void marquee.offsetWidth; marquee.classList.add('unison'); setTimeout(()=> marquee.classList.remove('unison'), 700); showFlash('win'); }
+        else { marquee.classList.remove('unison', 'miss'); void marquee.offsetWidth; marquee.classList.add('miss'); setTimeout(()=> marquee.classList.remove('miss'), 800); } },
+      hostSvg: ()=> window.HostAlien.full(),
+      finish: (res)=>{
+        if (over) return; over = true; stopTimer();
+        const pts = Math.max(0, Math.round((res && res.pts) || 0)), win = !!(res && res.win);
+        if (pts && runActive) addRunScore(pts);
+        if (win && runActive) addRunKey('mystery');
+        resEl.className = 'mg-result on ' + (pts ? 'win' : 'miss'); resEl.textContent = pts ? '+' + (pts * api.mult) : 'MISSED';
+        if (res && res.line) api.say(res.line, 1800);
+        if (pts){ sfx.cashRegister(); api.flash('win'); hostMood('cheer'); } else { hostMood('sad'); }
+        setTimeout(()=> close(false), 1700);
+      },
+    };
+    api.rng = mulberry32((api.seed ^ hashStr('mg-' + key)) >>> 0);
+    api.shuffle = (a)=> shuffle(a.slice(), api.rng);
+    const close = (silent)=>{
+      over = true; stopTimer(); if (api.onClose) try{ api.onClose(); }catch(e){}
+      ov.remove(); mgOpen = null; noteOverlayClosed(); updatePauseBtnVisibility();
+      if (!silent && done) done();
+    };
+    mgOpen = { close };
+    if (g.host) hostSay(g.host, 2200);
+    try{ g.run(api); }catch(e){ if (DEBUG_FAST) (window.__mgErrors = window.__mgErrors || []).push(String(e)); close(false); }
+    return true;
+  }
   // The day's Mystery Game in its slot.
   // The Mystery Game wheel spins and lands on the game's name, then the game plays.
   function runMysteryGame(st, done){
@@ -10300,6 +10395,7 @@
       if (!runActive) return;
       const ok = st.game === 'riddle' ? (runTriviaQuestion(null, null, { t:'quiz', riddle:true, mystery:true, seed: st.seed }), true)
         : st.game === 'crowdScan' ? runDailyCrowdScan(st, done)
+        : miniGame(st.game) ? runMiniGame(st.game, st, done)
         : runBrainBreak({ game: st.game, seed: st.seed }, done);
       if (!ok){ runPhase = 'running'; loadNext(); }
     });
@@ -10822,7 +10918,7 @@
   // frame on the studio set; a short drumroll, the curtains whip open on the game's name in its own colours, and it
   // slams in (about 2 s, then the game).
   function showMysteryReveal(game, then){
-    const c = MYSTERY_COLORS[game] || ['#ffd23f', '#c2275f'];
+    const c = MYSTERY_COLORS[game] || (miniGame(game) && miniGame(game).colors) || ['#ffd23f', '#c2275f'];
     showCard.className = 'show-card mreveal';
     showCard.innerHTML = '<div class="studio mr-studio" aria-hidden="true">' + STUDIO_HTML + '</div>' +
       '<div class="mr-inner"><div class="mr-title">MYSTERY GAME</div>' +
@@ -14066,6 +14162,7 @@
   }
   // ---------- The episode's results screen (refs/results.jpg) ----------
   function mysteryName(key){
+    if (miniGame(key)) return GN[key] || miniGame(key).name;
     if (BRAIN_BREAKS[key]) return BRAIN_BREAKS[key].name();
     return key === 'riddle' ? GN.riddleRound : key === 'crowdScan' ? GN.crowdScan : key || '';
   }
@@ -16587,6 +16684,7 @@
       { label:'Oddball Alert', go: mysteryAs('oddballAlert') },
       { label:'Emoji Decode', go: mysteryAs('emojiDecode') },
       { label:'Time Warp', go: mysteryAs('timeWarp') },
+      { label:'Peak or Plunge', go: mysteryAs('peakOrPlunge') },
       // The finale's cue card, then the Word Warp with all six letters in.
       { label:'Grand finale (6 letters)', wide:true, go: atType(s=> s.t === 'act' && s.finale, 0, 210, 6) },
       { label:'Orbit Drop', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); const r = replaySampleEpisode(); delete r.orbit; delete r.orbitPoints; r.score = 368; r.keys = 2; r.bonusChips = 1; r.warpChip = true; r.orbitChips = dailyChipsFor(2, 1, true); runResultToday = r; openDailyOrbit(r); }) },
