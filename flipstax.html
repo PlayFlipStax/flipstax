@@ -2658,6 +2658,26 @@
     background:radial-gradient(circle at 40% 35%, #c4ffa8, #66d85d 60%, #2f9a36); box-shadow:0 3px 6px rgba(0,0,0,0.35); }
   .cue-hand.l{ left:-8px; transform:rotate(18deg); } .cue-hand.r{ right:-8px; transform:rotate(-18deg); }
   .cue-host{ width:70px; height:80px; margin-top:-2px; z-index:3; }
+  /* The Mystery Game reveal (D3): the host beside a curtained door in a bulb frame; the curtains open on the name. */
+  .show-card.mreveal{ background:#1d0636; overflow:hidden; cursor:default; }
+  .mr-studio{ z-index:0; }
+  .mr-inner{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; gap:18px; margin-top:-10vh; }
+  .mr-title{ font:900 clamp(26px, 8vw, 36px)/1 var(--f-display); letter-spacing:3px; color:#ffe9a0; padding:10px 22px; border-radius:14px; background:rgba(20,4,36,0.82);
+    border:3px solid #ffd23f; box-shadow:0 0 22px rgba(255,200,60,0.5); text-shadow:0 0 12px rgba(255,200,80,0.8); }
+  .mr-frame{ position:relative; padding:14px; border-radius:24px; background:linear-gradient(180deg, #4a1468, #22063a); border:4px solid #ffd23f; --bulb:#fff3b0;
+    box-shadow:0 0 0 4px #5a2400, 0 0 44px rgba(255,180,60,0.5); }
+  .mr-door{ position:relative; width:min(74vw, 300px); height:min(42vw, 170px); border-radius:14px; overflow:hidden; background:linear-gradient(160deg, var(--c0), var(--c1));
+    box-shadow:inset 0 0 26px rgba(0,0,0,0.45); }
+  .mr-name{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; padding:0 12px; z-index:1;
+    font:900 clamp(34px, 10.5vw, 50px)/0.95 var(--f-display); letter-spacing:1px; color:#fff; text-shadow:0 3px 0 rgba(0,0,0,0.45), 0 0 18px rgba(255,255,255,0.65); opacity:0; }
+  .mreveal.open .mr-name{ animation:mwSlam .55s cubic-bezier(.2,1.4,.4,1) .18s both; }
+  .mr-curt{ position:absolute; top:0; bottom:0; width:51%; z-index:2; transition:transform .6s cubic-bezier(.6,0,.3,1);
+    background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0) 30%, rgba(0,0,0,0.4)), repeating-linear-gradient(90deg, #3e0410 0, #7a0a1e 6px, #c41c38 12px, #e23a55 14px, #8a0c22 20px, #4a0513 26px); }
+  .mr-curt.l{ left:0; transform-origin:0 50%; } .mr-curt.r{ right:0; transform-origin:100% 50%; }
+  .mreveal.open .mr-curt{ transform:scaleX(0.06); }
+  .mr-host{ position:absolute; z-index:3; left:1vw; bottom:calc(5vh + env(safe-area-inset-bottom)); width:min(30vw, 140px); }
+  :root:has(.show-card.mreveal:not(.hidden)) .show-host{ display:none !important; }
+  @media (prefers-reduced-motion: reduce){ .mr-curt{ transition:none; } .mreveal.open .mr-name{ animation:none; opacity:1; } }
   /* The Mystery Game wheel (refs/wheel.jpg without its buttons). */
   .show-card.wheel{ overflow:hidden; cursor:default; }
   .mw-bg{ position:absolute; inset:0; z-index:0; }
@@ -10164,7 +10184,7 @@
   function runMysteryGame(st, done){
     if (!st.game || !mysteryAvailable(st.game)) return false;
     runCurrentGame = mysteryName(st.game);
-    showMysteryWheel(st.game, ()=>{
+    showMysteryReveal(st.game, ()=>{
       if (!runActive) return;
       const ok = st.game === 'riddle' ? (runTriviaQuestion(null, null, { t:'quiz', riddle:true, mystery:true, seed: st.seed }), true)
         : st.game === 'crowdScan' ? runDailyCrowdScan(st, done)
@@ -10685,6 +10705,27 @@
   // pointer on top. It spins by itself and lands on the day's game, whose name then pops.
   const MYSTERY_COLORS = { riddle:['#7dff8a', '#18a83a'], emojiDecode:['#8ff3ff', '#0ea5c6'], crowdScan:['#ff9ad1', '#e11d74'],
     priceProbe:['#ffe680', '#e0a100'], timeWarp:['#d6b4ff', '#7c3aed'], oddballAlert:['#ffc27a', '#f06b0f'] };
+  // D3 (Oct 16): the Mystery Game reveal - no spinning wheel. The host stands beside a little curtained door in a bulb
+  // frame on the studio set; a short drumroll, the curtains whip open on the game's name in its own colours, and it
+  // slams in (about 2 s, then the game).
+  function showMysteryReveal(game, then){
+    const c = MYSTERY_COLORS[game] || ['#ffd23f', '#c2275f'];
+    showCard.className = 'show-card mreveal';
+    showCard.innerHTML = '<div class="studio mr-studio" aria-hidden="true">' + STUDIO_HTML + '</div>' +
+      '<div class="mr-inner"><div class="mr-title">MYSTERY GAME</div>' +
+      '<div class="mr-frame"><div class="sign-bulbs" aria-hidden="true"></div><div class="mr-door" style="--c0:' + c[0] + ';--c1:' + c[1] + '">' +
+      '<div class="mr-name" aria-live="polite"></div><i class="mr-curt l"></i><i class="mr-curt r"></i></div></div></div>' +
+      '<div class="mr-host host-full" aria-hidden="true">' + window.HostAlien.full() + '</div>';
+    showCard.querySelector('.mr-name').textContent = mysteryName(game).toUpperCase();
+    showCard.removeAttribute('role'); showCard.setAttribute('aria-label', 'Mystery game: ' + mysteryName(game));
+    showCard.classList.remove('hidden');
+    clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
+    ringBulbs(showCard.querySelector('.mr-frame .sign-bulbs'), 22, 7);
+    const rm = prefersReducedMotion();
+    if (!rm) sfx.drumroll(520);
+    setTimeout(()=>{ showCard.classList.add('open'); sfx.slam(); playTone(523, 0.05, 0.12, 'triangle', 0.08); playTone(784, 0.15, 0.25, 'triangle', 0.08); }, rm ? 0 : 560);
+    setTimeout(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; then(); }, rm ? 1600 : 2100);
+  }
   function showMysteryWheel(game, then){
     const games = MYSTERY_POOL.map(p=> p.game).filter(g=> MYSTERY_COLORS[g]);
     if (games.indexOf(game) < 0) games.push(game);

@@ -29,7 +29,7 @@ new fonts, original art, no real brand or show names, every new game gets a TEST
 
 - [x] D1. Oddball Alert and Price Probe out of the Mystery pool (code kept)
 - [x] D2. Riddle: fixed Mystery Game 1 (Act 1, every episode); restyled after refs/riddle (split-flap tiles, riddle-show look, green world with flying ?s); multiple choice kept
-- [ ] D3. Mystery Game 2 from the pool (Emoji Decode x2, Crowd Scan x2, Time Warp, the Part E games; Fact or Fib only when FACT_OR_FIB_REVIEWED); no game on consecutive days; the spinning wheel replaced by a ~2s host reveal (a small curtain/door opens on the name)
+- [x] D3. Mystery Game 2 from the pool (Emoji Decode x2, Crowd Scan x2, Time Warp, the Part E games; Fact or Fib only when FACT_OR_FIB_REVIEWED); no game on consecutive days; the spinning wheel replaced by a ~2s host reveal (a small curtain/door opens on the name). (Each Part E game joins the pool in data/rundown.js when it ships.)
 - [ ] D4. Cosmic Surprise: a small 3-reel slot machine (~2s, small prizes: points, a key, a chip) instead of the gift box; still ~1 episode in 3
 - [ ] D5. Lucky Lights: deep red and white marquee bulbs on a dark teal stage; DIRECTION.md colour table updated
 - [ ] D6. Word Warp: the UFO hovers over the tiles; a correct letter/word beams the letters up with an animal (cow, or one picked by the date seed); a wrong guess makes the beam flicker and miss
