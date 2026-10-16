@@ -197,3 +197,10 @@
 
 /* I4: Saucer Shuffle's host has drawn arms reaching for the saucers, so his pose never moves the figure. */
 .su-host .host-rig .hr-svg, .su-host .host-rig.hr-pop{ animation:none !important; transform:none !important; }
+
+/* J4: found words stay lit in their own colour and collect as coloured chips; only a bad swipe flashes and clears. */
+.zw-cell.found{ background:var(--wc); background:linear-gradient(180deg, color-mix(in srgb, var(--wc) 55%, #ffffff), var(--wc)); color:#101418; box-shadow:inset 0 0 0 2px rgba(255,255,255,0.55), 0 3px 0 rgba(0,0,0,0.45); }
+.zw-cell.found.on{ background:linear-gradient(180deg, #fff6a0, #ffd23f); }
+.zw-cell.found.bad{ background:linear-gradient(180deg, #ff9aa8, #c0263f); } .zw-cell.found.dup{ background:linear-gradient(180deg, #ffd9a8, #e08a1f); }
+.zw-found{ display:flex; flex-wrap:wrap; gap:5px; }
+.zw-chip{ padding:3px 8px; border-radius:99px; font:900 14px/1.2 var(--f-display); letter-spacing:0.5px; color:#101418; background:var(--wc); box-shadow:0 2px 0 rgba(0,0,0,0.4); }
