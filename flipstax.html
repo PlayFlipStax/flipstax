@@ -673,6 +673,30 @@
   .event-overlay.coin-mode .coin-stage{ display:block; }
   /* Wild Card (Infinity): a gift box that shakes, pops its lid and shows the
      prize - no downside. Same overlay as Coin Flip, its own look. */
+  /* The Cosmic Surprise slot machine (D4): a small space-age cabinet - a marquee top with bulbs, three reel windows,
+     a chrome base and a lever; the reels stop left to right and line up the prize. */
+  .gift-stage.slot-mode .gift-box, .gift-stage.slot-mode .reel-wrap, .gift-stage.slot-mode .gift-glow{ display:none !important; }
+  .gift-stage.slot-mode .gift-prize{ top:auto; bottom:2px; font-size:30px; }
+  .slot3{ position:absolute; left:50%; top:0; width:230px; margin-left:-115px; padding:0 0 12px; border-radius:22px 22px 14px 14px;
+    background:linear-gradient(180deg, #5b2a8c, #2c0e52); border:4px solid #ffd23f; box-shadow:0 0 0 3px #5a2400, 0 10px 24px rgba(0,0,0,0.45), 0 0 26px rgba(199,146,255,0.45); }
+  .s3-top{ position:relative; margin:8px 10px 8px; padding:8px 6px 9px; border-radius:12px; background:#1a0630; border:2px solid #c792ff; --bulb:#ffe9a0;
+    font:900 17px/1 var(--f-display); letter-spacing:2px; color:#ffe9a0; text-align:center; text-shadow:0 0 10px rgba(255,200,80,0.8); }
+  .s3-top span{ position:relative; z-index:3; }
+  .s3-row{ display:flex; gap:7px; justify-content:center; padding:0 12px; }
+  .s3-win{ position:relative; width:58px; height:64px; overflow:hidden; border-radius:10px; background:#fffbe6; border:3px solid #c9ced8;
+    box-shadow:inset 0 6px 8px rgba(0,0,0,0.3), inset 0 -6px 8px rgba(0,0,0,0.25); }
+  .s3-win::after{ content:''; position:absolute; left:0; right:0; top:50%; height:2px; margin-top:-1px; background:rgba(255,60,120,0.35); }
+  .s3-strip{ will-change:transform; }
+  .s3-strip b{ display:flex; align-items:center; justify-content:center; height:var(--cell, 58px); font-size:34px; line-height:1; font-weight:400; text-shadow:0 2px 2px rgba(0,0,0,0.25); }
+  .s3-win.stop{ animation:s3Stop .25s ease-out; }
+  @keyframes s3Stop{ 40%{ transform:translateY(3px); } }
+  .slot3.landed .s3-win{ border-color:#ffd23f; box-shadow:inset 0 6px 8px rgba(0,0,0,0.25), 0 0 14px rgba(255,214,90,0.9); }
+  .s3-base{ height:10px; margin:9px 14px 0; border-radius:6px; background:linear-gradient(180deg, #f2f4f8, #9aa3b2); }
+  .s3-lever{ position:absolute; right:-16px; top:46px; width:8px; height:46px; border-radius:4px; background:linear-gradient(90deg, #9aa3b2, #f2f4f8, #9aa3b2); transform-origin:50% 100%; }
+  .s3-lever::before{ content:''; position:absolute; left:50%; top:-12px; width:18px; height:18px; margin-left:-9px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #ff9ad1, #e11d74); border:2px solid #fff; }
+  .slot3.spinning .s3-lever{ animation:s3Lever .5s ease-in-out; }
+  @keyframes s3Lever{ 50%{ transform:scaleY(-0.6); } }
+  @media (prefers-reduced-motion: reduce){ .s3-win.stop, .slot3.spinning .s3-lever{ animation:none; } }
   .gift-stage{ display:none; position:relative; width:220px; height:210px; margin:4px auto 0; }
   .event-overlay.gift-mode .gift-stage{ display:block; }
   /* Cosmic Surprise's mini-games and effects (runCosmic*) - game-show style:
@@ -15387,9 +15411,9 @@
     const keys = Object.keys(COSMIC_WEIGHTS);
     let r = Math.random() * keys.reduce((a, k)=> a + COSMIC_WEIGHTS[k], 0), prize = keys.find(k=> (r -= COSMIC_WEIGHTS[k]) < 0) || 'points10';
     if ((DEBUG_FAST || REPLAY) && window.__forceWild) prize = window.__forceWild;   // (tests, and the replay menu's Cosmic Surprise jumps)
-    if (cosmicDaily){   // the show has no clock, and a key is its chip
-      if (prize === 'clock' || prize === 'freeze') prize = 'points20';
-      if (prize === 'chip') prize = 'key';
+    if (cosmicDaily){   // D4: the show's slot machine pays small prizes only - points, a key or an Orbit Drop chip
+      if (prize === 'clock' || prize === 'freeze' || prize === 'scramble') prize = 'points20';
+      if (prize === 'riddle') prize = 'points10';
       return prize;
     }
     if (prize === 'chip' && (!infRun || infRun.bonusChip)) prize = 'points10';
@@ -15399,9 +15423,9 @@
   const COSMIC_INTRO = { scramble:'🔀 SCRAMBLE!', clock:'⏱️ TIME WARP!', riddle:'🧩 DOUBLE OR NOTHING!', freeze:'❄️ CLOCK FREEZE!' };
   function runWildGift(){
     const prize = drawWildPrize(), ov = els.eventOverlay, stage = document.getElementById('giftStage'), label = document.getElementById('giftPrize');
-    stage.classList.remove('shaking', 'opened', 'reeling'); label.textContent = ''; { const w = document.getElementById('reelWrap'); if (w) w.className = 'reel-wrap'; }
+    stage.classList.remove('shaking', 'opened', 'reeling', 'slot-mode'); label.textContent = ''; { const w = document.getElementById('reelWrap'); if (w) w.className = 'reel-wrap'; }
     ov.classList.remove('cosmic-mode'); ov.classList.add('gift-mode');
-    els.eventPrompt.textContent = '🎁 ' + GN.cosmicSurprise.toUpperCase() + ' — what’s inside?';
+    els.eventPrompt.textContent = 'Three in a row wins a prize!';
     const open = ()=>{
       stage.classList.remove('shaking'); stage.classList.add('opened');
       if (COSMIC_INTRO[prize]){   // the weird ones: a title in the box, then their own screen
@@ -15412,6 +15436,7 @@
       if (prize === 'points10'){ cosmicPts(10); text = '+10 points'; }
       else if (prize === 'points20'){ cosmicPts(20); text = '+20 points'; }
       else if (prize === 'key'){ cosmicKey(); text = '🔑 +1 key'; }
+      else if (cosmicDaily){ runBonusChips++; saveRunSnapshot(); text = '🪙 +1 ' + GN.orbitDrop + ' chip'; }
       else { infRun.bonusChip = true; saveInfRun(); text = '🪙 Bonus ' + GN.orbitDrop + ' chip!'; }
       label.textContent = text;
       els.eventPrompt.textContent = '🎁 ' + GN.cosmicSurprise.toUpperCase() + ': ' + text;
@@ -15419,25 +15444,35 @@
       cosmicFx(true, label);
       setTimeout(finishPowerUp, 500);
     };
-    if (prefersReducedMotion() || !stage.animate){ open(); return; }
-    if (cosmicDaily){ stage.classList.add('shaking'); sfx.drumroll(1000); setTimeout(open, 1100); return; }   // (the show: the box shakes, then opens)
-    // The reveal is a slot-machine reel (Oct 2026): the icons blur past with buzzing lights, slow down, and the
-    // result lands with a slam. (The reel is a strip moved with transform; the lights are opacity.)
-    const wrap = document.getElementById('reelWrap'), strip = document.getElementById('reelStrip'), keys = Object.keys(COSMIC_REEL);
-    const seq = []; let lastK = ''; for (let i = 0; i < 17; i++){ let k; do{ k = keys[Math.floor(Math.random() * keys.length)]; }while(k === lastK); seq.push(k); lastK = k; } seq.push(prize);
-    strip.innerHTML = seq.map(k=> '<b>' + COSMIC_REEL[k] + '</b>').join('');
-    wrap.className = 'reel-wrap spinning'; stage.classList.add('reeling');
-    // One symbol fills the window at each step (the cell is the window's own height), so a spinning reel is never blank;
-    // no blur filter on the tall strip (it could blank the whole layer on iOS).
-    const cell = strip.parentElement.clientHeight || 94, exact = -(seq.length - 1) * cell; strip.style.setProperty('--cell', cell + 'px');
-    const spin = strip.animate([{ transform:'translateY(0)', easing:'cubic-bezier(.1,.62,.2,1)' }, { transform:'translateY(' + (exact - 16) + 'px)', offset:0.9, easing:'ease-out' }, { transform:'translateY(' + exact + 'px)' }], { duration:2300, fill:'forwards' });
-    for (let k = 0; k < 16; k++) setTimeout(()=> sfx.spinTick(k), 80 + Math.pow(k / 15, 1.8) * 2000);   // the ticks slow down with the reel
-    spin.onfinish = ()=>{
-      wrap.classList.remove('spinning'); wrap.classList.add('landed');
-      playTone(70, 0, 0.5, 'sine', 0.22); playTone(140, 0.02, 0.3, 'triangle', 0.12); haptic([40, 30, 60]);   // the slam
-      FX.shake(els.board); FX.burstAt(showFx, wrap, { count:16, spread:120, shapes:['star', 'coin'] }); showFlash('win');
-      setTimeout(open, 500);
-    };
+    // D4 (Oct 16): a small 3-reel slot machine - the reels spin, stop left to right over about 2 s and line up the prize.
+    stage.classList.add('slot-mode');
+    const keys = Object.keys(COSMIC_REEL), slot = document.getElementById('slot3') || (()=>{
+      const d = document.createElement('div'); d.className = 'slot3'; d.id = 'slot3';
+      d.innerHTML = '<div class="s3-top"><div class="sign-bulbs" aria-hidden="true"></div><span>COSMIC SURPRISE</span></div><div class="s3-row">' +
+        [0, 1, 2].map(()=> '<div class="s3-win"><div class="s3-strip"></div></div>').join('') + '</div><div class="s3-base"></div><i class="s3-lever"></i>';
+      stage.insertBefore(d, label); return d; })();
+    slot.className = 'slot3';
+    const strips = [...slot.querySelectorAll('.s3-strip')];
+    if (prefersReducedMotion() || !stage.animate){ strips.forEach(st=>{ st.style.transform = ''; st.innerHTML = '<b>' + COSMIC_REEL[prize] + '</b>'; }); slot.classList.add('landed'); open(); return; }
+    ringBulbs(slot.querySelector('.s3-top .sign-bulbs'), 16, 5);
+    slot.classList.add('spinning'); sfx.drumroll(1900);
+    let stopped = 0;
+    strips.forEach((st, r)=>{
+      const seq = []; let lastK = ''; for (let i = 0; i < 9 + r * 3; i++){ let k; do{ k = keys[Math.floor(Math.random() * keys.length)]; }while(k === lastK); seq.push(k); lastK = k; } seq.push(prize);
+      st.innerHTML = seq.map(k=> '<b>' + COSMIC_REEL[k] + '</b>').join('');
+      const cell = st.parentElement.clientHeight || 60, exact = -(seq.length - 1) * cell; st.style.setProperty('--cell', cell + 'px');
+      const ms = 1150 + r * 420;
+      st.animate([{ transform:'translateY(0)', easing:'cubic-bezier(.15,.55,.25,1)' }, { transform:'translateY(' + (exact - 10) + 'px)', offset:0.88, easing:'ease-out' }, { transform:'translateY(' + exact + 'px)' }], { duration:ms, fill:'forwards' })
+        .onfinish = ()=>{
+          sfx.clack(); st.parentElement.classList.add('stop');
+          if (++stopped < 3) return;
+          slot.classList.remove('spinning'); slot.classList.add('landed');
+          sfx.slam(); sfx.ding(); haptic([40, 30, 60]);
+          FX.burstAt(showFx, slot, { count:16, spread:120, shapes:['star', 'coin'] }); showFlash('win');
+          setTimeout(open, 450);
+        };
+    });
+    for (let k = 0; k < 14; k++) setTimeout(()=> sfx.spinTick(k), 60 + k * 70);
   }
   const COSMIC_REEL = { points10:'\u26A1', points20:'\uD83D\uDCA5', key:'\uD83D\uDD11', chip:'\uD83E\uDE99', scramble:'\uD83D\uDD00', clock:'\u23F1\uFE0F', riddle:'\uD83E\uDDE9', freeze:'\u2744\uFE0F' };
   // The weird ones play on the power-up screen, in .cosmic-stage.
