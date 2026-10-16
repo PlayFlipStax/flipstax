@@ -2822,14 +2822,45 @@
   @media (prefers-reduced-motion: reduce){ .ll-rim i{ animation:none; } }
   /* The commercial break: a 3-second fake 70s ad with a VHS wobble. Skippable. */
   .show-card.ad{ background:#000; overflow:hidden; }
+  /* D8: the retro TV spot. */
+  .show-card.ad{ background:radial-gradient(120% 80% at 50% 40%, #3a2240, #160a1c 70%); }
+  .ad-room{ position:relative; display:flex; flex-direction:column; align-items:center; gap:14px; width:100%; }
+  .ad-tv{ position:relative; width:min(92vw, 400px); padding:16px 58px 16px 16px; border-radius:26px;
+    background:repeating-linear-gradient(92deg, rgba(0,0,0,0.12) 0 3px, rgba(255,255,255,0.04) 3px 9px), linear-gradient(180deg, #8a5a32, #5a3418);
+    box-shadow:0 0 0 4px #2a1508, 0 18px 40px rgba(0,0,0,0.6), inset 0 2px 0 rgba(255,255,255,0.18); }
+  .ad-crt{ position:relative; aspect-ratio:4 / 3; overflow:hidden; border-radius:34px / 26px; background:#0b0b10;
+    box-shadow:inset 0 0 0 6px #1a1a1e, inset 0 0 40px rgba(0,0,0,0.9); }
+  .ad-crt::after{ content:''; position:absolute; inset:0; z-index:5; pointer-events:none; border-radius:inherit;
+    background:repeating-linear-gradient(0deg, rgba(0,0,0,0.2) 0 2px, rgba(0,0,0,0) 2px 4px), radial-gradient(120% 90% at 50% 45%, rgba(255,255,255,0.08), rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%); }
+  .ad-bumper{ position:absolute; inset:0; z-index:2; display:flex; align-items:center; justify-content:center; gap:16px; background:#14102a; color:#fff;
+    font:900 clamp(24px, 7.4vw, 32px)/1 var(--f-display); letter-spacing:2px; text-shadow:0 0 12px rgba(255,255,255,0.5); }
+  .ad-count{ width:64px; height:64px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:40px; color:#14102a; background:#fff3c4;
+    box-shadow:0 0 0 4px #14102a, 0 0 0 7px #fff3c4; }
+  .ad-spot{ position:absolute; inset:0; z-index:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; padding:10px;
+    background:linear-gradient(160deg, var(--ad1), var(--ad2)); opacity:0; }
+  .show-card.ad.spot .ad-bumper{ opacity:0; transition:opacity .12s; }
+  .show-card.ad.spot .ad-spot{ opacity:1; animation:vhsWobble .22s steps(2) infinite; }
+  .ad-burst{ position:absolute; left:50%; top:42%; width:420px; height:420px; margin:-210px 0 0 -210px; z-index:-1; opacity:0.35;
+    background:repeating-conic-gradient(from 0deg, rgba(255,255,255,0.55) 0deg 10deg, rgba(255,255,255,0) 10deg 20deg); }
+  .ad-art{ width:38%; height:auto; filter:drop-shadow(4px 4px 0 rgba(0,0,0,0.3)); }
+  .show-card.ad.spot .ad-art{ animation:adBob .8s ease-in-out infinite alternate; }
+  .show-card.ad.spot .ad-brand{ animation:mwSlam .45s cubic-bezier(.2,1.4,.4,1) .1s both; }
+  .ad-knobs{ position:absolute; right:12px; top:22px; display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .ad-knobs i{ width:28px; height:28px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #e9eef5, #8e97a8); box-shadow:0 2px 0 #2a1508; }
+  .ad-knobs b{ width:24px; height:46px; border-radius:6px; background:repeating-linear-gradient(0deg, #2a1508 0 3px, #6a4428 3px 6px); }
+  .ad-sponsor{ font:800 11px var(--f-body); letter-spacing:2px; color:rgba(255,240,220,0.7); }
+  .ad-sponsor b{ color:#fff3c4; letter-spacing:1px; }
+  :root.lite .show-card.ad.spot .ad-spot, :root.lite .show-card.ad.spot .ad-art{ animation:none; }
+  .show-card.ad .ad-skip{ right:auto; left:50%; transform:translateX(-50%); }   /* (clear of the TEST button) */
+  @media (prefers-reduced-motion: reduce){ .show-card.ad.spot .ad-spot, .show-card.ad.spot .ad-art, .show-card.ad.spot .ad-brand{ animation:none; } }
   .ad-screen{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
     background:linear-gradient(160deg, var(--ad1), var(--ad2)); animation:vhsWobble .22s steps(2) infinite; }
   .ad-screen::after{ content:''; position:absolute; inset:0; pointer-events:none; background:repeating-linear-gradient(0deg, rgba(0,0,0,0.16) 0 2px, transparent 2px 4px); }
   @keyframes vhsWobble{ 0%{ transform:translateX(0) skewX(0); filter:saturate(1.3); } 50%{ transform:translateX(2px) skewX(-0.6deg); } 100%{ transform:translateX(-1px); } }
   .ad-glyph{ font-size:84px; filter:drop-shadow(0 6px 0 rgba(0,0,0,0.25)); animation:adBob .8s ease-in-out infinite alternate; }
   @keyframes adBob{ to{ transform:translateY(-8px) rotate(4deg); } }
-  .ad-brand{ font:900 clamp(40px, 13vw, 58px)/0.95 var(--f-display); color:#fff; text-shadow:4px 4px 0 rgba(0,0,0,0.35); padding:0 14px; }
-  .ad-line{ font:800 italic 20px/1.2 var(--f-body); color:#fff; text-shadow:2px 2px 0 rgba(0,0,0,0.35); padding:0 20px; }
+  .ad-brand{ font:900 clamp(30px, 9.4vw, 44px)/0.95 var(--f-display); color:#fff; text-shadow:4px 4px 0 rgba(0,0,0,0.35); padding:0 14px; }
+  .ad-line{ font:800 italic clamp(14px, 4.2vw, 18px)/1.2 var(--f-body); color:#fff; text-shadow:2px 2px 0 rgba(0,0,0,0.35); padding:0 20px; }
   .ad-tag{ position:absolute; top:calc(16px + env(safe-area-inset-top)); left:16px; font:800 11px var(--f-body); letter-spacing:2px; color:#fff; background:rgba(0,0,0,0.45); padding:4px 8px; border-radius:6px; }
   .ad-skip{ position:absolute; right:16px; bottom:calc(18px + env(safe-area-inset-bottom)); font:800 12px var(--f-body); letter-spacing:2px; color:#fff; background:rgba(0,0,0,0.45); padding:6px 10px; border-radius:8px; }
   @media (prefers-reduced-motion: reduce){ .co-drape, .co-host, .co-cards span{ transition:none; } .cue-wipe{ animation:none; transform:scale(1); } .cue-hold, .cue-card, .cue-face{ animation:none; transform:none; } .cue-back{ display:none; } .cue-iris{ animation:none; transform:scale(2.5); } .cue-black{ animation:none; } .ad-screen, .ad-glyph{ animation:none; } }
@@ -5553,7 +5584,7 @@
     ],
     mystery: { pool: [ { game:'emojiDecode', weight:2 }, { game:'timeWarp', weight:1 } ] },   // (fallback; Price Probe and Oddball Alert are out of the pool)
     cosmicSurpriseChance: 0,
-    commercial: { ms:3000, ads:[ { brand:'ZING COLA', line:'Tastes like tomorrow!', glyph:'🥤', colors:['#ff3c9d', '#ffd23f'] } ] },
+    commercial: { ms:3000, ads:[ { brand:'ZING COLA', line:'Tastes like tomorrow!', glyph:'🥤', art:'can', colors:['#ff3c9d', '#ffd23f'] } ] },
   };
   const ACT_DEFAULT_VS_MS = 7000;
   function seedOf(rng){ return (rng() * 4294967296) >>> 0; }
@@ -10884,25 +10915,44 @@
   }
   // The commercial break: a 3 s fake 70s ad, skippable. Built as one component (an ad in,
   // done() out) so a real ad can take its place later.
+  // D8 (Oct 16): the commercial break as a retro TV spot - a wood-grain TV with a curved screen, scanlines and a
+  // vignette; a quick WE'LL BE RIGHT BACK leader counting 3-2-1, then the ad: bold flat 80s product art, the brand
+  // slamming in and the announcer's tagline; BROUGHT TO YOU BY under the set (RUNDOWN.commercial.sponsor when a real
+  // sponsor takes the slot, else the ad's own brand). Still 3 s and skippable. Invented brands only.
+  const AD_ART = {
+    can:'<rect x="34" y="18" width="52" height="84" rx="8" fill="var(--ad1)" stroke="#1a0a1a" stroke-width="4"/><rect x="34" y="18" width="52" height="12" rx="6" fill="#e9eef5" stroke="#1a0a1a" stroke-width="4"/><path d="M40 52 H80 M40 64 H80" stroke="var(--ad2)" stroke-width="8"/><path d="M46 30 V100" stroke="#fff" stroke-width="5" opacity="0.45"/>',
+    boots:'<path d="M28 28 H56 V70 L92 76 Q100 78 100 88 V96 H24 Z" fill="var(--ad1)" stroke="#1a0a1a" stroke-width="4" stroke-linejoin="round"/><path d="M24 96 H100" stroke="#1a0a1a" stroke-width="8"/><path d="M14 84 L2 90 M14 76 L0 76 M14 92 L4 100" stroke="var(--ad2)" stroke-width="5" stroke-linecap="round"/><circle cx="72" cy="86" r="5" fill="var(--ad2)"/>',
+    bowl:'<path d="M14 54 H106 Q102 98 60 98 Q18 98 14 54 Z" fill="var(--ad1)" stroke="#1a0a1a" stroke-width="4" stroke-linejoin="round"/><circle cx="34" cy="48" r="9" fill="var(--ad2)" stroke="#1a0a1a" stroke-width="3"/><circle cx="56" cy="44" r="10" fill="var(--ad2)" stroke="#1a0a1a" stroke-width="3"/><circle cx="80" cy="48" r="9" fill="var(--ad2)" stroke="#1a0a1a" stroke-width="3"/><path d="M84 30 L100 14" stroke="#e9eef5" stroke-width="8" stroke-linecap="round"/>',
+    jar:'<rect x="30" y="34" width="60" height="66" rx="12" fill="var(--ad1)" stroke="#1a0a1a" stroke-width="4"/><rect x="26" y="20" width="68" height="18" rx="6" fill="var(--ad2)" stroke="#1a0a1a" stroke-width="4"/><path d="M48 58 Q60 46 72 58 Q60 70 48 58 Z" fill="#fff"/><path d="M40 84 H80" stroke="#fff" stroke-width="5" opacity="0.6"/>',
+    robot:'<rect x="28" y="40" width="64" height="50" rx="10" fill="var(--ad1)" stroke="#1a0a1a" stroke-width="4"/><rect x="38" y="16" width="44" height="26" rx="8" fill="#e9eef5" stroke="#1a0a1a" stroke-width="4"/><circle cx="50" cy="29" r="5" fill="var(--ad2)"/><circle cx="70" cy="29" r="5" fill="var(--ad2)"/><circle cx="42" cy="98" r="8" fill="#1a0a1a"/><circle cx="78" cy="98" r="8" fill="#1a0a1a"/><path d="M60 16 V6" stroke="#1a0a1a" stroke-width="4"/><circle cx="60" cy="5" r="4" fill="var(--ad2)"/>',
+    pudding:'<path d="M26 92 L34 40 Q60 26 86 40 L94 92 Z" fill="var(--ad1)" stroke="#1a0a1a" stroke-width="4" stroke-linejoin="round"/><path d="M34 40 Q60 26 86 40 Q80 52 74 44 Q66 56 58 44 Q50 54 44 44 Q38 52 34 40 Z" fill="var(--ad2)" stroke="#1a0a1a" stroke-width="3"/><path d="M18 96 H102" stroke="#1a0a1a" stroke-width="6" stroke-linecap="round"/><circle cx="60" cy="24" r="6" fill="#ff3c5a" stroke="#1a0a1a" stroke-width="3"/>',
+  };
   function showCommercial(ad, done){
     if (!ad){ done(); return; }
-    const ms = (RUNDOWN.commercial && RUNDOWN.commercial.ms) || 3000;
+    const ms = (RUNDOWN.commercial && RUNDOWN.commercial.ms) || 3000, sponsor = (RUNDOWN.commercial && RUNDOWN.commercial.sponsor) || ad.brand || '';
     showCard.className = 'show-card ad';
-    showCard.innerHTML = '<div class="ad-screen"><div class="ad-glyph"></div><div class="ad-brand"></div><div class="ad-line"></div></div>' +
-      '<div class="ad-tag">WE’LL BE RIGHT BACK</div><div class="ad-skip">SKIP ▶</div>';
-    const scr = showCard.querySelector('.ad-screen');
-    scr.style.setProperty('--ad1', (ad.colors && ad.colors[0]) || '#ff3c9d'); scr.style.setProperty('--ad2', (ad.colors && ad.colors[1]) || '#ffd23f');
-    showCard.querySelector('.ad-glyph').textContent = ad.glyph || '';
+    showCard.innerHTML = '<div class="ad-room"><div class="ad-tv"><div class="ad-crt">' +
+      '<div class="ad-bumper"><span>WE\u2019LL BE<br>RIGHT BACK</span><b class="ad-count">3</b></div>' +
+      '<div class="ad-spot"><i class="ad-burst"></i><svg class="ad-art" viewBox="0 0 120 110" aria-hidden="true">' + (AD_ART[ad.art] || '') + '</svg>' +
+      (AD_ART[ad.art] ? '' : '<div class="ad-glyph"></div>') + '<div class="ad-brand"></div><div class="ad-line"></div></div>' +
+      '</div><div class="ad-knobs"><i></i><i></i><b></b></div></div>' +
+      '<div class="ad-sponsor">BROUGHT TO YOU BY <b></b></div></div><div class="ad-skip">SKIP \u25B6</div>';
+    const crt = showCard.querySelector('.ad-crt');
+    crt.style.setProperty('--ad1', (ad.colors && ad.colors[0]) || '#ff3c9d'); crt.style.setProperty('--ad2', (ad.colors && ad.colors[1]) || '#ffd23f');
+    const g = showCard.querySelector('.ad-glyph'); if (g) g.textContent = ad.glyph || '';
     showCard.querySelector('.ad-brand').textContent = ad.brand || '';
-    showCard.querySelector('.ad-line').textContent = ad.line || '';
+    showCard.querySelector('.ad-line').textContent = '\u201C' + (ad.line || '') + '\u201D';
+    showCard.querySelector('.ad-sponsor b').textContent = sponsor;
     showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'Commercial break: ' + (ad.brand || '') + '. Tap to skip');
     showCard.classList.remove('hidden');
-    playTone(392, 0, 0.12, 'square', 0.04); playTone(523, 0.12, 0.12, 'square', 0.04); playTone(659, 0.24, 0.25, 'square', 0.04);
+    const count = showCard.querySelector('.ad-count'), timers = [];
+    [3, 2, 1].forEach((n, i)=> timers.push(setTimeout(()=>{ count.textContent = n; sfx.tick(n === 1); }, i * 260)));
+    timers.push(setTimeout(()=>{ showCard.classList.add('spot'); playTone(392, 0, 0.12, 'square', 0.04); playTone(523, 0.12, 0.12, 'square', 0.04); playTone(659, 0.24, 0.25, 'square', 0.04); }, 820));
     const shownAt = performance.now();
     let gone = false, t = null;
     const go = (e)=>{
       if (gone || (e && performance.now() - shownAt < 300)) return;
-      gone = true; clearTimeout(t);
+      gone = true; clearTimeout(t); timers.forEach(clearTimeout);
       showCard.removeEventListener('click', go);
       showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden';
       noteOverlayClosed();

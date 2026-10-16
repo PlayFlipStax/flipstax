@@ -48,13 +48,16 @@ window.FLIPSTAX_RUNDOWN = {
   // the date). Skippable. Built so a real ad can replace it later.
   commercial: {
     ms: 3000,
+    // A real sponsor later: set `sponsor` (shown as BROUGHT TO YOU BY ...) and/or add its ad here. Invented brands only until then.
+    sponsor: null,
+    // `art` is the flat 80s product drawing: can, boots, bowl, jar, robot, pudding.
     ads: [
-      { brand: 'ZING COLA',         line: 'Tastes like tomorrow!',               glyph: '🥤', colors: ['#ff3c9d', '#ffd23f'] },
-      { brand: 'ZOOMO JET BOOTS',   line: 'Be home before you leave!',           glyph: '👟', colors: ['#2fd5ff', '#ff6a2b'] },
-      { brand: 'CAPTAIN CRUNCHO',   line: 'The cereal that crunches back!',      glyph: '🥣', colors: ['#ffb21f', '#3b7bff'] },
-      { brand: 'MOONGLOW HAIR GEL', line: 'Hold so strong, it holds you!',       glyph: '💇', colors: ['#c792ff', '#7dff9e'] },
-      { brand: 'ROBO-VAC 3000',     line: 'It cleans. It thinks. It judges.',    glyph: '🤖', colors: ['#7df9ff', '#ff3c9d'] },
-      { brand: 'SPACE PUDDING',     line: 'Wobbles in zero gravity!',            glyph: '🍮', colors: ['#ffd23f', '#a34dff'] },
+      { brand: 'ZING COLA',         line: 'Tastes like tomorrow!',               glyph: '🥤', art: 'can',     colors: ['#ff3c9d', '#ffd23f'] },
+      { brand: 'ZOOMO JET BOOTS',   line: 'Be home before you leave!',           glyph: '👟', art: 'boots',   colors: ['#2fd5ff', '#ff6a2b'] },
+      { brand: 'COSMO CRUNCH',      line: 'The cereal that crunches back!',      glyph: '🥣', art: 'bowl',    colors: ['#ffb21f', '#3b7bff'] },
+      { brand: 'MOONGLOW HAIR GEL', line: 'Hold so strong, it holds you!',       glyph: '💇', art: 'jar',     colors: ['#c792ff', '#7dff9e'] },
+      { brand: 'DUST-O-TRON 3000',  line: 'It cleans. It thinks. It judges.',    glyph: '🤖', art: 'robot',   colors: ['#7df9ff', '#ff3c9d'] },
+      { brand: 'SPACE PUDDING',     line: 'Wobbles in zero gravity!',            glyph: '🍮', art: 'pudding', colors: ['#ffd23f', '#a34dff'] },
     ],
   },
 };
