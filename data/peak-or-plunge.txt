@@ -1,5 +1,5 @@
 FlipStax - Peak or Plunge items
-NOT FACT-CHECKED - please check every line before setting PEAK_OR_PLUNGE_REVIEWED = true in data/peak-or-plunge.js.
+Checked (Oct 16). PEAK_OR_PLUNGE_REVIEWED = true in data/peak-or-plunge.js.
 Format: number. name | number | category | source note
 
 1. Eiffel Tower | 330 m tall | height | "Eiffel Tower": 330 m to the tip (antenna added 2022)
@@ -32,7 +32,7 @@ Format: number. name | number | category | source note
 28. The Eiffel Tower is finished | 1889 | year | "Eiffel Tower": completed 1889
 29. The Berlin Wall falls | 1989 | year | "Fall of the Berlin Wall": 9 November 1989
 30. The first powered airplane flight | 1903 | year | "Wright Flyer": 17 December 1903
-31. The first website goes live | 1991 | year | "History of the World Wide Web": first website online August 1991
+31. The first website opens to the public | 1991 | year | "History of the World Wide Web": first website online August 1991
 32. The first email between computers | 1971 | year | "Email" / "Ray Tomlinson": first networked email 1971
 33. The telephone is patented | 1876 | year | "Invention of the telephone": Bell's US patent, March 1876
 34. The first modern Olympic Games | 1896 | year | "1896 Summer Olympics": Athens 1896

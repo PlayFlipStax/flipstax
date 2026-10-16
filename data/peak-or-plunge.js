@@ -4,9 +4,9 @@
 // Items are only ever compared within their own `cat` (heights with heights, years with years, counts with counts).
 // Every number is a well-documented figure; the source is in the comment on each line (Wikipedia unless noted).
 // No real brand names (DIRECTION.md). `text` reads after the name: "Eiffel Tower: 330 m tall".
-// *** NOT FACT-CHECKED BY A HUMAN YET *** The plain-text copy for checking is data/peak-or-plunge.txt. The game stays out
-// of the Mystery Game rotation until PEAK_OR_PLUNGE_REVIEWED is set to true below (the TEST menu can still play it).
-window.PEAK_OR_PLUNGE_REVIEWED = false;
+// Checked by Rick and Claude (Oct 16); in the Mystery Game rotation. The plain-text copy is data/peak-or-plunge.txt.
+// Pairing (lib/mini-games.js): one category a game, no equal neighbours, no near-ties within 10%.
+window.PEAK_OR_PLUNGE_REVIEWED = true;
 window.FLIPSTAX_PEAK_OR_PLUNGE = [
   // ---- heights, in metres ----
   { cat:'height', glyph:'🗼', name:'Eiffel Tower', value:330, text:'m tall' },                       // "Eiffel Tower": 330 m to the tip (antenna added 2022)
@@ -41,7 +41,7 @@ window.FLIPSTAX_PEAK_OR_PLUNGE = [
   { cat:'year', glyph:'🗼', name:'The Eiffel Tower is finished', value:1889, text:'' },              // "Eiffel Tower": completed 1889
   { cat:'year', glyph:'🧱', name:'The Berlin Wall falls', value:1989, text:'' },                     // "Fall of the Berlin Wall": 9 November 1989
   { cat:'year', glyph:'✈️', name:'The first powered airplane flight', value:1903, text:'' },         // "Wright Flyer": 17 December 1903
-  { cat:'year', glyph:'🌐', name:'The first website goes live', value:1991, text:'' },               // "History of the World Wide Web": first website online August 1991
+  { cat:'year', glyph:'🌐', name:'The first website opens to the public', value:1991, text:'' },               // "History of the World Wide Web": first website online August 1991
   { cat:'year', glyph:'📧', name:'The first email between computers', value:1971, text:'' },         // "Email" / "Ray Tomlinson": first networked email 1971
   { cat:'year', glyph:'☎️', name:'The telephone is patented', value:1876, text:'' },                // "Invention of the telephone": Bell's US patent, March 1876
   { cat:'year', glyph:'🏅', name:'The first modern Olympic Games', value:1896, text:'' },            // "1896 Summer Olympics": Athens 1896
