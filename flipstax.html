@@ -3516,6 +3516,22 @@
      (canvas, see celebrateSolve), and a SOLVED! banner pops in with the
      word and the time. The solve screen is locked while it plays. */
   .solve-overlay.celebrating .solve-inner{ pointer-events:none; }
+  /* D6: the Word Warp UFO - it hovers over the tiles; its beam lifts right letters (and the episode's animal) into the
+     ship, or flickers and misses on a wrong guess. Transform and opacity only. */
+  .ww-ufo{ position:absolute; left:50%; top:0; z-index:4; width:96px; margin-left:-48px; pointer-events:none; }
+  .ww-ship{ position:relative; z-index:2; animation:wwHover 2.6s ease-in-out infinite; }
+  .ww-ship svg{ width:96px; height:auto; display:block; filter:drop-shadow(0 4px 6px rgba(0,0,0,0.4)); }
+  @keyframes wwHover{ 0%, 100%{ transform:translateY(0) rotate(-2deg); } 50%{ transform:translateY(-5px) rotate(2deg); } }
+  .ww-beam{ position:absolute; z-index:1; left:50%; top:38px; width:min(86vw, 380px); height:var(--beam-h, 120px); transform:translateX(-50%); transform-origin:50% 0; opacity:0;
+    background:linear-gradient(180deg, rgba(200,250,255,0.85), rgba(125,249,255,0.35) 70%, rgba(125,249,255,0.08)); clip-path:polygon(44% 0, 56% 0, 100% 100%, 0 100%); }
+  .ww-ufo.beaming .ww-beam{ animation:wwBeam 1.1s ease-out both; }
+  @keyframes wwBeam{ 0%{ opacity:0; transform:translateX(-50%) scaleY(0.2); } 18%{ opacity:0.95; transform:translateX(-50%) scaleY(1); } 80%{ opacity:0.8; } 100%{ opacity:0; transform:translateX(-50%) scaleY(1); } }
+  .ww-ufo.miss .ww-beam{ animation:wwMiss .85s steps(1) both; }
+  @keyframes wwMiss{ 0%{ opacity:0.8; transform:translateX(-30%) rotate(-14deg); } 12%{ opacity:0; } 24%{ opacity:0.7; transform:translateX(-62%) rotate(12deg); } 36%{ opacity:0; } 50%{ opacity:0.5; transform:translateX(-44%) rotate(-20deg); } 62%, 100%{ opacity:0; } }
+  .ww-lift{ position:absolute; z-index:3; pointer-events:none; transform:translate(-50%,-50%); font:900 30px/1 var(--f-display); color:#ffe9a0; text-shadow:0 0 10px rgba(125,249,255,0.9); }
+  .ww-lift.animal{ font-size:40px; font-weight:400; text-shadow:0 0 12px rgba(125,249,255,0.8); }
+  :root.lite .ww-ship{ animation:none; }
+  @media (prefers-reduced-motion: reduce){ .ww-ship{ animation:none; } .ww-ufo.beaming .ww-beam, .ww-ufo.miss .ww-beam{ animation:none; } }
   .solve-overlay.celebrating .solve-slot{
     background:linear-gradient(180deg,#ffe36a,#ffb800); border-color:#fff3a6; color:#3d2c00;
     box-shadow:0 0 22px rgba(255,217,61,0.85), 0 0 0 2px rgba(255,255,255,0.5);
@@ -13557,6 +13573,7 @@
   }
   function startSolvePhase(){
     runPhase = 'solving';
+    requestAnimationFrame(()=> requestAnimationFrame(wwUfo));
     // Can now be entered from the middle of a VS round (run clock expiry),
     // not just from a resolved trivia/riddle: cancel that round's timer and
     // tally polling, and drop any trivia/power-up that was queued behind it.
@@ -13717,13 +13734,49 @@
     solveCurrentGuessSource[slotIdx] = null;
     renderSolveUI();
   }
+  // ---- D6 (Oct 16): the Word Warp UFO abduction ----
+  // A silver UFO hovers over the tiles. A guess that gets letters right sends its beam down: the new right letters
+  // float up into the ship with an animal (the episode's own - picked by the date seed, a cow on most days); a guess
+  // with nothing new makes the beam flicker and miss. (The slots keep their letters; the prize track is unchanged.)
+  const WW_ANIMALS = ['\uD83D\uDC04', '\uD83D\uDC04', '\uD83D\uDC11', '\uD83D\uDC16', '\uD83D\uDC14', '\uD83E\uDD86', '\uD83D\uDC10', '\uD83D\uDC07', '\uD83E\uDD99'];
+  function wwAnimal(){ return WW_ANIMALS[hashStr('flipstax-abduct-' + (runStartDate || todayStr())) % WW_ANIMALS.length]; }
+  function wwUfo(){
+    const inner = els.solveOverlay.querySelector('.solve-inner'); if (!inner) return null;
+    let u = document.getElementById('wwUfo');
+    if (!u){ u = document.createElement('div'); u.id = 'wwUfo'; u.className = 'ww-ufo'; u.setAttribute('aria-hidden', 'true'); u.innerHTML = '<i class="ww-beam"></i><div class="ww-ship">' + FX.ufoSvg() + '</div>'; inner.appendChild(u); }
+    const sl = els.solveSlots; u.style.top = Math.max(0, sl.offsetTop - 70) + 'px'; u.style.setProperty('--beam-h', (sl.offsetHeight + 62) + 'px');
+    return u;
+  }
+  function wwAbduct(idxs, done){
+    const u = wwUfo(); if (!u || !idxs.length){ if (done) done(); return; }
+    const slots = Array.from(els.solveSlots.children), still = FX.reduced() || !Element.prototype.animate;
+    u.classList.remove('miss'); u.classList.add('beaming'); sfx.ufoBeam();
+    const ir = els.solveOverlay.querySelector('.solve-inner').getBoundingClientRect(), ur = u.querySelector('.ww-ship').getBoundingClientRect(), tx = ur.left + ur.width / 2 - ir.left, ty = ur.top + ur.height * 0.6 - ir.top;
+    const lift = (txt, cls, x, y, delay)=>{
+      const g = document.createElement('div'); g.className = 'ww-lift ' + cls; g.textContent = txt; g.style.left = x + 'px'; g.style.top = y + 'px';
+      els.solveOverlay.querySelector('.solve-inner').appendChild(g);
+      if (still){ setTimeout(()=> g.remove(), 500); return; }
+      g.animate([{ transform:'translate(-50%,-50%) scale(1) rotate(0deg)', opacity:1 }, { transform:'translate(-50%,-50%) translate(' + ((tx - x) * 0.3) + 'px,' + ((ty - y) * 0.45) + 'px) scale(0.9) rotate(-12deg)', opacity:1, offset:0.45 },
+        { transform:'translate(-50%,-50%) translate(' + (tx - x) + 'px,' + (ty - y) + 'px) scale(0.2) rotate(20deg)', opacity:0 }], { duration:900, delay, easing:'cubic-bezier(.5,0,.7,.4)', fill:'backwards' }).onfinish = ()=> g.remove();
+    };
+    idxs.forEach((i, k)=>{ const r = slots[i] && slots[i].getBoundingClientRect(); if (r) lift(runWord.word[i], 'letter', r.left + r.width / 2 - ir.left, r.top + r.height / 2 - ir.top, k * 70); });
+    const sr = els.solveSlots.getBoundingClientRect();
+    lift(wwAnimal(), 'animal', sr.left + sr.width / 2 - ir.left, sr.bottom + 18 - ir.top, 160);
+    setTimeout(()=>{ u.classList.remove('beaming'); if (done) done(); }, still ? 500 : 1150);
+  }
+  function wwMiss(){
+    const u = wwUfo(); if (!u) return;
+    u.classList.remove('beaming', 'miss'); void u.offsetWidth; u.classList.add('miss'); sfx.zap();
+    setTimeout(()=> u.classList.remove('miss'), 900);
+  }
   function submitSolveGuess(){
     const filled = solveLockedLetters.map((v,i)=> v || solveCurrentGuess[i]);
     if (filled.some(v=>!v)) return;
     solveGuesses.push(filled.slice());
     let allCorrect = true;
+    const newRight = [];
     filled.forEach((l,i)=>{
-      if (l === runWord.word[i]) solveLockedLetters[i] = l;
+      if (l === runWord.word[i]){ if (!solveLockedLetters[i]) newRight.push(i); solveLockedLetters[i] = l; }
       else allCorrect = false;
     });
     solveCurrentGuess = [];
@@ -13738,9 +13791,10 @@
       runWarpPoints = WARP_SOLVE_POINTS + Math.floor(Math.max(0, solveEndsAt - solvedAt) / 1000 / WARP_SECONDS_PER_POINT);
       runScore += runWarpPoints;
       showFlash('win'); hostMood('cheer'); hostSay('You warped it! +' + runWarpPoints, 2200);
-      FX.beamHit(showFx, Array.from(els.solveSlots.children));
       saveRunSnapshot();
-      celebrateSolve(solvedAt, ()=>{ if (runActive) endRun(true, solvedAt); });
+      // The whole word is beamed up (every letter, and the animal), then the reveal.
+      els.solveOverlay.classList.add('celebrating');
+      wwAbduct(runWord.word.split('').map((_, i)=> i), ()=> celebrateSolve(solvedAt, ()=>{ if (runActive) endRun(true, solvedAt); }));
       return;
     }
     runSolveWrongGuesses++;
@@ -13750,7 +13804,8 @@
       missWarp();
       return;
     }
-    sfx.wrong();
+    if (newRight.length){ renderSolveUI(); wwAbduct(newRight); sfx.correct(); hostMood('cheer'); return; }   // some letters right: they get beamed up
+    sfx.wrong(); wwMiss();
     FX.shake(els.solveSlots); hostMood('sad');
     renderSolveUI();
   }
