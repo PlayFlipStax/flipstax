@@ -2783,6 +2783,10 @@
   .show-marquee.unison i{ animation:bulbUnison .2s steps(1) 2; background:#fff6d0; box-shadow:0 0 12px #ffe27a, 0 0 0 1.5px rgba(40,10,70,0.55); }
   @keyframes bulbUnison{ 0%{ opacity:1; } 50%{ opacity:0.1; } }
   .show-marquee.miss i{ animation:bulbBlink .12s steps(1) 5; background:#ff3b3b; box-shadow:0 0 9px #ff2a2a, 0 0 0 1.5px rgba(40,10,70,0.55); }
+  .vs-tag{ position:absolute; left:0; top:0; padding:8px 18px 10px; border-radius:14px; white-space:nowrap; pointer-events:none;
+    font:900 clamp(30px, 9vw, 40px)/1 var(--f-display); letter-spacing:1px; color:#fff; text-shadow:0 2px 0 rgba(90,0,60,0.55);
+    background:linear-gradient(120deg, #ffd23f 0%, #ff9a3c 40%, #ff3c9d 100%); border:3px solid #fff3c4;
+    box-shadow:0 6px 18px rgba(60,0,40,0.4), 0 0 20px rgba(255,90,170,0.55); }
   .vs-stamp{ position:absolute; left:0; top:0; width:104px; height:104px; margin:-52px 0 0 -52px; border:7px solid #ff2d3a; border-radius:20px;
     background:rgba(255,255,255,0.14); box-shadow:0 0 20px rgba(255,40,60,0.65), inset 0 0 14px rgba(255,40,60,0.45); pointer-events:none; }
   .vs-stamp svg{ width:100%; height:100%; display:block; }
@@ -6192,6 +6196,13 @@
       g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.05, t + 0.002); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
       o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + 0.06); noiseHit(ctx, t, 0.05, 0.02, 'highpass', 3000);
     }),
+    // A soft whoosh (a bold VS pick): breathy noise sweeping up and away, quiet.
+    whoosh: ()=> withSfxCtx((ctx, t)=>{
+      const n = ctx.createBufferSource(); n.buffer = showNoise(ctx);
+      const f = ctx.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 1.2; f.frequency.setValueAtTime(500, t); f.frequency.exponentialRampToValueAtTime(2600, t + 0.32);
+      const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.05, t + 0.12); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.38);
+      n.connect(f); f.connect(g); g.connect(ctx.destination); n.start(t, Math.random() * 0.4, 0.42);
+    }),
     // One split-flap leaf falling: a short dry clack.
     clack: ()=> withSfxCtx((ctx, t)=>{ noiseHit(ctx, t, 0.07, 0.022, 'bandpass', 2400 + Math.random() * 600, 1.6); noiseHit(ctx, t + 0.006, 0.03, 0.015, 'highpass', 5000); }),
     // A missed Word Warp: the sad trombone (four falling notes, the last one wobbles).
@@ -6218,7 +6229,7 @@
     }),
     hostVoice: showSfx.hostVoice, drumroll: showSfx.drumroll, crowdOoh: showSfx.crowdOoh, bumper: showSfx.bumper, letterLand: showSfx.letterLand, warpMiss: showSfx.warpMiss,
     ding: showSfx.ding, strike: showSfx.strike, aww: showSfx.aww, clack: showSfx.clack, chime: showSfx.chime, siren: showSfx.siren, roar: showSfx.roar,
-    slam: showSfx.slam, squelch: showSfx.squelch, cheer: showSfx.cheer, cashRegister: showSfx.cashRegister, tick: showSfx.tick,
+    slam: showSfx.slam, squelch: showSfx.squelch, cheer: showSfx.cheer, cashRegister: showSfx.cashRegister, tick: showSfx.tick, whoosh: showSfx.whoosh,
     drumrollShort: ()=> showSfx.drumroll(450), drumrollLong: ()=> showSfx.drumroll(1800),
     fanfare: ()=> sfx.vaultFanfare(), zap: ()=> sfx.laser(),
     key: ()=> withSfxCtx((ctx, t)=>{ coinPing(ctx, t, 0.09, 1568); coinPing(ctx, t + 0.09, 0.08, 2093); haptic([8,20,8]); }),
@@ -10523,7 +10534,7 @@
     el.classList.toggle('hot', m > 1); el.classList.toggle('max', atMax);
     el.setAttribute('aria-label', 'Crowd combo: ' + runMatchStreak + ' in a row, points times ' + m);
     if (tierUp && !prefersReducedMotion()) FX.pop(el, 1.3);
-    if (broke) FX.shake(el);
+    // (C1: a broken crowd streak just resets - no shake)
   }
 
   // ---------- The cold open and the round bumpers ----------
@@ -14863,9 +14874,9 @@
   }
   // The verdict on the picked card once the flaps have landed: a match DINGs, flashes every bulb
   // white-gold in unison and pops the points; a miss stamps a red X, shakes the card, buzzes and the crowd goes "aww".
-  function vsVerdictFx(side, matched, pts){
+  function vsVerdictFx(side, matched, pts, pct){
     const ph = side === 'A' ? els.halfA : els.halfB;
-    marquee.classList.remove('unison', 'miss', 'blink'); void marquee.offsetWidth; marquee.classList.add(matched ? 'unison' : 'miss');
+    marquee.classList.remove('unison', 'miss', 'blink'); void marquee.offsetWidth; if (matched) marquee.classList.add('unison');
     clearTimeout(vsVerdictFx._t); vsVerdictFx._t = setTimeout(()=> marquee.classList.remove('unison', 'miss'), 900);
     const l = showFx.getBoundingClientRect(), r = ph.getBoundingClientRect(), x = r.left + r.width / 2 - l.left, y = r.top + r.height * 0.36 - l.top;
     const put = (el)=>{ el.style.left = x + 'px'; el.style.top = y + 'px'; showFx.appendChild(el); return el; };
@@ -14879,13 +14890,14 @@
           { transform:'translate(-50%,-80%) scale(1)', opacity:1, offset:0.7 }, { transform:'translate(-50%,-120%) scale(0.95)', opacity:0 }], { duration:1000, easing:'ease-out' }).onfinish = ()=> p.remove();
       }
     } else {
-      sfx.strike(); setTimeout(()=> sfx.aww(), 280);
-      const st = put(document.createElement('div')); st.className = 'vs-stamp';
-      st.innerHTML = '<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M26 26 L74 74 M74 26 L26 74" stroke="#ff2d3a" stroke-width="15" stroke-linecap="round"/></svg>';
-      if (still){ st.style.transform = 'rotate(-10deg)'; setTimeout(()=> st.remove(), 1000); }
-      else st.animate([{ transform:'rotate(-24deg) scale(2.3)', opacity:0 }, { transform:'rotate(-10deg) scale(0.92)', opacity:1, offset:0.18 }, { transform:'rotate(-10deg) scale(1)', opacity:1, offset:0.26 },
-        { transform:'rotate(-10deg) scale(1)', opacity:1, offset:0.8 }, { transform:'rotate(-10deg) scale(1.05)', opacity:0 }], { duration:950, easing:'ease-out' }).onfinish = ()=> st.remove();
-      FX.shake(ph);
+      // C1 (Oct 2026): a minority pick is never punished - no red X, buzzer, aww or red bulbs. A playful gold-to-pink tag
+      // (HOT TAKE! for a lonely pick, BOLD PICK! otherwise) and at most a soft whoosh. (Red X + buzzer: Brain Beam and Riddle only.)
+      sfx.whoosh();
+      const tag = put(document.createElement('div')); tag.className = 'vs-tag'; tag.textContent = pct != null && pct <= 30 ? 'HOT TAKE!' : 'BOLD PICK!';
+      if (still){ tag.style.transform = 'translate(-50%,-50%) rotate(-6deg)'; setTimeout(()=> tag.remove(), 1000); }
+      else tag.animate([{ transform:'translate(-50%,-50%) rotate(-14deg) scale(0.3)', opacity:0 }, { transform:'translate(-50%,-50%) rotate(-6deg) scale(1.12)', opacity:1, offset:0.22 },
+        { transform:'translate(-50%,-50%) rotate(-6deg) scale(1)', opacity:1, offset:0.36 }, { transform:'translate(-50%,-60%) rotate(-6deg) scale(1)', opacity:1, offset:0.82 }, { transform:'translate(-50%,-75%) rotate(-6deg) scale(0.95)', opacity:0 }],
+        { duration:1150, easing:'ease-out' }).onfinish = ()=> tag.remove();
     }
   }
   function reveal(counts, isLiveUpdate){
@@ -15029,7 +15041,7 @@
     // anyone else had voted on.
     if (cv.others > 0) lastVoteSummary = { pct: cv.pickPct, itemA: current.a, itemB: current.b };
     const underdog = cv.counted && cv.pickPct <= 30;
-    if (showReveal){ const matched = cv.counted ? cv.withCrowd : won; cbSettled.then(()=>{ if (!roundMovedOn()) vsVerdictFx(side, matched, ptsShown); }); }
+    if (showReveal){ const matched = cv.counted ? cv.withCrowd : won; cbSettled.then(()=>{ if (!roundMovedOn()) vsVerdictFx(side, matched, ptsShown, cv.counted ? cv.pickPct : (side === 'A' ? pctA : pctB)); }); }
     if (!cv.counted) els.hint.innerHTML = cv.others === 0 ? '\uD83C\uDF31 First vote on this one \u2014 no crowd yet'
       : cv.others < CROWD_MIN_OTHERS ? '\u23F3 Too few votes yet to call the crowd'
       : '\u2696\uFE0F Dead heat \u2014 split right down the middle';
