@@ -141,3 +141,21 @@
 :root:has(#mgOverlay .host-full) #showSay{ display:none !important; }
 .mg-factOrFib .mg-inner{ padding-bottom:calc(6px + env(safe-area-inset-bottom)); }
 .ff-host{ pointer-events:none; }
+
+/* ---- F9: Peak or Plunge and Fact or Fib fill a tall phone (the content grows into the free height). ---- */
+.pp-stage{ justify-content:space-between !important; gap:12px !important; padding-bottom:4px; }
+.pp-card{ flex:1 1 0; min-height:0; max-height:230px; justify-content:center; gap:8px; padding:16px 16px 18px; }
+.pp-glyph{ font-size:clamp(44px, 7vh, 64px); }
+.pp-name{ font-size:clamp(17px, 2.6vh, 22px); }
+.pp-val{ font-size:clamp(38px, 6.2vh, 58px); }
+.pp-val small{ font-size:17px; }
+.pp-vs{ font-size:17px; }
+.pp-btn{ min-height:clamp(64px, 9.5vh, 88px); font-size:clamp(24px, 3.8vh, 32px); }
+.pp-dots i{ width:16px; height:16px; }
+.ff-stage{ gap:12px !important; }
+.ff-bubble{ flex:1 1 auto; max-height:46vh; font-size:clamp(20px, 3.1vh, 27px); padding:22px 20px 26px; }
+.ff-btn{ min-height:clamp(76px, 11vh, 100px); font-size:clamp(32px, 5vh, 44px); }
+.ff-host{ width:min(32vw, 136px); margin-top:0; }
+.ff-dots i{ width:16px; height:16px; }
+/* (games without their own stage host leave the bottom corner to the corner host and his bubble) */
+.mg-overlay:not(:has(.host-full)) .mg-inner{ padding-bottom:calc(50px + env(safe-area-inset-bottom)); }
