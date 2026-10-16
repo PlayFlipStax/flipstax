@@ -5515,7 +5515,8 @@
   const DAILY_PICK_MS = 5000;
   const INF_PICK_MS = 6500;
   const INF_ZONE_PICK_MS = 4500;              // Infinity's 2x Points Zone rounds
-  const REVEAL_MS = 1650;                     // both modes
+  const VS_REVEAL_HOLD = 1200;                // how long a VS result stays up before the next card (was 1650; never under 1200 so it stays readable)
+  const REVEAL_MS = VS_REVEAL_HOLD;           // both modes
   const TOO_SLOW_NEXT_MS = 900;               // after a "Too slow", before the next matchup
   const TOO_SLOW_PENALTY = 1, DAILY_TOO_SLOW_STAR_PENALTY = 3;   // (Infinity star cards: INF_STAR_POINTS)
   // Timing restructure: 6min voting/trivia phase + 75s fixed solve phase
@@ -5531,7 +5532,8 @@
   const DAILY_SHOW_SECONDS = 360;
   const RUN_DURATION_MS = (DAILY_SHOW_SECONDS * 1000) / DEBUG_RUN_SCALE;
   const RUN_WORD_LENGTH = 6;
-  const RUN_SOLVE_MS = (60 * 1000) / DEBUG_TIME_SCALE;   // B5: the Word Warp is 60s (was 75s), plus any time banked in Portal Picks
+  const WORD_WARP_SECONDS = 45;               // the Word Warp timer (was 60), plus any time banked in Portal Picks
+  const RUN_SOLVE_MS = (WORD_WARP_SECONDS * 1000) / DEBUG_TIME_SCALE;
   // B5: solving the Word Warp scores WARP_SOLVE_POINTS plus a point for
   // every WARP_SECONDS_PER_POINT seconds left on its clock.
   const WARP_SOLVE_POINTS = 20, WARP_SECONDS_PER_POINT = 3;
