@@ -16230,6 +16230,9 @@
       els.homeOverlay.classList.add('hidden');
       els.modeDailyBtn.click();
       if (!runActive) return;
+      // B2: each jump restarts the day's deck, so every jump used to open on the same first card (Mewtwo vs Mew on
+      // Oct 15) and it looked like a repeat; a jump starts somewhere random in the deck instead (TEST menu only).
+      if (decks.daily && decks.daily.cards) decks.daily.next = Math.floor(Math.random() * Math.max(1, Math.min(80, decks.daily.cards.length - 40)));
       if (tweak) tweak();
       if (then) setTimeout(()=>{ if (runActive) then(); }, 450);   // (the cold open ignores a tap in its first 400ms)
     }
