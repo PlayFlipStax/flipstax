@@ -70,3 +70,13 @@ new fonts, original art, no real brand or show names, every new game gets a TEST
 - [x] G7. Lucky Lights palettes as CSS variables: 1 burgundy velvet + warm gold bulbs (default), 2 midnight indigo + white/yellow bulbs + hot pink, 3 near-black + rainbow bulbs + bright white tiles; GOOP green on all; TEST menu and ?luckytheme=1/2/3
 
 G2 measured (Oct 16, one real-time episode at 4 s a VS pick, 8 s a question, full game timers): 6:03 with the 12 s first-time cold open, 5:54 for a returning player - over the 4:30-5:30 target. Where it goes: 24 VS cards 2:36 (about 6.5 s each), Word Warp 1:04 (its full 60 s timer), 6 Brain Beams 1:00, Mystery Games 0:33 (Riddle 13 s, Snap Sort 20 s), act cards 0:12, Lucky Lights 0:07, Portal Pick 0:06, Orbit Drop 0:06. Nothing trimmed without asking.
+
+## H. Cleanup pass (Oct 16, evening)
+
+- [ ] H1. Old test suites (Infinity phase 2, Infinity phase 4, results image fit): NOT DONE - they are not in this repository (no test files are tracked; the old harness lived in an ignored screenshots/qa folder that is not on this machine). Needs the machine that has them: fix, update or delete each one
+- [x] H2. Orbit chips economy checked with 1,000 simulated episodes: average player 2 chips 50%, 3 chips 33%, 4 chips 12%, 5 chips 4%, 6 chips 1%; weak player 81 / 15 / 3 / 0 / 0. LUCKY_PLINKO_MIN (280) is NOT the chip rule - it is the Orbit Drop score a player needs for the Lucky Bounce personality card - so it was left alone; the minimum-chips rule is ORBIT_MIN_CHIPS = 2. Half of average players sit on the 2-chip minimum (over the 15% line) - a design call, not changed: see the report
+- [x] H3. Anonymous event counting (/api/event, /api/stats, /stats page with STATS_KEY); about 12 Redis commands per episode for events. The existing vote writes are far bigger (about 7 commands per vote, 24 votes an episode)
+- [x] H4. PROGRESS.md and DIRECTION.md brought up to date
+- [x] H5. Orbit Drop: an early Auto-drop tap during the host intro could strand "See your results" - fixed
+
+NEXT: H1 (needs the machine with the old test suites); set STATS_KEY in the Vercel project (Production and Preview) before opening /stats; decide the Redis plan (see H3); pick a Lucky Lights palette (TEST menu or ?luckytheme=1|2|3); check data/snap-sort.txt (hard tier) and then set SNAP_SORT_REVIEWED = true; the episode runs about 5:35 first time - decide whether to trim it (see PROGRESS G2 note).
