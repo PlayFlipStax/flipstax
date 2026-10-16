@@ -496,6 +496,30 @@
   :root:is(.mode-daily, .mode-infinity) .event-overlay.stack .event-tile.is-right{ box-shadow:var(--tile-depth), 0 0 0 4px #7dff9e, 0 0 28px 8px rgba(80,255,140,0.8); }
   :root:is(.mode-daily, .mode-infinity) .event-overlay.stack .event-tile.is-wrong{ animation:bbShake 0.4s ease both; }
   :root:is(.mode-daily, .mode-infinity) .event-overlay.stack .event-tile.bb-press{ animation:bbPress 0.18s ease-out both; }
+  /* ---- Brain Beam (Oct 2026, after style-board/refs/trivia): a dark navy question panel (halftone dots, gold
+     rim) with its key words in yellow; four tall royal-blue answer bars, each with a gold numbered circle, flip
+     open one by one (a clack each) before the timer starts; the right answer flips over gold with a green check. */
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-beam .event-prompt{ text-transform:uppercase; font-size:clamp(23px, 6.6vw, 30px); line-height:1.1; border:4px solid #f2c94c; border-radius:22px;
+    background:radial-gradient(circle, rgba(130,160,255,0.17) 1.2px, rgba(0,0,0,0) 1.9px) 0 0 / 7px 7px, linear-gradient(180deg, #1f2f80, #0c1548);
+    box-shadow:0 0 0 3px #5a3d06, 0 0 18px rgba(255,210,63,0.5), inset 0 0 30px rgba(0,0,0,0.55); }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-beam .event-prompt.long{ font-size:clamp(18px, 5vw, 22px); }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-beam .event-prompt::before, :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-beam .event-prompt::after{ display:none; }
+  .event-prompt .kw{ font-style:normal; color:#ffd23f; text-shadow:0 0 12px rgba(255,210,63,0.5); }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-beam .event-tile{ position:relative; justify-content:center; text-align:center; padding:6px 60px 6px 68px; text-transform:uppercase; color:#fff;
+    background-color:#2453e0 !important; background-image:linear-gradient(180deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.07) 45%, rgba(0,0,0,0) 55%, rgba(0,0,40,0.32) 100%);
+    background-size:auto; background-position:0 0; background-repeat:no-repeat; border:3px solid #a4c2ff; box-shadow:0 0 0 3px #0b1a5c, 0 5px 0 #0b1a5c, 0 0 14px rgba(90,140,255,0.45); }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-beam .tkey{ position:absolute; left:10px; top:50%; width:48px; height:48px; margin-top:-24px; color:#4a2600; font-size:27px; border:3px solid #fff1b0;
+    background:radial-gradient(circle at 35% 30%, #fff6c8, #ffd23f 55%, #d99100); box-shadow:0 0 0 3px #7a4a00, 0 3px 6px rgba(0,0,0,0.45); }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-beam .event-tile.is-right{ color:#3a1f00; text-shadow:none; border-color:#fff3c4; background-color:#f5b800 !important; background-image:linear-gradient(180deg, #fff3b0 0%, #ffd23f 42%, #e9a100 100%);
+    box-shadow:0 0 0 3px #7a4a00, 0 5px 0 #7a4a00, 0 0 30px 8px rgba(255,210,63,0.75); animation:beamFlipGold 0.5s cubic-bezier(.3,1.4,.5,1) both; }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-beam .event-tile.is-right::after{ content:''; position:absolute; right:10px; top:50%; width:42px; height:42px; margin-top:-21px; border-radius:50%; border:3px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,0.4);
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='white' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 62% no-repeat, radial-gradient(circle at 35% 30%, #8dff9c, #19a33d); }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-beam .event-tile.is-wrong{ background-color:#c0263f !important; border-color:#ff9aa8; opacity:1; }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-beam .event-tile.fw{ opacity:0; transform:perspective(600px) rotateX(-90deg); pointer-events:none; }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-beam .event-tile.fin{ animation:beamFlipIn 0.32s cubic-bezier(.3,1.5,.5,1) both; }
+  @keyframes beamFlipIn{ from{ opacity:1; transform:perspective(600px) rotateX(-90deg); } to{ opacity:1; transform:perspective(600px) rotateX(0); } }
+  @keyframes beamFlipGold{ from{ transform:perspective(600px) rotateX(90deg); } to{ transform:perspective(600px) rotateX(0); } }
+  @media (prefers-reduced-motion: reduce){ :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-beam .event-tile.fin, :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-beam .event-tile.is-right{ animation:none; } }
   @keyframes bbShake{ 0%, 100%{ transform:translateX(0); } 20%{ transform:translateX(-10px); } 40%{ transform:translateX(9px); } 60%{ transform:translateX(-6px); } 80%{ transform:translateX(4px); } }
   @keyframes bbPress{ 0%{ transform:scale(1); } 50%{ transform:translateY(3px) scale(0.96); } 100%{ transform:scale(1.02); } }
   /* Brain Breaks: big glyphs, centred cards */
@@ -9871,7 +9895,7 @@
   function runDailyCosmic(st, done){
     const ov = els.eventOverlay;
     stopTallyPolling(); clearRoundTimer(); voted = false; votedSinceTime = null;
-    ov.classList.remove('hidden', 'powerup', 'brainbreak', 'stack');
+    ov.classList.remove('hidden', 'powerup', 'brainbreak', 'stack', 'quiz-beam');
     els.powerupIcon.classList.add('hidden');
     fitTopChip();
     els.eventSubtitle.textContent = '🎁 ' + GN.cosmicSurprise.toUpperCase();
@@ -9980,7 +10004,7 @@
     const rd = buildBreakRound(key, st.seed), ov = els.eventOverlay, tiles = els.eventTiles, n = rd.tiles.length;
     runPhase = 'break';
     stopTallyPolling(); clearRoundTimer(); voted = false; votedSinceTime = null;
-    ov.classList.remove('hidden', 'powerup'); ov.classList.add('brainbreak', 'stack', 'bb-' + key); if (n === 2) ov.classList.add('bb-two'); ov.style.setProperty('--bb', def.accent); els.eventPrompt.classList.remove('long');
+    ov.classList.remove('hidden', 'powerup', 'quiz-beam'); ov.classList.add('brainbreak', 'stack', 'bb-' + key); if (n === 2) ov.classList.add('bb-two'); ov.style.setProperty('--bb', def.accent); els.eventPrompt.classList.remove('long');
     els.powerupIcon.classList.add('hidden');
     fitTopChip();
     els.eventSubtitle.textContent = '🎲 BRAIN BREAK · ' + def.name().toUpperCase() + (rd.kind ? ' · ' + rd.kind.toUpperCase() : '');
@@ -10398,6 +10422,35 @@
   // `resumeQ`/`resumeEndsAt`: a refresh during this question - show the
   // same one again with whatever time it had left (see resumeDailyRun).
   // Also used for Second Chance's resume (runPhase says which).
+  // Brain Beam (C2): the question's key words in yellow - names and numbers (a capital mid-sentence, a digit,
+  // a quote), or else its last two content words.
+  const KW_STOP = new Set('a an the of in on at to for by with and or is are was were be been do does did what which who whom whose when where why how this that these those it its from as into than then there their they he she his her you your we our not can could would should will has have had get got first most only one also about after before over under known called name named'.split(' '));
+  function keyWordsHtml(text){
+    const esc = t=> t.replace(/[&<>"]/g, c=> ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' })[c]);
+    const parts = String(text).split(/(\s+)/), marks = new Set();
+    const core = p=> p.replace(/^[^A-Za-z0-9\u00C0-\u024F]+|[^A-Za-z0-9\u00C0-\u024F%]+$/g, '');
+    parts.forEach((p, i)=>{ const w = core(p); if (!w || !i) return; if (/\d/.test(w) || (/^[A-Z\u00C0-\u00DE]/.test(w) && w !== 'I') || /^["\u201C\u2018']/.test(p)) marks.add(i); });
+    if (!marks.size) for (let i = parts.length - 1, n = 0; i >= 0 && n < 2; i--){ const w = core(parts[i]).toLowerCase(); if (w.length > 2 && !KW_STOP.has(w)){ marks.add(i); n++; } }
+    return parts.map((p, i)=>{
+      if (!marks.has(i)) return esc(p);
+      const w = core(p), at = p.indexOf(w);
+      return esc(p.slice(0, at)) + '<em class="kw">' + esc(w) + '</em>' + esc(p.slice(at + w.length));
+    }).join('');
+  }
+  // The answer bars flip open one by one, a clack each; done() starts the clock.
+  const BEAM_FLIP_GAP = 170, BEAM_FLIP_MS = 150 + 3 * BEAM_FLIP_GAP + 300;
+  function beamFlipIn(done){
+    const tiles = els.eventTiles;
+    tiles.forEach(t=> t.classList.remove('fw', 'fin'));
+    if (FX.reduced()){ done(); return; }
+    tiles.forEach(t=> t.classList.add('fw'));
+    tiles.forEach((t, k)=> setTimeout(()=>{ t.classList.remove('fw'); t.classList.add('fin'); sfx.clack(); }, dt(150 + k * BEAM_FLIP_GAP)));
+    setTimeout(()=>{ tiles.forEach(t=> t.classList.remove('fin')); done(); }, dt(BEAM_FLIP_MS));
+  }
+  function setBeamLook(on, question){
+    els.eventOverlay.classList.toggle('quiz-beam', on);
+    if (on){ els.eventPrompt.innerHTML = '<span>' + keyWordsHtml(question) + '</span>'; els.eventTiles.forEach((t, i)=>{ const k = t.querySelector('.tkey'); if (k) k.textContent = String(i + 1); }); }
+  }
   function runTriviaQuestion(resumeQ, resumeEndsAt, step){
     if (!runActive) return;
     const second = !!resumeQ && runPhase === 'secondchance';
@@ -10433,8 +10486,8 @@
     // A Brain Beam from the rundown earns a prize-track tile (right: a hidden letter; wrong: a red X).
     if (!resumeQ || !second){ runQuizBeam = !!(step ? step.beam : (resumeQ && resumeQ.beam)); runQuizMystery = !!(step ? step.mystery : (resumeQ && resumeQ.mystery)); }
     runPendingQ = { question: q.question, opts: q.opts, correctIdx: q.correctIdx, riddle: !!q.riddle, beam: runQuizBeam, mystery: runQuizMystery };
-    runPendingQEndsAt = resumeEndsAt || (Date.now() + dt(10000));
-    const remain = Math.max(0, runPendingQEndsAt - Date.now());
+    const beamLook = !q.riddle, flipIn = beamLook && !resumeEndsAt && !FX.reduced();
+    runPendingQEndsAt = resumeEndsAt || (Date.now() + (flipIn ? dt(BEAM_FLIP_MS) : 0) + dt(10000));
     if (DEBUG_FAST) window.__debugLastTriviaQ = q;
     els.eventOverlay.classList.remove('hidden', 'powerup'); els.eventOverlay.classList.add('stack'); els.eventOverlay.style.setProperty('--bb', q.riddle ? '#c792ff' : '#ffd23f');
     els.powerupIcon.classList.add('hidden');
@@ -10456,9 +10509,19 @@
         setTimeout(()=>{ tileEl.classList.remove('picked-wait'); resolve(i === q.correctIdx); }, dt(QUIZ_DRUMROLL_MS));
       };
     });
-    startEventTimerBar(remain, dt(10000));
+    setBeamLook(beamLook, q.question);
+    // The clock starts once the bars are open (a refresh mid-question resumes it at once).
+    const myQ = runPendingQ;
+    const startClock = ()=>{
+      if (runPendingQ !== myQ || runQuizPick != null) return;
+      const remain = Math.max(0, runPendingQEndsAt - Date.now());
+      startEventTimerBar(remain, dt(10000));
+      clearTimeout(eventTimeoutId);
+      eventTimeoutId = setTimeout(()=> resolve(false), remain);
+    };
     clearTimeout(eventTimeoutId);
-    eventTimeoutId = setTimeout(()=> resolve(false), remain);
+    if (flipIn){ els.eventTimerFill.style.transition = 'none'; els.eventTimerFill.style.width = '100%'; beamFlipIn(startClock); }
+    else startClock();
     saveRunSnapshot();
   }
   // Were the 5 required power-ups drawn in relative order? (Other picks in
@@ -13890,6 +13953,8 @@
   // C1: Infinity's popup world - the power-up pick, a Cosmic Surprise, or
   // the bonus Brain Beam.
   const evBg = document.getElementById('evBg');
+  new MutationObserver(()=>{ const ov = els.eventOverlay; if (ov.classList.contains('quiz-beam') && (ov.classList.contains('hidden') || ov.classList.contains('powerup') || ov.classList.contains('cosmic-mode') || ov.classList.contains('gift-mode'))) ov.classList.remove('quiz-beam'); })
+    .observe(els.eventOverlay, { attributes:true, attributeFilter:['class'] });
   new MutationObserver(()=>{
     const ov = els.eventOverlay, w = ov.classList.contains('cosmic-mode') && document.getElementById('cosmicStage').classList.contains('riddle') ? 'w-riddle' : ov.classList.contains('gift-mode') || ov.classList.contains('cosmic-mode') ? 'w-odd' : ov.classList.contains('powerup') ? 'w-powerup' : 'w-trivia';
     if (!evBg.classList.contains(w)) evBg.className = 'bg ev-bg ' + w;
@@ -14231,7 +14296,7 @@
   const VS_DRUMROLL_MS = 600;
   let cbFlapT = 0, cbSettled = Promise.resolve();
   function isShowMode(){ const c = document.documentElement.classList; return c.contains('mode-daily') || c.contains('mode-infinity'); }
-  function crowdBoardHide(){ clearInterval(cbFlapT); crowdBoard.classList.remove('on'); els.board.classList.remove('cb-on'); cbNums.forEach(n=> n.classList.remove('win')); }
+  function crowdBoardHide(){ clearInterval(cbFlapT); showFx.querySelectorAll('.vs-stamp, .pts-pop').forEach(e=> e.remove()); crowdBoard.classList.remove('on'); els.board.classList.remove('cb-on'); cbNums.forEach(n=> n.classList.remove('win')); }
   // Shows pctA / pctB; `animate` runs the flaps through random digits, left to right, a clack a tick.
   function crowdBoardShow(pctA, pctB, animate){
     clearInterval(cbFlapT);
@@ -14285,7 +14350,7 @@
       st.innerHTML = '<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M26 26 L74 74 M74 26 L26 74" stroke="#ff2d3a" stroke-width="15" stroke-linecap="round"/></svg>';
       if (still){ st.style.transform = 'rotate(-10deg)'; setTimeout(()=> st.remove(), 1000); }
       else st.animate([{ transform:'rotate(-24deg) scale(2.3)', opacity:0 }, { transform:'rotate(-10deg) scale(0.92)', opacity:1, offset:0.18 }, { transform:'rotate(-10deg) scale(1)', opacity:1, offset:0.26 },
-        { transform:'rotate(-10deg) scale(1)', opacity:1, offset:0.82 }, { transform:'rotate(-10deg) scale(1.05)', opacity:0 }], { duration:1150, easing:'ease-out' }).onfinish = ()=> st.remove();
+        { transform:'rotate(-10deg) scale(1)', opacity:1, offset:0.8 }, { transform:'rotate(-10deg) scale(1.05)', opacity:0 }], { duration:950, easing:'ease-out' }).onfinish = ()=> st.remove();
       FX.shake(ph);
     }
   }
@@ -14564,16 +14629,22 @@
       tileEl.style.backgroundColor = TILE_COLORS[i];
       tileEl.onclick = ()=>{ tileEl.classList.add('bb-press'); resolveEvent(i === trivia.correctIdx, trivia.correctIdx, i); };
     });
+    setBeamLook(true, trivia.question);
     els.eventOverlay.classList.remove('hidden');
     fitTopChip();
     els.eventTimerFill.style.transition = 'none';
     els.eventTimerFill.style.width = '100%';
-    requestAnimationFrame(()=>{
-      els.eventTimerFill.style.transition = 'width 10s linear';
-      els.eventTimerFill.style.width = '0%';
-    });
     clearTimeout(eventTimeoutId);
-    eventTimeoutId = setTimeout(()=> resolveEvent(null), 10000);
+    // The clock starts once the bars have flipped open (not if an answer is already in).
+    beamFlipIn(()=>{
+      if (!els.eventTiles[0].onclick) return;
+      requestAnimationFrame(()=>{
+        els.eventTimerFill.style.transition = 'width 10s linear';
+        els.eventTimerFill.style.width = '0%';
+      });
+      clearTimeout(eventTimeoutId);
+      eventTimeoutId = setTimeout(()=> resolveEvent(null), 10000);
+    });
   }
   function resolveEvent(wasCorrect, correctIdx, pickIdx){
     clearTimeout(eventTimeoutId);
