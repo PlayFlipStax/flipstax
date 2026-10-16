@@ -2864,6 +2864,53 @@
   :root.lite *, :root.lite *::before, :root.lite *::after{ -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
   :root.lite .cue-wipe{ left:0; top:0; width:100%; height:100%; margin:0; clip-path:none; animation-name:cueFade; will-change:auto; }
   @keyframes cueFade{ 0%{ opacity:0; transform:none; } 15%, 85%{ opacity:1; transform:none; } 100%{ opacity:0; transform:none; } }
+  /* ---- The disco celebration (D7): z under the frame's bulbs so they flash in time on top. ---- */
+  .disco{ position:fixed; inset:0; z-index:70; overflow:hidden; cursor:pointer; opacity:0; transition:opacity .3s; }
+  .disco.on{ opacity:1; } .disco.out{ opacity:0; }
+  .dc-dim{ position:absolute; inset:0; background:radial-gradient(80% 60% at 50% 30%, rgba(40,10,70,0.82), rgba(4,0,14,0.94)); }
+  .dc-rig{ position:absolute; left:50%; top:0; width:120px; margin-left:-60px; display:flex; flex-direction:column; align-items:center; transform:translateY(-100%); }
+  .disco.on .dc-rig{ animation:dcLower .9s cubic-bezier(.3,1.2,.5,1) .1s forwards; }
+  @keyframes dcLower{ to{ transform:translateY(0); } }
+  .dc-ufo svg{ width:110px; height:auto; display:block; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.5)); }
+  .dc-cord{ display:block; width:2px; height:13vh; background:linear-gradient(180deg, #c9ced8, #7d8594); }
+  .dc-ball{ position:relative; width:86px; height:86px; border-radius:50%; overflow:hidden; box-shadow:0 0 30px rgba(255,255,255,0.55), 0 0 60px rgba(199,146,255,0.5);
+    background:radial-gradient(circle at 35% 30%, #ffffff 0%, #d9dee8 30%, #8e97a8 75%, #4b5363 100%); }
+  .dc-facets{ position:absolute; top:0; bottom:0; left:-86px; width:258px; opacity:0.75;
+    background:repeating-linear-gradient(90deg, rgba(255,255,255,0.65) 0 2px, rgba(0,0,0,0) 2px 12px), repeating-linear-gradient(0deg, rgba(40,40,60,0.35) 0 1.5px, rgba(0,0,0,0) 1.5px 11px);
+    animation:dcFacets 1.2s linear infinite; }
+  @keyframes dcFacets{ to{ transform:translateX(86px); } }
+  .dc-ball::after{ content:''; position:absolute; inset:0; border-radius:50%; box-shadow:inset -10px -12px 20px rgba(0,0,0,0.45), inset 8px 8px 14px rgba(255,255,255,0.4); }
+  .dc-spots{ position:absolute; left:50%; top:calc(13vh + 120px); width:0; height:0; animation:dcSpin 6s linear infinite; }
+  .dc-spots i{ position:absolute; left:0; top:0; width:18px; height:18px; margin:-9px 0 0 -9px; border-radius:50%; background:var(--c); opacity:0.75; box-shadow:0 0 14px var(--c);
+    transform:rotate(var(--a)) translateY(calc(var(--d) * -1.6)); }
+  @keyframes dcSpin{ to{ transform:rotate(360deg); } }
+  .dc-sparks b{ position:absolute; left:var(--x); top:var(--y); width:10px; height:10px; background:#fff; clip-path:polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+    animation:haSpark 1.6s ease-in-out var(--dl) infinite; }
+  .dc-floor{ position:absolute; left:0; right:0; bottom:calc(8vh + env(safe-area-inset-bottom)); display:flex; justify-content:center; gap:4vw; }
+  .dc-alien{ width:min(36vw, 170px); }
+  .dc-alien.buddy{ transform:translateY(130%); }
+  .disco.on .dc-alien.buddy{ animation:dcHop .7s cubic-bezier(.3,1.5,.5,1) .5s forwards; }
+  @keyframes dcHop{ 0%{ transform:translateY(130%); } 60%{ transform:translateY(-14%); } 100%{ transform:translateY(0); } }
+  .dc-alien.buddy svg{ transform:scaleX(-1); }
+  /* the dance: hip sway, the free arm pointing up and down in time, then a spin */
+  .disco.on .dc-alien svg{ animation:dcSway .5s ease-in-out 1.1s 4 alternate, dcSpinBody .7s ease-in-out 3.1s 1; }
+  .disco.on .dc-alien.buddy svg{ animation:dcSwayB .5s ease-in-out 1.1s 4 alternate, dcSpinBodyB .7s ease-in-out 3.1s 1; }
+  @keyframes dcSway{ from{ transform:rotate(-6deg); } to{ transform:rotate(6deg); } }
+  @keyframes dcSwayB{ from{ transform:scaleX(-1) rotate(-6deg); } to{ transform:scaleX(-1) rotate(6deg); } }
+  @keyframes dcSpinBody{ from{ transform:rotateY(0deg); } to{ transform:rotateY(360deg); } }
+  @keyframes dcSpinBodyB{ from{ transform:scaleX(-1) rotateY(0deg); } to{ transform:scaleX(-1) rotateY(360deg); } }
+  .disco.on .dc-alien .ha-arm-wave{ animation:dcPoint .5s ease-in-out 1.1s 4 alternate; }
+  @keyframes dcPoint{ from{ transform:rotate(-165deg); } to{ transform:rotate(-20deg); } }
+  .dc-skip{ position:absolute; left:50%; bottom:calc(14px + env(safe-area-inset-bottom)); transform:translateX(-50%); font:800 12px var(--f-body); letter-spacing:2px; color:rgba(255,255,255,0.7); }
+  .show-marquee.disco{ display:block !important; z-index:72; }
+  .show-marquee.disco i{ animation:dcBulbs .5s steps(1) infinite; }
+  .show-marquee.disco i:nth-child(3n){ background:#ff3c9d; } .show-marquee.disco i:nth-child(3n+1){ background:#7df9ff; } .show-marquee.disco i:nth-child(3n+2){ background:#ffe27a; }
+  @keyframes dcBulbs{ 0%{ opacity:1; } 50%{ opacity:0.15; } }
+  /* lite mode / reduced motion: a still ball with sparkles, no dancers */
+  .disco.still .dc-rig{ transform:none; animation:none !important; }
+  .disco.still .dc-facets, .disco.still .dc-spots, .show-marquee.disco.still i{ animation:none; }
+  .disco.still .dc-floor, .disco.still .dc-spots{ display:none; }
+  :root.lite .show-marquee.disco i{ animation:none; }
   .show-marquee.strobe{ display:block !important; z-index:120; }
   .show-marquee.strobe i{ animation:bulbStrobe .14s steps(1) 16; background:#ffe680; box-shadow:0 0 12px #ffd23f, 0 0 0 1.5px rgba(40,10,70,0.55); }
   @keyframes bulbStrobe{ 0%{ opacity:1; } 50%{ opacity:0.08; } }
@@ -11773,8 +11820,39 @@
     z.animate([{ opacity:0 }, { opacity:1, offset:0.15 }, { opacity:0.4, offset:0.4 }, { opacity:1, offset:0.6 }, { opacity:0 }], { duration:520, easing:'ease-out' }).onfinish = ()=> z.remove();
   }
   // THE MOTHERSHIP: every bulb strobes gold, the silver UFO beams a shower of coins up out of the slot, a siren and the crowd roars.
+  // ---- D7 (Oct 16): the disco celebration - the one exception to "one host per screen" (DIRECTION.md) ----
+  // On THE MOTHERSHIP (and later hooks: a perfect act, a streak milestone - call discoCelebrate(reason)): the lights dim,
+  // the UFO lowers a mirror ball on a cord, mirror spots sweep the screen, a second alien hops out and the two dance
+  // (arm points, hip sway, a spin) for about 4 s while every bulb flashes in time. Tap to skip; at most once an episode.
+  // Lite mode: a still ball with sparkles, no dance. Audio sting: set window.FLIPSTAX_DISCO_STING = 'audio/your-track.mp3'
+  // (silent until then; it plays at the master volume).
+  let discoShownFor = null;
+  function discoCelebrate(reason, done){
+    const id = (runActive || dailyOrbit) ? 'daily-' + (runStartDate || todayStr()) : 'inf-' + (infRun && infRun.startedAt || 'run');
+    if (discoShownFor === id){ if (done) done(); return false; }
+    discoShownFor = id;
+    const lite = isLite() || prefersReducedMotion();
+    const d = document.createElement('div'); d.className = 'disco' + (lite ? ' still' : ''); d.setAttribute('role', 'button'); d.setAttribute('aria-label', 'Disco celebration. Tap to skip');
+    let spots = ''; for (let k = 0; k < 14; k++) spots += '<i style="--a:' + (k * 360 / 14) + 'deg;--d:' + (90 + (k * 53) % 160) + 'px;--c:' + ['#ffffff', '#ff8ad4', '#7df9ff', '#ffe27a', '#c792ff'][k % 5] + '"></i>';
+    let sparks = ''; for (let k = 0; k < 10; k++) sparks += '<b style="--x:' + (8 + (k * 37) % 84) + '%;--y:' + (14 + (k * 23) % 62) + '%;--dl:' + (k * 0.27).toFixed(2) + 's"></b>';
+    d.innerHTML = '<i class="dc-dim"></i><div class="dc-spots">' + spots + '</div><div class="dc-sparks">' + sparks + '</div>' +
+      '<div class="dc-rig"><div class="dc-ufo">' + FX.ufoSvg() + '</div><i class="dc-cord"></i><div class="dc-ball"><i class="dc-facets"></i></div></div>' +
+      '<div class="dc-floor"><div class="dc-alien host host-full">' + window.HostAlien.full() + '</div><div class="dc-alien buddy host-full">' + window.HostAlien.full() + '</div></div>' +
+      '<div class="dc-skip">TAP TO SKIP</div>';
+    document.body.appendChild(d);
+    marquee.classList.remove('strobe'); marquee.classList.add('disco'); marquee.classList.toggle('still', lite);
+    try{ if (window.FLIPSTAX_DISCO_STING && soundOn){ const a = new Audio(window.FLIPSTAX_DISCO_STING); a.volume = Math.max(0, Math.min(1, masterVol)); a.play().catch(()=>{}); d._sting = a; } }catch(e){}
+    let over = false;
+    const end = ()=>{ if (over) return; over = true; marquee.classList.remove('disco', 'still'); try{ if (d._sting) d._sting.pause(); }catch(e){} d.classList.add('out'); setTimeout(()=> d.remove(), 300); if (done) done(); };
+    d.addEventListener('click', (e)=>{ e.stopPropagation(); end(); });
+    requestAnimationFrame(()=> d.classList.add('on'));
+    setTimeout(end, lite ? 2600 : 4600);
+    return true;
+  }
+  window.__discoTest = (DEBUG_FAST || REPLAY) ? ()=>{ discoShownFor = null; discoCelebrate('test'); } : undefined;
   function pkJackpotShow(c){
     sfx.siren(); setTimeout(()=> sfx.roar(), 200);
+    setTimeout(()=> discoCelebrate('mothership'), 2300);   // D7: then the disco (once an episode)
     marquee.classList.remove('strobe'); void marquee.offsetWidth; marquee.classList.add('strobe');
     clearTimeout(pkJackpotShow._t); pkJackpotShow._t = setTimeout(()=> marquee.classList.remove('strobe'), 2300);
     if (prefersReducedMotion()) return;

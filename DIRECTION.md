@@ -32,7 +32,8 @@ A bright, cheeky 70s/80s TV game show.
 - **Clean beats busy.** One hero element per screen. No more than 2 decorative animations
   competing with the question.
 - **Premium, not cheap.** Never a casino or slot-machine look.
-- **One host per screen.**
+- **One host per screen.** The single exception is the disco celebration (on THE MOTHERSHIP, at most once an
+  episode): a second alien hops out and dances with the host for about 4 seconds.
 - **Runs smoothly on a 3-year-old phone.** Transform and opacity animations; a lite mode cuts
   the heaviest effects when the frame rate drops (or with `?lite=1`).
 
