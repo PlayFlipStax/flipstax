@@ -2683,6 +2683,14 @@
   @keyframes cbFlapA{ 50%{ transform:scaleY(0.12); } } @keyframes cbFlapB{ 50%{ transform:scaleY(0.12); } }
   .cb-num.win b{ color:#ffd23f; text-shadow:0 0 10px rgba(255,210,63,0.85); }
   .cb-sep{ font:900 28px/1 var(--f-display); color:#e0ad3c; }
+  /* Lite mode (C8): the heaviest effects off (see setLite). */
+  :root.lite .bg .rays, :root.lite .bg .glow, :root.lite .bg::before, :root.lite .bg::after, :root.lite .show-marquee i, :root.lite .divider,
+  :root.lite .event-overlay .event-prompt::before, :root.lite .event-overlay .event-prompt::after, :root.lite .event-overlay.stack.brainbreak .event-tile::after,
+  :root.lite .bb-marquee, :root.lite .bb-marquee *, :root.lite .co-marquee b{ animation:none !important; }
+  :root.lite .qm-field, :root.lite .inf-floaters{ display:none !important; }
+  :root.lite *, :root.lite *::before, :root.lite *::after{ -webkit-backdrop-filter:none !important; backdrop-filter:none !important; }
+  :root.lite .cue-wipe{ left:0; top:0; width:100%; height:100%; margin:0; clip-path:none; animation-name:cueFade; will-change:auto; }
+  @keyframes cueFade{ 0%{ opacity:0; transform:none; } 15%, 85%{ opacity:1; transform:none; } 100%{ opacity:0; transform:none; } }
   .show-marquee.strobe{ display:block !important; z-index:120; }
   .show-marquee.strobe i{ animation:bulbStrobe .14s steps(1) 16; background:#ffe680; box-shadow:0 0 12px #ffd23f, 0 0 0 1.5px rgba(40,10,70,0.55); }
   @keyframes bulbStrobe{ 0%{ opacity:1; } 50%{ opacity:0.08; } }
@@ -11407,7 +11415,7 @@
     board.appendChild(beam);
     beam.animate([{ opacity:0 }, { opacity:0.9, offset:0.12 }, { opacity:0.7, offset:0.8 }, { opacity:0 }], { duration:2000, easing:'ease-out' }).onfinish = ()=> beam.remove();
     ufo.classList.remove('spin'); void ufo.offsetWidth; ufo.classList.add('spin', 'beaming'); setTimeout(()=> ufo.classList.remove('beaming'), 1800);
-    for (let n = 0; n < 16; n++){
+    for (let n = 0, N = isLite() ? 6 : 16; n < N; n++){
       const coin = document.createElement('i'); coin.className = 'pk-upcoin'; board.appendChild(coin);
       const sx = x1 + (Math.random() - 0.5) * 44, sy = y1 - Math.random() * 10, ex = x0 + (Math.random() - 0.5) * 10, ey = y0 + 4, wob = (Math.random() - 0.5) * 50;
       coin.animate([{ transform:'translate(' + sx + 'px,' + sy + 'px) scale(0.6) rotateY(0deg)', opacity:0 },
@@ -13472,14 +13480,15 @@
     const colors = opts.colors || ['#ffd93d','#ff5f6d','#3ec76b','#19b6e6','#c73ec7','#ffffff','#ff9f1c'];
     const ox = slots.left + slots.width / 2, oy = slots.top + slots.height / 2;
     const bits = [];
-    for (let i = 0; i < (opts.burst || 150); i++){
+    const liteK = isLite() ? 0.3 : 1;
+    for (let i = 0; i < Math.round((opts.burst || 150) * liteK); i++){
       const a = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * (opts.spread || 1.25);
       const v = (opts.speed || 7) + Math.random() * 10;
       bits.push({ x: ox + (Math.random() - 0.5) * slots.width, y: oy, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 2,
         w: 6 + Math.random() * 6, h: 4 + Math.random() * 5, r: Math.random() * 6.3, vr: (Math.random() - 0.5) * 0.4,
         c: colors[i % colors.length], delay: 0 });
     }
-    for (let i = 0; i < (opts.rain || 70); i++){
+    for (let i = 0; i < Math.round((opts.rain || 70) * liteK); i++){
       bits.push({ x: Math.random() * W, y: -20 - Math.random() * 60, vx: (Math.random() - 0.5) * 2, vy: 2 + Math.random() * 3,
         w: 6 + Math.random() * 5, h: 4 + Math.random() * 4, r: Math.random() * 6.3, vr: (Math.random() - 0.5) * 0.3,
         c: colors[i % colors.length], delay: 350 + Math.random() * 500 });
@@ -14177,6 +14186,39 @@
     marquee.innerHTML = pts.map(([x, y], k)=> '<i style="--k:' + (k % 4) + ';transform:translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)"></i>').join('');
   }
   buildMarquee(); addEventListener('resize', buildMarquee);
+  // ---------- Lite mode (C8) ----------
+  // On with ?lite=1, or by itself when the page runs below 40fps for 2 seconds (measured with
+  // requestAnimationFrame while the tab is visible, from 3s after load; it then stays on for the
+  // session). It drops the heaviest effects: the turning ray backgrounds, the bulb chases, the flying
+  // question marks and floaters, backdrop blurs, the 2600px star wipe (a fade instead), and most of the
+  // particles and confetti.
+  function setLite(on, why){
+    document.documentElement.classList.toggle('lite', on); FX.MAX_PARTICLES = on ? 30 : 90;
+    if (on){ try{ sessionStorage.setItem('flipstax_lite', '1'); }catch(e){} }
+    if (DEBUG_FAST) window.__liteWhy = on ? why : null;
+  }
+  const isLite = ()=> document.documentElement.classList.contains('lite');
+  (function(){
+    let forced = /[?&]lite=1(&|$)/.test(location.search);
+    try{ forced = forced || sessionStorage.getItem('flipstax_lite') === '1'; }catch(e){}
+    if (forced){ setLite(true, 'param'); return; }
+    if (!window.requestAnimationFrame) return;
+    let frames = [], lowSince = 0;
+    const sample = (now)=>{
+      if (isLite()) return;
+      if (document.hidden){ frames = []; lowSince = 0; requestAnimationFrame(sample); return; }
+      // (WebKit runs late callbacks back to back when it catches up: those count as one frame)
+      if (frames.length && now - frames[frames.length - 1] < 6){ requestAnimationFrame(sample); return; }
+      frames.push(now); while (frames.length && now - frames[0] > 1000) frames.shift();
+      if (now > 3000 && frames.length > 1 && now - frames[0] >= 900){
+        if (frames.length < 40){ if (!lowSince) lowSince = now; else if (now - lowSince >= 2000){ setLite(true, 'fps'); return; } }
+        else lowSince = 0;
+      }
+      requestAnimationFrame(sample);
+    };
+    document.addEventListener('visibilitychange', ()=>{ frames = []; lowSince = 0; });
+    requestAnimationFrame(sample);
+  })();
   function syncMarquee(){
     const open = el=> el && !el.classList.contains('hidden');
     const html = document.documentElement, daily = html.classList.contains('mode-daily'), inf = html.classList.contains('mode-infinity');
