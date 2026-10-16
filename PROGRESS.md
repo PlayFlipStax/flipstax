@@ -90,5 +90,5 @@ NEXT: H1 (needs the machine with the old test suites); set STATS_KEY in the Verc
   Before (full mode, CPU x4): all screens p95 33.7 ms, 475 dropped frames; VS p95 34.1 ms / 285 dropped, Lucky Lights 34.2 / 36, Brain Beam 33.8 / 45, Portal Pick 33.7 / 8; about 57 layouts a second on every screen.
   After (full mode): all screens p95 17.3 ms, 123 dropped; VS 17.3 / 40, Lucky Lights 17.4 / 14, Brain Beam 17.3 / 18, Portal Pick 17.3 / 6; VS layouts 57 -> 15 a second. Lite mode: all screens p95 17.2 ms, 106 dropped (Portal Pick p95 33.8 over only 57 frames). Still heaviest: style recalcs from the host SVG's inner animations (blink, wave, sparkles) - see I4.
 - [x] I4. Host pose system (lib/host.js), PNG poses with SVG fallback, callers migrated, events mapped to poses
-- [ ] I5. Landing / menu and cold open polish with the tokens
+- [x] I5. Landing / menu and cold open polish with the tokens
 - [ ] I6. Verify: 40-run flow set incl. lite mode, screenshots of every screen at 360 and 390 px in screenshots/run2/
