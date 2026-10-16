@@ -2982,8 +2982,8 @@
   .show-marquee.unison i{ animation:bulbUnison .2s steps(1) 2; background:#fff6d0; box-shadow:0 0 12px #ffe27a, 0 0 0 1.5px rgba(40,10,70,0.55); }
   @keyframes bulbUnison{ 0%{ opacity:1; } 50%{ opacity:0.1; } }
   .show-marquee.miss i{ animation:bulbBlink .12s steps(1) 5; background:#ff3b3b; box-shadow:0 0 9px #ff2a2a, 0 0 0 1.5px rgba(40,10,70,0.55); }
-  .vs-tag{ position:absolute; left:0; top:0; padding:8px 18px 10px; border-radius:14px; white-space:nowrap; pointer-events:none;
-    font:900 clamp(30px, 9vw, 40px)/1 var(--f-display); letter-spacing:1px; color:#fff; text-shadow:0 2px 0 rgba(90,0,60,0.55);
+  .vs-tag{ position:absolute; right:12px; top:12px; z-index:6; padding:6px 13px 7px; border-radius:999px; white-space:nowrap; pointer-events:none; transform:rotate(6deg);
+    font:900 clamp(18px, 5.4vw, 22px)/1 var(--f-display); letter-spacing:1px; color:#fff; text-shadow:0 2px 0 rgba(90,0,60,0.55);
     background:linear-gradient(120deg, #ffd23f 0%, #ff9a3c 40%, #ff3c9d 100%); border:3px solid #fff3c4;
     box-shadow:0 6px 18px rgba(60,0,40,0.4), 0 0 20px rgba(255,90,170,0.55); }
   .vs-stamp{ position:absolute; left:0; top:0; width:104px; height:104px; margin:-52px 0 0 -52px; border:7px solid #ff2d3a; border-radius:20px;
@@ -15269,7 +15269,7 @@
     crowdBoard.querySelector('.cb-note').innerHTML = others > 0 ? 'EARLY CROWD<small>only ' + others + ' vote' + (others === 1 ? '' : 's') + ' so far</small>' : 'YOU\u2019RE THE FIRST TO VOTE!';
     crowdBoard.classList.add('on', 'note'); els.board.classList.add('cb-on'); cbSettled = Promise.resolve();
   }
-  function crowdBoardHide(){ crowdBoard.classList.remove('note'); clearInterval(cbFlapT); showFx.querySelectorAll('.vs-stamp, .pts-pop').forEach(e=> e.remove()); crowdBoard.classList.remove('on'); els.board.classList.remove('cb-on'); cbNums.forEach(n=> n.classList.remove('win')); }
+  function crowdBoardHide(){ crowdBoard.classList.remove('note'); clearInterval(cbFlapT); document.querySelectorAll('.vs-stamp, .pts-pop, .vs-tag').forEach(e=> e.remove()); crowdBoard.classList.remove('on'); els.board.classList.remove('cb-on'); cbNums.forEach(n=> n.classList.remove('win')); }
   // Shows pctA / pctB; `animate` runs the flaps through random digits, left to right, a clack a tick.
   function crowdBoardShow(pctA, pctB, animate){
     clearInterval(cbFlapT);
@@ -15321,11 +15321,9 @@
       // C1 (Oct 2026): a minority pick is never punished - no red X, buzzer, aww or red bulbs. A playful gold-to-pink tag
       // (HOT TAKE! for a lonely pick, BOLD PICK! otherwise) and at most a soft whoosh. (Red X + buzzer: Brain Beam and Riddle only.)
       sfx.whoosh();
-      const tag = put(document.createElement('div')); tag.className = 'vs-tag'; tag.textContent = pct != null && pct <= 30 ? 'HOT TAKE!' : 'BOLD PICK!';
-      if (still){ tag.style.transform = 'translate(-50%,-50%) rotate(-6deg)'; setTimeout(()=> tag.remove(), 1000); }
-      else tag.animate([{ transform:'translate(-50%,-50%) rotate(-14deg) scale(0.3)', opacity:0 }, { transform:'translate(-50%,-50%) rotate(-6deg) scale(1.12)', opacity:1, offset:0.22 },
-        { transform:'translate(-50%,-50%) rotate(-6deg) scale(1)', opacity:1, offset:0.36 }, { transform:'translate(-50%,-60%) rotate(-6deg) scale(1)', opacity:1, offset:0.82 }, { transform:'translate(-50%,-75%) rotate(-6deg) scale(0.95)', opacity:0 }],
-        { duration:1150, easing:'ease-out' }).onfinish = ()=> tag.remove();
+      // F3: a pill on the card's top-right corner (the picture stays clear), popping in and staying for the reveal.
+      const tag = document.createElement('div'); tag.className = 'vs-tag'; tag.textContent = pct != null && pct <= 30 ? 'HOT TAKE!' : 'BOLD PICK!'; ph.appendChild(tag);
+      if (!still) tag.animate([{ transform:'rotate(6deg) scale(0.3)', opacity:0 }, { transform:'rotate(6deg) scale(1.15)', opacity:1, offset:0.6 }, { transform:'rotate(6deg) scale(1)', opacity:1 }], { duration:380, easing:'ease-out' });
     }
   }
   function reveal(counts, isLiveUpdate, others){
@@ -16161,6 +16159,7 @@
       hostSayNow: (t, ms) => hostSay(t, ms),
       showQuizNow: (riddle) => { runActive = true; runPhase = 'running'; runTriviaQuestion(null, null, { t:'quiz', riddle: !!riddle, subject:'science', seed: 12345 }); return window.__debugLastTriviaQ; },
       showPlan: (date) => buildShowPlan(date || runStartDate || todayStr()),
+      vsVerdict: (side, matched, pts, pct) => vsVerdictFx(side, matched, pts, pct),   // (tests: the VS verdict on the card on screen)
       mysteryGames: (date) => pickMysteryGames(date),
       showReadout: () => { els.finOverlay.classList.add('hidden'); showRunReadout(); return !!runResultToday; },
       setResult: (o) => { runResultToday = Object.assign({}, runResultToday || { date: todayStr(), rule: SAVE_RULE, savedAt: Date.now(), score: 0, triviaCorrect: 0, triviaTotal: 0, solved: false, solveMs: null, word: 'LAUNCH', personalityType: 'fence_sitter', unlocked: [] }, o); return runResultToday; },
