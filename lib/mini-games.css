@@ -26,3 +26,16 @@
 .pp-dots{ display:flex; gap:8px; margin-top:4px; }
 .pp-dots i{ width:14px; height:14px; border-radius:50%; background:rgba(255,255,255,0.25); box-shadow:inset 0 0 0 2px rgba(255,255,255,0.5); }
 .pp-dots i.right{ background:#5ee08a; } .pp-dots i.wrong{ background:#ff5a6e; }
+
+/* ---- E2 Snap Sort: neon lime on black ---- */
+.ss-stage{ justify-content:flex-start !important; }
+.ss-cat{ width:100%; padding:12px 14px 14px; border-radius:16px; background:#0c1405; border:3px solid #e4ff7a; box-shadow:0 0 22px rgba(228,255,122,0.5);
+  font:900 clamp(26px, 8vw, 36px)/1 var(--f-display); letter-spacing:1px; color:#e4ff7a; text-shadow:0 0 12px rgba(228,255,122,0.7); }
+.ss-cat small{ display:block; margin-bottom:4px; font:800 12px var(--f-body); letter-spacing:3px; color:#fff; text-shadow:none; }
+.ss-field{ position:relative; width:calc(100% + 28px); margin:0 -14px; flex:1; min-height:240px; overflow:hidden; }
+.ss-word{ position:absolute; left:0; top:50%; min-height:52px; padding:10px 20px; border-radius:999px; white-space:nowrap; cursor:pointer; will-change:transform;
+  font:900 clamp(22px, 6.6vw, 28px)/1 var(--f-display); letter-spacing:0.5px; color:#0c1405; background:linear-gradient(180deg, #ffffff, #e9f5d0);
+  border:3px solid #e4ff7a; box-shadow:0 5px 0 rgba(0,0,0,0.45), 0 0 16px rgba(228,255,122,0.45); -webkit-tap-highlight-color:transparent; }
+.ss-word.right{ background:linear-gradient(180deg, #e2ffc8, #6ed94c); border-color:#fff; }
+.ss-word.wrong{ background:linear-gradient(180deg, #ff7d8e, #c0263f); color:#fff; border-color:#ffc2cb; }
+.ss-tally{ min-height:20px; font:800 14px var(--f-body); color:#e4ff7a; }

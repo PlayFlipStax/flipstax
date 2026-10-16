@@ -4566,6 +4566,7 @@
 <script src="data/rundown.js"></script>
 <script src="data/beam-levels.js"></script>
 <script src="data/peak-or-plunge.js"></script>
+<script src="data/snap-sort.js"></script>
 <script src="lib/mini-games.js"></script>
 <script src="lib/orbit-physics.js"></script>
 <script src="lib/host-alien.js"></script>
@@ -14824,6 +14825,7 @@
     let key = showWorldNow;
     if (inf) key = worldKey();
     marquee.style.setProperty('--bulb', BULB_COLORS[key] || '#ffe9a0');
+    { const mg = document.getElementById('mgOverlay'); if (mg) marquee.style.setProperty('--bulb', mg.style.getPropertyValue('--bulb') || '#ffe9a0'); }   // (a Part E game's own bulbs)
   }
   // The riddle world's flying question marks: the same markup in each background that can turn into it.
   function qmFieldHtml(){ let h = '<div class="qm-field" aria-hidden="true">'; for (let k = 0; k < 11; k++) h += '<span style="--y:' + (4 + (k * 9.1) % 88).toFixed(0) + '%;--s:' + (44 + (k * 37) % 70) + 'px;--d:' + (11 + (k * 5) % 9) + 's;--dl:-' + ((k * 3.7) % 14).toFixed(1) + 's;--x:' + ((k * 17) % 90) + '">?</span>'; return h + '</div>'; }
@@ -16685,6 +16687,7 @@
       { label:'Emoji Decode', go: mysteryAs('emojiDecode') },
       { label:'Time Warp', go: mysteryAs('timeWarp') },
       { label:'Peak or Plunge', go: mysteryAs('peakOrPlunge') },
+      { label:'Snap Sort', go: mysteryAs('snapSort') },
       // The finale's cue card, then the Word Warp with all six letters in.
       { label:'Grand finale (6 letters)', wide:true, go: atType(s=> s.t === 'act' && s.finale, 0, 210, 6) },
       { label:'Orbit Drop', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); const r = replaySampleEpisode(); delete r.orbit; delete r.orbitPoints; r.score = 368; r.keys = 2; r.bonusChips = 1; r.warpChip = true; r.orbitChips = dailyChipsFor(2, 1, true); runResultToday = r; openDailyOrbit(r); }) },
