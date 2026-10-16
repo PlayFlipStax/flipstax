@@ -194,3 +194,6 @@
 .su-stage{ justify-content:center !important; }
 .su-play{ height:min(64vh, 470px); }
 .su-table{ height:15%; }
+
+/* I4: Saucer Shuffle's host has drawn arms reaching for the saucers, so his pose never moves the figure. */
+.su-host .host-rig .hr-svg, .su-host .host-rig.hr-pop{ animation:none !important; transform:none !important; }

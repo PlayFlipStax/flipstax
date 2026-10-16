@@ -35,6 +35,7 @@
 <link rel="stylesheet" href="lib/design.css">
 <link rel="stylesheet" href="lib/show.css">
 <link rel="stylesheet" href="lib/mini-games.css">
+<link rel="stylesheet" href="lib/host.css">
 <style>
   :root{
     --bg: #1a1442; --panel: #241b5c;
@@ -4678,6 +4679,8 @@
 <script src="lib/mini-games.js"></script>
 <script src="lib/orbit-physics.js"></script>
 <script src="lib/host-alien.js"></script>
+<script src="data/host/manifest.js"></script>
+<script src="lib/host.js"></script>
 <script src="lib/show-fx.js"></script>
 <script>
 (function(){
@@ -9015,7 +9018,7 @@
   function isRunCard(k){ return RUN_CARD_ORDER.indexOf(k) !== -1; }
   // The host alien (the riddle's Mystery Visitor, the Vault's helper, the alien card art): one picture, drawn in
   // lib/host-alien.js, whatever the options (the old green / purple variants are gone).
-  function visitorSvg(opts){ return window.HostAlien.svg((opts && opts.cls) || ''); }
+  function visitorSvg(opts){ return Host.html({ kind:'head', cls:(opts && opts.cls) || '' }); }   // (I4: a host rig, so it takes poses too)
   function mothershipSvg(){
     return '<svg viewBox="0 0 160 110" aria-hidden="true"><defs><linearGradient id="msb" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fff3a8"/><stop offset="0.5" stop-color="#ffc928"/><stop offset="1" stop-color="#b86a00"/></linearGradient>' +
       '<linearGradient id="msd" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#d6fbff"/><stop offset="1" stop-color="#5fd4e6"/></linearGradient>' +
@@ -10604,7 +10607,7 @@
       say: (t, ms)=> hostSay(t, ms), mood: (m)=> hostMood(m),
       flash: (kind)=>{ if (kind === 'win'){ marquee.classList.remove('unison', 'miss'); void marquee.offsetWidth; marquee.classList.add('unison'); setTimeout(()=> marquee.classList.remove('unison'), 700); showFlash('win'); }
         else { marquee.classList.remove('unison', 'miss'); void marquee.offsetWidth; marquee.classList.add('miss'); setTimeout(()=> marquee.classList.remove('miss'), 800); } },
-      hostSvg: ()=> window.HostAlien.full(),
+      hostSvg: ()=> Host.html({ pose:'idle' }),
       finish: (res)=>{
         if (over) return; over = true; stopTimer();
         const pts = Math.max(0, Math.round((res && res.pts) || 0)), win = !!(res && res.win);
@@ -10625,6 +10628,7 @@
     };
     mgOpen = { close };
     if (g.host) hostSay(g.host, 2200);
+    setTimeout(()=> Host.poseAll('think'), 400);   // (I4: thinking while the game plays; right/wrong poses come from api.mood / the result)
     try{ g.run(api); }catch(e){ if (DEBUG_FAST) (window.__mgErrors = window.__mgErrors || []).push(String(e)); close(false); }
     return true;
   }
@@ -10742,7 +10746,7 @@
         runGoopLost += bank + (dbl ? act3 : 0);   // what the GOOP took (for the results' "Gooped" line)
         bank = 0; dbl = false; keys = 0; chips = 0; renderBank();
         hubT.textContent = 'GOOPED!'; hubS.textContent = 'The GOOP got the Lucky Lights bonus';
-        luckyOv.classList.add('slimed'); sfx.squelch(); setTimeout(()=> sfx.wahwah(), 380); haptic([60, 40, 60]);
+        luckyOv.classList.add('slimed'); hostMood('gasp'); sfx.squelch(); setTimeout(()=> sfx.wahwah(), 380); haptic([60, 40, 60]);
         finish(false); return;
       }
       if (k === '+20' || k === '+50') bank += +k.slice(1);
@@ -11084,7 +11088,7 @@
     showCard.className = 'show-card curtain';
     showCard.style.setProperty('--pull', T.pull + 'ms'); showCard.style.setProperty('--walk', T.walkMs + 'ms');
     showCard.innerHTML = '<div class="studio co-studio" aria-hidden="true">' + STUDIO_HTML + '</div><i class="co-follow" aria-hidden="true"></i>' +
-      '<div class="co-stage-host host-full" aria-hidden="true">' + window.HostAlien.full() + '</div>' +
+      '<div class="co-stage-host host-full" aria-hidden="true">' + Host.html({ pose:'wave' }) + '</div>' +
       '<div class="co-sign w1"><div class="sign-bulbs" aria-hidden="true"></div><span>WELCOME TO<br>FLIPSTAX!</span></div>' +
       '<div class="co-sign w2"><div class="sign-bulbs" aria-hidden="true"></div><span>EPISODE ' + ep + '</span></div>' +
       '<i class="co-drape l"></i><i class="co-drape r"></i><i class="co-spot"></i><i class="co-valance"></i>' +
@@ -11122,7 +11126,7 @@
   function cueCardHtml(){
     return '<div class="cue-hold"><div class="cue-grip"><div class="cue-card"><div class="cue-face cue-back"><span>FLIPSTAX</span></div>' +
       '<div class="cue-face cue-front"><div class="cc-sub"></div><div class="cc-title"></div></div></div><i class="cue-hand l"></i><i class="cue-hand r"></i></div>' +
-      '<div class="cue-host cue-bust host-full">' + window.HostAlien.full() + '</div></div>';   // F6: the new host, head and shoulders with the mic
+      '<div class="cue-host cue-bust host-full">' + Host.html({ pose:'presenting' }) + '</div></div>';   // F6: the new host, head and shoulders with the mic
   }
   function showActCard(st, then){
     const fin = !!st.finale, w = st.world || 'vs';
@@ -11203,7 +11207,7 @@
       '<div class="mr-inner"><div class="mr-title">MYSTERY GAME</div>' +
       '<div class="mr-frame"><div class="sign-bulbs" aria-hidden="true"></div><div class="mr-door" style="--c0:' + c[0] + ';--c1:' + c[1] + '">' +
       '<div class="mr-name" aria-live="polite"></div><i class="mr-curt l"></i><i class="mr-curt r"></i></div></div></div>' +
-      '<div class="mr-host host-full" aria-hidden="true">' + window.HostAlien.full() + '</div>';
+      '<div class="mr-host host-full" aria-hidden="true">' + Host.html({ pose:'presenting' }) + '</div>';
     showCard.querySelector('.mr-name').textContent = mysteryName(game).toUpperCase();
     showCard.removeAttribute('role'); showCard.setAttribute('aria-label', 'Mystery game: ' + mysteryName(game));
     showCard.classList.remove('hidden');
@@ -11453,6 +11457,7 @@
     if (!runActive) return;
     const second = !!resumeQ && runPhase === 'secondchance';
     if (!second) runPhase = 'trivia';
+    Host.poseAll('think');   // (I4: thinking while the question is up)
     stopTallyPolling();
     clearRoundTimer();
     let q = resumeQ;
@@ -12210,7 +12215,7 @@
     let sparks = ''; for (let k = 0; k < 10; k++) sparks += '<b style="--x:' + (8 + (k * 37) % 84) + '%;--y:' + (14 + (k * 23) % 62) + '%;--dl:' + (k * 0.27).toFixed(2) + 's"></b>';
     d.innerHTML = '<i class="dc-dim"></i><div class="dc-spots">' + spots + '</div><div class="dc-sparks">' + sparks + '</div>' +
       '<div class="dc-rig"><div class="dc-ufo">' + FX.ufoSvg() + '</div><i class="dc-cord"></i><div class="dc-ball"><i class="dc-facets"></i></div></div>' +
-      '<div class="dc-floor"><div class="dc-alien host host-full">' + window.HostAlien.full() + '</div><div class="dc-alien buddy host-full">' + window.HostAlien.full() + '</div></div>' +
+      '<div class="dc-floor"><div class="dc-alien host host-full">' + Host.html({ pose:'discoPoint' }) + '</div><div class="dc-alien buddy host-full">' + Host.html({ pose:'swayR' }) + '</div></div>' +
       '<div class="dc-skip">TAP TO SKIP</div>';
     document.body.appendChild(d);
     marquee.classList.remove('strobe'); marquee.classList.add('disco'); marquee.classList.toggle('still', lite);
@@ -12220,11 +12225,15 @@
     const discoAt = performance.now();
     d.addEventListener('click', (e)=>{ e.stopPropagation(); if (performance.now() - discoAt >= TIMING.SKIP_AFTER) end(); });
     requestAnimationFrame(()=> d.classList.add('on'));
+    // I4: the two dancers run through the disco poses, out of step with each other.
+    { const host = d.querySelector('.dc-alien.host'), buddy = d.querySelector('.dc-alien.buddy'), steps = [['discoPoint', 'swayR'], ['swayL', 'spin'], ['spin', 'swayL'], ['swayR', 'discoPoint'], ['discoPoint', 'swayR']];
+      steps.forEach(([a, b], k)=> setTimeout(()=>{ if (!d.isConnected) return; Host.pose(host, a, { hold:0 }); Host.pose(buddy, b, { hold:0 }); }, k * 900)); }
     setTimeout(end, 4600);   // (G2: lite mode is the still look - the same length)
     return true;
   }
   window.__discoTest = (DEBUG_FAST || REPLAY) ? ()=>{ discoShownFor = null; discoCelebrate('test'); } : undefined;
   function pkJackpotShow(c){
+    hostMood('laugh');
     sfx.siren(); setTimeout(()=> sfx.roar(), 200);
     setTimeout(()=> discoCelebrate('mothership'), 2300);   // D7: then the disco (once an episode)
     marquee.classList.remove('strobe'); void marquee.offsetWidth; marquee.classList.add('strobe');
@@ -15047,7 +15056,7 @@
   // game's mixer, so mute covers it.
   const showBg = document.getElementById('showBg'), showFrame = document.getElementById('showFrame'), showFx = document.getElementById('showFx');
   const showAlien = document.getElementById('showAlien');
-  showAlien.innerHTML = FX.alienSvg();
+  showAlien.innerHTML = Host.html({ kind:'head' });
   FX.confetti(document.getElementById('showAmb'), 8);
   FX.soundHook = (kind)=>{
     if (kind === 'beam') sfx.ufoBeam(); else if (kind === 'zap') playTone(1400, 0, 0.05, 'square', 0.03);
@@ -15173,7 +15182,12 @@
     if (good && el) FX.burstAt(showFx, el, { count:14, spread:110, shapes:['star', 'coin'], colors:['#ffd23f', '#c8ff3d', '#ff3c9d', '#7df9ff'] });
     if (!good) FX.shake(document.getElementById('cosmicStage'));
   }
-  function hostMood(m){ FX.alien(showAlien, m); }
+  // I4: the show's moments as host poses (lib/host.js) - right = cheer, wrong = shrug or oops, a question = think,
+  // an intro = wave, a reveal = presenting. Only the one host on screen moves (one host per screen).
+  function hostMood(m){
+    const p = m === 'cheer' ? 'cheer' : m === 'sad' ? (Math.random() < 0.5 ? 'shrug' : 'oops') : m;
+    Host.poseAll(p);
+  }
   function showFlash(kind){ FX.flash(showFrame, kind); marquee.classList.remove('blink'); void marquee.offsetWidth; marquee.classList.add('blink'); clearTimeout(showFlash._t); showFlash._t = setTimeout(()=> marquee.classList.remove('blink'), 1100); }
   // The host's speech bubble (B3): a short line from data/game-names.js
   // (cameo), about a second and a half. B9 adds his voice blips.
@@ -16514,9 +16528,9 @@
   const homeSignBulbs = ()=>{ const b = document.querySelector('#homeSign .sign-bulbs'); if (b && !els.homeOverlay.classList.contains('hidden')) ringBulbs(b, 24, 9); };
   { const img = document.querySelector('#homeSign .home-logo-img'); if (img && !img.complete) img.addEventListener('load', homeSignBulbs); }
   homeSignBulbs();
-  { const me = document.getElementById('msEpisode'); if (me) me.textContent = 'EPISODE ' + showEpisode(todayStr()); const mh = document.getElementById('msHost'); if (mh) mh.innerHTML = window.HostAlien.full(); }   // F4: the menu's title and its host on the stage
+  { const me = document.getElementById('msEpisode'); if (me) me.textContent = 'EPISODE ' + showEpisode(todayStr()); const mh = document.getElementById('msHost'); if (mh) mh.innerHTML = Host.html({ pose:'wave' }); }   // F4: the menu's title and its host on the stage
   document.getElementById('homeTonight').innerHTML = 'TONIGHT\u2019S SHOW \u00B7 <b>EPISODE ' + showEpisode(todayStr()) + '</b>';
-  document.getElementById('homeHost').innerHTML = window.HostAlien.full();
+  document.getElementById('homeHost').innerHTML = Host.html({ pose:'wave' });
   let doodleResizeTimer = null;
   window.addEventListener('resize', ()=>{
     clearTimeout(doodleResizeTimer);

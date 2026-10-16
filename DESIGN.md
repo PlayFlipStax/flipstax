@@ -94,3 +94,20 @@ layout (`.mg-*` in flipstax.html, the games' own parts in `lib/mini-games.css`):
 act pill) -> **host zone** (rule line, or the game's own stage host) -> **play area** -> **footer** (timer bar +
 score chip), inside the safe areas. The background is `--game-bg`: `style-board/assets/bg-<game>.png` when that
 file exists, otherwise a gradient in the game's world plus a pattern, so no screen is ever empty.
+
+## The host
+
+One host per screen (the disco celebration is the only exception). Every host is a **rig** from `lib/host.js`:
+`Host.html({ kind:'full'|'head', pose })` makes one, `Host.pose(el, name, { hold, then })` changes what he does,
+`Host.poseAll(name)` poses the one on screen. Poses: `idle`, `idleClosed`, `blink`, `wave`, `point`, `cheer`,
+`think`, `shrug`, `wink`, `oops`, `gasp`, `presenting`, `laugh`, and for the disco `discoPoint`, `swayL`, `swayR`,
+`spin`. One-shot poses (cheer, wave, shrug, oops, gasp, laugh, wink, blink) go back to idle by themselves.
+
+- **Art:** `data/host/<pose>.png`, listed in `data/host/manifest.js` once the file is there. All pictures share one
+  canvas (600 x 990 suggested, transparent) and one baseline - feet on the bottom edge - so poses crossfade without
+  a jump. Until a pose has art, the drawn SVG host acts it out (lib/host.css).
+- **Events:** a right answer = `cheer`; a wrong one = `shrug` or `oops`; a question or a game in play = `think`; an
+  intro (landing, cold open, menu) = `wave`; a reveal (act card, Mystery Game door) = `presenting`; the GOOP = `gasp`;
+  THE MOTHERSHIP = `laugh`.
+- Motion: idle bob, slow sway and blink; a quick pop on every pose change; transform and opacity only; still in lite
+  mode. Saucer Shuffle's host never moves (his arms are drawn to the saucers).

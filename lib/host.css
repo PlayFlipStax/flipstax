@@ -1,0 +1,51 @@
+/* FlipStax - the host's poses (lib/host.js). The rig: the drawn host (.hr-svg) or a pose picture (.hr-img, two
+   layers that crossfade), all on one baseline. Transform and opacity only; lite mode and reduced motion hold still. */
+.host-rig{ position:relative; display:block; width:100%; line-height:0; transform-origin:50% 100%; }
+.host-rig .hr-svg{ transform-origin:50% 92%; }
+.host-rig .hr-svg svg{ display:block; width:100%; height:auto; }
+.host-rig .hr-img{ position:absolute; left:0; right:0; bottom:0; width:100%; height:auto; opacity:0; transition:opacity var(--d-fast, 160ms) linear; pointer-events:none; }
+.host-rig .hr-img.on{ opacity:1; }
+.host-rig.has-img .hr-svg{ visibility:hidden; }
+.host-rig.hr-pop{ animation:hrPop var(--d-mid, 320ms) var(--ease-pop, cubic-bezier(.3,1.6,.5,1)); }
+@keyframes hrPop{ 0%{ transform:scale(0.94); } 60%{ transform:scale(1.04); } 100%{ transform:none; } }
+
+/* Idle: the bob, a slow sway, a blink now and then (the drawn host's own idle lives in show.css: haBob, haBlink). */
+.host-rig[data-pose="idle"] .hr-svg{ animation:hrSway 6s var(--ease-io, ease-in-out) infinite alternate; }
+@keyframes hrSway{ from{ transform:rotate(-1.5deg); } to{ transform:rotate(1.5deg); } }
+.host-rig[data-pose="idleClosed"] .ha-eyes, .host-rig[data-pose="blink"] .ha-eyes{ transform-box:fill-box; transform-origin:50% 50%; animation:hrBlink .9s steps(1) 1; }
+.host-rig[data-pose="idleClosed"] .ha-eyes{ animation:none; transform:scaleY(0.12); }
+@keyframes hrBlink{ 0%, 40%{ transform:scaleY(0.12); } 41%, 100%{ transform:none; } }
+.host-rig[data-pose="wink"] .ha-eyes{ transform-box:fill-box; transform-origin:50% 50%; animation:hrWink 1s ease-in-out 1; }
+@keyframes hrWink{ 0%, 100%{ transform:none; } 30%, 70%{ transform:scaleY(0.25) skewY(-4deg); } }
+
+/* Acting out the poses with the drawn host (whole-figure moves, plus the free arm where there is one). */
+.host-rig[data-pose="wave"] .ha-arm-wave{ transform-box:view-box; transform-origin:141px 147px; animation:hrWave .45s ease-in-out 4 alternate; }
+@keyframes hrWave{ from{ transform:rotate(-150deg); } to{ transform:rotate(-115deg); } }
+.host-rig[data-pose="point"] .hr-svg{ transform:rotate(3deg); }
+.host-rig[data-pose="point"] .ha-arm-wave, .host-rig[data-pose="presenting"] .ha-arm-wave, .host-rig[data-pose="discoPoint"] .ha-arm-wave{ transform-box:view-box; transform-origin:141px 147px; transform:rotate(-95deg); transition:transform var(--d-mid, 320ms) var(--ease-out, ease-out); }
+.host-rig[data-pose="presenting"] .hr-svg{ transform:rotate(4deg) translateX(2%); transition:transform var(--d-mid, 320ms) var(--ease-out, ease-out); }
+.host-rig[data-pose="cheer"] .hr-svg{ animation:hrCheer .8s var(--ease-pop, ease-out) 2; }
+@keyframes hrCheer{ 0%, 100%{ transform:none; } 40%{ transform:translateY(-9%) scale(1.06); } 70%{ transform:translateY(0) scale(0.98, 1.02); } }
+.host-rig[data-pose="cheer"] .ha-arm-wave{ transform-box:view-box; transform-origin:141px 147px; transform:rotate(-160deg); }
+.host-rig[data-pose="think"] .hr-svg{ animation:hrThink 2.4s var(--ease-io, ease-in-out) infinite alternate; }
+@keyframes hrThink{ from{ transform:rotate(-5deg) translateX(-2%); } to{ transform:rotate(-2deg) translateX(-1%); } }
+.host-rig[data-pose="shrug"] .hr-svg{ animation:hrShrug .75s ease-in-out 2; }
+@keyframes hrShrug{ 0%, 100%{ transform:none; } 35%{ transform:translateY(2%) rotate(-4deg) scaleY(0.97); } 70%{ transform:translateY(2%) rotate(4deg) scaleY(0.97); } }
+.host-rig[data-pose="oops"] .hr-svg{ animation:hrOops .5s ease-in-out 3; }
+@keyframes hrOops{ 0%, 100%{ transform:none; } 25%{ transform:translateX(-4%) rotate(-5deg); } 75%{ transform:translateX(4%) rotate(5deg); } }
+.host-rig[data-pose="gasp"] .hr-svg{ animation:hrGasp 1.2s var(--ease-out, ease-out) 1; }
+@keyframes hrGasp{ 0%{ transform:none; } 15%{ transform:scale(1.1) translateY(-4%); } 100%{ transform:scale(1.02); } }
+.host-rig[data-pose="laugh"] .hr-svg{ animation:hrLaugh .3s ease-in-out 6 alternate; }
+@keyframes hrLaugh{ from{ transform:translateY(0) rotate(-2deg); } to{ transform:translateY(-3%) rotate(2deg); } }
+/* the disco */
+.host-rig[data-pose="discoPoint"] .hr-svg{ transform:rotate(-8deg); }
+.host-rig[data-pose="swayL"] .hr-svg{ animation:hrSwayL .5s ease-in-out infinite alternate; }
+.host-rig[data-pose="swayR"] .hr-svg{ animation:hrSwayR .5s ease-in-out infinite alternate; }
+@keyframes hrSwayL{ from{ transform:translateX(0) rotate(0); } to{ transform:translateX(-8%) rotate(-8deg); } }
+@keyframes hrSwayR{ from{ transform:translateX(0) rotate(0); } to{ transform:translateX(8%) rotate(8deg); } }
+.host-rig[data-pose="spin"] .hr-svg{ animation:hrSpin .8s ease-in-out infinite; }
+@keyframes hrSpin{ 0%{ transform:scaleX(1); } 50%{ transform:scaleX(-1); } 100%{ transform:scaleX(1); } }
+
+/* Lite mode and reduced motion: the pose shows as its still end state. */
+:root.lite .host-rig .hr-svg, :root.lite .host-rig.hr-pop, :root.lite .host-rig .ha-arm-wave{ animation:none !important; }
+@media (prefers-reduced-motion: reduce){ .host-rig .hr-svg, .host-rig.hr-pop, .host-rig .ha-arm-wave, .host-rig .ha-eyes{ animation:none !important; } }
