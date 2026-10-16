@@ -2610,9 +2610,9 @@
   .ll-ring{ --r:min(35vw, 132px); position:relative; width:calc(var(--r) * 2 + 74px); aspect-ratio:1; margin:6px 0; border-radius:50%;
     background:radial-gradient(circle, #1c1405 40%, #0a0702 62%, transparent 63%); box-shadow:0 0 0 6px #2a1e06, 0 0 0 9px var(--gold-2), 0 0 40px rgba(255,190,40,0.35); }
   .ll-sq{ position:absolute; left:50%; top:50%; width:58px; height:50px; margin:-25px 0 0 -29px; display:flex; align-items:center; justify-content:center; border-radius:10px;
-    transform:rotate(var(--a)) translateY(calc(var(--r) * -1)); background:linear-gradient(180deg, #2a1e06, #120c02); border:2.5px solid #8a6a1a; color:#ffe27a;
+    transform:translate(calc(var(--x) * var(--r)), calc(var(--y) * var(--r))); background:linear-gradient(180deg, #2a1e06, #120c02);   /* (placed round the ring by sin/cos: every square and label stays upright) */ border:2.5px solid #8a6a1a; color:#ffe27a;
     font:900 19px/1 var(--f-display); transition:background .08s, border-color .08s, box-shadow .08s; }
-  .ll-sq span{ display:block; transform:rotate(calc(var(--a) * -1)); }
+  .ll-sq span{ display:block; }
   .ll-sq.goop{ color:#7dff5a; font-size:14px; border-color:#3a7a1a; }
   .ll-sq.dbl{ color:#fff; }
   .ll-sq.on{ background:linear-gradient(180deg, #fff6c4, #ffd23f); border-color:#fff; color:#3a1a00; box-shadow:0 0 18px 4px rgba(255,220,90,0.9); }
@@ -9997,7 +9997,7 @@
     const n = LUCKY_SQUARES.length;
     luckyOv.innerHTML = '<i class="ll-spot l"></i><i class="ll-spot r"></i><div class="ll-inner">' +
       '<div class="ll-title">LUCKY LIGHTS</div><div class="ll-bank" aria-live="polite"></div>' +
-      '<div class="ll-ring">' + LUCKY_SQUARES.map((k, i)=> '<div class="ll-sq' + (k === 'GOOP' ? ' goop' : k === 'x2' ? ' dbl' : '') + '" style="--a:' + (i * 360 / n) + 'deg"><span>' + luckyLabel(k) + '</span></div>').join('') +
+      '<div class="ll-ring">' + LUCKY_SQUARES.map((k, i)=> '<div class="ll-sq' + (k === 'GOOP' ? ' goop' : k === 'x2' ? ' dbl' : '') + '" style="--x:' + Math.sin(i * 2 * Math.PI / n).toFixed(4) + ';--y:' + (-Math.cos(i * 2 * Math.PI / n)).toFixed(4) + '"><span>' + luckyLabel(k) + '</span></div>').join('') +
       '<div class="ll-hub"><b class="ll-hub-t">READY?</b><span class="ll-hub-s"></span></div></div>' +
       '<div class="ll-buttons"><button type="button" class="ll-btn stop">STOP</button><button type="button" class="ll-btn bank hidden">BANK</button><button type="button" class="ll-btn again hidden">SPIN AGAIN</button></div>' +
       '<div class="ll-note"></div></div><div class="ll-slime" aria-hidden="true">' + GOOP_SVG + '</div>';
