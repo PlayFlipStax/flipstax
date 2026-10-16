@@ -10481,6 +10481,7 @@
     const api = {
       key, stage, overlay: ov, seed: (st && st.seed) || ((Math.random() * 4294967296) >>> 0),
       sfx, FX, fxLayer: showFx, lite: isLite(), reduced: prefersReducedMotion(), mult: runActive ? runActMult() : 1,
+      act: runActive ? runAct().id : null, opts: st || {},   // (G6: Snap Sort's difficulty follows the act; the TEST menu can force one)
       rng: null, shuffle: null,
       setRule: (t)=>{ ov.querySelector('.mg-rule').textContent = t || ''; },
       timer: (ms, cb)=>{ if (DEBUG_FAST) ms = dt(ms); startTimer(ms, cb); return { stop: stopTimer, left: ()=> Math.max(0, timerEnd - Date.now()), add: (d)=>{ const left = Math.max(0, timerEnd - Date.now()) + d; startTimer(Math.max(0, left), timerCb); } }; },
@@ -16822,7 +16823,7 @@
       // Oct 15) and it looked like a repeat; a jump starts somewhere random in the deck instead (TEST menu only).
       if (decks.daily && decks.daily.cards) decks.daily.next = Math.floor(Math.random() * Math.max(1, Math.min(80, decks.daily.cards.length - 40)));
       if (tweak) tweak();
-      if (then) setTimeout(()=>{ if (runActive) then(); }, 450);   // (the cold open ignores a tap in its first 400ms)
+      if (then) setTimeout(()=>{ if (runActive) then(); }, TIMING.SKIP_AFTER + 60);   // (the cold open ignores a tap in its first SKIP_AFTER ms)
     }
     // Stand-in progress: a score, `n` letters earned, a clock at 4:12.
     function replaySample(score, n){
@@ -16882,7 +16883,7 @@
       { label:'Emoji Decode', go: mysteryAs('emojiDecode') },
       { label:'Time Warp', go: mysteryAs('timeWarp') },
       { label:'Peak or Plunge', go: mysteryAs('peakOrPlunge') },
-      { label:'Snap Sort', go: mysteryAs('snapSort') },
+      ...['easy', 'medium', 'hard'].map(diff=> ({ label:'Snap Sort: ' + diff, go: atType(s=> s.t === 'mystery', 0, 60, 1, (i)=>{ runPlan[i] = Object.assign({}, runPlan[i], { game:'snapSort', seed:(Math.random() * 4294967296) >>> 0, forced:true, diff }); }) })),
       { label:'Zap Words', go: mysteryAs('zapWords') },
       { label:'Twin Flip', go: mysteryAs('twinFlip') },
       { label:'Fact or Fib', go: mysteryAs('factOrFib') },

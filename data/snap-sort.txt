@@ -1,0 +1,785 @@
+FlipStax - Snap Sort categories (81: 24 easy, 27 medium, 30 hard)
+The hard tier is NOT CHECKED YET (SNAP_SORT_REVIEWED = false in data/snap-sort.js): until it is true, hard categories play only from the TEST menu.
+Format: number. [difficulty] category
+   belongs: items
+   decoys: item - why it doesn't belong
+
+1. [easy] Fruits
+   belongs: Mango, Kiwi, Cherry, Pear, Plum, Apricot
+   decoy: Carrot - A root vegetable
+   decoy: Potato - A tuber, a vegetable
+   decoy: Celery - A stalk vegetable
+   decoy: Spinach - A leafy vegetable
+   decoy: Garlic - A bulb vegetable
+   decoy: Onion - A bulb vegetable
+   decoy: Broccoli - A flower-head vegetable
+
+2. [easy] Vegetables that grow underground
+   belongs: Carrot, Potato, Beet, Radish, Turnip, Parsnip
+   decoy: Broccoli - Grows above ground
+   decoy: Cucumber - Grows on a vine
+   decoy: Cabbage - Grows above ground
+   decoy: Pea - Grows in pods on the plant
+   decoy: Corn - Grows on a tall stalk
+   decoy: Pumpkin - Grows on a vine
+   decoy: Lettuce - Its leaves grow above ground
+
+3. [easy] Mammals
+   belongs: Dolphin, Bat, Whale, Kangaroo, Elephant, Platypus
+   decoy: Shark - A fish
+   decoy: Penguin - A bird
+   decoy: Crocodile - A reptile
+   decoy: Frog - An amphibian
+   decoy: Salmon - A fish
+   decoy: Ostrich - A bird
+   decoy: Turtle - A reptile
+
+4. [easy] Birds
+   belongs: Penguin, Ostrich, Eagle, Owl, Flamingo, Kiwi
+   decoy: Bat - A mammal
+   decoy: Butterfly - An insect
+   decoy: Flying fish - A fish
+   decoy: Pterodactyl - A prehistoric flying reptile
+   decoy: Dragonfly - An insect
+   decoy: Flying squirrel - A mammal that glides
+
+5. [easy] Planets
+   belongs: Mercury, Venus, Mars, Jupiter, Saturn, Neptune
+   decoy: Pluto - A dwarf planet since 2006
+   decoy: The Moon - Earth's moon
+   decoy: The Sun - A star
+   decoy: Ceres - A dwarf planet
+   decoy: Titan - One of Saturn's moons
+   decoy: Sirius - A star
+   decoy: Halley's Comet - A comet
+
+6. [easy] Colors of the rainbow
+   belongs: Red, Orange, Yellow, Green, Blue, Violet
+   decoy: Pink - Not one of the rainbow's seven
+   decoy: Brown - Not in the rainbow
+   decoy: Black - Not in the rainbow
+   decoy: White - All the colors mixed
+   decoy: Gray - Not in the rainbow
+   decoy: Gold - Not in the rainbow
+   decoy: Silver - Not in the rainbow
+
+7. [easy] String instruments
+   belongs: Violin, Cello, Harp, Guitar, Banjo, Ukulele
+   decoy: Flute - A woodwind
+   decoy: Trumpet - A brass instrument
+   decoy: Drum - Percussion
+   decoy: Clarinet - A woodwind
+   decoy: Xylophone - Struck wooden bars
+   decoy: Tuba - A brass instrument
+   decoy: Saxophone - A woodwind
+
+8. [easy] Continents
+   belongs: Africa, Asia, Europe, Antarctica, Australia, South America
+   decoy: Greenland - An island
+   decoy: India - A country in Asia
+   decoy: The Arctic - A polar region around an ocean
+   decoy: The Pacific - An ocean
+   decoy: Madagascar - An island country
+   decoy: Siberia - A region of Russia
+   decoy: Scandinavia - A region of Europe
+
+9. [easy] Oceans
+   belongs: Pacific, Atlantic, Indian, Arctic, Southern
+   decoy: Mediterranean - A sea
+   decoy: Caribbean - A sea
+   decoy: Red Sea - A sea
+   decoy: Dead Sea - A salt lake
+   decoy: Gulf of Mexico - A gulf
+   decoy: Baltic - A sea
+   decoy: Caspian - The Caspian Sea is a lake
+
+10. [easy] Shapes with only straight sides
+   belongs: Triangle, Square, Pentagon, Hexagon, Rectangle, Octagon
+   decoy: Circle - Curved all the way round
+   decoy: Oval - Curved
+   decoy: Crescent - Curved sides
+   decoy: Heart - Curved sides
+   decoy: Semicircle - One curved side
+   decoy: Ellipse - Curved
+
+11. [easy] Insects
+   belongs: Ant, Bee, Beetle, Butterfly, Grasshopper, Ladybug
+   decoy: Spider - An arachnid with 8 legs
+   decoy: Scorpion - An arachnid
+   decoy: Centipede - Many legs - not an insect
+   decoy: Tick - An arachnid
+   decoy: Snail - A mollusk
+   decoy: Earthworm - A worm
+   decoy: Crab - A crustacean
+
+12. [easy] Played with a racket or paddle
+   belongs: Tennis, Badminton, Squash, Table tennis, Pickleball, Racquetball
+   decoy: Golf - Played with clubs
+   decoy: Baseball - Played with a bat
+   decoy: Ice hockey - Played with sticks
+   decoy: Cricket - Played with a bat
+   decoy: Volleyball - Played with your hands
+   decoy: Croquet - Played with mallets
+   decoy: Polo - Played with mallets on horseback
+
+13. [easy] Names for baby animals
+   belongs: Cub, Joey, Kid, Foal, Fawn, Duckling
+   decoy: Doe - An adult female deer
+   decoy: Stallion - An adult male horse
+   decoy: Mare - An adult female horse
+   decoy: Ram - An adult male sheep
+   decoy: Drake - An adult male duck
+   decoy: Buck - An adult male deer
+   decoy: Hen - An adult female chicken
+
+14. [easy] Made from milk
+   belongs: Cheese, Butter, Yogurt, Cream, Ice cream, Kefir
+   decoy: Eggs - Laid by hens - not dairy
+   decoy: Mayonnaise - Made from eggs and oil
+   decoy: Margarine - Made from vegetable oils
+   decoy: Almond milk - Made from almonds
+   decoy: Coconut milk - Made from coconuts
+   decoy: Tofu - Made from soybeans
+   decoy: Oat milk - Made from oats
+
+15. [easy] Organs of the human body
+   belongs: Heart, Liver, Lungs, Kidney, Stomach, Skin
+   decoy: Femur - A bone
+   decoy: Rib - A bone
+   decoy: Kneecap - A bone
+   decoy: Fingernail - Not an organ
+   decoy: Hair - Not an organ
+   decoy: Eyelash - Not an organ
+
+16. [easy] Found out in space
+   belongs: Comet, Asteroid, Nebula, Galaxy, Star, Black hole
+   decoy: Cloud - Forms in Earth's atmosphere
+   decoy: Rainbow - Forms in Earth's atmosphere
+   decoy: Hailstone - Forms in storm clouds
+   decoy: Lightning - Happens in Earth's atmosphere
+   decoy: Fog - Forms near the ground
+   decoy: Tornado - Happens in Earth's atmosphere
+
+17. [easy] Dog breeds
+   belongs: Labrador, Poodle, Beagle, Dachshund, Bulldog, Husky
+   decoy: Siamese - A cat breed
+   decoy: Persian - A cat breed
+   decoy: Maine Coon - A cat breed
+   decoy: Clydesdale - A horse breed
+   decoy: Holstein - A breed of cattle
+   decoy: Merino - A breed of sheep
+   decoy: Bengal - A cat breed
+
+18. [easy] Team sports
+   belongs: Basketball, Soccer, Ice hockey, Baseball, Volleyball, Rugby
+   decoy: Golf - Played on your own
+   decoy: Boxing - One against one
+   decoy: Archery - An individual sport
+   decoy: Surfing - An individual sport
+   decoy: Skiing - An individual sport
+   decoy: Weightlifting - An individual sport
+
+19. [easy] Weather
+   belongs: Hail, Sleet, Drizzle, Fog, Thunder, Snow
+   decoy: Lava - Comes out of volcanoes
+   decoy: Magma - Melted rock underground
+   decoy: Quicksand - Wet sand, not weather
+   decoy: Earthquake - The ground shaking, not weather
+   decoy: Tsunami - A sea wave set off by an earthquake
+   decoy: Geyser - Hot water shooting from the ground
+
+20. [easy] 3D shapes
+   belongs: Cube, Sphere, Cylinder, Cone, Pyramid, Prism
+   decoy: Circle - A flat 2D shape
+   decoy: Square - A flat 2D shape
+   decoy: Triangle - A flat 2D shape
+   decoy: Rectangle - A flat 2D shape
+   decoy: Hexagon - A flat 2D shape
+   decoy: Oval - A flat 2D shape
+
+21. [easy] Units of length
+   belongs: Meter, Mile, Inch, Kilometer, Foot, Yard
+   decoy: Liter - Measures volume
+   decoy: Gram - Measures mass
+   decoy: Acre - Measures area
+   decoy: Pint - Measures volume
+   decoy: Hectare - Measures area
+   decoy: Ounce - Measures weight or volume
+   decoy: Celsius - Measures temperature
+
+22. [easy] Rivers
+   belongs: Nile, Amazon, Danube, Mississippi, Ganges, Thames
+   decoy: Sahara - A desert
+   decoy: Everest - A mountain
+   decoy: Andes - A mountain range
+   decoy: Gobi - A desert
+   decoy: Baikal - A lake
+   decoy: Kilimanjaro - A mountain
+   decoy: Serengeti - A plain in Africa
+
+23. [easy] Big cats
+   belongs: Lion, Tiger, Leopard, Jaguar, Snow leopard
+   decoy: Hyena - Not a cat at all
+   decoy: Wolf - A member of the dog family
+   decoy: Bear - Not a cat
+   decoy: Fox - A member of the dog family
+   decoy: Jackal - A member of the dog family
+   decoy: Wolverine - A member of the weasel family
+
+24. [easy] Star Wars characters
+   belongs: Luke Skywalker, Darth Vader, Yoda, Chewbacca, Princess Leia, Han Solo
+   decoy: Spock - From Star Trek
+   decoy: Captain Kirk - From Star Trek
+   decoy: Gandalf - From The Lord of the Rings
+   decoy: Optimus Prime - From Transformers
+   decoy: Neo - From The Matrix
+   decoy: Data - From Star Trek
+
+25. [medium] Foods rich in protein
+   belongs: Eggs, Chicken, Lentils, Beans, Tofu, Fish
+   decoy: Apples - Mostly carbs and fiber
+   decoy: White rice - Mostly carbs
+   decoy: Cucumber - Mostly water
+   decoy: Lettuce - Mostly water
+   decoy: Butter - Mostly fat
+   decoy: Orange juice - Mostly sugar and vitamin C
+   decoy: White bread - Mostly carbs
+
+26. [medium] Foods high in vitamin C
+   belongs: Oranges, Kiwi, Strawberries, Bell peppers, Broccoli, Lemons
+   decoy: White rice - Almost no vitamin C
+   decoy: Bread - Almost no vitamin C
+   decoy: Cheese - Almost no vitamin C
+   decoy: Eggs - No vitamin C
+   decoy: Butter - No vitamin C
+   decoy: Chicken - Almost no vitamin C
+   decoy: Pasta - Almost no vitamin C
+
+27. [medium] Foods high in fiber
+   belongs: Lentils, Beans, Raspberries, Oats, Broccoli, Chia seeds
+   decoy: Chicken - Animal foods have no fiber
+   decoy: Eggs - Animal foods have no fiber
+   decoy: Cheese - Animal foods have no fiber
+   decoy: Fish - Animal foods have no fiber
+   decoy: Milk - Animal foods have no fiber
+   decoy: Butter - No fiber
+   decoy: Steak - Animal foods have no fiber
+
+28. [medium] Good sources of calcium
+   belongs: Milk, Cheese, Yogurt, Sardines, Kale
+   decoy: Apple - Very little calcium
+   decoy: Banana - Known for potassium, not calcium
+   decoy: White rice - Very little calcium
+   decoy: Chicken breast - Very little calcium
+   decoy: Watermelon - Very little calcium
+   decoy: Cucumber - Very little calcium
+
+29. [medium] Whole grains
+   belongs: Oats, Brown rice, Quinoa, Bulgur, Popcorn, Whole-wheat bread
+   decoy: White rice - Refined - the bran and germ are removed
+   decoy: White bread - Made with refined flour
+   decoy: Croissant - Made with refined flour
+   decoy: White pasta - Made with refined flour
+   decoy: Pretzels - Usually made with refined flour
+   decoy: Bagel - Usually made with refined flour
+
+30. [medium] Pixar movies
+   belongs: Toy Story, Finding Nemo, Up, Ratatouille, Coco, The Incredibles
+   decoy: Shrek - Made by DreamWorks
+   decoy: Frozen - Made by Walt Disney Animation Studios
+   decoy: Moana - Made by Walt Disney Animation Studios
+   decoy: Despicable Me - Made by Illumination
+   decoy: Kung Fu Panda - Made by DreamWorks
+   decoy: The Lion King - Made by Walt Disney Animation Studios
+   decoy: Madagascar - Made by DreamWorks
+   decoy: Ice Age - Made by Blue Sky Studios
+
+31. [medium] Marvel superheroes
+   belongs: Iron Man, Thor, Black Panther, Spider-Man, Hulk, Captain America
+   decoy: Batman - A DC hero
+   decoy: Superman - A DC hero
+   decoy: Wonder Woman - A DC hero
+   decoy: The Flash - A DC hero
+   decoy: Aquaman - A DC hero
+   decoy: Green Lantern - A DC hero
+
+32. [medium] Hogwarts houses
+   belongs: Gryffindor, Hufflepuff, Ravenclaw, Slytherin
+   decoy: Durmstrang - Another wizarding school
+   decoy: Beauxbatons - Another wizarding school
+   decoy: Hogsmeade - The village near Hogwarts
+   decoy: Diagon Alley - A shopping street in London
+   decoy: Azkaban - The wizard prison
+   decoy: Quidditch - A wizarding sport
+
+33. [medium] Official Disney Princesses
+   belongs: Cinderella, Ariel, Belle, Jasmine, Mulan, Moana
+   decoy: Elsa - A queen, and not in the Disney Princess line
+   decoy: Fiona - From Shrek, a DreamWorks film
+   decoy: Dorothy - From The Wizard of Oz, not Disney
+   decoy: Alice - From Alice in Wonderland - not a princess
+   decoy: Tinker Bell - A fairy, not a princess
+   decoy: Wendy - From Peter Pan - not a princess
+
+34. [medium] NBA teams
+   belongs: Lakers, Celtics, Bulls, Warriors, Knicks, Heat
+   decoy: Yankees - Baseball (MLB)
+   decoy: Cowboys - Football (NFL)
+   decoy: Red Sox - Baseball (MLB)
+   decoy: Patriots - Football (NFL)
+   decoy: Maple Leafs - Hockey (NHL)
+   decoy: Dodgers - Baseball (MLB)
+   decoy: Packers - Football (NFL)
+
+35. [medium] NFL teams
+   belongs: Packers, Patriots, Steelers, Cowboys, Chiefs, Eagles
+   decoy: Lakers - Basketball (NBA)
+   decoy: Cubs - Baseball (MLB)
+   decoy: Bruins - Hockey (NHL)
+   decoy: Raptors - Basketball (NBA)
+   decoy: Yankees - Baseball (MLB)
+   decoy: Blackhawks - Hockey (NHL)
+   decoy: Celtics - Basketball (NBA)
+
+36. [medium] MLB baseball teams
+   belongs: Yankees, Red Sox, Dodgers, Cubs, Astros, Mariners
+   decoy: Knicks - Basketball (NBA)
+   decoy: Bears - Football (NFL)
+   decoy: Penguins - Hockey (NHL)
+   decoy: Celtics - Basketball (NBA)
+   decoy: Saints - Football (NFL)
+   decoy: Spurs - Basketball (NBA)
+   decoy: Steelers - Football (NFL)
+
+37. [medium] Winter Olympic sports
+   belongs: Curling, Biathlon, Bobsleigh, Luge, Figure skating, Ski jumping
+   decoy: Rowing - A Summer Olympic sport
+   decoy: Gymnastics - A Summer Olympic sport
+   decoy: Fencing - A Summer Olympic sport
+   decoy: Surfing - A Summer Olympic sport
+   decoy: Triathlon - A Summer Olympic sport
+   decoy: Diving - A Summer Olympic sport
+   decoy: Archery - A Summer Olympic sport
+
+38. [medium] Capital cities in Europe
+   belongs: Paris, Madrid, Rome, Berlin, Lisbon, Vienna
+   decoy: Barcelona - Spain's capital is Madrid
+   decoy: Milan - Italy's capital is Rome
+   decoy: Munich - Germany's capital is Berlin
+   decoy: Geneva - Switzerland's capital is Bern
+   decoy: Venice - Italy's capital is Rome
+   decoy: Istanbul - Turkey's capital is Ankara
+   decoy: Porto - Portugal's capital is Lisbon
+
+39. [medium] Countries in South America
+   belongs: Brazil, Argentina, Peru, Chile, Colombia, Uruguay
+   decoy: Mexico - In North America
+   decoy: Panama - In Central America
+   decoy: Cuba - In the Caribbean
+   decoy: Costa Rica - In Central America
+   decoy: Guatemala - In Central America
+   decoy: Jamaica - In the Caribbean
+   decoy: Spain - In Europe
+
+40. [medium] Countries in Africa
+   belongs: Kenya, Egypt, Nigeria, Ghana, Morocco, Ethiopia
+   decoy: Jamaica - In the Caribbean
+   decoy: Haiti - In the Caribbean
+   decoy: Sri Lanka - In Asia
+   decoy: Papua New Guinea - In Oceania
+   decoy: Yemen - In Asia, across the Red Sea
+   decoy: Saudi Arabia - In Asia
+   decoy: Brazil - In South America
+
+41. [medium] Countries in Asia
+   belongs: Japan, Thailand, Vietnam, India, Mongolia, Nepal
+   decoy: Australia - In Oceania
+   decoy: Morocco - In Africa
+   decoy: Madagascar - In Africa
+   decoy: New Zealand - In Oceania
+   decoy: Fiji - In Oceania
+   decoy: Greece - In Europe
+   decoy: Kenya - In Africa
+
+42. [medium] Mountain ranges
+   belongs: Andes, Alps, Himalayas, Rockies, Appalachians, Pyrenees
+   decoy: Sahara - A desert
+   decoy: Amazon - A river and rainforest
+   decoy: Gobi - A desert
+   decoy: Serengeti - A plain
+   decoy: Everglades - A wetland
+   decoy: Kilimanjaro - A single mountain, not a range
+
+43. [medium] Deserts
+   belongs: Sahara, Gobi, Kalahari, Mojave, Atacama, Sonoran
+   decoy: Serengeti - A grassland
+   decoy: Amazon - A rainforest
+   decoy: Everglades - A wetland
+   decoy: Andes - Mountains
+   decoy: Pampas - Grasslands
+   decoy: Siberia - A region of Russia
+   decoy: Yukon - A river and a territory
+
+44. [medium] Gases at room temperature
+   belongs: Oxygen, Nitrogen, Hydrogen, Helium, Neon, Chlorine
+   decoy: Mercury - A liquid metal
+   decoy: Bromine - A liquid
+   decoy: Iodine - A solid
+   decoy: Sulfur - A solid
+   decoy: Sodium - A solid metal
+   decoy: Carbon - A solid
+   decoy: Iron - A solid metal
+
+45. [medium] Metals
+   belongs: Iron, Copper, Gold, Aluminum, Zinc, Silver
+   decoy: Carbon - A nonmetal
+   decoy: Sulfur - A nonmetal
+   decoy: Silicon - A metalloid
+   decoy: Glass - Not an element
+   decoy: Diamond - A form of carbon
+   decoy: Quartz - A mineral
+   decoy: Granite - A rock
+
+46. [medium] Bones in the human body
+   belongs: Femur, Tibia, Skull, Rib, Kneecap, Collarbone
+   decoy: Biceps - A muscle
+   decoy: Achilles - A tendon
+   decoy: Aorta - An artery
+   decoy: Retina - Part of the eye
+   decoy: Esophagus - The food pipe
+   decoy: Diaphragm - A muscle
+
+47. [medium] US presidents
+   belongs: George Washington, Abraham Lincoln, Theodore Roosevelt, John F. Kennedy, Thomas Jefferson, Ulysses S. Grant
+   decoy: Benjamin Franklin - Never president
+   decoy: Alexander Hamilton - The first Treasury Secretary
+   decoy: Paul Revere - Famous for his midnight ride
+   decoy: Martin Luther King Jr. - A civil rights leader
+   decoy: Robert E. Lee - A Confederate general
+   decoy: John Hancock - Signed the Declaration, never president
+   decoy: Al Gore - Vice president, never president
+
+48. [medium] Greek gods
+   belongs: Zeus, Athena, Poseidon, Apollo, Hera, Ares
+   decoy: Jupiter - Roman
+   decoy: Mars - Roman
+   decoy: Odin - Norse
+   decoy: Thor - Norse
+   decoy: Ra - Egyptian
+   decoy: Venus - Roman
+   decoy: Anubis - Egyptian
+
+49. [medium] Reptiles
+   belongs: Snake, Lizard, Crocodile, Turtle, Iguana, Gecko
+   decoy: Frog - An amphibian
+   decoy: Salamander - An amphibian
+   decoy: Newt - An amphibian
+   decoy: Axolotl - An amphibian
+   decoy: Toad - An amphibian
+   decoy: Eel - A fish
+
+50. [medium] Members of the Beatles
+   belongs: John Lennon, Paul McCartney, George Harrison, Ringo Starr
+   decoy: Mick Jagger - The Rolling Stones
+   decoy: Elvis Presley - A solo star
+   decoy: Freddie Mercury - Queen
+   decoy: Keith Richards - The Rolling Stones
+   decoy: Pete Townshend - The Who
+   decoy: Bob Dylan - A solo star
+
+51. [medium] States of matter
+   belongs: Solid, Liquid, Gas, Plasma
+   decoy: Energy - Not a state of matter
+   decoy: Heat - A form of energy
+   decoy: Light - A form of energy
+   decoy: Electricity - A flow of charge
+   decoy: Sound - A vibration
+   decoy: Gravity - A force
+
+52. [hard] Directed by Steven Spielberg
+   belongs: Jaws, E.T., Jurassic Park, Raiders of the Lost Ark, Schindler's List
+   decoy: Back to the Future - Directed by Robert Zemeckis (Spielberg produced)
+   decoy: Gremlins - Directed by Joe Dante (Spielberg produced)
+   decoy: The Goonies - Directed by Richard Donner
+   decoy: Star Wars - Directed by George Lucas
+   decoy: Titanic - Directed by James Cameron
+   decoy: The Godfather - Directed by Francis Ford Coppola
+
+53. [hard] Directed by Christopher Nolan
+   belongs: Inception, Interstellar, The Dark Knight, Dunkirk, Memento, Oppenheimer
+   decoy: The Matrix - Directed by the Wachowskis
+   decoy: Gravity - Directed by Alfonso Cuaron
+   decoy: Avatar - Directed by James Cameron
+   decoy: Arrival - Directed by Denis Villeneuve
+   decoy: Blade Runner 2049 - Directed by Denis Villeneuve
+   decoy: Man of Steel - Directed by Zack Snyder (Nolan produced)
+
+54. [hard] Directed by James Cameron
+   belongs: Titanic, Avatar, The Terminator, Aliens, The Abyss, True Lies
+   decoy: Alien - Directed by Ridley Scott - Cameron made the sequel
+   decoy: Jurassic Park - Directed by Steven Spielberg
+   decoy: Predator - Directed by John McTiernan
+   decoy: Independence Day - Directed by Roland Emmerich
+   decoy: RoboCop - Directed by Paul Verhoeven
+   decoy: Interstellar - Directed by Christopher Nolan
+
+55. [hard] Studio Ghibli films
+   belongs: Spirited Away, My Neighbor Totoro, Princess Mononoke, Kiki's Delivery Service, Howl's Moving Castle, Ponyo
+   decoy: Akira - Made by TMS Entertainment
+   decoy: Your Name - Made by CoMix Wave Films
+   decoy: Ghost in the Shell - Made by Production I.G
+   decoy: Paprika - Made by Madhouse
+   decoy: Perfect Blue - Made by Madhouse
+   decoy: Big Hero 6 - Made by Walt Disney Animation Studios
+
+56. [hard] Sitcoms set in New York
+   belongs: Friends, Seinfeld, How I Met Your Mother, Brooklyn Nine-Nine, 30 Rock, Will & Grace
+   decoy: Cheers - Set in Boston
+   decoy: The Office - The US one is set in Scranton
+   decoy: Frasier - Set in Seattle
+   decoy: The Big Bang Theory - Set in Pasadena
+   decoy: Parks and Recreation - Set in Pawnee, Indiana
+   decoy: Modern Family - Set in Los Angeles
+   decoy: Happy Days - Set in Milwaukee
+
+57. [hard] Actors who played James Bond
+   belongs: Sean Connery, Roger Moore, Pierce Brosnan, Daniel Craig, Timothy Dalton, George Lazenby
+   decoy: Michael Caine - Played the spy Harry Palmer, never Bond
+   decoy: Tom Cruise - The Mission: Impossible films
+   decoy: Matt Damon - The Bourne films
+   decoy: Clive Owen - Often tipped, never cast
+   decoy: Idris Elba - Often tipped, never cast
+   decoy: Hugh Jackman - Never played Bond
+
+58. [hard] Members of the Fellowship of the Ring
+   belongs: Frodo, Sam, Gandalf, Aragorn, Legolas, Gimli
+   decoy: Bilbo - Stays behind in Rivendell
+   decoy: Gollum - Never part of the Fellowship
+   decoy: Saruman - A villain
+   decoy: Galadriel - An elf queen who helps them
+   decoy: Elrond - Forms the Fellowship but doesn't join
+   decoy: Faramir - Boromir's brother, not a member
+
+59. [hard] NHL hockey teams
+   belongs: Maple Leafs, Bruins, Canadiens, Red Wings, Blackhawks, Oilers
+   decoy: Raptors - Basketball (NBA)
+   decoy: Blue Jays - Baseball (MLB)
+   decoy: Lions - Football (NFL)
+   decoy: Pistons - Basketball (NBA)
+   decoy: Tigers - Baseball (MLB)
+   decoy: Bulls - Basketball (NBA)
+   decoy: Bears - Football (NFL)
+
+60. [hard] Cities with an NBA team
+   belongs: Boston, Chicago, Miami, Denver, Phoenix, Toronto
+   decoy: Pittsburgh - NFL, MLB and NHL teams, but no NBA
+   decoy: St. Louis - MLB and NHL teams, but no NBA
+   decoy: Kansas City - NFL and MLB teams, but no NBA
+   decoy: Baltimore - NFL and MLB teams, but no NBA
+   decoy: Nashville - NFL and NHL teams, but no NBA
+   decoy: San Diego - An MLB team, but no NBA
+   decoy: Tampa - NFL, MLB and NHL teams, but no NBA
+
+61. [hard] English football clubs
+   belongs: Arsenal, Liverpool, Chelsea, Everton, Aston Villa, Newcastle United
+   decoy: Real Madrid - Spanish
+   decoy: Barcelona - Spanish
+   decoy: Juventus - Italian
+   decoy: Bayern Munich - German
+   decoy: Celtic - Scottish
+   decoy: Ajax - Dutch
+   decoy: Paris Saint-Germain - French
+   decoy: Rangers - Scottish
+
+62. [hard] Summer Olympics host cities
+   belongs: Tokyo, London, Sydney, Beijing, Paris, Barcelona
+   decoy: Vancouver - Hosted the Winter Games (2010)
+   decoy: Sochi - Hosted the Winter Games (2014)
+   decoy: Pyeongchang - Hosted the Winter Games (2018)
+   decoy: Salt Lake City - Hosted the Winter Games (2002)
+   decoy: Calgary - Hosted the Winter Games (1988)
+   decoy: Lillehammer - Hosted the Winter Games (1994)
+   decoy: Chamonix - Hosted the first Winter Games (1924)
+
+63. [hard] Countries that use the euro
+   belongs: France, Germany, Italy, Spain, Ireland, Portugal
+   decoy: United Kingdom - Uses the pound
+   decoy: Switzerland - Uses the Swiss franc
+   decoy: Sweden - Uses the krona
+   decoy: Denmark - Uses the krone
+   decoy: Norway - Uses the krone
+   decoy: Poland - Uses the zloty
+   decoy: Czech Republic - Uses the koruna
+
+64. [hard] Landlocked countries
+   belongs: Switzerland, Austria, Bolivia, Nepal, Mongolia, Paraguay
+   decoy: Portugal - On the Atlantic
+   decoy: Chile - On the Pacific
+   decoy: Peru - On the Pacific
+   decoy: Vietnam - On the South China Sea
+   decoy: Croatia - On the Adriatic Sea
+   decoy: Belgium - On the North Sea
+   decoy: Bangladesh - On the Bay of Bengal
+
+65. [hard] US states that border Canada
+   belongs: Alaska, Washington, Montana, Minnesota, Maine, New York
+   decoy: Oregon - Doesn't touch Canada
+   decoy: Wyoming - Doesn't touch Canada
+   decoy: Wisconsin - Doesn't touch Canada
+   decoy: Iowa - Doesn't touch Canada
+   decoy: Massachusetts - Doesn't touch Canada
+   decoy: Connecticut - Doesn't touch Canada
+   decoy: South Dakota - Doesn't touch Canada
+
+66. [hard] US state capitals
+   belongs: Sacramento, Austin, Albany, Tallahassee, Springfield, Harrisburg
+   decoy: Los Angeles - California's capital is Sacramento
+   decoy: Houston - Texas's capital is Austin
+   decoy: New York City - New York's capital is Albany
+   decoy: Miami - Florida's capital is Tallahassee
+   decoy: Chicago - Illinois's capital is Springfield
+   decoy: Philadelphia - Pennsylvania's capital is Harrisburg
+   decoy: Seattle - Washington's capital is Olympia
+
+67. [hard] Islands
+   belongs: Greenland, Madagascar, Iceland, Borneo, Cuba, Tasmania
+   decoy: Florida - A peninsula
+   decoy: Italy - A peninsula
+   decoy: Korea - A peninsula
+   decoy: Baja California - A peninsula
+   decoy: Scandinavia - A peninsula
+   decoy: Iberia - A peninsula (Spain and Portugal)
+   decoy: Yucatan - A peninsula
+
+68. [hard] Noble gases
+   belongs: Helium, Neon, Argon, Krypton, Xenon, Radon
+   decoy: Hydrogen - Very reactive, not noble
+   decoy: Oxygen - Very reactive
+   decoy: Nitrogen - Not a noble gas
+   decoy: Chlorine - A halogen
+   decoy: Fluorine - A halogen
+   decoy: Carbon dioxide - A compound, not an element
+
+69. [hard] Planets with rings
+   belongs: Saturn, Jupiter, Uranus, Neptune
+   decoy: Mars - No rings
+   decoy: Venus - No rings
+   decoy: Mercury - No rings
+   decoy: Earth - No rings
+   decoy: Pluto - A dwarf planet, no rings
+   decoy: The Moon - Earth's moon, no rings
+
+70. [hard] Invented in the 1900s
+   belongs: Airplane, Television, Microwave oven, Personal computer, Video game console, Ballpoint pen
+   decoy: Telephone - Patented in 1876
+   decoy: Light bulb - Edison's worked in 1879
+   decoy: Printing press - Around 1440
+   decoy: Steam engine - Early 1700s
+   decoy: Telescope - 1608
+   decoy: Phonograph - 1877
+   decoy: Bicycle - The 1800s
+
+71. [hard] Seven Wonders of the Ancient World
+   belongs: Great Pyramid of Giza, Hanging Gardens of Babylon, Colossus of Rhodes, Lighthouse of Alexandria, Temple of Artemis, Statue of Zeus
+   decoy: Stonehenge - Not on the ancient list
+   decoy: Great Wall of China - Not on the ancient list
+   decoy: Colosseum - Not on the ancient list
+   decoy: Parthenon - Not on the ancient list
+   decoy: Taj Mahal - Built in the 1600s
+   decoy: Machu Picchu - Not on the ancient list
+   decoy: Petra - Not on the ancient list
+
+72. [hard] Norse gods
+   belongs: Odin, Thor, Loki, Freya, Frigg, Baldur
+   decoy: Zeus - Greek
+   decoy: Hermes - Greek
+   decoy: Osiris - Egyptian
+   decoy: Mercury - Roman
+   decoy: Apollo - Greek and Roman
+   decoy: Isis - Egyptian
+
+73. [hard] Parts of the eye
+   belongs: Retina, Iris, Pupil, Cornea, Lens, Optic nerve
+   decoy: Cochlea - In the ear
+   decoy: Eardrum - In the ear
+   decoy: Alveoli - In the lungs
+   decoy: Tonsils - In the throat
+   decoy: Molar - A tooth
+   decoy: Larynx - The voice box
+
+74. [hard] Parts of the ear
+   belongs: Eardrum, Cochlea, Hammer, Anvil, Stirrup, Ear canal
+   decoy: Retina - In the eye
+   decoy: Iris - In the eye
+   decoy: Cornea - In the eye
+   decoy: Larynx - The voice box
+   decoy: Uvula - At the back of the throat
+   decoy: Pupil - In the eye
+
+75. [hard] Vitamins
+   belongs: Vitamin A, Vitamin C, Vitamin D, Vitamin E, Vitamin K, Vitamin B12
+   decoy: Iron - A mineral
+   decoy: Calcium - A mineral
+   decoy: Zinc - A mineral
+   decoy: Magnesium - A mineral
+   decoy: Potassium - A mineral
+   decoy: Omega-3 - A fatty acid
+   decoy: Protein - A macronutrient
+
+76. [hard] Muscles
+   belongs: Biceps, Triceps, Hamstrings, Quadriceps, Deltoid, Gluteus maximus
+   decoy: Femur - A bone
+   decoy: Humerus - A bone
+   decoy: Tibia - A bone
+   decoy: Achilles - A tendon
+   decoy: Patella - A bone (the kneecap)
+   decoy: Spleen - An organ
+
+77. [hard] Dinosaurs
+   belongs: Tyrannosaurus, Triceratops, Stegosaurus, Velociraptor, Brachiosaurus, Ankylosaurus
+   decoy: Pterodactyl - A flying reptile, not a dinosaur
+   decoy: Woolly mammoth - A mammal
+   decoy: Plesiosaur - A marine reptile, not a dinosaur
+   decoy: Saber-toothed cat - A mammal
+   decoy: Dimetrodon - Older than the dinosaurs, closer to mammals
+   decoy: Mosasaur - A marine reptile, not a dinosaur
+
+78. [hard] Marsupials
+   belongs: Kangaroo, Koala, Wombat, Opossum, Wallaby, Tasmanian devil
+   decoy: Platypus - Lays eggs - a monotreme
+   decoy: Echidna - Lays eggs - a monotreme
+   decoy: Sloth - Not a marsupial
+   decoy: Lemur - A primate
+   decoy: Raccoon - Not a marsupial
+   decoy: Meerkat - A mongoose
+   decoy: Red panda - Not a marsupial
+
+79. [hard] Renaissance painters
+   belongs: Leonardo da Vinci, Michelangelo, Raphael, Botticelli, Titian
+   decoy: Picasso - 1900s
+   decoy: Van Gogh - 1800s
+   decoy: Monet - 1800s Impressionist
+   decoy: Rembrandt - Dutch Golden Age, 1600s
+   decoy: Dali - 1900s
+   decoy: Frida Kahlo - 1900s
+   decoy: Warhol - 1900s
+
+80. [hard] Plays by Shakespeare
+   belongs: Hamlet, Macbeth, Othello, Romeo and Juliet, King Lear, The Tempest
+   decoy: Doctor Faustus - By Christopher Marlowe
+   decoy: Pride and Prejudice - A novel by Jane Austen
+   decoy: Oliver Twist - A novel by Charles Dickens
+   decoy: The Odyssey - An epic poem by Homer
+   decoy: Paradise Lost - A poem by John Milton
+   decoy: Don Quixote - A novel by Cervantes
+   decoy: Les Miserables - A novel by Victor Hugo
+
+81. [hard] Simple machines
+   belongs: Lever, Pulley, Wedge, Screw, Wheel and axle, Inclined plane
+   decoy: Spring - Not one of the six
+   decoy: Battery - Stores energy
+   decoy: Engine - A complex machine
+   decoy: Magnet - Not a machine
+   decoy: Pendulum - Not one of the six
+   decoy: Motor - A complex machine
+
