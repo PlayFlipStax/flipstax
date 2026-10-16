@@ -52,7 +52,7 @@ A bright, cheeky 70s/80s TV game show.
 | Time Warp | violet |
 | Word Warp | red |
 | Orbit Drop | deep-space neon |
-| Lucky Lights | deep red and white marquee bulbs on a dark teal stage (Oct 16) |
+| Lucky Lights | palette 1 for now: burgundy velvet with warm gold bulbs (Oct 16 - Rick is choosing between 1, burgundy and gold; 2, midnight indigo with white and yellow bulbs and hot-pink accents; 3, near-black with rainbow bulbs and bright white tiles; the GOOP is slime green on all three) |
 
 ### Bulbs
 
@@ -79,7 +79,7 @@ earned tile glows gold with a "?", a missed tile shows a red X. Letters appear o
 - Cold open: slower curtain (about 4s). No alien head or floating cards. Host at center stage with WELCOME TO FLIPSTAX plates. Every plate on screen at least 1 second.
 - VS cards: never punish a minority pick (no red X, no buzzer, no MISSED). Neutral 'HOT TAKE!' tag. Red X and buzzer only for Brain Beam and Riddle. Selection sounds: higher DING (top) and lower DONG (bottom).
 - Mystery Games: cut Oddball Alert and Price Probe. Riddle is a fixed slot (Game 1). Pool for Game 2: Emoji Decode x2, Crowd Scan x2, Time Warp, Peak or Plunge, Snap Sort, Zap Words, Twin Flip, Fact or Fib (only after review), Saucer Shuffle. No game on consecutive days. Mystery wheel replaced by a quick host reveal. Cosmic Surprise becomes a small 3-reel slot machine.
-- Lucky Lights is the favorite; recolor to deep red and white marquee bulbs on dark teal.
+- Lucky Lights is the favorite. (Oct 16: the red-and-white-on-teal and the earlier gold-and-black looks are out; three palettes to pick from in the TEST menu or with ?luckytheme=1, 2 or 3 - palette 1 until Rick picks.)
 - Word Warp: UFO hovers over tiles; correct = tractor beam lifts the letters with an animal chosen by the date seed (a cow, or a different animal each episode); wrong = beam flickers.
 - Disco celebration (single exception to 'one host per screen'): on a Mothership jackpot, the UFO lowers a disco ball, a second alien hops out, they dance about 4 seconds, tap to skip, max once per episode.
 - Later ideas (not yet built): Space-Age Inflation (then-and-now price slider), Yesterday's Survey (needs real votes), typed daily riddle, arcade-style Orbit Drop with a UFO laser ball, Sunday Big Show, grey-alien merch character, real sponsor slot in the commercial break.

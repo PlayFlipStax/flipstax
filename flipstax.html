@@ -2800,30 +2800,77 @@
   @keyframes llSlime{ 0%{ opacity:0; transform:scale(0.3); } 12%{ opacity:1; transform:scale(1.08); } 20%{ transform:scale(1); } 75%{ opacity:1; transform:translateY(14px) scaleY(1.06); } 100%{ opacity:0.85; transform:translateY(30px) scaleY(1.12); } }
   .slimed .ll-hub-t{ color:#7dff5a; text-shadow:0 0 12px rgba(120,255,90,0.8); }
   @media (prefers-reduced-motion: reduce){ .ll-spot, .ll-sq.hit{ animation:none; } .slimed .ll-slime{ animation:none; opacity:0.85; } }
-  /* ---- D5 (Oct 16): Lucky Lights' world - deep red and white marquee bulbs on a dark teal stage (was gold and black). ---- */
-  .lucky-overlay{ background:radial-gradient(120% 80% at 50% 45%, #0d5560, #04282e 60%, #011417); }
-  .lucky-overlay .ll-spot{ background:linear-gradient(180deg, rgba(255,250,240,0.6), rgba(255,240,230,0) 80%); }
-  .ll-title{ position:relative; color:#fff; background:linear-gradient(180deg, #7a0618, #3a020c); border:3px solid #fff; padding:10px 20px;
-    text-shadow:0 3px 0 #5a0010, 0 0 16px rgba(255,80,100,0.75); box-shadow:0 0 0 3px #3a020c, 0 0 28px rgba(255,40,70,0.45); }
+  /* ---- G7 (Oct 16): Lucky Lights palettes - every colour is a variable; data-ll on the overlay picks the palette
+     (1 burgundy velvet + warm gold bulbs, the default; 2 midnight indigo + white and yellow bulbs + hot pink;
+     3 near-black + rainbow bulbs + bright white tiles). The GOOP stays slime green on all three. ---- */
+  .lucky-overlay, .lucky-overlay[data-ll="1"]{
+    --ll-bg1:#5a0f22; --ll-bg2:#2e0612; --ll-bg3:#14020a; --ll-spot:rgba(255,226,170,0.55);
+    --ll-title-a:#7c1530; --ll-title-b:#3a0614; --ll-title-edge:#ffd27a; --ll-title-ink:#fff4d6; --ll-title-glow:rgba(255,190,90,0.6);
+    --ll-b1:#ffd27a; --ll-b2:#ffb347; --ll-b3:#ffd27a; --ll-b4:#ffb347; --ll-b5:#ffd27a; --ll-b6:#ffb347;
+    --ll-bank-edge:rgba(255,200,110,0.7); --ll-bank-bg:rgba(30,4,12,0.7);
+    --ll-ring-in:#4a0c1d; --ll-ring-out:#24050e; --ll-ring-edge1:#3a0715; --ll-ring-edge2:#e0a640; --ll-ring-edge3:#ffe0a0; --ll-ring-glow:rgba(255,180,80,0.35);
+    --ll-sq-a:#6a1128; --ll-sq-b:#36060f; --ll-sq-edge:#c8913a; --ll-sq-ink:#ffe8c0;
+    --ll-on-a:#fff6d8; --ll-on-b:#ffcf6a; --ll-on-edge:#fff; --ll-on-ink:#5a0f22; --ll-on-glow:rgba(255,205,110,0.9);
+    --ll-hub-a:#6a1128; --ll-hub-b:#1e030b; --ll-hub-edge:#e0a640; --ll-hub-ring:#ffe0a0; --ll-hub-glow:rgba(255,180,80,0.3);
+    --ll-ink:#fff4d6; --ll-ink-glow:rgba(255,190,90,0.8); --ll-soft:#f5dcc0;
+    --ll-again-a:#fff6d8; --ll-again-b:#ffcf6a; --ll-again-ink:#5a0f22; --ll-stop-a:#e8503f; --ll-stop-b:#9c1420; --ll-marquee-a:#ffd27a; --ll-marquee-b:#ffb347; }
+  .lucky-overlay[data-ll="2"]{
+    --ll-bg1:#22206e; --ll-bg2:#110f44; --ll-bg3:#06051f; --ll-spot:rgba(220,225,255,0.5);
+    --ll-title-a:#2d2a8c; --ll-title-b:#14124d; --ll-title-edge:#ff4fb4; --ll-title-ink:#ffffff; --ll-title-glow:rgba(255,79,180,0.6);
+    --ll-b1:#ffffff; --ll-b2:#ffe14a; --ll-b3:#ffffff; --ll-b4:#ffe14a; --ll-b5:#ffffff; --ll-b6:#ffe14a;
+    --ll-bank-edge:rgba(255,79,180,0.75); --ll-bank-bg:rgba(8,7,32,0.72);
+    --ll-ring-in:#1d1b66; --ll-ring-out:#0c0a34; --ll-ring-edge1:#13114a; --ll-ring-edge2:#ff4fb4; --ll-ring-edge3:#ffffff; --ll-ring-glow:rgba(255,79,180,0.35);
+    --ll-sq-a:#2a2785; --ll-sq-b:#14124d; --ll-sq-edge:#ff4fb4; --ll-sq-ink:#ffffff;
+    --ll-on-a:#ffffff; --ll-on-b:#ffe14a; --ll-on-edge:#ff4fb4; --ll-on-ink:#14124d; --ll-on-glow:rgba(255,225,74,0.9);
+    --ll-hub-a:#2a2785; --ll-hub-b:#08072a; --ll-hub-edge:#ff4fb4; --ll-hub-ring:#ffffff; --ll-hub-glow:rgba(255,79,180,0.3);
+    --ll-ink:#ffffff; --ll-ink-glow:rgba(255,79,180,0.85); --ll-soft:#e2e4ff;
+    --ll-again-a:#ff7ccb; --ll-again-b:#e0218e; --ll-again-ink:#ffffff; --ll-stop-a:#ff6fc5; --ll-stop-b:#c4126f; --ll-marquee-a:#ffffff; --ll-marquee-b:#ffe14a; }
+  .lucky-overlay[data-ll="3"]{
+    --ll-bg1:#1b1b22; --ll-bg2:#0c0c10; --ll-bg3:#030304; --ll-spot:rgba(255,255,255,0.45);
+    --ll-title-a:#18181f; --ll-title-b:#08080b; --ll-title-edge:#ffffff; --ll-title-ink:#ffffff; --ll-title-glow:rgba(255,255,255,0.5);
+    --ll-b1:#ff3b4f; --ll-b2:#ff9d2e; --ll-b3:#ffe74a; --ll-b4:#3fe07a; --ll-b5:#3fb8ff; --ll-b6:#b56bff;
+    --ll-bank-edge:rgba(255,255,255,0.7); --ll-bank-bg:rgba(0,0,0,0.72);
+    --ll-ring-in:#141418; --ll-ring-out:#060607; --ll-ring-edge1:#0a0a0c; --ll-ring-edge2:#ffffff; --ll-ring-edge3:#3fb8ff; --ll-ring-glow:rgba(255,255,255,0.25);
+    --ll-sq-a:#ffffff; --ll-sq-b:#e9e9ef; --ll-sq-edge:#ffffff; --ll-sq-ink:#141418;
+    --ll-on-a:#fffbe0; --ll-on-b:#ffe74a; --ll-on-edge:#ff3b4f; --ll-on-ink:#141418; --ll-on-glow:rgba(255,240,120,0.95);
+    --ll-hub-a:#1e1e26; --ll-hub-b:#050506; --ll-hub-edge:#ffffff; --ll-hub-ring:#3fb8ff; --ll-hub-glow:rgba(255,255,255,0.25);
+    --ll-ink:#ffffff; --ll-ink-glow:rgba(255,255,255,0.7); --ll-soft:#e6e6ee;
+    --ll-again-a:#ffffff; --ll-again-b:#dcdce6; --ll-again-ink:#141418; --ll-stop-a:#ff5a64; --ll-stop-b:#c81e2e; --ll-marquee-a:#ff3b4f; --ll-marquee-b:#3fb8ff; }
+  .lucky-overlay{ background:radial-gradient(120% 80% at 50% 45%, var(--ll-bg1), var(--ll-bg2) 60%, var(--ll-bg3)); }
+  .lucky-overlay .ll-spot{ background:linear-gradient(180deg, var(--ll-spot), rgba(255,255,255,0) 80%); }
+  .ll-title{ position:relative; color:var(--ll-title-ink); background:linear-gradient(180deg, var(--ll-title-a), var(--ll-title-b)); border:3px solid var(--ll-title-edge); padding:10px 20px;
+    text-shadow:0 3px 0 rgba(0,0,0,0.45), 0 0 16px var(--ll-title-glow); box-shadow:0 0 0 3px var(--ll-title-b), 0 0 28px var(--ll-title-glow); }
   .ll-title span{ position:relative; z-index:3; }
-  .ll-title .sign-bulbs i:nth-child(odd){ --bulb:#ffffff; } .ll-title .sign-bulbs i:nth-child(even){ --bulb:#ff2a3c; }
-  .ll-bank{ color:#fff; border-color:rgba(255,80,100,0.7); background:rgba(1,20,23,0.7); }
-  .ll-ring{ background:radial-gradient(circle, #073a40 40%, #03191c 62%, transparent 63%); box-shadow:0 0 0 6px #05262b, 0 0 0 9px #b0122e, 0 0 0 11px #fff, 0 0 40px rgba(255,40,70,0.35); }
+  .ll-title .sign-bulbs i:nth-child(6n+1){ --bulb:var(--ll-b1); } .ll-title .sign-bulbs i:nth-child(6n+2){ --bulb:var(--ll-b2); } .ll-title .sign-bulbs i:nth-child(6n+3){ --bulb:var(--ll-b3); }
+  .ll-title .sign-bulbs i:nth-child(6n+4){ --bulb:var(--ll-b4); } .ll-title .sign-bulbs i:nth-child(6n+5){ --bulb:var(--ll-b5); } .ll-title .sign-bulbs i:nth-child(6n){ --bulb:var(--ll-b6); }
+  .ll-bank{ color:var(--ll-ink); border-color:var(--ll-bank-edge); background:var(--ll-bank-bg); }
+  .ll-ring{ background:radial-gradient(circle, var(--ll-ring-in) 40%, var(--ll-ring-out) 62%, transparent 63%); box-shadow:0 0 0 6px var(--ll-ring-edge1), 0 0 0 9px var(--ll-ring-edge2), 0 0 0 11px var(--ll-ring-edge3), 0 0 40px var(--ll-ring-glow); }
   .ll-rim{ position:absolute; inset:0; pointer-events:none; }
   .ll-rim i{ position:absolute; left:50%; top:50%; width:8px; height:8px; margin:-4px 0 0 -4px; border-radius:50%;
     transform:translate(calc(var(--x) * (var(--r) + 34px)), calc(var(--y) * (var(--r) + 34px)));
-    background:var(--c); box-shadow:0 0 6px var(--c); --c:#fff; animation:llRim 0.8s steps(1) infinite; animation-delay:calc(var(--k) * -0.4s); }
-  .ll-rim i:nth-child(even){ --c:#ff2a3c; }
+    background:var(--c); box-shadow:0 0 6px var(--c); --c:var(--ll-b1); animation:llRim 0.8s steps(1) infinite; animation-delay:calc(var(--k) * -0.4s); }
+  .ll-rim i:nth-child(6n+2){ --c:var(--ll-b2); } .ll-rim i:nth-child(6n+3){ --c:var(--ll-b3); } .ll-rim i:nth-child(6n+4){ --c:var(--ll-b4); } .ll-rim i:nth-child(6n+5){ --c:var(--ll-b5); } .ll-rim i:nth-child(6n){ --c:var(--ll-b6); }
   @keyframes llRim{ 0%{ opacity:1; } 50%{ opacity:0.3; } }
-  .ll-sq{ background:linear-gradient(180deg, #0a4a52, #03222a); border-color:#b0122e; color:#fff; }
-  .ll-sq.on{ background:linear-gradient(180deg, #ffffff, #ffd9de); border-color:#ff2a3c; color:#7a0618; box-shadow:0 0 18px 4px rgba(255,60,90,0.85); }
-  .ll-hub{ background:radial-gradient(circle at 40% 35%, #0d5560, #021a1e 70%); border-color:#b0122e; box-shadow:inset 0 0 24px rgba(255,60,90,0.3), 0 0 0 3px #fff; }
-  .ll-hub-t{ color:#fff; text-shadow:0 0 12px rgba(255,80,100,0.85); }
-  .ll-hub-s, .ll-note{ color:#d8f6f8; }
-  .ll-btn.again{ background:linear-gradient(180deg, #ffffff, #ffd9de); color:#7a0618; }
+  .ll-sq{ background:linear-gradient(180deg, var(--ll-sq-a), var(--ll-sq-b)); border-color:var(--ll-sq-edge); color:var(--ll-sq-ink); }
+  .ll-sq.on{ background:linear-gradient(180deg, var(--ll-on-a), var(--ll-on-b)); border-color:var(--ll-on-edge); color:var(--ll-on-ink); box-shadow:0 0 18px 4px var(--ll-on-glow); }
+  .ll-sq.goop{ color:#2fa810; border-color:#3a9a1a; }
+  .lucky-overlay:not([data-ll="3"]) .ll-sq.goop{ color:#7dff5a; }
+  .ll-sq.goop.on{ background:linear-gradient(180deg, #c8ff9a, #39d42a); border-color:#eaffd6; color:#0d3a05; box-shadow:0 0 18px 4px rgba(120,255,90,0.85); }
+  .ll-hub{ background:radial-gradient(circle at 40% 35%, var(--ll-hub-a), var(--ll-hub-b) 70%); border-color:var(--ll-hub-edge); box-shadow:inset 0 0 24px var(--ll-hub-glow), 0 0 0 3px var(--ll-hub-ring); }
+  .ll-hub-t{ color:var(--ll-ink); text-shadow:0 0 12px var(--ll-ink-glow); }
+  .ll-hub-s, .ll-note{ color:var(--ll-soft); }
+  .ll-btn.again{ background:linear-gradient(180deg, var(--ll-again-a), var(--ll-again-b)); color:var(--ll-again-ink); }
+  .ll-sq.dbl{ color:var(--ll-sq-ink); font-weight:900; }
+  .ll-sq.dbl.on{ color:var(--ll-on-ink); }
+  .ll-btn.stop{ background:linear-gradient(180deg, var(--ll-stop-a), var(--ll-stop-b)); }
   :root.lite .ll-rim i, :root.lite .ll-spot{ animation:none !important; }
-  :root:has(#luckyOverlay:not(.hidden)) .show-marquee{ --bulb:#ffffff !important; }
-  :root:has(#luckyOverlay:not(.hidden)) .show-marquee i:nth-child(even){ background:#ff2a3c; box-shadow:0 0 7px #ff2a3c, 0 0 0 1.5px rgba(40,10,20,0.55); }
+  :root:has(#luckyOverlay:not(.hidden)) .show-marquee{ --bulb:#ffd27a !important; }
+  :root:has(#luckyOverlay:not(.hidden)) .show-marquee i:nth-child(even){ background:#ffb347; box-shadow:0 0 7px #ffb347, 0 0 0 1.5px rgba(40,10,20,0.55); }
+  :root:has(#luckyOverlay[data-ll="2"]:not(.hidden)) .show-marquee{ --bulb:#ffffff !important; }
+  :root:has(#luckyOverlay[data-ll="2"]:not(.hidden)) .show-marquee i:nth-child(even){ background:#ffe14a; box-shadow:0 0 7px #ffe14a, 0 0 0 1.5px rgba(10,8,40,0.55); }
+  :root:has(#luckyOverlay[data-ll="3"]:not(.hidden)) .show-marquee i:nth-child(3n+1){ background:#ff3b4f; box-shadow:0 0 7px #ff3b4f; }
+  :root:has(#luckyOverlay[data-ll="3"]:not(.hidden)) .show-marquee i:nth-child(3n+2){ background:#ffe74a; box-shadow:0 0 7px #ffe74a; }
+  :root:has(#luckyOverlay[data-ll="3"]:not(.hidden)) .show-marquee i:nth-child(3n){ background:#3fb8ff; box-shadow:0 0 7px #3fb8ff; }
   @media (prefers-reduced-motion: reduce){ .ll-rim i{ animation:none; } }
   /* The commercial break: a 3-second fake 70s ad with a VHS wobble. Skippable. */
   .show-card.ad{ background:#000; overflow:hidden; }
@@ -10577,10 +10624,20 @@
       '<g fill="rgba(255,255,255,0.45)"><ellipse cx="92" cy="186" rx="16" ry="9"/><ellipse cx="282" cy="440" rx="18" ry="10"/></g>' +
       '<text x="200" y="352" text-anchor="middle" transform="rotate(-8 200 352)" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="70" letter-spacing="2" fill="#eaffd6" stroke="#2a7a10" stroke-width="8" paint-order="stroke">GOOPED!</text></svg>';
   })();
+  // G7: three Lucky Lights palettes (all colours are CSS variables; see .lucky-overlay[data-ll]). ?luckytheme=1, 2
+  // or 3 picks one; in replay mode the TEST menu's "Lucky palette" jumps remember the pick. Palette 1 until Rick picks.
+  const LUCKY_THEMES = { 1:'burgundy velvet, warm gold bulbs', 2:'midnight indigo, white and yellow bulbs, hot pink', 3:'near-black, rainbow bulbs, white tiles' };
+  function luckyTheme(){
+    const q = new URLSearchParams(location.search).get('luckytheme');
+    if (LUCKY_THEMES[q]) return q;
+    if (REPLAY){ try{ const s = localStorage.getItem('flipstax_lucky_theme'); if (LUCKY_THEMES[s]) return s; }catch(e){} }
+    return '1';
+  }
   function luckyLabel(k){ return k === 'KEY' ? '🔑' : k === 'CHIP' ? '🪙' : k === 'x2' ? '×2' : k; }
   function runLuckyLights(st, done){
     if (!luckyOv){ luckyOv = document.createElement('div'); luckyOv.className = 'lucky-overlay hidden'; luckyOv.id = 'luckyOverlay'; luckyOv.setAttribute('role', 'dialog'); luckyOv.setAttribute('aria-label', 'Lucky Lights'); document.body.appendChild(luckyOv); }
     stopTallyPolling(); clearRoundTimer(); voted = false; votedSinceTime = null;
+    luckyOv.dataset.ll = luckyTheme();
     runCurrentGame = 'Lucky Lights';
     const act3 = Math.round(runActPts[runActIdx] || 0), gen = ++luckyGen;
     let bank = 0, dbl = false, keys = 0, chips = 0, spins = 0, pos = 0, timer = null, autoT = null, state = 'idle';
@@ -16878,6 +16935,7 @@
       { label:'Act 3 card', go: actCard(RUNDOWN.acts.findIndex(a=> a.id === 'act3')) },
       { label:'Lucky Lights', go: atType(s=> s.t === 'lucky', 0, 180, 5, ()=>{ window.__forceLucky = null; }) },
       { label:'Lucky: GOOP', go: atType(s=> s.t === 'lucky', 0, 180, 5, ()=>{ window.__forceLucky = 'GOOP'; }) },
+      ...[1, 2, 3].map(n=> ({ label:'Lucky palette ' + n, go: atType(s=> s.t === 'lucky', 0, 180, 5, ()=>{ window.__forceLucky = null; try{ localStorage.setItem('flipstax_lucky_theme', String(n)); }catch(e){} }) })),
       { label:'Price Probe', go: mysteryAs('priceProbe') },
       { label:'Oddball Alert', go: mysteryAs('oddballAlert') },
       { label:'Emoji Decode', go: mysteryAs('emojiDecode') },
