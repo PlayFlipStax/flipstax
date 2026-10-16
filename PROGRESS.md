@@ -44,3 +44,17 @@ new fonts, original art, no real brand or show names, every new game gets a TEST
 - [x] E4. Twin Flip: 4x4 memory match, original 70s/80s neon icons, 25s, stage look after refs/memory-match
 - [x] E5. Fact or Fib: host pops up with a statement, TRUE / FIB buttons, ~6s each, 5 statements, +10 each, +20 for 5/5, a one-line reaction after each; ~120 statements in data/fact-or-fib.js + data/fact-or-fib.txt, marked NOT FACT-CHECKED, out of rotation until FACT_OR_FIB_REVIEWED
 - [x] E6. Saucer Shuffle: three saucers on a table, the host shuffles them (arms and eyes follow the logic's exact positions), 3 rounds faster each time, tap the star's saucer, +10, ~25s
+
+## F. Fix pass (Oct 16, after the mega build)
+
+- [ ] F1. Fact or Fib: TRUE / FIB fully visible and tappable on a 390x844 phone (safe-area padding), the host's bubble never covers them, the statement stays readable with the one-line fact after the answer
+- [ ] F2. VS with no real crowd (first vote, or under 30 votes): no CROWD SAYS numbers and no HOT TAKE / BOLD PICK - a friendly "You're the first to vote!" note instead (keep "Early crowd" under 30 if it exists); same rule in Crowd Scan
+- [ ] F3. The HOT TAKE / BOLD PICK tag as a corner pill at the card's edge, off the art
+- [ ] F4. Menu: TONIGHT'S EPISODE n as the title (keep the same-show-for-everyone line), "How to play" (no "Daily"), less empty space at the top
+- [ ] F5. Landing: host ~40% larger and centred on the stage, tighter spacing so logo, episode line, button and host read as one scene
+- [ ] F6. Act cards: the new host cropped (head and shoulders with the mic) instead of the old head-only alien
+- [ ] F7. Star wipe ~60% of its size; the card fully readable for at least 1 s
+- [ ] F8. Host SVG: a short neck; fix the arm hanging behind the body; Saucer Shuffle arms normal length with sleeve and hand shapes
+- [ ] F9. Peak or Plunge and Fact or Fib fill a tall screen (bigger blocks and buttons, spread vertically)
+- [ ] F10. Zap Words: why MELO counted; only real, common English words; report the final list size
+- [ ] F11. PEAK_OR_PLUNGE_REVIEWED = false (out of the rotation, TEST menu still plays it); data/peak-or-plunge.txt export; data/fact-or-fib.txt up to date; nothing marked reviewed
