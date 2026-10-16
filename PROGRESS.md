@@ -15,7 +15,7 @@ new fonts, original art, no real brand or show names, every new game gets a TEST
 
 ## B. Bugs
 
-- [ ] B1. Brain Beam answers don't register after a TEST-menu jump
+- [x] B1. Brain Beam answers don't register after a TEST-menu jump
 - [ ] B2. A normal full run (?replay=1, no TEST menu) never repeats a VS card and never skips an act or Mystery Game (Mewtwo vs Mew repeating, "speeding up and skipping")
 - [ ] B3. The star wipe is too big / covers the screen too long: cap it so the card is visible at least 1s
 - [ ] B4. Orbit Drop: "See your results" only after the last chip lands

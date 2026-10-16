@@ -9945,7 +9945,10 @@
     showColdOpen(beginShow);
   }
   function beginShow(){
-    if (!runActive) return;
+    // Only from the cold open, once: a second start (a stale cold-open tap after a TEST-menu restart used to call
+    // this again) dealt a second card stream over the first and reset a live Brain Beam to 'running', so its answer
+    // was dropped (B1), and doubled the dealing (B2's 'speeding up and skipping').
+    if (!runActive || runPhase !== 'coldopen') return;
     // Warm-up while the bumper plays (the cold open's tap is a user
     // gesture): the audio context, and one invisible particle so the first
     // vote's sparkle doesn't pay the first-use cost. (4x CPU: the first tap
