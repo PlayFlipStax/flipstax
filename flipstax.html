@@ -3107,6 +3107,32 @@
   .lb-host{ position:absolute; z-index:2; right:2vw; bottom:calc(5vh + env(safe-area-inset-bottom)); width:min(30vw, 150px); }
   @media (max-height:700px){ .lb-host{ width:min(24vw, 112px); } .lb-tonight{ margin-bottom:12px; } .lb-sign{ margin-bottom:12px; } }
   :root.lite .home-overlay .home-enter-btn{ animation:none; }
+  /* ---- A2 (Oct 2026): after Enter - the menu and the page between screens are the same studio set (no more sky or the
+     moving gold Infinity look). The page's own set sits under everything (each game's world covers it while it plays). */
+  body{ background:#1d0636; }
+  .studio.page-set{ position:fixed; z-index:-5; }
+  :root:is(.mode-daily, .mode-infinity) .studio.page-set{ display:none; }   /* (a game's own world covers the page while it plays: no hidden motion) */
+  :root.mode-infinity body::before, :root.mode-infinity body::after{ display:none !important; }
+  .split-select-overlay.one-show{ background:#1d0636; }
+  .one-show .ms-sky{ background:transparent; }
+  .one-show .ms-sky .ms-bg::before{ display:none; }
+  .one-show .ms-body-daily .ms-wm{ color:#fff3c4; animation:none; text-shadow:0 0 10px rgba(255,200,90,0.85), 0 0 24px rgba(255,90,200,0.6); }
+  .one-show .ms-body-daily .ms-wm svg g{ stroke:#2a0838; }
+  .one-show .ms-body-daily .ms-tag{ color:#ff8ad4; text-shadow:0 0 12px rgba(255,60,172,0.75); }
+  .one-show .ms-body-daily .ms-desc, .one-show .ms-body-daily .ms-desc-short{ color:#f1e6ff; text-shadow:0 1px 3px rgba(20,0,40,0.8); }
+  .one-show .ms-body-daily .ms-cta{ background:linear-gradient(180deg, #fff5c4, #ffd23f 45%, #f29b00); color:#3a1500; border:3px solid #fff3c4;
+    box-shadow:0 5px 0 #8a4a00, 0 0 26px rgba(255,200,60,0.7); animation:lbEnterGlow 2.4s ease-in-out infinite; }
+  .one-show .ms-streak{ background:rgba(20,4,36,0.75); color:#ffe9a0; box-shadow:0 0 0 1.5px rgba(255,214,90,0.55); }
+  .one-show .split-select-header .logo .flip{ color:#fff; } .one-show .split-select-header .logo .stax{ color:#ffb21f; }
+  .one-show .split-select-header .logo{ text-shadow:0 0 14px rgba(255,90,200,0.7); }
+  .one-show .split-select-title{ color:#ffe9a0; opacity:1; }
+  .one-show .ms-howto{ color:#e9dcff; }
+  .one-show .contact-footer{ color:rgba(240,225,255,0.65); } .one-show .contact-footer a{ color:#ffb8e6; }
+  /* the Cards and Donations buttons as stage pieces: a gold rim and a stage-light glow */
+  .one-show .ms-collection-btn{ border-color:#ffd23f; box-shadow:0 4px 0 #3a0a52, 0 0 0 3px rgba(255,214,90,0.35), 0 0 22px rgba(255,60,172,0.6); }
+  .one-show .ms-coffee-btn{ border-color:#ffd23f; box-shadow:0 4px 0 #5a2400, 0 0 0 3px rgba(255,214,90,0.35), 0 0 20px rgba(255,150,40,0.7); }
+  .one-show .ms-coffee-label{ background:rgba(20,4,36,0.85); color:#ffe9a0; box-shadow:0 0 0 1.5px rgba(255,214,90,0.6); }
+  :root.lite .one-show .ms-body-daily .ms-cta{ animation:none; }
   .legal-overlay{
     position:fixed; inset:0; z-index:70; display:flex; align-items:center;
     justify-content:center; background:rgba(8,10,24,0.82); padding:24px;
@@ -3718,6 +3744,7 @@
      flashes on a win or a miss); a layer for bursts; the alien host. -->
 <div class="show-bg bg w-vs" id="showBg" aria-hidden="true"><i class="rays"></i><i class="glow"></i><div class="amb" id="showAmb"></div></div>
 <div class="show-frame show-flash" id="showFrame" aria-hidden="true"></div>
+<div class="studio page-set" data-studio aria-hidden="true"></div>
 <div class="show-marquee off" id="showMarquee" aria-hidden="true"></div>
 <!-- The sound panel: one master volume and the mute button (opened from the speaker). -->
 <div class="vol-pop hidden" id="volPop" role="dialog" aria-label="Sound"><button type="button" class="vol-mute" id="volMute" aria-label="Mute">🔊</button><input type="range" id="volSlider" min="0" max="100" step="5" aria-label="Master volume"><b id="volPct"></b></div>
@@ -3973,6 +4000,7 @@
 </div>
 
 <div class="split-select-overlay one-show hidden" id="modeSelectOverlay">
+  <div class="studio menu-set" data-studio aria-hidden="true"></div>
   <!-- Infinity: the gold world underneath; takes every tap the sky doesn't. -->
   <div class="ms-gold" id="modeInfinityBtn" role="button" aria-label="Play Infinity Flips">
     <div class="ms-bg" id="msGoldSparks"></div>
