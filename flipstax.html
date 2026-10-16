@@ -2492,13 +2492,30 @@
   /* The cold open (DIRECTION.md): red velvet curtain, the EPISODE plate, the curtain parts,
      FLIPSTAX lights up letter by letter on a marquee, the host slides in, three cue cards fan out. */
   .show-card.curtain{ background:radial-gradient(120% 80% at 50% 40%, #3a0d1c, #12030a 70%); overflow:hidden; }
+  /* C11: velvet drapes with rounded folds (each fold shaded dark-light-dark, a highlight on its crest), darker at the
+     top and the hem; a swagged valance with a gold rope and a gold fringe; a spotlight (a cone and a pool of light) on
+     the EPISODE plate until the curtain parts. */
   .co-drape{ position:absolute; top:0; bottom:0; width:51%; z-index:5; pointer-events:none;
-    background:repeating-linear-gradient(90deg, #7a0a1e 0 14px, #b0122e 14px 30px, #8c0c22 30px 40px, #5c0716 40px 52px);
-    box-shadow:inset 0 -40px 60px rgba(0,0,0,0.5), 0 0 30px rgba(0,0,0,0.6); transition:transform 1.4s cubic-bezier(.6,0,.3,1); }
-  .co-drape.l{ left:0; transform-origin:left; } .co-drape.r{ right:0; transform-origin:right; }
-  .co-valance{ position:absolute; left:0; right:0; top:0; height:58px; z-index:6; pointer-events:none;
-    background:linear-gradient(180deg, #5c0716, #a3102b 60%, #6e0a1b); border-bottom:4px solid var(--gold-2); box-shadow:0 6px 18px rgba(0,0,0,0.5); }
-  .co-plate{ position:absolute; z-index:7; top:42%; left:50%; transform:translate(-50%, -50%); font:900 22px/1 var(--f-display); letter-spacing:4px; color:#3a1a00; padding:12px 22px;
+    background:linear-gradient(180deg, rgba(0,0,0,0.42), rgba(0,0,0,0) 22%, rgba(0,0,0,0) 72%, rgba(0,0,0,0.55)),
+      repeating-linear-gradient(90deg, #3e0410 0, #7a0a1e 8px, #b8152f 17px, #e23a55 21px, #c41c38 25px, #8a0c22 33px, #4a0513 42px);
+    box-shadow:0 0 30px rgba(0,0,0,0.6); transition:transform 1.4s cubic-bezier(.6,0,.3,1); }
+  .co-drape.l{ left:0; transform-origin:left; box-shadow:inset -18px 0 26px rgba(0,0,0,0.55), 0 0 30px rgba(0,0,0,0.6); }
+  .co-drape.r{ right:0; transform-origin:right; box-shadow:inset 18px 0 26px rgba(0,0,0,0.55), 0 0 30px rgba(0,0,0,0.6); }
+  .co-valance{ position:absolute; left:0; right:0; top:0; height:64px; z-index:7; pointer-events:none;
+    background:linear-gradient(180deg, rgba(0,0,0,0.5), rgba(0,0,0,0) 45%, rgba(255,255,255,0.07) 72%, rgba(0,0,0,0.35)),
+      radial-gradient(60px 26px at 50% 100%, rgba(0,0,0,0.38), rgba(0,0,0,0) 70%) 0 0 / 78px 64px repeat-x,
+      repeating-linear-gradient(90deg, #6a0819 0, #a3102b 14px, #c8203d 20px, #a3102b 26px, #6a0819 39px);
+    box-shadow:inset 0 -5px 0 #c98a00, inset 0 -8px 0 #ffe27a, 0 6px 18px rgba(0,0,0,0.5); }
+  .co-valance::after{ content:''; position:absolute; left:0; right:0; top:100%; height:16px;
+    background:repeating-linear-gradient(90deg, #ffe27a 0 1.5px, #c98a00 1.5px 3px, rgba(0,0,0,0) 3px 5px);
+    -webkit-mask:linear-gradient(180deg, #000 60%, rgba(0,0,0,0.25)); mask:linear-gradient(180deg, #000 60%, rgba(0,0,0,0.25)); filter:drop-shadow(0 3px 2px rgba(0,0,0,0.5)); }
+  .co-spot{ position:absolute; inset:0; z-index:6; pointer-events:none; transition:opacity .5s; }
+  .co-spot::before, .co-spot::after{ content:''; position:absolute; inset:0; }
+  .co-spot::before{ background:linear-gradient(180deg, rgba(255,244,210,0.24), rgba(255,244,210,0.12) 32%, rgba(255,244,210,0) calc(42% + 60px));
+    clip-path:polygon(45% 0, 55% 0, 74% calc(42% + 70px), 26% calc(42% + 70px)); }
+  .co-spot::after{ background:radial-gradient(ellipse 150px 84px at 50% 42%, rgba(255,244,210,0.4), rgba(255,244,210,0.13) 58%, rgba(255,244,210,0) 100%); }
+  .curtain.open .co-spot{ opacity:0; }
+  .co-plate{ position:absolute; z-index:8; top:42%; left:50%; transform:translate(-50%, -50%); font:900 22px/1 var(--f-display); letter-spacing:4px; color:#3a1a00; padding:12px 22px;
     border-radius:10px; border:3px solid #fff3c4; background:linear-gradient(180deg, var(--gold-1), var(--gold-2) 50%, var(--gold-3)); box-shadow:0 8px 24px rgba(0,0,0,0.55); transition:opacity .4s, transform .4s; }
   .curtain.open .co-drape.l{ transform:translateX(-92%) scaleX(0.6); }
   .curtain.open .co-drape.r{ transform:translateX(92%) scaleX(0.6); }
@@ -2521,7 +2538,7 @@
   .curtain.fan .co-cards span:nth-child(3){ transform:translateX(96px) rotate(14deg); transition-delay:.24s; }
   /* One host per screen: the corner host steps out while the curtain or a cue card is up. */
   :root:has(.show-card.curtain:not(.hidden)) .show-host, :root:has(.show-card.cue:not(.hidden)) .show-host{ display:none !important; }
-  .co-skip{ position:absolute; z-index:8; right:16px; bottom:calc(18px + env(safe-area-inset-bottom)); font:800 12px var(--f-body); letter-spacing:2px; color:rgba(255,255,255,0.75); }
+  .co-skip{ position:absolute; z-index:9; left:50%; transform:translateX(-50%); bottom:calc(18px + env(safe-area-inset-bottom)); white-space:nowrap; font:800 12px var(--f-body); letter-spacing:2px; color:rgba(255,255,255,0.75); }
   /* The cue card (reusable, C4): the host rises holding a card (his hands on its bottom corners) that flips over in 3D
      from its FLIPSTAX back to the act's name. Between acts a star wipe in the act's world opens behind it and closes
      after; the grand finale gets a spotlight iris instead (black all round, opening on the card, then a fade to black).
@@ -10342,7 +10359,7 @@
     // The beats, scaled to the length: the curtain parts, the marquee lights, the host, the cards.
     const k = total / 12000, at = (ms)=> Math.round(ms * (seen ? Math.max(k, 0.25) : k));
     showCard.className = 'show-card curtain';
-    showCard.innerHTML = '<i class="co-drape l"></i><i class="co-drape r"></i><i class="co-valance"></i>' +
+    showCard.innerHTML = '<i class="co-drape l"></i><i class="co-drape r"></i><i class="co-spot"></i><i class="co-valance"></i>' +
       '<div class="co-plate">EPISODE ' + ep + '</div>' +
       '<div class="sc-inner"><div class="co-marquee" aria-hidden="true">' + 'FLIPSTAX'.split('').map(c=> '<b>' + c + '</b>').join('') + '</div>' +
       '<div class="alien co-host">' + FX.alienSvg() + '</div>' +
