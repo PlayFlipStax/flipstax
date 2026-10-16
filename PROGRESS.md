@@ -54,7 +54,7 @@ new fonts, original art, no real brand or show names, every new game gets a TEST
 - [x] F5. Landing: host ~40% larger and centred on the stage, tighter spacing so logo, episode line, button and host read as one scene
 - [x] F6. Act cards: the new host cropped (head and shoulders with the mic) instead of the old head-only alien
 - [x] F7. Star wipe ~60% of its size; the card fully readable for at least 1 s
-- [ ] F8. Host SVG: a short neck; fix the arm hanging behind the body; Saucer Shuffle arms normal length with sleeve and hand shapes
+- [x] F8. Host SVG: a short neck; fix the arm hanging behind the body; Saucer Shuffle arms normal length with sleeve and hand shapes
 - [ ] F9. Peak or Plunge and Fact or Fib fill a tall screen (bigger blocks and buttons, spread vertically)
 - [ ] F10. Zap Words: why MELO counted; only real, common English words; report the final list size
 - [ ] F11. PEAK_OR_PLUNGE_REVIEWED = false (out of the rotation, TEST menu still plays it); data/peak-or-plunge.txt export; data/fact-or-fib.txt up to date; nothing marked reviewed
