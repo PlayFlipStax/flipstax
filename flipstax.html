@@ -202,7 +202,7 @@
     background:linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
     animation: shimmerSweep 2.2s linear infinite;
   }
-  @keyframes shimmerSweep{ 0%{ left:-40%; } 100%{ left:100%; } }
+  @keyframes shimmerSweep{ 0%{ transform:translateX(0); } 100%{ transform:translateX(350%); } }   /* (I3: was left - a layout every frame) */
   @keyframes cardIn{ 0%{ opacity:0; transform:scale(0.92); } 100%{ opacity:1; transform:scale(1); } }
   .content.pop-in{ animation: cardIn 0.22s ease-out; }
   @keyframes revealFlash{ 0%{ filter:brightness(1); } 30%{ filter:brightness(1.4); } 100%{ filter:brightness(1); } }
@@ -211,7 +211,7 @@
     .round-timer::after{ animation:none !important; }
     .content.pop-in, .board.flash{ animation:none !important; }
   }
-  .round-timer-fill{ height:100%; background:var(--pulse); width:100%; }
+  .round-timer-fill{ height:100%; background:var(--pulse); width:100%; transform-origin:0 50%; transform:scaleX(1); }   /* (I3: drains with transform, not width) */
   /* Pause sits at the right of the top card's top row, beside its category
      chip - VS screen only. */
   .pause-overlay{
@@ -599,7 +599,7 @@
     margin-bottom:16px; color:#fff; text-shadow:0 2px 10px rgba(0,0,0,0.5);
   }
   .event-timerbar{ width:80%; max-width:320px; height:6px; background:rgba(255,255,255,0.15); border-radius:4px; overflow:hidden; margin-bottom:20px; }
-  .event-timerbar-fill{ height:100%; background:#fff; width:100%; box-shadow:0 0 8px rgba(255,255,255,0.8); }
+  .event-timerbar-fill{ height:100%; background:#fff; width:100%; box-shadow:0 0 8px rgba(255,255,255,0.8); transform-origin:0 50%; transform:scaleX(1); }
   .event-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; width:100%; max-width:360px; }
   /* Answer and power-up tiles: the colour (set from JS) with a glossy
      top-light/bottom-shade, a white rim, a solid 3D base and soft drop
@@ -1814,6 +1814,7 @@
     box-shadow:0 4px 0 rgba(140,60,10,0.4), 0 0 18px rgba(255,140,40,0.7);
     text-decoration:none; animation:msCoffeeIdle 4.5s ease-in-out infinite;
   }
+  .personality-overlay:not(.show) .ms-coffee-btn{ animation-play-state:paused; }   /* (I3: not while the results are hidden) */
   .ms-coffee-btn svg{ width:32px; height:32px; filter:drop-shadow(0 1.5px 1.5px rgba(90,40,8,0.5)); }
   .ms-coffee-btn:active{ transform:scale(0.88); }
   .ms-coffee-label{
@@ -3082,7 +3083,12 @@
   .show-marquee{ display:none; position:fixed; inset:0; z-index:71; pointer-events:none; --bulb:#ffe9a0; }
   :root:is(.mode-daily, .mode-infinity) .show-marquee:not(.off){ display:block; }
   .show-marquee i{ position:absolute; left:0; top:0; width:9px; height:9px; margin:-4.5px 0 0 -4.5px; border-radius:50%; background:var(--bulb);
-    box-shadow:0 0 7px var(--bulb), 0 0 0 1.5px rgba(40,10,70,0.55); animation:bulbChase 0.9s steps(1) infinite; animation-delay:calc(var(--k) * -0.225s); will-change:opacity; }
+    box-shadow:0 0 7px var(--bulb), 0 0 0 1.5px rgba(40,10,70,0.55); }
+  .show-marquee .mq-g{ position:absolute; inset:0; animation:bulbChase 0.9s steps(1) infinite; animation-delay:calc(var(--k) * -0.225s); }
+  .show-marquee:is(.blink, .unison, .miss, .strobe, .disco) .mq-g{ animation:none; }
+  :root.tab-hidden .show-marquee .mq-g{ animation-play-state:paused; }
+  :root.lite .show-marquee .mq-g{ animation:none; }
+  @media (prefers-reduced-motion: reduce){ .show-marquee .mq-g{ animation:none; } }
   @keyframes bulbChase{ 0%{ opacity:1; } 25%{ opacity:0.25; } 50%{ opacity:0.25; } 75%{ opacity:0.25; } }
   .show-marquee.blink i{ animation:bulbBlink 0.16s steps(1) 6; }
   @keyframes bulbBlink{ 0%{ opacity:1; } 50%{ opacity:0.15; } }
@@ -11403,10 +11409,10 @@
   function startEventTimerBar(remainMs, totalMs){
     scheduleLastTicks(remainMs, eventCountdownLive);
     els.eventTimerFill.style.transition = 'none';
-    els.eventTimerFill.style.width = (100 * remainMs / totalMs) + '%';
+    els.eventTimerFill.style.transform = 'scaleX(' + (remainMs / totalMs) + ')';
     requestAnimationFrame(()=>{
-      els.eventTimerFill.style.transition = 'width ' + (remainMs / 1000) + 's linear';
-      els.eventTimerFill.style.width = '0%';
+      els.eventTimerFill.style.transition = 'transform ' + (remainMs / 1000) + 's linear';
+      els.eventTimerFill.style.transform = 'scaleX(0)';
     });
   }
   // `resumeQ`/`resumeEndsAt`: a refresh during this question - show the
@@ -11513,7 +11519,7 @@
       eventTimeoutId = setTimeout(()=> resolve(false), remain);
     };
     clearTimeout(eventTimeoutId);
-    if (flipIn){ els.eventTimerFill.style.transition = 'none'; els.eventTimerFill.style.width = '100%'; beamFlipIn(startClock); }
+    if (flipIn){ els.eventTimerFill.style.transition = 'none'; els.eventTimerFill.style.transform = 'scaleX(1)'; beamFlipIn(startClock); }
     else startClock();
     saveRunSnapshot();
   }
@@ -14758,10 +14764,10 @@
     roundDurationMs = durationMs;
     roundStartedAt = Date.now();
     els.roundTimerFill.style.transition = 'none';
-    els.roundTimerFill.style.width = '100%';
+    els.roundTimerFill.style.transform = 'scaleX(1)';
     requestAnimationFrame(()=>{
-      els.roundTimerFill.style.transition = 'width ' + (durationMs/1000) + 's linear';
-      els.roundTimerFill.style.width = '0%';
+      els.roundTimerFill.style.transition = 'transform ' + (durationMs/1000) + 's linear';
+      els.roundTimerFill.style.transform = 'scaleX(0)';
     });
     roundTimeoutId = setTimeout(onRoundTimeout, durationMs);
     { const id = roundTimeoutId; scheduleLastTicks(durationMs, ()=> roundTimeoutId === id && !voted); }
@@ -14856,14 +14862,14 @@
     // Freeze the round's decision countdown - same "read the current visual
     // width, stop the timeout, pin the bar" trick.
     if (roundTimeoutId){
-      const trackWidth = els.roundTimerFill.parentElement.clientWidth;
-      const currentWidthPx = parseFloat(getComputedStyle(els.roundTimerFill).width) || 0;
+      const trackWidth = 1;   // (I3: the fill scales with transform; read its scaleX)
+      const currentWidthPx = (()=>{ const m = getComputedStyle(els.roundTimerFill).transform; const a = m && m !== 'none' ? m.match(/matrix\(([^,]+)/) : null; return a ? parseFloat(a[1]) : 1; })();
       pausedRoundPct = trackWidth ? (currentWidthPx / trackWidth * 100) : 0;
       const elapsed = Date.now() - roundStartedAt;
       pausedRoundRemainingMs = Math.max(0, roundDurationMs - elapsed);
       clearTimeout(roundTimeoutId); roundTimeoutId = null;
       els.roundTimerFill.style.transition = 'none';
-      els.roundTimerFill.style.width = pausedRoundPct + '%';
+      els.roundTimerFill.style.transform = 'scaleX(' + (pausedRoundPct / 100) + ')';
     } else {
       pausedRoundRemainingMs = null;
     }
@@ -14951,10 +14957,10 @@
       roundStartedAt = Date.now();
       roundTimeoutId = setTimeout(onRoundTimeout, remaining);
       els.roundTimerFill.style.transition = 'none';
-      els.roundTimerFill.style.width = pausedRoundPct + '%';
+      els.roundTimerFill.style.transform = 'scaleX(' + (pausedRoundPct / 100) + ')';
       requestAnimationFrame(()=>{
-        els.roundTimerFill.style.transition = 'width ' + (remaining/1000) + 's linear';
-        els.roundTimerFill.style.width = '0%';
+        els.roundTimerFill.style.transition = 'transform ' + (remaining/1000) + 's linear';
+        els.roundTimerFill.style.transform = 'scaleX(0)';
       });
       pausedRoundRemainingMs = null;
     }
@@ -15071,7 +15077,10 @@
     for (let i = 0; i < ny; i++) pts.push([W - inset, inset + (H - 2 * inset) * i / ny]);
     for (let i = 0; i < nx; i++) pts.push([W - inset - (W - 2 * inset) * i / nx, H - inset]);
     for (let i = 0; i < ny; i++) pts.push([inset, H - inset - (H - 2 * inset) * i / ny]);
-    marquee.innerHTML = pts.map(([x, y], k)=> '<i style="--k:' + (k % 4) + ';transform:translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)"></i>').join('');
+    // I3: the bulbs sit in four chase groups (every fourth bulb), and each group fades as one - 4 animations, not about 90.
+    const groups = [[], [], [], []];
+    pts.forEach(([x, y], k)=> groups[k % 4].push('<i style="transform:translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)"></i>'));
+    marquee.innerHTML = groups.map((g, k)=> '<b class="mq-g" style="--k:' + k + '">' + g.join('') + '</b>').join('');
   }
   buildMarquee(); addEventListener('resize', buildMarquee);
   // ---------- Lite mode (C8) ----------
@@ -15671,7 +15680,7 @@
     const showReveal = isShowMode();
     if (showReveal) sfx.drumroll(VS_DRUMROLL_MS);
     els.roundTimerFill.style.transition = 'none';
-    els.roundTimerFill.style.width = '0%';
+    els.roundTimerFill.style.transform = 'scaleX(0)';
 
     const slugA = slugify(current.a), slugB = slugify(current.b);
     const myVote = await castVote(side === 'A' ? slugA : slugB);
@@ -15851,14 +15860,14 @@
     els.eventOverlay.classList.remove('hidden');
     fitTopChip();
     els.eventTimerFill.style.transition = 'none';
-    els.eventTimerFill.style.width = '100%';
+    els.eventTimerFill.style.transform = 'scaleX(1)';
     clearTimeout(eventTimeoutId);
     // The clock starts once the bars have flipped open (not if an answer is already in).
     beamFlipIn(()=>{
       if (!els.eventTiles[0].onclick) return;
       requestAnimationFrame(()=>{
-        els.eventTimerFill.style.transition = 'width 10s linear';
-        els.eventTimerFill.style.width = '0%';
+        els.eventTimerFill.style.transition = 'transform 10s linear';
+        els.eventTimerFill.style.transform = 'scaleX(0)';
       });
       clearTimeout(eventTimeoutId);
       eventTimeoutId = setTimeout(()=> resolveEvent(null), 10000);
@@ -15915,10 +15924,10 @@
       tileEl.onclick = ()=> resolvePowerUp(pu.key);
     });
     els.eventTimerFill.style.transition = 'none';
-    els.eventTimerFill.style.width = '100%';
+    els.eventTimerFill.style.transform = 'scaleX(1)';
     requestAnimationFrame(()=>{
-      els.eventTimerFill.style.transition = 'width 5s linear';
-      els.eventTimerFill.style.width = '0%';
+      els.eventTimerFill.style.transition = 'transform 5s linear';
+      els.eventTimerFill.style.transform = 'scaleX(0)';
     });
     clearTimeout(eventTimeoutId);
     eventTimeoutId = setTimeout(()=> resolvePowerUp(null), 5000);
