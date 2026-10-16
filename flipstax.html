@@ -2551,6 +2551,9 @@
   .show-card{ position:fixed; inset:0; z-index:29; display:flex; align-items:center; justify-content:center; text-align:center; color:#fff; cursor:pointer;
     padding:calc(24px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom)); }
   .show-card.hidden{ display:none; }
+  /* G1: ?debug=1 - the show director's state and its last 20 transitions. */
+  .show-debug{ position:fixed; left:4px; top:calc(4px + env(safe-area-inset-top)); z-index:10001; max-width:62vw; margin:0; padding:6px 8px; border-radius:8px; pointer-events:none;
+    background:rgba(0,0,0,0.78); color:#b8ffcf; font:10px/1.25 ui-monospace, Menlo, Consolas, monospace; white-space:pre-wrap; }
   .show-card .sc-inner{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; gap:12px; max-width:380px; }
   .sc-ep{ font:800 13px var(--f-body); letter-spacing:3px; padding:5px 14px; border-radius:99px; background:rgba(28,6,48,0.75); border:2px solid var(--gold-2); color:#fff3c4; }
   .show-card .sc-title{ font:900 clamp(44px, 14vw, 64px)/0.95 var(--f-display); text-transform:uppercase; letter-spacing:1px; color:#fffbe0; text-shadow:0 4px 0 #7a2e00, 0 0 24px rgba(255,200,40,0.8); animation:scPop 0.6s var(--ease-pop) both; }
@@ -5598,6 +5601,7 @@
     commercial: { ms:3000, ads:[ { brand:'ZING COLA', line:'Tastes like tomorrow!', glyph:'🥤', art:'can', colors:['#ff3c9d', '#ffd23f'] } ] },
   };
   const ACT_DEFAULT_VS_MS = 7000;
+  const COMMERCIAL_ENABLED = RUNDOWN.COMMERCIAL_ENABLED !== false;   // the commercial break, unless data/rundown.js turns it off
   function seedOf(rng){ return (rng() * 4294967296) >>> 0; }
   // The day's two Mystery Games (see pickMysteryGames).
   function showMysteryGames(date){ return pickMysteryGames(date); }
@@ -5645,7 +5649,11 @@
     const ads = (RUNDOWN.commercial && RUNDOWN.commercial.ads) || [];
     return ads.length ? ads[hashStr('flipstax-ad-' + date) % ads.length] : null;
   }
+  // Tests only (localhost ?debug=fast): ?showdate=YYYY-MM-DD builds that day's rundown, so the automated runs can cover
+  // other days' Mystery Games and Cosmic Surprises.
+  const SHOW_DATE_OVERRIDE = (()=>{ const q = DEBUG_FAST && new URLSearchParams(location.search).get('showdate'); return q && /^\d{4}-\d\d-\d\d$/.test(q) ? q : null; })();
   function buildShowPlan(date){
+    if (SHOW_DATE_OVERRIDE) date = SHOW_DATE_OVERRIDE;
     const rng = mulberry32(hashStr('flipstax-show-' + date));
     const mystery = showMysteryGames(date);
     const steps = [];
@@ -10199,6 +10207,7 @@
     resetDeck('daily');
     // The cold open first; the run clock starts on the tap.
     runPhase = 'coldopen';
+    showEnter('coldopen'); Show.stats = { dealt:[], drops:0, scenes:['coldopen'] };
     saveRunSnapshot();
     showColdOpen(beginShow);
   }
@@ -10264,6 +10273,8 @@
     stopTallyPolling();
     lastWasEvent = true;
     renderRunBanner();
+    // G1: a resumed run re-enters the scene it was saved in.
+    showEnter({ solving:'wordwarp', coldopen:'coldopen', trivia:'quiz', secondchance:'quiz', powerup:'portal', riddle:'quiz', 'finale-bumper':'finale' }[runPhase] || 'resume');
     if (runPhase === 'solving' && snap.solve){ resumeSolvePhase(snap.solve); saveRunSnapshot(); return; }
     if (runPhase === 'coldopen'){ saveRunSnapshot(); showColdOpen(beginShow); return; }
     if (runPhase === 'finale-bumper'){ runPhase = 'running'; goToFinale(); return; }
@@ -10317,6 +10328,65 @@
   // Where the show is: called by loadNextImpl before it deals a VS card.
   // Returns true if it took over (a bumper, a question, a Portal Pick, a
   // Brain Break, the finale) - false means "deal the next VS card".
+  // ---------- The show director (G1, Oct 16) ----------
+  // Every Daily scene - the cold open, a VS card, an act card, a Brain Beam, a Mystery Game, Portal Pick,
+  // a Cosmic Surprise, Lucky Lights, the finale, Orbit Drop, the results - is entered through showEnter().
+  // Entering a scene bumps Show.gen and cancels everything the previous scene left pending (its timers,
+  // animation frames and listeners, registered with showLater / showRaf / showOn). A scene ends with
+  // showDone(gen): it advances the show once, and only if that scene is still the current one - a late or
+  // second callback (a stale timer, a tap during a transition, a watchdog) is dropped and logged. A VS card
+  // is 'live' until it is voted or times out; while one is live, nothing can deal another (the old skip:
+  // a stray reveal timer dealt a second card over the first). ?debug=1 shows it all in a corner overlay.
+  const Show = { gen:0, scene:'idle', state:'', info:'', since:0, cardSeq:-1, log:[], timers:new Set(), frames:new Set(), offs:[], stats:{ dealt:[], drops:0, scenes:[] } };
+  function showLog(kind, detail){
+    Show.log.push({ t: Math.round(performance.now()), kind, scene: Show.scene, state: Show.state, step: runShow ? runShow.step : -1, left: runShow ? runShow.left : null, detail: detail || '' });
+    if (Show.log.length > 400) Show.log.splice(0, Show.log.length - 400);
+    renderShowDebug();
+  }
+  function showCancelPending(){
+    Show.timers.forEach(id=> clearTimeout(id)); Show.timers.clear();
+    Show.frames.forEach(id=> cancelAnimationFrame(id)); Show.frames.clear();
+    Show.offs.splice(0).forEach(f=>{ try{ f(); }catch(e){} });
+  }
+  function showEnter(scene, info){
+    showCancelPending();
+    Show.gen++; Show.scene = scene; Show.state = scene === 'vs' ? 'live' : 'playing'; Show.info = info || ''; Show.since = performance.now();
+    Show.stats.scenes.push(scene + (info && scene !== 'vs' ? ':' + info : ''));
+    showLog('enter', info);
+    return Show.gen;
+  }
+  function showSetState(s, detail){ Show.state = s; showLog('state', detail); }
+  // A timer / frame / listener that belongs to the current scene (cancelled when the scene ends).
+  function showLater(fn, ms){ const g = Show.gen; const id = setTimeout(()=>{ Show.timers.delete(id); if (g === Show.gen) fn(); }, ms); Show.timers.add(id); return id; }
+  function showRaf(fn){ const g = Show.gen; const id = requestAnimationFrame((t)=>{ Show.frames.delete(id); if (g === Show.gen) fn(t); }); Show.frames.add(id); return id; }
+  function showOn(el, ev, fn, opts){ el.addEventListener(ev, fn, opts); Show.offs.push(()=> el.removeEventListener(ev, fn, opts)); }
+  // The scene that started as `gen` is over: on to the next step (once).
+  function showDone(gen, why){
+    if (!runActive) return false;
+    if (gen !== Show.gen || Show.state === 'leaving'){ Show.stats.drops++; showLog('drop', 'stale done (' + (why || '') + ', gen ' + gen + ' vs ' + Show.gen + ')'); return false; }
+    showSetState('leaving', why);
+    runPhase = 'running';
+    loadNext();
+    return true;
+  }
+  // For the older finishers (Brain Beam, Portal Pick, the riddle) that end with loadNext: only if their scene is current.
+  function showDoneFrom(scenes, why){
+    if (!runActive) return false;
+    if (scenes.indexOf(Show.scene) < 0){ Show.stats.drops++; showLog('drop', 'finisher from ' + scenes.join('/') + ' while in ' + Show.scene + ' (' + (why || '') + ')'); return false; }
+    return showDone(Show.gen, why);
+  }
+  // ?debug=1: the step, the card, the transition state and the last 20 transitions.
+  const SHOW_DEBUG = new URLSearchParams(location.search).get('debug') === '1';
+  if (SHOW_DEBUG || DEBUG_FAST) window.__show = Show;   // (for the automated flow and pacing checks)
+  let showDebugEl = null;
+  function renderShowDebug(){
+    if (!SHOW_DEBUG) return;
+    if (!showDebugEl){ showDebugEl = document.createElement('pre'); showDebugEl.className = 'show-debug'; showDebugEl.setAttribute('aria-hidden', 'true'); document.body.appendChild(showDebugEl); }
+    const st = runPlan && runShow ? runPlan[runShow.step] : null;
+    const head = 'step ' + (runShow ? runShow.step : '-') + '/' + (runPlan ? runPlan.length : '-') + (st ? ' (' + st.t + (st.n ? ' x' + st.n : '') + ')' : '') + ' left ' + (runShow && runShow.left != null ? runShow.left : '-') +
+      '\ncard ' + (current && Show.scene === 'vs' ? current.id : '-') + '\nscene ' + Show.scene + ' / ' + Show.state + ' / gen ' + Show.gen + ' / drops ' + Show.stats.drops;
+    showDebugEl.textContent = head + '\n' + Show.log.slice(-20).map(e=> (e.t / 1000).toFixed(2) + 's ' + e.kind + ' ' + e.scene + (e.state ? ':' + e.state : '') + (e.detail ? ' ' + e.detail : '')).join('\n');
+  }
   function showAdvance(){
     if (!runPlan) runPlan = buildShowPlan(runStartDate || todayStr());
     for (let guard = 0; guard < 99; guard++){
@@ -10333,31 +10403,37 @@
         runActIdx = st.act; renderRunBanner();
         if (runScoreAtHalfway == null && st.act >= 2) runScoreAtHalfway = runScore;   // (for the comeback check: points before Act 2 vs after)
         runPhase = 'bumper'; saveRunSnapshot();
-        showActCard(st, ()=>{ if (!runActive || runPhase !== 'bumper') return; runPhase = 'running'; loadNext(); });
+        const g = showEnter('act', st.title);
+        showActCard(st, ()=> showDone(g, 'act card'));
         return true;
       }
       if (st.t === 'ad'){
+        if (!COMMERCIAL_ENABLED) continue;   // (G3: the commercial break is off)
         runPhase = 'bumper'; saveRunSnapshot();
-        showCommercial(st.ad, ()=>{ if (!runActive || runPhase !== 'bumper') return; runPhase = 'running'; loadNext(); });
+        const g = showEnter('ad', st.ad && st.ad.brand);
+        showCommercial(st.ad, ()=> showDone(g, 'commercial'));
         return true;
       }
-      if (st.t === 'quiz'){ runTriviaQuestion(null, null, st); return true; }
-      if (st.t === 'portal'){ runPortalDoors = st.doors; runPowerUpRoundForRun(null); return true; }
+      if (st.t === 'quiz'){ showEnter('quiz', st.level || ''); runTriviaQuestion(null, null, st); return true; }
+      if (st.t === 'portal'){ showEnter('portal'); runPortalDoors = st.doors; runPowerUpRoundForRun(null); return true; }
       if (st.t === 'mystery' || st.t === 'break'){
         runPhase = 'break'; saveRunSnapshot();
-        if (runMysteryGame(st, ()=>{ if (!runActive) return; runPhase = 'running'; loadNext(); })) return true;
+        const g = showEnter('mystery', st.game);
+        if (runMysteryGame(st, ()=> showDone(g, 'mystery ' + st.game))) return true;
         runPhase = 'running';
         continue;   // (its data turned out unusable: carry on with the show)
       }
       if (st.t === 'cosmic'){
         runPhase = 'break'; saveRunSnapshot();
-        if (runDailyCosmic(st, ()=>{ if (!runActive) return; runPhase = 'running'; loadNext(); })) return true;
+        const g = showEnter('cosmic');
+        if (runDailyCosmic(st, ()=> showDone(g, 'cosmic'))) return true;
         runPhase = 'running';
         continue;
       }
       if (st.t === 'lucky'){
         runPhase = 'break'; saveRunSnapshot();
-        if (typeof runLuckyLights === 'function' && runLuckyLights(st, ()=>{ if (!runActive) return; runPhase = 'running'; loadNext(); })) return true;
+        const g = showEnter('lucky');
+        if (typeof runLuckyLights === 'function' && runLuckyLights(st, ()=> showDone(g, 'lucky lights'))) return true;
         runPhase = 'running';
         continue;
       }
@@ -10401,7 +10477,7 @@
       sfx, FX, fxLayer: showFx, lite: isLite(), reduced: prefersReducedMotion(), mult: runActive ? runActMult() : 1,
       rng: null, shuffle: null,
       setRule: (t)=>{ ov.querySelector('.mg-rule').textContent = t || ''; },
-      timer: (ms, cb)=>{ startTimer(ms, cb); return { stop: stopTimer, left: ()=> Math.max(0, timerEnd - Date.now()), add: (d)=>{ const left = Math.max(0, timerEnd - Date.now()) + d; startTimer(Math.max(0, left), timerCb); } }; },
+      timer: (ms, cb)=>{ if (DEBUG_FAST) ms = dt(ms); startTimer(ms, cb); return { stop: stopTimer, left: ()=> Math.max(0, timerEnd - Date.now()), add: (d)=>{ const left = Math.max(0, timerEnd - Date.now()) + d; startTimer(Math.max(0, left), timerCb); } }; },
       score: (n)=>{ scoreEl.textContent = n; FX.pop(scoreEl, 1.2); },
       say: (t, ms)=> hostSay(t, ms), mood: (m)=> hostMood(m),
       flash: (kind)=>{ if (kind === 'win'){ marquee.classList.remove('unison', 'miss'); void marquee.offsetWidth; marquee.classList.add('unison'); setTimeout(()=> marquee.classList.remove('unison'), 700); showFlash('win'); }
@@ -10446,7 +10522,7 @@
         : st.game === 'crowdScan' ? (runDailyCrowdScan(st, done) || (hostSay('The crowd\u2019s still voting - Emoji Decode instead!', 2000), runBrainBreak({ game:'emojiDecode', seed: st.seed }, done)))
         : miniGame(st.game) ? runMiniGame(st.game, st, done)
         : runBrainBreak({ game: st.game, seed: st.seed }, done);
-      if (!ok){ runPhase = 'running'; loadNext(); }
+      if (!ok) showDone(Show.gen, 'mystery unavailable');
     });
     return true;
   }
@@ -10804,10 +10880,12 @@
       runActIdx = fi; renderRunBanner();
       const a = RUNDOWN.acts[fi];
       runPhase = 'finale-bumper'; saveRunSnapshot();
-      showActCard({ title:a.title, sub:a.sub, world:a.world, finale:true }, ()=>{ if (runActive && runPhase === 'finale-bumper') startSolvePhase(); });
+      const g = showEnter('finale', 'act card');
+      showActCard({ title:a.title, sub:a.sub, world:a.world, finale:true }, ()=>{ if (runActive && runPhase === 'finale-bumper' && g === Show.gen){ showEnter('wordwarp'); startSolvePhase(); } else showLog('drop', 'stale finale card'); });
       return;
     }
     runPhase = 'finale-bumper'; saveRunSnapshot();
+    showEnter('wordwarp');
     startSolvePhase();
   }
   // ---------- A face-down "?" tile flies up to the prize track (the letter stays hidden until the Word Warp) ----------
@@ -10928,7 +11006,7 @@
     if (fin) setTimeout(()=> sfx.drumrollLong(), 500);   // the finale: a long drumroll under the spotlight
     const ms = fin ? 2300 : 2000;   // (B3: the act card is fully up for about 1.1 s, from 28% to 84% of this)
     showCard.style.setProperty('--cue-ms', ms + 'ms');
-    setTimeout(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; showCard.style.removeProperty('--cue-ms'); then(); }, ms);
+    (runActive ? showLater : setTimeout)(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; showCard.style.removeProperty('--cue-ms'); then(); }, ms);
   }
   // The commercial break: a 3 s fake 70s ad, skippable. Built as one component (an ad in,
   // done() out) so a real ad can take its place later.
@@ -11001,8 +11079,8 @@
     ringBulbs(showCard.querySelector('.mr-frame .sign-bulbs'), 22, 7);
     const rm = prefersReducedMotion();
     if (!rm) sfx.drumroll(520);
-    setTimeout(()=>{ showCard.classList.add('open'); sfx.slam(); playTone(523, 0.05, 0.12, 'triangle', 0.08); playTone(784, 0.15, 0.25, 'triangle', 0.08); }, rm ? 0 : 560);
-    setTimeout(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; then(); }, rm ? 1600 : 2100);
+    (runActive ? showLater : setTimeout)(()=>{ showCard.classList.add('open'); sfx.slam(); playTone(523, 0.05, 0.12, 'triangle', 0.08); playTone(784, 0.15, 0.25, 'triangle', 0.08); }, rm ? 0 : 560);
+    (runActive ? showLater : setTimeout)(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; then(); }, rm ? 1600 : 2100);
   }
   function showMysteryWheel(game, then){
     const games = MYSTERY_POOL.map(p=> p.game).filter(g=> MYSTERY_COLORS[g]);
@@ -11402,8 +11480,7 @@
     // B2: the show plan decides what's next (Second Chance is retired - the
     // Portal Pick's hint is the help now).
     if (runClockExpired()){ goToFinale(); return; }
-    runPhase = 'running';
-    loadNext();
+    showDoneFrom(['quiz', 'mystery'], 'brain beam');
   }
   // Second Chance: one question, from the same subject as the player's first
   // miss, worth exactly one letter - the next one in word order (letters are
@@ -11568,8 +11645,7 @@
       }
       els.eventTiles.forEach(t=>{ t.classList.remove('portal', 'open', 'pu-points10', 'pu-slowclock', 'pu-wildcard', 'pu-hint'); delete t.dataset.pu; });
       if (runClockExpired()){ goToFinale(); return; }
-      runPhase = 'running';
-      loadNext();
+      showDoneFrom(['portal'], 'portal pick');
     }, dt(1100));
   }
 
@@ -12482,6 +12558,7 @@
   function dailyOrbitChips(r){ return Math.max(ORBIT_MIN_CHIPS, Math.min(DAILY_ORBIT_MAX, r.orbitChips || ORBIT_MIN_CHIPS)); }
   function saveDailyOrbit(){ if (runResultToday && runResultToday.orbit === dailyOrbit) saveRunResultToday(runResultToday); }
   function openDailyOrbit(r){
+    showEnter('orbit');
     if (!r.orbit) r.orbit = { stage:'plinko', chips: drawPlinkoOutcomes(dailyOrbitChips(r)), dropped:0, base: r.score, done:false };
     if (r.orbit.done){ showRunReadout(); return; }
     saveRunResultToday(r);
@@ -14169,6 +14246,7 @@
   }
 
   function endRun(solved, solvedAt){
+    showEnter('end');
     runActive = false;
     clearRunSnapshot();
     sessionHalted = true;
@@ -14291,6 +14369,7 @@
     document.getElementById('readoutShare').textContent = '📤 SHARE YOUR GLORY';
   }
   function showRunReadout(fromOrbit){
+    showEnter('results');
     const r = runResultToday;
     preloadShareArt(r);
     const ep = !!(r.actPts || r.orbit);   // an episode result (the rundown show): the new results screen
@@ -14458,12 +14537,18 @@
   // this is the actual guard against the "flash still covering the screen
   // when the next round loads" freeze.
   function scheduleNext(delay){
-    setTimeout(function tick(){
+    // G1: in the Daily show the next round belongs to the scene that asked for it - if that scene has ended
+    // (another advance got there first, or the player left), this one is dropped.
+    const g = runActive ? Show.gen : null;
+    const run = function tick(){
+      if (g !== null && (g !== Show.gen || !runActive)){ Show.stats.drops++; showLog('drop', 'stale scheduleNext'); return; }
       // Paused mid-reveal: hold the next round until Resume (it used to be
       // dealt behind the pause screen and time out, costing points).
-      if (levelUpActive || personalityActive || isPaused || (DEBUG_FAST && window.__holdBoard)){ setTimeout(tick, 150); return; }
+      if (levelUpActive || personalityActive || isPaused || (DEBUG_FAST && window.__holdBoard)){ const id = setTimeout(run, 150); if (g !== null) Show.timers.add(id); return; }
+      if (g !== null){ showDone(g, 'next round'); return; }
       loadNext();
-    }, delay);
+    };
+    const id = setTimeout(run, delay); if (g !== null) Show.timers.add(id);
   }
 
   // baseAmount: how many flipz this action is worth before the 2x bonus zone multiplier.
@@ -14551,7 +14636,9 @@
   }
   function onRoundTimeout(){
     if (voted || !current) return;
+    if (runActive && !(Show.scene === 'vs' && Show.state === 'live')) return;
     voted = true;
+    if (runActive) showSetState('timedout', current.id);
     votedSinceTime = Date.now();
     comboCount = 0;
     if (!runActive && inInfinity()) infSession.fire = 0;   // a missed round breaks On Fire
@@ -14576,6 +14663,9 @@
   // reliable signal in Infinity mode (see resolveEvent/resolvePowerUp, which
   // never touch runPhase).
   function isOnVsScreen(){
+    // G1: in the show, only a VS card is the VS screen (a Mystery Game, an act card or Lucky Lights is not, so the
+    // app going to the background doesn't pause on top of them).
+    if (runActive && Show.scene !== 'vs') return false;
     return els.eventOverlay.classList.contains('hidden') &&
            els.solveOverlay.classList.contains('hidden') &&
            els.riddleOverlay.classList.contains('hidden') &&
@@ -14753,6 +14843,8 @@
 
     els.pauseOverlay.classList.add('hidden');
     updatePauseBtnVisibility();
+    // G1: a scene that ended while the game was paused (its advance was held) moves on now.
+    if (runActive && Show.state === 'leaving' && runPhase === 'running') loadNext();
   }
   // Whenever any gameplay overlay's visibility changes - trivia/power-up
   // opening or closing, puzzle or riddle starting or ending - re-check
@@ -15048,6 +15140,8 @@
     if (runActive){
       if (runPhase === 'coldopen' || runPhase === 'bumper' || runPhase === 'finale-bumper' || runPhase === 'break') return;
       if (runClockExpired()){ goToFinale(); return; }
+      // G1: a VS card that is still live (not yet voted or timed out) is never replaced - this second advance is dropped.
+      if (Show.scene === 'vs' && Show.state === 'live'){ Show.stats.drops++; showLog('drop', 'advance while card ' + (current && current.id) + ' is live'); return; }
       if (showAdvance()) return;   // the show's next step (B2) - or deal a VS card
     } else {
       renderStatusBanner();
@@ -15077,6 +15171,7 @@
     if (deckNow.next >= deckNow.cards.length) resetDeck();
     current = deckNow.cards[deckNow.next++];
     roundSeq++;
+    if (runActive){ showEnter('vs', current.id); Show.cardSeq = roundSeq; Show.stats.dealt.push({ id: current.id, step: runShow.step, left: runShow.left, deck: deckNow.next - 1 }); }
     if (inInfinity() && infRun && !infRun.ended){ infRun.voteRounds++; infRun.sinceGuess++; saveInfRun(); maybeScheduleTapUfo(); }
     current.bonusPoints = runActive ? hashStr((runStartDate || '') + '|' + current.id) % 5 === 0 : Math.random() < 0.2;   // Daily: the same star cards for everyone that day
     rampOnRound();
@@ -15413,7 +15508,10 @@
   }
   async function voteImpl(side){
     if (voted || !current) return;
+    // G1: in the show, only the live VS card takes a vote (a tap during a transition does nothing).
+    if (runActive && !(Show.scene === 'vs' && Show.state === 'live' && Show.cardSeq === roundSeq)){ showLog('drop', 'tap outside a live card'); return; }
     voted = true;
+    if (runActive) showSetState('revealing', side + ' ' + current.id);
     const tapAt = performance.now();
     const mySeq = roundSeq;
     // True if this vote's round is no longer the live one: another card has
@@ -16091,6 +16189,7 @@
   // went wrong somewhere we didn't catch above. Force it forward rather
   // than leave it stuck.
   setInterval(()=>{
+    if (runActive && !(Show.scene === 'vs' && Show.state !== 'live')) return;   // (G1: the show's other scenes have their own ends)
     if (voted && votedSinceTime && (Date.now() - votedSinceTime > 8000)){
       const overlayVisible = !els.eventOverlay.classList.contains('hidden');
       const levelupVisible = els.levelupOverlay.classList.contains('show');
@@ -16101,7 +16200,8 @@
         console.warn('FlipStax: watchdog recovering a stalled round');
         voted = false;
         votedSinceTime = null;
-        loadNext();
+        if (runActive){ showLog('watchdog', current && current.id); showSetState('timedout', 'watchdog'); showDone(Show.gen, 'watchdog'); }
+        else loadNext();
       }
     }
   }, 2000);
@@ -16172,6 +16272,7 @@
       showReadout: () => { els.finOverlay.classList.add('hidden'); showRunReadout(); return !!runResultToday; },
       setResult: (o) => { runResultToday = Object.assign({}, runResultToday || { date: todayStr(), rule: SAVE_RULE, savedAt: Date.now(), score: 0, triviaCorrect: 0, triviaTotal: 0, solved: false, solveMs: null, word: 'LAUNCH', personalityType: 'fence_sitter', unlocked: [] }, o); return runResultToday; },
       comboVerdict: (w, base) => { comboOnVerdict(!!w, base || 1); return { streak: runMatchStreak, mult: comboMult(runMatchStreak), bonus: runComboBonus, bank: runComboBank, score: runScore }; },
+      showDirector: () => ({ gen: Show.gen, scene: Show.scene, state: Show.state, log: Show.log.slice(), stats: Show.stats, plan: runPlan, step: runShow.step, left: runShow.left, runActive, runPhase }),
       showState: () => ({ step: runShow.step, left: runShow.left, phase: runPhase, act: runActIdx, score: runScore, actPts: runActPts.slice(), t: runPlan && runPlan[runShow.step] && runPlan[runShow.step].t, episode: showEpisode(runStartDate || todayStr()) }),
       startColdOpenTap: () => showCard.click(),
       playSfx: (name, arg) => { const errs = []; try{ sfx[name](arg); }catch(e){ errs.push(String(e)); } return { name, on: soundOn, ctx: audioCtx ? audioCtx.state : null, errs }; },
@@ -16613,6 +16714,7 @@
   // every gameplay overlay so nothing is left showing underneath.
   function returnToModeSelect(opts){
     opts = opts || {};
+    showEnter('idle', 'left the show');   // G1: nothing from the show fires after leaving it
     if (els.finOverlay.classList.contains('daily-vault')){ vaultTimers.forEach(clearTimeout); vaultTimers = []; coinRun = null; els.finOverlay.classList.add('hidden'); els.finOverlay.classList.remove('daily-vault', 'vault-stage'); stopFinSky(); }
     setTimeout(refreshDailyDay, 0);   // once the run is torn down
     stopTallyPolling();
