@@ -2651,7 +2651,7 @@
   .show-card.cue:not(.finale)::before{ content:''; position:absolute; inset:0; z-index:0; pointer-events:none; background:rgba(16,4,30,0.62); opacity:0; animation:cueScrim var(--cue-ms) linear forwards; }
   @keyframes cueScrim{ 0%{ opacity:0; } 14%, 86%{ opacity:1; } 100%{ opacity:0; } }
   @media (prefers-reduced-motion: reduce){ .show-card.cue:not(.finale)::before{ animation:none; opacity:1; } }
-  .cue-wipe{ position:absolute; left:50%; top:50%; width:760px; height:760px; margin:-380px 0 0 -380px; z-index:0; will-change:transform;
+  .cue-wipe{ position:absolute; left:50%; top:50%; width:456px; height:456px; margin:-228px 0 0 -228px; z-index:0; will-change:transform;   /* (F7: 60% of the 760px star) */
     clip-path:polygon(50% 0%, 61.2% 34.5%, 97.6% 34.5%, 68.2% 55.9%, 79.4% 90.5%, 50% 69.1%, 20.6% 90.5%, 31.8% 55.9%, 2.4% 34.5%, 38.8% 34.5%);
     transform:scale(0) rotate(-60deg); animation:starWipe var(--cue-ms) cubic-bezier(.6,0,.35,1) forwards; }
   .cue-wipe > .bg .rays, .cue-wipe > .bg .glow{ top:50%; }
