@@ -2554,6 +2554,10 @@
   .show-card{ position:fixed; inset:0; z-index:29; display:flex; align-items:center; justify-content:center; text-align:center; color:#fff; cursor:pointer;
     padding:calc(24px + env(safe-area-inset-top)) 22px calc(24px + env(safe-area-inset-bottom)); }
   .show-card.hidden{ display:none; }
+  /* J1: the flight recorder's elapsed-time badge and Copy log button (?debug=1 only). */
+  .fr-badge{ position:fixed; left:50%; top:calc(4px + env(safe-area-inset-top)); z-index:9998; transform:translateX(-50%); padding:3px 9px; border-radius:99px;
+    background:rgba(0,0,0,0.72); color:#7dff9e; font:800 12px/1.2 ui-monospace, Menlo, monospace; pointer-events:none; }
+  .fr-copy.hidden{ display:none !important; }
   /* G1: ?debug=1 - the show director's state and its last 20 transitions. */
   .show-debug{ position:fixed; left:4px; top:calc(4px + env(safe-area-inset-top)); z-index:10001; max-width:62vw; margin:0; padding:6px 8px; border-radius:8px; pointer-events:none;
     background:rgba(0,0,0,0.78); color:#b8ffcf; font:10px/1.25 ui-monospace, Menlo, Consolas, monospace; white-space:pre-wrap; }
@@ -4560,6 +4564,7 @@
     <div class="solve-buttons" style="margin-top:14px;">
       <div class="daily-btn" id="readoutDone">Done</div>
       <div class="daily-btn primary" id="readoutShare">📤 Share</div>
+      <div class="daily-btn fr-copy hidden" id="frCopyBtn" role="button" tabindex="0">📋 Copy log</div>
       <div class="daily-btn ep-only" id="readoutCopy" role="button" tabindex="0">📋 Copy</div>
     </div>
     <a class="readout-support" id="readoutSupport" href="https://ko-fi.com/flipstax" target="_blank" rel="noopener noreferrer">Enjoying FlipStax? ❤️ Support it</a>
@@ -10417,8 +10422,67 @@
   function showLog(kind, detail){
     Show.log.push({ t: Math.round(performance.now()), kind, scene: Show.scene, state: Show.state, step: runShow ? runShow.step : -1, left: runShow ? runShow.left : null, detail: detail || '' });
     if (Show.log.length > 400) Show.log.splice(0, Show.log.length - 400);
+    if (kind !== 'enter' && typeof frLog === 'function') frLog(kind, Show.scene + (Show.state ? ':' + Show.state : '') + (detail ? ' ' + detail : ''));
     renderShowDebug();
   }
+  // ---------- J1: the flight recorder (?debug=1) ----------
+  // Every scene transition with its time and trigger (the director's reason, or "tap" when the player's finger
+  // came down in the last 80 ms), the player's touches and clicks with their targets, any two advances within
+  // 400 ms flagged, and the device: viewport, userAgent, devicePixelRatio, lite mode (and why), service worker /
+  // cache, the build and the rundown loaded. A Copy log button on the results screen; an elapsed-time badge.
+  // It stays in memory on the phone - nothing is sent anywhere.
+  const BUILD_ID = 'J-2026-10-16';
+  const FR = { on: new URLSearchParams(location.search).get('debug') === '1' || DEBUG_FAST, t0: performance.now(), showAt: null, lines: [], lastInput: null, lastAdvance: 0, flags: 0 };
+  const frTime = ()=> ((performance.now() - FR.t0) / 1000).toFixed(2);
+  function frLog(kind, detail){ if (!FR.on) return; FR.lines.push(frTime() + 's ' + kind + (detail ? ' ' + detail : '')); if (FR.lines.length > 3000) FR.lines.splice(0, 500); }
+  const frTarget = (el)=>{ if (!el || !el.closest) return '?'; const t = el.closest('[id], button, .event-tile, .half, .show-card, .mg-overlay') || el;
+    return (t.id ? '#' + t.id : t.tagName.toLowerCase()) + (t.className && typeof t.className === 'string' ? '.' + t.className.trim().split(/\s+/).slice(0, 2).join('.') : '') + (t.textContent ? ' "' + t.textContent.trim().replace(/\s+/g, ' ').slice(0, 18) + '"' : ''); };
+  if (FR.on){
+    ['touchstart', 'touchend', 'pointerdown', 'click'].forEach(ev=> document.addEventListener(ev, (e)=>{
+      if (ev === 'pointerdown' || ev === 'touchstart') FR.lastInput = { t: performance.now(), what: ev + ' ' + frTarget(e.target) };
+      const pt = e.touches && e.touches[0] || e.changedTouches && e.changedTouches[0] || e;
+      frLog('input', ev + ' @' + Math.round(pt.clientX || 0) + ',' + Math.round(pt.clientY || 0) + ' ' + frTarget(e.target) + (e.isTrusted ? '' : ' (synthetic)'));
+    }, { capture:true, passive:true }));
+    const env = ()=>{
+      frLog('env', 'build ' + BUILD_ID + ' · modified ' + document.lastModified + ' · viewport ' + innerWidth + 'x' + innerHeight + ' · dpr ' + devicePixelRatio + ' · lite ' + (document.documentElement.classList.contains('lite') ? 'ON (' + (liteWhy || 'param/session') + ')' : 'off') +
+        ' · reduced motion ' + (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches));
+      frLog('env', 'ua ' + navigator.userAgent);
+      frLog('env', 'service worker ' + (navigator.serviceWorker ? (navigator.serviceWorker.controller ? 'CONTROLLED by ' + navigator.serviceWorker.controller.scriptURL : 'none controlling') : 'unsupported'));
+      if (window.caches && caches.keys) caches.keys().then(k=> frLog('env', 'cache storage ' + (k.length ? k.join(', ') : 'empty'))).catch(()=>{});
+      try{ frLog('env', 'timing ' + JSON.stringify(TIMING)); }catch(e){}
+    };
+    setTimeout(env, 50);
+  }
+  // Called on each scene change and each advance (see showEnter / showDone).
+  function frScene(kind, scene, info, why){
+    if (!FR.on) return;
+    const now = performance.now(), tap = FR.lastInput && now - FR.lastInput.t < 80 ? 'tap: ' + FR.lastInput.what : null;
+    frLog(kind, scene + (info ? ' (' + info + ')' : '') + ' · trigger ' + (tap || why || 'timer'));
+    if (kind === 'advance'){
+      if (FR.lastAdvance && now - FR.lastAdvance < 400){ FR.flags++; frLog('FLAG', 'two advances ' + Math.round(now - FR.lastAdvance) + ' ms apart'); }
+      FR.lastAdvance = now;
+    }
+    if (kind === 'enter' && scene === 'coldopen' && FR.showAt == null) FR.showAt = now;
+  }
+  function frRundown(){
+    if (!FR.on || !runPlan) return;
+    frLog('rundown', runPlan.map(st=> st.t + (st.n ? ' x' + st.n : '') + (st.level ? ' ' + st.level : '') + (st.game ? ' ' + st.game : '') + (st.title ? ' "' + st.title + '"' : '')).join(' > '));
+  }
+  // The elapsed-time badge (from the cold open).
+  let frBadge = null;
+  if (FR.on) setInterval(()=>{
+    if (!frBadge){ frBadge = document.createElement('div'); frBadge.className = 'fr-badge'; frBadge.setAttribute('aria-hidden', 'true'); document.body.appendChild(frBadge); }
+    const s0 = FR.showAt == null ? 0 : (performance.now() - FR.showAt) / 1000;
+    frBadge.textContent = '\u23F1 ' + Math.floor(s0 / 60) + ':' + String(Math.floor(s0 % 60)).padStart(2, '0') + (FR.flags ? ' \u26A0' + FR.flags : '');
+  }, 500);
+  function frCopy(btn){
+    const text = ['FlipStax flight recorder · ' + BUILD_ID + ' · ' + new Date().toISOString(), ...FR.lines].join('\n');
+    const ok = ()=>{ if (btn) btn.textContent = '\u2705 Log copied'; };
+    try{ if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(ok, ()=> fallback()); return; } }catch(e){}
+    function fallback(){ const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); ok(); }catch(e){} ta.remove(); }
+    fallback();
+  }
+  if (FR.on){ const b = document.getElementById('frCopyBtn'); if (b){ b.classList.remove('hidden'); b.addEventListener('click', (e)=>{ e.stopPropagation(); frCopy(b); }); } }
   function showCancelPending(){
     Show.timers.forEach(id=> clearTimeout(id)); Show.timers.clear();
     Show.frames.forEach(id=> cancelAnimationFrame(id)); Show.frames.clear();
@@ -10450,7 +10514,8 @@
     showCancelPending();
     Show.gen++; Show.scene = scene; Show.state = scene === 'vs' ? 'live' : 'playing'; Show.info = info || ''; Show.since = performance.now();
     Show.stats.scenes.push(scene + (info && scene !== 'vs' ? ':' + info : ''));
-    showLog('enter', info);
+    showLog('enter', info); frScene('enter', scene, info && scene !== 'vs' ? info : (scene === 'vs' && current ? current.id : ''));
+    if (scene === 'coldopen') frRundown();
     return Show.gen;
   }
   function showSetState(s, detail){ Show.state = s; showLog('state', detail); }
@@ -10462,7 +10527,7 @@
   function showDone(gen, why){
     if (!runActive) return false;
     if (gen !== Show.gen || Show.state === 'leaving'){ Show.stats.drops++; showLog('drop', 'stale done (' + (why || '') + ', gen ' + gen + ' vs ' + Show.gen + ')'); return false; }
-    showSetState('leaving', why);
+    showSetState('leaving', why); frScene('advance', Show.scene, Show.info, why);
     if (Show.scene === 'mystery' || Show.scene === 'lucky' || Show.scene === 'cosmic') trackEvent('game_completed:' + (Show.scene === 'mystery' ? Show.info : EV_GAME[Show.scene]));
     runPhase = 'running';
     loadNext();
@@ -10476,7 +10541,8 @@
   }
   // ?debug=1: the step, the card, the transition state and the last 20 transitions.
   const SHOW_DEBUG = new URLSearchParams(location.search).get('debug') === '1';
-  if (SHOW_DEBUG || DEBUG_FAST) window.__show = Show;   // (for the automated flow and pacing checks)
+  if (SHOW_DEBUG || DEBUG_FAST) window.__show = Show;
+  if (DEBUG_FAST) window.__frLines = FR.lines;   // (the automated checks read the flight recorder)   // (for the automated flow and pacing checks)
   let showDebugEl = null;
   function renderShowDebug(){
     if (!SHOW_DEBUG) return;
@@ -15102,7 +15168,9 @@
     document.documentElement.classList.toggle('lite', on); FX.MAX_PARTICLES = on ? 30 : 90;
     if (on){ try{ sessionStorage.setItem('flipstax_lite', '1'); }catch(e){} }
     if (DEBUG_FAST) window.__liteWhy = on ? why : null;
+    liteWhy = on ? (why || 'on') : null; if (typeof frLog === 'function') frLog('lite', on ? 'ON (' + liteWhy + ')' : 'off');
   }
+  let liteWhy = null;
   const isLite = ()=> document.documentElement.classList.contains('lite');
   (function(){
     let forced = /[?&]lite=1(&|$)/.test(location.search);

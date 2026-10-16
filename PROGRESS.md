@@ -96,7 +96,7 @@ NEXT: H1 (needs the machine with the old test suites); set STATS_KEY in the Verc
 
 ## J. Real-phone bug-fix pass (Oct 16). An episode on a real phone lasted ~2.5 min; act cards popped up over running VS cards.
 
-- [ ] J1. Flight recorder (?debug=1): every scene transition with time and trigger (named timer, tap, skip, watchdog), pointer events (touchstart, pointerdown, click) with targets, two advances within 400 ms flagged; viewport, userAgent, devicePixelRatio, auto-lite and why, service worker / cache version, the rundown loaded; a Copy log button on the results screen and an elapsed-time badge; nothing sent to the server
+- [x] J1. Flight recorder (?debug=1): every scene transition with time and trigger (named timer, tap, skip, watchdog), pointer events (touchstart, pointerdown, click) with targets, two advances within 400 ms flagged; viewport, userAgent, devicePixelRatio, auto-lite and why, service worker / cache version, the rundown loaded; a Copy log button on the results screen and an elapsed-time badge; nothing sent to the server
 - [ ] J2. Find and fix the cause (touch + click double advance, a skip tap passing through, auto-lite shortening scenes, timers surviving their scene, a stale service worker / cache); a test with real touch sequences (touchstart, touchend, a synthesized click ~300 ms later, a tap during every cinematic) through a whole episode, asserting the scene order and minimum cinematic durations; reproduce first if possible
 - [ ] J3. Print today's rundown (acts, games and counts, letter-giving trivia, riddles); expected 6 trivia and 1 riddle (fixed Mystery Game 1)
 - [ ] J4. Zap Words: found words stay highlighted (a colour per word) and go in a found list; only invalid swipes flash and clear; tested with simulated swipes
