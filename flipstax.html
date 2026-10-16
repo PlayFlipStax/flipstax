@@ -11544,6 +11544,7 @@
   function pkRunScore(){ return dailyOrbit ? shownScore(dailyOrbit.base) : Math.max(0, infRun.score); }
   let pkLaunched = 0, pkAuto = false, pkAim = OP.C.W / 2, pkLanded = [], pkLastDrop = -1e9, pkDragging = false;
   const pkFalling = new Map();   // chip index -> its animation (in flight)
+  let pkResizePending = false;   // a resize came mid-drop: re-render once the chips in flight have landed
   function renderPlinko(){
     const f = pkF();
     document.getElementById('finPlinko').classList.remove('hidden', 'jackpot');
@@ -11558,7 +11559,7 @@
     setAim(OP.C.W / 2);
     renderPlinkoTally();
   }
-  function plinkoAllLanded(){ const f = pkF(); return f.dropped >= f.chips.length && pkLanded.length >= f.chips.length; }
+  function plinkoAllLanded(){ const f = pkF(); return f.dropped >= f.chips.length && pkLanded.length >= f.chips.length && pkFalling.size === 0; }
   function renderPlinkoTally(){
     const f = pkF(), n = f.chips.length, left = n - f.dropped;
     const landed = pkLanded.map(i=> f.chips[i]), won = landed.reduce((a, c)=> a + c.pts, 0);
@@ -11682,6 +11683,7 @@
     if (c.kind === 'jackpot' && dailyOrbit){ sfx.jackpot(); showToast('🛸 THE MOTHERSHIP! +' + c.pts); document.getElementById('finPlinko').classList.add('jackpot'); }
     else if (c.kind === 'jackpot'){ sfx.jackpot(); showToast('🛸 MOTHERSHIP JACKPOT! +100' + (f.chips.slice(0, f.dropped).filter(x=> x.kind === 'jackpot').length === 1 ? ' and a bonus card' : '')); document.getElementById('finPlinko').classList.add('jackpot'); }
     if (pkLanded.length >= f.chips.length) pkAuto = false;
+    if (pkResizePending && !pkFalling.size){ pkResizePending = false; setAim(pkAim); renderPlinko(); return; }
     renderPlinkoTally();
   }
   function canDropNow(){
@@ -11725,7 +11727,9 @@
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight'){ e.preventDefault(); setAim(pkAim + (e.key === 'ArrowLeft' ? -8 : 8)); }
       else if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); if (canDropNow()) launchChip(pkAim); }
     });
-    addEventListener('resize', ()=>{ if (pkF() && pkF().stage === 'plinko' && !document.getElementById('finPlinko').classList.contains('hidden')){ setAim(pkAim); renderPlinko(); } });
+    // B4: a resize mid-drop (a phone's address bar sliding, a rotation) used to re-render the board, which cancelled the falling
+    // chip and counted it as landed - so 'See your results' showed before the last chip landed. It now waits for the chips in flight.
+    addEventListener('resize', ()=>{ if (pkF() && pkF().stage === 'plinko' && !document.getElementById('finPlinko').classList.contains('hidden')){ if (pkFalling.size){ pkResizePending = true; return; } setAim(pkAim); renderPlinko(); } });
   })();
   function goToVault(){
     const f = pkF();
