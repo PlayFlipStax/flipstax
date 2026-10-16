@@ -70,3 +70,15 @@ earned tile glows gold with a "?", a missed tile shows a red X. Letters appear o
   Daily Double, Bankrupt, Lose a Turn, 50:50, Ask the Audience.
 - Game types or features beyond the brief.
 - Lifeline buttons, "VOTE NOW" buttons (tapping a card is the vote), casino buttons.
+
+## Decisions, Oct 15 (Rick)
+
+- Landing page and menu background are a TV game-show lobby (bulb marquee, spotlights, stage), not a night sky. Spotlight beams sweep slowly. Host alien: green, big black eyes, sparkly silver suit, retro microphone.
+- Cold open: slower curtain (about 4s). No alien head or floating cards. Host at center stage with WELCOME TO FLIPSTAX plates. Every plate on screen at least 1 second.
+- VS cards: never punish a minority pick (no red X, no buzzer, no MISSED). Neutral 'HOT TAKE!' tag. Red X and buzzer only for Brain Beam and Riddle. Selection sounds: higher DING (top) and lower DONG (bottom).
+- Mystery Games: cut Oddball Alert and Price Probe. Riddle is a fixed slot (Game 1). Pool for Game 2: Emoji Decode x2, Crowd Scan x2, Time Warp, Peak or Plunge, Snap Sort, Zap Words, Twin Flip, Fact or Fib (only after review), Saucer Shuffle. No game on consecutive days. Mystery wheel replaced by a quick host reveal. Cosmic Surprise becomes a small 3-reel slot machine.
+- Lucky Lights is the favorite; recolor to deep red and white marquee bulbs on dark teal.
+- Word Warp: UFO hovers over tiles; correct = tractor beam lifts the letters with an animal chosen by the date seed (a cow, or a different animal each episode); wrong = beam flickers.
+- Disco celebration (single exception to 'one host per screen'): on a Mothership jackpot, the UFO lowers a disco ball, a second alien hops out, they dance about 4 seconds, tap to skip, max once per episode.
+- Later ideas (not yet built): Space-Age Inflation (then-and-now price slider), Yesterday's Survey (needs real votes), typed daily riddle, arcade-style Orbit Drop with a UFO laser ball, Sunday Big Show, grey-alien merch character, real sponsor slot in the commercial break.
+- Never use the names 'Wheel of Fortune', 'Price Is Right', 'Press Your Luck' etc. in the game. Borrow mechanics only.
