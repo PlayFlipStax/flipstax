@@ -79,7 +79,7 @@ earned tile glows gold with a "?", a missed tile shows a red X. Letters appear o
 - Rundown: cold open, Act 1 THE OPENER (x1), Act 2 DOUBLE TROUBLE (x2), Act 3 LIGHTNING ROUND (x3, 5 s VS), Grand Finale (Word Warp 45 s, then Orbit Drop), results. No commercial break (COMMERCIAL_ENABLED = false in data/rundown.js; the code and the sponsor field stay). Episode about 5:35 at a human pace.
 - Hold times are named constants at the top of data/rundown.js; no cinematic moment under 1.5 s; tap-to-skip only after 1 s; lite mode changes looks only, never timing or content. A VS result stays up 1.2 s.
 - Mystery Games: Game 1 is the Riddle; Game 2 comes from the date-seeded pool (Emoji Decode, Crowd Scan, Time Warp, Peak or Plunge, Snap Sort, Zap Words, Twin Flip, Fact or Fib, Saucer Shuffle). Peak or Plunge and Fact or Fib are checked and in the pool; Snap Sort's hard tier is not (SNAP_SORT_REVIEWED = false).
-- Economy: keys (Mystery Game wins, Lucky Lights, Cosmic Surprise) and Lucky Lights chips are Orbit Drop chips, plus one for solving the Word Warp; 2 to 6 chips.
+- Economy: keys (Mystery Game wins, Lucky Lights, Cosmic Surprise) and Lucky Lights chips are Orbit Drop chips, plus one for solving the Word Warp; 3 to 6 chips (ORBIT_MIN_CHIPS = 3 since Oct 16).
 - Lucky Lights: three palettes to choose from (TEST menu or ?luckytheme=1|2|3), palette 1 meanwhile.
 - Anonymous counters only: show_started, reached_results, share_clicked, game_started:<name>, game_completed:<name>, per day, no personal data; /stats (STATS_KEY) shows them.
 

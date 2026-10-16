@@ -80,3 +80,13 @@ G2 measured (Oct 16, one real-time episode at 4 s a VS pick, 8 s a question, ful
 - [x] H5. Orbit Drop: an early Auto-drop tap during the host intro could strand "See your results" - fixed
 
 NEXT: H1 (needs the machine with the old test suites); set STATS_KEY in the Vercel project (Production and Preview) before opening /stats; decide the Redis plan (see H3); pick a Lucky Lights palette (TEST menu or ?luckytheme=1|2|3); check data/snap-sort.txt (hard tier) and then set SNAP_SORT_REVIEWED = true; the episode runs about 5:35 first time - decide whether to trim it (see PROGRESS G2 note).
+
+## I. Run 2 - design foundation (Oct 16, night). Looks, structure and motion only: no game logic, content, director or rundown timing changes.
+
+- [x] I0. ORBIT_MIN_CHIPS 2 -> 3. Re-simulated (1,000 episodes each): average player 3 chips 83%, 4 chips 12%, 5 chips 4%, 6 chips 1% (avg 3.22, was 2.72); weak player 3 chips 96%, 4 chips 3% (avg 3.05, was 2.24). Nobody gets 2 any more; most players now sit on the new floor of 3, so the earned chips only show up from 4 up
+- [ ] I1. Design system: lib/design.css tokens + shared components, DESIGN.md
+- [ ] I2. One mini-game template for the six new games, --game-bg with gradient + pattern fallbacks, 360/390 px checks
+- [ ] I3. Motion standards + frame-time check script (tools/), numbers here, worst offenders fixed
+- [ ] I4. Host pose system (lib/host.js), PNG poses with SVG fallback, callers migrated, events mapped to poses
+- [ ] I5. Landing / menu and cold open polish with the tokens
+- [ ] I6. Verify: 40-run flow set incl. lite mode, screenshots of every screen at 360 and 390 px in screenshots/run2/

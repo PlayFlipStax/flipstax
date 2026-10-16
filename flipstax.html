@@ -11915,7 +11915,7 @@
   // landing slots are drawn once, up front. Awards happen once, in the Vault
   // (see finaleAward).
   const PLINKO_MAX_CHIPS = 5;   // key chips; a Cosmic Surprise bonus chip can make it 6
-  const ORBIT_MIN_CHIPS = 2;    // Orbit Drop is every run's finale: at least this many chips, keys or not
+  const ORBIT_MIN_CHIPS = 3;    // Orbit Drop is every run's finale: at least this many chips, keys or not (Oct 16: was 2 - half of average players sat on the minimum)
   let finTapShieldAt = -1000;   // the 250ms tap shield, after a stage or overlay change
   function finTap(fn){ return e=>{ if (e) e.stopPropagation(); if (performance.now() - finTapShieldAt < TAP_SHIELD_MS) return; fn(e); }; }
   function infCrowdPct(r){ return r.crowdN ? Math.round(r.crowdAgree / r.crowdN * 100) : null; }
@@ -12648,7 +12648,7 @@
   // (r.orbit), saved at every drop, so a refresh comes back to the board.
   // The economy (DIRECTION.md): every key (a Mystery Game win, Lucky Lights, a Cosmic Surprise)
   // and every Lucky Lights chip is an Orbit Drop chip, solving the Word Warp adds a bonus
-  // chip, and there are always 2 to 6.
+  // chip, and there are always 3 to 6 (ORBIT_MIN_CHIPS).
   const DAILY_ORBIT_MAX = 6;
   function dailyChipsFor(keys, chips, solved){ return Math.max(ORBIT_MIN_CHIPS, Math.min(DAILY_ORBIT_MAX, (keys || 0) + (chips || 0) + (solved ? 1 : 0))); }
   function dailyOrbitChips(r){ return Math.max(ORBIT_MIN_CHIPS, Math.min(DAILY_ORBIT_MAX, r.orbitChips || ORBIT_MIN_CHIPS)); }
