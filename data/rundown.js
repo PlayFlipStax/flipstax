@@ -32,9 +32,8 @@ window.FLIPSTAX_RUNDOWN = {
       { game: 'riddle',       weight: 2 },
       { game: 'emojiDecode',  weight: 2 },
       { game: 'crowdScan',    weight: 2 },
-      { game: 'priceProbe',   weight: 1, price: true },
       { game: 'timeWarp',     weight: 1 },
-      { game: 'oddballAlert', weight: 1 },
+      // (Oct 16: Price Probe and Oddball Alert are out of the pool - their code and data stay, and the TEST menu still plays them.)
     ],
   },
   // About one episode in three, one random VS card is replaced by a Cosmic Surprise twist.

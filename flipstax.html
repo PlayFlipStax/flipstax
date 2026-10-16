@@ -5366,7 +5366,7 @@
       { id:'act3', title:'LIGHTNING ROUND', sub:'ACT 3 · POINTS x3', mult:3, vsTimerMs:5000, world:'jumble', steps:[ { vs:6 }, { beam:'hard' }, { beam:'hard' }, { lucky:true } ] },
       { id:'finale', title:'GRAND FINALE', sub:'PLAY FOR THE GRAND PRIZE', mult:1, world:'results', steps:[ { wordWarp:true }, { orbitDrop:true } ] },
     ],
-    mystery: { pool: [ { game:'emojiDecode', weight:2 }, { game:'priceProbe', weight:1, price:true }, { game:'timeWarp', weight:1 }, { game:'oddballAlert', weight:1 } ] },
+    mystery: { pool: [ { game:'emojiDecode', weight:2 }, { game:'timeWarp', weight:1 } ] },   // (fallback; Price Probe and Oddball Alert are out of the pool)
     cosmicSurpriseChance: 0,
     commercial: { ms:3000, ads:[ { brand:'ZING COLA', line:'Tastes like tomorrow!', glyph:'🥤', colors:['#ff3c9d', '#ffd23f'] } ] },
   };
