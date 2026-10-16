@@ -3132,6 +3132,8 @@
   .lb-host{ position:absolute; z-index:2; right:2vw; bottom:calc(5vh + env(safe-area-inset-bottom)); width:min(30vw, 150px); }
   @media (max-height:700px){ .lb-host{ width:min(24vw, 112px); } .lb-tonight{ margin-bottom:12px; } .lb-sign{ margin-bottom:12px; } }
   :root.lite .home-overlay .home-enter-btn{ animation:none; }
+  .home-overlay.entering .home-enter-btn, .home-overlay.entering .home-legal-links{ pointer-events:none; }
+  .home-overlay.entering .st-beam{ opacity:0.85; }   /* (the spotlights swing onto the host and brighten) */
   /* ---- A2 (Oct 2026): after Enter - the menu and the page between screens are the same studio set (no more sky or the
      moving gold Infinity look). The page's own set sits under everything (each game's world covers it while it plays). */
   body{ background:#1d0636; }
@@ -15800,9 +15802,28 @@
       fitTopChip();
     }, 200);
   });
+  // A4: on Enter the host slides to centre stage and every spotlight swings onto him (about 0.9 s), then the menu.
+  // Lite mode and reduced motion go straight in.
   els.homeEnterBtn.addEventListener('click', ()=>{
-    els.homeOverlay.classList.add('hidden');
-    els.modeSelectOverlay.classList.remove('hidden');
+    const ov = els.homeOverlay;
+    if (ov.classList.contains('entering')) return;
+    const beams = [...ov.querySelectorAll('.st-beam')], host = document.getElementById('homeHost');
+    const enter = ()=>{
+      ov.classList.add('hidden'); ov.classList.remove('entering');
+      beams.concat(host ? [host] : []).forEach(el=>{ el.style.transition = ''; el.style.transform = ''; el.style.animation = ''; });
+      const c = document.documentElement.classList; if (!c.contains('mode-daily') && !c.contains('mode-infinity')) els.modeSelectOverlay.classList.remove('hidden');   // (unless a mode already started)
+    };
+    if (prefersReducedMotion() || isLite() || !host){ enter(); return; }
+    ov.classList.add('entering');
+    const W = ov.clientWidth, H = ov.clientHeight, hr = host.getBoundingClientRect(), tx = W / 2, ty = hr.top + hr.height * 0.6;
+    host.style.transition = 'transform .85s cubic-bezier(.3,.7,.3,1)'; host.style.transform = 'translateX(' + (tx - (hr.left + hr.width / 2)).toFixed(1) + 'px)';
+    beams.forEach(b=>{
+      const now = getComputedStyle(b).transform, bx = b.offsetLeft + b.offsetWidth / 2, by = b.offsetTop;
+      const deg = Math.atan2(-(tx - bx), ty - by) * 180 / Math.PI;
+      b.style.transform = now === 'none' ? '' : now; b.style.animation = 'none'; void b.offsetWidth;
+      b.style.transition = 'transform .8s cubic-bezier(.4,0,.2,1)'; b.style.transform = 'rotate(' + deg.toFixed(1) + 'deg)';
+    });
+    setTimeout(enter, 950);
   });
   const LEGAL_LAST_UPDATED = 'October 1, 2026';
   // The contact address never appears whole in the page source (scrapers
