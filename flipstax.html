@@ -2768,6 +2768,31 @@
   @keyframes llSlime{ 0%{ opacity:0; transform:scale(0.3); } 12%{ opacity:1; transform:scale(1.08); } 20%{ transform:scale(1); } 75%{ opacity:1; transform:translateY(14px) scaleY(1.06); } 100%{ opacity:0.85; transform:translateY(30px) scaleY(1.12); } }
   .slimed .ll-hub-t{ color:#7dff5a; text-shadow:0 0 12px rgba(120,255,90,0.8); }
   @media (prefers-reduced-motion: reduce){ .ll-spot, .ll-sq.hit{ animation:none; } .slimed .ll-slime{ animation:none; opacity:0.85; } }
+  /* ---- D5 (Oct 16): Lucky Lights' world - deep red and white marquee bulbs on a dark teal stage (was gold and black). ---- */
+  .lucky-overlay{ background:radial-gradient(120% 80% at 50% 45%, #0d5560, #04282e 60%, #011417); }
+  .lucky-overlay .ll-spot{ background:linear-gradient(180deg, rgba(255,250,240,0.6), rgba(255,240,230,0) 80%); }
+  .ll-title{ position:relative; color:#fff; background:linear-gradient(180deg, #7a0618, #3a020c); border:3px solid #fff; padding:10px 20px;
+    text-shadow:0 3px 0 #5a0010, 0 0 16px rgba(255,80,100,0.75); box-shadow:0 0 0 3px #3a020c, 0 0 28px rgba(255,40,70,0.45); }
+  .ll-title span{ position:relative; z-index:3; }
+  .ll-title .sign-bulbs i:nth-child(odd){ --bulb:#ffffff; } .ll-title .sign-bulbs i:nth-child(even){ --bulb:#ff2a3c; }
+  .ll-bank{ color:#fff; border-color:rgba(255,80,100,0.7); background:rgba(1,20,23,0.7); }
+  .ll-ring{ background:radial-gradient(circle, #073a40 40%, #03191c 62%, transparent 63%); box-shadow:0 0 0 6px #05262b, 0 0 0 9px #b0122e, 0 0 0 11px #fff, 0 0 40px rgba(255,40,70,0.35); }
+  .ll-rim{ position:absolute; inset:0; pointer-events:none; }
+  .ll-rim i{ position:absolute; left:50%; top:50%; width:8px; height:8px; margin:-4px 0 0 -4px; border-radius:50%;
+    transform:translate(calc(var(--x) * (var(--r) + 34px)), calc(var(--y) * (var(--r) + 34px)));
+    background:var(--c); box-shadow:0 0 6px var(--c); --c:#fff; animation:llRim 0.8s steps(1) infinite; animation-delay:calc(var(--k) * -0.4s); }
+  .ll-rim i:nth-child(even){ --c:#ff2a3c; }
+  @keyframes llRim{ 0%{ opacity:1; } 50%{ opacity:0.3; } }
+  .ll-sq{ background:linear-gradient(180deg, #0a4a52, #03222a); border-color:#b0122e; color:#fff; }
+  .ll-sq.on{ background:linear-gradient(180deg, #ffffff, #ffd9de); border-color:#ff2a3c; color:#7a0618; box-shadow:0 0 18px 4px rgba(255,60,90,0.85); }
+  .ll-hub{ background:radial-gradient(circle at 40% 35%, #0d5560, #021a1e 70%); border-color:#b0122e; box-shadow:inset 0 0 24px rgba(255,60,90,0.3), 0 0 0 3px #fff; }
+  .ll-hub-t{ color:#fff; text-shadow:0 0 12px rgba(255,80,100,0.85); }
+  .ll-hub-s, .ll-note{ color:#d8f6f8; }
+  .ll-btn.again{ background:linear-gradient(180deg, #ffffff, #ffd9de); color:#7a0618; }
+  :root.lite .ll-rim i, :root.lite .ll-spot{ animation:none !important; }
+  :root:has(#luckyOverlay:not(.hidden)) .show-marquee{ --bulb:#ffffff !important; }
+  :root:has(#luckyOverlay:not(.hidden)) .show-marquee i:nth-child(even){ background:#ff2a3c; box-shadow:0 0 7px #ff2a3c, 0 0 0 1.5px rgba(40,10,20,0.55); }
+  @media (prefers-reduced-motion: reduce){ .ll-rim i{ animation:none; } }
   /* The commercial break: a 3-second fake 70s ad with a VHS wobble. Skippable. */
   .show-card.ad{ background:#000; overflow:hidden; }
   .ad-screen{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
@@ -10269,11 +10294,12 @@
     let bank = 0, dbl = false, keys = 0, chips = 0, spins = 0, pos = 0, timer = null, autoT = null, state = 'idle';
     const n = LUCKY_SQUARES.length;
     luckyOv.innerHTML = '<i class="ll-spot l"></i><i class="ll-spot r"></i><div class="ll-inner">' +
-      '<div class="ll-title">LUCKY LIGHTS</div><div class="ll-bank" aria-live="polite"></div>' +
-      '<div class="ll-ring">' + LUCKY_SQUARES.map((k, i)=> '<div class="ll-sq' + (k === 'GOOP' ? ' goop' : k === 'x2' ? ' dbl' : '') + '" style="--x:' + Math.sin(i * 2 * Math.PI / n).toFixed(4) + ';--y:' + (-Math.cos(i * 2 * Math.PI / n)).toFixed(4) + '"><span>' + luckyLabel(k) + '</span></div>').join('') +
+      '<div class="ll-title"><div class="sign-bulbs" aria-hidden="true"></div><span>LUCKY LIGHTS</span></div><div class="ll-bank" aria-live="polite"></div>' +
+      '<div class="ll-ring"><div class="ll-rim" aria-hidden="true">' + Array.from({ length:36 }, (_, k)=> '<i style="--x:' + Math.sin(k * Math.PI / 18).toFixed(4) + ';--y:' + (-Math.cos(k * Math.PI / 18)).toFixed(4) + ';--k:' + (k % 2) + '"></i>').join('') + '</div>' + LUCKY_SQUARES.map((k, i)=> '<div class="ll-sq' + (k === 'GOOP' ? ' goop' : k === 'x2' ? ' dbl' : '') + '" style="--x:' + Math.sin(i * 2 * Math.PI / n).toFixed(4) + ';--y:' + (-Math.cos(i * 2 * Math.PI / n)).toFixed(4) + '"><span>' + luckyLabel(k) + '</span></div>').join('') +
       '<div class="ll-hub"><b class="ll-hub-t">READY?</b><span class="ll-hub-s"></span></div></div>' +
       '<div class="ll-buttons"><button type="button" class="ll-btn stop">STOP</button><button type="button" class="ll-btn bank hidden">BANK</button><button type="button" class="ll-btn again hidden">SPIN AGAIN</button></div>' +
       '<div class="ll-note"></div></div><div class="ll-slime" aria-hidden="true">' + GOOP_SVG + '</div>';
+    { const tb = luckyOv.querySelector('.ll-title .sign-bulbs'); if (tb) requestAnimationFrame(()=> ringBulbs(tb, 18, 6)); }
     const sqs = [...luckyOv.querySelectorAll('.ll-sq')], hubT = luckyOv.querySelector('.ll-hub-t'), hubS = luckyOv.querySelector('.ll-hub-s');
     const bStop = luckyOv.querySelector('.stop'), bBank = luckyOv.querySelector('.bank'), bAgain = luckyOv.querySelector('.again'), note = luckyOv.querySelector('.ll-note');
     const renderBank = ()=>{ luckyOv.querySelector('.ll-bank').textContent = 'BANK +' + bank + (dbl ? ' · ×2 ACT 3' : '') + (keys ? ' · 🔑' + keys : '') + (chips ? ' · 🪙' + chips : '') + ' · SPIN ' + Math.min(LUCKY_SPINS, spins + (state === 'spinning' ? 1 : 0)) + '/' + LUCKY_SPINS; };

@@ -50,7 +50,7 @@ A bright, cheeky 70s/80s TV game show.
 | Time Warp | violet |
 | Word Warp | red |
 | Orbit Drop | deep-space neon |
-| Lucky Lights | gold and black |
+| Lucky Lights | deep red and white marquee bulbs on a dark teal stage (Oct 16) |
 
 ### Bulbs
 
