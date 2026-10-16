@@ -2903,6 +2903,9 @@
   :root:is(.mode-daily, .mode-infinity) #board.cb-on .divider{ visibility:hidden; }
   :root:is(.mode-daily, .mode-infinity) .half .pct{ display:none; }
   :root.event-open .crowd-board{ visibility:hidden; }
+  .cb-note{ display:none; padding:6px 10px 4px; font:900 clamp(18px, 5.4vw, 22px)/1.1 var(--f-display); letter-spacing:1px; color:#ffe9a8; white-space:nowrap; }
+  .cb-note small{ display:block; margin-top:3px; font:800 11px var(--f-body); letter-spacing:1px; color:rgba(255,233,168,0.75); }
+  .crowd-board.note .cb-note{ display:block; } .crowd-board.note .cb-label, .crowd-board.note .cb-row{ display:none; }
   .cb-label{ font:900 11px/1 var(--f-display); letter-spacing:0.34em; padding-left:0.34em; color:#ffe9a8; margin:1px 0 5px; }
   .cb-row{ display:flex; align-items:center; justify-content:center; gap:5px; }
   .cb-num{ display:flex; gap:3px; }
@@ -4087,7 +4090,7 @@
     </div>
     <div class="divider">VS</div>
     <!-- The VS reveal's split-flap board (Daily and Infinity): the crowd's split clacks over after a pick. -->
-    <div class="crowd-board" id="crowdBoard" aria-live="polite"><div class="cb-label">CROWD SAYS</div><div class="cb-row"><span class="cb-num" id="cbA"></span><span class="cb-sep">/</span><span class="cb-num" id="cbB"></span></div></div>
+    <div class="crowd-board" id="crowdBoard" aria-live="polite"><div class="cb-note"></div><div class="cb-label">CROWD SAYS</div><div class="cb-row"><span class="cb-num" id="cbA"></span><span class="cb-sep">/</span><span class="cb-num" id="cbB"></span></div></div>
     <div class="half bottom" id="halfB">
       <i class="gloss" aria-hidden="true"></i>
       <div class="cat-chip" id="chipB"></div>
@@ -10424,10 +10427,15 @@
   function runMysteryGame(st, done){
     if (!st.game || !(mysteryAvailable(st.game) || (st.forced && miniGame(st.game)))) return false;   // (TEST jumps can force a game not yet in the rotation)
     runCurrentGame = mysteryName(st.game);
+    // F2: Crowd Scan needs a real crowd - read the next cards' tallies while the door opens.
+    if (st.game === 'crowdScan'){
+      const ids = []; upcomingCards(12).forEach(c=> [slugify(c.a), slugify(c.b)].forEach(id=>{ if (!tallyCache.has(id) && ids.indexOf(id) < 0 && ids.length < 20) ids.push(id); }));
+      if (ids.length) fetchTallies(ids).then(r=>{ if (r && r.counts) cacheTallies(r.counts); }).catch(()=>{});
+    }
     showMysteryReveal(st.game, ()=>{
       if (!runActive) return;
       const ok = st.game === 'riddle' ? (runTriviaQuestion(null, null, { t:'quiz', riddle:true, mystery:true, seed: st.seed }), true)
-        : st.game === 'crowdScan' ? runDailyCrowdScan(st, done)
+        : st.game === 'crowdScan' ? (runDailyCrowdScan(st, done) || (hostSay('The crowd\u2019s still voting - Emoji Decode instead!', 2000), runBrainBreak({ game:'emojiDecode', seed: st.seed }, done)))
         : miniGame(st.game) ? runMiniGame(st.game, st, done)
         : runBrainBreak({ game: st.game, seed: st.seed }, done);
       if (!ok){ runPhase = 'running'; loadNext(); }
@@ -10441,7 +10449,8 @@
   let dailyScanDone = null;
   function runDailyCrowdScan(st, done){
     const d = decks.daily; if (!d || d.next >= d.cards.length) return false;
-    const card = d.cards[d.next];
+    const card = upcomingCards(12).find(guessCounts);   // F2: the next card with a real crowd (30+ votes), or no Crowd Scan
+    if (!card) return false;
     dailyScanDone = done;
     if (!startGuessRound(card, true)){ dailyScanDone = null; return false; }
     return true;
@@ -12744,7 +12753,7 @@
   function startGuessRound(card, daily){
     if (guessState !== 'idle') return false;
     let counts = guessCounts(card);
-    if (!counts && daily){ const p = mockPercentA(card.id, card.a); counts = { a:p, b:100 - p }; }   // (the show: the split the VS reveal would show)
+    // (F2: no stand-in split - Crowd Scan only ever uses a real crowd of CROWD_DATA_MIN or more)
     if (!counts) return false;
     // Taken out of this lap of the deck: once its split has been seen, it
     // shouldn't come back as an ordinary vote.
@@ -15254,11 +15263,17 @@
   const VS_DRUMROLL_MS = 600;
   let cbFlapT = 0, cbSettled = Promise.resolve();
   function isShowMode(){ const c = document.documentElement.classList; return c.contains('mode-daily') || c.contains('mode-infinity'); }
-  function crowdBoardHide(){ clearInterval(cbFlapT); showFx.querySelectorAll('.vs-stamp, .pts-pop').forEach(e=> e.remove()); crowdBoard.classList.remove('on'); els.board.classList.remove('cb-on'); cbNums.forEach(n=> n.classList.remove('win')); }
+  // F2: no fake crowd. With fewer than CROWD_DATA_MIN real votes from others, the board shows a friendly note instead of numbers.
+  function crowdBoardNote(others){
+    clearInterval(cbFlapT); cbNums.forEach(n=> n.classList.remove('win'));
+    crowdBoard.querySelector('.cb-note').innerHTML = others > 0 ? 'EARLY CROWD<small>only ' + others + ' vote' + (others === 1 ? '' : 's') + ' so far</small>' : 'YOU\u2019RE THE FIRST TO VOTE!';
+    crowdBoard.classList.add('on', 'note'); els.board.classList.add('cb-on'); cbSettled = Promise.resolve();
+  }
+  function crowdBoardHide(){ crowdBoard.classList.remove('note'); clearInterval(cbFlapT); showFx.querySelectorAll('.vs-stamp, .pts-pop').forEach(e=> e.remove()); crowdBoard.classList.remove('on'); els.board.classList.remove('cb-on'); cbNums.forEach(n=> n.classList.remove('win')); }
   // Shows pctA / pctB; `animate` runs the flaps through random digits, left to right, a clack a tick.
   function crowdBoardShow(pctA, pctB, animate){
     clearInterval(cbFlapT);
-    crowdBoard.classList.add('on'); els.board.classList.add('cb-on');
+    crowdBoard.classList.remove('note'); crowdBoard.classList.add('on'); els.board.classList.add('cb-on');
     const texts = [pctA + '%', pctB + '%'], cells = [], target = [];
     cbNums.forEach((n, k)=>{
       n.classList.remove('win');
@@ -15313,7 +15328,7 @@
         { duration:1150, easing:'ease-out' }).onfinish = ()=> tag.remove();
     }
   }
-  function reveal(counts, isLiveUpdate){
+  function reveal(counts, isLiveUpdate, others){
     const a = (counts && counts.a) || 0;
     const b = (counts && counts.b) || 0;
     const total = a + b;
@@ -15323,7 +15338,12 @@
     els.halfA.classList.add('revealed'); els.halfB.classList.add('revealed');
     els.fillA.style.width = pctA + '%'; els.fillB.style.width = pctB + '%';
     animateCount(els.pctA, pctA); animateCount(els.pctB, pctB);
-    if (isShowMode()) crowdBoardShow(pctA, pctB, !isLiveUpdate);
+    if (isShowMode()){
+      // F2: the crowd's numbers only with a real crowd (CROWD_DATA_MIN votes from others); else a note and empty bars.
+      const n = others != null ? others : Math.max(0, total - 1);
+      if (n >= CROWD_DATA_MIN_NOW) crowdBoardShow(pctA, pctB, !isLiveUpdate || crowdBoard.classList.contains('note'));   // (a live update that brings the crowd past 30 clacks the numbers in)
+      else { crowdBoardNote(n); els.fillA.style.width = '0%'; els.fillB.style.width = '0%'; }
+    }
     // Skip the reveal flash/sound-adjacent pulse on live poll updates - it's
     // a one-time "results are in" beat, not something that should re-fire
     // every few seconds while the player is just looking at the board.
@@ -15433,12 +15453,13 @@
       if (left > 0){ await new Promise(r=> setTimeout(r, left)); if (roundMovedOn()) return; }
     }
 
-    const { pctA, pctB } = reveal(counts);
+    const cv = crowdVerdict(side, counts, myVote), realCrowd = cv.others >= CROWD_DATA_MIN_NOW;
+    const { pctA, pctB } = reveal(counts, false, cv.others);
     if (testTagEl) requestAnimationFrame(()=> noteTapTiming(performance.now() - tapAt, talliesMs));
     // Keep the result ticking live while it's on screen, in case other
     // players vote on this same pairing in the meantime.
     startTallyPolling([slugA, slugB], (data)=>{
-      reveal({ a: data.counts[slugA] || 0, b: data.counts[slugB] || 0 }, true);
+      const ra = data.counts[slugA] || 0, rb = data.counts[slugB] || 0; reveal({ a: ra, b: rb }, true, Math.max(0, ra + rb - 1));
     });
     const won = side==='A' ? pctA>=pctB : pctB>=pctA;
     if (!showReveal){ if (won) sfx.revealWin(); else sfx.revealLose(); }
@@ -15446,16 +15467,17 @@
     els.tagB.textContent = side==='B' ? 'Your pick' : '';
     queueLayoutBoard();
 
-    // With the crowd or not - other players' votes only (see crowdVerdict).
-    const cv = crowdVerdict(side, counts, myVote);
+    // With the crowd or not - other players' votes only (see crowdVerdict; computed above, before the reveal).
     // For the share card's "You agreed with N% of players on X vs Y": other
     // players only (it used to include the player's own vote, so a card
     // nobody else had voted on said 100%). Kept from the latest vote that
     // anyone else had voted on.
     if (cv.others > 0) lastVoteSummary = { pct: cv.pickPct, itemA: current.a, itemB: current.b };
     const underdog = cv.counted && cv.pickPct <= 30;
-    if (showReveal){ const matched = cv.counted ? cv.withCrowd : won; cbSettled.then(()=>{ if (!roundMovedOn()) vsVerdictFx(side, matched, ptsShown, cv.counted ? cv.pickPct : (side === 'A' ? pctA : pctB)); }); }
-    if (!cv.counted) els.hint.innerHTML = cv.others === 0 ? '\uD83C\uDF31 First vote on this one \u2014 no crowd yet'
+    if (showReveal && realCrowd && cv.counted){ cbSettled.then(()=>{ if (!roundMovedOn()) vsVerdictFx(side, cv.withCrowd, ptsShown, cv.pickPct); }); }   // (F2: no verdict, tag or numbers without a real crowd)
+    else if (showReveal) sfx.chime(4);
+    if (showReveal && !realCrowd) els.hint.innerHTML = cv.others === 0 ? '\uD83C\uDF31 You\u2019re the first to vote!' : '\u23F3 Early crowd \u2014 only ' + cv.others + ' vote' + (cv.others === 1 ? '' : 's') + ' so far';
+    else if (!cv.counted) els.hint.innerHTML = cv.others === 0 ? '\uD83C\uDF31 First vote on this one \u2014 no crowd yet'
       : cv.others < CROWD_MIN_OTHERS ? '\u23F3 Too few votes yet to call the crowd'
       : '\u2696\uFE0F Dead heat \u2014 split right down the middle';
     else if (Math.abs(cv.pickPct - 50) <= 3) els.hint.innerHTML = '\u2696\uFE0F Dead heat \u2014 almost split down the middle';
