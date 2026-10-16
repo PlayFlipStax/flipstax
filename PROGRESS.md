@@ -23,7 +23,7 @@ new fonts, original art, no real brand or show names, every new game gets a TEST
 ## C. VS cards
 
 - [x] C1. A minority pick is never punished: no red X, MISSED or negative sound; a gold-to-pink HOT TAKE! / BOLD PICK! tag, at most a soft whoosh; a crowd match keeps the gold pill and chime; red X + buzzer only for Brain Beam and Riddle
-- [ ] C2. Selection sounds: soft same-instrument DING (top card) and DONG a major third lower (bottom), each < 200ms, mute and master volume respected
+- [x] C2. Selection sounds: soft same-instrument DING (top card) and DONG a major third lower (bottom), each < 200ms, mute and master volume respected
 
 ## D. Overhaul
 

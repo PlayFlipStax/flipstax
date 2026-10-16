@@ -6252,7 +6252,19 @@
     lockIn: ()=>{ playTone(520, 0, 0.08, 'square', 0.06); playTone(780, 0.07, 0.12, 'square', 0.06); },
     secretSolve: ()=> playSecretSolveSound(),
     coinSpin: ()=> playCoinSpin(), coinWin: ()=> playCoinWin(), coinLose: ()=> playCoinLose(),
-    tap: (side)=>{ playClick(0.2, document.documentElement.classList.contains('mode-infinity') ? TAP_TONES.infinity : TAP_TONES.daily, side); haptic(8); },
+    // C2: picking a card - a soft mallet DING for the top card and a DONG a major third lower for the bottom one, the
+    // same instrument, each under 200 ms (through the master volume; nothing when muted).
+    tap: (side)=>{
+      withSfxCtx((ctx, t)=>{
+        const f = side === 'bottom' ? 830.6 : 1046.5;
+        [[f, 'sine', 0.075, 0.17], [f * 2, 'sine', 0.018, 0.08], [f * 3.01, 'triangle', 0.006, 0.04]].forEach(([fq, ty, v, d])=>{
+          const o = ctx.createOscillator(), g = ctx.createGain(); o.type = ty; o.frequency.value = fq;
+          g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(v, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+          o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + d + 0.02);
+        });
+      });
+      haptic(8);
+    },
     revealWin: ()=>{ playTone(660,0,0.09,'sine',0.1); playTone(880,0.08,0.14,'sine',0.1); },
     revealLose: ()=>{ playTone(320,0,0.15,'sine',0.07); },
     combo: ()=>{ playTone(784,0,0.06,'triangle',0.09); playTone(988,0.05,0.08,'triangle',0.09); haptic(12); },
