@@ -1,0 +1,76 @@
+FlipStax - Peak or Plunge items
+NOT FACT-CHECKED - please check every line before setting PEAK_OR_PLUNGE_REVIEWED = true in data/peak-or-plunge.js.
+Format: number. name | number | category | source note
+
+1. Eiffel Tower | 330 m tall | height | "Eiffel Tower": 330 m to the tip (antenna added 2022)
+2. Statue of Liberty (ground to torch) | 93 m tall | height | "Statue of Liberty": 93 m / 305 ft, ground to torch (also US National Park Service)
+3. Burj Khalifa | 828 m tall | height | "Burj Khalifa": 828 m
+4. Empire State Building (roof) | 381 m tall | height | "Empire State Building": roof 381 m (443 m to the antenna tip)
+5. Big Ben’s tower | 96 m tall | height | "Elizabeth Tower": 96 m / 316 ft
+6. Leaning Tower of Pisa | 56 m tall | height | "Leaning Tower of Pisa": 55.86 m (low side) to 56.67 m (high side)
+7. Great Pyramid of Giza (today) | 139 m tall | height | "Great Pyramid of Giza": 138.5 m today (146.6 m originally)
+8. Taipei 101 | 508 m tall | height | "Taipei 101": 508 m
+9. CN Tower in Toronto | 553 m tall | height | "CN Tower": 553.3 m
+10. Seattle’s Space Needle | 184 m tall | height | "Space Needle": 184 m / 605 ft
+11. Sydney Opera House (top shell) | 65 m tall | height | "Sydney Opera House": 65 m high
+12. Christ the Redeemer statue (without its pedestal) | 30 m tall | height | "Christ the Redeemer (statue)": 30 m statue, 8 m pedestal
+13. Golden Gate Bridge towers (above the water) | 227 m tall | height | "Golden Gate Bridge": towers 227 m / 746 ft above the water
+14. Shanghai Tower | 632 m tall | height | "Shanghai Tower": 632 m
+15. Petronas Towers | 452 m tall | height | "Petronas Towers": 451.9 m
+16. Gateway Arch in St. Louis | 192 m tall | height | "Gateway Arch": 192 m / 630 ft
+17. Mount Everest | 8,849 m high | height | "Mount Everest": 8,848.86 m (2020 China-Nepal survey)
+18. K2 | 8,611 m high | height | "K2": 8,611 m
+19. Mount Kilimanjaro | 5,895 m high | height | "Mount Kilimanjaro": 5,895 m
+20. Mount Fuji | 3,776 m high | height | "Mount Fuji": 3,776.24 m
+21. Denali in Alaska | 6,190 m high | height | "Denali": 6,190 m (2015 survey, 20,310 ft)
+22. The Matterhorn | 4,478 m high | height | "Matterhorn": 4,478 m
+23. Aconcagua | 6,961 m high | height | "Aconcagua": 6,961 m
+24. Mount Kosciuszko, Australia’s highest | 2,228 m high | height | "Mount Kosciuszko": 2,228 m
+25. Angel Falls (total drop) | 979 m tall | height | "Angel Falls": 979 m total height
+26. First people walk on the Moon | 1969 | year | "Apollo 11": landed 20 July 1969
+27. The Titanic sinks | 1912 | year | "Titanic": sank 15 April 1912
+28. The Eiffel Tower is finished | 1889 | year | "Eiffel Tower": completed 1889
+29. The Berlin Wall falls | 1989 | year | "Fall of the Berlin Wall": 9 November 1989
+30. The first powered airplane flight | 1903 | year | "Wright Flyer": 17 December 1903
+31. The first website goes live | 1991 | year | "History of the World Wide Web": first website online August 1991
+32. The first email between computers | 1971 | year | "Email" / "Ray Tomlinson": first networked email 1971
+33. The telephone is patented | 1876 | year | "Invention of the telephone": Bell's US patent, March 1876
+34. The first modern Olympic Games | 1896 | year | "1896 Summer Olympics": Athens 1896
+35. The Panama Canal opens | 1914 | year | "Panama Canal": opened 15 August 1914
+36. The Golden Gate Bridge opens | 1937 | year | "Golden Gate Bridge": opened 27 May 1937
+37. Mount Everest is first climbed | 1953 | year | "Mount Everest": first ascent 29 May 1953
+38. The first person goes to space | 1961 | year | "Yuri Gagarin": Vostok 1, 12 April 1961
+39. The Hubble telescope is launched | 1990 | year | "Hubble Space Telescope": launched 24 April 1990
+40. The Great Fire of London | 1666 | year | "Great Fire of London": September 1666
+41. The Statue of Liberty is dedicated | 1886 | year | "Statue of Liberty": dedicated 28 October 1886
+42. The first football World Cup | 1930 | year | "1930 FIFA World Cup": Uruguay 1930
+43. The Sydney Opera House opens | 1973 | year | "Sydney Opera House": opened 20 October 1973
+44. The tunnel under the English Channel opens | 1994 | year | "Channel Tunnel": opened 6 May 1994
+45. The Mona Lisa is stolen from the Louvre | 1911 | year | "Mona Lisa": stolen 21 August 1911 (found 1913)
+46. Edison’s long-lasting light bulb test | 1879 | year | "Incandescent light bulb": Edison's successful test, October 1879
+47. Bones in an adult human | 206 | count | "Human skeleton": 206 bones in a typical adult
+48. Keys on a standard piano | 88 | count | "Piano": 88 keys
+49. Squares on a chessboard | 64 | count | "Chessboard": 8 x 8 = 64
+50. Member countries of the United Nations | 193 | count | "Member states of the United Nations": 193
+51. Teeth in a full adult set | 32 | count | "Human tooth": 32 permanent teeth
+52. Hearts in an octopus | 3 | count | "Octopus": three hearts
+53. Strings on a standard guitar | 6 | count | "Guitar": six strings (standard)
+54. Dots on one six-sided die, added up | 21 | count | 1+2+3+4+5+6 = 21
+55. Rings on the Olympic flag | 5 | count | "Olympic symbols": five rings
+56. Players per side on a football pitch | 11 | count | "Association football": 11 players per team on the field
+57. Days in one year on Mars | 687 | count | "Mars": orbital period 687 Earth days
+58. Cards in a standard deck (no jokers) | 52 | count | "Standard 52-card deck"
+59. Legs on a spider | 8 | count | "Spider": eight legs
+60. Legs on a lobster (claws included) | 10 | count | "Lobster": ten legs, the front pair being the claws (decapods)
+61. Eyes on a honeybee | 5 | count | "Western honey bee": two compound eyes and three ocelli
+62. Symphonies Beethoven finished | 9 | count | "Ludwig van Beethoven": nine symphonies
+63. Planets in our solar system | 8 | count | "Solar System": eight planets (IAU 2006)
+64. Time zones across Russia | 11 | count | "Time in Russia": 11 time zones
+65. Tiles in a double-six domino set | 28 | count | "Dominoes": a double-six set has 28 tiles
+66. Minutes in one day | 1,440 | count | 24 x 60 = 1,440
+67. Holes on a full golf course | 18 | count | "Golf course": 18 holes
+68. Sides on a stop sign | 8 | count | "Stop sign": octagon (Vienna Convention / US MUTCD)
+69. Bones in a shark | 0 | count | "Shark": skeleton made of cartilage, no bones
+70. Strings on a violin | 4 | count | "Violin": four strings
+71. Days in a leap year | 366 | count | "Leap year": 366 days
+72. Hours in one week | 168 | count | 7 x 24 = 168

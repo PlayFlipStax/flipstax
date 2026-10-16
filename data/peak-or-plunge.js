@@ -4,6 +4,9 @@
 // Items are only ever compared within their own `cat` (heights with heights, years with years, counts with counts).
 // Every number is a well-documented figure; the source is in the comment on each line (Wikipedia unless noted).
 // No real brand names (DIRECTION.md). `text` reads after the name: "Eiffel Tower: 330 m tall".
+// *** NOT FACT-CHECKED BY A HUMAN YET *** The plain-text copy for checking is data/peak-or-plunge.txt. The game stays out
+// of the Mystery Game rotation until PEAK_OR_PLUNGE_REVIEWED is set to true below (the TEST menu can still play it).
+window.PEAK_OR_PLUNGE_REVIEWED = false;
 window.FLIPSTAX_PEAK_OR_PLUNGE = [
   // ---- heights, in metres ----
   { cat:'height', glyph:'🗼', name:'Eiffel Tower', value:330, text:'m tall' },                       // "Eiffel Tower": 330 m to the tip (antenna added 2022)
