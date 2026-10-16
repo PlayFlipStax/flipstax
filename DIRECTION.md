@@ -14,11 +14,12 @@ tuned without touching code:
    lights up letter by letter, the host slides in, three cue cards fan out
    (VS SHOWDOWN, ?, GRAND PRIZE). 12 s the first time, 3 s for returning players, tap to skip.
 2. **Act 1 - THE OPENER** (x1 points): 5 VS, Brain Beam (easy), 4 VS, Mystery Game 1, Brain Beam (easy).
-3. **Commercial break** - a 3 s fake 70s ad for a fictional product, skippable.
+3. **No commercial break** (Oct 16): cut from the rundown. The code stays, behind `COMMERCIAL_ENABLED = false` at the top of
+   `data/rundown.js`, with its "Brought to you by" sponsor field kept for a real sponsor later.
 4. **Act 2 - DOUBLE TROUBLE** (x2): 5 VS, Brain Beam (medium), Portal Pick, 4 VS, Mystery Game 2, Brain Beam (medium).
 5. **Act 3 - LIGHTNING ROUND** (x3, 5 s VS timer): 6 VS, two hard Brain Beams back to back, Lucky Lights.
    Lucky Lights has two GOOP squares: landing on the GOOP loses the whole Lucky Lights bonus
-   (a green slime splat that says GOOPED!). The commercial's product is ZING COLA.
+   (a green slime splat that says GOOPED!). (When the commercial comes back, its product is ZING COLA.)
 6. **Grand finale** - Word Warp, then Orbit Drop for the grand prize (the jackpot slot is THE MOTHERSHIP).
 7. **Results** - the share card, a score breakdown, your best moment, the personality card,
    the streak, a "Tomorrow on FlipStax" tease and a countdown to the next episode.

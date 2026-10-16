@@ -21,6 +21,10 @@ const ROUND_BUMPER_HOLD = 2200;      // a round title card (the "Round N" bumper
 const COSMIC_SURPRISE_INTRO = 2000;  // the Cosmic Surprise machine on screen before its reels spin
 const CINEMATIC_MIN = 1500;          // no cinematic moment is shorter than this
 const SKIP_AFTER = 1000;             // tap-to-skip works only after this long
+
+// G3 (Oct 16): the commercial break is cut from the show. Its code and the "Brought to you by" sponsor field stay;
+// set this to true to bring it back (it plays after the act named in commercial.after).
+const COMMERCIAL_ENABLED = false;
 window.FLIPSTAX_TIMING = { ACT_CARD_HOLD, MYSTERY_REVEAL_HOLD, STAR_WIPE, ROUND_BUMPER_HOLD, COSMIC_SURPRISE_INTRO, CINEMATIC_MIN, SKIP_AFTER };
 
 window.FLIPSTAX_RUNDOWN = {
@@ -28,7 +32,6 @@ window.FLIPSTAX_RUNDOWN = {
   acts: [
     { id: 'act1', title: 'THE OPENER', sub: 'ACT 1', mult: 1, vsTimerMs: 7000, world: 'vs',
       steps: [ { vs: 5 }, { beam: 'easy' }, { vs: 4 }, { mystery: 1 }, { beam: 'easy' } ] },
-    { ad: true },
     { id: 'act2', title: 'DOUBLE TROUBLE', sub: 'ACT 2 · POINTS x2', mult: 2, vsTimerMs: 7000, world: 'powerup',
       steps: [ { vs: 5 }, { beam: 'medium' }, { portal: true }, { vs: 4 }, { mystery: 2 }, { beam: 'medium' } ] },
     { id: 'act3', title: 'LIGHTNING ROUND', sub: 'ACT 3 · POINTS x3', mult: 3, vsTimerMs: 5000, world: 'jumble',
@@ -58,6 +61,8 @@ window.FLIPSTAX_RUNDOWN = {
   // The commercial break: a 3-second fake 70s ad for a fictional product (one a day, by
   // the date). Skippable. Built so a real ad can replace it later.
   commercial: {
+    enabled: COMMERCIAL_ENABLED,
+    after: 'act1',   // (when enabled: between Act 1 and Act 2)
     ms: 3000,
     // A real sponsor later: set `sponsor` (shown as BROUGHT TO YOU BY ...) and/or add its ad here. Invented brands only until then.
     sponsor: null,

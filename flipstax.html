@@ -5591,7 +5591,6 @@
     coldOpen: { firstMs: 12000, returningMs: 3000 },
     acts: [
       { id:'act1', title:'THE OPENER', sub:'ACT 1', mult:1, vsTimerMs:7000, world:'vs', steps:[ { vs:5 }, { beam:'easy' }, { vs:4 }, { mystery:1 }, { beam:'easy' } ] },
-      { ad:true },
       { id:'act2', title:'DOUBLE TROUBLE', sub:'ACT 2 · POINTS x2', mult:2, vsTimerMs:7000, world:'powerup', steps:[ { vs:5 }, { beam:'medium' }, { portal:true }, { vs:4 }, { mystery:2 }, { beam:'medium' } ] },
       { id:'act3', title:'LIGHTNING ROUND', sub:'ACT 3 · POINTS x3', mult:3, vsTimerMs:5000, world:'jumble', steps:[ { vs:6 }, { beam:'hard' }, { beam:'hard' }, { lucky:true } ] },
       { id:'finale', title:'GRAND FINALE', sub:'PLAY FOR THE GRAND PRIZE', mult:1, world:'results', steps:[ { wordWarp:true }, { orbitDrop:true } ] },
@@ -5605,7 +5604,9 @@
   const TIMING = Object.assign({ ACT_CARD_HOLD:2800, MYSTERY_REVEAL_HOLD:3000, STAR_WIPE:1600, ROUND_BUMPER_HOLD:2200, COSMIC_SURPRISE_INTRO:2000, CINEMATIC_MIN:1500, SKIP_AFTER:1000 }, window.FLIPSTAX_TIMING || {});
   // A cinematic moment (a full-screen card, a reveal, a result) is never on screen for less than CINEMATIC_MIN.
   const cine = (ms)=> Math.max(TIMING.CINEMATIC_MIN, ms);
-  const COMMERCIAL_ENABLED = RUNDOWN.COMMERCIAL_ENABLED !== false;   // the commercial break, unless data/rundown.js turns it off
+  // G3: the commercial break is out of the rundown; COMMERCIAL_ENABLED at the top of data/rundown.js brings it back
+  // (after the act named in commercial.after). The ad code and the "Brought to you by" sponsor field stay.
+  const COMMERCIAL_ON = !!(RUNDOWN.commercial && RUNDOWN.commercial.enabled);
   function seedOf(rng){ return (rng() * 4294967296) >>> 0; }
   // The day's two Mystery Games (see pickMysteryGames).
   function showMysteryGames(date){ return pickMysteryGames(date); }
@@ -5673,6 +5674,7 @@
         else if (s.wordWarp) steps.push({ t:'finale', act:ai });
         // (orbitDrop: the Word Warp's finish opens it - see endRun)
       });
+      if (COMMERCIAL_ON && RUNDOWN.commercial.after === act.id) steps.push({ t:'ad', ad: showAd(date) });
     });
     // About one episode in three, a Cosmic Surprise takes one random VS card's place.
     if (rng() < (RUNDOWN.cosmicSurpriseChance || 0)){
@@ -10405,14 +10407,14 @@
       if (st.t === 'act'){
         // An act opens: the host holds up its cue card; its multiplier and VS timer apply from here.
         runActIdx = st.act; renderRunBanner();
-        if (runScoreAtHalfway == null && st.act >= 2) runScoreAtHalfway = runScore;   // (for the comeback check: points before Act 2 vs after)
+        if (runScoreAtHalfway == null && (RUNDOWN.acts[st.act] || {}).id === 'act2') runScoreAtHalfway = runScore;   // (for the comeback check: points before Act 2 vs after)
         runPhase = 'bumper'; saveRunSnapshot();
         const g = showEnter('act', st.title);
         showActCard(st, ()=> showDone(g, 'act card'));
         return true;
       }
       if (st.t === 'ad'){
-        if (!COMMERCIAL_ENABLED) continue;   // (G3: the commercial break is off)
+        if (!COMMERCIAL_ON && !st.forced) continue;   // (G3: the commercial break is off; the TEST menu can still show it)
         runPhase = 'bumper'; saveRunSnapshot();
         const g = showEnter('ad', st.ad && st.ad.brand);
         showCommercial(st.ad, ()=> showDone(g, 'commercial'));
@@ -16857,7 +16859,7 @@
     const mysteryAs = (game)=> atType(s=> s.t === 'mystery', 0, 60, 1, (i)=>{ runPlan[i] = Object.assign({}, runPlan[i], { game, seed:20261013, forced:true }); });
     function replaySampleEpisode(){
       const r = replaySampleResult();
-      return Object.assign(r, { score: 412, actPts: [64, 0, 128, 141], missPts: 10, goopLost: 28, best: { pts: 45, text: 'Read the crowd on Pizza vs Tacos in Lightning Round' }, episode: showEpisode(todayStr()),
+      return Object.assign(r, { score: 412, actPts: [64, 128, 141], missPts: 10, goopLost: 28, best: { pts: 45, text: 'Read the crowd on Pizza vs Tacos in Lightning Round' }, episode: showEpisode(todayStr()),
         orbit: { stage:'done', done:true, chips:[], dropped:0, base: 368 }, orbitPoints: 44, jackpot: true, letters: 5, streak: 7,
         vsMarks: ['ggrggrggg', '', 'grggrgggr', 'ggrgrg'] });
     }
@@ -16869,10 +16871,10 @@
       { label:'Riddle', go: mysteryAs('riddle') },
       { label:'Crowd Scan', go: mysteryAs('crowdScan') },
       { label:'Cosmic Surprise', go: atType(s=> s.t === 'vs', 0, 30, 1, (i)=>{ runPlan.splice(i, 0, { t:'cosmic', act:0, seed:7 }); }) },
-      { label:'Commercial', go: atType(s=> s.t === 'ad', 0, 70, 2) },
-      { label:'Act 2 card', go: actCard(2) },
+      { label:'Commercial (off)', go: atType(s=> s.t === 'act' && (RUNDOWN.acts[s.act] || {}).id === 'act2', 0, 70, 2, (i)=>{ runPlan.splice(i, 0, { t:'ad', forced:true, ad: showAd(todayStr()) }); }) },
+      { label:'Act 2 card', go: actCard(RUNDOWN.acts.findIndex(a=> a.id === 'act2')) },
       { label:'Portal Pick', go: atType(s=> s.t === 'portal', 0, 96, 3) },
-      { label:'Act 3 card', go: actCard(3) },
+      { label:'Act 3 card', go: actCard(RUNDOWN.acts.findIndex(a=> a.id === 'act3')) },
       { label:'Lucky Lights', go: atType(s=> s.t === 'lucky', 0, 180, 5, ()=>{ window.__forceLucky = null; }) },
       { label:'Lucky: GOOP', go: atType(s=> s.t === 'lucky', 0, 180, 5, ()=>{ window.__forceLucky = 'GOOP'; }) },
       { label:'Price Probe', go: mysteryAs('priceProbe') },
