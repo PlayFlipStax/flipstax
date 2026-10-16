@@ -2603,6 +2603,39 @@
   :root.mode-infinity .take{ font-size:clamp(26px, 7.8vw, 42px); font-weight:800; }
   :root:is(.mode-infinity, .mode-daily) .divider{ width:56px; height:56px; font-size:19px; color:#2a1300; border:4px solid #7a3d00; animation:none;
     background:radial-gradient(circle at 35% 30%, #fff8c8, #ffd23f 50%, #f5a300); box-shadow:0 0 18px rgba(255,210,60,0.85), 0 3px 0 rgba(60,20,0,0.5); }
+  /* ---- The VS reveal (Oct 2026): a 0.6s drumroll after the pick, then a split-flap CROWD SAYS board over
+     the VS coin clacks the split over like an airport board (each flap a quick scaleY) while the bars fill;
+     a match flashes every bulb white-gold in unison and pops the points, a miss stamps a red X on the pick,
+     shakes it and flickers the bulbs red. The board replaces the in-card percentages. */
+  .crowd-board{ display:none; }
+  :root:is(.mode-daily, .mode-infinity) .crowd-board{ display:block; position:absolute; top:var(--seam, 50%); left:50%; z-index:6; pointer-events:none;
+    transform:translate(-50%,-50%) scale(0.55); opacity:0; transition:transform .24s cubic-bezier(.2,1.6,.4,1), opacity .14s;
+    padding:6px 10px 9px; border-radius:14px; text-align:center; background:linear-gradient(#2b2a31, #111115); border:3px solid #e0ad3c;
+    box-shadow:0 0 0 2px #5a3a08, 0 8px 22px rgba(0,0,0,0.55), 0 0 20px rgba(255,210,63,0.45); }
+  :root:is(.mode-daily, .mode-infinity) .crowd-board.on{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+  :root:is(.mode-daily, .mode-infinity) #board.cb-on .divider{ visibility:hidden; }
+  :root:is(.mode-daily, .mode-infinity) .half .pct{ display:none; }
+  :root.event-open .crowd-board{ visibility:hidden; }
+  .cb-label{ font:900 11px/1 var(--f-display); letter-spacing:0.34em; padding-left:0.34em; color:#ffe9a8; margin:1px 0 5px; }
+  .cb-row{ display:flex; align-items:center; justify-content:center; gap:5px; }
+  .cb-num{ display:flex; gap:3px; }
+  .cb-num b{ position:relative; width:25px; height:38px; display:flex; align-items:center; justify-content:center; border-radius:5px;
+    background:linear-gradient(#383840 0 49%, #1d1d23 51%); color:#fdf3d8; font:900 30px/1 var(--f-display);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.14), 0 2px 0 rgba(0,0,0,0.6); }
+  .cb-num b::after{ content:''; position:absolute; left:0; right:0; top:50%; height:2px; margin-top:-1px; background:rgba(0,0,0,0.8); }
+  .cb-num b.fa{ animation:cbFlapA .06s linear; } .cb-num b.fb{ animation:cbFlapB .06s linear; }
+  @keyframes cbFlapA{ 50%{ transform:scaleY(0.12); } } @keyframes cbFlapB{ 50%{ transform:scaleY(0.12); } }
+  .cb-num.win b{ color:#ffd23f; text-shadow:0 0 10px rgba(255,210,63,0.85); }
+  .cb-sep{ font:900 28px/1 var(--f-display); color:#e0ad3c; }
+  .show-marquee.unison i{ animation:bulbUnison .2s steps(1) 2; background:#fff6d0; box-shadow:0 0 12px #ffe27a, 0 0 0 1.5px rgba(40,10,70,0.55); }
+  @keyframes bulbUnison{ 0%{ opacity:1; } 50%{ opacity:0.1; } }
+  .show-marquee.miss i{ animation:bulbBlink .12s steps(1) 5; background:#ff3b3b; box-shadow:0 0 9px #ff2a2a, 0 0 0 1.5px rgba(40,10,70,0.55); }
+  .vs-stamp{ position:absolute; left:0; top:0; width:104px; height:104px; margin:-52px 0 0 -52px; border:7px solid #ff2d3a; border-radius:20px;
+    background:rgba(255,255,255,0.14); box-shadow:0 0 20px rgba(255,40,60,0.65), inset 0 0 14px rgba(255,40,60,0.45); pointer-events:none; }
+  .vs-stamp svg{ width:100%; height:100%; display:block; }
+  .pts-pop{ position:absolute; left:0; top:0; font:900 48px/1 var(--f-display); color:#ffd23f; -webkit-text-stroke:2px #6a3300; pointer-events:none;
+    text-shadow:0 3px 0 #6a3300, 0 0 18px rgba(255,210,63,0.9); white-space:nowrap; }
+  @media (prefers-reduced-motion: reduce){ .cb-num b.fa, .cb-num b.fb, .show-marquee.unison i, .show-marquee.miss i{ animation:none; } :root:is(.mode-daily, .mode-infinity) .crowd-board{ transition:none; } }
   :root.mode-infinity #board .half.picked::after{ background:#ffd23f; }
   :root.mode-infinity .half.picked::before{ box-shadow:inset 0 0 40px 8px rgba(255,214,90,0.7); animation:none; }
   :root.mode-infinity .hint{ padding-left:52px; padding-right:52px; }
@@ -3555,6 +3588,8 @@
       </div>
     </div>
     <div class="divider">VS</div>
+    <!-- The VS reveal's split-flap board (Daily and Infinity): the crowd's split clacks over after a pick. -->
+    <div class="crowd-board" id="crowdBoard" aria-live="polite"><div class="cb-label">CROWD SAYS</div><div class="cb-row"><span class="cb-num" id="cbA"></span><span class="cb-sep">/</span><span class="cb-num" id="cbB"></span></div></div>
     <div class="half bottom" id="halfB">
       <i class="gloss" aria-hidden="true"></i>
       <div class="cat-chip" id="chipB"></div>
@@ -5765,6 +5800,33 @@
       noiseHit(ctx, t + 0.17, 0.09, 0.7, 'highpass', 5600);
     }),
     letterLand: ()=> withSfxCtx((ctx, t)=>{ coinPing(ctx, t, 0.09, 1760); coinPing(ctx, t + 0.08, 0.08, 2349); }),
+    // A crowd match: a bright bell DING (a struck partial set, long ring).
+    ding: ()=> withSfxCtx((ctx, t)=>{
+      [[1319, 0.11, 1.3], [2637, 0.04, 0.7], [3640, 0.025, 0.4], [1976, 0.03, 0.9]].forEach(([f, v, d])=>{
+        const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.value = f;
+        g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(v, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+        o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + d + 0.05);
+      });
+    }),
+    // A miss: the strike buzzer (two detuned square waves, a hard edge).
+    strike: ()=> withSfxCtx((ctx, t)=>{
+      const lp = ctx.createBiquadFilter(), g = ctx.createGain(); lp.type = 'lowpass'; lp.frequency.value = 1500;
+      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.07, t + 0.01); g.gain.setValueAtTime(0.07, t + 0.46); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.56);
+      lp.connect(g); g.connect(ctx.destination);
+      [92, 97.5, 184].forEach(f=>{ const o = ctx.createOscillator(); o.type = 'square'; o.frequency.value = f; o.connect(lp); o.start(t); o.stop(t + 0.6); });
+    }),
+    // The studio audience's "awww": voices sliding down through a closing vowel.
+    aww: ()=> withSfxCtx((ctx, t)=>{
+      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 2.6;
+      bp.frequency.setValueAtTime(820, t); bp.frequency.linearRampToValueAtTime(520, t + 0.5); bp.frequency.linearRampToValueAtTime(360, t + 1.1);
+      const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.1, t + 0.15); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.2);
+      bp.connect(g); g.connect(ctx.destination);
+      [220, 247, 262, 294, 330, 349].forEach((f, i)=>{ const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.setValueAtTime(f * (1 + (Math.random() - 0.5) * 0.03), t);
+        o.frequency.linearRampToValueAtTime(f * 0.86, t + 0.7); o.frequency.linearRampToValueAtTime(f * 0.8, t + 1.15); o.connect(bp); o.start(t + i * 0.015); o.stop(t + 1.25); });
+      noiseHit(ctx, t, 0.03, 1.0, 'bandpass', 800, 0.8);
+    }),
+    // One split-flap leaf falling: a short dry clack.
+    clack: ()=> withSfxCtx((ctx, t)=>{ noiseHit(ctx, t, 0.07, 0.022, 'bandpass', 2400 + Math.random() * 600, 1.6); noiseHit(ctx, t + 0.006, 0.03, 0.015, 'highpass', 5000); }),
     // A missed Word Warp: the sad trombone (four falling notes, the last one wobbles).
     warpMiss: ()=> withSfxCtx((ctx, t)=>{
       [[392, 0, 0.3], [370, 0.32, 0.3], [349, 0.64, 0.3], [330, 0.96, 0.9]].forEach(([f, at, d], i)=>{
@@ -5788,6 +5850,7 @@
       o.connect(g).connect(ctx.destination); o.start(t + 0.96); lfo.start(t + 0.96); o.stop(t + 2); lfo.stop(t + 2);
     }),
     hostVoice: showSfx.hostVoice, drumroll: showSfx.drumroll, crowdOoh: showSfx.crowdOoh, bumper: showSfx.bumper, letterLand: showSfx.letterLand, warpMiss: showSfx.warpMiss,
+    ding: showSfx.ding, strike: showSfx.strike, aww: showSfx.aww, clack: showSfx.clack,
     key: ()=> withSfxCtx((ctx, t)=>{ coinPing(ctx, t, 0.09, 1568); coinPing(ctx, t + 0.09, 0.08, 2093); haptic([8,20,8]); }),
     milestone: ()=>{ [659, 784, 988, 1319].forEach((f, i)=> playTone(f, i * 0.08, 0.18, 'triangle', 0.1)); haptic([12,30,12]); },
     chipPeg: (i)=> withSfxCtx((ctx, t)=> coinTap(ctx, t, 0.22, 2600 + (i % 4) * 280)),
@@ -13461,6 +13524,7 @@
   function renderUnvoted(){
     els.halfA.classList.remove('revealed', 'picked'); els.halfB.classList.remove('revealed', 'picked');
     els.fillA.style.width = '0%'; els.fillB.style.width = '0%';
+    crowdBoardHide();
     els.pctA.textContent=''; els.pctB.textContent='';
     els.votesA.textContent=''; els.votesB.textContent='';
     els.tagA.textContent=''; els.tagB.textContent='';
@@ -14162,6 +14226,69 @@
     if (tallyPollInterval){ clearInterval(tallyPollInterval); tallyPollInterval = null; }
   }
 
+  // ---- The VS reveal's split-flap board (C1) ----
+  const crowdBoard = document.getElementById('crowdBoard'), cbNums = [document.getElementById('cbA'), document.getElementById('cbB')];
+  const VS_DRUMROLL_MS = 600;
+  let cbFlapT = 0, cbSettled = Promise.resolve();
+  function isShowMode(){ const c = document.documentElement.classList; return c.contains('mode-daily') || c.contains('mode-infinity'); }
+  function crowdBoardHide(){ clearInterval(cbFlapT); crowdBoard.classList.remove('on'); els.board.classList.remove('cb-on'); cbNums.forEach(n=> n.classList.remove('win')); }
+  // Shows pctA / pctB; `animate` runs the flaps through random digits, left to right, a clack a tick.
+  function crowdBoardShow(pctA, pctB, animate){
+    clearInterval(cbFlapT);
+    crowdBoard.classList.add('on'); els.board.classList.add('cb-on');
+    const texts = [pctA + '%', pctB + '%'], cells = [], target = [];
+    cbNums.forEach((n, k)=>{
+      n.classList.remove('win');
+      const chars = Array.from(texts[k]);
+      if (n.children.length !== chars.length) n.innerHTML = chars.map(()=> '<b></b>').join('');
+      Array.from(n.children).forEach((c, i)=>{ cells.push(c); target.push(chars[i]); });
+    });
+    const finish = ()=>{ cells.forEach((c, i)=> c.textContent = target[i]); cbNums[0].classList.toggle('win', pctA >= pctB); cbNums[1].classList.toggle('win', pctB >= pctA); };
+    if (!animate || FX.reduced()){ finish(); cbSettled = Promise.resolve(); return; }
+    cbSettled = new Promise(res=>{
+      let tick = 0;
+      const step = ()=>{
+        tick++; let busy = false;
+        cells.forEach((c, i)=>{
+          const stop = 3 + Math.round(i * 1.5);
+          if (tick > stop + 1) return;
+          if (tick <= stop) busy = true;
+          c.textContent = tick > stop ? target[i] : String(Math.floor(Math.random() * 10));
+          c.classList.remove(tick % 2 ? 'fb' : 'fa'); c.classList.add(tick % 2 ? 'fa' : 'fb');
+        });
+        sfx.clack();
+        if (!busy){ clearInterval(cbFlapT); finish(); res(); }
+      };
+      step(); cbFlapT = setInterval(step, 55);
+    });
+  }
+  // The verdict on the picked card once the flaps have landed: a match DINGs, flashes every bulb
+  // white-gold in unison and pops the points; a miss stamps a red X, shakes the card, buzzes and the crowd goes "aww".
+  function vsVerdictFx(side, matched, pts){
+    const ph = side === 'A' ? els.halfA : els.halfB;
+    marquee.classList.remove('unison', 'miss', 'blink'); void marquee.offsetWidth; marquee.classList.add(matched ? 'unison' : 'miss');
+    clearTimeout(vsVerdictFx._t); vsVerdictFx._t = setTimeout(()=> marquee.classList.remove('unison', 'miss'), 900);
+    const l = showFx.getBoundingClientRect(), r = ph.getBoundingClientRect(), x = r.left + r.width / 2 - l.left, y = r.top + r.height * 0.36 - l.top;
+    const put = (el)=>{ el.style.left = x + 'px'; el.style.top = y + 'px'; showFx.appendChild(el); return el; };
+    const still = FX.reduced() || !Element.prototype.animate;
+    if (matched){
+      sfx.ding();
+      if (pts > 0){
+        const p = put(document.createElement('div')); p.className = 'pts-pop'; p.textContent = '+' + pts;
+        if (still){ p.style.transform = 'translate(-50%,-50%)'; setTimeout(()=> p.remove(), 900); }
+        else p.animate([{ transform:'translate(-50%,-50%) scale(0.3)', opacity:0 }, { transform:'translate(-50%,-60%) scale(1.25)', opacity:1, offset:0.25 },
+          { transform:'translate(-50%,-80%) scale(1)', opacity:1, offset:0.7 }, { transform:'translate(-50%,-120%) scale(0.95)', opacity:0 }], { duration:1000, easing:'ease-out' }).onfinish = ()=> p.remove();
+      }
+    } else {
+      sfx.strike(); setTimeout(()=> sfx.aww(), 280);
+      const st = put(document.createElement('div')); st.className = 'vs-stamp';
+      st.innerHTML = '<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M26 26 L74 74 M74 26 L26 74" stroke="#ff2d3a" stroke-width="15" stroke-linecap="round"/></svg>';
+      if (still){ st.style.transform = 'rotate(-10deg)'; setTimeout(()=> st.remove(), 1000); }
+      else st.animate([{ transform:'rotate(-24deg) scale(2.3)', opacity:0 }, { transform:'rotate(-10deg) scale(0.92)', opacity:1, offset:0.18 }, { transform:'rotate(-10deg) scale(1)', opacity:1, offset:0.26 },
+        { transform:'rotate(-10deg) scale(1)', opacity:1, offset:0.82 }, { transform:'rotate(-10deg) scale(1.05)', opacity:0 }], { duration:1150, easing:'ease-out' }).onfinish = ()=> st.remove();
+      FX.shake(ph);
+    }
+  }
   function reveal(counts, isLiveUpdate){
     const a = (counts && counts.a) || 0;
     const b = (counts && counts.b) || 0;
@@ -14172,6 +14299,7 @@
     els.halfA.classList.add('revealed'); els.halfB.classList.add('revealed');
     els.fillA.style.width = pctA + '%'; els.fillB.style.width = pctB + '%';
     animateCount(els.pctA, pctA); animateCount(els.pctB, pctB);
+    if (isShowMode()) crowdBoardShow(pctA, pctB, !isLiveUpdate);
     // Skip the reveal flash/sound-adjacent pulse on live poll updates - it's
     // a one-time "results are in" beat, not something that should re-fire
     // every few seconds while the player is just looking at the board.
@@ -14257,7 +14385,10 @@
     els.halfA.classList.toggle('picked', side === 'A');
     els.halfB.classList.toggle('picked', side === 'B');
     const points = current.bonusPoints ? (runActive ? 3 : INF_STAR_POINTS) : 1;
+    const ptsShown = runActive ? points * runActMult() : zonePoints(points);
     if (runActive) addRunScore(points); else addRacePoints(zonePoints(points));
+    const showReveal = isShowMode();
+    if (showReveal) sfx.drumroll(VS_DRUMROLL_MS);
     els.roundTimerFill.style.transition = 'none';
     els.roundTimerFill.style.width = '0%';
 
@@ -14272,6 +14403,11 @@
       ? { a: tallyData.counts[slugA] || 0, b: tallyData.counts[slugB] || 0 }
       : { a: 0, b: 0 }; // request failed - reveal() falls back to its own local estimate
     if (tallyData) cacheTallies(tallyData.counts);
+    // The drumroll's pause: the crowd's answer never shows sooner than 0.6s after the pick.
+    if (showReveal){
+      const left = dt(VS_DRUMROLL_MS) - (performance.now() - tapAt);
+      if (left > 0){ await new Promise(r=> setTimeout(r, left)); if (roundMovedOn()) return; }
+    }
 
     const { pctA, pctB } = reveal(counts);
     if (testTagEl) requestAnimationFrame(()=> noteTapTiming(performance.now() - tapAt, talliesMs));
@@ -14281,7 +14417,7 @@
       reveal({ a: data.counts[slugA] || 0, b: data.counts[slugB] || 0 }, true);
     });
     const won = side==='A' ? pctA>=pctB : pctB>=pctA;
-    if (won) sfx.revealWin(); else sfx.revealLose();
+    if (!showReveal){ if (won) sfx.revealWin(); else sfx.revealLose(); }
     els.tagA.textContent = side==='A' ? 'Your pick' : '';
     els.tagB.textContent = side==='B' ? 'Your pick' : '';
     queueLayoutBoard();
@@ -14294,6 +14430,7 @@
     // anyone else had voted on.
     if (cv.others > 0) lastVoteSummary = { pct: cv.pickPct, itemA: current.a, itemB: current.b };
     const underdog = cv.counted && cv.pickPct <= 30;
+    if (showReveal){ const matched = cv.counted ? cv.withCrowd : won; cbSettled.then(()=>{ if (!roundMovedOn()) vsVerdictFx(side, matched, ptsShown); }); }
     if (!cv.counted) els.hint.innerHTML = cv.others === 0 ? '\uD83C\uDF31 First vote on this one \u2014 no crowd yet'
       : cv.others < CROWD_MIN_OTHERS ? '\u23F3 Too few votes yet to call the crowd'
       : '\u2696\uFE0F Dead heat \u2014 split right down the middle';
