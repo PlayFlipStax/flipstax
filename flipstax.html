@@ -2676,6 +2676,13 @@
   @keyframes cbFlapA{ 50%{ transform:scaleY(0.12); } } @keyframes cbFlapB{ 50%{ transform:scaleY(0.12); } }
   .cb-num.win b{ color:#ffd23f; text-shadow:0 0 10px rgba(255,210,63,0.85); }
   .cb-sep{ font:900 28px/1 var(--f-display); color:#e0ad3c; }
+  .show-marquee.strobe{ display:block !important; z-index:120; }
+  .show-marquee.strobe i{ animation:bulbStrobe .14s steps(1) 16; background:#ffe680; box-shadow:0 0 12px #ffd23f, 0 0 0 1.5px rgba(40,10,70,0.55); }
+  @keyframes bulbStrobe{ 0%{ opacity:1; } 50%{ opacity:0.08; } }
+  .pk-tractor{ position:absolute; z-index:3; width:96px; margin-left:-48px; transform-origin:50% 0; pointer-events:none; opacity:0;
+    clip-path:polygon(38% 0, 62% 0, 100% 100%, 0 100%); background:linear-gradient(180deg, rgba(220,250,255,0.9), rgba(125,249,255,0.45) 60%, rgba(255,214,90,0.5)); }
+  .pk-upcoin{ position:absolute; left:-9px; top:-9px; width:18px; height:18px; z-index:4; border-radius:50%; pointer-events:none;
+    background:radial-gradient(circle at 35% 30%, #fff6c0, #ffd23f 55%, #c98a00); box-shadow:inset 0 0 0 2px rgba(122,74,0,0.55), 0 0 8px rgba(255,214,90,0.8); }
   .show-marquee.unison i{ animation:bulbUnison .2s steps(1) 2; background:#fff6d0; box-shadow:0 0 12px #ffe27a, 0 0 0 1.5px rgba(40,10,70,0.55); }
   @keyframes bulbUnison{ 0%{ opacity:1; } 50%{ opacity:0.1; } }
   .show-marquee.miss i{ animation:bulbBlink .12s steps(1) 5; background:#ff3b3b; box-shadow:0 0 9px #ff2a2a, 0 0 0 1.5px rgba(40,10,70,0.55); }
@@ -2684,7 +2691,7 @@
   .vs-stamp svg{ width:100%; height:100%; display:block; }
   .pts-pop{ position:absolute; left:0; top:0; font:900 48px/1 var(--f-display); color:#ffd23f; -webkit-text-stroke:2px #6a3300; pointer-events:none;
     text-shadow:0 3px 0 #6a3300, 0 0 18px rgba(255,210,63,0.9); white-space:nowrap; }
-  @media (prefers-reduced-motion: reduce){ .cb-num b.fa, .cb-num b.fb, .show-marquee.unison i, .show-marquee.miss i{ animation:none; } :root:is(.mode-daily, .mode-infinity) .crowd-board{ transition:none; } }
+  @media (prefers-reduced-motion: reduce){ .cb-num b.fa, .cb-num b.fb, .show-marquee.unison i, .show-marquee.miss i, .show-marquee.strobe i{ animation:none; } :root:is(.mode-daily, .mode-infinity) .crowd-board{ transition:none; } }
   :root.mode-infinity #board .half.picked::after{ background:#ffd23f; }
   :root.mode-infinity .half.picked::before{ box-shadow:inset 0 0 40px 8px rgba(255,214,90,0.7); animation:none; }
   :root.mode-infinity .hint{ padding-left:52px; padding-right:52px; }
@@ -5903,6 +5910,34 @@
     }),
     // A rising chime: the k-th step up a major pentatonic, a struck bell.
     chime: (k)=> withSfxCtx((ctx, t)=>{ const f = [523, 587, 659, 784, 880, 1047, 1175, 1319, 1568][Math.max(0, Math.min(8, k | 0))]; coinPing(ctx, t, 0.085, f); coinPing(ctx, t + 0.01, 0.03, f * 2); }),
+    // Orbit Drop: a peg hit, the n-th of a chip's fall - a mallet note a step higher each hit (major pentatonic from G4).
+    pegNote: (n)=> withSfxCtx((ctx, t)=>{
+      const st = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24, 26, 28, 31][Math.max(0, Math.min(13, n | 0))], f = 392 * Math.pow(2, st / 12);
+      [[f, 'sine', 0.07, 0.3], [f * 2, 'triangle', 0.02, 0.12], [f * 4.02, 'sine', 0.012, 0.05]].forEach(([fq, ty, v, d])=>{
+        const o = ctx.createOscillator(), g = ctx.createGain(); o.type = ty; o.frequency.value = fq;
+        g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(v, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+        o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + d + 0.03);
+      });
+    }),
+    // The jackpot siren: a two-tone wail, twice up and down.
+    siren: ()=> withSfxCtx((ctx, t)=>{
+      const lp = ctx.createBiquadFilter(), g = ctx.createGain(); lp.type = 'lowpass'; lp.frequency.value = 2200;
+      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.045, t + 0.08); g.gain.setValueAtTime(0.045, t + 1.45); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.7);
+      lp.connect(g); g.connect(ctx.destination);
+      [1, 1.012].forEach(m=>{ const o = ctx.createOscillator(); o.type = 'sawtooth';
+        o.frequency.setValueAtTime(620 * m, t); [0.4, 0.8, 1.2, 1.6].forEach((at, i)=> o.frequency.linearRampToValueAtTime((i % 2 ? 620 : 980) * m, t + at));
+        o.connect(lp); o.start(t); o.stop(t + 1.75); });
+    }),
+    // The studio crowd roars: a swell of voices and breath, about two seconds.
+    roar: ()=> withSfxCtx((ctx, t)=>{
+      const bp = ctx.createBiquadFilter(), g = ctx.createGain(); bp.type = 'bandpass'; bp.frequency.value = 720; bp.Q.value = 1.1;
+      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.06, t + 0.35); g.gain.setValueAtTime(0.06, t + 1.2); g.gain.exponentialRampToValueAtTime(0.0001, t + 2.1);
+      bp.connect(g); g.connect(ctx.destination);
+      for (let k = 0; k < 10; k++){ const o = ctx.createOscillator(), f = 150 + Math.random() * 280; o.type = 'sawtooth';
+        o.frequency.setValueAtTime(f, t); o.frequency.linearRampToValueAtTime(f * (1.08 + Math.random() * 0.1), t + 0.5); o.frequency.linearRampToValueAtTime(f * 0.95, t + 2);
+        o.connect(bp); o.start(t + Math.random() * 0.12); o.stop(t + 2.15); }
+      for (let x = 0; x < 2; x += 0.25) noiseHit(ctx, t + x, 0.09 * Math.sin(Math.PI * Math.min(1, (x + 0.2) / 1.9)), 0.4, 'bandpass', 1100, 0.6);
+    }),
     // One split-flap leaf falling: a short dry clack.
     clack: ()=> withSfxCtx((ctx, t)=>{ noiseHit(ctx, t, 0.07, 0.022, 'bandpass', 2400 + Math.random() * 600, 1.6); noiseHit(ctx, t + 0.006, 0.03, 0.015, 'highpass', 5000); }),
     // A missed Word Warp: the sad trombone (four falling notes, the last one wobbles).
@@ -5928,10 +5963,10 @@
       o.connect(g).connect(ctx.destination); o.start(t + 0.96); lfo.start(t + 0.96); o.stop(t + 2); lfo.stop(t + 2);
     }),
     hostVoice: showSfx.hostVoice, drumroll: showSfx.drumroll, crowdOoh: showSfx.crowdOoh, bumper: showSfx.bumper, letterLand: showSfx.letterLand, warpMiss: showSfx.warpMiss,
-    ding: showSfx.ding, strike: showSfx.strike, aww: showSfx.aww, clack: showSfx.clack, chime: showSfx.chime,
+    ding: showSfx.ding, strike: showSfx.strike, aww: showSfx.aww, clack: showSfx.clack, chime: showSfx.chime, siren: showSfx.siren, roar: showSfx.roar,
     key: ()=> withSfxCtx((ctx, t)=>{ coinPing(ctx, t, 0.09, 1568); coinPing(ctx, t + 0.09, 0.08, 2093); haptic([8,20,8]); }),
     milestone: ()=>{ [659, 784, 988, 1319].forEach((f, i)=> playTone(f, i * 0.08, 0.18, 'triangle', 0.1)); haptic([12,30,12]); },
-    chipPeg: (i)=> withSfxCtx((ctx, t)=> coinTap(ctx, t, 0.22, 2600 + (i % 4) * 280)),
+    chipPeg: (i)=>{ showSfx.pegNote(i); withSfxCtx((ctx, t)=> coinTap(ctx, t, 0.1, 2600 + Math.min(i, 12) * 120)); },   // a note rising with each peg the chip hits
     chipLand: (big)=> withSfxCtx((ctx, t)=>{ coinPing(ctx, t, 0.1, big ? 1175 : 988); if (big) coinPing(ctx, t + 0.1, 0.09, 1568); }),
     coinCollect: (i)=> withSfxCtx((ctx, t)=>{ coinTap(ctx, t, 0.32, 3300); coinPing(ctx, t + 0.01, 0.075, 1500 + Math.min(i, 12) * 110); coinPing(ctx, t + 0.07, 0.05, 2200 + Math.min(i, 12) * 140); }),
     coins: (n)=> withSfxCtx((ctx, t)=>{ for (let i = 0; i < (n || 14); i++) coinPing(ctx, t + i * 0.07 + Math.random() * 0.04, 0.045 + Math.random() * 0.03, 1100 + Math.random() * 900); }),
@@ -11274,6 +11309,31 @@
     board.appendChild(z); ufo.classList.remove('spin'); void ufo.offsetWidth; ufo.classList.add('spin'); sfx.laser();
     z.animate([{ opacity:0 }, { opacity:1, offset:0.15 }, { opacity:0.4, offset:0.4 }, { opacity:1, offset:0.6 }, { opacity:0 }], { duration:520, easing:'ease-out' }).onfinish = ()=> z.remove();
   }
+  // THE MOTHERSHIP: every bulb strobes gold, the silver UFO beams a shower of coins up out of the slot, a siren and the crowd roars.
+  function pkJackpotShow(c){
+    sfx.siren(); setTimeout(()=> sfx.roar(), 200);
+    marquee.classList.remove('strobe'); void marquee.offsetWidth; marquee.classList.add('strobe');
+    clearTimeout(pkJackpotShow._t); pkJackpotShow._t = setTimeout(()=> marquee.classList.remove('strobe'), 2300);
+    if (prefersReducedMotion()) return;
+    const board = document.getElementById('plinkoBoard'), ufo = document.getElementById('pkUfo'); if (!board || !ufo || !board.animate) return;
+    const br = board.getBoundingClientRect(), ur = ufo.getBoundingClientRect(), k = plinkoScale(), p = restXY(c);
+    const x0 = ur.left + ur.width / 2 - br.left, y0 = ur.top + ur.height * 0.62 - br.top, x1 = p.x * k, y1 = p.y * k;
+    const len = Math.hypot(x1 - x0, y1 - y0), ang = Math.atan2(x0 - x1, y1 - y0) * 180 / Math.PI;
+    const beam = document.createElement('i'); beam.className = 'pk-tractor';
+    beam.style.left = x0 + 'px'; beam.style.top = y0 + 'px'; beam.style.height = len + 'px'; beam.style.transform = 'rotate(' + ang + 'deg)';
+    board.appendChild(beam);
+    beam.animate([{ opacity:0 }, { opacity:0.9, offset:0.12 }, { opacity:0.7, offset:0.8 }, { opacity:0 }], { duration:2000, easing:'ease-out' }).onfinish = ()=> beam.remove();
+    ufo.classList.remove('spin'); void ufo.offsetWidth; ufo.classList.add('spin', 'beaming'); setTimeout(()=> ufo.classList.remove('beaming'), 1800);
+    for (let n = 0; n < 16; n++){
+      const coin = document.createElement('i'); coin.className = 'pk-upcoin'; board.appendChild(coin);
+      const sx = x1 + (Math.random() - 0.5) * 44, sy = y1 - Math.random() * 10, ex = x0 + (Math.random() - 0.5) * 10, ey = y0 + 4, wob = (Math.random() - 0.5) * 50;
+      coin.animate([{ transform:'translate(' + sx + 'px,' + sy + 'px) scale(0.6) rotateY(0deg)', opacity:0 },
+        { transform:'translate(' + (sx + wob) + 'px,' + (sy - (sy - ey) * 0.25) + 'px) scale(1) rotateY(360deg)', opacity:1, offset:0.2 },
+        { transform:'translate(' + ex + 'px,' + ey + 'px) scale(0.35) rotateY(1080deg)', opacity:0.9 }], { duration:950, delay:150 + n * 85, easing:'cubic-bezier(.5,0,.8,.6)', fill:'backwards' })
+        .onfinish = ()=> coin.remove();
+      if (n % 3 === 0) setTimeout(()=> sfx.coinCollect(n), 1050 + n * 85);
+    }
+  }
   function pingPeg(idx, n){
     sfx.chipPeg(n);
     const p = document.querySelector('.pk-peg[data-p="' + idx + '"]'); if (p){ p.classList.remove('ping'); void p.getBoundingClientRect(); p.classList.add('ping'); }
@@ -11313,6 +11373,7 @@
       FX.ripple(showFx, x, y, c.kind === 'jackpot' ? '#7df9ff' : '#ffd23f', c.kind === 'x1' || c.kind === 'x2' ? 34 : 60);
       if (c.kind !== 'x1' && c.kind !== 'x2'){ FX.flash(document.getElementById('plinkoBoard'), 'win'); FX.burst(showFx, x, y - 10, { count: c.kind === 'jackpot' ? 18 : 10, spread:90, shapes:['star'], colors:['#ffd23f', '#fff3c4', '#7df9ff'] }); }
       if (c.kind === 'jackpot') FX.coinShower(showFx, 3); }
+    if (c.kind === 'jackpot') pkJackpotShow(c);
     if (c.kind === 'jackpot' && dailyOrbit){ sfx.jackpot(); showToast('🛸 THE MOTHERSHIP! +' + c.pts); document.getElementById('finPlinko').classList.add('jackpot'); }
     else if (c.kind === 'jackpot'){ sfx.jackpot(); showToast('🛸 MOTHERSHIP JACKPOT! +100' + (f.chips.slice(0, f.dropped).filter(x=> x.kind === 'jackpot').length === 1 ? ' and a bonus card' : '')); document.getElementById('finPlinko').classList.add('jackpot'); }
     if (pkLanded.length >= f.chips.length) pkAuto = false;
