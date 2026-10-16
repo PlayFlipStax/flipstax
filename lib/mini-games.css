@@ -109,3 +109,25 @@
 
 /* One host per screen: a game with its own stage host hides the corner host. */
 :root:has(#mgOverlay .host-full) .show-host{ display:none !important; }
+
+/* ---- E6 Saucer Shuffle: silver and plum; the host behind a little table, three saucers, his arms drawn to them ---- */
+.su-stage{ justify-content:flex-start !important; }
+.su-play{ position:relative; width:100%; height:min(62vh, 440px); margin-top:4px; }
+.su-host{ position:absolute; left:50%; top:4%; width:min(46vw, 190px); transform:translateX(-50%); }
+.su-host .ha-arm-wave, .su-host .ha-arm-mic{ display:none; }   /* his own arms are the drawn ones below */
+.su-host svg{ animation:none !important; }
+.su-arms{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; z-index:5; }
+.su-arms .sl.o{ fill:none; stroke:#4b5363; stroke-width:21; stroke-linecap:round; }
+.su-arms .sl.i{ fill:none; stroke:#d6dbe4; stroke-width:16; stroke-linecap:round; }
+.su-arms .hand{ fill:#6fdc57; stroke:#2b8a2e; stroke-width:3; }
+.su-table{ position:absolute; left:2%; right:2%; top:74%; height:18%; z-index:1; border-radius:16px 16px 22px 22px;
+  background:linear-gradient(180deg, #f1e6ff 0 10%, #a37bd1 10% 22%, #5b2a7a 22%, #30113f); box-shadow:0 10px 24px rgba(0,0,0,0.45), 0 0 0 3px rgba(233,228,255,0.6); }
+.su-star{ position:absolute; z-index:2; left:50%; width:44px; margin-left:-22px; text-align:center; font-size:38px; line-height:1; opacity:0; transition:opacity .15s; filter:drop-shadow(0 0 10px #ffd23f); }
+.su-star.on{ opacity:1; }
+.su-saucer{ position:absolute; left:0; top:0; z-index:3; width:min(26vw, 108px); padding:0; border:0; background:none; cursor:default; -webkit-tap-highlight-color:transparent; will-change:transform; }
+.su-saucer svg{ width:100%; height:auto; display:block; filter:drop-shadow(0 6px 6px rgba(0,0,0,0.45)); }
+.su-play.picking .su-saucer{ cursor:pointer; }
+.su-play.picking .su-saucer svg{ filter:drop-shadow(0 6px 6px rgba(0,0,0,0.45)) drop-shadow(0 0 10px rgba(233,228,255,0.9)); }
+.su-saucer.up{ transform:translateY(-56px); }
+.su-play.blur .su-saucer svg{ filter:blur(1px) drop-shadow(0 6px 6px rgba(0,0,0,0.45)); }
+.su-round{ font:900 16px/1 var(--f-display); letter-spacing:3px; color:#e9e4ff; text-shadow:0 0 10px rgba(233,228,255,0.7); }

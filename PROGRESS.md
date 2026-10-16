@@ -43,4 +43,4 @@ new fonts, original art, no real brand or show names, every new game gets a TEST
 - [x] E3. Zap Words: 6x6 grid, swipe neighbouring letters, longer words score more, ZAP_SECONDS = 20, a hint, good phone swiping, a plain word list in the repo, grids with guaranteed words
 - [x] E4. Twin Flip: 4x4 memory match, original 70s/80s neon icons, 25s, stage look after refs/memory-match
 - [x] E5. Fact or Fib: host pops up with a statement, TRUE / FIB buttons, ~6s each, 5 statements, +10 each, +20 for 5/5, a one-line reaction after each; ~120 statements in data/fact-or-fib.js + data/fact-or-fib.txt, marked NOT FACT-CHECKED, out of rotation until FACT_OR_FIB_REVIEWED
-- [ ] E6. Saucer Shuffle: three saucers on a table, the host shuffles them (arms and eyes follow the logic's exact positions), 3 rounds faster each time, tap the star's saucer, +10, ~25s
+- [x] E6. Saucer Shuffle: three saucers on a table, the host shuffles them (arms and eyes follow the logic's exact positions), 3 rounds faster each time, tap the star's saucer, +10, ~25s

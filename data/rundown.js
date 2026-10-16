@@ -37,6 +37,7 @@ window.FLIPSTAX_RUNDOWN = {
       { game: 'snapSort',     weight: 1 },
       { game: 'zapWords',     weight: 1 },
       { game: 'twinFlip',     weight: 1 },
+      { game: 'saucerShuffle', weight: 1 },
       { game: 'factOrFib',    weight: 1 },   // (only once FACT_OR_FIB_REVIEWED is true in data/fact-or-fib.js)
       // (Oct 16: Price Probe and Oddball Alert are out of the pool - their code and data stay, and the TEST menu still plays them.)
     ],
