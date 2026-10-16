@@ -5676,6 +5676,9 @@
   const TIMING = Object.assign({ ACT_CARD_HOLD:2800, MYSTERY_REVEAL_HOLD:3000, STAR_WIPE:1600, ROUND_BUMPER_HOLD:2200, COSMIC_SURPRISE_INTRO:2000, CINEMATIC_MIN:1500, SKIP_AFTER:1000 }, window.FLIPSTAX_TIMING || {});
   // A cinematic moment (a full-screen card, a reveal, a result) is never on screen for less than CINEMATIC_MIN.
   const cine = (ms)=> Math.max(TIMING.CINEMATIC_MIN, ms);
+  // J2: a skip tap only counts once a cinematic has had its minimum time (SKIP_AFTER was shorter than CINEMATIC_MIN,
+  // so a tap at 1 s ended a cold open under its 1.5 s minimum).
+  const SKIP_MIN_MS = Math.max(TIMING.SKIP_AFTER, TIMING.CINEMATIC_MIN);
   // G3: the commercial break is out of the rundown; COMMERCIAL_ENABLED at the top of data/rundown.js brings it back
   // (after the act named in commercial.after). The ad code and the "Brought to you by" sponsor field stay.
   const COMMERCIAL_ON = !!(RUNDOWN.commercial && RUNDOWN.commercial.enabled);
@@ -10483,6 +10486,23 @@
     fallback();
   }
   if (FR.on){ const b = document.getElementById('frCopyBtn'); if (b){ b.classList.remove('hidden'); b.addEventListener('click', (e)=>{ e.stopPropagation(); frCopy(b); }); } }
+  // ---------- J2: the ghost-click guard ----------
+  // On a phone a click arrives a moment after the finger lifts and goes to whatever is under it THEN. A tap on one
+  // screen (a VS card mid-reveal, an answer, a cinematic) could so land on the next one - mostly on the new VS card
+  // dealt into the same place, voting it before the player saw it (reproduced: cards voted 7-150 ms after they
+  // appeared, a whole episode in 2.6 minutes). During a run, a click whose finger came down before the current scene
+  // began (and less than a second ago - so plain programmatic clicks are not affected) is swallowed and logged.
+  let lastDownAt = -1e9;
+  document.addEventListener('pointerdown', ()=>{ lastDownAt = performance.now(); }, { capture:true, passive:true });
+  document.addEventListener('touchstart', ()=>{ lastDownAt = performance.now(); }, { capture:true, passive:true });
+  document.addEventListener('click', (e)=>{
+    if (!runActive || !Show.since) return;
+    const now = performance.now();
+    if (now - lastDownAt < 1000 && lastDownAt < Show.since - 10){
+      e.stopPropagation(); e.preventDefault(); Show.stats.drops++;
+      showLog('drop', 'ghost click on ' + (typeof frTarget === 'function' ? frTarget(e.target) : '?') + ' (finger down ' + Math.round(Show.since - lastDownAt) + ' ms before this scene)');
+    }
+  }, true);
   function showCancelPending(){
     Show.timers.forEach(id=> clearTimeout(id)); Show.timers.clear();
     Show.frames.forEach(id=> cancelAnimationFrame(id)); Show.frames.clear();
@@ -10542,7 +10562,7 @@
   // ?debug=1: the step, the card, the transition state and the last 20 transitions.
   const SHOW_DEBUG = new URLSearchParams(location.search).get('debug') === '1';
   if (SHOW_DEBUG || DEBUG_FAST) window.__show = Show;
-  if (DEBUG_FAST) window.__frLines = FR.lines;   // (the automated checks read the flight recorder)   // (for the automated flow and pacing checks)
+  if (DEBUG_FAST || SHOW_DEBUG){ window.__frLines = FR.lines; window.__showPlan = ()=> runPlan; window.__timing = TIMING; }   // (the automated checks read the flight recorder, the plan and the timings)   // (for the automated flow and pacing checks)
   let showDebugEl = null;
   function renderShowDebug(){
     if (!SHOW_DEBUG) return;
@@ -11174,7 +11194,7 @@
     const go = (e)=>{
       if (gone) return;
       if (e && e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
-      if (e && performance.now() - shownAt < TIMING.SKIP_AFTER) return;   // G2: a tap skips only after SKIP_AFTER (and never the tap that opened it)
+      if (e && performance.now() - shownAt < SKIP_MIN_MS) return;   // G2: a tap skips only after SKIP_AFTER (and never the tap that opened it)
       gone = true; timers.forEach(clearTimeout); coldOpenCancel = null;
       try{ localStorage.setItem(COLD_OPEN_SEEN_KEY, '1'); }catch(err){}
       showCard.removeEventListener('click', go); document.removeEventListener('keydown', go);
@@ -11248,7 +11268,7 @@
     const shownAt = performance.now();
     let gone = false, t = null;
     const go = (e)=>{
-      if (gone || (e && performance.now() - shownAt < TIMING.SKIP_AFTER)) return;
+      if (gone || (e && performance.now() - shownAt < SKIP_MIN_MS)) return;
       gone = true; clearTimeout(t); timers.forEach(clearTimeout);
       showCard.removeEventListener('click', go);
       showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden';
@@ -12289,7 +12309,7 @@
     let over = false;
     const end = ()=>{ if (over) return; over = true; marquee.classList.remove('disco', 'still'); try{ if (d._sting) d._sting.pause(); }catch(e){} d.classList.add('out'); setTimeout(()=> d.remove(), 300); if (done) done(); };
     const discoAt = performance.now();
-    d.addEventListener('click', (e)=>{ e.stopPropagation(); if (performance.now() - discoAt >= TIMING.SKIP_AFTER) end(); });
+    d.addEventListener('click', (e)=>{ e.stopPropagation(); if (performance.now() - discoAt >= SKIP_MIN_MS) end(); });
     requestAnimationFrame(()=> d.classList.add('on'));
     // I4: the two dancers run through the disco poses, out of step with each other.
     { const host = d.querySelector('.dc-alien.host'), buddy = d.querySelector('.dc-alien.buddy'), steps = [['discoPoint', 'swayR'], ['swayL', 'spin'], ['spin', 'swayL'], ['swayR', 'discoPoint'], ['discoPoint', 'swayR']];
@@ -13028,7 +13048,7 @@
     const shownAt = performance.now(); let finished = false;
     const done = ()=>{ if (finished) return; finished = true; clearTimeout(t); ov.onclick = null; ov.classList.add('hidden'); noteOverlayClosed(); updatePauseBtnVisibility(); then(); };
     const t = setTimeout(done, full ? HOST_INTRO_MS : HOST_QUIP_MS);
-    ov.onclick = e=>{ e.stopPropagation(); if (performance.now() - shownAt > TIMING.SKIP_AFTER) done(); };
+    ov.onclick = e=>{ e.stopPropagation(); if (performance.now() - shownAt > SKIP_MIN_MS) done(); };
   }
   // Crowd Scan: a small silver UFO crosses the screen now and then (transform and opacity only; it stops
   // with the overlay, with a hidden tab, and with reduced motion).
@@ -17044,7 +17064,7 @@
       // Oct 15) and it looked like a repeat; a jump starts somewhere random in the deck instead (TEST menu only).
       if (decks.daily && decks.daily.cards) decks.daily.next = Math.floor(Math.random() * Math.max(1, Math.min(80, decks.daily.cards.length - 40)));
       if (tweak) tweak();
-      if (then) setTimeout(()=>{ if (runActive) then(); }, TIMING.SKIP_AFTER + 60);   // (the cold open ignores a tap in its first SKIP_AFTER ms)
+      if (then) setTimeout(()=>{ if (runActive) then(); }, SKIP_MIN_MS + 60);   // (the cold open ignores a tap in its first SKIP_MIN_MS)
     }
     // Stand-in progress: a score, `n` letters earned, a clock at 4:12.
     function replaySample(score, n){
