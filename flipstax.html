@@ -3382,6 +3382,18 @@
     font:900 26px/1 var(--f-display); letter-spacing:1px; color:#3a1a00; background:radial-gradient(circle at 17px 50%, transparent 0 4.5px, #fff1b0 5.5px);
     clip-path:polygon(16px 0, 100% 0, 100% 100%, 16px 100%, 0 50%); }
   .bb-tag .tb{ transform:rotateY(180deg); background:radial-gradient(circle at 17px 50%, transparent 0 4.5px, #ffd23f 5.5px); }
+  /* C3 (after refs/price): the price tag is a gold-framed flip-digit board; on the reveal each digit wheel rolls to the price. */
+  .event-overlay .bb-tag.price-tag{ display:flex; width:max-content; height:auto; margin:4px auto 0; padding:4px 5px; border-radius:10px; perspective:none;
+    background:linear-gradient(180deg, #fff5c2, #f2c03a 45%, #c98a00); box-shadow:inset 0 0 0 2px #fff3c4, 0 0 0 2px #6a3d00, 0 3px 0 #6a3d00; filter:none; }
+  .price-tag .pt-in{ display:flex; gap:2px; }
+  .price-tag .pc{ position:relative; width:24px; height:36px; overflow:hidden; border-radius:5px; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(#34343c 0 49%, #1b1b21 51%); color:#fdf3d8; font:900 28px/36px var(--f-display); box-shadow:inset 0 1px 0 rgba(255,255,255,0.14); }
+  .price-tag .pc::after{ content:''; position:absolute; left:0; right:0; top:50%; height:2px; margin-top:-1px; background:rgba(0,0,0,0.75); }
+  .price-tag .ps{ color:#ffd23f; } .price-tag .pn{ width:12px; }
+  .price-tag .pd{ align-items:flex-start; }
+  .price-tag .pcol{ display:flex; flex-direction:column; will-change:transform; }
+  .price-tag .pcol span{ display:block; height:36px; line-height:36px; text-align:center; }
+  @media (max-height:700px){ .price-tag .pc{ width:19px; height:28px; font-size:22px; line-height:28px; } .price-tag .pcol span{ height:28px; line-height:28px; } .price-tag .pn{ width:9px; } }
   :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.brainbreak .event-tile::after{ content:''; position:absolute; left:5px; right:5px; top:10px; bottom:0; pointer-events:none;
     background-image:radial-gradient(circle, #fff6c0 0 2.6px, rgba(255,214,90,0) 3.4px), radial-gradient(circle, #fff6c0 0 2.6px, rgba(255,214,90,0) 3.4px);
     background-size:12px 20px, 12px 20px; background-position:0 0, 100% 0; background-repeat:repeat-y; animation:bulbA 0.5s steps(1) infinite; }
@@ -9950,6 +9962,24 @@
     if (idx < 0) idx = Math.floor(mulberry32(seed)() * list.length);
     used.add(idx); return list[idx];
   }
+  // Rolls a Price Probe tag's digit wheels to its price (left to right, each a turn longer), a clack a step.
+  function priceRoll(tag, delayMs){
+    const inn = tag.querySelector('.pt-in'), text = tag.dataset.price || '';
+    if (!inn || !text) return;
+    inn.innerHTML = Array.from(text).map(c=> /\d/.test(c) ? '<span class="pc pd"><span class="pcol"></span></span>' : '<span class="pc ps' + (c === ',' || c === '.' ? ' pn' : '') + '">' + c + '</span>').join('');
+    const digits = text.replace(/\D/g, ''), still = FX.reduced() || !Element.prototype.animate;
+    let longest = 0;
+    inn.querySelectorAll('.pcol').forEach((col, k)=>{
+      const d = +digits[k], seq = [], start = Math.floor(Math.random() * 10), steps = 10 * (1 + (k > 1 ? 1 : 0)) + ((d - start + 10) % 10);
+      for (let n = 0; n <= steps; n++) seq.push((start + n) % 10);
+      col.innerHTML = seq.map(n=> '<span>' + n + '</span>').join('');
+      const to = 'translateY(' + (-100 * (seq.length - 1) / seq.length).toFixed(4) + '%)';
+      if (still){ col.style.transform = to; return; }
+      const dur = 650 + k * 200; longest = Math.max(longest, dur);
+      col.animate([{ transform:'translateY(0)' }, { transform:to }], { duration:dur, delay:delayMs, easing:'cubic-bezier(.15,.6,.25,1)', fill:'forwards' });
+    });
+    if (!still) for (let t = 0; t < longest; t += t < longest * 0.6 ? 55 : 110) setTimeout(()=> sfx.clack(), delayMs + t);
+  }
   function breakPriceText(p){ return '$' + (p >= 100 ? Math.round(p).toLocaleString() : p % 1 ? p.toFixed(2) : String(p)); }
   // One round: { prompt, kind, tiles:[{glyph,name,sub}], correct, reveal:(tileEl, i)=>..., why }.
   function buildBreakRound(key, seed){
@@ -9982,7 +10012,12 @@
       const spot = document.createElement('i'); spot.className = 'bb-spot'; tileEl.appendChild(spot);
     }
     // Price Probe: a price tag ("$ ?") that flips over to the price; Time Warp: a clock plate that flips to the year.
-    if (key === 'priceProbe' || key === 'timeWarp'){
+    // C3: Price Probe's tag is a gold-framed flip-digit board ("$ ? ? ?") whose digit wheels roll to the price.
+    if (key === 'priceProbe'){
+      const tag = document.createElement('span'); tag.className = 'bb-tag price-tag'; tag.dataset.price = back || '';
+      tag.innerHTML = '<span class="pt-in"><span class="pc ps">$</span><span class="pc">?</span><span class="pc">?</span><span class="pc">?</span></span>';
+      tileEl.appendChild(tag);
+    } else if (key === 'timeWarp'){
       const tag = document.createElement('span'); tag.className = 'bb-tag';
       tag.innerHTML = '<span class="tag-in"><b class="tf">' + (key === 'priceProbe' ? '$ ?' : '\uD83D\uDD70\uFE0F ?') + '</b><b class="tb"></b></span>';
       tag.querySelector('.tb').textContent = back || ''; tileEl.appendChild(tag);
@@ -10037,7 +10072,8 @@
       tiles.forEach((t, i)=>{
         if (i >= n || !rd.revealSub) return;
         const tag = t.querySelector('.bb-tag');
-        if (tag){ tag.style.setProperty('--fd', (i * 0.35) + 's'); tag.classList.add('flipped'); }   // the tags flip over, one after the other
+        if (tag && tag.classList.contains('price-tag')) priceRoll(tag, i * 450);   // the digit wheels roll to the price, one tag after the other
+        else if (tag){ tag.style.setProperty('--fd', (i * 0.35) + 's'); tag.classList.add('flipped'); }   // the tags flip over, one after the other
         else fillBreakTile(t, rd.tiles[i], rd.revealSub[i], true);
       });
       if (right) right.classList.add('is-right');
@@ -10057,7 +10093,7 @@
         playTone(150, 0, 0.16, 'triangle', 0.05); playTone(120, 0.14, 0.2, 'triangle', 0.05);   // a gentle buzz
       }
       saveRunSnapshot();
-      setTimeout(finish, dt(ok ? 900 : BRAIN_BREAK_REVEAL_MS));
+      setTimeout(finish, dt(key === 'priceProbe' ? 2200 : ok ? 900 : BRAIN_BREAK_REVEAL_MS));   // (Price Probe: long enough for both tags to roll)
     };
     tiles.forEach((tileEl, i)=>{ if (i < n) tileEl.onclick = ()=>{ tileEl.classList.add('bb-press'); resolve(i); }; });
     startEventTimerBar(dt(BRAIN_BREAK_MS), dt(BRAIN_BREAK_MS));
