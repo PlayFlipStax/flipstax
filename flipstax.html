@@ -2548,9 +2548,34 @@
   .curtain.open .co-spot{ opacity:0; }
   .co-plate{ position:absolute; z-index:8; top:42%; left:50%; transform:translate(-50%, -50%); font:900 22px/1 var(--f-display); letter-spacing:4px; color:#3a1a00; padding:12px 22px;
     border-radius:10px; border:3px solid #fff3c4; background:linear-gradient(180deg, var(--gold-1), var(--gold-2) 50%, var(--gold-3)); box-shadow:0 8px 24px rgba(0,0,0,0.55); transition:opacity .4s, transform .4s; }
-  .curtain.open .co-drape.l{ transform:translateX(-92%) scaleX(0.6); }
-  .curtain.open .co-drape.r{ transform:translateX(92%) scaleX(0.6); }
+  /* A3: the pull - each drape bunches to its side (the folds crowd together) over --pull, then sways as it settles. */
+  .curtain .co-drape{ transition:none; }
+  .curtain .co-drape.l{ transform-origin:0 0; } .curtain .co-drape.r{ transform-origin:100% 0; }
+  .curtain.open .co-drape.l{ animation:coPullL var(--pull, 4s) cubic-bezier(.5,0,.3,1) forwards; }
+  .curtain.open .co-drape.r{ animation:coPullR var(--pull, 4s) cubic-bezier(.5,0,.3,1) forwards; }
+  @keyframes coPullL{ 0%{ transform:none; } 80%{ transform:scaleX(0.22) skewX(0deg); } 87%{ transform:scaleX(0.235) skewX(2.2deg); } 94%{ transform:scaleX(0.218) skewX(-1.2deg); } 100%{ transform:scaleX(0.225) skewX(0deg); } }
+  @keyframes coPullR{ 0%{ transform:none; } 80%{ transform:scaleX(0.22) skewX(0deg); } 87%{ transform:scaleX(0.235) skewX(-2.2deg); } 94%{ transform:scaleX(0.218) skewX(1.2deg); } 100%{ transform:scaleX(0.225) skewX(0deg); } }
+  .co-studio{ z-index:0; }
+  .co-stage-host{ position:absolute; z-index:2; left:50%; bottom:calc(6vh + env(safe-area-inset-bottom)); width:min(46vw, 210px); margin-left:calc(min(46vw, 210px) / -2);
+    transform:translateX(75vw); transition:transform var(--walk, 2s) cubic-bezier(.3,.75,.3,1); }
+  .co-follow{ position:absolute; z-index:1; left:50%; top:-6%; bottom:calc(3vh + env(safe-area-inset-bottom)); width:min(84vw, 380px); margin-left:calc(min(84vw, 380px) / -2); pointer-events:none;
+    background:radial-gradient(50% 9% at 50% 95%, rgba(255,246,214,0.6), rgba(255,246,214,0) 100%), linear-gradient(180deg, rgba(255,246,214,0.3), rgba(255,246,214,0.1) 75%, rgba(255,246,214,0));
+    clip-path:polygon(45% 0, 55% 0, 100% 100%, 0 100%); opacity:0; transform:translateX(75vw);
+    transition:transform var(--walk, 2s) cubic-bezier(.3,.75,.3,1), opacity .6s ease; }
+  .curtain.open .co-follow{ opacity:1; }
+  .curtain.walk .co-stage-host, .curtain.walk .co-follow{ transform:none; }
+  .co-sign{ position:absolute; z-index:3; left:50%; top:19%; width:max-content; max-width:92vw; padding:16px 26px 18px; border-radius:20px; text-align:center; --bulb:#fff3b0;
+    background:linear-gradient(180deg, #fff5c4, #ffd23f 50%, #f2a100); border:4px solid #fff3c4; color:#3a1500; font:900 clamp(30px, 9.4vw, 44px)/0.95 var(--f-display); letter-spacing:1.5px;
+    box-shadow:0 0 0 4px #7a3d00, 0 10px 30px rgba(0,0,0,0.5), 0 0 40px rgba(255,200,60,0.6);
+    transform:translate(-50%, 0) scale(0.4); opacity:0; transition:transform .45s cubic-bezier(.2,1.5,.4,1), opacity .25s; }
+  .co-sign span{ position:relative; z-index:3; display:block; padding:4px 6px; }
+  .co-sign.on{ transform:translate(-50%, 0) scale(1); opacity:1; }
+  .co-sign.off{ transform:translate(-50%, -30%) scale(0.85); opacity:0; transition-duration:.3s; }
+  .co-sign .sign-bulbs i{ --bulb:#fff8d0; box-shadow:0 0 7px #ffd23f, 0 0 0 1.5px rgba(90,40,0,0.6); }
+  .co-sign.on .sign-bulbs i{ animation:bulbUnison .2s steps(1) 4, bulbChase .9s steps(1) .8s infinite; animation-delay:0s, calc(.8s + var(--k) * -0.225s); }
+  @media (prefers-reduced-motion: reduce){ .curtain.open .co-drape{ animation:none; transform:scaleX(0.225); } .co-stage-host, .co-follow, .co-sign{ transition:none; } .co-sign.on .sign-bulbs i{ animation:none; } }
   .curtain.open .co-plate{ opacity:0; transform:translate(-50%, -80%) scale(0.8); }
+  .show-card.curtain{ background:#1d0636; }
   .curtain .sc-inner{ gap:16px; }
   .co-marquee{ display:flex; gap:4px; padding:12px 14px; border-radius:14px; background:#1a0610; border:3px solid var(--gold-2);
     box-shadow:0 0 0 3px #1a0610, 0 0 26px rgba(255,190,40,0.35); }
@@ -10504,24 +10529,30 @@
     const ep = showEpisode(runStartDate || todayStr());
     let seen = false; try{ seen = !!localStorage.getItem(COLD_OPEN_SEEN_KEY); }catch(e){}
     const co = RUNDOWN.coldOpen || {}, total = seen ? (co.returningMs || 3000) : (co.firstMs || 12000);
-    // The beats, scaled to the length: the curtain parts, the marquee lights, the host, the cards.
-    const k = total / 12000, at = (ms)=> Math.round(ms * (seen ? Math.max(k, 0.25) : k));
+    // A3 (Oct 2026): the curtain pulls open (about 4 s the first time: the folds bunch to the sides and sway as they
+    // settle) on the studio set; the host walks to center stage in his silver suit under a follow spot; then two
+    // plates, WELCOME TO FLIPSTAX! and EPISODE n, each on screen at least a second, their bulbs flashing as they land.
+    // The beats for the first time (12 s) and for returning players (3 s).
+    const T = seen ? { open:0, pull:1000, walk:150, walkMs:700, s1:700, s1off:1800, s2:1850 }
+                   : { open:700, pull:4000, walk:2600, walkMs:2000, s1:4900, s1off:7900, s2:8150 };
     showCard.className = 'show-card curtain';
-    showCard.innerHTML = '<i class="co-drape l"></i><i class="co-drape r"></i><i class="co-spot"></i><i class="co-valance"></i>' +
-      '<div class="co-plate">EPISODE ' + ep + '</div>' +
-      '<div class="sc-inner"><div class="co-marquee" aria-hidden="true">' + 'FLIPSTAX'.split('').map(c=> '<b>' + c + '</b>').join('') + '</div>' +
-      '<div class="alien co-host">' + FX.alienSvg() + '</div>' +
-      '<div class="co-cards" aria-hidden="true"><span>VS SHOW&shy;DOWN</span><span class="q">?</span><span>GRAND PRIZE</span></div></div>' +
+    showCard.style.setProperty('--pull', T.pull + 'ms'); showCard.style.setProperty('--walk', T.walkMs + 'ms');
+    showCard.innerHTML = '<div class="studio co-studio" aria-hidden="true">' + STUDIO_HTML + '</div><i class="co-follow" aria-hidden="true"></i>' +
+      '<div class="co-stage-host host-full" aria-hidden="true">' + window.HostAlien.full() + '</div>' +
+      '<div class="co-sign w1"><div class="sign-bulbs" aria-hidden="true"></div><span>WELCOME TO<br>FLIPSTAX!</span></div>' +
+      '<div class="co-sign w2"><div class="sign-bulbs" aria-hidden="true"></div><span>EPISODE ' + ep + '</span></div>' +
+      '<i class="co-drape l"></i><i class="co-drape r"></i><i class="co-spot"></i><i class="co-valance"></i>' +
       '<div class="co-skip">TAP TO SKIP</div>';
     showCard.classList.remove('hidden');
-    showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'Episode ' + ep + ' of FlipStax. Tap to skip');
+    showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'Welcome to FlipStax, episode ' + ep + '. Tap to skip');
+    showCard.querySelectorAll('.co-sign .sign-bulbs').forEach(b=> ringBulbs(b, 22, 8));
     const timers = [], later = (ms, f)=> timers.push(setTimeout(f, ms));
-    const letters = showCard.querySelectorAll('.co-marquee b');
-    const rm = prefersReducedMotion();
-    later(rm ? 0 : at(seen ? 900 : 2200), ()=>{ showCard.classList.add('open'); if (sfx.bumper) sfx.bumper(false); });
-    letters.forEach((b, i)=> later(rm ? 0 : at(seen ? 1300 : 3800) + i * at(seen ? 90 : 260), ()=>{ b.classList.add('on'); playTone(523 + i * 66, 0, 0.08, 'triangle', 0.05); }));
-    later(rm ? 0 : at(seen ? 2000 : 6400), ()=>{ showCard.classList.add('host'); });
-    later(rm ? 0 : at(seen ? 2300 : 7600), ()=>{ showCard.classList.add('fan'); playTone(784, 0, 0.1, 'triangle', 0.06); playTone(988, 0.1, 0.1, 'triangle', 0.06); playTone(1319, 0.2, 0.3, 'triangle', 0.06); });
+    const sign = (cls, on)=>{ const el = showCard.querySelector('.co-sign.' + cls); if (!el) return; el.classList.toggle('on', on); el.classList.toggle('off', !on); };
+    later(T.open, ()=>{ showCard.classList.add('open'); if (sfx.bumper) sfx.bumper(false); });
+    later(T.walk, ()=> showCard.classList.add('walk'));
+    later(T.s1, ()=>{ sign('w1', true); sfx.chime(4); sfx.chime(6); });
+    later(T.s1off, ()=> sign('w1', false));
+    later(T.s2, ()=>{ sign('w2', true); sfx.chime(5); sfx.chime(7); });
     let gone = false;
     const shownAt = performance.now();
     const go = (e)=>{
