@@ -16961,6 +16961,7 @@
       returnToModeSelect({ silent:true });
       runResultToday = null; clearRunSnapshot();
       dailyScanDone = null; cosmicDaily = null; try{ closeGuessRound(); }catch(e){}
+      if (mgOpen) try{ mgOpen.close(true); }catch(e){}   // (a Mystery Game left open by an earlier jump)
       if (luckyOv){ luckyGen++; luckyOv.classList.add('hidden'); luckyOv.innerHTML = ''; }
       showCard.classList.add('hidden'); showCard.innerHTML = '';
       document.getElementById('showSay').classList.remove('on');
