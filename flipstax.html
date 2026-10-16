@@ -464,6 +464,12 @@
   .event-overlay.brainbreak .bb-marquee{ display:block; }
   @keyframes bbBulbs{ from{ background-position:0 50%; } to{ background-position:9px 50%; } }
   .event-overlay.brainbreak .event-subtitle{ background:var(--bb, #ffd23f); color:#1c1006; box-shadow:0 0 0 2px rgba(255,255,255,0.55); }
+  /* A Brain Break's result pill (C16): a gold +10 for a win, a red MISSED for a miss. */
+  .event-overlay .event-subtitle.res-win, .event-overlay .event-subtitle.res-miss{ font:900 24px/1 var(--f-display); letter-spacing:1px; padding:6px 20px 7px; border-radius:999px; animation:resPop .4s cubic-bezier(.2,1.6,.4,1) both; }
+  .event-overlay .event-subtitle.res-win{ background:linear-gradient(180deg, #fff6c2, #ffd23f 50%, #e9a100); color:#3a1f00; box-shadow:0 0 0 2px #fff3c4, 0 0 18px rgba(255,210,63,0.85); }
+  .event-overlay .event-subtitle.res-miss{ background:linear-gradient(180deg, #ff6a7d, #d61f3c 55%, #a3102b); color:#fff; box-shadow:0 0 0 2px #ffc2cb, 0 0 16px rgba(255,40,70,0.7); }
+  @keyframes resPop{ 0%{ transform:scale(0.4); opacity:0; } 100%{ transform:scale(1); opacity:1; } }
+  @media (prefers-reduced-motion: reduce){ .event-overlay .event-subtitle.res-win, .event-overlay .event-subtitle.res-miss{ animation:none; } }
   .event-overlay.brainbreak .event-tile{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:12px 8px; min-height:104px; text-align:center; line-height:1.15; }
   .event-overlay.brainbreak .bb-glyph{ font-size:34px; line-height:1; }
   .event-overlay.brainbreak .bb-name{ font-weight:800; font-size:clamp(14px, 4vw, 17px); }
@@ -10266,7 +10272,7 @@
     if (tl){ tl.classList.remove('on'); tl.querySelectorAll('.tl-m b').forEach(b=> b.textContent = '?'); tl.querySelector('.tl-gap').textContent = ''; }
     let settled = false;
     const finish = ()=>{
-      ov.classList.add('hidden'); ov.classList.remove('brainbreak', 'stack', 'bb-two', 'flash-win', 'bb-' + key); ov.style.removeProperty('--bb');
+      ov.classList.add('hidden'); ov.classList.remove('brainbreak', 'stack', 'bb-two', 'flash-win', 'bb-' + key); els.eventSubtitle.classList.remove('res-win', 'res-miss'); ov.style.removeProperty('--bb');
       tiles.forEach(t=>{ t.style.display = ''; t.classList.remove('is-right', 'is-wrong'); t.onclick = null; });
       if (runActive) done();
     };
@@ -10291,13 +10297,13 @@
       if (ok){
         addRunScore(BRAIN_BREAK_POINTS);
         if (runActive) addRunKey('mystery');   // a Mystery Game win: a key (an Orbit Drop chip)
-        els.eventSubtitle.textContent = '✅ +' + BRAIN_BREAK_POINTS + ' POINTS';
+        els.eventSubtitle.textContent = '+' + (runActive ? BRAIN_BREAK_POINTS * runActMult() : BRAIN_BREAK_POINTS); els.eventSubtitle.classList.add('res-win');   // a gold +10 (with the act's multiplier)
         if (rd.why) els.eventPrompt.textContent = rd.why;
         showFlash('win'); hostMood('cheer'); hostSay(hostLine('right')); sfx.combo(); if (key === 'priceProbe') sfx.cashRegister(); else sfx.cheer(); ov.classList.add('flash-win');
         if (right){ FX.burstAt(showFx, right, { count:12, spread:100, shapes:['star', 'coin'] }); FX.pop(right, 1.25); }
       } else {
         if (pick != null && tiles[pick]) tiles[pick].classList.add('is-wrong');
-        els.eventSubtitle.textContent = pick == null ? '⏱️ OUT OF TIME · 0 POINTS' : '0 POINTS';
+        els.eventSubtitle.textContent = pick == null ? 'MISSED · OUT OF TIME' : 'MISSED'; els.eventSubtitle.classList.add('res-miss');   // a red MISSED (not a 0 POINTS pill)
         if (rd.why) els.eventPrompt.textContent = rd.why;
         hostMood('sad'); hostSay(hostLine(pick == null ? 'slow' : 'wrong'));
         playTone(150, 0, 0.16, 'triangle', 0.05); playTone(120, 0.14, 0.2, 'triangle', 0.05);   // a gentle buzz
@@ -10763,6 +10769,7 @@
     els.eventSubtitle.textContent = second ? '🔁 SECOND CHANCE · answer right, recover a letter'
       : q.riddle ? '🧩 ' + GN.riddleRound.toUpperCase() + (runQuizBeam ? ' · win a prize-track tile' : '')
       : '🧠 ' + GN.brainBeam.toUpperCase() + (step && step.level ? ' · ' + step.level.toUpperCase() : '') + (runQuizBeam ? ' · win a prize-track tile' : '');
+    els.eventSubtitle.classList.remove('res-win', 'res-miss');
     els.eventPrompt.textContent = q.question; els.eventPrompt.classList.toggle('long', q.question.length > 90);
     runQuizPick = null;
     els.eventTiles.forEach((tileEl,i)=>{
@@ -14331,7 +14338,7 @@
   // C1: Infinity's popup world - the power-up pick, a Cosmic Surprise, or
   // the bonus Brain Beam.
   const evBg = document.getElementById('evBg');
-  new MutationObserver(()=>{ const ov = els.eventOverlay; if (ov.classList.contains('quiz-beam') && (ov.classList.contains('hidden') || ov.classList.contains('powerup') || ov.classList.contains('cosmic-mode') || ov.classList.contains('gift-mode'))) ov.classList.remove('quiz-beam'); })
+  new MutationObserver(()=>{ const ov = els.eventOverlay; if (ov.classList.contains('hidden')) els.eventSubtitle.classList.remove('res-win', 'res-miss'); if (ov.classList.contains('quiz-beam') && (ov.classList.contains('hidden') || ov.classList.contains('powerup') || ov.classList.contains('cosmic-mode') || ov.classList.contains('gift-mode'))) ov.classList.remove('quiz-beam'); })
     .observe(els.eventOverlay, { attributes:true, attributeFilter:['class'] });
   new MutationObserver(()=>{
     const ov = els.eventOverlay, w = ov.classList.contains('cosmic-mode') && document.getElementById('cosmicStage').classList.contains('riddle') ? 'w-riddle' : ov.classList.contains('gift-mode') || ov.classList.contains('cosmic-mode') ? 'w-odd' : ov.classList.contains('powerup') ? 'w-powerup' : 'w-trivia';
