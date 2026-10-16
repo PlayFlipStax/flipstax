@@ -3367,6 +3367,14 @@
   .one-show .ms-coffee-btn{ border-color:#ffd23f; box-shadow:0 4px 0 #5a2400, 0 0 0 3px rgba(255,214,90,0.35), 0 0 20px rgba(255,150,40,0.7); }
   .one-show .ms-coffee-label{ background:rgba(20,4,36,0.85); color:#ffe9a0; box-shadow:0 0 0 1.5px rgba(255,214,90,0.6); }
   :root.lite .one-show .ms-body-daily .ms-cta{ animation:none; }
+  /* F4: the menu's title is tonight's episode, and the content sits higher (no big empty top). */
+  .ms-title-ep{ display:flex; flex-direction:column; align-items:center; gap:2px; line-height:1; }
+  .ms-title-ep small{ font:900 clamp(18px, 5.4vw, 22px)/1 var(--f-display); letter-spacing:5px; color:#ff8ad4; text-shadow:0 0 12px rgba(255,60,172,0.75); }
+  .ms-title-ep b{ font:900 clamp(46px, 14vw, 64px)/1 var(--f-display); letter-spacing:2px; color:#fff3c4; text-shadow:0 0 12px rgba(255,200,90,0.85), 0 0 28px rgba(255,90,200,0.6), 0 4px 0 #5a1a6a; }
+  .one-show .ms-body-daily{ justify-content:flex-start; top:calc(118px + env(safe-area-inset-top)); padding-top:clamp(14px, 8vh, 80px); gap:6px; }
+  .ms-host{ position:absolute; z-index:1; left:50%; bottom:calc(9vh + env(safe-area-inset-bottom)); width:min(34vw, 160px); transform:translateX(-50%); pointer-events:none; }
+  @media (max-height:700px){ .ms-host{ display:none; } }
+  .split-select-overlay:not(.one-show) .ms-host{ display:none; }
   .legal-overlay{
     position:fixed; inset:0; z-index:70; display:flex; align-items:center;
     justify-content:center; background:rgba(8,10,24,0.82); padding:24px;
@@ -4251,6 +4259,7 @@
 
 <div class="split-select-overlay one-show hidden" id="modeSelectOverlay">
   <div class="studio menu-set" data-studio aria-hidden="true"></div>
+  <div class="ms-host host-full" id="msHost" aria-hidden="true"></div>
   <!-- Infinity: the gold world underneath; takes every tap the sky doesn't. -->
   <div class="ms-gold" id="modeInfinityBtn" role="button" aria-label="Play Infinity Flips">
     <div class="ms-bg" id="msGoldSparks"></div>
@@ -4272,12 +4281,7 @@
   <div class="ms-sky" id="modeDailyBtn" role="button" aria-label="Play Daily Stax">
     <div class="ms-bg"><div class="ms-ufo ufo" id="msUfo" aria-hidden="true"></div></div>
     <div class="ms-body ms-body-daily">
-      <div class="ms-wm" aria-hidden="true">
-        <span>DAILY</span>
-        <svg viewBox="0 0 48 34" width="40" height="28"><g stroke="#0d2b5e" stroke-width="2" stroke-linejoin="round"><rect x="7" y="6" width="17" height="24" rx="3" fill="#ff7a59" transform="rotate(-18 15.5 18)"/><rect x="24" y="6" width="17" height="24" rx="3" fill="#2dd4c4" transform="rotate(18 32.5 18)"/><rect x="15.5" y="3" width="17" height="24" rx="3" fill="#ffd93d"/></g><path d="M24 9.5 l1.9 4.2 4.6.5-3.4 3.1 1 4.5-4.1-2.4-4.1 2.4 1-4.5-3.4-3.1 4.6-.5z" fill="#fff" stroke="#0d2b5e" stroke-width="0.8" stroke-linejoin="round"/></svg>
-        <span>STAX</span>
-      </div>
-      <div class="ms-tag">Today's episode is on!</div>
+      <div class="ms-title-ep"><small>TONIGHT’S</small><b id="msEpisode">EPISODE</b></div>
       <div class="ms-desc">Pick with the crowd, beat the Brain Beams, crack two mystery games and play for the grand prize. The same show for everyone, new every day.</div>
       <div class="ms-desc-short">Pick, answer, play for the grand prize.</div>
       <div class="ms-cta">PLAY TODAY &#9654;</div>
@@ -4287,7 +4291,7 @@
   <div class="split-select-header">
     <div class="logo"><span class="flip">Flip</span><span class="stax">Stax</span></div>
     <div class="split-select-title">A new episode every day</div>
-    <div class="ms-howto">How to play: <span role="button" tabindex="0" data-howto="daily">Daily</span><span class="ms-howto-sep"> · </span><span role="button" tabindex="0" data-howto="infinity">Infinity</span></div>
+    <div class="ms-howto"><span role="button" tabindex="0" data-howto="daily">How to play</span><span class="ms-howto-sep"> · </span><span role="button" tabindex="0" data-howto="infinity">Infinity</span></div>
   </div>
   <div class="ms-divider-ring" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
   <div class="split-divider">OR</div>
@@ -16258,6 +16262,7 @@
   const homeSignBulbs = ()=>{ const b = document.querySelector('#homeSign .sign-bulbs'); if (b && !els.homeOverlay.classList.contains('hidden')) ringBulbs(b, 24, 9); };
   { const img = document.querySelector('#homeSign .home-logo-img'); if (img && !img.complete) img.addEventListener('load', homeSignBulbs); }
   homeSignBulbs();
+  { const me = document.getElementById('msEpisode'); if (me) me.textContent = 'EPISODE ' + showEpisode(todayStr()); const mh = document.getElementById('msHost'); if (mh) mh.innerHTML = window.HostAlien.full(); }   // F4: the menu's title and its host on the stage
   document.getElementById('homeTonight').innerHTML = 'TONIGHT\u2019S SHOW \u00B7 <b>EPISODE ' + showEpisode(todayStr()) + '</b>';
   document.getElementById('homeHost').innerHTML = window.HostAlien.full();
   let doodleResizeTimer = null;
