@@ -3035,6 +3035,78 @@
     font-size:11.5px; color:#fff; text-decoration:underline; cursor:pointer; font-weight:600; text-shadow:0 1px 2px rgba(50,15,80,0.85), 0 0 6px rgba(50,15,80,0.6);
   }
   .home-legal-dot{ color:rgba(255,255,255,0.4); font-size:11.5px; }
+  /* ---- The studio set (A1/A2, Oct 2026): a 70s/80s TV studio - a dark purple and magenta back wall with faint
+     neon strips, slow light rays, soft-edged spotlight beams that sweep on their own timings (6-10 s, eased), a
+     round stage floor with a lit rim, and faint audience lights along the bottom. Shared by the landing lobby and
+     the menu; transform and opacity motion only; lite mode and reduced motion keep it still. */
+  .studio{ position:absolute; inset:0; z-index:-1; overflow:hidden; pointer-events:none;
+    background:radial-gradient(120% 70% at 50% 28%, #7a1d86 0%, #43105f 42%, #1d0636 78%, #0e0322 100%); }
+  .st-wall{ position:absolute; left:0; right:0; top:0; height:74%;
+    background:radial-gradient(55% 42% at 50% 34%, rgba(255,90,200,0.32), rgba(255,90,200,0) 72%),
+      repeating-linear-gradient(90deg, rgba(255,140,230,0.07) 0 2px, rgba(0,0,0,0) 2px 52px); }
+  .st-rays{ position:absolute; left:50%; top:-40vmax; width:170vmax; height:170vmax; margin-left:-85vmax; opacity:0.55;
+    background:repeating-conic-gradient(from 0deg, rgba(255,215,255,0.07) 0deg 5deg, rgba(255,215,255,0) 5deg 15deg);
+    -webkit-mask-image:radial-gradient(closest-side, #000 20%, rgba(0,0,0,0) 78%); mask-image:radial-gradient(closest-side, #000 20%, rgba(0,0,0,0) 78%);
+    animation:stRays 120s linear infinite; will-change:transform; }
+  @keyframes stRays{ to{ transform:rotate(360deg); } }
+  .st-beam{ position:absolute; top:-6%; width:44vmin; height:118%; margin-left:-22vmin; transform-origin:50% 0; opacity:var(--bo, 0.5); will-change:transform;
+    background:linear-gradient(180deg, var(--bc, rgba(255,248,220,0.6)), rgba(255,240,210,0.16) 58%, rgba(255,240,210,0) 94%);
+    clip-path:polygon(45% 0, 55% 0, 100% 100%, 0 100%);
+    -webkit-mask-image:linear-gradient(90deg, rgba(0,0,0,0) 4%, #000 38%, #000 62%, rgba(0,0,0,0) 96%); mask-image:linear-gradient(90deg, rgba(0,0,0,0) 4%, #000 38%, #000 62%, rgba(0,0,0,0) 96%);
+    transform:rotate(var(--a0)); animation:stSweep var(--sw, 8s) cubic-bezier(.45,0,.55,1) var(--sd, 0s) infinite alternate; }
+  @keyframes stSweep{ from{ transform:rotate(var(--a0)); } to{ transform:rotate(var(--a1)); } }
+  .st-beam.b1{ left:8%;  --a0:-30deg; --a1:4deg;   --sw:7.4s; }
+  .st-beam.b2{ left:92%; --a0:30deg;  --a1:-6deg;  --sw:9.2s; --sd:-3.1s; --bc:rgba(255,160,230,0.55); }
+  .st-beam.b3{ left:34%; --a0:-12deg; --a1:16deg;  --sw:8.3s; --sd:-5.4s; --bc:rgba(160,235,255,0.45); --bo:0.42; }
+  .st-beam.b4{ left:66%; --a0:14deg;  --a1:-15deg; --sw:6.4s; --sd:-1.7s; --bo:0.42; }
+  .st-floor{ position:absolute; left:50%; bottom:-16vh; width:170vw; height:48vh; margin-left:-85vw; border-radius:50%;
+    background:repeating-radial-gradient(50% 50% at 50% 46%, rgba(255,255,255,0) 0 34px, rgba(255,190,255,0.07) 34px 36px),
+      radial-gradient(48% 44% at 50% 40%, #a03aa8 0%, #5a1470 52%, #2a0738 100%);
+    box-shadow:0 -3px 0 rgba(255,214,90,0.75), 0 -14px 46px rgba(255,90,200,0.4); }
+  .st-audience{ position:absolute; left:0; right:0; bottom:0; height:9vh; opacity:0.75; animation:stCrowd 5.5s ease-in-out infinite alternate;
+    background-image:radial-gradient(circle, rgba(255,232,170,0.65) 0 1.4px, rgba(255,232,170,0) 2.2px), radial-gradient(circle, rgba(255,170,230,0.5) 0 1.2px, rgba(255,170,230,0) 2px);
+    background-size:23px 13px, 31px 17px; background-position:0 2px, 11px 7px;
+    -webkit-mask-image:linear-gradient(0deg, #000, rgba(0,0,0,0)); mask-image:linear-gradient(0deg, #000, rgba(0,0,0,0)); }
+  @keyframes stCrowd{ from{ opacity:0.45; } to{ opacity:0.85; } }
+  :root.lite .st-beam, :root.lite .st-rays, :root.lite .st-audience{ animation:none !important; }
+  :root.lite .st-rays{ display:none; }
+  @media (prefers-reduced-motion: reduce){ .st-beam, .st-rays, .st-audience{ animation:none !important; } }
+  /* Bulbs placed round a box by JS (ringBulbs): the shared chase (bulbChase), in the box's --bulb colour. */
+  .sign-bulbs{ position:absolute; inset:0; pointer-events:none; z-index:2; }
+  .sign-bulbs i{ position:absolute; left:0; top:0; width:9px; height:9px; margin:-4.5px 0 0 -4.5px; border-radius:50%; background:var(--bulb, #fff3b0);
+    box-shadow:0 0 7px var(--bulb, #ffd23f), 0 0 0 1.5px rgba(60,20,0,0.6); animation:bulbChase 0.9s steps(1) infinite; animation-delay:calc(var(--k) * -0.225s); }
+  :root.lite .sign-bulbs i{ animation:none; }
+  @media (prefers-reduced-motion: reduce){ .sign-bulbs i{ animation:none; } }
+  /* The full host on a stage (lib/host-alien.js HostAlien.full): a gentle bob, a blink, a wave now and then, sparkles. */
+  .host-full svg, .host-full img{ display:block; width:100%; height:auto; }
+  .host-full svg{ animation:haBob 3.4s ease-in-out infinite; transform-origin:50% 100%; }
+  @keyframes haBob{ 0%, 100%{ transform:translateY(0); } 50%{ transform:translateY(-2.5%); } }
+  .host-full .ha-eyes{ transform-box:view-box; transform-origin:50px 64px; animation:haBlink 4.7s infinite; }
+  @keyframes haBlink{ 0%, 93%, 100%{ transform:scaleY(1); } 95.5%{ transform:scaleY(0.08); } }
+  .host-full .ha-arm-wave{ transform-box:view-box; transform-origin:140px 148px; animation:haWave 9s ease-in-out 2s infinite; }
+  @keyframes haWave{ 0%, 66%, 100%{ transform:rotate(0deg); } 72%{ transform:rotate(-152deg); } 76%{ transform:rotate(-132deg); } 80%{ transform:rotate(-156deg); } 84%{ transform:rotate(-134deg); } 88%{ transform:rotate(-150deg); } 94%{ transform:rotate(0deg); } }
+  .host-full .ha-spark{ transform-box:fill-box; transform-origin:center; animation:haSpark 2.4s ease-in-out infinite; }
+  @keyframes haSpark{ 0%, 100%{ opacity:0.15; transform:scale(0.5); } 50%{ opacity:1; transform:scale(1.1); } }
+  :root.lite .host-full svg, :root.lite .host-full .ha-arm-wave, :root.lite .host-full .ha-spark{ animation:none !important; }
+  @media (prefers-reduced-motion: reduce){ .host-full svg, .host-full .ha-eyes, .host-full .ha-arm-wave, .host-full .ha-spark{ animation:none !important; } }
+  /* The lobby (A1): the sign, tonight's episode, START THE SHOW, the host at the lower right of the stage. */
+  .home-overlay{ justify-content:flex-start; padding-top:calc(clamp(24px, 7vh, 64px) + env(safe-area-inset-top)); background:#1d0636; }
+  .home-overlay .home-sky, .home-overlay .home-sparks, .home-overlay .doodle-scatter-track, .home-overlay .doodle-scatter, .home-overlay::before, .home-overlay .home-ufo{ display:none !important; }
+  .lb-sign{ position:relative; z-index:2; padding:18px 18px 14px; border-radius:28px; margin-bottom:18px; --bulb:#ffe9a0;
+    background:radial-gradient(90% 80% at 50% 40%, #4a1468, #22063a 80%); border:4px solid #ffd23f;
+    box-shadow:0 0 0 4px #5a2400, 0 0 0 7px rgba(255,214,90,0.25), 0 0 46px rgba(255,170,60,0.45), inset 0 0 30px rgba(0,0,0,0.6); }
+  .lb-sign .home-logo-img{ width:min(64vw, 290px, calc(36vh * 584 / 519)); margin:0; display:block; animation:logoZoomIn 650ms cubic-bezier(.25,.85,.35,1.25) 300ms both; }
+  .lb-tonight{ position:relative; z-index:2; margin-bottom:20px; padding:8px 18px; border-radius:12px; font:900 clamp(17px, 5vw, 22px)/1 var(--f-display); letter-spacing:2px; color:#ffe9a0;
+    background:rgba(20,4,36,0.7); border:2px solid rgba(255,214,90,0.6); text-shadow:0 0 12px rgba(255,200,80,0.7); }
+  .lb-tonight b{ color:#fff; }
+  .home-overlay .home-enter-btn.daily-btn.primary{ --btn-fill:linear-gradient(180deg, #fff5c4, #ffd23f 45%, #f29b00); color:#3a1500; border:4px solid #fff3c4;
+    padding:16px 34px; font:900 clamp(22px, 6.6vw, 28px)/1 var(--f-display); letter-spacing:1.5px; background:linear-gradient(180deg, #fff5c4, #ffd23f 45%, #f29b00);
+    box-shadow:0 6px 0 #8a4a00, 0 0 0 3px rgba(122,74,0,0.6), 0 0 30px rgba(255,200,60,0.75); animation:lbEnterGlow 2.4s ease-in-out infinite; }
+  @keyframes lbEnterGlow{ 0%, 100%{ box-shadow:0 6px 0 #8a4a00, 0 0 0 3px rgba(122,74,0,0.6), 0 0 22px rgba(255,200,60,0.55); } 50%{ box-shadow:0 6px 0 #8a4a00, 0 0 0 3px rgba(122,74,0,0.6), 0 0 46px rgba(255,210,80,0.95); } }
+  .home-overlay .home-legal-links{ position:absolute; left:0; right:0; bottom:calc(4px + env(safe-area-inset-bottom)); margin:0; z-index:3; }
+  .lb-host{ position:absolute; z-index:2; right:2vw; bottom:calc(5vh + env(safe-area-inset-bottom)); width:min(30vw, 150px); }
+  @media (max-height:700px){ .lb-host{ width:min(24vw, 112px); } .lb-tonight{ margin-bottom:12px; } .lb-sign{ margin-bottom:12px; } }
+  :root.lite .home-overlay .home-enter-btn{ animation:none; }
   .legal-overlay{
     position:fixed; inset:0; z-index:70; display:flex; align-items:center;
     justify-content:center; background:rgba(8,10,24,0.82); padding:24px;
@@ -3875,10 +3947,15 @@
     </svg>
   </div>
   <div class="home-sparks" id="homeSparks" aria-hidden="true"></div>
+  <!-- A1 (Oct 2026): the landing is a TV game-show lobby - the studio set (data-studio, filled by JS: back
+       wall, sweeping spotlights, the stage floor, audience lights), the logo as a bulb-lit marquee sign,
+       tonight's episode, the host on the stage and a big START THE SHOW button. -->
+  <div class="studio lobby-set" data-studio aria-hidden="true"></div>
   <div class="home-sound-hint hidden" id="homeSoundHint" role="button" aria-label="Turn on sound">🔊 Tap for sound</div>
-  <div class="riddle-ufo home-ufo" aria-hidden="true"><span>🛸</span><i></i></div>
-  <img class="home-logo-img" src="images/flipstax-logo-final.png" alt="FlipStax - Flip, Vote, Jumble &amp; Solve">
-  <div class="daily-btn primary home-enter-btn" id="homeEnterBtn">Enter</div>
+  <div class="lb-sign" id="homeSign"><div class="sign-bulbs" aria-hidden="true"></div><img class="home-logo-img" src="images/flipstax-logo-final.png" alt="FlipStax - Flip, Vote, Jumble &amp; Solve"></div>
+  <div class="lb-tonight" id="homeTonight">TONIGHT'S SHOW</div>
+  <div class="daily-btn primary home-enter-btn" id="homeEnterBtn" role="button" tabindex="0">START THE SHOW <span aria-hidden="true">&#9654;</span></div>
+  <div class="lb-host host-full" id="homeHost" aria-hidden="true"></div>
   <div class="home-legal-links">
     <span class="home-legal-link" id="homeDisclaimerLink">Disclaimer</span>
     <span class="home-legal-dot">&middot;</span>
@@ -15633,16 +15710,32 @@
   // just packed a lot denser (cell 52 vs. the halves' 92) and weighted
   // toward question marks/VS/hourglasses, so there's a lot more going on
   // behind the logo, not just a plain gradient with one image on it.
-  renderDoodleScatter(els.homeOverlay, {direction:'left', cell:52, icons:HOME_DOODLE_ICONS});
   renderDoodleScatter(els.halfA, {direction:'right'});
   renderDoodleScatter(els.halfB, {direction:'left'});
-  buildHomeSparks();
-  startHomeRays();
+  // (A1: the landing is the studio lobby now - its old doodles, sparks and sunburst are off.)
+  // ---------- The studio set and the lobby (A1) ----------
+  const STUDIO_HTML = '<i class="st-wall"></i><i class="st-rays"></i><i class="st-beam b1"></i><i class="st-beam b2"></i><i class="st-beam b3"></i><i class="st-beam b4"></i><i class="st-floor"></i><i class="st-audience"></i>';
+  document.querySelectorAll('[data-studio]').forEach(el=>{ el.innerHTML = STUDIO_HTML; });
+  // Bulbs round a box's edge (inside it by `inset`), every `gap` px, chasing (CSS .sign-bulbs).
+  function ringBulbs(holder, gap, inset){
+    const box = holder.parentElement, W = box.clientWidth, H = box.clientHeight; if (!W || !H) return;
+    const pts = [], per = (len)=> Math.max(2, Math.round(len / gap)), nx = per(W - 2 * inset), ny = per(H - 2 * inset);
+    for (let i = 0; i < nx; i++) pts.push([inset + (W - 2 * inset) * i / nx, inset]);
+    for (let i = 0; i < ny; i++) pts.push([W - inset, inset + (H - 2 * inset) * i / ny]);
+    for (let i = 0; i < nx; i++) pts.push([W - inset - (W - 2 * inset) * i / nx, H - inset]);
+    for (let i = 0; i < ny; i++) pts.push([inset, H - inset - (H - 2 * inset) * i / ny]);
+    holder.innerHTML = pts.map(([x, y], k)=> '<i style="--k:' + (k % 4) + ';transform:translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)"></i>').join('');
+  }
+  const homeSignBulbs = ()=>{ const b = document.querySelector('#homeSign .sign-bulbs'); if (b && !els.homeOverlay.classList.contains('hidden')) ringBulbs(b, 24, 9); };
+  { const img = document.querySelector('#homeSign .home-logo-img'); if (img && !img.complete) img.addEventListener('load', homeSignBulbs); }
+  homeSignBulbs();
+  document.getElementById('homeTonight').innerHTML = 'TONIGHT\u2019S SHOW \u00B7 <b>EPISODE ' + showEpisode(todayStr()) + '</b>';
+  document.getElementById('homeHost').innerHTML = window.HostAlien.full();
   let doodleResizeTimer = null;
   window.addEventListener('resize', ()=>{
     clearTimeout(doodleResizeTimer);
     doodleResizeTimer = setTimeout(()=>{
-      renderDoodleScatter(els.homeOverlay, {direction:'left', cell:52, icons:HOME_DOODLE_ICONS});
+      homeSignBulbs();
       renderDoodleScatter(els.halfA, {direction:'right'});
       renderDoodleScatter(els.halfB, {direction:'left'});
       fitTopChip();

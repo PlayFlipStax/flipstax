@@ -8,7 +8,7 @@ new fonts, original art, no real brand or show names, every new game gets a TEST
 
 ## A. Opening (highest priority)
 
-- [ ] A1. Landing page (before Enter): TV game-show lobby - logo as a bulb-lit marquee sign (slow chase), purple/magenta stage and floor, host alien lower right, "Tonight's show" line with the EPISODE number, big glowing ENTER button, existing menu cards and donation buttons restyled onto the stage, slow spotlight beams
+- [x] A1. Landing page (before Enter): TV game-show lobby - logo as a bulb-lit marquee sign (slow chase), purple/magenta stage and floor, host alien lower right, "Tonight's show" line with the EPISODE number, big glowing ENTER button, existing menu cards and donation buttons restyled onto the stage, slow spotlight beams
 - [ ] A2. Background after Enter (menu, between screens): the same studio set (dark stage, soft spotlights, faint audience lights, slow rays) instead of the plain sky / old yellow Infinity look
 - [ ] A3. Cold open: ~4s fabric curtain pull with sway; no alien head, loose cards or VS SHOWDOWN/?/GRAND PRIZE; full host alien (silver suit, retro mic) at center stage; plates WELCOME TO FLIPSTAX! then EPISODE n (each >= 1s), bulbs flash on the plate, a spotlight follows him; 12s first / 3s returning / tap to skip
 - [ ] A4. Motion: spotlight beams sweep and sway (soft cones, own timings, 6-10s); static glow in lite mode; host idles (bob, wave, blink), slides to center on Enter as beams swing to him; host SVG in lib/host-alien.js (silver suit, mic) with an image-swap hook
