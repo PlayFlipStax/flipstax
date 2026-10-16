@@ -528,11 +528,33 @@
   :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-beam .event-tile.is-right::after{ content:''; position:absolute; right:10px; top:50%; width:42px; height:42px; margin-top:-21px; border-radius:50%; border:3px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,0.4);
     background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='white' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 62% no-repeat, radial-gradient(circle at 35% 30%, #8dff9c, #19a33d); }
   :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-beam .event-tile.is-wrong{ background-color:#c0263f !important; border-color:#ff9aa8; opacity:1; }
-  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-beam .event-tile.fw{ opacity:0; transform:perspective(600px) rotateX(-90deg); pointer-events:none; }
-  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-beam .event-tile.fin{ animation:beamFlipIn 0.32s cubic-bezier(.3,1.5,.5,1) both; }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-tile.fw{ opacity:0; transform:perspective(600px) rotateX(-90deg); pointer-events:none; }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-tile.fin{ animation:beamFlipIn 0.32s cubic-bezier(.3,1.5,.5,1) both; }
   @keyframes beamFlipIn{ from{ opacity:1; transform:perspective(600px) rotateX(-90deg); } to{ opacity:1; transform:perspective(600px) rotateX(0); } }
   @keyframes beamFlipGold{ from{ transform:perspective(600px) rotateX(90deg); } to{ transform:perspective(600px) rotateX(0); } }
   @media (prefers-reduced-motion: reduce){ :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-beam .event-tile.fin, :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-beam .event-tile.is-right{ animation:none; } }
+  /* ---- The Riddle (D2, after style-board/refs/riddle): the riddle show - a green neon sign, a big dark panel in a bulb
+     frame with the riddle in capitals and its key words in yellow, and the four answers as cream split-flap rows with
+     gold numbered circles (they flip open one by one, a clack each); the right one turns green with a check. */
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-riddle .event-subtitle{ font:900 clamp(22px, 6.6vw, 28px)/1 var(--f-display); letter-spacing:3px; padding:9px 24px 10px; border-radius:16px; color:#efffd6;
+    background:linear-gradient(180deg, #2a6a1a, #0c3308); border:3px solid #c9ff7a; box-shadow:0 0 0 3px #08250a, 0 0 22px rgba(160,255,90,0.7); text-shadow:0 0 10px rgba(200,255,140,0.9); }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-riddle .event-prompt{ text-transform:uppercase; font-size:clamp(23px, 6.8vw, 31px); line-height:1.12; min-height:24%; border:5px solid #ffd23f; border-radius:20px;
+    background:radial-gradient(circle, rgba(255,255,255,0.05) 1.2px, rgba(0,0,0,0) 1.9px) 0 0 / 7px 7px, linear-gradient(180deg, #1c1236, #0b0818);
+    box-shadow:0 0 0 3px #5a3d06, 0 0 26px rgba(255,210,63,0.5), inset 0 0 30px rgba(0,0,0,0.6); --bb:#ffe27a; }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-riddle .event-prompt.long{ font-size:clamp(18px, 5.2vw, 23px); }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-riddle .event-tile{ position:relative; justify-content:center; text-align:center; padding:6px 22px 6px 66px; text-transform:uppercase; color:#2a1030; text-shadow:none;
+    background-color:#f3e7c4 !important; background-image:linear-gradient(180deg, #fffcef 0%, #f7eed2 49%, #e6d7ab 51%, #efe3c0 100%);
+    background-size:auto; background-position:0 0; background-repeat:no-repeat; border:3px solid #d9b45a; border-radius:14px; box-shadow:0 5px 0 #7a5410, 0 8px 16px rgba(0,0,0,0.35); }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-riddle .event-tile::after{ content:''; position:absolute; left:8px; right:8px; top:50%; height:2px; margin-top:-1px; background:rgba(60,30,0,0.28); pointer-events:none; }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-riddle .tkey{ position:absolute; left:10px; top:50%; width:44px; height:44px; margin-top:-22px; color:#4a2600; font-size:25px; border:3px solid #fff1b0;
+    background:radial-gradient(circle at 35% 30%, #fff6c8, #ffd23f 55%, #d99100); box-shadow:0 0 0 2px #7a4a00, 0 3px 6px rgba(0,0,0,0.4); }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-riddle .ttxt{ position:relative; z-index:1; }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-riddle .event-tile.is-right{ color:#0d3a05; border-color:#efffd6; background-color:#8ff06a !important; background-image:linear-gradient(180deg, #e2ffc8 0%, #9cf27a 49%, #6ed94c 51%, #4fbf34 100%);
+    box-shadow:0 5px 0 #1d5a12, 0 0 28px 6px rgba(140,255,90,0.75); animation:beamFlipGold 0.5s cubic-bezier(.3,1.4,.5,1) both; }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-riddle .event-tile.is-right::after{ left:auto; right:10px; top:50%; width:40px; height:40px; margin-top:-20px; border-radius:50%; border:3px solid #fff; z-index:2; box-shadow:0 2px 6px rgba(0,0,0,0.4);
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='white' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 62% no-repeat, radial-gradient(circle at 35% 30%, #8dff9c, #19a33d); }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-riddle .event-tile.is-wrong{ color:#fff; background-color:#c0263f !important; background-image:linear-gradient(180deg, #ff7d8e, #c0263f 50%, #a3102b 51%, #8a0c22); border-color:#ff9aa8; opacity:1; }
+  @media (prefers-reduced-motion: reduce){ :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.quiz-riddle .event-tile.is-right{ animation:none; } }
   @keyframes bbShake{ 0%, 100%{ transform:translateX(0); } 20%{ transform:translateX(-10px); } 40%{ transform:translateX(9px); } 60%{ transform:translateX(-6px); } 80%{ transform:translateX(4px); } }
   @keyframes bbPress{ 0%{ transform:scale(1); } 50%{ transform:translateY(3px) scale(0.96); } 100%{ transform:scale(1.02); } }
   /* Brain Breaks: big glyphs, centred cards */
@@ -5388,7 +5410,10 @@
   function pickMysteryDay(date, prev, pool){
     const rng = mulberry32(hashStr('flipstax-mystery-' + date)), out = [];
     const isPrice = g=> !!(pool.find(p=> p.game === g) || {}).price;
-    for (let k = 0; k < 2; k++){
+    // D2: Game 1 can be a fixed slot (the Riddle, every episode); Game 2 comes from the pool, never yesterday's.
+    const fixed1 = RUNDOWN.mystery && RUNDOWN.mystery.fixed1;
+    if (fixed1 && mysteryAvailable(fixed1)){ out.push(fixed1); pool = pool.filter(p=> p.game !== fixed1); }
+    for (let k = out.length; k < 2; k++){
       let cand = pool.filter(p=> out.indexOf(p.game) < 0 && prev.indexOf(p.game) < 0 && !(p.price && out.some(isPrice)));
       if (!cand.length) cand = pool.filter(p=> out.indexOf(p.game) < 0 && !(p.price && out.some(isPrice)));
       if (!cand.length) cand = pool.filter(p=> out.indexOf(p.game) < 0);
@@ -10417,7 +10442,7 @@
     const rd = buildBreakRound(key, st.seed), ov = els.eventOverlay, tiles = els.eventTiles, n = rd.tiles.length;
     runPhase = 'break';
     stopTallyPolling(); clearRoundTimer(); voted = false; votedSinceTime = null;
-    ov.classList.remove('hidden', 'powerup', 'quiz-beam'); ov.classList.add('brainbreak', 'stack', 'bb-' + key); if (n === 2) ov.classList.add('bb-two'); ov.style.setProperty('--bb', def.accent); els.eventPrompt.classList.remove('long');
+    ov.classList.remove('hidden', 'powerup', 'quiz-beam', 'quiz-riddle'); ov.classList.add('brainbreak', 'stack', 'bb-' + key); if (n === 2) ov.classList.add('bb-two'); ov.style.setProperty('--bb', def.accent); els.eventPrompt.classList.remove('long');
     els.powerupIcon.classList.add('hidden');
     fitTopChip();
     els.eventSubtitle.textContent = '🎲 BRAIN BREAK · ' + def.name().toUpperCase() + (rd.kind ? ' · ' + rd.kind.toUpperCase() : '');
@@ -10871,7 +10896,8 @@
     const esc = t=> t.replace(/[&<>"]/g, c=> ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' })[c]);
     const parts = String(text).split(/(\s+)/), marks = new Set();
     const core = p=> p.replace(/^[^A-Za-z0-9\u00C0-\u024F]+|[^A-Za-z0-9\u00C0-\u024F%]+$/g, '');
-    parts.forEach((p, i)=>{ const w = core(p); if (!w || !i) return; if (/\d/.test(w) || (/^[A-Z\u00C0-\u00DE]/.test(w) && w !== 'I') || /^["\u201C\u2018']/.test(p)) marks.add(i); });
+    parts.forEach((p, i)=>{ const w = core(p); if (!w || !i) return; const sentenceStart = i >= 2 && /[.!?]$/.test(parts[i - 2]);
+      if (/\d/.test(w) || (/^[A-Z\u00C0-\u00DE]/.test(w) && w !== 'I' && !sentenceStart) || /^["\u201C\u2018']/.test(p)) marks.add(i); });
     if (!marks.size) for (let i = parts.length - 1, n = 0; i >= 0 && n < 2; i--){ const w = core(parts[i]).toLowerCase(); if (w.length > 2 && !KW_STOP.has(w)){ marks.add(i); n++; } }
     return parts.map((p, i)=>{
       if (!marks.has(i)) return esc(p);
@@ -10889,8 +10915,9 @@
     tiles.forEach((t, k)=> setTimeout(()=>{ t.classList.remove('fw'); t.classList.add('fin'); sfx.clack(); }, dt(150 + k * BEAM_FLIP_GAP)));
     setTimeout(()=>{ tiles.forEach(t=> t.classList.remove('fin')); done(); }, dt(BEAM_FLIP_MS));
   }
-  function setBeamLook(on, question){
-    els.eventOverlay.classList.toggle('quiz-beam', on);
+  function setBeamLook(on, question, riddle){
+    els.eventOverlay.classList.toggle('quiz-beam', on && !riddle);
+    els.eventOverlay.classList.toggle('quiz-riddle', on && !!riddle);   // D2: the riddle show's own look (split-flap answers)
     if (on){ els.eventPrompt.innerHTML = '<span>' + keyWordsHtml(question) + '</span>'; els.eventTiles.forEach((t, i)=>{ const k = t.querySelector('.tkey'); if (k) k.textContent = String(i + 1); }); }
   }
   function runTriviaQuestion(resumeQ, resumeEndsAt, step){
@@ -10928,14 +10955,14 @@
     // A Brain Beam from the rundown earns a prize-track tile (right: a hidden letter; wrong: a red X).
     if (!resumeQ || !second){ runQuizBeam = !!(step ? step.beam : (resumeQ && resumeQ.beam)); runQuizMystery = !!(step ? step.mystery : (resumeQ && resumeQ.mystery)); }
     runPendingQ = { question: q.question, opts: q.opts, correctIdx: q.correctIdx, riddle: !!q.riddle, beam: runQuizBeam, mystery: runQuizMystery };
-    const beamLook = !q.riddle, flipIn = beamLook && !resumeEndsAt && !FX.reduced();
+    const beamLook = true, flipIn = !resumeEndsAt && !FX.reduced();   // (D2: riddles get their own look and flip in too)
     runPendingQEndsAt = resumeEndsAt || (Date.now() + (flipIn ? dt(BEAM_FLIP_MS) : 0) + dt(10000));
     if (DEBUG_FAST) window.__debugLastTriviaQ = q;
-    els.eventOverlay.classList.remove('hidden', 'powerup'); els.eventOverlay.classList.add('stack'); els.eventOverlay.style.setProperty('--bb', q.riddle ? '#c792ff' : '#ffd23f');
+    els.eventOverlay.classList.remove('hidden', 'powerup'); els.eventOverlay.classList.add('stack'); els.eventOverlay.style.setProperty('--bb', q.riddle ? '#c9ff7a' : '#ffd23f');
     els.powerupIcon.classList.add('hidden');
     fitTopChip();
     els.eventSubtitle.textContent = second ? '🔁 SECOND CHANCE · answer right, recover a letter'
-      : q.riddle ? '🧩 ' + GN.riddleRound.toUpperCase() + (runQuizBeam ? ' · win a prize-track tile' : '')
+      : q.riddle ? GN.riddleRound.toUpperCase()
       : '🧠 ' + GN.brainBeam.toUpperCase() + (step && step.level ? ' · ' + step.level.toUpperCase() : '') + (runQuizBeam ? ' · win a prize-track tile' : '');
     els.eventSubtitle.classList.remove('res-win', 'res-miss');
     els.eventPrompt.textContent = q.question; els.eventPrompt.classList.toggle('long', q.question.length > 90);
@@ -10952,7 +10979,7 @@
         setTimeout(()=>{ tileEl.classList.remove('picked-wait'); resolve(i === q.correctIdx); }, dt(QUIZ_DRUMROLL_MS));
       };
     });
-    setBeamLook(beamLook, q.question);
+    setBeamLook(beamLook, q.question, !!q.riddle);
     // The clock starts once the bars are open (a refresh mid-question resumes it at once).
     const myQ = runPendingQ;
     const startClock = ()=>{
@@ -14510,7 +14537,7 @@
   // C1: Infinity's popup world - the power-up pick, a Cosmic Surprise, or
   // the bonus Brain Beam.
   const evBg = document.getElementById('evBg');
-  new MutationObserver(()=>{ const ov = els.eventOverlay; if (ov.classList.contains('hidden')) els.eventSubtitle.classList.remove('res-win', 'res-miss'); if (ov.classList.contains('quiz-beam') && (ov.classList.contains('hidden') || ov.classList.contains('powerup') || ov.classList.contains('cosmic-mode') || ov.classList.contains('gift-mode'))) ov.classList.remove('quiz-beam'); })
+  new MutationObserver(()=>{ const ov = els.eventOverlay; if (ov.classList.contains('hidden')) els.eventSubtitle.classList.remove('res-win', 'res-miss'); if ((ov.classList.contains('quiz-beam') || ov.classList.contains('quiz-riddle')) && (ov.classList.contains('hidden') || ov.classList.contains('powerup') || ov.classList.contains('cosmic-mode') || ov.classList.contains('gift-mode'))) ov.classList.remove('quiz-beam', 'quiz-riddle'); })
     .observe(els.eventOverlay, { attributes:true, attributeFilter:['class'] });
   new MutationObserver(()=>{
     const ov = els.eventOverlay, w = ov.classList.contains('cosmic-mode') && document.getElementById('cosmicStage').classList.contains('riddle') ? 'w-riddle' : ov.classList.contains('gift-mode') || ov.classList.contains('cosmic-mode') ? 'w-odd' : ov.classList.contains('powerup') ? 'w-powerup' : 'w-trivia';

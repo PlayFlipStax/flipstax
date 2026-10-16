@@ -28,8 +28,8 @@ window.FLIPSTAX_RUNDOWN = {
   // Mystery Games: two a day, picked by the date. A game never comes up on two days
   // in a row, at most one price game an episode; `weight` 2 is twice as likely.
   mystery: {
+    fixed1: 'riddle',   // Mystery Game 1 is the Riddle, every episode (Oct 16); Game 2 is drawn from the pool below
     pool: [
-      { game: 'riddle',       weight: 2 },
       { game: 'emojiDecode',  weight: 2 },
       { game: 'crowdScan',    weight: 2 },
       { game: 'timeWarp',     weight: 1 },
