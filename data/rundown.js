@@ -44,7 +44,7 @@ window.FLIPSTAX_RUNDOWN = {
   commercial: {
     ms: 3000,
     ads: [
-      { brand: 'GLORP COLA',        line: 'Tastes like tomorrow!',               glyph: '🥤', colors: ['#ff3c9d', '#ffd23f'] },
+      { brand: 'ZING COLA',         line: 'Tastes like tomorrow!',               glyph: '🥤', colors: ['#ff3c9d', '#ffd23f'] },
       { brand: 'ZOOMO JET BOOTS',   line: 'Be home before you leave!',           glyph: '👟', colors: ['#2fd5ff', '#ff6a2b'] },
       { brand: 'CAPTAIN CRUNCHO',   line: 'The cereal that crunches back!',      glyph: '🥣', colors: ['#ffb21f', '#3b7bff'] },
       { brand: 'MOONGLOW HAIR GEL', line: 'Hold so strong, it holds you!',       glyph: '💇', colors: ['#c792ff', '#7dff9e'] },

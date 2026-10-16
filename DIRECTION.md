@@ -17,6 +17,8 @@ tuned without touching code:
 3. **Commercial break** - a 3 s fake 70s ad for a fictional product, skippable.
 4. **Act 2 - DOUBLE TROUBLE** (x2): 5 VS, Brain Beam (medium), Portal Pick, 4 VS, Mystery Game 2, Brain Beam (medium).
 5. **Act 3 - LIGHTNING ROUND** (x3, 5 s VS timer): 6 VS, two hard Brain Beams back to back, Lucky Lights.
+   Lucky Lights has two GOOP squares: landing on the GOOP loses the whole Lucky Lights bonus
+   (a green slime splat that says GOOPED!). The commercial's product is ZING COLA.
 6. **Grand finale** - Word Warp, then Orbit Drop for the grand prize (the jackpot slot is THE MOTHERSHIP).
 7. **Results** - the share card, a score breakdown, your best moment, the personality card,
    the streak, a "Tomorrow on FlipStax" tease and a countdown to the next episode.

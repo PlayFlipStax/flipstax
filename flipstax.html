@@ -2596,10 +2596,10 @@
     transform:rotate(var(--a)) translateY(calc(var(--r) * -1)); background:linear-gradient(180deg, #2a1e06, #120c02); border:2.5px solid #8a6a1a; color:#ffe27a;
     font:900 19px/1 var(--f-display); transition:background .08s, border-color .08s, box-shadow .08s; }
   .ll-sq span{ display:block; transform:rotate(calc(var(--a) * -1)); }
-  .ll-sq.glorp{ color:#7dff5a; font-size:14px; border-color:#3a7a1a; }
+  .ll-sq.goop{ color:#7dff5a; font-size:14px; border-color:#3a7a1a; }
   .ll-sq.dbl{ color:#fff; }
   .ll-sq.on{ background:linear-gradient(180deg, #fff6c4, #ffd23f); border-color:#fff; color:#3a1a00; box-shadow:0 0 18px 4px rgba(255,220,90,0.9); }
-  .ll-sq.glorp.on{ background:linear-gradient(180deg, #c8ff9a, #39d42a); color:#0d3a05; box-shadow:0 0 18px 4px rgba(120,255,90,0.85); }
+  .ll-sq.goop.on{ background:linear-gradient(180deg, #c8ff9a, #39d42a); color:#0d3a05; box-shadow:0 0 18px 4px rgba(120,255,90,0.85); }
   .ll-sq.hit{ animation:llHit 0.25s steps(1) 4; }
   @keyframes llHit{ 50%{ background:#fff; box-shadow:0 0 26px 8px #fff; } }
   .ll-hub{ position:absolute; left:50%; top:50%; width:calc(var(--r) * 1.12); aspect-ratio:1; transform:translate(-50%, -50%); border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
@@ -5176,7 +5176,7 @@
     ],
     mystery: { pool: [ { game:'emojiDecode', weight:2 }, { game:'priceProbe', weight:1, price:true }, { game:'timeWarp', weight:1 }, { game:'oddballAlert', weight:1 } ] },
     cosmicSurpriseChance: 0,
-    commercial: { ms:3000, ads:[ { brand:'GLORP COLA', line:'Tastes like tomorrow!', glyph:'🥤', colors:['#ff3c9d', '#ffd23f'] } ] },
+    commercial: { ms:3000, ads:[ { brand:'ZING COLA', line:'Tastes like tomorrow!', glyph:'🥤', colors:['#ff3c9d', '#ffd23f'] } ] },
   };
   const ACT_DEFAULT_VS_MS = 7000;
   function seedOf(rng){ return (rng() * 4294967296) >>> 0; }
@@ -6019,7 +6019,7 @@
     }),
   };
   const sfx = {
-    // GLORP: a sad trombone - three steps down, the last one sagging with a wobble.
+    // The GOOP: a sad trombone - three steps down, the last one sagging with a wobble.
     wahwah: ()=> withSfxCtx((ctx, t)=>{
       [[392, 0], [370, 0.32], [349, 0.64]].forEach(([f, s])=> playTone(f, s, 0.28, 'sawtooth', 0.05));
       const o = ctx.createOscillator(), g = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
@@ -9953,22 +9953,23 @@
   // ---------- Lucky Lights (DIRECTION.md, refs/showcase.jpg): the end of Act 3 ----------
   // A ring of 12 squares in gold and black under swaying spotlights. A light races round;
   // tap STOP and it slows to a square. Prizes go in the bank: +20, +50, x2 (doubles the
-  // Act 3 points), a key or an Orbit Drop chip. Two GLORP squares lose the whole Lucky
+  // Act 3 points), a key or an Orbit Drop chip. Two GOOP squares (the GOOP) lose the whole Lucky
   // Lights bonus (green slime, wah-wah). After a prize: BANK it or SPIN AGAIN, up to 3 spins.
   // Prizes are at face value (the act's x3 isn't applied on top).
-  const LUCKY_SQUARES = ['+20', 'KEY', '+50', 'GLORP', '+20', 'x2', 'CHIP', '+20', 'GLORP', '+50', 'KEY', 'CHIP'];
+  const LUCKY_SQUARES = ['+20', 'KEY', '+50', 'GOOP', '+20', 'x2', 'CHIP', '+20', 'GOOP', '+50', 'KEY', 'CHIP'];
   const LUCKY_SPINS = 3, LUCKY_STEP_MS = 70, LUCKY_AUTO_STOP_MS = 8000, LUCKY_AUTO_BANK_MS = 7000;
   let runBonusChips = 0;   // Orbit Drop chips won outright (Lucky Lights' CHIP square)
   let luckyOv = null, luckyGen = 0;   // (luckyGen: a game left early never calls back into a newer run)
-  // The GLORP splat: two lumpy blobs of green slime with drips (an SVG, scaled in and sliding down).
-  const GLORP_SVG = (()=>{
+  // The GOOP splat: two lumpy blobs of green slime with drips (an SVG, scaled in and sliding down).
+  const GOOP_SVG = (()=>{
     const blob = (cx, cy, r, k)=>{ let s = ''; for (let i = 0; i < 9; i++){ const a = i / 9 * Math.PI * 2 + k, rr = r * (0.42 + ((i * 37 + k * 11) % 7) / 18); s += '<circle cx="' + (cx + Math.cos(a) * r * 0.62).toFixed(1) + '" cy="' + (cy + Math.sin(a) * r * 0.62).toFixed(1) + '" r="' + rr.toFixed(1) + '"/>'; }
       return s + '<circle cx="' + cx + '" cy="' + cy + '" r="' + (r * 0.8) + '"/>'; };
     const drip = (x, y, h, w)=> '<rect x="' + (x - w / 2) + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="' + (w / 2) + '"/>';
     return '<svg viewBox="0 0 400 700" preserveAspectRatio="xMidYMid slice"><g fill="#6fe63c" stroke="#3aa81a" stroke-width="3" paint-order="stroke">' +
       blob(110, 210, 64, 0.3) + blob(300, 470, 74, 1.1) + drip(92, 240, 120, 18) + drip(132, 250, 70, 12) + drip(286, 500, 150, 20) + drip(326, 510, 90, 14) + drip(258, 505, 60, 10) +
       '<circle cx="190" cy="120" r="12"/><circle cx="350" cy="350" r="9"/><circle cx="60" cy="380" r="10"/><circle cx="220" cy="590" r="8"/></g>' +
-      '<g fill="rgba(255,255,255,0.45)"><ellipse cx="92" cy="186" rx="16" ry="9"/><ellipse cx="282" cy="440" rx="18" ry="10"/></g></svg>';
+      '<g fill="rgba(255,255,255,0.45)"><ellipse cx="92" cy="186" rx="16" ry="9"/><ellipse cx="282" cy="440" rx="18" ry="10"/></g>' +
+      '<text x="200" y="352" text-anchor="middle" transform="rotate(-8 200 352)" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="70" letter-spacing="2" fill="#eaffd6" stroke="#2a7a10" stroke-width="8" paint-order="stroke">GOOPED!</text></svg>';
   })();
   function luckyLabel(k){ return k === 'KEY' ? '🔑' : k === 'CHIP' ? '🪙' : k === 'x2' ? '×2' : k; }
   function runLuckyLights(st, done){
@@ -9980,10 +9981,10 @@
     const n = LUCKY_SQUARES.length;
     luckyOv.innerHTML = '<i class="ll-spot l"></i><i class="ll-spot r"></i><div class="ll-inner">' +
       '<div class="ll-title">LUCKY LIGHTS</div><div class="ll-bank" aria-live="polite"></div>' +
-      '<div class="ll-ring">' + LUCKY_SQUARES.map((k, i)=> '<div class="ll-sq' + (k === 'GLORP' ? ' glorp' : k === 'x2' ? ' dbl' : '') + '" style="--a:' + (i * 360 / n) + 'deg"><span>' + luckyLabel(k) + '</span></div>').join('') +
+      '<div class="ll-ring">' + LUCKY_SQUARES.map((k, i)=> '<div class="ll-sq' + (k === 'GOOP' ? ' goop' : k === 'x2' ? ' dbl' : '') + '" style="--a:' + (i * 360 / n) + 'deg"><span>' + luckyLabel(k) + '</span></div>').join('') +
       '<div class="ll-hub"><b class="ll-hub-t">READY?</b><span class="ll-hub-s"></span></div></div>' +
       '<div class="ll-buttons"><button type="button" class="ll-btn stop">STOP</button><button type="button" class="ll-btn bank hidden">BANK</button><button type="button" class="ll-btn again hidden">SPIN AGAIN</button></div>' +
-      '<div class="ll-note"></div></div><div class="ll-slime" aria-hidden="true">' + GLORP_SVG + '</div>';
+      '<div class="ll-note"></div></div><div class="ll-slime" aria-hidden="true">' + GOOP_SVG + '</div>';
     const sqs = [...luckyOv.querySelectorAll('.ll-sq')], hubT = luckyOv.querySelector('.ll-hub-t'), hubS = luckyOv.querySelector('.ll-hub-s');
     const bStop = luckyOv.querySelector('.stop'), bBank = luckyOv.querySelector('.bank'), bAgain = luckyOv.querySelector('.again'), note = luckyOv.querySelector('.ll-note');
     const renderBank = ()=>{ luckyOv.querySelector('.ll-bank').textContent = 'BANK +' + bank + (dbl ? ' · ×2 ACT 3' : '') + (keys ? ' · 🔑' + keys : '') + (chips ? ' · 🪙' + chips : '') + ' · SPIN ' + Math.min(LUCKY_SPINS, spins + (state === 'spinning' ? 1 : 0)) + '/' + LUCKY_SPINS; };
@@ -10005,9 +10006,9 @@
       const k = LUCKY_SQUARES[pos], sq = sqs[pos];
       spins++; state = 'landed';
       sq.classList.add('hit');
-      if (k === 'GLORP'){
+      if (k === 'GOOP'){
         bank = 0; dbl = false; keys = 0; chips = 0; renderBank();
-        hubT.textContent = 'GLORP!'; hubS.textContent = 'The Lucky Lights bonus got slimed';
+        hubT.textContent = 'GOOPED!'; hubS.textContent = 'The GOOP got the Lucky Lights bonus';
         luckyOv.classList.add('slimed'); sfx.squelch(); setTimeout(()=> sfx.wahwah(), 380); haptic([60, 40, 60]);
         finish(false); return;
       }
@@ -10020,7 +10021,7 @@
       hubS.textContent = k === 'x2' ? 'Act 3 points doubled: +' + act3 : k === 'KEY' ? 'An extra Orbit Drop chip' : k === 'CHIP' ? 'An Orbit Drop chip' : 'into the bank';
       renderBank();
       if (spins >= LUCKY_SPINS){ setTimeout(()=>{ if (gen === luckyGen) finish(true); }, 700); return; }
-      note.textContent = 'Bank it, or spin again and risk the GLORP?';
+      note.textContent = 'Bank it, or spin again and risk the GOOP?';
       show(['bank', 'again']);
       autoT = setTimeout(()=>{ if (gen === luckyGen) finish(true); }, dt(LUCKY_AUTO_BANK_MS));
     };
@@ -10038,7 +10039,7 @@
       if (state !== 'spinning') return;
       clearTimeout(timer); clearTimeout(autoT); state = 'stopping'; show([]); note.textContent = '';
       let left = 4 + Math.floor(Math.random() * 6), gap = LUCKY_STEP_MS;
-      if ((REPLAY || DEBUG_FAST) && window.__forceLucky){ const want = LUCKY_SQUARES.indexOf(window.__forceLucky); if (want >= 0) left = ((want - pos + n) % n) || n; }   // (the TEST menu's GLORP jump)
+      if ((REPLAY || DEBUG_FAST) && window.__forceLucky){ const want = LUCKY_SQUARES.indexOf(window.__forceLucky); if (want >= 0) left = ((want - pos + n) % n) || n; }   // (the TEST menu's GOOP jump)
       const slow = ()=>{
         if (gone()) return;
         pos = (pos + 1) % n; light(pos); sfx.spinTick(pos % 8);
@@ -16033,7 +16034,7 @@
       { label:'Portal Pick', go: atType(s=> s.t === 'portal', 0, 96, 3) },
       { label:'Act 3 card', go: actCard(3) },
       { label:'Lucky Lights', go: atType(s=> s.t === 'lucky', 0, 180, 5, ()=>{ window.__forceLucky = null; }) },
-      { label:'Lucky: GLORP', go: atType(s=> s.t === 'lucky', 0, 180, 5, ()=>{ window.__forceLucky = 'GLORP'; }) },
+      { label:'Lucky: GOOP', go: atType(s=> s.t === 'lucky', 0, 180, 5, ()=>{ window.__forceLucky = 'GOOP'; }) },
       { label:'Price Probe', go: mysteryAs('priceProbe') },
       { label:'Oddball Alert', go: mysteryAs('oddballAlert') },
       { label:'Emoji Decode', go: mysteryAs('emojiDecode') },
