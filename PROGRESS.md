@@ -52,7 +52,7 @@ new fonts, original art, no real brand or show names, every new game gets a TEST
 - [x] F3. The HOT TAKE / BOLD PICK tag as a corner pill at the card's edge, off the art
 - [x] F4. Menu: TONIGHT'S EPISODE n as the title (keep the same-show-for-everyone line), "How to play" (no "Daily"), less empty space at the top
 - [x] F5. Landing: host ~40% larger and centred on the stage, tighter spacing so logo, episode line, button and host read as one scene
-- [ ] F6. Act cards: the new host cropped (head and shoulders with the mic) instead of the old head-only alien
+- [x] F6. Act cards: the new host cropped (head and shoulders with the mic) instead of the old head-only alien
 - [ ] F7. Star wipe ~60% of its size; the card fully readable for at least 1 s
 - [ ] F8. Host SVG: a short neck; fix the arm hanging behind the body; Saucer Shuffle arms normal length with sleeve and hand shapes
 - [ ] F9. Peak or Plunge and Fact or Fib fill a tall screen (bigger blocks and buttons, spread vertically)

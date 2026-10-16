@@ -2683,6 +2683,8 @@
     background:radial-gradient(circle at 40% 35%, #c4ffa8, #66d85d 60%, #2f9a36); box-shadow:0 3px 6px rgba(0,0,0,0.35); }
   .cue-hand.l{ left:-8px; transform:rotate(18deg); } .cue-hand.r{ right:-8px; transform:rotate(-18deg); }
   .cue-host{ width:70px; height:80px; margin-top:-2px; z-index:3; }
+  .cue-host.cue-bust{ position:relative; width:124px; height:122px; margin-top:-6px; overflow:hidden; -webkit-mask-image:linear-gradient(180deg, #000 72%, transparent); mask-image:linear-gradient(180deg, #000 72%, transparent); }
+  .cue-bust svg{ width:100%; height:auto; display:block; animation:none !important; }
   /* ---- The Part E games' stage (runMiniGame): each game's own colour world (--mg-a/b/c), a bulb-lit sign, a rule
      line, a timer bar and a score pill, the game's stage, and the result pill. Transform and opacity motion only. ---- */
   .mg-overlay{ position:fixed; inset:0; z-index:28; overflow:hidden; color:#fff; text-align:center; -webkit-user-select:none; user-select:none;
@@ -10910,7 +10912,7 @@
   function cueCardHtml(){
     return '<div class="cue-hold"><div class="cue-grip"><div class="cue-card"><div class="cue-face cue-back"><span>FLIPSTAX</span></div>' +
       '<div class="cue-face cue-front"><div class="cc-sub"></div><div class="cc-title"></div></div></div><i class="cue-hand l"></i><i class="cue-hand r"></i></div>' +
-      '<div class="alien cue-host">' + FX.alienSvg() + '</div></div>';
+      '<div class="cue-host cue-bust host-full">' + window.HostAlien.full() + '</div></div>';   // F6: the new host, head and shoulders with the mic
   }
   function showActCard(st, then){
     const fin = !!st.finale, w = st.world || 'vs';
