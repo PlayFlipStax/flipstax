@@ -2656,9 +2656,9 @@
   @media (prefers-reduced-motion: reduce){ .show-card.cue:not(.finale)::before{ animation:none; opacity:1; } }
   .cue-wipe{ position:absolute; left:50%; top:50%; width:456px; height:456px; margin:-228px 0 0 -228px; z-index:0; will-change:transform;   /* (F7: 60% of the 760px star) */
     clip-path:polygon(50% 0%, 61.2% 34.5%, 97.6% 34.5%, 68.2% 55.9%, 79.4% 90.5%, 50% 69.1%, 20.6% 90.5%, 31.8% 55.9%, 2.4% 34.5%, 38.8% 34.5%);
-    transform:scale(0) rotate(-60deg); animation:starWipe var(--cue-ms) cubic-bezier(.6,0,.35,1) forwards; }
+    transform:scale(0) rotate(-60deg); animation:starWipe var(--wipe-ms, 1.6s) cubic-bezier(.6,0,.35,1) forwards; }   /* G2: STAR_WIPE, in and out */
   .cue-wipe > .bg .rays, .cue-wipe > .bg .glow{ top:50%; }
-  @keyframes starWipe{ 0%{ transform:scale(0) rotate(-60deg); } 18%{ transform:scale(1) rotate(0deg); } 84%{ transform:scale(1) rotate(0deg); } 100%{ transform:scale(0) rotate(60deg); } }
+  @keyframes starWipe{ 0%{ transform:scale(0) rotate(-60deg); } 28%{ transform:scale(1) rotate(0deg); } 72%{ transform:scale(1) rotate(0deg); } 100%{ transform:scale(0) rotate(60deg); } }
   .cue-stage{ position:absolute; inset:0; z-index:0; }
   .cue-iris{ position:absolute; left:50%; top:47%; width:2400px; height:2400px; margin:-1200px 0 0 -1200px; z-index:1; pointer-events:none; will-change:transform;
     background:radial-gradient(circle, rgba(255,236,170,0.14) 0 66px, rgba(255,236,170,0.05) 76px, rgba(3,1,10,0.95) 94px); transform:scale(0.5); animation:irisOpen var(--cue-ms) cubic-bezier(.45,0,.2,1) forwards; }
@@ -5553,7 +5553,7 @@
   const SHOW_VS_BEFORE = [5, 6];             // VS cards before a round's Brain Beam (min, max)
   const SHOW_VS_AFTER = [3, 4];              // VS cards between the Brain Beam and the Portal Pick
   const SHOW_RIDDLE_CHANCE = 1;              // chance a pass swaps one round's Brain Beam for a riddle (1 = every pass; it was 0.5, so about half the days had none)
-  const SHOW_BUMPER_MS = 1500;               // the round title card ("Round N") with its light flash
+  const SHOW_BUMPER_MS = 2200;               // the round title card ("Round N") with its light flash (G2: ROUND_BUMPER_HOLD in data/rundown.js)
   const SHOW_NEW_ROUND_MIN_MS = 10000;       // a new round only starts with at least this much on the clock
   const QUIZ_DRUMROLL_MS = 450;              // B9: the drumroll between tapping an answer (or a portal) and its reveal
   // Brain Breaks: one slot per round, after its Portal Pick - a 10-15 second
@@ -5601,6 +5601,10 @@
     commercial: { ms:3000, ads:[ { brand:'ZING COLA', line:'Tastes like tomorrow!', glyph:'🥤', art:'can', colors:['#ff3c9d', '#ffd23f'] } ] },
   };
   const ACT_DEFAULT_VS_MS = 7000;
+  // G2: the show's hold times live at the top of data/rundown.js (FLIPSTAX_TIMING); these are the fallbacks.
+  const TIMING = Object.assign({ ACT_CARD_HOLD:2800, MYSTERY_REVEAL_HOLD:3000, STAR_WIPE:1600, ROUND_BUMPER_HOLD:2200, COSMIC_SURPRISE_INTRO:2000, CINEMATIC_MIN:1500, SKIP_AFTER:1000 }, window.FLIPSTAX_TIMING || {});
+  // A cinematic moment (a full-screen card, a reveal, a result) is never on screen for less than CINEMATIC_MIN.
+  const cine = (ms)=> Math.max(TIMING.CINEMATIC_MIN, ms);
   const COMMERCIAL_ENABLED = RUNDOWN.COMMERCIAL_ENABLED !== false;   // the commercial break, unless data/rundown.js turns it off
   function seedOf(rng){ return (rng() * 4294967296) >>> 0; }
   // The day's two Mystery Games (see pickMysteryGames).
@@ -10851,7 +10855,7 @@
         playTone(150, 0, 0.16, 'triangle', 0.05); playTone(120, 0.14, 0.2, 'triangle', 0.05);   // a gentle buzz
       }
       saveRunSnapshot();
-      setTimeout(finish, dt(key === 'priceProbe' ? 2200 : ok ? 900 : BRAIN_BREAK_REVEAL_MS));   // (Price Probe: long enough for both tags to roll)
+      setTimeout(finish, dt(cine(key === 'priceProbe' ? 2200 : BRAIN_BREAK_REVEAL_MS)));   // (Price Probe: long enough for both tags to roll; G2: every result at least CINEMATIC_MIN)
     };
     tiles.forEach((tileEl, i)=>{ if (i < n) tileEl.onclick = ()=>{ tileEl.classList.add('bb-press'); resolve(i); }; });
     startEventTimerBar(dt(BRAIN_BREAK_MS), dt(BRAIN_BREAK_MS));
@@ -10972,7 +10976,7 @@
     const go = (e)=>{
       if (gone) return;
       if (e && e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
-      if (e && performance.now() - shownAt < 400) return;   // not the tap that opened it
+      if (e && performance.now() - shownAt < TIMING.SKIP_AFTER) return;   // G2: a tap skips only after SKIP_AFTER (and never the tap that opened it)
       gone = true; timers.forEach(clearTimeout); coldOpenCancel = null;
       try{ localStorage.setItem(COLD_OPEN_SEEN_KEY, '1'); }catch(err){}
       showCard.removeEventListener('click', go); document.removeEventListener('keydown', go);
@@ -11004,9 +11008,9 @@
     clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
     if (sfx.bumper) sfx.bumper(!!st.finale);
     if (fin) setTimeout(()=> sfx.drumrollLong(), 500);   // the finale: a long drumroll under the spotlight
-    const ms = fin ? 2300 : 2000;   // (B3: the act card is fully up for about 1.1 s, from 28% to 84% of this)
-    showCard.style.setProperty('--cue-ms', ms + 'ms');
-    (runActive ? showLater : setTimeout)(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; showCard.style.removeProperty('--cue-ms'); then(); }, ms);
+    const ms = cine(TIMING.ACT_CARD_HOLD + (fin ? 300 : 0));   // G2: ACT_CARD_HOLD (the card is fully up from 28% to 84% of it - about 1.6 s)
+    showCard.style.setProperty('--cue-ms', ms + 'ms'); showCard.style.setProperty('--wipe-ms', TIMING.STAR_WIPE + 'ms');
+    (runActive ? showLater : setTimeout)(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; showCard.style.removeProperty('--cue-ms'); showCard.style.removeProperty('--wipe-ms'); then(); }, ms);
   }
   // The commercial break: a 3 s fake 70s ad, skippable. Built as one component (an ad in,
   // done() out) so a real ad can take its place later.
@@ -11046,7 +11050,7 @@
     const shownAt = performance.now();
     let gone = false, t = null;
     const go = (e)=>{
-      if (gone || (e && performance.now() - shownAt < 300)) return;
+      if (gone || (e && performance.now() - shownAt < TIMING.SKIP_AFTER)) return;
       gone = true; clearTimeout(t); timers.forEach(clearTimeout);
       showCard.removeEventListener('click', go);
       showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden';
@@ -11080,7 +11084,7 @@
     const rm = prefersReducedMotion();
     if (!rm) sfx.drumroll(520);
     (runActive ? showLater : setTimeout)(()=>{ showCard.classList.add('open'); sfx.slam(); playTone(523, 0.05, 0.12, 'triangle', 0.08); playTone(784, 0.15, 0.25, 'triangle', 0.08); }, rm ? 0 : 560);
-    (runActive ? showLater : setTimeout)(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; then(); }, rm ? 1600 : 2100);
+    (runActive ? showLater : setTimeout)(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; then(); }, cine(TIMING.MYSTERY_REVEAL_HOLD));   // G2: MYSTERY_REVEAL_HOLD
   }
   function showMysteryWheel(game, then){
     const games = MYSTERY_POOL.map(p=> p.game).filter(g=> MYSTERY_COLORS[g]);
@@ -11143,7 +11147,7 @@
     showCard.classList.remove('hidden');
     clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');   // (no stale line over the title card)
     if (sfx.bumper) sfx.bumper(last);
-    setTimeout(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; then(); }, prefersReducedMotion() ? SHOW_BUMPER_MS + 300 : SHOW_BUMPER_MS);
+    setTimeout(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; then(); }, cine(TIMING.ROUND_BUMPER_HOLD || SHOW_BUMPER_MS));
   }
   // Smoothly blends from green (plenty of time) through yellow/orange to red
   // (running out), instead of jumping between three flat colors at fixed
@@ -11468,7 +11472,7 @@
       els.eventTiles.forEach(t=> t.classList.remove('is-right', 'is-wrong'));
       if (!runActive) return;
       advanceAfterTrivia();
-    }, dt(runPerfect ? 1900 : 1400));   // (B3: a beat longer, for the UFO's beam)   // a little longer so the Perfect Run banner can be read
+    }, dt(cine(runPerfect ? 1900 : 1500)));   // (B3: a beat longer, for the UFO's beam; G2: at least CINEMATIC_MIN)   // a little longer so the Perfect Run banner can be read
   }
   // Where the run goes after a trivia (or the riddle that can follow one).
   // Once all six trivia shots have been taken the solve phase is next -
@@ -11646,7 +11650,7 @@
       els.eventTiles.forEach(t=>{ t.classList.remove('portal', 'open', 'pu-points10', 'pu-slowclock', 'pu-wildcard', 'pu-hint'); delete t.dataset.pu; });
       if (runClockExpired()){ goToFinale(); return; }
       showDoneFrom(['portal'], 'portal pick');
-    }, dt(1100));
+    }, dt(cine(1500)));
   }
 
   // The Super Secret Hidden Riddle (see checkSecretUnlock). Visually
@@ -12085,9 +12089,10 @@
     try{ if (window.FLIPSTAX_DISCO_STING && soundOn){ const a = new Audio(window.FLIPSTAX_DISCO_STING); a.volume = Math.max(0, Math.min(1, masterVol)); a.play().catch(()=>{}); d._sting = a; } }catch(e){}
     let over = false;
     const end = ()=>{ if (over) return; over = true; marquee.classList.remove('disco', 'still'); try{ if (d._sting) d._sting.pause(); }catch(e){} d.classList.add('out'); setTimeout(()=> d.remove(), 300); if (done) done(); };
-    d.addEventListener('click', (e)=>{ e.stopPropagation(); end(); });
+    const discoAt = performance.now();
+    d.addEventListener('click', (e)=>{ e.stopPropagation(); if (performance.now() - discoAt >= TIMING.SKIP_AFTER) end(); });
     requestAnimationFrame(()=> d.classList.add('on'));
-    setTimeout(end, lite ? 2600 : 4600);
+    setTimeout(end, 4600);   // (G2: lite mode is the still look - the same length)
     return true;
   }
   window.__discoTest = (DEBUG_FAST || REPLAY) ? ()=>{ discoShownFor = null; discoCelebrate('test'); } : undefined;
@@ -12816,7 +12821,7 @@
     const shownAt = performance.now(); let finished = false;
     const done = ()=>{ if (finished) return; finished = true; clearTimeout(t); ov.onclick = null; ov.classList.add('hidden'); noteOverlayClosed(); updatePauseBtnVisibility(); then(); };
     const t = setTimeout(done, full ? HOST_INTRO_MS : HOST_QUIP_MS);
-    ov.onclick = e=>{ e.stopPropagation(); if (performance.now() - shownAt > (full ? 300 : 120)) done(); };
+    ov.onclick = e=>{ e.stopPropagation(); if (performance.now() - shownAt > TIMING.SKIP_AFTER) done(); };
   }
   // Crowd Scan: a small silver UFO crosses the screen now and then (transform and opacity only; it stops
   // with the overlay, with a hidden tab, and with reduced motion).
@@ -12867,7 +12872,7 @@
   // in GUESS_COUNT_MS (it used to take 1.3s with a long slow tail, a second
   // of dead time before the verdict), then the round moves on after
   // GUESS_REVEAL_HOLD_MS; a tap anywhere skips ahead.
-  const GUESS_COUNT_MS = 900, GUESS_REVEAL_HOLD_MS = 1800, GUESS_SKIP_SHIELD_MS = 300;
+  const GUESS_COUNT_MS = 900, GUESS_REVEAL_HOLD_MS = 1800, GUESS_SKIP_SHIELD_MS = 1000;   // (G2: a tap skips the reveal only after 1 s)
   let guessLockedAt = 0, guessFinish = null;
   function skipGuessReveal(){
     if (guessFinish){   // the count is still running: settle it (points and all) first, and say what it paid
@@ -15890,6 +15895,9 @@
     const strips = [...slot.querySelectorAll('.s3-strip')];
     if (prefersReducedMotion() || !stage.animate){ strips.forEach(st=>{ st.style.transform = ''; st.innerHTML = '<b>' + COSMIC_REEL[prize] + '</b>'; }); slot.classList.add('landed'); open(); return; }
     ringBulbs(slot.querySelector('.s3-top .sign-bulbs'), 16, 5);
+    if (cosmicDaily && !slot.dataset.introDone){ slot.dataset.introDone = '1'; showLater(()=>{ delete slot.dataset.introDone; spinSlot(); }, TIMING.COSMIC_SURPRISE_INTRO); return; }   // G2: COSMIC_SURPRISE_INTRO
+    spinSlot();
+    function spinSlot(){
     slot.classList.add('spinning'); sfx.drumroll(1900);
     let stopped = 0;
     strips.forEach((st, r)=>{
@@ -15908,6 +15916,7 @@
         };
     });
     for (let k = 0; k < 14; k++) setTimeout(()=> sfx.spinTick(k), 60 + k * 70);
+    }
   }
   const COSMIC_REEL = { points10:'\u26A1', points20:'\uD83D\uDCA5', key:'\uD83D\uDD11', chip:'\uD83E\uDE99', scramble:'\uD83D\uDD00', clock:'\u23F1\uFE0F', riddle:'\uD83E\uDDE9', freeze:'\u2744\uFE0F' };
   // The weird ones play on the power-up screen, in .cosmic-stage.
@@ -16008,7 +16017,7 @@
     const timer = setTimeout(()=> end(null), ms);
   }
   function finishPowerUp(){
-    setTimeout(()=>{
+    (cosmicDaily ? showLater : setTimeout)(()=>{
       els.eventOverlay.classList.add('hidden');
       els.eventOverlay.classList.remove('coin-mode', 'coin-won', 'coin-lost', 'gift-mode');
       els.eventOverlay.classList.remove('daily-gift');
@@ -16391,7 +16400,8 @@
       beams.concat(host ? [host] : []).forEach(el=>{ el.style.transition = ''; el.style.transform = ''; el.style.animation = ''; });
       const c = document.documentElement.classList; if (!c.contains('mode-daily') && !c.contains('mode-infinity')) els.modeSelectOverlay.classList.remove('hidden');   // (unless a mode already started)
     };
-    if (prefersReducedMotion() || isLite() || !host){ enter(); return; }
+    if (prefersReducedMotion() || !host){ enter(); return; }
+    if (isLite()){ setTimeout(enter, 950); return; }   // (G2: lite mode skips the motion, not the beat)
     ov.classList.add('entering');
     const W = ov.clientWidth, H = ov.clientHeight, hr = host.getBoundingClientRect(), tx = W / 2, ty = hr.top + hr.height * 0.6;
     host.style.transition = 'transform .85s cubic-bezier(.3,.7,.3,1)'; host.style.transform = 'translateX(' + (tx - (hr.left + hr.width / 2)).toFixed(1) + 'px)';

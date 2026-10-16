@@ -62,7 +62,7 @@ new fonts, original art, no real brand or show names, every new game gets a TEST
 ## G. Fix and content pass (Oct 16, afternoon)
 
 - [x] G1. Flow: one show director (scene + gen, a single timer queue, everything pending cancelled on leaving a scene, double-advance guard); ?debug=1 overlay (step, card id, transition state, last 20 transitions); 30 automated random-tap runs: no VS card skipped or repeated, step count matches the rundown
-- [ ] G2. Timing constants at the top of data/rundown.js (ACT_CARD_HOLD 2800, MYSTERY_REVEAL_HOLD 3000, STAR_WIPE 1600, ROUND_BUMPER_HOLD 2200, COSMIC_SURPRISE_INTRO 2000); no cinematic moment under 1500ms; tap-to-skip only after 1000ms; auto-lite changes visuals only; episode length at a human pace (target 4:30-5:30)
+- [x] G2. Timing constants at the top of data/rundown.js (ACT_CARD_HOLD 2800, MYSTERY_REVEAL_HOLD 3000, STAR_WIPE 1600, ROUND_BUMPER_HOLD 2200, COSMIC_SURPRISE_INTRO 2000); no cinematic moment under 1500ms; tap-to-skip only after 1000ms; auto-lite changes visuals only; episode length at a human pace (target 4:30-5:30)
 - [ ] G3. Commercial break out of the rundown (COMMERCIAL_ENABLED = false, code and the "Brought to you by" sponsor field kept); DIRECTION.md updated
 - [ ] G4. Peak or Plunge: item 31 "The first website opens to the public"; same-category pairs, no equal neighbours, no near-ties within 10%; PEAK_OR_PLUNGE_REVIEWED = true
 - [ ] G5. Fact or Fib edits (#4, #10, #35, #39, #55, #86, #93, #111, #117), a topic tag per statement and a no-duplicate-topic picker; data/fact-or-fib.txt; FACT_OR_FIB_REVIEWED = true

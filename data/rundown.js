@@ -12,6 +12,17 @@
 //   { orbitDrop: true }      Orbit Drop, the grand prize
 // An act opens with the host holding up its cue card. `mult` multiplies every
 // point won in the act; `vsTimerMs` is how long each VS card waits for a pick.
+
+// ---- Hold times (ms) - every cinematic moment's length, in one place (G2, Oct 16) ----
+const ACT_CARD_HOLD = 2800;          // an act's cue card, from the star wipe in to the card leaving
+const MYSTERY_REVEAL_HOLD = 3000;    // the host's door opening on the Mystery Game's name
+const STAR_WIPE = 1600;              // the star wipe behind an act card, in and out (total)
+const ROUND_BUMPER_HOLD = 2200;      // a round title card (the "Round N" bumper)
+const COSMIC_SURPRISE_INTRO = 2000;  // the Cosmic Surprise machine on screen before its reels spin
+const CINEMATIC_MIN = 1500;          // no cinematic moment is shorter than this
+const SKIP_AFTER = 1000;             // tap-to-skip works only after this long
+window.FLIPSTAX_TIMING = { ACT_CARD_HOLD, MYSTERY_REVEAL_HOLD, STAR_WIPE, ROUND_BUMPER_HOLD, COSMIC_SURPRISE_INTRO, CINEMATIC_MIN, SKIP_AFTER };
+
 window.FLIPSTAX_RUNDOWN = {
   coldOpen: { firstMs: 12000, returningMs: 3000 },
   acts: [
