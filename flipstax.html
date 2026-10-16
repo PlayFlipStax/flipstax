@@ -9514,6 +9514,7 @@
   }
   async function copyEpisodeShare(){
     const r = runResultToday; if (!r) return;
+    trackEvent('share_clicked'); flushEvents();
     const text = episodeShareText(r, true);
     let ok = false;
     try{ if (navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(text); ok = true; } }catch(e){}
@@ -10025,6 +10026,7 @@
   let dailyShareBusy = false;
   async function shareRunResult(){
     if (!runResultToday || dailyShareBusy) return;
+    trackEvent('share_clicked'); flushEvents();
     dailyShareBusy = true;
     const btn = els.readoutShare, label = btn ? btn.textContent : '';
     try{
@@ -10263,6 +10265,7 @@
     // The cold open first; the run clock starts on the tap.
     runPhase = 'coldopen';
     showEnter('coldopen'); Show.stats = { dealt:[], drops:0, scenes:['coldopen'] };
+    evResultsSent = false; trackEvent('show_started'); flushEvents();
     saveRunSnapshot();
     showColdOpen(beginShow);
   }
@@ -10403,7 +10406,29 @@
     Show.frames.forEach(id=> cancelAnimationFrame(id)); Show.frames.clear();
     Show.offs.splice(0).forEach(f=>{ try{ f(); }catch(e){} });
   }
+  // ---------- Anonymous event counting (G8): daily counters only, via /api/event ----------
+  // No ids, no cookies, nothing about the player: just "this happened once". Events queue in memory and go out in a few
+  // small batches (the show starting right away; the rest at the results, a share, or when the page is hidden), so one
+  // episode costs about 10 Redis commands. Test sessions (replay, the localhost / preview default of noVotes) send nothing.
+  const evQueue = {};
+  let evResultsSent = false;
+  function trackEvent(name, n){
+    if (TEST_SWITCHES.noVotes || DEBUG_FAST) return;
+    evQueue[name] = Math.min(5, (evQueue[name] || 0) + (n || 1));
+  }
+  function flushEvents(){
+    const names = Object.keys(evQueue); if (!names.length || TEST_SWITCHES.noVotes || DEBUG_FAST) return;
+    const e = {}; names.slice(0, 8).forEach(k=>{ e[k] = evQueue[k]; delete evQueue[k]; });
+    try{
+      const body = JSON.stringify({ e });
+      if (!(navigator.sendBeacon && navigator.sendBeacon('/api/event', new Blob([body], { type:'application/json' })))) fetch('/api/event', { method:'POST', headers:{ 'Content-Type':'application/json' }, body, keepalive:true }).catch(()=>{});
+    }catch(err){}
+    if (Object.keys(evQueue).length) flushEvents();
+  }
+  document.addEventListener('visibilitychange', ()=>{ if (document.hidden) flushEvents(); });
+  const EV_GAME = { lucky:'luckyLights', cosmic:'cosmicSurprise' };
   function showEnter(scene, info){
+    if (runActive && (scene === 'mystery' || scene === 'lucky' || scene === 'cosmic')) trackEvent('game_started:' + (scene === 'mystery' ? info : EV_GAME[scene]));
     showCancelPending();
     Show.gen++; Show.scene = scene; Show.state = scene === 'vs' ? 'live' : 'playing'; Show.info = info || ''; Show.since = performance.now();
     Show.stats.scenes.push(scene + (info && scene !== 'vs' ? ':' + info : ''));
@@ -10420,6 +10445,7 @@
     if (!runActive) return false;
     if (gen !== Show.gen || Show.state === 'leaving'){ Show.stats.drops++; showLog('drop', 'stale done (' + (why || '') + ', gen ' + gen + ' vs ' + Show.gen + ')'); return false; }
     showSetState('leaving', why);
+    if (Show.scene === 'mystery' || Show.scene === 'lucky' || Show.scene === 'cosmic') trackEvent('game_completed:' + (Show.scene === 'mystery' ? Show.info : EV_GAME[Show.scene]));
     runPhase = 'running';
     loadNext();
     return true;
@@ -12197,6 +12223,9 @@
     const path = c.path, hits = c.hits; delete c.path; delete c.hits;
     f.chips[i] = c; f.dropped++; pkLaunched = f.dropped; pkSave();
     pkLastDrop = performance.now(); setTimeout(()=>{ if (pkF() === f) renderPlinkoTally(); }, PK_DROP_GAP_MS + 20);
+    // Safety net: if every chip has been dropped but one never reported landing (its animation was cut off by a
+    // re-render), settle them all after 14 s so "See your results" always appears.
+    if (f.dropped >= f.chips.length) setTimeout(()=>{ if (pkF() === f && !plinkoAllLanded()){ console.warn('FlipStax: Orbit Drop settled its chips late'); renderPlinko(); } }, 14000);
     if (prefersReducedMotion()){ landChip(i); return; }
     const ufo = document.getElementById('pkUfo'); ufo.classList.remove('spin'); void ufo.offsetWidth; ufo.classList.add('beaming', 'spin'); sfx.ufoBeam(); setTimeout(()=> ufo.classList.remove('beaming'), 420);
     const el = chipEl(i), k = plinkoScale(), T = path[path.length - 1] || 1, frames = [];
@@ -12640,7 +12669,8 @@
     document.getElementById('pkBanner').textContent = 'ORBIT DROP';
     const from = [(r.keys ? r.keys + ' 🔑' : ''), (r.bonusChips ? r.bonusChips + ' 🪙' : ''), (r.warpChip ? '+1 ' + GN.wordWarp : '')].filter(Boolean).join(', ');
     document.getElementById('pkLine').textContent = r.orbit.chips.length + ' chips' + (from ? ' (' + from + ')' : '') + '. Drag the UFO, let go to drop.';
-    hostIntro('orbitDrop', ()=>{ if (dailyOrbit === r.orbit) renderPlinko(); });
+    renderPlinko();   // (the board is up under the host's intro, so an early tap never meets a blank one)
+    hostIntro('orbitDrop', ()=>{ if (dailyOrbit === r.orbit && !r.orbit.dropped) renderPlinko(); });   // (not once a chip is already in the air)
   }
   function finishDailyOrbit(){
     const r = runResultToday, o = dailyOrbit; if (!r || !o) return;
@@ -14437,6 +14467,8 @@
   }
   function showRunReadout(fromOrbit){
     showEnter('results');
+    if (fromOrbit === true && !evResultsSent){   // (only the fresh arrival from Orbit Drop - not a later visit to a saved result)
+       evResultsSent = true; trackEvent('reached_results'); flushEvents(); }
     const r = runResultToday;
     preloadShareArt(r);
     const ep = !!(r.actPts || r.orbit);   // an episode result (the rundown show): the new results screen
@@ -16343,6 +16375,7 @@
       showReadout: () => { els.finOverlay.classList.add('hidden'); showRunReadout(); return !!runResultToday; },
       setResult: (o) => { runResultToday = Object.assign({}, runResultToday || { date: todayStr(), rule: SAVE_RULE, savedAt: Date.now(), score: 0, triviaCorrect: 0, triviaTotal: 0, solved: false, solveMs: null, word: 'LAUNCH', personalityType: 'fence_sitter', unlocked: [] }, o); return runResultToday; },
       comboVerdict: (w, base) => { comboOnVerdict(!!w, base || 1); return { streak: runMatchStreak, mult: comboMult(runMatchStreak), bonus: runComboBonus, bank: runComboBank, score: runScore }; },
+      orbitState: () => { const f = pkF(); return f ? { chips: f.chips.length, dropped: f.dropped, landed: pkLanded.slice(), falling: [...pkFalling.keys()], auto: pkAuto, kinds: f.chips.map(c=> c.kind) } : null; },
       showDirector: () => ({ gen: Show.gen, scene: Show.scene, state: Show.state, log: Show.log.slice(), stats: Show.stats, plan: runPlan, step: runShow.step, left: runShow.left, runActive, runPhase }),
       showState: () => ({ step: runShow.step, left: runShow.left, phase: runPhase, act: runActIdx, score: runScore, actPts: runActPts.slice(), t: runPlan && runPlan[runShow.step] && runPlan[runShow.step].t, episode: showEpisode(runStartDate || todayStr()) }),
       startColdOpenTap: () => showCard.click(),

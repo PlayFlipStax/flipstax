@@ -1,6 +1,7 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/flipstax.html" }
+    { "source": "/", "destination": "/flipstax.html" },
+    { "source": "/stats", "destination": "/stats.html" }
   ],
   "headers": [
     {
