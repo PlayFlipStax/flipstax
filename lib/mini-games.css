@@ -87,10 +87,13 @@
 .ff-dots i{ width:14px; height:14px; border-radius:50%; background:rgba(255,255,255,0.3); box-shadow:inset 0 0 0 2px rgba(255,255,255,0.6); }
 .ff-dots i.right{ background:#5ee08a; } .ff-dots i.wrong{ background:#ff5a6e; }
 .ff-bubble{ position:relative; width:100%; min-height:150px; padding:18px 18px 22px; border-radius:22px; background:#fffaf0; color:#3a1503; border:4px solid #fff;
-  box-shadow:0 8px 0 rgba(90,30,0,0.35), 0 12px 26px rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center;
+  box-shadow:0 8px 0 rgba(90,30,0,0.35), 0 12px 26px rgba(0,0,0,0.3); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
   font:800 clamp(19px, 5.6vw, 24px)/1.3 var(--f-body); }
 .ff-bubble::after{ content:''; position:absolute; left:22%; bottom:-18px; border:12px solid transparent; border-top:14px solid #fffaf0; }
-.ff-bubble.said{ background:#fff3d6; font-style:italic; }
+.ff-bubble.said{ background:#fff3d6; }
+.ff-bubble.said .ff-text{ font-size:0.86em; opacity:0.8; }
+.ff-fact{ display:none; font-style:italic; color:#7a3a00; border-top:2px dashed rgba(122,58,0,0.3); padding-top:8px; width:100%; }
+.ff-bubble.said .ff-fact{ display:block; }
 .ff-stamp{ position:absolute; right:-8px; top:-18px; padding:6px 14px; border-radius:12px; font:900 26px/1 var(--f-display); letter-spacing:1px; color:#fff; opacity:0; transform:rotate(8deg) scale(0.4); transition:transform .3s cubic-bezier(.2,1.6,.4,1), opacity .15s; }
 .ff-stamp.on{ opacity:1; transform:rotate(8deg) scale(1); }
 .ff-stamp.true{ background:linear-gradient(180deg, #5ee08a, #148a3c); box-shadow:0 0 0 3px #fff, 0 0 16px rgba(90,220,130,0.8); }
@@ -131,3 +134,8 @@
 .su-saucer.up{ transform:translateY(-56px); }
 .su-play.blur .su-saucer svg{ filter:blur(1px) drop-shadow(0 6px 6px rgba(0,0,0,0.45)); }
 .su-round{ font:900 16px/1 var(--f-display); letter-spacing:3px; color:#e9e4ff; text-shadow:0 0 10px rgba(233,228,255,0.7); }
+
+/* F1: a game with its own stage host never shows the corner host's speech bubble (it covered the buttons). */
+:root:has(#mgOverlay .host-full) #showSay{ display:none !important; }
+.mg-factOrFib .mg-inner{ padding-bottom:calc(6px + env(safe-area-inset-bottom)); }
+.ff-host{ pointer-events:none; }

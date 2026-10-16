@@ -47,7 +47,7 @@ new fonts, original art, no real brand or show names, every new game gets a TEST
 
 ## F. Fix pass (Oct 16, after the mega build)
 
-- [ ] F1. Fact or Fib: TRUE / FIB fully visible and tappable on a 390x844 phone (safe-area padding), the host's bubble never covers them, the statement stays readable with the one-line fact after the answer
+- [x] F1. Fact or Fib: TRUE / FIB fully visible and tappable on a 390x844 phone (safe-area padding), the host's bubble never covers them, the statement stays readable with the one-line fact after the answer
 - [ ] F2. VS with no real crowd (first vote, or under 30 votes): no CROWD SAYS numbers and no HOT TAKE / BOLD PICK - a friendly "You're the first to vote!" note instead (keep "Early crowd" under 30 if it exists); same rule in Crowd Scan
 - [ ] F3. The HOT TAKE / BOLD PICK tag as a corner pill at the card's edge, off the art
 - [ ] F4. Menu: TONIGHT'S EPISODE n as the title (keep the same-show-for-everyone line), "How to play" (no "Daily"), less empty space at the top
