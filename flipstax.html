@@ -1662,6 +1662,12 @@
      the buttons, and the personality label drops its big emoji. */
   #readoutOverlay.has-secret{ padding-top:calc(92px + env(safe-area-inset-top)); align-items:flex-start; overflow-y:auto; flex-wrap:wrap; align-content:flex-start; }
   #readoutOverlay.has-secret .contact-footer{ position:static; width:100%; margin-top:14px; }
+  /* The episode results scroll: the footer follows the content (it sat over the new-card badge). */
+  #readoutOverlay.ep{ flex-wrap:wrap; align-content:flex-start; }
+  #readoutOverlay.ep .contact-footer{ position:static; width:100%; margin-top:16px; padding-bottom:calc(8px + env(safe-area-inset-bottom)); }
+  .epr-num{ font-family:var(--f-body); font-weight:900; letter-spacing:0; }
+  :root.results-open #hint{ visibility:hidden; }   /* (the results overlay is see-through to its world: the board's hint showed under the footer) */
+  #eprBreak .miss{ color:#ff8a9a; } #eprBreak .goop{ color:#8dff6a; }
   #readoutOverlay.has-secret .readout-type-icon{ display:none; }
   #readoutOverlay.has-secret .readout-secret{ font-size:clamp(22px,6.6vw,30px); margin-bottom:10px; }
   #readoutOverlay.has-secret .ru-cell{ width:62px; }
@@ -8912,7 +8918,7 @@
       deck: deck.cards.slice(deck.next).map(c=> c.id),
       show: runShow, doors: runPortalDoors, warpBonus: runWarpBonusMs,
       combo: { streak: runMatchStreak, bank: runComboBank, bonus: runComboBonus, best: runBestStreak },
-      letterPos: runLetterPos, tray: runTrayMarks, act: runActIdx, actPts: runActPts, best: runBestMoment, keys: runKeys, bonusChips: runBonusChips, vsMarks: runVsMarks,
+      letterPos: runLetterPos, tray: runTrayMarks, act: runActIdx, actPts: runActPts, missPts: runMissPts, goopLost: runGoopLost, best: runBestMoment, keys: runKeys, bonusChips: runBonusChips, vsMarks: runVsMarks,
     };
     try{ localStorage.setItem(RUN_LIVE_KEY, JSON.stringify(snap)); }catch(e){}
   }
@@ -9481,14 +9487,16 @@
     const rows = [], acts = RUNDOWN.acts; let listed = 0;
     acts.forEach((a, i)=>{ if (a.ad || a.id === 'finale') return; const p = Math.round((r.actPts || [])[i] || 0); listed += p; rows.push([(a.sub || '').split(' · ')[0] + ' · ' + a.title + (a.mult > 1 ? ' ×' + a.mult : ''), p]); });
     listed += r.warpPoints || 0; rows.push([GN.wordWarp + (r.solved ? ' · ' + formatRaceTime(r.solveMs) : ' · not solved'), r.warpPoints || 0]);
-    const other = Math.round(r.score - (r.orbitPoints || 0) - listed); if (other) rows.push([other > 0 ? 'Bonuses' : 'Misses', other]);
+    const other = Math.round(r.score - (r.orbitPoints || 0) - listed), miss = Math.round(r.missPts || 0);
+    const bonus = r.missPts != null ? other + miss : Math.max(0, other), missShown = r.missPts != null ? miss - Math.min(0, bonus) : Math.max(0, -other);
+    if (bonus > 0) rows.push(['Bonuses', bonus]); if (missShown > 0) rows.push(['Missed', -missShown]);   // (the share image leaves out the GOOP line: it is not in the score)
     rows.push([GN.orbitDrop + (r.jackpot ? ' · THE MOTHERSHIP!' : ''), r.orbitPoints || 0]);
-    const pTop = 410, pH = 240 + rows.length * 46;
+    const rowH = rows.length > 6 ? 40 : 46, pTop = 410, pH = 240 + rows.length * rowH;
     roundRectPath(ctx, 110, pTop, W - 220, pH, 34); ctx.fillStyle = '#240845'; ctx.fill(); ctx.lineWidth = 10; ctx.strokeStyle = '#ffd23f'; ctx.stroke();
     center('FINAL SCORE', pTop + 70, '900 46px ' + D, '#ffd23f');
     center(shownScore(r.score).toLocaleString(), pTop + 220, '900 170px ' + D, goldFill(pTop + 90, pTop + 230), '#8a4a00', 10);
     ctx.font = '700 34px ' + T;
-    rows.forEach(([label, pts], k)=>{ const y = pTop + 275 + k * 46; ctx.textAlign = 'left'; ctx.fillStyle = k === rows.length - 1 ? '#7df9ff' : '#e9dcff'; ctx.fillText(label, 160, y); ctx.textAlign = 'right'; ctx.fillText((pts > 0 ? '+' : '') + pts, W - 160, y); });
+    rows.forEach(([label, pts], k)=>{ const y = pTop + 275 + k * rowH; ctx.textAlign = 'left'; ctx.fillStyle = k === rows.length - 1 ? '#7df9ff' : '#e9dcff'; ctx.fillText(label, 160, y); ctx.textAlign = 'right'; ctx.fillText(pts > 0 ? '+' + pts : pts < 0 ? '\u2212' + Math.abs(pts) : '0', W - 160, y); });
     // the three cards
     const cTop = pTop + pH + 50, cw = 270, gap = 30, cx0 = (W - (cw * 3 + gap * 2)) / 2, ch = 380;
     const cardBox = (x, gold)=>{ roundRectPath(ctx, x, cTop, cw, ch, 26); const g = ctx.createLinearGradient(0, cTop, 0, cTop + ch); if (gold){ g.addColorStop(0, '#ffe27a'); g.addColorStop(1, '#d99a1a'); } else { g.addColorStop(0, '#4a1680'); g.addColorStop(1, '#2c0b52'); } ctx.fillStyle = g; ctx.fill(); ctx.lineWidth = 6; ctx.strokeStyle = '#ffd23f'; ctx.stroke(); };
@@ -9512,7 +9520,11 @@
     // streak
     const sx = px + cw + gap, n = Math.max(1, r.streak || dailyRunStreak || 1);
     cardBox(sx, false);
-    ctx.fillStyle = '#fff'; ctx.font = '900 40px ' + D; ctx.fillText(n + ' DAY', sx + cw / 2, cTop + 58); ctx.fillText('STREAK!', sx + cw / 2, cTop + 100);
+    ctx.fillStyle = '#fff';
+    { // the number in the body font (the display font's 1 reads as an I)
+      ctx.font = '900 40px ' + T; const nw = ctx.measureText(String(n)).width; ctx.font = '900 40px ' + D; const dw = ctx.measureText(' DAY').width, x0 = sx + cw / 2 - (nw + dw) / 2;
+      ctx.textAlign = 'left'; ctx.font = '900 40px ' + T; ctx.fillText(String(n), x0, cTop + 58); ctx.font = '900 40px ' + D; ctx.fillText(' DAY', x0 + nw, cTop + 58); ctx.textAlign = 'center'; }
+    ctx.fillText('STREAK!', sx + cw / 2, cTop + 100);
     ctx.font = '110px sans-serif'; ctx.fillText('🔥', sx + cw / 2, cTop + 235);
     ctx.font = '900 36px ' + D; ctx.fillStyle = '#ffd23f'; ctx.fillText('STREAK ' + n, sx + cw / 2, cTop + ch - 24);
     // the VS squares, a row per act
@@ -9769,7 +9781,7 @@
     runPendingTrivia = false; runPendingPowerUp = false;
     runStartDate = todayStr();
     runWord = dailyWordForPlayer();
-    runPlan = buildShowPlan(runStartDate); runShow = { step:0, left:null }; runActIdx = 0; runActPts = []; runBestMoment = null; runKeys = 0; runBonusChips = 0; runVsMarks = []; runPortalDoors = null; runWarpBonusMs = 0; runBreakSeen = {};
+    runPlan = buildShowPlan(runStartDate); runShow = { step:0, left:null }; runActIdx = 0; runActPts = []; runMissPts = 0; runGoopLost = 0; runBestMoment = null; runKeys = 0; runBonusChips = 0; runVsMarks = []; runPortalDoors = null; runWarpBonusMs = 0; runBreakSeen = {};
     runMatchStreak = 0; runComboBank = 0; runComboBonus = 0; runBestStreak = 0; renderComboMeter();
     runLetterPos = []; runWarpPoints = 0; letterIncoming.clear(); runTrayMarks = []; trayIncoming.clear();
     runEndsAt = Date.now() + RUN_DURATION_MS;
@@ -9829,7 +9841,7 @@
     currentRiddle = snap.riddle >= 0 ? RIDDLES[snap.riddle] : null; riddleEndsAt = snap.riddleEndsAt;
     runSolvedAt = null;
     runClockAddedMs = snap.clockAdded || 0;
-    runShow = snap.show || { step:0, left:null }; runPlan = buildShowPlan(runStartDate); runActIdx = snap.act || 0; runActPts = Array.isArray(snap.actPts) ? snap.actPts : []; runBestMoment = snap.best || null; runKeys = snap.keys || 0; runBonusChips = snap.bonusChips || 0; runVsMarks = Array.isArray(snap.vsMarks) ? snap.vsMarks : []; runPortalDoors = snap.doors || null; runWarpBonusMs = snap.warpBonus || 0;
+    runShow = snap.show || { step:0, left:null }; runPlan = buildShowPlan(runStartDate); runActIdx = snap.act || 0; runActPts = Array.isArray(snap.actPts) ? snap.actPts : []; runMissPts = snap.missPts || 0; runGoopLost = snap.goopLost || 0; runBestMoment = snap.best || null; runKeys = snap.keys || 0; runBonusChips = snap.bonusChips || 0; runVsMarks = Array.isArray(snap.vsMarks) ? snap.vsMarks : []; runPortalDoors = snap.doors || null; runWarpBonusMs = snap.warpBonus || 0;
     runMatchStreak = (snap.combo && snap.combo.streak) || 0; runComboBank = (snap.combo && snap.combo.bank) || 0; runComboBonus = (snap.combo && snap.combo.bonus) || 0; runBestStreak = (snap.combo && snap.combo.best) || 0;
     renderComboMeter();
     runLetterPos = Array.isArray(snap.letterPos) ? snap.letterPos : runLetters.map((_, k)=> k); runWarpPoints = 0; letterIncoming.clear();
@@ -10042,6 +10054,7 @@
       spins++; state = 'landed';
       sq.classList.add('hit');
       if (k === 'GOOP'){
+        runGoopLost += bank + (dbl ? act3 : 0);   // what the GOOP took (for the results' "Gooped" line)
         bank = 0; dbl = false; keys = 0; chips = 0; renderBank();
         hubT.textContent = 'GOOPED!'; hubS.textContent = 'The GOOP got the Lucky Lights bonus';
         luckyOv.classList.add('slimed'); sfx.squelch(); setTimeout(()=> sfx.wahwah(), 380); haptic([60, 40, 60]);
@@ -10574,6 +10587,7 @@
   }
   let runBestMoment = null;   // { text, pts } - the run's single biggest win, for the results' "Your best moment"
   let runVsMarks = [];   // per act: a string of g (matched the crowd) / r (didn't), one per VS pick
+  let runMissPts = 0, runGoopLost = 0;   // points lost to misses (wrong answers, too slow, a Cosmic loss) and the Lucky Lights bank lost to the GOOP, for the results
   let runActPts = [];   // points won in each act (by its index in the rundown), for the results breakdown   // the question on screen is a rundown Brain Beam (it earns a prize-track tile)
   let runPlan = null, runShow = { step:0, left:null }, runPortalDoors = null, runWarpBonusMs = 0, runQuizPick = null;
   let runMatchStreak = 0, runComboBank = 0, runComboBonus = 0, runBestStreak = 0;
@@ -10604,7 +10618,7 @@
     // Every point won in an act is multiplied by the act's multiplier (DIRECTION.md).
     if (delta > 0 && !raw) delta *= runActMult();   // (raw: a prize at face value - Lucky Lights)
     runScore += delta;
-    if (delta > 0) runActPts[runActIdx] = (runActPts[runActIdx] || 0) + delta;
+    if (delta > 0) runActPts[runActIdx] = (runActPts[runActIdx] || 0) + delta; else runMissPts -= delta;
     if (delta > 0 && (!runBestMoment || delta > runBestMoment.pts)) runBestMoment = { pts: delta, text: runMomentLabel() };
     checkRunMilestones();
     renderRunBanner();
@@ -10838,7 +10852,7 @@
       sfx.wrong();
       runTriviaStreak = 0;
       if (runQuizBeam && runTrayMarks.length < RUN_WORD_LENGTH) runTrayMarks.push('miss');   // the prize track: a red X
-      runScore -= 5; // trivia carries real stakes too, applied directly since we're deliberately in the 'trivia' phase
+      runScore -= 5; runMissPts += 5; // trivia carries real stakes too, applied directly since we're deliberately in the 'trivia' phase
       renderRunBanner();
       els.eventSubtitle.textContent = '';
       els.eventPrompt.textContent = '\u274C Not quite \u2014 \u22125 points, no letter this time';
@@ -13591,7 +13605,7 @@
       secretRiddle: !!runRiddleSolved,
       personalityNote: personality.note,
       warpPoints: runWarpPoints, comboBonus: runComboBonus,
-      actPts: runActPts.slice(), best: runBestMoment, episode: showEpisode(runStartDate || todayStr()),   // B5/B6: the Word Warp's points and the combo meter's (in the score already)
+      actPts: runActPts.slice(), missPts: runMissPts, goopLost: runGoopLost, best: runBestMoment, episode: showEpisode(runStartDate || todayStr()),   // B5/B6: the Word Warp's points and the combo meter's (in the score already)
     };
     // Collection unlocks for this checkpoint (today's personality above is
     // just a label - it isn't collected).
@@ -13631,11 +13645,15 @@
       rows.push([(a.sub || '').split(' · ')[0] + ' · ' + a.title + (a.mult > 1 ? ' ×' + a.mult : ''), p]); });
     const warp = r.warpPoints || 0; listed += warp;
     rows.push([GN.wordWarp + (r.solved ? ' · ' + formatRaceTime(r.solveMs) : ' · not solved'), warp]);
-    const other = Math.round(r.score - orbit - listed);
-    if (other) rows.push([other > 0 ? 'Bonuses' : 'Misses', other]);
+    // What's left is bonuses less misses: the misses get their own line, and a negative "Bonuses" never shows.
+    const other = Math.round(r.score - orbit - listed), miss = Math.round(r.missPts || 0);
+    const bonus = r.missPts != null ? other + miss : Math.max(0, other), missShown = r.missPts != null ? miss - Math.min(0, bonus) : Math.max(0, -other);
+    if (bonus > 0) rows.push(['Bonuses', bonus]);
+    if (missShown > 0) rows.push(['Missed', -missShown, 'miss']);
+    if (r.goopLost > 0) rows.push(['Gooped', -Math.round(r.goopLost), 'goop']);   // (a prize the GOOP took, never in the score)
     rows.push([GN.orbitDrop + (r.jackpot ? ' · THE MOTHERSHIP!' : ''), orbit, 'roll']);
     const br = document.getElementById('eprBreak'); br.textContent = '';
-    rows.forEach(([label, pts, cls])=>{ const s = document.createElement('span'), b = document.createElement('b'); s.textContent = label; b.textContent = (pts > 0 ? '+' : '') + pts; if (cls){ s.className = cls; b.className = cls; } br.appendChild(s); br.appendChild(b); });
+    rows.forEach(([label, pts, cls])=>{ const s = document.createElement('span'), b = document.createElement('b'); s.textContent = label; b.textContent = pts > 0 ? '+' + pts : pts < 0 ? '\u2212' + Math.abs(pts) : '0'; if (cls){ s.className = cls; b.className = cls; } br.appendChild(s); br.appendChild(b); });
     // The score counts up; straight from the Orbit Drop, the winnings roll in on top.
     const el = document.getElementById('eprScore'), from = fromOrbit ? Math.max(0, final - orbit) : 0;
     el.textContent = from.toLocaleString();
@@ -13650,7 +13668,8 @@
     document.getElementById('eprPersName').textContent = meta.name;
     document.getElementById('eprPersArt').innerHTML = cardArtHtml(PERSONALITY_META[r.personalityType] ? r.personalityType : 'fence_sitter');
     const n = dailyRunStreak || 1;
-    document.getElementById('eprStreakH').textContent = n + ' DAY STREAK!';
+    // (the number in the body font: the display font's 1 reads as an I)
+    document.getElementById('eprStreakH').innerHTML = '<span class="epr-num">' + n + '</span> DAY STREAK!';
     document.getElementById('eprStreakNote').textContent = dailyFreezeNote === 'earned' ? '🧊 Streak freeze earned! It saves one missed day.'
       : dailyFreezeNote === 'used' ? '🧊 Your streak freeze saved the streak!'
       : hasStreakFreeze() ? '🧊 Freeze ready · ' + (STREAK_FREEZE_EVERY - n % STREAK_FREEZE_EVERY) + ' days to the next'
@@ -16061,7 +16080,7 @@
     const mysteryAs = (game)=> atType(s=> s.t === 'mystery', 0, 60, 1, (i)=>{ runPlan[i] = Object.assign({}, runPlan[i], { game, seed:20261013 }); });
     function replaySampleEpisode(){
       const r = replaySampleResult();
-      return Object.assign(r, { score: 412, actPts: [64, 0, 128, 141], best: { pts: 45, text: 'Read the crowd on Pizza vs Tacos in Lightning Round' }, episode: showEpisode(todayStr()),
+      return Object.assign(r, { score: 412, actPts: [64, 0, 128, 141], missPts: 10, goopLost: 28, best: { pts: 45, text: 'Read the crowd on Pizza vs Tacos in Lightning Round' }, episode: showEpisode(todayStr()),
         orbit: { stage:'done', done:true, chips:[], dropped:0, base: 368 }, orbitPoints: 44, jackpot: true, letters: 5, streak: 7,
         vsMarks: ['ggrggrggg', '', 'grggrgggr', 'ggrgrg'] });
     }
