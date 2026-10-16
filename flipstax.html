@@ -2515,18 +2515,40 @@
   /* One host per screen: the corner host steps out while the curtain or a cue card is up. */
   :root:has(.show-card.curtain:not(.hidden)) .show-host, :root:has(.show-card.cue:not(.hidden)) .show-host{ display:none !important; }
   .co-skip{ position:absolute; z-index:8; right:16px; bottom:calc(18px + env(safe-area-inset-bottom)); font:800 12px var(--f-body); letter-spacing:2px; color:rgba(255,255,255,0.75); }
-  /* The act cue card (reusable): the host holds up a card that flips in, over a colour sweep in the act's world. */
-  .show-card.cue{ background:transparent; overflow:hidden; }
-  .cue-sweep{ position:absolute; inset:0; z-index:0; transform:translateX(-101%); animation:cueSweep 1.5s cubic-bezier(.7,0,.3,1) forwards; }
-  @keyframes cueSweep{ 0%{ transform:translateX(-101%); } 22%{ transform:none; } 82%{ transform:none; } 100%{ transform:translateX(101%); } }
-  .cue-hold{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; perspective:700px; }
-  .cue-card{ position:relative; width:min(300px, 80vw); padding:18px 16px 20px; border-radius:16px; background:linear-gradient(180deg, #fffdf2, #f1e3bd); border:4px solid #fff;
-    box-shadow:0 14px 30px rgba(0,0,0,0.5); color:#2a1030; transform:rotateY(-90deg); animation:cueFlip .5s .15s var(--ease-pop) forwards; }
-  @keyframes cueFlip{ to{ transform:rotateY(0deg) rotate(-2deg); } }
+  /* The cue card (reusable, C4): the host rises holding a card (his hands on its bottom corners) that flips over in 3D
+     from its FLIPSTAX back to the act's name. Between acts a star wipe in the act's world opens behind it and closes
+     after; the grand finale gets a spotlight iris instead (black all round, opening on the card, then a fade to black).
+     Everything runs on one clock, --cue-ms; transform and opacity only. */
+  .show-card.cue{ background:transparent; overflow:hidden; --cue-ms:1.5s; }
+  .cue-wipe{ position:absolute; left:50%; top:50%; width:2600px; height:2600px; margin:-1300px 0 0 -1300px; z-index:0; will-change:transform;
+    clip-path:polygon(50% 0%, 61.2% 34.5%, 97.6% 34.5%, 68.2% 55.9%, 79.4% 90.5%, 50% 69.1%, 20.6% 90.5%, 31.8% 55.9%, 2.4% 34.5%, 38.8% 34.5%);
+    transform:scale(0) rotate(-60deg); animation:starWipe var(--cue-ms) cubic-bezier(.6,0,.35,1) forwards; }
+  .cue-wipe > .bg .rays, .cue-wipe > .bg .glow{ top:50%; }
+  @keyframes starWipe{ 0%{ transform:scale(0) rotate(-60deg); } 24%{ transform:scale(1.3) rotate(0deg); } 82%{ transform:scale(1.3) rotate(0deg); } 100%{ transform:scale(0) rotate(60deg); } }
+  .cue-stage{ position:absolute; inset:0; z-index:0; }
+  .cue-iris{ position:absolute; left:50%; top:47%; width:2400px; height:2400px; margin:-1200px 0 0 -1200px; z-index:1; pointer-events:none; will-change:transform;
+    background:radial-gradient(circle, rgba(255,236,170,0.14) 0 66px, rgba(255,236,170,0.05) 76px, rgba(3,1,10,0.95) 94px); transform:scale(0.5); animation:irisOpen var(--cue-ms) cubic-bezier(.45,0,.2,1) forwards; }
+  @keyframes irisOpen{ 0%{ transform:scale(0.5); } 30%{ transform:scale(2.5); } 100%{ transform:scale(2.5); } }
+  .cue-black{ position:absolute; inset:0; z-index:4; background:#030108; opacity:0; animation:cueBlack var(--cue-ms) linear forwards; pointer-events:none; }
+  @keyframes cueBlack{ 0%, 84%{ opacity:0; } 100%{ opacity:1; } }
+  .cue-hold{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; perspective:800px; transform:translateY(110vh); animation:cueRise var(--cue-ms) cubic-bezier(.2,.9,.3,1) forwards; }
+  @keyframes cueRise{ 0%, 8%{ transform:translateY(110vh); } 28%{ transform:none; } 84%{ transform:none; } 100%{ transform:translateY(110vh); } }
+  .show-card.cue.finale .cue-hold{ animation-name:cueRiseFin; }
+  @keyframes cueRiseFin{ 0%, 8%{ transform:translateY(110vh); } 28%{ transform:none; } 100%{ transform:none; } }
+  .cue-grip{ position:relative; width:min(300px, 80vw); }
+  .cue-card{ position:relative; transform-style:preserve-3d; transform:rotateY(180deg); animation:cueFlip3d .6s calc(var(--cue-ms) * 0.3) cubic-bezier(.3,1.35,.5,1) forwards; }
+  @keyframes cueFlip3d{ to{ transform:rotateY(0deg) rotate(-2deg); } }
+  .cue-face{ border-radius:16px; border:4px solid #fff; box-shadow:0 14px 30px rgba(0,0,0,0.5); backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+  .cue-front{ position:relative; padding:18px 16px 20px; background:linear-gradient(180deg, #fffdf2, #f1e3bd); color:#2a1030; text-align:center; }
+  .cue-back{ position:absolute; inset:0; transform:rotateY(180deg); display:flex; align-items:center; justify-content:center;
+    background:repeating-linear-gradient(45deg, rgba(255,210,63,0.16) 0 8px, rgba(255,210,63,0) 8px 16px), radial-gradient(circle at 50% 40%, #e0193f, #7a0620);
+    font:900 34px/1 var(--f-display); letter-spacing:3px; color:#ffd23f; text-shadow:0 2px 0 #5a0414; }
   .cue-card .cc-sub{ font:800 13px var(--f-body); letter-spacing:3px; color:#a3102b; }
   .cue-card .cc-title{ margin-top:6px; font:900 clamp(38px, 12vw, 54px)/0.95 var(--f-display); text-transform:uppercase; }
-  .cue-host{ width:70px; height:80px; margin-top:-14px; z-index:3; }
-  .cue-out .cue-card, .cue-out .cue-host{ transition:transform .25s ease-in, opacity .25s; transform:translateY(40px) scale(0.9); opacity:0; }
+  .cue-hand{ position:absolute; bottom:-12px; z-index:3; width:32px; height:24px; border-radius:50% 50% 46% 46%; border:2px solid #1d5a22;
+    background:radial-gradient(circle at 40% 35%, #c4ffa8, #66d85d 60%, #2f9a36); box-shadow:0 3px 6px rgba(0,0,0,0.35); }
+  .cue-hand.l{ left:-8px; transform:rotate(18deg); } .cue-hand.r{ right:-8px; transform:rotate(-18deg); }
+  .cue-host{ width:70px; height:80px; margin-top:-2px; z-index:3; }
   /* The Mystery Game wheel (refs/wheel.jpg without its buttons). */
   .show-card.wheel{ overflow:hidden; cursor:default; }
   .mw-bg{ position:absolute; inset:0; z-index:0; }
@@ -2600,7 +2622,7 @@
   .ad-line{ font:800 italic 20px/1.2 var(--f-body); color:#fff; text-shadow:2px 2px 0 rgba(0,0,0,0.35); padding:0 20px; }
   .ad-tag{ position:absolute; top:calc(16px + env(safe-area-inset-top)); left:16px; font:800 11px var(--f-body); letter-spacing:2px; color:#fff; background:rgba(0,0,0,0.45); padding:4px 8px; border-radius:6px; }
   .ad-skip{ position:absolute; right:16px; bottom:calc(18px + env(safe-area-inset-bottom)); font:800 12px var(--f-body); letter-spacing:2px; color:#fff; background:rgba(0,0,0,0.45); padding:6px 10px; border-radius:8px; }
-  @media (prefers-reduced-motion: reduce){ .co-drape, .co-host, .co-cards span{ transition:none; } .cue-sweep{ animation:none; transform:none; } .cue-card{ animation:none; transform:none; } .ad-screen, .ad-glyph{ animation:none; } }
+  @media (prefers-reduced-motion: reduce){ .co-drape, .co-host, .co-cards span{ transition:none; } .cue-wipe{ animation:none; transform:scale(1.3); } .cue-hold, .cue-card{ animation:none; transform:none; } .cue-iris{ animation:none; transform:scale(2.5); } .cue-black{ animation:none; } .ad-screen, .ad-glyph{ animation:none; } }
   /* B9: the tapped answer / door rattles while the drumroll plays. */
   .event-tile.picked-wait{ animation:tileRattle 0.12s linear infinite !important; box-shadow:var(--tile-depth), 0 0 0 4px #fff3c4, 0 0 18px rgba(255,240,180,0.8); }
   @keyframes tileRattle{ 0%, 100%{ transform:rotate(0); } 25%{ transform:rotate(-1.5deg); } 75%{ transform:rotate(1.5deg); } }
@@ -10177,7 +10199,9 @@
   // parts, FLIPSTAX lights up letter by letter on the marquee, the host slides in and three
   // cue cards fan out. 12 s the first time, 3 s for a returning player; a tap skips it.
   const COLD_OPEN_SEEN_KEY = 'flipstax_coldopen_seen_v1';
+  let coldOpenCancel = null;   // a cold open still listening (a restart opened another): detached without starting the show
   function showColdOpen(then){
+    if (coldOpenCancel) coldOpenCancel();
     const ep = showEpisode(runStartDate || todayStr());
     let seen = false; try{ seen = !!localStorage.getItem(COLD_OPEN_SEEN_KEY); }catch(e){}
     const co = RUNDOWN.coldOpen || {}, total = seen ? (co.returningMs || 3000) : (co.firstMs || 12000);
@@ -10205,7 +10229,7 @@
       if (gone) return;
       if (e && e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
       if (e && performance.now() - shownAt < 400) return;   // not the tap that opened it
-      gone = true; timers.forEach(clearTimeout);
+      gone = true; timers.forEach(clearTimeout); coldOpenCancel = null;
       try{ localStorage.setItem(COLD_OPEN_SEEN_KEY, '1'); }catch(err){}
       showCard.removeEventListener('click', go); document.removeEventListener('keydown', go);
       showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden';
@@ -10214,23 +10238,30 @@
     };
     later(total, ()=> go());
     showCard.addEventListener('click', go); document.addEventListener('keydown', go);
+    coldOpenCancel = ()=>{ gone = true; timers.forEach(clearTimeout); showCard.removeEventListener('click', go); document.removeEventListener('keydown', go); coldOpenCancel = null; };
   }
   // The act cue card (reusable): the host holds up a cue card that flips in over a colour
   // sweep in the act's world, for about 1.5 s. `st` is { title, sub, world }.
-  function showActCard(st, then){
-    showCard.className = 'show-card cue';
-    showCard.innerHTML = '<i class="cue-sweep bg w-' + (st.world || 'vs') + '"><i class="rays"></i></i>' +
-      '<div class="cue-hold"><div class="cue-card"><div class="cc-sub"></div><div class="cc-title"></div></div>' +
+  // The card itself: { sub, title } on the front, FLIPSTAX on the back, the host holding it.
+  function cueCardHtml(){
+    return '<div class="cue-hold"><div class="cue-grip"><div class="cue-card"><div class="cue-face cue-back"><span>FLIPSTAX</span></div>' +
+      '<div class="cue-face cue-front"><div class="cc-sub"></div><div class="cc-title"></div></div></div><i class="cue-hand l"></i><i class="cue-hand r"></i></div>' +
       '<div class="alien cue-host">' + FX.alienSvg() + '</div></div>';
+  }
+  function showActCard(st, then){
+    const fin = !!st.finale, w = st.world || 'vs';
+    showCard.className = 'show-card cue' + (fin ? ' finale' : '');
+    showCard.innerHTML = (fin ? '<i class="cue-stage bg w-' + w + '"><i class="rays"></i><i class="glow"></i></i><i class="cue-iris"></i><i class="cue-black"></i>'
+      : '<i class="cue-wipe"><i class="bg w-' + w + '"><i class="rays"></i><i class="glow"></i></i></i>') + cueCardHtml();
     showCard.querySelector('.cc-sub').textContent = st.sub || '';
     showCard.querySelector('.cc-title').textContent = st.title || '';
     showCard.removeAttribute('role'); showCard.setAttribute('aria-label', (st.sub ? st.sub + ': ' : '') + (st.title || ''));
     showCard.classList.remove('hidden');
     clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
     if (sfx.bumper) sfx.bumper(!!st.finale);
-    const ms = prefersReducedMotion() ? 1800 : 1500;
-    setTimeout(()=> showCard.classList.add('cue-out'), ms - 250);
-    setTimeout(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; then(); }, ms);
+    const ms = fin ? 2300 : prefersReducedMotion() ? 1800 : 1500;
+    showCard.style.setProperty('--cue-ms', ms + 'ms');
+    setTimeout(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; showCard.style.removeProperty('--cue-ms'); then(); }, ms);
   }
   // The commercial break: a 3 s fake 70s ad, skippable. Built as one component (an ad in,
   // done() out) so a real ad can take its place later.
