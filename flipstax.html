@@ -3322,13 +3322,13 @@
   :root.lite .host-full svg, :root.lite .host-full .ha-arm-wave, :root.lite .host-full .ha-spark{ animation:none !important; }
   @media (prefers-reduced-motion: reduce){ .host-full svg, .host-full .ha-eyes, .host-full .ha-arm-wave, .host-full .ha-spark{ animation:none !important; } }
   /* The lobby (A1): the sign, tonight's episode, START THE SHOW, the host at the lower right of the stage. */
-  .home-overlay{ justify-content:flex-start; padding-top:calc(clamp(24px, 7vh, 64px) + env(safe-area-inset-top)); background:#1d0636; }
+  .home-overlay{ justify-content:flex-start; padding-top:calc(clamp(16px, 7vh, 64px) + env(safe-area-inset-top)); background:#1d0636; }
   .home-overlay .home-sky, .home-overlay .home-sparks, .home-overlay .doodle-scatter-track, .home-overlay .doodle-scatter, .home-overlay::before, .home-overlay .home-ufo{ display:none !important; }
-  .lb-sign{ position:relative; z-index:2; padding:18px 18px 14px; border-radius:28px; margin-bottom:18px; --bulb:#ffe9a0;
+  .lb-sign{ position:relative; z-index:2; padding:18px 18px 14px; border-radius:28px; margin-bottom:14px; --bulb:#ffe9a0;
     background:radial-gradient(90% 80% at 50% 40%, #4a1468, #22063a 80%); border:4px solid #ffd23f;
     box-shadow:0 0 0 4px #5a2400, 0 0 0 7px rgba(255,214,90,0.25), 0 0 46px rgba(255,170,60,0.45), inset 0 0 30px rgba(0,0,0,0.6); }
   .lb-sign .home-logo-img{ width:min(64vw, 290px, calc(36vh * 584 / 519)); margin:0; display:block; animation:logoZoomIn 650ms cubic-bezier(.25,.85,.35,1.25) 300ms both; }
-  .lb-tonight{ position:relative; z-index:2; margin-bottom:20px; padding:8px 18px; border-radius:12px; font:900 clamp(17px, 5vw, 22px)/1 var(--f-display); letter-spacing:2px; color:#ffe9a0;
+  .lb-tonight{ position:relative; z-index:2; margin-bottom:16px; padding:8px 18px; border-radius:12px; font:900 clamp(17px, 5vw, 22px)/1 var(--f-display); letter-spacing:2px; color:#ffe9a0;
     background:rgba(20,4,36,0.7); border:2px solid rgba(255,214,90,0.6); text-shadow:0 0 12px rgba(255,200,80,0.7); }
   .lb-tonight b{ color:#fff; }
   .home-overlay .home-enter-btn.daily-btn.primary{ --btn-fill:linear-gradient(180deg, #fff5c4, #ffd23f 45%, #f29b00); color:#3a1500; border:4px solid #fff3c4;
@@ -3336,8 +3336,10 @@
     box-shadow:0 6px 0 #8a4a00, 0 0 0 3px rgba(122,74,0,0.6), 0 0 30px rgba(255,200,60,0.75); animation:lbEnterGlow 2.4s ease-in-out infinite; }
   @keyframes lbEnterGlow{ 0%, 100%{ box-shadow:0 6px 0 #8a4a00, 0 0 0 3px rgba(122,74,0,0.6), 0 0 22px rgba(255,200,60,0.55); } 50%{ box-shadow:0 6px 0 #8a4a00, 0 0 0 3px rgba(122,74,0,0.6), 0 0 46px rgba(255,210,80,0.95); } }
   .home-overlay .home-legal-links{ position:absolute; left:0; right:0; bottom:calc(4px + env(safe-area-inset-bottom)); margin:0; z-index:3; }
-  .lb-host{ position:absolute; z-index:2; right:2vw; bottom:calc(5vh + env(safe-area-inset-bottom)); width:min(30vw, 150px); }
-  @media (max-height:700px){ .lb-host{ width:min(24vw, 112px); } .lb-tonight{ margin-bottom:12px; } .lb-sign{ margin-bottom:12px; } }
+  /* F5: the host about 40% larger, centred on the stage between START THE SHOW and the links. */
+  .lb-host{ position:absolute; z-index:2; left:50%; margin-left:calc(min(42vw, 210px) / -2); bottom:calc(68px + env(safe-area-inset-bottom)); width:min(42vw, 210px); }
+  @media (max-height:740px){ .lb-host{ width:min(30vw, 130px); margin-left:calc(min(30vw, 130px) / -2); bottom:calc(50px + env(safe-area-inset-bottom)); } .lb-tonight{ margin-bottom:12px; } .lb-sign{ margin-bottom:10px; } }
+  @media (max-height:640px){ .lb-host{ display:none; } }
   :root.lite .home-overlay .home-enter-btn{ animation:none; }
   .home-overlay.entering .home-enter-btn, .home-overlay.entering .home-legal-links{ pointer-events:none; }
   .home-overlay.entering .st-beam{ opacity:0.85; }   /* (the spotlights swing onto the host and brighten) */
