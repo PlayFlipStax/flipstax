@@ -16688,6 +16688,7 @@
       { label:'Time Warp', go: mysteryAs('timeWarp') },
       { label:'Peak or Plunge', go: mysteryAs('peakOrPlunge') },
       { label:'Snap Sort', go: mysteryAs('snapSort') },
+      { label:'Zap Words', go: mysteryAs('zapWords') },
       // The finale's cue card, then the Word Warp with all six letters in.
       { label:'Grand finale (6 letters)', wide:true, go: atType(s=> s.t === 'act' && s.finale, 0, 210, 6) },
       { label:'Orbit Drop', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); const r = replaySampleEpisode(); delete r.orbit; delete r.orbitPoints; r.score = 368; r.keys = 2; r.bonusChips = 1; r.warpChip = true; r.orbitChips = dailyChipsFor(2, 1, true); runResultToday = r; openDailyOrbit(r); }) },

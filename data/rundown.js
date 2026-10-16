@@ -35,6 +35,7 @@ window.FLIPSTAX_RUNDOWN = {
       { game: 'timeWarp',     weight: 1 },
       { game: 'peakOrPlunge', weight: 1 },
       { game: 'snapSort',     weight: 1 },
+      { game: 'zapWords',     weight: 1 },
       // (Oct 16: Price Probe and Oddball Alert are out of the pool - their code and data stay, and the TEST menu still plays them.)
     ],
   },
