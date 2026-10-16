@@ -144,6 +144,13 @@
     min-width:44px; min-height:44px; display:flex; align-items:center; justify-content:center;
   }
   .sound-toggle:active{ opacity:1; }
+  .vol-pop{ position:fixed; z-index:400; display:flex; align-items:center; gap:10px; padding:8px 12px 8px 8px; border-radius:16px; background:rgba(24,8,44,0.96);
+    border:2px solid #ffd23f; box-shadow:0 8px 24px rgba(0,0,0,0.5); color:#fff3c4; font:800 13px var(--f-body); }
+  .vol-pop.hidden{ display:none; }
+  .vol-mute{ width:40px; height:40px; border-radius:12px; border:2px solid rgba(255,214,90,0.6); background:rgba(255,255,255,0.08); font-size:18px; cursor:pointer; }
+  .vol-mute.off{ background:#c0263f; border-color:#ff9aa8; }
+  .vol-pop input{ width:150px; accent-color:#ffd23f; }
+  .vol-pop b{ min-width:34px; text-align:right; }
   /* Fixed (not header-relative) so it stays reachable above every gameplay
      overlay - trivia, puzzle, riddle - not just the base VS board, while
      matching the sound-toggle's own bare-icon chrome style. */
@@ -3580,6 +3587,8 @@
 <div class="show-bg bg w-vs" id="showBg" aria-hidden="true"><i class="rays"></i><i class="glow"></i><div class="amb" id="showAmb"></div></div>
 <div class="show-frame show-flash" id="showFrame" aria-hidden="true"></div>
 <div class="show-marquee off" id="showMarquee" aria-hidden="true"></div>
+<!-- The sound panel: one master volume and the mute button (opened from the speaker). -->
+<div class="vol-pop hidden" id="volPop" role="dialog" aria-label="Sound"><button type="button" class="vol-mute" id="volMute" aria-label="Mute">🔊</button><input type="range" id="volSlider" min="0" max="100" step="5" aria-label="Master volume"><b id="volPct"></b></div>
 <div class="fx-layer show-fx" id="showFx" aria-hidden="true"></div>
 <div class="show-card hidden" id="showCard"></div>
 <div class="show-host" id="showHost" aria-hidden="true"><div class="alien" id="showAlien"></div><div class="show-say" id="showSay"></div></div>
@@ -3597,7 +3606,7 @@
   <header>
     <div class="top-row">
       <div class="left-group">
-        <span class="sound-toggle" id="soundToggle">🔊</span>
+        <span class="sound-toggle" id="soundToggle" role="button" tabindex="0" aria-label="Sound" aria-haspopup="dialog">🔊</span>
         <div class="logo"><span class="flip">Flip</span><span class="stax">Stax</span></div>
       </div>
       <!-- You, lifetime: tier name over your Flipz (votes, ever) and play streak. -->
@@ -5599,11 +5608,20 @@
   // down could help, so an unguarded throw would blank the whole page.
   let soundOn = true;
   try{ soundOn = localStorage.getItem('flipstax_sound') !== 'off'; }catch(e){}
-  let audioCtx = null;
+  // One master volume (0-1, saved) for every sound: the synthesized effects go through one gain node (the
+  // context's destination is pointed at it, so every effect's connect(ctx.destination) passes through), and
+  // the music's <audio> elements take it on their own levels. Mute is the sound switch (soundOn).
+  let masterVol = 1;
+  try{ const v = parseFloat(localStorage.getItem('flipstax_volume')); if (!isNaN(v)) masterVol = Math.max(0, Math.min(1, v)); }catch(e){}
+  let audioCtx = null, masterGain = null;
   function getAudioCtx(){
     if (!audioCtx){
       try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
       catch(e){ return null; }
+      try{
+        masterGain = audioCtx.createGain(); masterGain.gain.value = masterVol * masterVol; masterGain.connect(audioCtx.destination);
+        Object.defineProperty(audioCtx, 'destination', { value: masterGain, configurable: true });
+      }catch(e){ masterGain = null; }
     }
     if (audioCtx.state === 'suspended') audioCtx.resume().catch(()=>{});
     return audioCtx;
@@ -5938,6 +5956,46 @@
         o.connect(bp); o.start(t + Math.random() * 0.12); o.stop(t + 2.15); }
       for (let x = 0; x < 2; x += 0.25) noiseHit(ctx, t + x, 0.09 * Math.sin(Math.PI * Math.min(1, (x + 0.2) / 1.9)), 0.4, 'bandpass', 1100, 0.6);
     }),
+    // A slam: a sub thud, a noise crack and a short brass hit (the Mystery wheel landing).
+    slam: ()=> withSfxCtx((ctx, t)=>{
+      const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(110, t); o.frequency.exponentialRampToValueAtTime(38, t + 0.35);
+      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.28, t + 0.006); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+      o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + 0.5);
+      noiseHit(ctx, t, 0.22, 0.28, 'lowpass', 1400); noiseHit(ctx, t, 0.08, 0.12, 'highpass', 4200);
+      brass(ctx, t + 0.02, [392, 523, 659], 0.3, 0.045);
+    }),
+    // The GOOP: a wet squelch (a pitch drop through a closing filter, then two bubbles).
+    squelch: ()=> withSfxCtx((ctx, t)=>{
+      const o = ctx.createOscillator(), bp = ctx.createBiquadFilter(), g = ctx.createGain(); o.type = 'sawtooth';
+      o.frequency.setValueAtTime(260, t); o.frequency.exponentialRampToValueAtTime(70, t + 0.3);
+      bp.type = 'bandpass'; bp.Q.value = 4; bp.frequency.setValueAtTime(1300, t); bp.frequency.exponentialRampToValueAtTime(260, t + 0.32);
+      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.12, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.36);
+      o.connect(bp); bp.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + 0.4);
+      noiseHit(ctx, t, 0.08, 0.25, 'bandpass', 700, 2);
+      [0.36, 0.5].forEach((at, i)=>{ const b = ctx.createOscillator(), bg = ctx.createGain(); b.type = 'sine'; b.frequency.setValueAtTime(300 + i * 140, t + at); b.frequency.exponentialRampToValueAtTime(900 + i * 200, t + at + 0.06);
+        bg.gain.setValueAtTime(0.0001, t + at); bg.gain.linearRampToValueAtTime(0.05, t + at + 0.01); bg.gain.exponentialRampToValueAtTime(0.0001, t + at + 0.08); b.connect(bg); bg.connect(ctx.destination); b.start(t + at); b.stop(t + at + 0.1); });
+    }),
+    // The crowd cheers: a short bright "yay" with claps (shorter than the roar).
+    cheer: ()=> withSfxCtx((ctx, t)=>{
+      const bp = ctx.createBiquadFilter(), g = ctx.createGain(); bp.type = 'bandpass'; bp.frequency.value = 1050; bp.Q.value = 1.4;
+      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.05, t + 0.12); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.1);
+      bp.connect(g); g.connect(ctx.destination);
+      for (let k = 0; k < 8; k++){ const o = ctx.createOscillator(), f = 260 + Math.random() * 300; o.type = 'sawtooth'; o.frequency.setValueAtTime(f, t); o.frequency.linearRampToValueAtTime(f * 1.25, t + 0.25); o.frequency.linearRampToValueAtTime(f * 1.05, t + 1);
+        o.connect(bp); o.start(t + Math.random() * 0.06); o.stop(t + 1.15); }
+      for (let k = 0; k < 14; k++) noiseHit(ctx, t + 0.05 + Math.random() * 0.9, 0.05 + Math.random() * 0.04, 0.035, 'bandpass', 1600 + Math.random() * 1200, 1.2);
+    }),
+    // Ka-ching: the register's clunk, its bell, a rattle of coins.
+    cashRegister: ()=> withSfxCtx((ctx, t)=>{
+      noiseHit(ctx, t, 0.16, 0.06, 'bandpass', 1500, 2.5); noiseHit(ctx, t + 0.07, 0.1, 0.05, 'bandpass', 900, 2);
+      coinPing(ctx, t + 0.12, 0.11, 2093); coinPing(ctx, t + 0.12, 0.06, 2637);
+      for (let k = 0; k < 6; k++) coinTap(ctx, t + 0.2 + k * 0.045 + Math.random() * 0.02, 0.12, 2800 + Math.random() * 900);
+    }),
+    // A clock tick for the last three seconds (the last one higher).
+    tick: (last)=> withSfxCtx((ctx, t)=>{
+      const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'square'; o.frequency.value = last ? 1760 : 1320;
+      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.05, t + 0.002); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.05);
+      o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + 0.06); noiseHit(ctx, t, 0.05, 0.02, 'highpass', 3000);
+    }),
     // One split-flap leaf falling: a short dry clack.
     clack: ()=> withSfxCtx((ctx, t)=>{ noiseHit(ctx, t, 0.07, 0.022, 'bandpass', 2400 + Math.random() * 600, 1.6); noiseHit(ctx, t + 0.006, 0.03, 0.015, 'highpass', 5000); }),
     // A missed Word Warp: the sad trombone (four falling notes, the last one wobbles).
@@ -5964,6 +6022,9 @@
     }),
     hostVoice: showSfx.hostVoice, drumroll: showSfx.drumroll, crowdOoh: showSfx.crowdOoh, bumper: showSfx.bumper, letterLand: showSfx.letterLand, warpMiss: showSfx.warpMiss,
     ding: showSfx.ding, strike: showSfx.strike, aww: showSfx.aww, clack: showSfx.clack, chime: showSfx.chime, siren: showSfx.siren, roar: showSfx.roar,
+    slam: showSfx.slam, squelch: showSfx.squelch, cheer: showSfx.cheer, cashRegister: showSfx.cashRegister, tick: showSfx.tick,
+    drumrollShort: ()=> showSfx.drumroll(450), drumrollLong: ()=> showSfx.drumroll(1800),
+    fanfare: ()=> sfx.vaultFanfare(), zap: ()=> sfx.laser(),
     key: ()=> withSfxCtx((ctx, t)=>{ coinPing(ctx, t, 0.09, 1568); coinPing(ctx, t + 0.09, 0.08, 2093); haptic([8,20,8]); }),
     milestone: ()=>{ [659, 784, 988, 1319].forEach((f, i)=> playTone(f, i * 0.08, 0.18, 'triangle', 0.1)); haptic([12,30,12]); },
     chipPeg: (i)=>{ showSfx.pegNote(i); withSfxCtx((ctx, t)=> coinTap(ctx, t, 0.1, 2600 + Math.min(i, 12) * 120)); },   // a note rising with each peg the chip hits
@@ -6008,6 +6069,16 @@
     riddleTimeout: ()=>{ playTone(110,0,0.6,'square',0.07); playTone(116.5,0,0.6,'square',0.05); playTone(98,0.62,0.5,'square',0.06); haptic([120,60,120]); },
     personality: ()=>{ playTone(392,0,0.14,'sine',0.1); playTone(494,0.12,0.14,'sine',0.1); playTone(587,0.24,0.14,'sine',0.1); playTone(784,0.36,0.32,'sine',0.12); haptic([15,30,15,30,25]); },
   };
+  function setMasterVolume(v){
+    masterVol = Math.max(0, Math.min(1, v));
+    try{ localStorage.setItem('flipstax_volume', String(masterVol)); }catch(e){}
+    if (masterGain && audioCtx) masterGain.gain.setTargetAtTime(masterVol * masterVol, audioCtx.currentTime, 0.02);
+    applyMusicVolume();
+  }
+  function applyMusicVolume(){
+    Object.keys(trackEls).forEach(k=>{ const a = trackEls[k]; if (a && a._base != null) a.volume = a._base * masterVol; });
+    infEls.forEach(a=>{ if (a && a._base != null) a.volume = a._base * masterVol; });
+  }
   function setSoundOn(on){
     soundOn = on;
     try{ localStorage.setItem('flipstax_sound', on ? 'on' : 'off'); }catch(e){}
@@ -6110,7 +6181,7 @@
       const a = new Audio(TRACK_SRC[key]);
       a.loop = ONE_SHOT_TRACKS.indexOf(key) === -1;
       a.preload = 'auto';
-      a.volume = MUSIC_VOLUME;
+      a._base = MUSIC_VOLUME; a.volume = MUSIC_VOLUME * masterVol;
       // Safety net: whatever queued or started this element (a play() that
       // was waiting on a user gesture, a stale handler), if it starts
       // playing while a different track is the current one, stop it.
@@ -6159,7 +6230,7 @@
       const t = INFINITY_PLAYLIST[i];
       const a = new Audio(t.src);
       a.preload = 'auto';
-      a.volume = MUSIC_VOLUME * t.gain;
+      a._base = MUSIC_VOLUME * t.gain; a.volume = a._base * masterVol;
       a.addEventListener('playing', ()=>{ if (!infIsActive(i)){ try{ a.pause(); }catch(e){} } });
       a.addEventListener('timeupdate', ()=>{ if (infIsActive(i)) infWatch(); });
       // Fallback only (e.g. a background tab throttled the handoff timer):
@@ -9918,7 +9989,7 @@
         for (let k = 0; k < keys; k++) addRunKey('lucky');
         if (chips){ runBonusChips += chips; saveRunSnapshot(); }
         hubT.textContent = 'BANKED!'; hubS.textContent = [total ? '+' + total + ' points' : '', keys ? '🔑 ' + keys : '', chips ? '🪙 ' + chips + ' chip' + (chips > 1 ? 's' : '') : ''].filter(Boolean).join(' · ') || 'Nothing ventured!';
-        if (total || keys || chips){ sfx.jackpot(); FX.burstAt(showFx, luckyOv.querySelector('.ll-hub'), { count:18, spread:130, shapes:['star', 'coin'] }); }
+        if (total || keys || chips){ sfx.cashRegister(); sfx.jackpot(); FX.burstAt(showFx, luckyOv.querySelector('.ll-hub'), { count:18, spread:130, shapes:['star', 'coin'] }); }
       }
       setTimeout(()=>{ if (gen !== luckyGen) return; luckyOv.classList.add('hidden'); luckyOv.innerHTML = ''; noteOverlayClosed(); updatePauseBtnVisibility(); done(); }, banked ? 1700 : 2300);
     };
@@ -9929,7 +10000,7 @@
       if (k === 'GLORP'){
         bank = 0; dbl = false; keys = 0; chips = 0; renderBank();
         hubT.textContent = 'GLORP!'; hubS.textContent = 'The Lucky Lights bonus got slimed';
-        luckyOv.classList.add('slimed'); sfx.wahwah(); haptic([60, 40, 60]);
+        luckyOv.classList.add('slimed'); sfx.squelch(); setTimeout(()=> sfx.wahwah(), 380); haptic([60, 40, 60]);
         finish(false); return;
       }
       if (k === '+20' || k === '+50') bank += +k.slice(1);
@@ -10160,7 +10231,7 @@
         if (runActive) addRunKey('mystery');   // a Mystery Game win: a key (an Orbit Drop chip)
         els.eventSubtitle.textContent = '✅ +' + BRAIN_BREAK_POINTS + ' POINTS';
         if (rd.why) els.eventPrompt.textContent = rd.why;
-        showFlash('win'); hostMood('cheer'); hostSay(hostLine('right')); sfx.combo(); ov.classList.add('flash-win');
+        showFlash('win'); hostMood('cheer'); hostSay(hostLine('right')); sfx.combo(); if (key === 'priceProbe') sfx.cashRegister(); else sfx.cheer(); ov.classList.add('flash-win');
         if (right){ FX.burstAt(showFx, right, { count:12, spread:100, shapes:['star', 'coin'] }); FX.pop(right, 1.25); }
       } else {
         if (pick != null && tiles[pick]) tiles[pick].classList.add('is-wrong');
@@ -10314,6 +10385,7 @@
     showCard.classList.remove('hidden');
     clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
     if (sfx.bumper) sfx.bumper(!!st.finale);
+    if (fin) setTimeout(()=> sfx.drumrollLong(), 500);   // the finale: a long drumroll under the spotlight
     const ms = fin ? 2300 : prefersReducedMotion() ? 1800 : 1500;
     showCard.style.setProperty('--cue-ms', ms + 'ms');
     setTimeout(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; showCard.style.removeProperty('--cue-ms'); then(); }, ms);
@@ -10388,7 +10460,7 @@
     const land = ()=>{
       name.textContent = mysteryName(game).toUpperCase() + '!';
       name.classList.add('on'); showCard.classList.add('landed');
-      playTone(70, 0, 0.4, 'sine', 0.2); playTone(523, 0.05, 0.12, 'triangle', 0.08); playTone(784, 0.15, 0.25, 'triangle', 0.08);
+      sfx.slam(); playTone(523, 0.05, 0.12, 'triangle', 0.08); playTone(784, 0.15, 0.25, 'triangle', 0.08);
       setTimeout(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; then(); }, rm ? 1400 : 1100);
     };
     if (rm){ wheel.style.transform = 'rotate(' + end + 'deg)'; land(); return; }
@@ -10533,7 +10605,18 @@
 
   // The 10s answer bar, started (or, after a refresh, picked up) with
   // `remainMs` of `totalMs` left.
+  // The last three seconds of a countdown tick (a Brain Beam, a Brain Break, a VS card with a timer).
+  let countTicks = [];
+  function scheduleLastTicks(remainMs, still){
+    countTicks.forEach(clearTimeout); countTicks = [];
+    [3, 2, 1].forEach(sec=>{ const at = remainMs - sec * 1000; if (at >= 0) countTicks.push(setTimeout(()=>{ if (still()) sfx.tick(sec === 1); }, at)); });
+  }
+  function eventCountdownLive(){
+    const ov = els.eventOverlay;
+    return !ov.classList.contains('hidden') && !ov.classList.contains('bb-revealed') && !ov.classList.contains('powerup') && !els.eventTiles.some(t=> t.classList.contains('is-right') || t.classList.contains('picked-wait'));
+  }
   function startEventTimerBar(remainMs, totalMs){
+    scheduleLastTicks(remainMs, eventCountdownLive);
     els.eventTimerFill.style.transition = 'none';
     els.eventTimerFill.style.width = (100 * remainMs / totalMs) + '%';
     requestAnimationFrame(()=>{
@@ -13791,6 +13874,7 @@
       els.roundTimerFill.style.width = '0%';
     });
     roundTimeoutId = setTimeout(onRoundTimeout, durationMs);
+    { const id = roundTimeoutId; scheduleLastTicks(durationMs, ()=> roundTimeoutId === id && !voted); }
     fitTopChip();
   }
   function onRoundTimeout(){
@@ -14172,7 +14256,7 @@
     const tiles = els.eventTiles, right = tiles[correctIdx], picked = tiles[pickIdx];
     if (right) right.classList.add('is-right');
     if (correct){
-      showFlash('win'); hostMood('cheer'); hostSay(hostLine('right'));
+      showFlash('win'); hostMood('cheer'); hostSay(hostLine('right')); sfx.cheer();
       els.eventOverlay.classList.add('flash-win');   // the marquee bulbs flash
       if (right){ FX.beamHit(showFx, [right]); FX.glowSweep(showFx, right); FX.burstAt(showFx, right, { count:14, spread:110, shapes:['star', 'coin'] }); FX.pop(right, 1.12); }
     } else {
@@ -14829,6 +14913,7 @@
       });
       clearTimeout(eventTimeoutId);
       eventTimeoutId = setTimeout(()=> resolveEvent(null), 10000);
+      scheduleLastTicks(10000, eventCountdownLive);
     });
   }
   function resolveEvent(wasCorrect, correctIdx, pickIdx){
@@ -15250,7 +15335,24 @@
     try{ localStorage.setItem('flipstax_seen_run_intro','1'); }catch(e){}
     startDailyRun();
   });
-  els.soundToggle.addEventListener('click', ()=> setSoundOn(!soundOn));
+  // The speaker opens the sound panel: the mute button and the master volume.
+  const volPop = document.getElementById('volPop'), volMute = document.getElementById('volMute'), volSlider = document.getElementById('volSlider'), volPct = document.getElementById('volPct');
+  function renderVolPop(){ volMute.textContent = soundOn ? '\uD83D\uDD0A' : '\uD83D\uDD07'; volMute.classList.toggle('off', !soundOn); volMute.setAttribute('aria-label', soundOn ? 'Mute' : 'Unmute');
+    volSlider.value = String(Math.round(masterVol * 100)); volPct.textContent = Math.round(masterVol * 100) + '%'; }
+  let volPopT = 0;
+  function closeVolPop(){ volPop.classList.add('hidden'); clearTimeout(volPopT); }
+  function openVolPop(){
+    const r = els.soundToggle.getBoundingClientRect();
+    volPop.style.left = Math.max(8, Math.round(r.left)) + 'px'; volPop.style.top = Math.round(r.bottom + 6) + 'px';
+    renderVolPop(); volPop.classList.remove('hidden'); clearTimeout(volPopT); volPopT = setTimeout(closeVolPop, 5000);
+  }
+  els.soundToggle.addEventListener('click', (e)=>{ e.stopPropagation(); if (volPop.classList.contains('hidden')) openVolPop(); else closeVolPop(); });
+  els.soundToggle.addEventListener('keydown', (e)=>{ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); els.soundToggle.click(); } });
+  volMute.addEventListener('click', (e)=>{ e.stopPropagation(); setSoundOn(!soundOn); renderVolPop(); clearTimeout(volPopT); volPopT = setTimeout(closeVolPop, 5000); });
+  volSlider.addEventListener('input', ()=>{ setMasterVolume(+volSlider.value / 100); if (masterVol > 0 && !soundOn) setSoundOn(true); renderVolPop(); clearTimeout(volPopT); volPopT = setTimeout(closeVolPop, 5000); });
+  volSlider.addEventListener('change', ()=>{ if (soundOn) sfx.ding(); });
+  volPop.addEventListener('click', (e)=> e.stopPropagation());
+  document.addEventListener('click', (e)=>{ if (!volPop.classList.contains('hidden') && !volPop.contains(e.target) && !els.soundToggle.contains(e.target)){ closeVolPop(); e.stopPropagation(); e.preventDefault(); } }, true);   // (the tap that closes it does nothing else)
 
   // Last line of defense: if the game has been sitting "voted, waiting to
   // advance" for far longer than any legitimate transition (reveal pause,
