@@ -36,6 +36,8 @@
 <link rel="stylesheet" href="lib/show.css">
 <link rel="stylesheet" href="lib/mini-games.css">
 <link rel="stylesheet" href="lib/host.css">
+<link rel="stylesheet" href="lib/stage.css">
+<link rel="preload" as="image" href="data/stage/stage-close.webp" type="image/webp">
 <style>
   :root{
     --bg: #1a1442; --panel: #241b5c;
@@ -4695,6 +4697,7 @@
 <script src="data/host/manifest.js"></script>
 <script src="lib/host.js"></script>
 <script src="lib/show-fx.js"></script>
+<script src="lib/stage.js"></script>
 <script>
 (function(){
 
@@ -16620,6 +16623,8 @@
   // ---------- The studio set and the lobby (A1) ----------
   const STUDIO_HTML = '<i class="st-wall"></i><i class="st-rays"></i><i class="st-beam b1"></i><i class="st-beam b2"></i><i class="st-beam b3"></i><i class="st-beam b4"></i><i class="st-floor"></i><i class="st-audience"></i>';
   document.querySelectorAll('[data-studio]').forEach(el=>{ el.innerHTML = STUDIO_HTML; });
+  // Run 3: the photo stage behind the show (lib/stage.js picks the shot for the screen on top; the cinematics cue theirs).
+  if (window.Stage) Stage.init({ episode: showEpisode(todayStr()) });
   // Bulbs round a box's edge (inside it by `inset`), every `gap` px, chasing (CSS .sign-bulbs).
   function ringBulbs(holder, gap, inset){
     const box = holder.parentElement;

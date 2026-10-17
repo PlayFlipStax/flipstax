@@ -3,6 +3,7 @@
 # The originals are big renders (2-3 MB each) and stay out of git; this writes small WebP copies the game loads:
 #   data/stage/stage-close.webp  - a portrait 3:4 crop centred on the arch, 1080 px wide (the close shot)
 #   data/stage/stage-wide.webp   - the whole stage, 1600 px wide (the wide shot)
+#   data/stage/stage-dim.webp    - the close shot blurred, 540 px wide (the dim shot behind gameplay; the scrim is CSS)
 #   data/host/<pose>.webp        - host poses (discoPoint, oops, laugh, ...)
 #   data/cast/<name>-<pose>.webp - the cast (orange-idle, pink-presenting, ...)
 # Characters come with a flat grey studio backdrop and no alpha, so each is lifted first with tools/cutout.swift
@@ -114,6 +115,9 @@ def main():
         im = im.resize((width, round(im.height * width / im.width)), Image.LANCZOS)
         print('%-16s sign %s' % (stem, sign_box(im, dark=(shot == 'wide'))))
         out = os.path.join(ROOT, 'data/stage', stem + '.webp'); q = save_webp(im, out, kb); made.append((out, q))
+        if shot == 'close':   # the dim shot: the close shot pre-blurred (about 6 CSS px on a phone), so no live blur filter runs
+            dim = im.filter(ImageFilter.GaussianBlur(10)).resize((im.width // 2, im.height // 2), Image.LANCZOS)
+            out = os.path.join(ROOT, 'data/stage', 'stage-dim.webp'); q = save_webp(dim, out, 60); made.append((out, q))
     # host poses: lift all, then one shared crop box
     lifted = {pose: lift(find(pose))[0] for pose in HOST if find(pose)}
     if lifted:
