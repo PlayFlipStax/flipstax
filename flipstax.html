@@ -11193,10 +11193,11 @@
     showCard.classList.remove('hidden');
     showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'Welcome to FlipStax, episode ' + ep + '. Tap to skip');
     showCard.querySelectorAll('.co-sign .sign-bulbs').forEach(b=> ringBulbs(b, 22, 8));
+    if (window.Stage){ Stage.loadWide(); Stage.cue('wide', { over:showCard, cls:'curtain', sign:{ sub:'WELCOME TO', main:'FLIPSTAX' } }); }   // Run 3: the wide shot, then a push in
     const timers = [], later = (ms, f)=> timers.push(setTimeout(f, ms));
     const sign = (cls, on)=>{ const el = showCard.querySelector('.co-sign.' + cls); if (!el) return; el.classList.toggle('on', on); el.classList.toggle('off', !on); };
     later(T.open, ()=>{ showCard.classList.add('open'); if (sfx.bumper) sfx.bumper(false); });
-    later(T.walk, ()=> showCard.classList.add('walk'));
+    later(T.walk, ()=>{ showCard.classList.add('walk'); if (window.Stage) Stage.cue('close', { over:showCard, cls:'curtain', push:true, ms: total - T.walk + 600, sign:{ main:'FLIPSTAX' } }); });   // (the plates below carry the welcome and the episode)
     later(T.s1, ()=>{ sign('w1', true); sfx.chime(4); sfx.chime(6); });
     later(T.s1off, ()=> sign('w1', false));
     later(T.s2, ()=>{ sign('w2', true); sfx.chime(5); sfx.chime(7); });
@@ -11234,6 +11235,7 @@
     showCard.querySelector('.cc-title').textContent = st.title || '';
     showCard.removeAttribute('role'); showCard.setAttribute('aria-label', (st.sub ? st.sub + ': ' : '') + (st.title || ''));
     showCard.classList.remove('hidden');
+    if (window.Stage) Stage.cue('close', { over:showCard, cls:'cue', push:true, ms: cine(TIMING.ACT_CARD_HOLD + (fin ? 300 : 0)), sign:{ sub: st.sub || '', main: st.title || '' } });   // Run 3: the act on the marquee
     clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
     if (sfx.bumper) sfx.bumper(!!st.finale);
     if (fin) setTimeout(()=> sfx.drumrollLong(), 500);   // the finale: a long drumroll under the spotlight
@@ -11310,6 +11312,7 @@
     showCard.classList.remove('hidden');
     clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
     ringBulbs(showCard.querySelector('.mr-frame .sign-bulbs'), 22, 7);
+    if (window.Stage){ const a = runActive ? runAct() : {}; Stage.cue('close', { over:showCard, cls:'mreveal', push:true, ms: cine(TIMING.MYSTERY_REVEAL_HOLD), sign:{ sub: a.sub || '', main: a.title || 'MYSTERY GAME' } }); }   // Run 3
     const rm = prefersReducedMotion();
     if (!rm) sfx.drumroll(520);
     (runActive ? showLater : setTimeout)(()=>{ showCard.classList.add('open'); sfx.slam(); playTone(523, 0.05, 0.12, 'triangle', 0.08); playTone(784, 0.15, 0.25, 'triangle', 0.08); }, rm ? 0 : 560);

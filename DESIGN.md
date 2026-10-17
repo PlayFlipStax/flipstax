@@ -95,6 +95,58 @@ act pill) -> **host zone** (rule line, or the game's own stage host) -> **play a
 score chip), inside the safe areas. The background is `--game-bg`: `style-board/assets/bg-<game>.png` when that
 file exists, otherwise a gradient in the game's world plus a pattern, so no screen is ever empty.
 
+## The stage
+
+The show happens on one photo set - `data/stage/` (built by `tools/build-art.py` from the big renders, which stay
+out of git) - shown by `lib/stage.js` / `lib/stage.css` in three camera shots:
+
+| Shot | Picture | Motion | For |
+|---|---|---|---|
+| `close` | `stage-close.webp`, 3:4 portrait crop on the arch, 1080 px | a slow push-in 1.00 -> 1.06 over the scene | reveals |
+| `wide` | `stage-wide.webp`, the whole set, 1600 px | a slow pan from one end of the stage to the other | establishing shots, the end |
+| `dim` | `stage-dim.webp`, the close shot pre-blurred (about 6 CSS px), 540 px | none | every gameplay screen |
+
+A camera cut is a 600 ms crossfade. Only transform and opacity move; a slow light sweep and a glow pulse give the
+close and wide shots some life. Lite mode and reduced motion: still pictures (cuts still crossfade). The close shot is
+preloaded, the dim one loads at once, the wide one lazily from the cold open. If the pictures cannot load, nothing
+changes: `:root.stage-on` is only set once they have.
+
+### Scene -> shot
+
+| Scene | Shot | Marquee text |
+|---|---|---|
+| Landing | close | TONIGHT'S SHOW / EPISODE n (mostly behind the logo sign) |
+| Menu | close | none (the menu says the episode itself) |
+| Cold open | wide while the curtain opens, then a push in on close as the host walks out | WELCOME TO / FLIPSTAX, then FLIPSTAX |
+| Act cards (and the grand finale card) | close, pushing in | the act: ACT 1 / THE OPENER, ACT 3 · POINTS ×3 / LIGHTNING ROUND ... |
+| Mystery Game door reveal | close, pushing in | the act |
+| Results (Daily), the Infinity run-complete screen (the outro) | wide | THAT'S OUR SHOW / SEE YOU TOMORROW (or FINAL SCORE) |
+| VS cards, Brain Beam, the riddle, Portal Pick, Cosmic Surprise, Crowd Scan, Lucky Lights, Word Warp, the older Mystery Games and the six new mini-games | dim | - |
+| Orbit Drop, the Vault, the commercial, the round bumpers, the disco | their own looks (no stage) | - |
+
+The game cues only the cinematics (`Stage.cue('close', { over, cls, push, ms, sign })`); everything else the stage
+works out from the screen on top. Behind a full-screen overlay the stage takes that overlay's z-index and paints just
+under it (the overlay gets `.stage-backed`, which clears its own backdrop); behind gameplay it sits at z -3 under the
+show's world layer, which goes clear. The full-screen game overlays paint the same dim picture as their own backdrop
+(same crop, so nothing jumps).
+
+### The marquee
+
+The blank sign above the arch is found in each picture (`tools/build-art.py`; `Stage.SIGN`, in percent of the
+picture) and the live text sits on it at any crop (`tools/stage-sign-check.py`). The close shot's cream panel is
+darkened to match the wide shot's dark sign. Text: Big Shoulders 900, uppercase; the main line white with a pink neon
+glow, an optional gold sub line above it. One or two short lines - the act, the episode, a sign-off - never a sentence.
+
+### Scrim rules (legibility first)
+
+- **dim**: a scrim of at least 45% (it is 55%) plus a vignette over the blurred picture; the sign is darkened in the
+  picture too. Worst case, the brightest spot of the dim shot gives white text 7.7:1 (5.9:1 at the 45% floor) - never
+  below 4.5:1.
+- Landing and menu: a soft scrim at the top and the bottom where the text and buttons sit, the middle clear for the set.
+- Results and outro: a 30-60% scrim over the wide shot; the score panel itself is unchanged.
+- The stage never sits in front of anything: buttons, cards, timers and text keep their own panels and colours,
+  and no game screen's layout moves for it.
+
 ## The host
 
 One host per screen (the disco celebration is the only exception). Every host is a **rig** from `lib/host.js`:

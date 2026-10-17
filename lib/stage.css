@@ -54,3 +54,34 @@
 :root.lite .stg-plate, :root.lite .stg-glow, :root.lite .stg-sweep{ animation:none !important; }
 :root.lite .stg-sweep{ display:none; }
 @media (prefers-reduced-motion: reduce){ .stg-plate, .stg-glow, .stg-sweep{ animation:none !important; } .stg-sweep{ display:none; } }
+
+/* ---- The scenes (DESIGN.md "The stage" has the table). The stage paints just under the overlay it backs
+   (.stage-backed), so that overlay's own set and backdrop step aside; its buttons, cards and text stay as they were. */
+/* landing and menu: the close shot, with a soft scrim at the top and bottom where the text and buttons sit */
+:root.stage-on .home-overlay.stage-backed, :root.stage-on .split-select-overlay.stage-backed{
+  background:linear-gradient(180deg, rgba(14,4,30,0.5) 0%, rgba(14,4,30,0.12) 34%, rgba(14,4,30,0.08) 55%, rgba(14,4,30,0.55) 100%) !important; }
+:root.stage-on .stage-backed > .studio{ display:none; }
+:root.stage-on .show-card.stage-backed{ background:transparent !important; }
+/* the cold open (wide, then a push on the close shot), the act cards (close, the act on the marquee), the Mystery Game
+   door (close): their drawn studio, the act card's dimming scrim and colour sweeps step aside */
+:root.stage-on .show-card.stage-backed .co-studio, :root.stage-on .show-card.stage-backed .mr-studio,
+:root.stage-on .show-card.stage-backed .cue-stage{ display:none; }
+:root.stage-on .show-card.cue.stage-backed:not(.finale)::before{ display:none; }
+:root.stage-on .show-card.cue.stage-backed .cue-wipe > .bg{ opacity:0.85; }
+/* results and the outro: the wide shot under a scrim, so the score panel reads as before */
+:root.stage-on #readoutOverlay.stage-backed{ background:linear-gradient(180deg, rgba(14,4,30,0.5), rgba(14,4,30,0.3) 40%, rgba(14,4,30,0.6)) !important; }
+:root.stage-on #readoutOverlay.stage-backed .warp-bg{ display:none; }
+:root.stage-on .fin-overlay.stage-backed{ background:linear-gradient(180deg, rgba(14,4,30,0.62), rgba(14,4,30,0.45) 40%, rgba(14,4,30,0.7)) !important; }
+
+/* gameplay: the dim shot. The VS screen and the Daily question rounds show the stage layer itself (the world layer
+   above it goes clear); the full-screen game overlays paint the same picture as their own backdrop (the same crop,
+   so nothing jumps), with the same scrim and vignette. Orbit Drop keeps its own look. */
+:root.stage-on .show-bg{ background:none !important; }
+:root.stage-on .show-bg > .rays, :root.stage-on .show-bg > .glow{ display:none; }
+:root.stage-on :is(.mg-overlay, .lucky-overlay, .ir-overlay, .guess-overlay, .solve-overlay, .riddle-overlay),
+:root.stage-on.mode-infinity .event-overlay{
+  background:radial-gradient(120% 90% at 50% 42%, rgba(8,2,20,0) 40%, rgba(8,2,20,0.65) 100%), linear-gradient(rgba(10,3,24,0.55), rgba(10,3,24,0.55)),
+    url(../data/stage/stage-dim.webp) 50% 30% / cover no-repeat, #12062a !important; }
+:root.stage-on :is(.mg-overlay, .ir-overlay, .guess-overlay, .solve-overlay, .event-overlay, .riddle-overlay) :is(.mg-bg, .ir-bg, .guess-bg, .warp-bg, .ev-bg){ background:none !important; }
+:root.stage-on :is(.mg-overlay, .ir-overlay, .guess-overlay, .solve-overlay, .event-overlay, .riddle-overlay) :is(.mg-bg, .ir-bg, .guess-bg, .warp-bg, .ev-bg) > :is(.rays, .glow){ display:none; }
+:root.stage-on .mg-overlay .mg-bg{ display:none; }

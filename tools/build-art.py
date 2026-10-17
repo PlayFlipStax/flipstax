@@ -116,7 +116,13 @@ def main():
         print('%-16s sign %s' % (stem, sign_box(im, dark=(shot == 'wide'))))
         out = os.path.join(ROOT, 'data/stage', stem + '.webp'); q = save_webp(im, out, kb); made.append((out, q))
         if shot == 'close':   # the dim shot: the close shot pre-blurred (about 6 CSS px on a phone), so no live blur filter runs
-            dim = im.filter(ImageFilter.GaussianBlur(10)).resize((im.width // 2, im.height // 2), Image.LANCZOS)
+            # (the cream sign is darkened first, as lib/stage.css darkens it on the close shot)
+            sb = sign_box(im, dark=False); base = im.copy()
+            if sb:
+                from PIL import ImageDraw
+                W, H = im.size
+                ImageDraw.Draw(base).rectangle(((sb['x'] - 0.8) * W / 100, (sb['y'] - 0.9) * H / 100, (sb['x'] + sb['w'] + 0.8) * W / 100, (sb['y'] + sb['h'] + 0.9) * H / 100), fill=(26, 7, 37))
+            dim = base.filter(ImageFilter.GaussianBlur(10)).resize((im.width // 2, im.height // 2), Image.LANCZOS)
             out = os.path.join(ROOT, 'data/stage', 'stage-dim.webp'); q = save_webp(dim, out, 60); made.append((out, q))
     # host poses: lift all, then one shared crop box
     lifted = {pose: lift(find(pose))[0] for pose in HOST if find(pose)}
