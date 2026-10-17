@@ -99,23 +99,30 @@
       else if (st.t === 'mystery' || st.t === 'break') want.push('mystery');
       else if (st.t === 'portal') want.push('portal');
       else if (st.t === 'lucky') want.push('lucky');
+      else if (st.t === 'cosmic') want.push('cosmic');
       else if (st.t === 'finale') want.push('wordwarp');
       else if (st.t === 'ad' && st.forced) want.push('ad');
     });
-    const got = scenes.map(s=> s.scene).filter(s=> s !== 'coldopen' && s !== 'cosmic' && s !== 'orbit' && s !== 'results' && s !== 'end');
-    const cosmicIdx = scenes.filter(s=> s.scene === 'cosmic').length;   // (a Cosmic Surprise replaces one VS card)
+    const got = scenes.map(s=> s.scene).filter(s=> s !== 'coldopen' && s !== 'orbit' && s !== 'results' && s !== 'end');
+    const cosmicIdx = scenes.filter(s=> s.scene === 'cosmic').length;
     const problems = [];
-    const wantAdj = cosmicIdx ? null : want;
-    if (wantAdj && got.join(',') !== wantAdj.join(',')) problems.push('scene order differs: got ' + got.join(',') + ' want ' + wantAdj.join(','));
+    // (a Cosmic Surprise is its own rundown step, in place of a VS card: it must come exactly there)
+    if (got.join(',') !== want.join(',')) problems.push('scene order differs: got ' + got.join(',') + ' want ' + want.join(','));
+    // (opts.fast: a ?debug=fast episode - time is scaled, so the real-time minimums and the 250 / 400 ms checks are off)
     const minFor = { act: T.ACT_CARD_HOLD || 2800, mystery: T.MYSTERY_REVEAL_HOLD || 3000, coldopen: T.CINEMATIC_MIN || 1500 };
-    scenes.forEach(s=>{ const m = minFor[s.scene]; if (m && s.ms < m - 40) problems.push(s.scene + (s.info ? ' ' + s.info : '') + ' lasted ' + s.ms + ' ms (min ' + m + ')'); });
+    if (!opts.fast) scenes.forEach(s=>{ const m = minFor[s.scene]; if (m && s.ms < m - 40) problems.push(s.scene + (s.info ? ' ' + s.info : '') + ' lasted ' + s.ms + ' ms (min ' + m + ')'); });
+    // no VS card dealt twice
+    const ids = (S.stats.dealt || []).map(d=> d.id), dup = ids.filter((id, i)=> ids.indexOf(id) !== i);
+    if (dup.length) problems.push('VS card dealt twice: ' + dup.join(', '));
     // a VS card voted within 250 ms of appearing
     const vsEnter = S.log.filter(e=> e.kind === 'enter' && e.scene === 'vs'), voted = S.log.filter(e=> e.kind === 'state' && e.scene === 'vs' && /revealing|voted/.test(e.state || ''));
-    vsEnter.forEach(e=>{ const v = voted.find(x=> x.t >= e.t); if (v && v.t - e.t < 250) problems.push('VS card ' + e.detail + ' voted ' + Math.round(v.t - e.t) + ' ms after it appeared'); });
+    if (!opts.fast) vsEnter.forEach(e=>{ const v = voted.find(x=> x.t >= e.t); if (v && v.t - e.t < 250) problems.push('VS card ' + e.detail + ' voted ' + Math.round(v.t - e.t) + ' ms after it appeared'); });
     const adv = S.log.filter(e=> e.kind === 'state' && e.state === 'leaving');
-    for (let i = 1; i < adv.length; i++) if (adv[i].t - adv[i - 1].t < 400) problems.push('two advances ' + Math.round(adv[i].t - adv[i - 1].t) + ' ms apart (' + adv[i - 1].scene + ' -> ' + adv[i].scene + ')');
+    if (!opts.fast) for (let i = 1; i < adv.length; i++) if (adv[i].t - adv[i - 1].t < 400) problems.push('two advances ' + Math.round(adv[i].t - adv[i - 1].t) + ' ms apart (' + adv[i - 1].scene + ' -> ' + adv[i].scene + ')');
     const coldAt = (enters.find(e=> e.scene === 'coldopen') || enters[0] || { t:0 }).t;
-    TT.report = { ok: !problems.length, problems, minutes: +((performance.now() - coldAt) / 60000).toFixed(2), taps: TT.taps, ghostClicks: TT.ghost,
+    const errs = (window.__qa && window.__qa.errors || []).concat(window.__qa && window.__qa.rejections || []);
+    if (errs.length) problems.push('script errors: ' + errs.slice(0, 3).join(' | '));
+    TT.report = { ok: !problems.length, problems, cosmic: cosmicIdx, plan: want.length, minutes: +((performance.now() - coldAt) / 60000).toFixed(2), taps: TT.taps, ghostClicks: TT.ghost,
       vsCards: got.filter(s=> s === 'vs').length, scenes: scenes.map(s=> s.scene + (s.info && s.scene !== 'vs' ? ':' + s.info : '') + ' ' + s.ms + 'ms'), drops: S.stats.drops };
   }
   step();
