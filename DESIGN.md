@@ -177,9 +177,11 @@ One host per screen (the disco celebration is the only exception). Every host is
 `think`, `shrug`, `wink`, `oops`, `gasp`, `presenting`, `laugh`, and for the disco `discoPoint`, `swayL`, `swayR`,
 `spin`. One-shot poses (cheer, wave, shrug, oops, gasp, laugh, wink, blink) go back to idle by themselves.
 
-- **Art:** `data/host/<pose>.png`, listed in `data/host/manifest.js` once the file is there. All pictures share one
-  canvas (600 x 990 suggested, transparent) and one baseline - feet on the bottom edge - so poses crossfade without
-  a jump. Until a pose has art, the drawn SVG host acts it out (lib/host.css).
+- **Art:** `data/host/<pose>.webp` (tools/build-art.py: cut out, one shared crop box, 900 px tall, feet on the
+  bottom edge), listed in `data/host/manifest.js`. **HOST_IMAGE_MODE**: the host is all pictures or all the drawn SVG,
+  never a mix - it switches to pictures only when the manifest lists at least idle, blink, wave, cheer, think, shrug,
+  oops, laugh and presenting (`Host.IMAGE_SET`); then a pose without its own picture borrows the nearest one. Until
+  then the drawn SVG host acts out every pose (lib/host.css) and the rendered cast stays off.
 - **Events:** a right answer = `cheer`; a wrong one = `shrug` or `oops`; a question or a game in play = `think`; an
   intro (landing, cold open, menu) = `wave`; a reveal (act card, Mystery Game door) = `presenting`; the GOOP = `gasp`;
   THE MOTHERSHIP = `laugh`.
