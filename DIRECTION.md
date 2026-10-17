@@ -94,3 +94,20 @@ earned tile glows gold with a "?", a missed tile shows a red X. Letters appear o
 - Disco celebration (single exception to 'one host per screen'): on a Mothership jackpot, the UFO lowers a disco ball, a second alien hops out, they dance about 4 seconds, tap to skip, max once per episode.
 - Later ideas (not yet built): Space-Age Inflation (then-and-now price slider), Yesterday's Survey (needs real votes), typed daily riddle, arcade-style Orbit Drop with a UFO laser ball, Sunday Big Show, grey-alien merch character, real sponsor slot in the commercial break.
 - Never use the names 'Wheel of Fortune', 'Price Is Right', 'Press Your Luck' etc. in the game. Borrow mechanics only.
+
+## Decisions, Oct 16 (Run 3 - Rick)
+
+- The show happens on one photo set (the neon arch with the bulb marquee, the audience, the tiled floor) in camera
+  shots: close for reveals and the menus, wide to open and close the show, a dimmed, blurred close shot behind all
+  gameplay. The marquee carries live text (the episode, the act). DESIGN.md "The stage" has the scene table.
+- The cast: an orange sidekick (afro, round shades, mint suit) and two presenters, pink and purple - one presents each
+  episode, picked by the episode seed. They are **showcase only**: they appear at between-play moments (the Mystery
+  Game door, the Cosmic Surprise prize, the big-win fanfare when the Word Warp is solved, the Lucky Lights bank, the
+  results), never during timed play and never on a VS card.
+- The sidekick may laugh along after a wrong answer that already shows the red X and buzzer (Brain Beam, the riddle,
+  trivia) - "Ooh, so close!" - at most once per act. Warm: laughing with the player, never at them. Never on VS picks.
+- The disco celebration stays as it was (the single exception to one host per screen).
+- The host never mixes looks: he stays the drawn host for every pose until the full set of rendered poses is in
+  (idle, blink, wave, cheer, think, shrug, oops, laugh, presenting - data/host/manifest.js), then switches all at once.
+  Until then the rendered cast stays off too and the stage shows alone.
+

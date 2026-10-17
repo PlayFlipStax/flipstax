@@ -37,6 +37,7 @@
 <link rel="stylesheet" href="lib/mini-games.css">
 <link rel="stylesheet" href="lib/host.css">
 <link rel="stylesheet" href="lib/stage.css">
+<link rel="stylesheet" href="lib/cast.css">
 <link rel="preload" as="image" href="data/stage/stage-close.webp" type="image/webp">
 <style>
   :root{
@@ -4698,6 +4699,8 @@
 <script src="lib/host.js"></script>
 <script src="lib/show-fx.js"></script>
 <script src="lib/stage.js"></script>
+<script src="data/cast/manifest.js"></script>
+<script src="lib/cast.js"></script>
 <script>
 (function(){
 
@@ -10831,7 +10834,7 @@
         for (let k = 0; k < keys; k++) addRunKey('lucky');
         if (chips){ runBonusChips += chips; saveRunSnapshot(); }
         hubT.textContent = 'BANKED!'; hubS.textContent = [total ? '+' + total + ' points' : '', keys ? '🔑 ' + keys : '', chips ? '🪙 ' + chips + ' chip' + (chips > 1 ? 's' : '') : ''].filter(Boolean).join(' · ') || 'Nothing ventured!';
-        if (total || keys || chips){ sfx.cashRegister(); sfx.jackpot(); FX.burstAt(showFx, luckyOv.querySelector('.ll-hub'), { count:18, spread:130, shapes:['star', 'coin'] }); }
+        if (total || keys || chips){ sfx.cashRegister(); sfx.jackpot(); FX.burstAt(showFx, luckyOv.querySelector('.ll-hub'), { count:18, spread:130, shapes:['star', 'coin'] }); castShowcase('left', 1500, ()=> gen === luckyGen && !luckyOv.classList.contains('hidden'), true); }   // (Run 3: the presenter, for the reveal)
       }
       setTimeout(()=>{ if (gen !== luckyGen) return; luckyOv.classList.add('hidden'); luckyOv.innerHTML = ''; noteOverlayClosed(); updatePauseBtnVisibility(); done(); }, banked ? 1700 : 2300);
     };
@@ -11313,6 +11316,7 @@
     clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
     ringBulbs(showCard.querySelector('.mr-frame .sign-bulbs'), 22, 7);
     if (window.Stage){ const a = runActive ? runAct() : {}; Stage.cue('close', { over:showCard, cls:'mreveal', push:true, ms: cine(TIMING.MYSTERY_REVEAL_HOLD), sign:{ sub: a.sub || '', main: a.title || 'MYSTERY GAME' } }); }   // Run 3
+    castShowcase('right', cine(TIMING.MYSTERY_REVEAL_HOLD) - 350, ()=> showCard.classList.contains('mreveal') && !showCard.classList.contains('hidden'));   // tonight's presenter at the door
     const rm = prefersReducedMotion();
     if (!rm) sfx.drumroll(520);
     (runActive ? showLater : setTimeout)(()=>{ showCard.classList.add('open'); sfx.slam(); playTone(523, 0.05, 0.12, 'triangle', 0.08); playTone(784, 0.15, 0.25, 'triangle', 0.08); }, rm ? 0 : 560);
@@ -13497,6 +13501,7 @@
     els.irOverlay.classList.add('answered');
     els.irOpts.querySelectorAll('.ir-opt').forEach(b=>{ b.disabled = true; if (b.dataset.right) b.classList.add('right'); });
     if (pickedBtn && result !== 'win') pickedBtn.classList.add('wrong');
+    if (pickedBtn && result === 'wrong') castOops();
     const reduced = prefersReducedMotion();
     if (infRun && !infRun.finale) infRun.riddles = (infRun.riddles || 0);   // counted when it started (infRunEventDue)
     if (result !== 'timeout' && infRun && !infRun.finale){ infRun.riddlesAnswered = (infRun.riddlesAnswered || 0) + 1; saveInfRun(); }
@@ -14429,6 +14434,7 @@
     const secs = Math.max(0, Math.round((RUN_SOLVE_MS - Math.max(0, solveEndsAt - solvedAt)) / 1000));
     els.solveCelebrateSub.textContent = runWord.word + ' · ' + Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0') + (runWarpPoints ? ' · +' + runWarpPoints + ' pts' : '');
     els.solveCelebrate.classList.remove('hidden');
+    castShowcase('right', 2600, ()=> !els.solveCelebrate.classList.contains('hidden'));   // Run 3: the big win
     // The tiles slide to the middle and flip one by one; then the banner just under them, over the faded keyboard.
     const rv = warpReveal(runWord.word, 'win');
     const banner = els.solveCelebrate.querySelector('.sc-banner');
@@ -14656,6 +14662,7 @@
     };
     if (!ep && !(pre.done && asImage(pre))) pre.promise.then(p=>{ if (performance.now() - shownAt < 4000 && els.readoutOverlay.classList.contains('show')) asImage(p); });
     els.readoutOverlay.classList.add('show');
+    castShowcase('right', 2800, ()=> els.readoutOverlay.classList.contains('show'), true);   // Run 3: the presenter takes a bow as the score lands
     updatePauseBtnVisibility();
     sfx.personality();
   }
@@ -15304,6 +15311,14 @@
     clearTimeout(hostSayT); hostSayT = setTimeout(()=>{ b.classList.remove('on'); document.documentElement.classList.remove('host-say'); }, Math.min(ms || 1600, HOST_SAY_MAX_MS));
     if (sfx.hostVoice) sfx.hostVoice(text);
   }
+  // Run 3, the cast (lib/cast.js) - showcase moments only: tonight's presenter at a between-play moment, for `hold` ms
+  // while `still()` holds; the sidekick's laugh after a wrong answer, once per act (Daily) or per run stretch (Infinity).
+  function castShowcase(side, hold, still, peek){ if (window.Cast){ const p = Cast.presenter(); if (p) Cast.show(p, 'presenting', side, { hold, while: still, peek: !!peek }); } }
+  function castOops(){
+    if (!window.Cast) return;
+    const key = runActive ? 'd' + (runStartDate || '') + ':' + runActIdx : 'i' + ((infRun && infRun.runNo) || 0) + ':' + Math.floor(((infRun && infRun.clockMs) || 0) / 200000);
+    Cast.oops(key, { side:'left', while: ()=> !els.eventOverlay.classList.contains('hidden') || !els.irOverlay.classList.contains('hidden') });
+  }
   // A Brain Beam's answer, the full show treatment (B3): right = the gold
   // frame glows round the screen, the UFO beams down on the right answer
   // and the host cheers; wrong = a red flash and a shake, the right answer
@@ -15318,6 +15333,7 @@
     } else {
       showFlash('lose'); hostMood('sad'); hostSay(hostLine(pickIdx == null ? 'slow' : 'wrong')); sfx.crowdOoh();
       if (picked) picked.classList.add('is-wrong');
+      if (pickIdx != null) castOops();   // Run 3: the sidekick laughs along (a wrong pick, not a time-out)
       FX.shake(document.getElementById('eventGrid'));
     }
   }
@@ -16014,6 +16030,7 @@
       sfx.wrong();
       els.eventSubtitle.textContent = 'No flip this time';
       els.eventPrompt.textContent = '\u274C NOT QUITE';
+      castOops();
     } else {
       sfx.wrong();
       els.eventSubtitle.textContent = 'No flip this time';
@@ -16144,6 +16161,7 @@
       sfx.correct(); sfx.cashRegister(); if (prize === 'chip' || prize === 'key') sfx.coins(6);
       cosmicFx(true, label); renderRunBanner();
       { const sc = els.runBanner && els.runBanner.querySelector(prize === 'key' ? '.sp-keys' : '.sp-num'); if (sc) FX.pop(sc, 1.35); }
+      castShowcase('left', COSMIC_PRIZE_HOLD - 150, ()=> !els.eventOverlay.classList.contains('hidden'));   // Run 3: the presenter shows off the prize
       setTimeout(finishPowerUp, COSMIC_PRIZE_HOLD);
     };
     // D4 (Oct 16): a small 3-reel slot machine - the reels spin, stop left to right over about 2 s and line up the prize.
@@ -16628,6 +16646,7 @@
   document.querySelectorAll('[data-studio]').forEach(el=>{ el.innerHTML = STUDIO_HTML; });
   // Run 3: the photo stage behind the show (lib/stage.js picks the shot for the screen on top; the cinematics cue theirs).
   if (window.Stage) Stage.init({ episode: showEpisode(todayStr()) });
+  if (window.Cast) Cast.init({ episode: showEpisode(todayStr()) });   // (tonight's presenter goes by the episode)
   // Bulbs round a box's edge (inside it by `inset`), every `gap` px, chasing (CSS .sign-bulbs).
   function ringBulbs(holder, gap, inset){
     const box = holder.parentElement;

@@ -147,6 +147,28 @@ glow, an optional gold sub line above it. One or two short lines - the act, the 
 - The stage never sits in front of anything: buttons, cards, timers and text keep their own panels and colours,
   and no game screen's layout moves for it.
 
+## The cast
+
+`lib/cast.js` / `lib/cast.css`, pictures in `data/cast/<name>-<pose>.webp` listed in `data/cast/manifest.js`
+(built by `tools/build-art.py`: trimmed, 900 px tall, feet on the bottom edge - one shared baseline).
+
+- Members: `orange` (the sidekick), `pink` and `purple` (presenters; `Cast.presenter()` picks tonight's by the
+  episode seed, the other one when that lady has no picture yet).
+- `Cast.show(name, pose, side, { hold, while, say, peek })`, `Cast.hide()`. A pose without a picture falls back to
+  the member's idle with a gentle bob (a laugh: idle plus a quick wiggle), else any picture of theirs, else they sit
+  the moment out. Entrance: a slide in from the side with a pop; idle bob; exit: a slide back out. Transform and
+  opacity only; lite mode and reduced motion: a plain fade, standing still.
+- **Showcase only**, at between-play moments: the Mystery Game door (the presenter, right), the Cosmic Surprise prize
+  (left), the Word Warp solve fanfare (right), the Lucky Lights bank (left, peek), the results (right, peek). Never
+  during timed play, never on a VS card. On the right-hand side the picture is mirrored so the open hand points in.
+- `peek`: smaller, half past the screen edge - wherever content fills the screen, so nothing that matters is covered.
+  The cast never takes a tap (pointer-events: none).
+- The sidekick's laugh (`Cast.oops`): only after a wrong pick that already shows its red X and buzzer (Brain Beam,
+  the riddle, trivia), at most once per act, never on a time-out or a VS pick; a speech bubble, "Ooh, so close!".
+- Gated with the host: the cast shows only in HOST_IMAGE_MODE (lib/host.js - the host's full rendered pose set is in),
+  so rendered and drawn characters never share a screen; until then the stage shows alone. On localhost
+  `?castpreview=1` lets the cast on for checking the art.
+
 ## The host
 
 One host per screen (the disco celebration is the only exception). Every host is a **rig** from `lib/host.js`:

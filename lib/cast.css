@@ -1,0 +1,56 @@
+/* FlipStax - the cast (lib/cast.js): a member slides in from the side with a pop, bobs, slides out. Transform and
+   opacity only; lite mode and reduced motion: a plain fade, standing still. Above the screen's content but never
+   taking a tap (pointer-events: none) - and only ever out at between-play moments. */
+.cast{ position:fixed; inset:0; z-index:73; pointer-events:none; overflow:hidden; }
+.cast-m{ position:absolute; bottom:calc(58px + env(safe-area-inset-bottom)); height:min(40vh, 340px); opacity:0; }
+.cast-m.left{ left:max(2vw, 6px); transform:translateX(-140%); }
+.cast-m.right{ right:max(2vw, 6px); transform:translateX(140%); }
+.cast-m.in{ opacity:1; animation:castIn 520ms var(--ease-pop, cubic-bezier(.3,1.6,.5,1)) forwards; }
+.cast-m.right.in{ animation-name:castInR; }
+.cast-m.out{ opacity:1; animation:castOut 380ms var(--ease-in, cubic-bezier(.5,0,.75,0)) forwards; }
+.cast-m.right.out{ animation-name:castOutR; }
+@keyframes castIn{ 0%{ transform:translateX(-140%) scale(0.9); } 70%{ transform:translateX(5%) scale(1.04); } 100%{ transform:none; } }
+@keyframes castInR{ 0%{ transform:translateX(140%) scale(0.9); } 70%{ transform:translateX(-5%) scale(1.04); } 100%{ transform:none; } }
+@keyframes castOut{ from{ transform:none; } to{ transform:translateX(-140%); } }
+@keyframes castOutR{ from{ transform:none; } to{ transform:translateX(140%); } }
+.cast-fig{ height:100%; transform-origin:50% 100%; }
+.cast-fig img{ display:block; height:100%; width:auto; filter:drop-shadow(0 10px 14px rgba(0,0,0,0.45)); -webkit-user-drag:none; }
+/* idle: a gentle bob; a stand-in (no picture for the pose) bobs a touch more; a laugh without its picture: a quick wiggle */
+.cast-m.in .cast-fig{ animation:castBob 1.7s var(--ease-io, ease-in-out) 520ms infinite alternate; }
+.cast-m.stand-in.in .cast-fig{ animation-duration:1.2s; }
+@keyframes castBob{ from{ transform:translateY(0); } to{ transform:translateY(-2.5%); } }
+.cast-m.wiggle.in .cast-fig{ animation:castWiggle 0.16s ease-in-out 520ms 6 alternate, castBob 1.2s var(--ease-io, ease-in-out) 1.5s infinite alternate; }
+@keyframes castWiggle{ from{ transform:rotate(-4deg); } to{ transform:rotate(4deg); } }
+/* the speech bubble, over the head (warm: laughing with the player) */
+.cast-say{ position:absolute; bottom:96%; left:50%; transform:translateX(-50%) scale(0.6); opacity:0; white-space:nowrap;
+  padding:8px 14px; border-radius:16px; background:#fff; color:#2a1300; font:900 18px/1 var(--f-display, 'Big Shoulders Display', sans-serif); letter-spacing:0.5px;
+  box-shadow:0 4px 0 rgba(122,61,0,0.35), 0 8px 18px rgba(0,0,0,0.35); animation:castSay 300ms var(--ease-pop, ease-out) 380ms forwards; }
+.cast-say::after{ content:''; position:absolute; top:100%; left:50%; margin-left:-8px; border:8px solid transparent; border-top-color:#fff; }
+.cast-m.left .cast-say{ left:62%; }
+.cast-m.right .cast-say{ left:38%; }
+@keyframes castSay{ to{ opacity:1; transform:translateX(-50%) scale(1); } }
+/* lite mode and reduced motion: fade in and out, no slide, bob or wiggle */
+:root.lite .cast-m, :root.lite .cast-m .cast-fig, :root.lite .cast-say{ animation:none !important; transform:none !important; transition:opacity 250ms linear; }
+:root.lite .cast-m.in, :root.lite .cast-say{ opacity:1; }
+@media (prefers-reduced-motion: reduce){
+  .cast-m, .cast-m .cast-fig, .cast-say{ animation:none !important; transform:none !important; transition:opacity 250ms linear; }
+  .cast-m.in, .cast-say{ opacity:1; }
+  .cast-say{ transform:translateX(-50%) !important; }
+}
+:root.lite .cast-say{ transform:translateX(-50%) !important; }
+/* (a presenter's open hand points into the screen from either side: the right-hand side shows the picture mirrored) */
+.cast-m.right .cast-fig img{ transform:scaleX(-1); }
+/* peek: smaller, half out past the screen edge - for moments with content all over the screen (a wrong answer's
+   result, the results, the Lucky Lights board), so nothing that matters is covered */
+.cast-m.peek{ height:min(24vh, 200px); bottom:calc(46px + env(safe-area-inset-bottom)); }
+.cast-m.peek.left{ left:0; margin-left:calc(min(24vh, 200px) * -0.16); }
+.cast-m.peek.right{ right:0; margin-right:calc(min(24vh, 200px) * -0.16); }
+.cast-m.peek .cast-say{ font-size:16px; }
+.cast-m.peek .cast-say{ bottom:84%; transform:scale(0.6); animation-name:castSayP; }
+.cast-m.peek.left .cast-say{ left:46%; right:auto; transform-origin:0 100%; }
+.cast-m.peek.right .cast-say{ left:auto; right:46%; transform-origin:100% 100%; }
+.cast-m.peek.left .cast-say::after{ left:22px; }
+.cast-m.peek.right .cast-say::after{ left:auto; right:14px; }
+@keyframes castSayP{ to{ opacity:1; transform:none; } }
+:root.lite .cast-m.peek .cast-say{ transform:none !important; }
+@media (prefers-reduced-motion: reduce){ .cast-m.peek .cast-say{ transform:none !important; } }
