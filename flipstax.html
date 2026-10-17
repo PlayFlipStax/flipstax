@@ -680,6 +680,14 @@
      a chrome base and a lever; the reels stop left to right and line up the prize. */
   .gift-stage.slot-mode .gift-box, .gift-stage.slot-mode .reel-wrap, .gift-stage.slot-mode .gift-glow{ display:none !important; }
   .gift-stage.slot-mode .gift-prize{ top:auto; bottom:2px; font-size:30px; }
+  /* J5: the won prize, big and clear. */
+  .gift-prize.won{ left:-90px; right:-90px; top:auto; bottom:-34px; z-index:5; display:flex; justify-content:center; transform:none !important; animation:none !important; opacity:1 !important; text-shadow:none; }
+  .cz-pill{ display:flex; flex-direction:column; align-items:center; gap:4px; padding:10px 22px 12px; border-radius:20px; color:#3a1f00;
+    background:linear-gradient(180deg, #fff6c2, #ffd23f 50%, #e9a100); box-shadow:0 0 0 3px #fff3c4, 0 0 30px rgba(255,210,63,0.9), 0 8px 18px rgba(0,0,0,0.4); animation:czWon .45s cubic-bezier(.2,1.6,.4,1) both; }
+  .cz-pill b{ font:900 clamp(30px, 9vw, 42px)/1 var(--f-display); letter-spacing:1px; white-space:nowrap; }
+  .cz-pill small{ font:800 13px/1.2 var(--f-body); }
+  @keyframes czWon{ 0%{ transform:scale(0.4); opacity:0; } 100%{ transform:scale(1); opacity:1; } }
+  @media (prefers-reduced-motion: reduce){ .cz-pill{ animation:none; } }
   .slot3{ position:absolute; left:50%; top:0; width:230px; margin-left:-115px; padding:0 0 12px; border-radius:22px 22px 14px 14px;
     background:linear-gradient(180deg, #5b2a8c, #2c0e52); border:4px solid #ffd23f; box-shadow:0 0 0 3px #5a2400, 0 10px 24px rgba(0,0,0,0.45), 0 0 26px rgba(199,146,255,0.45); }
   .s3-top{ position:relative; margin:8px 10px 8px; padding:8px 6px 9px; border-radius:12px; background:#1a0630; border:2px solid #c792ff; --bulb:#ffe9a0;
@@ -16099,10 +16107,11 @@
     if (prize === 'key' && (!infRun || infRun.keys >= INF_KEY_CAP)) prize = 'points10';
     return prize;
   }
+  const COSMIC_PRIZE_HOLD = 1800;   // J5: how long the won prize stays up
   const COSMIC_INTRO = { scramble:'🔀 SCRAMBLE!', clock:'⏱️ TIME WARP!', riddle:'🧩 DOUBLE OR NOTHING!', freeze:'❄️ CLOCK FREEZE!' };
   function runWildGift(){
     const prize = drawWildPrize(), ov = els.eventOverlay, stage = document.getElementById('giftStage'), label = document.getElementById('giftPrize');
-    stage.classList.remove('shaking', 'opened', 'reeling', 'slot-mode'); label.textContent = ''; { const w = document.getElementById('reelWrap'); if (w) w.className = 'reel-wrap'; }
+    stage.classList.remove('shaking', 'opened', 'reeling', 'slot-mode'); label.textContent = ''; label.classList.remove('won'); { const w = document.getElementById('reelWrap'); if (w) w.className = 'reel-wrap'; }
     ov.classList.remove('cosmic-mode'); ov.classList.add('gift-mode');
     els.eventPrompt.textContent = 'Three in a row wins a prize!';
     const open = ()=>{
@@ -16111,17 +16120,25 @@
         label.textContent = COSMIC_INTRO[prize]; sfx.powerUp();
         setTimeout(()=> runCosmic(prize), prefersReducedMotion() ? 300 : 900); return;
       }
-      let text;
-      if (prize === 'points10'){ cosmicPts(10); text = '+10 points'; }
-      else if (prize === 'points20'){ cosmicPts(20); text = '+20 points'; }
-      else if (prize === 'key'){ cosmicKey(); text = '🔑 +1 key'; }
-      else if (cosmicDaily){ runBonusChips++; saveRunSnapshot(); text = '🪙 +1 ' + GN.orbitDrop + ' chip'; }
-      else { infRun.bonusChip = true; saveInfRun(); text = '🪙 Bonus ' + GN.orbitDrop + ' chip!'; }
-      label.textContent = text;
-      els.eventPrompt.textContent = '🎁 ' + GN.cosmicSurprise.toUpperCase() + ': ' + text;
-      sfx.correct(); if (prize === 'chip' || prize === 'key') sfx.coins(6);
-      cosmicFx(true, label);
-      setTimeout(finishPowerUp, 500);
+      // J5: the prize applies (as before) and now SHOWS - a big prize pill with what was won (points with the act's
+      // multiplier, or what a key / chip is for), the score popping, held for COSMIC_PRIZE_HOLD before the show goes on
+      // (it closed 0.5 s after the reels stopped, under a small line of text - easy to miss).
+      const mult = cosmicDaily && runActive ? runActMult() : 1;
+      let text, sub = '';
+      if (prize === 'points10'){ cosmicPts(10); text = '+' + (10 * mult) + ' POINTS'; }
+      else if (prize === 'points20'){ cosmicPts(20); text = '+' + (20 * mult) + ' POINTS'; }
+      else if (prize === 'key'){ cosmicKey(); text = '🔑 +1 KEY'; sub = cosmicDaily ? 'An extra ' + GN.orbitDrop + ' chip in the finale' : 'Keys open the finale'; }
+      else if (cosmicDaily){ runBonusChips++; saveRunSnapshot(); text = '🪙 +1 CHIP'; sub = 'An extra ' + GN.orbitDrop + ' chip in the finale'; }
+      else { infRun.bonusChip = true; saveInfRun(); text = '🪙 BONUS CHIP'; sub = 'An extra ' + GN.orbitDrop + ' chip'; }
+      label.innerHTML = ''; label.classList.add('won');
+      const pill = document.createElement('span'); pill.className = 'cz-pill'; label.appendChild(pill);
+      const big = document.createElement('b'); big.textContent = text; pill.appendChild(big);
+      if (sub){ const sm = document.createElement('small'); sm.textContent = sub; pill.appendChild(sm); }
+      els.eventPrompt.textContent = 'YOU WON!';
+      sfx.correct(); sfx.cashRegister(); if (prize === 'chip' || prize === 'key') sfx.coins(6);
+      cosmicFx(true, label); renderRunBanner();
+      { const sc = els.runBanner && els.runBanner.querySelector(prize === 'key' ? '.sp-keys' : '.sp-num'); if (sc) FX.pop(sc, 1.35); }
+      setTimeout(finishPowerUp, COSMIC_PRIZE_HOLD);
     };
     // D4 (Oct 16): a small 3-reel slot machine - the reels spin, stop left to right over about 2 s and line up the prize.
     stage.classList.add('slot-mode');
@@ -16564,7 +16581,7 @@
       getRunState: () => ({
         runScore, runPhase, runTriviaAttempted, runTriviaCorrect,
         runThresholdsHit: runThresholdsHit.slice(), runPowerupThresholdsHit: runPowerupThresholdsHit.slice(),
-        runPendingTrivia, runPendingPowerUp, runLetters: runLetters.slice(),
+        runPendingTrivia, runPendingPowerUp, runLetters: runLetters.slice(), runKeys, runBonusChips, scene: Show.scene,
       }),
     };
   }
