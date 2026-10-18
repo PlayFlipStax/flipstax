@@ -2624,7 +2624,7 @@
   @keyframes coPullL{ 0%{ transform:none; } 80%{ transform:scaleX(0.22) skewX(0deg); } 87%{ transform:scaleX(0.235) skewX(2.2deg); } 94%{ transform:scaleX(0.218) skewX(-1.2deg); } 100%{ transform:scaleX(0.225) skewX(0deg); } }
   @keyframes coPullR{ 0%{ transform:none; } 80%{ transform:scaleX(0.22) skewX(0deg); } 87%{ transform:scaleX(0.235) skewX(-2.2deg); } 94%{ transform:scaleX(0.218) skewX(1.2deg); } 100%{ transform:scaleX(0.225) skewX(0deg); } }
   .co-studio{ z-index:0; }
-  .co-stage-host{ position:absolute; z-index:2; left:50%; bottom:calc(6vh + env(safe-area-inset-bottom)); width:min(46vw, 210px); margin-left:calc(min(46vw, 210px) / -2);
+  .co-stage-host{ position:absolute; z-index:2; left:50%; bottom:calc(max(6vh, 76px) + env(safe-area-inset-bottom)); width:min(46vw, 210px); margin-left:calc(min(46vw, 210px) / -2);
     transform:translateX(75vw); transition:transform var(--walk, 2s) cubic-bezier(.3,.75,.3,1); }
   .co-follow{ position:absolute; z-index:1; left:50%; top:-6%; bottom:calc(3vh + env(safe-area-inset-bottom)); width:min(84vw, 380px); margin-left:calc(min(84vw, 380px) / -2); pointer-events:none;
     background:radial-gradient(50% 9% at 50% 95%, rgba(255,246,214,0.6), rgba(255,246,214,0) 100%), linear-gradient(180deg, rgba(255,246,214,0.3), rgba(255,246,214,0.1) 75%, rgba(255,246,214,0));
@@ -11227,7 +11227,9 @@
   function cueCardHtml(){
     return '<div class="cue-hold"><div class="cue-grip"><div class="cue-card"><div class="cue-face cue-back"><span>FLIPSTAX</span></div>' +
       '<div class="cue-face cue-front"><div class="cc-sub"></div><div class="cc-title"></div></div></div><i class="cue-hand l"></i><i class="cue-hand r"></i></div>' +
-      '<div class="cue-host cue-bust host-full">' + Host.html({ pose:'presenting' }) + '</div></div>';   // F6: the new host, head and shoulders with the mic
+      (Host.imageMode   // Run 4: with the host's pictures he stands whole in front of the stage, under the card (not tucked behind it)
+        ? '</div><div class="cue-fig host-full">' + Host.html({ pose:'presenting' }) + '</div>'
+        : '<div class="cue-host cue-bust host-full">' + Host.html({ pose:'presenting' }) + '</div></div>');   // F6: the drawn host, head and shoulders with the mic
   }
   function showActCard(st, then){
     const fin = !!st.finale, w = st.world || 'vs';
@@ -14664,7 +14666,7 @@
     };
     if (!ep && !(pre.done && asImage(pre))) pre.promise.then(p=>{ if (performance.now() - shownAt < 4000 && els.readoutOverlay.classList.contains('show')) asImage(p); });
     els.readoutOverlay.classList.add('show');
-    castShowcase('right', 2800, ()=> els.readoutOverlay.classList.contains('show'), true);   // Run 3: the presenter takes a bow as the score lands
+    castShowcase('left', 2800, ()=> els.readoutOverlay.classList.contains('show'), true, 700);   // the presenter takes a bow as the score lands - tablets and up only: the phone's results panel fills the whole width, no room
     updatePauseBtnVisibility();
     sfx.personality();
   }
@@ -15315,11 +15317,12 @@
   }
   // Run 3, the cast (lib/cast.js) - showcase moments only: tonight's presenter at a between-play moment, for `hold` ms
   // while `still()` holds; the sidekick's laugh after a wrong answer, once per act (Daily) or per run stretch (Infinity).
-  function castShowcase(side, hold, still, peek){ if (window.Cast){ const p = Cast.presenter(); if (p) Cast.show(p, 'presenting', side, { hold, while: still, peek: !!peek }); } }
+  function castShowcase(side, hold, still, peek, minWidth){ if (window.Cast){ const p = Cast.presenter(); if (p) Cast.show(p, 'presenting', side, { hold, while: still, peek: !!peek, minWidth }); } }
   function castOops(){
     if (!window.Cast) return;
     const key = runActive ? 'd' + (runStartDate || '') + ':' + runActIdx : 'i' + ((infRun && infRun.runNo) || 0) + ':' + Math.floor(((infRun && infRun.clockMs) || 0) / 200000);
-    Cast.oops(key, { side:'left', while: ()=> !els.eventOverlay.classList.contains('hidden') || !els.irOverlay.classList.contains('hidden') });
+    try{ document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say'); clearTimeout(hostSayT); }catch(e){}   // (the host's own line would sit where the sidekick's does)
+    Cast.oops(key, { side:'right', while: ()=> !els.eventOverlay.classList.contains('hidden') || !els.irOverlay.classList.contains('hidden') });
   }
   // A Brain Beam's answer, the full show treatment (B3): right = the gold
   // frame glows round the screen, the UFO beams down on the right answer

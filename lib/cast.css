@@ -54,3 +54,10 @@
 @keyframes castSayP{ to{ opacity:1; transform:none; } }
 :root.lite .cast-m.peek .cast-say{ transform:none !important; }
 @media (prefers-reduced-motion: reduce){ .cast-m.peek .cast-say{ transform:none !important; } }
+/* lane: the bottom strip every game screen keeps clear (the corner host's lane): a small bust at the right, the bubble to its left */
+.cast-m.lane{ height:36px; width:auto; bottom:calc(2px + env(safe-area-inset-bottom)); right:8px; left:auto; margin:0; overflow:visible; }
+.cast-m.lane .cast-fig{ height:36px; overflow:hidden; }
+.cast-m.lane .cast-fig img{ height:auto; width:34px; transform:none !important; }
+.cast-m.lane .cast-say{ bottom:3px; left:auto; right:100%; margin-right:8px; transform-origin:100% 50%; font-size:14px; padding:6px 11px; transform:scale(0.7); animation-name:castSayP; }
+.cast-m.lane .cast-say::after{ top:50%; left:100%; margin:-6px 0 0 0; border:6px solid transparent; border-left-color:#fff; border-top-color:transparent; }
+:root.lite .cast-m.lane .cast-say, :root.lite .cast-m.peek .cast-say{ transform:none !important; }

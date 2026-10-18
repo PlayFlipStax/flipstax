@@ -165,7 +165,7 @@ glow, an optional gold sub line above it. One or two short lines - the act, the 
   The cast never takes a tap (pointer-events: none).
 - The sidekick's laugh (`Cast.oops`): only after a wrong pick that already shows its red X and buzzer (Brain Beam,
   the riddle, trivia), at most once per act, never on a time-out or a VS pick; a speech bubble, "Ooh, so close!".
-- Gated with the host: the cast shows only in HOST_IMAGE_MODE (lib/host.js - the host's full rendered pose set is in),
+- The bottom lane (Run 4): the strip under every game screen (36 px) belongs to the corner host (a small head-and-shoulders at the left, the same size everywhere) and, after a wrong answer, the sidekick at the right (a small bust, the bubble to his left; not on screens under 640 px tall). The games' own stage hosts are not shown in image mode, and nothing is centred. On the results panel there is no room on a phone, so the presenter only takes a bow on tablets (700 px and up, left side). Gated with the host: the cast shows only in HOST_IMAGE_MODE (lib/host.js - the host's full rendered pose set is in),
   so rendered and drawn characters never share a screen; until then the stage shows alone. On localhost
   `?castpreview=1` lets the cast on for checking the art.
 
@@ -181,7 +181,7 @@ One host per screen (the disco celebration is the only exception). Every host is
   bottom edge), listed in `data/host/manifest.js`. **HOST_IMAGE_MODE**: the host is all pictures or all the drawn SVG,
   never a mix - it switches to pictures only when the manifest lists at least idle, blink, wave, cheer, think, shrug,
   oops, laugh and presenting (`Host.IMAGE_SET`); then a pose without its own picture borrows the nearest one. Until
-  then the drawn SVG host acts out every pose (lib/host.css) and the rendered cast stays off.
+  then the drawn SVG host acts out every pose (lib/host.css) and the rendered cast stays off. **It is on since Oct 18** (idle, blink, wave, cheer, think, shrug, presenting, oops, laugh, discoPoint registered; borrowed: idleClosed and wink -> blink, point -> presenting, gasp -> oops, swayL / swayR / spin -> discoPoint); the drawn host is never put in the page. The act cue card shows the host whole in front of the stage below the card.
 - **Events:** a right answer = `cheer`; a wrong one = `shrug` or `oops`; a question or a game in play = `think`; an
   intro (landing, cold open, menu) = `wave`; a reveal (act card, Mystery Game door) = `presenting`; the GOOP = `gasp`;
   THE MOTHERSHIP = `laugh`.

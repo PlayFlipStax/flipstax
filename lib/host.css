@@ -49,3 +49,37 @@
 /* Lite mode and reduced motion: the pose shows as its still end state. */
 :root.lite .host-rig .hr-svg, :root.lite .host-rig.hr-pop, :root.lite .host-rig .ha-arm-wave{ animation:none !important; }
 @media (prefers-reduced-motion: reduce){ .host-rig .hr-svg, .host-rig.hr-pop, .host-rig .ha-arm-wave, .host-rig .ha-eyes{ animation:none !important; } }
+
+/* Image mode (HOST_IMAGE_MODE, lib/host.js): the rig is pictures only. One canvas, one baseline (feet on the bottom edge). */
+.host-rig.has-img{ aspect-ratio:607 / 900; }
+.host-rig.has-img .hr-img{ height:100%; object-fit:contain; object-position:50% 100%; transform-origin:50% 100%; -webkit-user-drag:none; }
+.host-rig.has-img[data-pose="idle"] .hr-img.on{ animation:hrBob 3.4s var(--ease-io, ease-in-out) infinite; }
+.host-rig.has-img[data-pose="laugh"] .hr-img.on{ animation:hrLaughImg .3s ease-in-out 6 alternate; }
+.host-rig.has-img[data-pose="cheer"] .hr-img.on{ animation:hrCheerImg .8s var(--ease-pop, ease-out) 2; }
+@keyframes hrBob{ 0%, 100%{ transform:translateY(0); } 50%{ transform:translateY(-1.5%); } }
+@keyframes hrLaughImg{ from{ transform:translateY(0) rotate(-1.5deg); } to{ transform:translateY(-2%) rotate(1.5deg); } }
+@keyframes hrCheerImg{ 0%, 100%{ transform:none; } 40%{ transform:translateY(-4%) scale(1.04); } }
+/* the head crop (the corner host, the visitor): the top of the same picture */
+.host-rig.hr-head.has-img{ aspect-ratio:1 / 1.1; overflow:hidden; }
+.host-rig.hr-head.has-img .hr-img{ left:-47%; right:auto; top:0; bottom:auto; width:194%; height:auto; object-fit:fill; transform-origin:50% 0; }
+:root.lite .host-rig.has-img .hr-img{ animation:none !important; }
+@media (prefers-reduced-motion: reduce){ .host-rig.has-img .hr-img{ animation:none !important; } }
+
+/* ---- Run 4 placements (image mode) ---- */
+/* the act cue card: the host stands whole on the stage below the card (the card rises to the middle; he is clear of it) */
+.cue-fig{ position:absolute; z-index:3; left:50%; bottom:calc(5vh + env(safe-area-inset-bottom)); width:min(30vh * 0.6743, 38vw, 190px); height:min(30vh, 281px); margin-left:calc(min(30vh * 0.6743, 38vw, 190px) / -2); pointer-events:none;
+  opacity:0; animation:cueFigIn 460ms var(--ease-pop, cubic-bezier(.3,1.6,.5,1)) calc(var(--cue-ms, 2.8s) * 0.16) forwards; }
+.cue-fig .host-rig{ height:100%; width:100%; }
+@keyframes cueFigIn{ from{ opacity:0; transform:translateY(30%) scale(0.9); } to{ opacity:1; transform:none; } }
+:root.lite .cue-fig, :root.lite .cue-fig .host-rig{ animation:none; opacity:1; }
+@media (prefers-reduced-motion: reduce){ .cue-fig{ animation:none; opacity:1; } }
+/* gameplay: the corner host only (a small head-and-shoulders in the bottom-left lane, the same size on every screen); the games'
+   own stage hosts (Fact or Fib, Saucer Shuffle) are not shown, and never centred */
+:root.host-img .ff-host, :root.host-img .su-host{ display:none !important; }
+:root.host-img:has(#mgOverlay .host-full) .show-host{ display:flex !important; }
+:root.host-img .show-host{ bottom:calc(2px + env(safe-area-inset-bottom)); left:10px; }
+:root.host-img .show-host .alien{ width:34px; height:36px; flex:0 0 auto; }
+:root.host-img .show-host .host-rig.hr-head.has-img{ aspect-ratio:auto; width:34px; height:36px; }
+:root.host-img .show-host .host-rig.hr-head.has-img .hr-img{ left:-30%; width:160%; }
+/* (the games with their own stage host had no bottom strip for the corner host; they have it now that he is not on the stage) */
+:root.host-img .mg-overlay .mg-inner{ padding-bottom:calc(50px + env(safe-area-inset-bottom)) !important; }
