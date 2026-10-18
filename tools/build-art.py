@@ -97,10 +97,26 @@ def lift(path):
 
 def bbox(im): return im.getchannel('A').point(lambda v: 255 if v > 8 else 0).getbbox()
 
+def defringe(im):
+    """Clean the soft edge: pull the outer pixel of alpha in, then give every semi-transparent pixel the colour of the
+    solid pixels just inside it (a normalised blur of the solid colours), so no light backdrop colour is left in the rim."""
+    import numpy as np
+    a = im.getchannel('A')
+    a = a.filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(0.6))
+    arr = np.asarray(im.convert('RGB')).astype('float32'); al = np.asarray(a).astype('float32') / 255
+    solid = (al > 0.97).astype('float32')
+    num = np.stack([Image.fromarray((arr[..., c] * solid).astype('uint8')).filter(ImageFilter.GaussianBlur(4)) for c in range(3)], -1).astype('float32')
+    den = np.asarray(Image.fromarray((solid * 255).astype('uint8')).filter(ImageFilter.GaussianBlur(4))).astype('float32')[..., None] / 255
+    fill = num / np.maximum(den, 1e-3)
+    rim = (al <= 0.97)[..., None] & (den > 0.02)
+    out = np.where(rim, fill, arr).clip(0, 255).astype('uint8')
+    res = Image.fromarray(out, 'RGB').convert('RGBA'); res.putalpha(a)
+    return res
+
 def fit(im, box):
     im = im.crop(box)
     s = FIG_H / im.height
-    return im.resize((max(1, round(im.width * s)), FIG_H), Image.LANCZOS)
+    return defringe(im.resize((max(1, round(im.width * s)), FIG_H), Image.LANCZOS))
 
 def main():
     made, total = [], 0
