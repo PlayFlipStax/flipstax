@@ -69,7 +69,7 @@
 :root.stage-on .show-card.cue.stage-backed:not(.finale)::before{ display:none; }
 :root.stage-on .show-card.cue.stage-backed .cue-wipe > .bg{ opacity:0.85; }
 /* results and the outro: the wide shot under a scrim, so the score panel reads as before */
-:root.stage-on #readoutOverlay.stage-backed{ background:linear-gradient(180deg, rgba(14,4,30,0.5), rgba(14,4,30,0.3) 40%, rgba(14,4,30,0.6)) !important; }
+:root.stage-on #readoutOverlay.stage-backed{ background:radial-gradient(120% 90% at 50% 42%, rgba(8,2,20,0) 40%, rgba(8,2,20,0.65) 100%), linear-gradient(rgba(10,3,24,0.5), rgba(10,3,24,0.5)) !important; }   /* the wide shot dimmed like gameplay: scrim + vignette */
 :root.stage-on #readoutOverlay.stage-backed .warp-bg{ display:none; }
 :root.stage-on .fin-overlay.stage-backed{ background:linear-gradient(180deg, rgba(14,4,30,0.62), rgba(14,4,30,0.45) 40%, rgba(14,4,30,0.7)) !important; }
 

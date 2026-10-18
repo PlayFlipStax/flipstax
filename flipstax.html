@@ -1670,7 +1670,7 @@
   .ec-art img{ width:100%; height:100%; object-fit:cover; display:block; }
   .ec-art .cc-stand{ display:flex; flex-direction:column; align-items:center; } .ec-art .cs-icon{ font-size:40px; } .ec-art .cs-soon, .ec-art .cs-name{ display:none; }
   .epr-tomorrow{ display:flex; flex-direction:column; align-items:center; width:100%; }
-  .et-h{ font:900 15px/1 var(--f-display); letter-spacing:1px; color:#fff; padding:6px 14px 4px; border-radius:10px 10px 0 0; background:#3a0d66; border:2px solid var(--gold-2); border-bottom:0; }
+  .et-h{ position:relative; z-index:1; margin-bottom:7px; font:900 15px/1 var(--f-display); letter-spacing:1px; color:#fff; padding:6px 14px 4px; border-radius:10px 10px 0 0; background:#3a0d66; border:2px solid var(--gold-2); border-bottom:0; }
   .et-board{ display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; padding:8px 12px; border-radius:14px; border:3px solid var(--gold-2); background:#1c0636;
     box-shadow:0 0 0 4px #1c0636, 0 0 0 6px rgba(255,210,63,0.55); }
   .et-board b{ font:900 24px/1 var(--f-display); color:#fff3dd; }
@@ -11234,8 +11234,10 @@
     showCard.className = 'show-card cue' + (fin ? ' finale' : '');
     showCard.innerHTML = (fin ? '<i class="cue-stage bg w-' + w + '"><i class="rays"></i><i class="glow"></i></i><i class="cue-iris"></i><i class="cue-black"></i>'
       : '<i class="cue-wipe"><i class="bg w-' + w + '"><i class="rays"></i><i class="glow"></i></i></i>') + cueCardHtml();
-    showCard.querySelector('.cc-sub').textContent = st.sub || '';
-    showCard.querySelector('.cc-title').textContent = st.title || '';
+    // The marquee sign already carries the act name (Stage.cue), so the cue card keeps only what the sign does not say: the points.
+    const stageSign = !!(window.Stage && Stage.ready);
+    showCard.querySelector('.cc-sub').textContent = stageSign ? '' : (st.sub || '');
+    showCard.querySelector('.cc-title').textContent = stageSign ? (fin ? 'GRAND PRIZE' : 'POINTS \u00D7' + (st.mult || (RUNDOWN.acts[st.act] || {}).mult || 1)) : (st.title || '');
     showCard.removeAttribute('role'); showCard.setAttribute('aria-label', (st.sub ? st.sub + ': ' : '') + (st.title || ''));
     showCard.classList.remove('hidden');
     if (window.Stage) Stage.cue('close', { over:showCard, cls:'cue', push:true, ms: cine(TIMING.ACT_CARD_HOLD + (fin ? 300 : 0)), sign:{ sub: st.sub || '', main: st.title || '' } });   // Run 3: the act on the marquee

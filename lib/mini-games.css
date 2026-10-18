@@ -188,7 +188,9 @@
 
 /* ---- I2: fill the play area (no empty halves at 360-390 px) ---- */
 .zw-stage{ justify-content:center !important; }
-.zw-grid{ width:min(100%, 380px, 56vh); }
+.zw-grid{ width:min(100%, 380px, 56vh, max(200px, calc(100vh - 400px))); }   /* (sized by the room left under the rule line, so the grid and the +N line never cover it) */
+.zw-stage{ justify-content:flex-start !important; }
+.zw-hint{ margin-left:6px; }
 .tf-grid{ width:min(100%, 400px, 58vh); }
 .mg-twinFlip .mg-stage{ justify-content:center; }
 .su-stage{ justify-content:center !important; }
