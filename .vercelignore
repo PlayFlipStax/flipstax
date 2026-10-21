@@ -1,0 +1,7 @@
+# Not served: design references and unused image copies (they stay in git).
+# The game loads style-board/assets/bg-<game>.png when that art exists, so assets/ is kept.
+style-board/*
+!style-board/assets/
+images/flipstax-logo-clean.png
+images/flipstax-logo-transparent.png
+images/og-preview.png
