@@ -48,13 +48,14 @@
     const S = window.__show, now = performance.now();
     const ro = document.getElementById('readoutOverlay');
     if (ro && ro.classList.contains('show')){ finish(); return; }
-    if (S && S.gen !== lastGen){ lastGen = S.gen; sceneAt = now; next = now + rnd(150, 400); }
+    if (S && S.gen !== lastGen){ lastGen = S.gen; sceneAt = now; next = now + (opts.cine === false ? rnd(opts.firstMin || 1500, opts.firstMax || 3500) : rnd(150, 400)); }
     if (now >= next){
       const sc = document.getElementById('showCard'), ev = document.getElementById('eventOverlay'), mg = document.getElementById('mgOverlay');
       const lucky = document.getElementById('luckyOverlay'), solve = document.getElementById('solveOverlay'), fin = document.getElementById('finOverlay'), guess = document.getElementById('guessOverlay');
       const A = document.getElementById('halfA'), B = document.getElementById('halfB');
-      if (sc && vis(sc)){   // a cinematic: keep tapping where the cards are (and the skip tap on it)
-        tapEl(Math.random() < 0.5 ? A : B, 'cinematic ' + sc.className.replace('show-card', '').trim());
+      if (sc && vis(sc)){   // a cinematic: keep tapping where the cards are (and the skip tap on it) - unless opts.cine is false (a patient player)
+        if (opts.cine !== false) tapEl(Math.random() < 0.5 ? A : B, 'cinematic ' + sc.className.replace('show-card', '').trim());
+        else if (sc.classList.contains('ex-wait')) tapEl(sc.querySelector('.ex-go') || sc, 'explainer got it');   // (a card that waits for a tap)
         next = now + rnd(150, 400);
       } else if (fin && vis(fin)){
         const all = document.getElementById('plinkoAll'), go = document.getElementById('plinkoDrop');
@@ -64,21 +65,21 @@
         const tiles = [...solve.querySelectorAll('#solveRack .solve-tile:not(.used), .solve-key')].filter(vis);
         if (tiles.length && Math.random() < 0.7) tapEl(tiles[Math.floor(Math.random() * tiles.length)], 'letter');
         else { const sub = document.getElementById('solveSubmit'); if (sub) tapEl(sub, 'submit'); }
-        next = now + rnd(500, 1400);
+        next = now + rnd(opts.wwMin || 500, opts.wwMax || 1400);
       } else if (lucky && vis(lucky)){
         const b = [...lucky.querySelectorAll('.ll-btn')].filter(vis)[0]; if (b) tapEl(b, 'lucky ' + b.textContent);
-        next = now + rnd(1200, 2500);
+        next = now + rnd(opts.luckyMin || 1200, opts.luckyMax || 2500);
       } else if (guess && vis(guess)){
         const b = guess.querySelector('.guess-lock'); if (b && vis(b)) tapEl(b, 'crowd scan lock'); else tapEl(guess, 'crowd scan');
         next = now + rnd(1500, 2500);
       } else if (mg){
         const b = [...mg.querySelectorAll('button')].filter(x=> vis(x) && !x.disabled);
         if (b.length) tapEl(b[Math.floor(Math.random() * b.length)], 'mini game');
-        next = now + rnd(500, 1500);
+        next = now + rnd(opts.mgMin || 500, opts.mgMax || 1500);
       } else if (ev && vis(ev)){
         const t = [...ev.querySelectorAll('.event-tile')].filter(vis);
         if (t.length) tapEl(t[Math.floor(Math.random() * t.length)], 'answer');
-        next = now + rnd(700, 2200);
+        next = now + rnd(opts.ansMin || 700, opts.ansMax || 2200);
       } else {
         tapEl(Math.random() < 0.5 ? A : B, 'vs');
         next = now + rnd(opts.vsMin || 400, opts.vsMax || 2500);
@@ -99,6 +100,8 @@
       else if (st.t === 'mystery' || st.t === 'break') want.push('mystery');
       else if (st.t === 'portal') want.push('portal');
       else if (st.t === 'lucky') want.push('lucky');
+      else if (st.t === 'game') want.push('game');
+      else if (st.t === 'reward') want.push('reward');
       else if (st.t === 'cosmic') want.push('cosmic');
       else if (st.t === 'finale') want.push('wordwarp');
       else if (st.t === 'ad' && st.forced) want.push('ad');

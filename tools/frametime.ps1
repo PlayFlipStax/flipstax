@@ -4,7 +4,7 @@
 #   powershell -File tools\frametime.ps1                 # fast-forwarded episode (?debug=fast), about 2 minutes
 #   powershell -File tools\frametime.ps1 -Lite           # the same with ?lite=1
 #   powershell -File tools\frametime.ps1 -CpuSlowdown 4  # throttle the CPU 4x (a mid-range phone)
-param([switch]$Lite, [switch]$Profile, [int]$CpuSlowdown = 4, [int]$MaxSecs = 300, [int]$Port = 9341, [switch]$Headed)
+param([switch]$Lite, [switch]$Profile, [int]$CpuSlowdown = 4, [int]$MaxSecs = 300, [int]$Port = 9341, [switch]$Headed, [string]$Base = 'http://localhost:8834')
 $ErrorActionPreference = 'Stop'
 $chrome = "C:\Program Files\Google\Chrome\Application\chrome.exe"
 $prof = Join-Path $env:TEMP ("fs-ft-" + [guid]::NewGuid().ToString('N').Substring(0,8))
@@ -33,7 +33,7 @@ try {
   Cdp 'Emulation.setDeviceMetricsOverride' @{ width = 390; height = 844; deviceScaleFactor = 2; mobile = $true } | Out-Null
   if ($CpuSlowdown -gt 1) { Cdp 'Emulation.setCPUThrottlingRate' @{ rate = $CpuSlowdown } | Out-Null }
   $q = 'replay=1&debug=fast' + $(if ($Lite) { '&lite=1' } else { '' })
-  Cdp 'Page.navigate' @{ url = "http://localhost:8834/flipstax.html?$q" } | Out-Null
+  Cdp 'Page.navigate' @{ url = "$Base/flipstax.html?$q" } | Out-Null
   Start-Sleep 4
   Js "(()=>{ document.querySelector('.replay-btn').click(); [...document.querySelectorAll('.replay-list button')].find(x=>x.textContent==='Restart Daily').click(); return 1; })()" | Out-Null
   Js ([IO.File]::ReadAllText((Join-Path $PSScriptRoot 'frametime-probe.js'))) | Out-Null

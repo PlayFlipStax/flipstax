@@ -132,6 +132,15 @@
   @keyframes keyPop{ 0%{ transform:scale(1); } 40%{ transform:scale(1.7); color:#fff6c2; } 100%{ transform:scale(1); } }
   .score-pill .sp-act{ font-family:'Big Shoulders Display', sans-serif; font-weight:900; font-size:13px; letter-spacing:0.6px; white-space:nowrap; color:#2a1300; }
   .score-pill .sp-act.hot{ color:#d81b60; }
+  /* Run 4A, the round tracker: six segments along the bottom edge of the Daily pill - done, now (a slow glow), to come. */
+  .score-pill .sp-rounds{ position:absolute; z-index:1; left:12px; right:12px; bottom:2px; height:3px; display:flex; gap:3px; pointer-events:none; }
+  :root.mode-daily .score-pill .sp-rounds{ right:74px; }
+  .score-pill .sp-rounds i{ flex:1 1 0; border-radius:2px; background:rgba(42,19,0,0.2); }
+  .score-pill .sp-rounds i.done{ background:#f5a300; }
+  .score-pill .sp-rounds i.now{ background:#d81b60; animation:spRoundNow 1.8s var(--ease-io, ease-in-out) infinite alternate; }
+  @keyframes spRoundNow{ from{ opacity:0.55; } to{ opacity:1; } }
+  :root.lite .score-pill .sp-rounds i.now{ animation:none; }
+  @media (prefers-reduced-motion: reduce){ .score-pill .sp-rounds i.now{ animation:none; } }
   .score-pill .sp-clock.low #infClock, .score-pill .sp-clock.low #dailyClock{ color:#ffe066; animation: runTimerPulse 0.8s ease-in-out infinite; }
   .pill-row{ position:relative; }
   .inf-milestone{ position:absolute; left:50%; top:100%; z-index:20; pointer-events:none; white-space:nowrap; opacity:0;
@@ -2588,6 +2597,23 @@
   @keyframes scFlash{ 0%{ opacity:0; } 12%{ opacity:0.85; } 30%{ opacity:0.2; } 45%{ opacity:0.6; } 100%{ opacity:0; } }
   @media (prefers-reduced-motion: reduce){ .show-card .sc-title, .sc-name, .sc-tap{ animation:none; } .sc-flash{ animation:none; display:none; } }
   @media (max-height:660px){ .show-card .sc-title{ font-size:44px; } .sc-host{ width:56px; height:64px; } .show-card .sc-inner{ gap:9px; } .sc-rules{ font-size:13px; } }
+  /* Run 4A, the reward beat: what the round paid - points, the Brain Beam's letter, gold keys - over the dimmed stage. */
+  .show-card.reward{ background:rgba(10,3,24,0.62); padding:0 var(--gutter, 16px); }
+  .rw-panel{ width:min(360px, 100%); padding:var(--sp-6, 24px) var(--sp-4, 16px) var(--sp-5, 20px); display:flex; flex-direction:column; align-items:center; gap:var(--sp-4, 16px);
+    animation:rwIn var(--d-mid, 320ms) var(--ease-pop) both; }
+  .rw-title{ font:900 var(--fs-title, 30px)/1 var(--f-display); letter-spacing:1px; color:var(--c-gold, #ffd23f); text-shadow:0 3px 0 rgba(122,61,0,0.8); }
+  .rw-row{ display:flex; gap:var(--sp-2, 8px); justify-content:center; width:100%; }
+  .rw-chip{ flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:center; gap:4px; padding:var(--sp-3, 12px) 4px; border-radius:var(--r-md, 14px);
+    background:rgba(255,255,255,0.08); box-shadow:inset 0 0 0 2px rgba(255,210,63,0.35); opacity:0; animation:rwChip var(--d-mid, 320ms) var(--ease-out) both; animation-delay:calc(180ms + var(--i, 0) * var(--stagger, 80ms)); }
+  .rw-chip b{ font:900 28px/1 var(--f-display); color:#fff; white-space:nowrap; }
+  .rw-chip small{ font:800 12px/1.1 var(--f-body, Inter, sans-serif); letter-spacing:var(--ls-label, 1px); color:var(--c-text-soft, #e9dcff); text-transform:uppercase; }
+  .rw-chip.pts b{ color:var(--c-gold, #ffd23f); }
+  .rw-chip.letter.got b{ color:var(--c-gold, #ffd23f); } .rw-chip.letter.miss b{ color:var(--c-bad-hi, #ff6a7d); }
+  .rw-total{ font:700 var(--fs-body, 17px)/1.3 var(--f-body, Inter, sans-serif); color:var(--c-text-soft, #e9dcff); }
+  @keyframes rwIn{ from{ transform:scale(0.86); opacity:0; } to{ transform:none; opacity:1; } }
+  @keyframes rwChip{ from{ transform:translateY(12px); opacity:0; } to{ transform:none; opacity:1; } }
+  :root.lite .rw-panel, :root.lite .rw-chip{ animation-duration:1ms; }
+  @media (prefers-reduced-motion: reduce){ .rw-panel, .rw-chip{ animation:none; opacity:1; } }
   /* The cold open (DIRECTION.md): red velvet curtain, the EPISODE plate, the curtain parts,
      FLIPSTAX lights up letter by letter on a marquee, the host slides in, three cue cards fan out. */
   .show-card.curtain{ background:radial-gradient(120% 80% at 50% 40%, #3a0d1c, #12030a 70%); overflow:hidden; }
@@ -5675,13 +5701,11 @@
   // run clock any more: the show plays its plan through to the Grand Finale.
   const RUNDOWN = (window.FLIPSTAX_RUNDOWN && Array.isArray(window.FLIPSTAX_RUNDOWN.acts)) ? window.FLIPSTAX_RUNDOWN : {
     coldOpen: { firstMs: 12000, returningMs: 3000 },
-    acts: [
-      { id:'act1', title:'THE OPENER', sub:'ACT 1', mult:1, vsTimerMs:7000, world:'vs', steps:[ { vs:5 }, { beam:'easy' }, { vs:4 }, { mystery:1 }, { beam:'easy' } ] },
-      { id:'act2', title:'DOUBLE TROUBLE', sub:'ACT 2 · POINTS x2', mult:2, vsTimerMs:7000, world:'powerup', steps:[ { vs:5 }, { beam:'medium' }, { portal:true }, { vs:4 }, { mystery:2 }, { beam:'medium' } ] },
-      { id:'act3', title:'LIGHTNING ROUND', sub:'ACT 3 · POINTS x3', mult:3, vsTimerMs:5000, world:'jumble', steps:[ { vs:6 }, { beam:'hard' }, { beam:'hard' }, { lucky:true } ] },
-      { id:'finale', title:'GRAND FINALE', sub:'PLAY FOR THE GRAND PRIZE', mult:1, world:'results', steps:[ { wordWarp:true }, { orbitDrop:true } ] },
-    ],
-    mystery: { pool: [ { game:'emojiDecode', weight:2 }, { game:'timeWarp', weight:1 } ] },   // (fallback; Price Probe and Oddball Alert are out of the pool)
+    acts: [1, 2, 3, 4, 5, 6].map(n=> ({ id:'r' + n, round:n, title:'ROUND ' + ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX'][n - 1], sub:'ROUND ' + n, mult: n < 3 ? 1 : n < 5 ? 2 : 3, vsTimerMs: n < 5 ? 7000 : 5000, world:'vs',
+      steps:[ { vs:4 }, { beam: n < 3 ? 'easy' : n < 5 ? 'medium' : 'hard' }, { game: ['riddle', 'lucky', 'door', 'zapWords', 'twinFlip', 'orbitDrop'][n - 1] }, { reward:true } ] }))
+      .concat([ { id:'finale', title:'GRAND FINALE', sub:'WORD WARP', mult:1, world:'results', steps:[ { wordWarp:true } ] } ]),
+    door: { pool: [ 'emojiDecode', 'timeWarp', 'priceProbe' ] },   // (fallback)
+    mystery: { pool: [ { game:'emojiDecode', weight:2 }, { game:'timeWarp', weight:1 } ] },
     cosmicSurpriseChance: 0,
     commercial: { ms:3000, ads:[ { brand:'ZING COLA', line:'Tastes like tomorrow!', glyph:'🥤', art:'can', colors:['#ff3c9d', '#ffd23f'] } ] },
   };
@@ -5704,7 +5728,9 @@
   // episode. The days are walked from Episode 1, so "not two days in a row" holds for
   // every pair of days. A game whose data didn't load is left out of the pool.
   const MYSTERY_POOL = (RUNDOWN.mystery && Array.isArray(RUNDOWN.mystery.pool)) ? RUNDOWN.mystery.pool : [];
+  const SHOW_OFF = Array.isArray(RUNDOWN.off) ? RUNDOWN.off : [];   // games switched off in the show (Peak or Plunge)
   function mysteryAvailable(g){
+    if (SHOW_OFF.indexOf(g) >= 0) return false;
     if (miniGame(g)) return !miniGame(g).available || !!miniGame(g).available();   // the Part E games (lib/mini-games.js)
     if (g === 'riddle') return INFINITY_RIDDLES.length >= 8;
     if (g === 'crowdScan') return !!(CARD_POOLS.daily && CARD_POOLS.daily.length);
@@ -5739,6 +5765,13 @@
     const out = mysteryCache[date] || prev;
     return [out[0] || null, out[1] || out[0] || null];
   }
+  // Run 4A, the Mystery Door (Round 3): four different bonus games behind four doors, by the date (the same for
+  // everyone that day), from RUNDOWN.door.pool - only games whose data loaded, and none twice in the episode.
+  const DOOR_COUNT = 4;
+  function showDoorGames(date){
+    const pool = ((RUNDOWN.door && RUNDOWN.door.pool) || []).filter(g=> mysteryAvailable(g));
+    return shuffle(pool.slice(), mulberry32(hashStr('flipstax-door-' + date))).slice(0, DOOR_COUNT);
+  }
   function showAd(date){
     const ads = (RUNDOWN.commercial && RUNDOWN.commercial.ads) || [];
     return ads.length ? ads[hashStr('flipstax-ad-' + date) % ads.length] : null;
@@ -5749,14 +5782,16 @@
   function buildShowPlan(date){
     if (SHOW_DATE_OVERRIDE) date = SHOW_DATE_OVERRIDE;
     const rng = mulberry32(hashStr('flipstax-show-' + date));
-    const mystery = showMysteryGames(date);
+    const mystery = showMysteryGames(date), doors = showDoorGames(date);
     const steps = [];
     RUNDOWN.acts.forEach((act, ai)=>{
       if (act.ad){ steps.push({ t:'ad', ad: showAd(date) }); return; }
-      steps.push({ t:'act', act:ai, title:act.title, sub:act.sub || '', world:act.world || 'vs', finale: act.id === 'finale' });
+      steps.push({ t:'act', act:ai, title:act.title, sub:act.sub || '', world:act.world || 'vs', finale: act.id === 'finale', round: act.round || 0, announce: act.announce || '' });
       (act.steps || []).forEach(s=>{
         if (s.vs) steps.push({ t:'vs', n:s.vs, act:ai });
         else if (s.beam) steps.push({ t:'quiz', beam:true, level:s.beam, act:ai, seed:seedOf(rng) });
+        else if (s.game) steps.push(s.game === 'door' ? { t:'game', key:'door', doors: doors.slice(), act:ai, seed:seedOf(rng) } : { t:'game', key:s.game, act:ai, seed:seedOf(rng) });
+        else if (s.reward) steps.push({ t:'reward', act:ai });
         else if (s.mystery) steps.push({ t:'mystery', k:s.mystery, game:mystery[s.mystery - 1], act:ai, seed:seedOf(rng) });
         else if (s.portal) steps.push({ t:'portal', act:ai, doors: shuffle(RUN_POWERUPS.map(p=> p.key), rng) });
         else if (s.lucky) steps.push({ t:'lucky', act:ai, seed:seedOf(rng) });
@@ -9423,6 +9458,7 @@
       show: runShow, doors: runPortalDoors, warpBonus: runWarpBonusMs,
       combo: { streak: runMatchStreak, bank: runComboBank, bonus: runComboBonus, best: runBestStreak },
       letterPos: runLetterPos, tray: runTrayMarks, act: runActIdx, actPts: runActPts, missPts: runMissPts, goopLost: runGoopLost, best: runBestMoment, keys: runKeys, bonusChips: runBonusChips, vsMarks: runVsMarks,
+      actKeys: runActKeys, actLetter: runActLetter, orbit: runOrbit, orbitPts: runOrbitPts, orbitJackpot: runOrbitJackpot,
     };
     try{ localStorage.setItem(RUN_LIVE_KEY, JSON.stringify(snap)); }catch(e){}
   }
@@ -9530,7 +9566,8 @@
       els.runBanner.innerHTML = '<span class="sp-label">Pts</span><b class="sp-num">' + shownScore(runScore) + '</b>' +
         '<span class="sp-sep">\u00B7</span><span class="sp-act" id="dailyClock"></span>' +
         '<span class="sp-sep">\u00B7</span><span class="sp-tray" id="letterTray" aria-label="Word Warp letters: ' + runLetters.length + ' of ' + RUN_WORD_LENGTH + '">' + tray + '</span>' +
-        (runKeys ? '<span class="sp-sep">·</span><span class="sp-keys" aria-label="' + runKeys + ' keys: extra Orbit Drop chips">🔑<b>' + runKeys + '</b></span>' : '') + streakTag;
+        (runGoldKeys() ? '<span class="sp-sep">·</span><span class="sp-keys" aria-label="' + runGoldKeys() + ' gold keys: Orbit Drop chips">🔑<b>' + runGoldKeys() + '</b></span>' : '') + streakTag +
+        roundTrackHtml();
       renderDailyClock();
     } else {
       els.runBanner.innerHTML = '<span class="sp-mode">\uD83C\uDFAE</span><span class="sp-label">Daily Stax</span>' + streakTag + ' <span class="run-link" id="runPlayLink">Play</span>';
@@ -10288,6 +10325,7 @@
     runStartDate = todayStr();
     runWord = dailyWordForPlayer();
     runPlan = buildShowPlan(runStartDate); runShow = { step:0, left:null }; runActIdx = 0; runActPts = []; runMissPts = 0; runGoopLost = 0; runBestMoment = null; runKeys = 0; runBonusChips = 0; runVsMarks = []; runPortalDoors = null; runWarpBonusMs = 0; runBreakSeen = {};
+    runActKeys = []; runActLetter = []; runOrbit = null; runOrbitPts = 0; runOrbitJackpot = false; runOrbitDone = null;
     runMatchStreak = 0; runComboBank = 0; runComboBonus = 0; runBestStreak = 0; renderComboMeter();
     runLetterPos = []; runWarpPoints = 0; letterIncoming.clear(); runTrayMarks = []; trayIncoming.clear();
     runEndsAt = Date.now() + RUN_DURATION_MS;
@@ -10354,6 +10392,8 @@
     runClockAddedMs = snap.clockAdded || 0;
     runShow = snap.show || { step:0, left:null }; runPlan = buildShowPlan(runStartDate); runActIdx = snap.act || 0; runActPts = Array.isArray(snap.actPts) ? snap.actPts : []; runMissPts = snap.missPts || 0; runGoopLost = snap.goopLost || 0; runBestMoment = snap.best || null; runKeys = snap.keys || 0; runBonusChips = snap.bonusChips || 0; runVsMarks = Array.isArray(snap.vsMarks) ? snap.vsMarks : []; runPortalDoors = snap.doors || null; runWarpBonusMs = snap.warpBonus || 0;
     runMatchStreak = (snap.combo && snap.combo.streak) || 0; runComboBank = (snap.combo && snap.combo.bank) || 0; runComboBonus = (snap.combo && snap.combo.bonus) || 0; runBestStreak = (snap.combo && snap.combo.best) || 0;
+    runActKeys = Array.isArray(snap.actKeys) ? snap.actKeys : []; runActLetter = Array.isArray(snap.actLetter) ? snap.actLetter : [];
+    runOrbit = snap.orbit || null; runOrbitPts = snap.orbitPts || 0; runOrbitJackpot = !!snap.orbitJackpot; runOrbitDone = null;
     renderComboMeter();
     runLetterPos = Array.isArray(snap.letterPos) ? snap.letterPos : runLetters.map((_, k)=> k); runWarpPoints = 0; letterIncoming.clear();
     runTrayMarks = Array.isArray(snap.tray) ? snap.tray : runLetters.map(()=> 'got'); trayIncoming.clear();
@@ -10376,6 +10416,10 @@
     if (runPhase === 'solving' && snap.solve){ resumeSolvePhase(snap.solve); saveRunSnapshot(); return; }
     if (runPhase === 'coldopen'){ saveRunSnapshot(); showColdOpen(beginShow); return; }
     if (runPhase === 'finale-bumper'){ runPhase = 'running'; goToFinale(); return; }
+    if (runPhase === 'orbit' && runOrbit && !runOrbit.done){   // Run 4A: back on Round 6's Orbit Drop board, then on with the show
+      const g = showEnter('game', 'orbitDrop'); runRoundOrbit({ key:'orbitDrop' }, ()=> showDone(g, 'game orbitDrop')); return;
+    }
+    if (runPhase === 'orbit') runPhase = 'running';
     if (runPhase === 'bumper' || runPhase === 'break') runPhase = 'running';
     updateRunTimerBar();
     clearInterval(runTimerInterval);
@@ -10600,7 +10644,7 @@
       if (st.t === 'act'){
         // An act opens: the host holds up its cue card; its multiplier and VS timer apply from here.
         runActIdx = st.act; renderRunBanner();
-        if (runScoreAtHalfway == null && (RUNDOWN.acts[st.act] || {}).id === 'act2') runScoreAtHalfway = runScore;   // (for the comeback check: points before Act 2 vs after)
+        if (runScoreAtHalfway == null && (RUNDOWN.acts[st.act] || {}).id === 'r4') runScoreAtHalfway = runScore;   // (for the comeback check: points before Round 4 vs after)
         runPhase = 'bumper'; saveRunSnapshot();
         const g = showEnter('act', st.title);
         showActCard(st, ()=> showDone(g, 'act card'));
@@ -10636,9 +10680,46 @@
         runPhase = 'running';
         continue;
       }
+      if (st.t === 'game'){
+        // Run 4A: the round-end game (Riddle Round, Lucky Lights, the Mystery Door, Zap Words, Twin Flip, Orbit Drop).
+        runPhase = 'break'; saveRunSnapshot();
+        const g = showEnter('game', st.key);
+        if (runRoundGame(st, ()=> showDone(g, 'game ' + st.key))) return true;
+        runPhase = 'running';
+        continue;   // (its data turned out unusable: carry on with the show)
+      }
+      if (st.t === 'reward'){
+        runPhase = 'bumper'; saveRunSnapshot();
+        const g = showEnter('reward', 'round ' + ((RUNDOWN.acts[st.act] || {}).round || ''));
+        showRewardBeat(st, ()=> showDone(g, 'reward'));
+        return true;
+      }
       if (st.t === 'finale'){ goToFinale(); return true; }
     }
     return false;
+  }
+  // ---------- Run 4A: the round-end games ----------
+  const ROUND_GAME_NAMES = { riddle:()=> GN.riddleRound, lucky:()=> 'Lucky Lights', door:()=> 'Mystery Door', orbitDrop:()=> GN.orbitDrop };
+  function roundGameName(key){ return ROUND_GAME_NAMES[key] ? ROUND_GAME_NAMES[key]() : mysteryName(key); }
+  function runRoundGame(st, done){
+    const key = st.key;
+    runCurrentGame = roundGameName(key);
+    if (key === 'riddle'){
+      if (!INFINITY_RIDDLES.length) return false;
+      runTriviaQuestion(null, null, { t:'quiz', riddle:true, mystery:true, seed: st.seed });   // (a right answer wins a gold key; it ends through advanceAfterTrivia)
+      return true;
+    }
+    if (key === 'lucky') return typeof runLuckyLights === 'function' && runLuckyLights(st, done);
+    if (key === 'door') return runMysteryDoor(st, done);
+    if (key === 'orbitDrop') return runRoundOrbit(st, done);
+    if (miniGame(key) && mysteryAvailable(key)) return runMiniGame(key, st, done);
+    return false;
+  }
+  // The Mystery Door: the game behind the door opens (Stage 6 gives it four doors to pick from).
+  function runMysteryDoor(st, done){
+    const games = (st.doors || []).filter(g=> mysteryAvailable(g));
+    if (!games.length) return false;
+    return runMysteryGame({ game: games[0], seed: st.seed }, done);
   }
   // ---------- Part E: the new Mystery Games (lib/mini-games.js) ----------
   // Each game registers in window.MiniGames.games[key] = { name, colors:[a, b, c], bulb, rule, available(), run(api) }.
@@ -10770,18 +10851,22 @@
   let runKeys = 0;
   function addRunKey(src){
     if (!runActive) return false;
-    runKeys++; renderRunBanner(); saveRunSnapshot();
+    runKeys++; runActKeys[runActIdx] = (runActKeys[runActIdx] || 0) + 1; renderRunBanner(); saveRunSnapshot();
     if (sfx.key) sfx.key();
-    showToast('🔑 +1 key · an extra ' + GN.orbitDrop + ' chip');
+    showToast('🔑 +1 gold key · one more ' + GN.orbitDrop + ' chip');
     return true;
   }
+  let runActKeys = [], runActLetter = [];   // Run 4A: per round, the gold keys won and the Brain Beam's letter ('got' / 'miss'), for the reward beat
+  // A gold key won outright (Lucky Lights, a Cosmic Surprise): the same as a key - each is one Orbit Drop chip.
+  function addRunBonusKey(n){ runBonusChips += n; runActKeys[runActIdx] = (runActKeys[runActIdx] || 0) + n; renderRunBanner(); saveRunSnapshot(); }
+  function runGoldKeys(){ return runKeys + runBonusChips; }
   // ---------- Lucky Lights (DIRECTION.md, refs/showcase.jpg): the end of Act 3 ----------
   // A ring of 12 squares in gold and black under swaying spotlights. A light races round;
   // tap STOP and it slows to a square. Prizes go in the bank: +20, +50, x2 (doubles the
   // Act 3 points), a key or an Orbit Drop chip. Two GOOP squares (the GOOP) lose the whole Lucky
   // Lights bonus (green slime, wah-wah). After a prize: BANK it or SPIN AGAIN, up to 3 spins.
   // Prizes are at face value (the act's x3 isn't applied on top).
-  const LUCKY_SQUARES = ['+20', 'KEY', '+50', 'GOOP', '+20', 'x2', 'CHIP', '+20', 'GOOP', '+50', 'KEY', 'CHIP'];
+  const LUCKY_SQUARES = ['+20', 'KEY', '+50', 'GOOP', '+20', 'x2', 'KEY', '+20', 'GOOP', '+50', 'KEY', 'KEY'];   // (Run 4A: the CHIP squares are gold keys - a gold key is an Orbit Drop chip)
   const LUCKY_SPINS = 3, LUCKY_STEP_MS = 70, LUCKY_AUTO_STOP_MS = 8000, LUCKY_AUTO_BANK_MS = 7000;
   let runBonusChips = 0;   // Orbit Drop chips won outright (Lucky Lights' CHIP square)
   let luckyOv = null, luckyGen = 0;   // (luckyGen: a game left early never calls back into a newer run)
@@ -10823,7 +10908,7 @@
     { const tb = luckyOv.querySelector('.ll-title .sign-bulbs'); if (tb) requestAnimationFrame(()=> ringBulbs(tb, 18, 6)); }
     const sqs = [...luckyOv.querySelectorAll('.ll-sq')], hubT = luckyOv.querySelector('.ll-hub-t'), hubS = luckyOv.querySelector('.ll-hub-s');
     const bStop = luckyOv.querySelector('.stop'), bBank = luckyOv.querySelector('.bank'), bAgain = luckyOv.querySelector('.again'), note = luckyOv.querySelector('.ll-note');
-    const renderBank = ()=>{ luckyOv.querySelector('.ll-bank').textContent = 'BANK +' + bank + (dbl ? ' · ×2 ACT 3' : '') + (keys ? ' · 🔑' + keys : '') + (chips ? ' · 🪙' + chips : '') + ' · SPIN ' + Math.min(LUCKY_SPINS, spins + (state === 'spinning' ? 1 : 0)) + '/' + LUCKY_SPINS; };
+    const renderBank = ()=>{ luckyOv.querySelector('.ll-bank').textContent = 'BANK +' + bank + (dbl ? ' · ×2 ROUND' : '') + (keys ? ' · 🔑' + keys : '') + (chips ? ' · 🪙' + chips : '') + ' · SPIN ' + Math.min(LUCKY_SPINS, spins + (state === 'spinning' ? 1 : 0)) + '/' + LUCKY_SPINS; };
     const light = (i)=>{ sqs.forEach((s, k)=> s.classList.toggle('on', k === i)); };
     const show = (btns)=>{ bStop.classList.toggle('hidden', btns.indexOf('stop') < 0); bBank.classList.toggle('hidden', btns.indexOf('bank') < 0); bAgain.classList.toggle('hidden', btns.indexOf('again') < 0); };
     const finish = (banked)=>{
@@ -10832,8 +10917,8 @@
         const extra = dbl ? act3 : 0, total = bank + extra;
         if (total) addRunScore(total, true);
         for (let k = 0; k < keys; k++) addRunKey('lucky');
-        if (chips){ runBonusChips += chips; saveRunSnapshot(); }
-        hubT.textContent = 'BANKED!'; hubS.textContent = [total ? '+' + total + ' points' : '', keys ? '🔑 ' + keys : '', chips ? '🪙 ' + chips + ' chip' + (chips > 1 ? 's' : '') : ''].filter(Boolean).join(' · ') || 'Nothing ventured!';
+        if (chips) addRunBonusKey(chips);
+        hubT.textContent = 'BANKED!'; hubS.textContent = [total ? '+' + total + ' points' : '', keys + chips ? '🔑 ' + (keys + chips) + ' gold key' + (keys + chips > 1 ? 's' : '') : ''].filter(Boolean).join(' · ') || 'Nothing ventured!';
         if (total || keys || chips){ sfx.cashRegister(); sfx.jackpot(); FX.burstAt(showFx, luckyOv.querySelector('.ll-hub'), { count:18, spread:130, shapes:['star', 'coin'] }); castShowcase('left', 1500, ()=> gen === luckyGen && !luckyOv.classList.contains('hidden'), true); }   // (Run 3: the presenter, for the reveal)
       }
       setTimeout(()=>{ if (gen !== luckyGen) return; luckyOv.classList.add('hidden'); luckyOv.innerHTML = ''; noteOverlayClosed(); updatePauseBtnVisibility(); done(); }, banked ? 1700 : 2300);
@@ -10854,8 +10939,8 @@
       else if (k === 'KEY') keys++;
       else if (k === 'CHIP') chips++;
       sfx.correct(); FX.pop(sq, 1.25);
-      hubT.textContent = k === 'KEY' ? '🔑 KEY' : k === 'CHIP' ? '🪙 CHIP' : luckyLabel(k);
-      hubS.textContent = k === 'x2' ? 'Act 3 points doubled: +' + act3 : k === 'KEY' ? 'An extra Orbit Drop chip' : k === 'CHIP' ? 'An Orbit Drop chip' : 'into the bank';
+      hubT.textContent = k === 'KEY' || k === 'CHIP' ? '🔑 GOLD KEY' : luckyLabel(k);
+      hubS.textContent = k === 'x2' ? 'This round’s points doubled: +' + act3 : k === 'KEY' || k === 'CHIP' ? 'One more Orbit Drop chip' : 'into the bank';
       renderBank();
       if (spins >= LUCKY_SPINS){ setTimeout(()=>{ if (gen === luckyGen) finish(true); }, 700); return; }
       note.textContent = 'Bank it, or spin again and risk the GOOP?';
@@ -11231,6 +11316,34 @@
         ? '</div><div class="cue-fig host-full">' + Host.html({ pose:'presenting' }) + '</div>'
         : '<div class="cue-host cue-bust host-full">' + Host.html({ pose:'presenting' }) + '</div></div>');   // F6: the drawn host, head and shoulders with the mic
   }
+  // Run 4A: the reward beat - the round's points (Orbit Drop's winnings in Round 6), its letter and its gold keys.
+  function showRewardBeat(st, then){
+    const a = RUNDOWN.acts[st.act] || {}, letter = runActLetter[st.act], keys = runActKeys[st.act] || 0;
+    const hasOrbit = (a.steps || []).some(s=> s.game === 'orbitDrop' || s.orbitDrop);
+    const pts = Math.round((runActPts[st.act] || 0) + (hasOrbit ? runOrbitPts : 0));
+    showCard.className = 'show-card reward';
+    showCard.innerHTML = '<div class="rw-panel ds-card dark"><div class="rw-title"></div><div class="rw-row">' +
+      '<span class="rw-chip pts" style="--i:0"><b>+' + pts + '</b><small>points</small></span>' +
+      '<span class="rw-chip letter ' + (letter || 'none') + '" style="--i:1"><b>' + (letter === 'got' ? '?' : letter === 'miss' ? '✕' : '–') + '</b><small>' + (letter === 'got' ? 'letter won' : 'no letter') + '</small></span>' +
+      '<span class="rw-chip keys" style="--i:2"><b>🔑 ' + keys + '</b><small>gold key' + (keys === 1 ? '' : 's') + '</small></span></div>' +
+      '<div class="rw-total"></div></div>';
+    showCard.querySelector('.rw-title').textContent = (a.title || 'ROUND') + ' DONE!';
+    showCard.querySelector('.rw-total').textContent = shownScore(runScore) + ' points · ' + runGoldKeys() + ' gold key' + (runGoldKeys() === 1 ? '' : 's') + ' · ' + runLetters.length + ' of ' + RUN_WORD_LENGTH + ' letters';
+    showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', (a.title || 'Round') + ' done: ' + pts + ' points, ' + (letter === 'got' ? 'a letter, ' : '') + keys + ' gold keys. Tap to go on');
+    showCard.classList.remove('hidden');
+    if (pts > 0) sfx.chime(5);
+    const shownAt = performance.now();
+    let gone = false;
+    const go = (e)=>{
+      if (gone || (e && performance.now() - shownAt < SKIP_MIN_MS)) return;
+      gone = true; showCard.removeEventListener('click', go);
+      showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden';
+      noteOverlayClosed();
+      then();
+    };
+    (runActive ? showLater : setTimeout)(()=> go(), cine(TIMING.REWARD_HOLD || 2200));
+    if (runActive) showOn(showCard, 'click', go); else showCard.addEventListener('click', go);
+  }
   function showActCard(st, then){
     const fin = !!st.finale, w = st.world || 'vs';
     showCard.className = 'show-card cue' + (fin ? ' finale' : '');
@@ -11408,8 +11521,17 @@
   function renderDailyClock(){
     const el = document.getElementById('dailyClock'); if (!el || !runActive) return;
     const a = runAct(), m = a.mult || 1;
-    el.textContent = a.id === 'finale' ? 'FINALE' : (a.sub || '').split(' ')[0] === 'ACT' ? 'ACT ' + (a.sub.split(' ')[1] || '') + (m > 1 ? ' ×' + m : '') : (a.title || '');
+    el.textContent = a.id === 'finale' ? 'FINALE' : a.round ? 'R' + a.round + (m > 1 ? ' ×' + m : '') : (a.title || '');   // (the six segments under the pill show the "of 6")
+    el.setAttribute('aria-label', a.id === 'finale' ? 'Grand Finale' : a.round ? 'Round ' + a.round + ' of ' + SHOW_ROUND_COUNT + (m > 1 ? ', points times ' + m : '') : (a.title || ''));
     el.classList.toggle('hot', m > 1);
+  }
+  // Run 4A: the round tracker - six segments along the bottom of the HUD pill: done, the one you're in, to come.
+  const SHOW_ROUND_COUNT = RUNDOWN.acts.filter(a=> a.round).length || 6;
+  function roundTrackHtml(){
+    const a = runAct(), cur = a.id === 'finale' ? SHOW_ROUND_COUNT + 1 : (a.round || 0);
+    let s = '<span class="sp-rounds" aria-hidden="true">';
+    for (let k = 1; k <= SHOW_ROUND_COUNT; k++) s += '<i class="' + (k < cur ? 'done' : k === cur ? 'now' : '') + '"></i>';
+    return s + '</span>';
   }
   function updateRunTimerBar(){
     renderDailyClock();
@@ -11598,7 +11720,8 @@
     if (!resumeQ || !second){ runQuizBeam = !!(step ? step.beam : (resumeQ && resumeQ.beam)); runQuizMystery = !!(step ? step.mystery : (resumeQ && resumeQ.mystery)); }
     runPendingQ = { question: q.question, opts: q.opts, correctIdx: q.correctIdx, riddle: !!q.riddle, beam: runQuizBeam, mystery: runQuizMystery };
     const beamLook = true, flipIn = !resumeEndsAt && !FX.reduced();   // (D2: riddles get their own look and flip in too)
-    runPendingQEndsAt = resumeEndsAt || (Date.now() + (flipIn ? dt(BEAM_FLIP_MS) : 0) + dt(10000));
+    const qMs = q.riddle ? RIDDLE_MS : dt(10000);   // (Run 4A: the Riddle Round gets its 30 s; a Brain Beam 10 s)
+    runPendingQEndsAt = resumeEndsAt || (Date.now() + (flipIn ? dt(BEAM_FLIP_MS) : 0) + qMs);
     if (DEBUG_FAST) window.__debugLastTriviaQ = q;
     els.eventOverlay.classList.remove('hidden', 'powerup'); els.eventOverlay.classList.add('stack'); els.eventOverlay.style.setProperty('--bb', q.riddle ? '#c9ff7a' : '#ffd23f');
     els.powerupIcon.classList.add('hidden');
@@ -11627,7 +11750,7 @@
     const startClock = ()=>{
       if (runPendingQ !== myQ || runQuizPick != null) return;
       const remain = Math.max(0, runPendingQEndsAt - Date.now());
-      startEventTimerBar(remain, dt(10000));
+      startEventTimerBar(remain, qMs);
       clearTimeout(eventTimeoutId);
       eventTimeoutId = setTimeout(()=> resolve(false), remain);
     };
@@ -11677,6 +11800,7 @@
         runLetters.push(nextLetter); runLetterPos.push(pos);
         if (runTrayMarks.length < RUN_WORD_LENGTH){ trayAt = runTrayMarks.length; runTrayMarks.push('got'); trayIncoming.add(trayAt); }
       } else { quizScore(EXTRA_BEAM_POINTS); }
+      if (runQuizBeam) runActLetter[runActIdx] = 'got';
       if (runQuizMystery) addRunKey('mystery');   // a Mystery Game win (the riddle): a key
       // Accuracy bonus: points (never letters) for back-to-back correct
       // answers - +2, then +4, then +6 from the 4th in a row on. Added
@@ -11701,6 +11825,7 @@
       sfx.wrong();
       runTriviaStreak = 0;
       if (runQuizBeam && runTrayMarks.length < RUN_WORD_LENGTH) runTrayMarks.push('miss');   // the prize track: a red X
+      if (runQuizBeam) runActLetter[runActIdx] = 'miss';
       runScore -= 5; runMissPts += 5; // trivia carries real stakes too, applied directly since we're deliberately in the 'trivia' phase
       renderRunBanner();
       els.eventSubtitle.textContent = '';
@@ -11725,7 +11850,7 @@
     // B2: the show plan decides what's next (Second Chance is retired - the
     // Portal Pick's hint is the help now).
     if (runClockExpired()){ goToFinale(); return; }
-    showDoneFrom(['quiz', 'mystery'], 'brain beam');
+    showDoneFrom(['quiz', 'mystery', 'game'], 'brain beam');
   }
   // Second Chance: one question, from the same subject as the player's first
   // miss, worth exactly one letter - the next one in word order (letters are
@@ -12259,7 +12384,7 @@
     document.getElementById('plinkoTally').innerHTML = landed.map(c=> '<span class="pt-chip' + (c.kind === 'jackpot' ? ' jack' : '') + '">' + plinkoLabel(c.kind) + ' <b>+' + c.pts + '</b></span>').join('');
     const drop = document.getElementById('plinkoDrop'), all = document.getElementById('plinkoAll'), board = document.getElementById('plinkoBoard');
     const done = plinkoAllLanded();
-    drop.textContent = dailyOrbit ? '🏆 See your results ▶' : '🔐 Open ' + GN.vault + ' ▶';
+    drop.textContent = dailyOrbit ? (dailyOrbit.mid ? 'On with the show ▶' : '🏆 See your results ▶') : '🔐 Open ' + GN.vault + ' ▶';
     drop.classList.toggle('hidden', !done);
     all.classList.toggle('hidden', left <= 0 || pkAuto);
     board.classList.toggle('done', left <= 0);
@@ -12809,13 +12934,27 @@
   const DAILY_ORBIT_MAX = 6;
   function dailyChipsFor(keys, chips, solved){ return Math.max(ORBIT_MIN_CHIPS, Math.min(DAILY_ORBIT_MAX, (keys || 0) + (chips || 0) + (solved ? 1 : 0))); }
   function dailyOrbitChips(r){ return Math.max(ORBIT_MIN_CHIPS, Math.min(DAILY_ORBIT_MAX, r.orbitChips || ORBIT_MIN_CHIPS)); }
-  function saveDailyOrbit(){ if (runResultToday && runResultToday.orbit === dailyOrbit) saveRunResultToday(runResultToday); }
+  function saveDailyOrbit(){ if (dailyOrbit && dailyOrbit.mid){ saveRunSnapshot(); return; } if (runResultToday && runResultToday.orbit === dailyOrbit) saveRunResultToday(runResultToday); }
+  // Run 4A: Orbit Drop is Round 6's game, mid-show: one chip per gold key (ORBIT_MIN_CHIPS to DAILY_ORBIT_MAX); its
+  // winnings go straight into the score (not through the round's multiplier) and the show goes on to the Word Warp.
+  let runOrbit = null, runOrbitPts = 0, runOrbitJackpot = false, runOrbitDone = null;
+  function runRoundOrbit(st, done){
+    if (!runOrbit || runOrbit.done) runOrbit = { stage:'plinko', chips: drawPlinkoOutcomes(dailyChipsFor(runKeys, runBonusChips, false)), dropped:0, base: runScore, done:false, mid:true };
+    runPhase = 'orbit'; runOrbitDone = done; saveRunSnapshot();
+    const n = runOrbit.chips.length, k = runGoldKeys();
+    openOrbitBoard(runOrbit, (k ? k + ' gold key' + (k === 1 ? '' : 's') + (n > k ? ' + ' + (n - k) + ' free' : '') : n + ' free') + ' = ' + n + ' chips. Drag the UFO, let go to drop.');
+    return true;
+  }
   function openDailyOrbit(r){
     showEnter('orbit');
     if (!r.orbit) r.orbit = { stage:'plinko', chips: drawPlinkoOutcomes(dailyOrbitChips(r)), dropped:0, base: r.score, done:false };
     if (r.orbit.done){ showRunReadout(); return; }
     saveRunResultToday(r);
-    dailyOrbit = r.orbit;
+    const from = [(r.keys ? r.keys + ' 🔑' : ''), (r.bonusChips ? r.bonusChips + ' 🔑' : ''), (r.warpChip ? '+1 ' + GN.wordWarp : '')].filter(Boolean).join(', ');
+    openOrbitBoard(r.orbit, r.orbit.chips.length + ' chips' + (from ? ' (' + from + ')' : '') + '. Drag the UFO, let go to drop.');
+  }
+  function openOrbitBoard(o, line){
+    dailyOrbit = o;
     els.eventOverlay.classList.add('hidden');
     ['finComplete', 'finVault'].forEach(id=> document.getElementById(id).classList.add('hidden'));
     els.finOverlay.classList.remove('vault-stage', 'daily-vault');
@@ -12824,13 +12963,27 @@
     updatePauseBtnVisibility();
     finTapShieldAt = performance.now(); startFinSky();
     document.getElementById('pkBanner').textContent = 'ORBIT DROP';
-    const from = [(r.keys ? r.keys + ' 🔑' : ''), (r.bonusChips ? r.bonusChips + ' 🪙' : ''), (r.warpChip ? '+1 ' + GN.wordWarp : '')].filter(Boolean).join(', ');
-    document.getElementById('pkLine').textContent = r.orbit.chips.length + ' chips' + (from ? ' (' + from + ')' : '') + '. Drag the UFO, let go to drop.';
+    document.getElementById('pkLine').textContent = line;
     renderPlinko();   // (the board is up under the host's intro, so an early tap never meets a blank one)
-    hostIntro('orbitDrop', ()=>{ if (dailyOrbit === r.orbit && !r.orbit.dropped) renderPlinko(); });   // (not once a chip is already in the air)
+    hostIntro('orbitDrop', ()=>{ if (dailyOrbit === o && !o.dropped) renderPlinko(); });   // (not once a chip is already in the air)
   }
   function finishDailyOrbit(){
-    const r = runResultToday, o = dailyOrbit; if (!r || !o) return;
+    const o = dailyOrbit;
+    if (o && o.mid){   // Round 6: the winnings into the score, on with the show
+      const won = o.chips.reduce((a, c)=> a + (c.pts || 0), 0);
+      o.done = true; o.stage = 'done';
+      runOrbitPts = won; runOrbitJackpot = o.chips.some(c=> c.kind === 'jackpot');
+      runScore += won;
+      if (!runBestMoment || won > runBestMoment.pts) runBestMoment = { pts: won, text: GN.orbitDrop + (runOrbitJackpot ? ': THE MOTHERSHIP!' : '') };
+      dailyOrbit = null;
+      document.getElementById('pkLine').textContent = 'Drag the UFO, let go to drop. Every chip pays.';
+      els.finOverlay.classList.add('hidden'); els.finOverlay.classList.remove('daily-orbit'); stopFinSky();
+      runPhase = 'running'; renderRunBanner(); saveRunSnapshot();
+      const d = runOrbitDone; runOrbitDone = null;
+      if (d) d();
+      return;
+    }
+    const r = runResultToday; if (!r || !o) return;
     const won = o.chips.reduce((a, c)=> a + (c.pts || 0), 0);
     o.done = true; o.stage = 'done';
     r.orbitPoints = won; r.jackpot = o.chips.some(c=> c.kind === 'jackpot');
@@ -13989,7 +14142,7 @@
     const type = personality.type, meta = PERSONALITY_META[type];
     if (b.crowd) recordSwing(b.agree, b.crowd);
     const fresh = checkUnlocks({});
-    els.infAwardEyebrow.textContent = 'YOUR LAST ' + INF_AWARD_VOTES + ' FLIPS';
+    els.infAwardEyebrow.textContent = 'YOUR LAST ' + INF_AWARD_VOTES + ' CARDS';
     document.getElementById('infAwardIcon').textContent = meta.icon;
     els.infAwardName.textContent = meta.name;
     els.infAwardBlurb.textContent = personality.note || meta.blurb;
@@ -14557,11 +14710,14 @@
     renderRunBanner();
     voted = false; votedSinceTime = null;
     playRunEndMusic(!!solved);
-    // The grand prize: Orbit Drop (the Vault is retired from Daily), then today's results.
+    // Run 4A: Orbit Drop was Round 6 (its points are in the score already); the Word Warp finale ends the show: the results.
     runResultToday.vsMarks = runVsMarks.slice(); runResultToday.letters = runLetters.length;
-    runResultToday.keys = runKeys; runResultToday.bonusChips = runBonusChips; runResultToday.warpChip = !!solved;
-    runResultToday.orbitChips = dailyChipsFor(runKeys, runBonusChips, !!solved);
-    openDailyOrbit(runResultToday);
+    runResultToday.keys = runKeys; runResultToday.bonusChips = runBonusChips; runResultToday.warpChip = false;
+    runResultToday.orbitChips = runOrbit ? runOrbit.chips.length : dailyChipsFor(runKeys, runBonusChips, false);
+    runResultToday.orbitPoints = runOrbitPts; runResultToday.jackpot = runOrbitJackpot;
+    runResultToday.orbit = { stage:'done', chips: runOrbit ? runOrbit.chips : [], dropped: runOrbit ? runOrbit.dropped : 0, base: runScore - runOrbitPts, done:true };
+    saveRunResultToday(runResultToday);
+    showRunReadout(true);
   }
   // ---------- The episode's results screen (refs/results.jpg) ----------
   function mysteryName(key){
@@ -14577,7 +14733,7 @@
     const rows = [], acts = RUNDOWN.acts;
     let listed = 0;
     acts.forEach((a, i)=>{ if (a.ad || a.id === 'finale') return; const p = Math.round((r.actPts || [])[i] || 0); listed += p;
-      rows.push([(a.sub || '').split(' · ')[0] + ' · ' + a.title + (a.mult > 1 ? ' ×' + a.mult : ''), p]); });
+      rows.push([(a.round ? 'Round ' + a.round : a.title) + (a.mult > 1 ? ' ×' + a.mult : ''), p]); });
     const warp = r.warpPoints || 0; listed += warp;
     rows.push([GN.wordWarp + (r.solved ? ' · ' + formatRaceTime(r.solveMs) : ' · not solved'), warp]);
     // What's left is bonuses less misses: the misses get their own line, and a negative "Bonuses" never shows.
@@ -14613,8 +14769,8 @@
     // Tomorrow on FlipStax: the next episode, its countdown and a tease of its Mystery Games.
     const tomorrow = dayAfter(r.date || todayStr());
     document.getElementById('eprNextEp').textContent = 'EPISODE ' + showEpisode(tomorrow);
-    const g = pickMysteryGames(tomorrow).filter(Boolean).map(mysteryName);
-    document.getElementById('eprTease').textContent = g.length ? 'Mystery Games: ' + g.join(' and ') + '. Plus a new crowd, new Brain Beams and a new word.' : '';
+    const g = showDoorGames(tomorrow).filter(Boolean).map(mysteryName);
+    document.getElementById('eprTease').textContent = g.length ? 'Behind the Mystery Door: ' + g.slice(0, -1).join(', ') + (g.length > 1 ? ' or ' : '') + g[g.length - 1] + '. Plus a new crowd, new Brain Beams and a new word.' : '';
     const clock = document.getElementById('eprCountdown');
     const tick = (first)=>{
       if (!first && !els.readoutOverlay.classList.contains('show')){ clearInterval(eprClockT); eprClockT = null; return; }
@@ -14722,7 +14878,7 @@
   // still kept, for the vibe reveal.
   function crowdNow(){
     if (runActive) return { agree: runVotesAgreed, n: runVotesDecided, scope: 'this run' };
-    if (inInfinity()) return { agree: infBlock.agree, n: infBlock.crowd, scope: 'these ' + infBlock.votes + ' flips' };
+    if (inInfinity()) return { agree: infBlock.agree, n: infBlock.crowd, scope: 'these ' + infBlock.votes + ' cards' };
     return null;
   }
   function updateVibeMeter(){
@@ -16155,8 +16311,8 @@
       let text, sub = '';
       if (prize === 'points10'){ cosmicPts(10); text = '+' + (10 * mult) + ' POINTS'; }
       else if (prize === 'points20'){ cosmicPts(20); text = '+' + (20 * mult) + ' POINTS'; }
-      else if (prize === 'key'){ cosmicKey(); text = '🔑 +1 KEY'; sub = cosmicDaily ? 'An extra ' + GN.orbitDrop + ' chip in the finale' : 'Keys open the finale'; }
-      else if (cosmicDaily){ runBonusChips++; saveRunSnapshot(); text = '🪙 +1 CHIP'; sub = 'An extra ' + GN.orbitDrop + ' chip in the finale'; }
+      else if (prize === 'key'){ cosmicKey(); text = cosmicDaily ? '🔑 +1 GOLD KEY' : '🔑 +1 KEY'; sub = cosmicDaily ? 'One more ' + GN.orbitDrop + ' chip in Round 6' : 'Keys open the finale'; }
+      else if (cosmicDaily){ addRunBonusKey(1); text = '🔑 +1 GOLD KEY'; sub = 'One more ' + GN.orbitDrop + ' chip in Round 6'; }
       else { infRun.bonusChip = true; saveInfRun(); text = '🪙 BONUS CHIP'; sub = 'An extra ' + GN.orbitDrop + ' chip'; }
       label.innerHTML = ''; label.classList.add('won');
       const pill = document.createElement('span'); pill.className = 'cz-pill'; label.appendChild(pill);
@@ -16899,12 +17055,12 @@
   const HOWTO_SCREENS = {
     daily: [
       HOWTO_PICK,
-      { icon:'🎬', lead:'One show a day, in three acts.',
-        lines:['Act 1: THE OPENER. Act 2: DOUBLE TROUBLE, points ×2. Act 3: LIGHTNING ROUND, points ×3 and faster cards.',
-          'Each ' + GN.brainBeam + ' you get right wins a face-down tile on the prize track. Two Mystery Games change every day.'],
-        chipsLabel:GN.portalPick + ' — pick a portal',
-        chips:[ ['⚡ +10 pts', 'Instant points'], ['🐌 +30s', 'More time on the clock'],
-                ['🎁 ' + GN.cosmicSurprise, 'A gamble: +25 or −25 points'], ['💡 Free Hint', 'A clue for the word'] ] },
+      { icon:'🎬', lead:'One show a day, in six rounds.',
+        lines:['Rounds 1 and 2 score normal points, Rounds 3 and 4 points ×2, Rounds 5 and 6 points ×3.',
+          'Each ' + GN.brainBeam + ' you get right wins a Word Warp letter. Win a round-end game for a 🔑 gold key: each one is a chip in ' + GN.orbitDrop + '.'],
+        chipsLabel:'The round-end games',
+        chips:[ ['🧩 ' + GN.riddleRound, 'Round 1'], ['💡 Lucky Lights', 'Round 2'],
+                ['🚪 Mystery Door', 'Round 3'], ['⚡ ' + GN.zapWords, 'Round 4'], ['🃏 ' + GN.twinFlip, 'Round 5'], ['🛸 ' + GN.orbitDrop, 'Round 6'] ] },
       HOWTO_LAST_DAILY,
     ],
     infinity: [
@@ -17147,41 +17303,47 @@
     function planIndex(pred, nth){ const plan = buildShowPlan(todayStr()); let k = 0; for (let i = 0; i < plan.length; i++) if (pred(plan[i]) && k++ === (nth || 0)) return i; return 0; }
     const atType = (pred, nth, score, letters, tweak)=> ()=> replayAtStep(planIndex(pred, nth), score, letters, tweak);
     const actCard = (a)=> atType(s=> s.t === 'act' && s.act === a);
-    const mysteryAs = (game)=> atType(s=> s.t === 'mystery', 0, 60, 1, (i)=>{ runPlan[i] = Object.assign({}, runPlan[i], { game, seed:20261013, forced:true }); });
+    // (Run 4A: a forced game plays in the Mystery Door's slot, through the old Mystery Game reveal)
+    const doorStep = s=> s.t === 'game' && s.key === 'door';
+    const mysteryAs = (game)=> atType(doorStep, 0, 60, 2, (i)=>{ runPlan[i] = Object.assign({}, runPlan[i], { t:'mystery', game, seed:20261013, forced:true }); });
+    const roundGame = (key, score, letters, tweak)=> atType(s=> s.t === 'game' && s.key === key, 0, score, letters, tweak);
+    const roundCard = (n)=> actCard(RUNDOWN.acts.findIndex(a=> a.round === n));
     function replaySampleEpisode(){
       const r = replaySampleResult();
-      return Object.assign(r, { score: 412, actPts: [64, 128, 141], missPts: 10, goopLost: 28, best: { pts: 45, text: 'Read the crowd on Pizza vs Tacos in Lightning Round' }, episode: showEpisode(todayStr()),
+      return Object.assign(r, { score: 412, actPts: [22, 31, 58, 64, 89, 60], missPts: 10, goopLost: 28, best: { pts: 45, text: 'Read the crowd on Pizza vs Tacos in Round Five' }, episode: showEpisode(todayStr()),
         orbit: { stage:'done', done:true, chips:[], dropped:0, base: 368 }, orbitPoints: 44, jackpot: true, letters: 5, streak: 7,
         vsMarks: ['ggrggrggg', '', 'grggrgggr', 'ggrgrg'] });
     }
     const JUMPS = [
       { label:'Cold open', go: ()=> replayEnter(null, null) },
-      { label:'Act 1 card', go: actCard(0) },
+      { label:'Round 1 card', go: roundCard(1) },
       { label:'VS card', go: atType(s=> s.t === 'vs', 0, 12, 0) },
       { label:'Brain Beam', go: atType(s=> s.t === 'quiz', 0, 24, 0) },
-      { label:'Riddle', go: mysteryAs('riddle') },
+      { label:'Riddle Round', go: roundGame('riddle', 30, 1) },
+      { label:'Reward beat', go: atType(s=> s.t === 'reward', 0, 40, 1) },
       { label:'Crowd Scan', go: mysteryAs('crowdScan') },
       { label:'Cosmic Surprise', go: atType(s=> s.t === 'vs', 0, 30, 1, (i)=>{ runPlan.splice(i, 0, { t:'cosmic', act:0, seed:7 }); }) },
-      { label:'Commercial (off)', go: atType(s=> s.t === 'act' && (RUNDOWN.acts[s.act] || {}).id === 'act2', 0, 70, 2, (i)=>{ runPlan.splice(i, 0, { t:'ad', forced:true, ad: showAd(todayStr()) }); }) },
-      { label:'Act 2 card', go: actCard(RUNDOWN.acts.findIndex(a=> a.id === 'act2')) },
-      { label:'Portal Pick', go: atType(s=> s.t === 'portal', 0, 96, 3) },
-      { label:'Act 3 card', go: actCard(RUNDOWN.acts.findIndex(a=> a.id === 'act3')) },
-      { label:'Lucky Lights', go: atType(s=> s.t === 'lucky', 0, 180, 5, ()=>{ window.__forceLucky = null; }) },
-      { label:'Lucky: GOOP', go: atType(s=> s.t === 'lucky', 0, 180, 5, ()=>{ window.__forceLucky = 'GOOP'; }) },
-      ...[1, 2, 3].map(n=> ({ label:'Lucky palette ' + n, go: atType(s=> s.t === 'lucky', 0, 180, 5, ()=>{ window.__forceLucky = null; try{ localStorage.setItem('flipstax_lucky_theme', String(n)); }catch(e){} }) })),
+      { label:'Commercial (off)', go: atType(s=> s.t === 'act' && (RUNDOWN.acts[s.act] || {}).id === 'r3', 0, 70, 2, (i)=>{ runPlan.splice(i, 0, { t:'ad', forced:true, ad: showAd(todayStr()) }); }) },
+      { label:'Round 3 card', go: roundCard(3) },
+      { label:'Mystery Door', go: roundGame('door', 96, 3) },
+      { label:'Portal Pick (old)', go: atType(doorStep, 0, 96, 3, (i)=>{ runPlan.splice(i, 0, { t:'portal', act:runPlan[i].act, doors: RUN_POWERUPS.map(p=> p.key) }); }) },
+      { label:'Round 5 card', go: roundCard(5) },
+      { label:'Lucky Lights', go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = null; }) },
+      { label:'Lucky: GOOP', go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = 'GOOP'; }) },
+      ...[1, 2, 3].map(n=> ({ label:'Lucky palette ' + n, go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = null; try{ localStorage.setItem('flipstax_lucky_theme', String(n)); }catch(e){} }) })),
       { label:'Price Probe', go: mysteryAs('priceProbe') },
       { label:'Oddball Alert', go: mysteryAs('oddballAlert') },
       { label:'Emoji Decode', go: mysteryAs('emojiDecode') },
       { label:'Time Warp', go: mysteryAs('timeWarp') },
       { label:'Peak or Plunge', go: mysteryAs('peakOrPlunge') },
-      ...['easy', 'medium', 'hard'].map(diff=> ({ label:'Snap Sort: ' + diff, go: atType(s=> s.t === 'mystery', 0, 60, 1, (i)=>{ runPlan[i] = Object.assign({}, runPlan[i], { game:'snapSort', seed:(Math.random() * 4294967296) >>> 0, forced:true, diff }); }) })),
-      { label:'Zap Words', go: mysteryAs('zapWords') },
-      { label:'Twin Flip', go: mysteryAs('twinFlip') },
+      ...['easy', 'medium', 'hard'].map(diff=> ({ label:'Snap Sort: ' + diff, go: atType(doorStep, 0, 60, 2, (i)=>{ runPlan[i] = Object.assign({}, runPlan[i], { t:'mystery', game:'snapSort', seed:(Math.random() * 4294967296) >>> 0, forced:true, diff }); }) })),
+      { label:'Zap Words', go: roundGame('zapWords', 150, 4) },
+      { label:'Twin Flip', go: roundGame('twinFlip', 220, 5) },
       { label:'Fact or Fib', go: mysteryAs('factOrFib') },
       { label:'Saucer Shuffle', go: mysteryAs('saucerShuffle') },
       // The finale's cue card, then the Word Warp with all six letters in.
       { label:'Grand finale (6 letters)', wide:true, go: atType(s=> s.t === 'act' && s.finale, 0, 210, 6) },
-      { label:'Orbit Drop', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); const r = replaySampleEpisode(); delete r.orbit; delete r.orbitPoints; r.score = 368; r.keys = 2; r.bonusChips = 1; r.warpChip = true; r.orbitChips = dailyChipsFor(2, 1, true); runResultToday = r; openDailyOrbit(r); }) },
+      { label:'Orbit Drop', go: roundGame('orbitDrop', 300, 6, ()=>{ runKeys = 3; runBonusChips = 1; }) },
       { label:'Results (sample)', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); runResultToday = replaySampleEpisode(); showRunReadout(); updatePauseBtnVisibility(); }) },
       { label:'Share image', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); runResultToday = replaySampleEpisode(); showRunReadout(); updatePauseBtnVisibility();
         prebuildDailyShare(runResultToday).promise.then(p=>{ if (!p.canvas) return; const v = document.createElement('div'); v.className = 'replay-shareview'; v.innerHTML = '<img alt="Share image"><pre></pre>'; v.querySelector('img').src = p.canvas.toDataURL('image/png'); v.querySelector('pre').textContent = episodeShareText(runResultToday, true); v.onclick = ()=> v.remove(); document.body.appendChild(v); }); }) },
