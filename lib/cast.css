@@ -61,3 +61,7 @@
 .cast-m.lane .cast-say{ bottom:3px; left:auto; right:100%; margin-right:8px; transform-origin:100% 50%; font-size:14px; padding:6px 11px; transform:scale(0.7); animation-name:castSayP; }
 .cast-m.lane .cast-say::after{ top:50%; left:100%; margin:-6px 0 0 0; border:6px solid transparent; border-left-color:#fff; border-top-color:transparent; }
 :root.lite .cast-m.lane .cast-say, :root.lite .cast-m.peek .cast-say{ transform:none !important; }
+
+/* Run 4A: Cleo's picture points to its left, so it is mirrored on the left side (her open hand points in, toward the score) */
+.cast-m.m-purple.left .cast-fig img{ transform:scaleX(-1); }
+.cast-m.m-purple.right .cast-fig img{ transform:none; }

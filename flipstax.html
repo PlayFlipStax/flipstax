@@ -2554,6 +2554,9 @@
   .show-host .alien{ width:36px; height:41px; }
   /* On the results screen the host steps out of the way: it used to sit on the Share button. */
   :root.results-open .show-host{ display:none !important; }
+  /* Run 4A: no corner host on gameplay screens - the host appears only in the intro, the round announcements, the outro
+     and his failure reactions (lib/cast.js). His speech bubble stays as a caption line. */
+  :root:is(.mode-daily, .mode-infinity) .show-host .alien{ display:none !important; }
   /* The host and his bubble live in a reserved strip at the bottom (HOST_STRIP tall): the screens keep that
      strip clear (the board's hint line, the popups' bottom padding), so the bubble never covers an answer,
      a card or its text. One line, and it hides itself after 2.5s. */
@@ -10797,6 +10800,8 @@
         resEl.className = 'mg-result on ' + (pts ? 'win' : 'miss'); resEl.textContent = pts ? '+' + (pts * api.mult) : 'MISSED';
         if (res && res.line) api.say(res.line, 1800);
         if (pts){ sfx.cashRegister(); api.flash('win'); hostMood('cheer'); } else { hostMood('sad'); }
+        if (runActive && win && Show.scene === 'game') castWin(()=> !!document.getElementById('mgOverlay'));   // (Run 4A: a round-end game won)
+        else if (runActive && !pts && Show.scene === 'game') castOops();
         setTimeout(()=> close(false), 1700);
       },
     };
@@ -10919,7 +10924,7 @@
         for (let k = 0; k < keys; k++) addRunKey('lucky');
         if (chips) addRunBonusKey(chips);
         hubT.textContent = 'BANKED!'; hubS.textContent = [total ? '+' + total + ' points' : '', keys + chips ? '🔑 ' + (keys + chips) + ' gold key' + (keys + chips > 1 ? 's' : '') : ''].filter(Boolean).join(' · ') || 'Nothing ventured!';
-        if (total || keys || chips){ sfx.cashRegister(); sfx.jackpot(); FX.burstAt(showFx, luckyOv.querySelector('.ll-hub'), { count:18, spread:130, shapes:['star', 'coin'] }); castShowcase('left', 1500, ()=> gen === luckyGen && !luckyOv.classList.contains('hidden'), true); }   // (Run 3: the presenter, for the reveal)
+        if (total || keys || chips){ sfx.cashRegister(); sfx.jackpot(); FX.burstAt(showFx, luckyOv.querySelector('.ll-hub'), { count:18, spread:130, shapes:['star', 'coin'] }); castWin(()=> gen === luckyGen && !luckyOv.classList.contains('hidden')); }   // (Run 4A: a round-end game won - the presenter, now and then)
       }
       setTimeout(()=>{ if (gen !== luckyGen) return; luckyOv.classList.add('hidden'); luckyOv.innerHTML = ''; noteOverlayClosed(); updatePauseBtnVisibility(); done(); }, banked ? 1700 : 2300);
     };
@@ -11160,6 +11165,7 @@
       if (ok){
         addRunScore(BRAIN_BREAK_POINTS);
         if (runActive) addRunKey('mystery');   // a Mystery Game win: a key (an Orbit Drop chip)
+        if (runActive && Show.scene === 'game') castWin(()=> !els.eventOverlay.classList.contains('hidden'));   // (Run 4A: the Mystery Door's game won)
         els.eventSubtitle.textContent = '+' + (runActive ? BRAIN_BREAK_POINTS * runActMult() : BRAIN_BREAK_POINTS); els.eventSubtitle.classList.add('res-win');   // a gold +10 (with the act's multiplier)
         if (rd.why) els.eventPrompt.textContent = rd.why;
         showFlash('win'); hostMood('cheer'); hostSay(hostLine('right')); sfx.combo(); if (key === 'priceProbe') sfx.cashRegister(); else sfx.cheer(); ov.classList.add('flash-win');
@@ -11426,14 +11432,14 @@
       '<div class="mr-inner"><div class="mr-title">MYSTERY GAME</div>' +
       '<div class="mr-frame"><div class="sign-bulbs" aria-hidden="true"></div><div class="mr-door" style="--c0:' + c[0] + ';--c1:' + c[1] + '">' +
       '<div class="mr-name" aria-live="polite"></div><i class="mr-curt l"></i><i class="mr-curt r"></i></div></div></div>' +
-      '<div class="mr-host host-full" aria-hidden="true">' + Host.html({ pose:'presenting' }) + '</div>';
+      '';   // (Run 4A: no host at the door - he appears only in the intro, the round announcements, the outro and failure reactions)
     showCard.querySelector('.mr-name').textContent = mysteryName(game).toUpperCase();
     showCard.removeAttribute('role'); showCard.setAttribute('aria-label', 'Mystery game: ' + mysteryName(game));
     showCard.classList.remove('hidden');
     clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
     ringBulbs(showCard.querySelector('.mr-frame .sign-bulbs'), 22, 7);
     if (window.Stage){ const a = runActive ? runAct() : {}; Stage.cue('close', { over:showCard, cls:'mreveal', push:true, ms: cine(TIMING.MYSTERY_REVEAL_HOLD), sign:{ sub: a.sub || '', main: a.title || 'MYSTERY GAME' } }); }   // Run 3
-    castShowcase('right', cine(TIMING.MYSTERY_REVEAL_HOLD) - 350, ()=> showCard.classList.contains('mreveal') && !showCard.classList.contains('hidden'));   // tonight's presenter at the door
+
     const rm = prefersReducedMotion();
     if (!rm) sfx.drumroll(520);
     (runActive ? showLater : setTimeout)(()=>{ showCard.classList.add('open'); sfx.slam(); playTone(523, 0.05, 0.12, 'triangle', 0.08); playTone(784, 0.15, 0.25, 'triangle', 0.08); }, rm ? 0 : 560);
@@ -11801,7 +11807,7 @@
         if (runTrayMarks.length < RUN_WORD_LENGTH){ trayAt = runTrayMarks.length; runTrayMarks.push('got'); trayIncoming.add(trayAt); }
       } else { quizScore(EXTRA_BEAM_POINTS); }
       if (runQuizBeam) runActLetter[runActIdx] = 'got';
-      if (runQuizMystery) addRunKey('mystery');   // a Mystery Game win (the riddle): a key
+      if (runQuizMystery){ addRunKey('mystery'); castWin(()=> !els.eventOverlay.classList.contains('hidden')); }   // a round-end game won (the Riddle Round): a gold key, and now and then the presenter
       // Accuracy bonus: points (never letters) for back-to-back correct
       // answers - +2, then +4, then +6 from the 4th in a row on. Added
       // directly like the wrong-answer penalty below, so it can't fire a
@@ -12448,7 +12454,7 @@
     let sparks = ''; for (let k = 0; k < 10; k++) sparks += '<b style="--x:' + (8 + (k * 37) % 84) + '%;--y:' + (14 + (k * 23) % 62) + '%;--dl:' + (k * 0.27).toFixed(2) + 's"></b>';
     d.innerHTML = '<i class="dc-dim"></i><div class="dc-spots">' + spots + '</div><div class="dc-sparks">' + sparks + '</div>' +
       '<div class="dc-rig"><div class="dc-ufo">' + FX.ufoSvg() + '</div><i class="dc-cord"></i><div class="dc-ball"><i class="dc-facets"></i></div></div>' +
-      '<div class="dc-floor"><div class="dc-alien host host-full">' + Host.html({ pose:'discoPoint' }) + '</div><div class="dc-alien buddy host-full">' + Host.html({ pose:'swayR' }) + '</div></div>' +
+      '<div class="dc-floor"></div>' +   // (Run 4A: the disco keeps its ball and lights; the host dances only in the intro and the outro now)
       '<div class="dc-skip">TAP TO SKIP</div>';
     document.body.appendChild(d);
     marquee.classList.remove('strobe'); marquee.classList.add('disco'); marquee.classList.toggle('still', lite);
@@ -13658,7 +13664,7 @@
     els.irOverlay.classList.add('answered');
     els.irOpts.querySelectorAll('.ir-opt').forEach(b=>{ b.disabled = true; if (b.dataset.right) b.classList.add('right'); });
     if (pickedBtn && result !== 'win') pickedBtn.classList.add('wrong');
-    if (pickedBtn && result === 'wrong') castOops();
+    if (pickedBtn && result === 'wrong') castOops(true);
     const reduced = prefersReducedMotion();
     if (infRun && !infRun.finale) infRun.riddles = (infRun.riddles || 0);   // counted when it started (infRunEventDue)
     if (result !== 'timeout' && infRun && !infRun.finale){ infRun.riddlesAnswered = (infRun.riddlesAnswered || 0) + 1; saveInfRun(); }
@@ -14591,7 +14597,7 @@
     const secs = Math.max(0, Math.round((RUN_SOLVE_MS - Math.max(0, solveEndsAt - solvedAt)) / 1000));
     els.solveCelebrateSub.textContent = runWord.word + ' · ' + Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0') + (runWarpPoints ? ' · +' + runWarpPoints + ' pts' : '');
     els.solveCelebrate.classList.remove('hidden');
-    castShowcase('right', 2600, ()=> !els.solveCelebrate.classList.contains('hidden'));   // Run 3: the big win
+
     // The tiles slide to the middle and flip one by one; then the banner just under them, over the faded keyboard.
     const rv = warpReveal(runWord.word, 'win');
     const banner = els.solveCelebrate.querySelector('.sc-banner');
@@ -14822,7 +14828,7 @@
     };
     if (!ep && !(pre.done && asImage(pre))) pre.promise.then(p=>{ if (performance.now() - shownAt < 4000 && els.readoutOverlay.classList.contains('show')) asImage(p); });
     els.readoutOverlay.classList.add('show');
-    castShowcase('left', 2800, ()=> els.readoutOverlay.classList.contains('show'), true, 700);   // the presenter takes a bow as the score lands - tablets and up only: the phone's results panel fills the whole width, no room
+    // (Run 4A: the presenter's bow is gone from the results - the host's outro plays just before them)   // (was: tablets and up only: the phone's results panel fills the whole width, no room
     updatePauseBtnVisibility();
     sfx.personality();
   }
@@ -15473,12 +15479,14 @@
   }
   // Run 3, the cast (lib/cast.js) - showcase moments only: tonight's presenter at a between-play moment, for `hold` ms
   // while `still()` holds; the sidekick's laugh after a wrong answer, once per act (Daily) or per run stretch (Infinity).
-  function castShowcase(side, hold, still, peek, minWidth){ if (window.Cast){ const p = Cast.presenter(); if (p) Cast.show(p, 'presenting', side, { hold, while: still, peek: !!peek, minWidth }); } }
+  // Run 4A, reactions on milestones only (lib/cast.js; each about one time in three, never blocking a tap or the next
+  // screen): a round-end game won - Cleo (or Kandi) pops out from the side, pointing in toward the score; a failure -
+  // the host laughs or winces at the side.
+  function castWin(still){ if (window.Cast) Cast.win({ side:'left', hold:1800, while: still }); }
   function castOops(){
     if (!window.Cast) return;
-    const key = runActive ? 'd' + (runStartDate || '') + ':' + runActIdx : 'i' + ((infRun && infRun.runNo) || 0) + ':' + Math.floor(((infRun && infRun.clockMs) || 0) / 200000);
-    try{ document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say'); clearTimeout(hostSayT); }catch(e){}   // (the host's own line would sit where the sidekick's does)
-    Cast.oops(key, { side:'right', while: ()=> !els.eventOverlay.classList.contains('hidden') || !els.irOverlay.classList.contains('hidden') });
+    try{ document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say'); clearTimeout(hostSayT); }catch(e){}   // (the host's own line would sit where his reaction does)
+    Cast.oops({ side:'right', while: ()=> !els.eventOverlay.classList.contains('hidden') || !els.irOverlay.classList.contains('hidden') || !!document.getElementById('mgOverlay') });
   }
   // A Brain Beam's answer, the full show treatment (B3): right = the gold
   // frame glows round the screen, the UFO beams down on the right answer
@@ -16322,7 +16330,7 @@
       sfx.correct(); sfx.cashRegister(); if (prize === 'chip' || prize === 'key') sfx.coins(6);
       cosmicFx(true, label); renderRunBanner();
       { const sc = els.runBanner && els.runBanner.querySelector(prize === 'key' ? '.sp-keys' : '.sp-num'); if (sc) FX.pop(sc, 1.35); }
-      castShowcase('left', COSMIC_PRIZE_HOLD - 150, ()=> !els.eventOverlay.classList.contains('hidden'));   // Run 3: the presenter shows off the prize
+
       setTimeout(finishPowerUp, COSMIC_PRIZE_HOLD);
     };
     // D4 (Oct 16): a small 3-reel slot machine - the reels spin, stop left to right over about 2 s and line up the prize.

@@ -5,6 +5,9 @@
 // says in a speech bubble the first time each game shows up in an Infinity
 // run (a player's first 3 runs; after that just the `quip`). Keep host lines short (about 60 characters or less) and funny, like a
 // 70s game-show host - never techy.
+// The host's name, in one place (Run 4A): every line that names him reads HOST_NAME (lib/cast.js reads window.FLIPSTAX_HOST_NAME).
+const HOST_NAME = 'Flip Sterling';
+window.FLIPSTAX_HOST_NAME = HOST_NAME;
 window.FLIPSTAX_NAMES = {
   names: {
     orbitDrop:      'Orbit Drop',            // the bonus finale (was Plinko)
