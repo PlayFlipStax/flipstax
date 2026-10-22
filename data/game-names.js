@@ -54,6 +54,18 @@ window.FLIPSTAX_NAMES = {
   // Round 1 is the opener, a riddle round is the head scratcher, the finale is the grand
   // finale, and the rounds in between take these in turn (round numbers keep counting up
   // when the show repeats).
+  // Run 4A: the host's introduction after the curtains open (four cue lines, each up for at least 2 s), the one line
+  // a returning player gets (about 3 s), and his outro before the results.
+  intro: {
+    first: [
+      'Greetings, Earthlings! I\u2019m ' + HOST_NAME + ', host of FlipStax. Yes, I named it after myself.',
+      'We crossed the galaxy because we are obsessed with your game shows.',
+      'Humans fascinate us, so every card you flip tells us what you like.',
+      'We love games, we love disco, and we REALLY love funk. Let\u2019s play!',
+    ],
+    back: 'Welcome back, Earthlings! Let\u2019s play!',
+    outro: 'That\u2019s our show, Earthlings! See you tomorrow!',
+  },
   roundTitles: {
     opener:  'THE OPENER',
     riddle:  'HEAD SCRATCHER',

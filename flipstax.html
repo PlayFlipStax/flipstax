@@ -2690,7 +2690,38 @@
   .curtain.fan .co-cards span:nth-child(2){ transform:translateY(-16px); transition-delay:.12s; z-index:2; }
   .curtain.fan .co-cards span:nth-child(3){ transform:translateX(96px) rotate(14deg); transition-delay:.24s; }
   /* One host per screen: the corner host steps out while the curtain or a cue card is up. */
-  :root:has(.show-card.curtain:not(.hidden)) .show-host, :root:has(.show-card.cue:not(.hidden)) .show-host{ display:none !important; }
+  :root:has(.show-card.curtain:not(.hidden)) .show-host, :root:has(.show-card.cue:not(.hidden)) .show-host, :root:has(.show-card.flipstage:not(.hidden)) .show-host{ display:none !important; }
+  /* Run 4A: the host on stage speaking in cue lines - the cold open's introduction, a round's title card, the outro.
+     The line is a cream caption plate at the foot of the stage (body type, never under 16px); the marquee above the
+     arch carries ROUND N (lib/stage.js). Transform and opacity only. */
+  .fs-line{ position:absolute; z-index:8; left:50%; bottom:calc(64px + env(safe-area-inset-bottom)); width:min(92vw, 420px); padding:14px 18px 15px; border-radius:var(--r-lg, 20px);
+    background:linear-gradient(180deg, #fff9e6, var(--c-cream, #fff6d8)); color:var(--c-ink, #2a1300); font:800 clamp(17px, 4.8vw, 20px)/1.3 var(--f-body, Inter, sans-serif); text-align:center;
+    box-shadow:0 0 0 3px rgba(255,210,63,0.9), 0 10px 26px rgba(0,0,0,0.5); transform:translate(-50%, 14px) scale(0.96); opacity:0; transition:transform 260ms var(--ease-out, ease-out), opacity 200ms linear; pointer-events:none; }
+  .fs-line::before{ content:''; position:absolute; left:50%; top:-9px; margin-left:-9px; border:9px solid transparent; border-top:0; border-bottom-color:rgba(255,210,63,0.95); }
+  .fs-line.on{ transform:translate(-50%, 0); opacity:1; }
+  .fs-line.long{ font-size:clamp(16px, 4.4vw, 18px); }
+  .fs-line span{ display:block; }
+  .show-card.flipstage{ background:radial-gradient(120% 80% at 50% 30%, #3a1268, #12062a 75%); overflow:hidden; }
+  :root.stage-on .show-card.flipstage.stage-backed{ background:transparent !important; }
+  .fs-host{ position:absolute; z-index:3; left:50%; bottom:calc(150px + env(safe-area-inset-bottom)); width:min(30vh * 0.6743, 44vw, 210px); margin-left:calc(min(30vh * 0.6743, 44vw, 210px) / -2); pointer-events:none;
+    animation:fsHostIn 420ms var(--ease-pop) both; }
+  .fs-host .host-rig{ width:100%; }
+  @keyframes fsHostIn{ from{ transform:translateY(24px) scale(0.94); opacity:0; } to{ transform:none; opacity:1; } }
+  .fs-title{ position:absolute; z-index:4; left:50%; top:calc(14% + env(safe-area-inset-top)); transform:translateX(-50%); width:max-content; max-width:92vw; padding:12px 22px; border-radius:18px; text-align:center;
+    background:linear-gradient(180deg, #fff5c4, #ffd23f 50%, #f2a100); border:4px solid #fff3c4; color:#3a1500; box-shadow:0 0 0 4px #7a3d00, 0 10px 30px rgba(0,0,0,0.5); }
+  .fs-title b{ display:block; font:900 clamp(32px, 10vw, 46px)/0.95 var(--f-display); letter-spacing:1.5px; }
+  .fs-title span{ display:block; margin-top:4px; font:900 var(--fs-small, 14px)/1 var(--f-display); letter-spacing:var(--ls-label, 2px); }
+  .show-card.flipstage.staged .fs-title{ display:none; }   /* (the marquee on the stage shows the title) */
+  .fs-pill{ position:absolute; z-index:5; left:50%; bottom:calc(150px + min(30vh, 296px) + 10px + env(safe-area-inset-bottom)); transform:translateX(-50%); white-space:nowrap; animation:fsPill 360ms var(--ease-pop) 200ms both; }
+  @keyframes fsPill{ from{ transform:translateX(-50%) scale(0.6); opacity:0; } to{ transform:translateX(-50%); opacity:1; } }
+  @media (max-height:660px){ .fs-host{ bottom:calc(128px + env(safe-area-inset-bottom)); width:min(26vh * 0.6743, 40vw, 170px); margin-left:calc(min(26vh * 0.6743, 40vw, 170px) / -2); } .fs-line{ bottom:calc(20px + env(safe-area-inset-bottom)); }
+    .fs-pill{ bottom:calc(128px + 26vh + 8px + env(safe-area-inset-bottom)); } }
+  /* the cold open: the caption plate above TAP TO SKIP, the host lifted clear of it */
+  .curtain.lines .co-stage-host{ bottom:calc(150px + env(safe-area-inset-bottom)); width:min(30vh * 0.6743, 44vw, 210px); margin-left:calc(min(30vh * 0.6743, 44vw, 210px) / -2); }
+  @media (max-height:660px){ .curtain.lines .co-stage-host{ bottom:calc(140px + env(safe-area-inset-bottom)); width:min(26vh * 0.6743, 40vw, 170px); margin-left:calc(min(26vh * 0.6743, 40vw, 170px) / -2); } .curtain.lines .co-line{ bottom:calc(58px + env(safe-area-inset-bottom)); } }
+  :root.lite .fs-line, :root.lite .fs-host, :root.lite .fs-pill{ transition:opacity 200ms linear; animation:none; }
+  :root.lite .fs-line{ transform:translate(-50%, 0); }
+  @media (prefers-reduced-motion: reduce){ .fs-line{ transition:opacity 200ms linear; transform:translate(-50%, 0); } .fs-host, .fs-pill{ animation:none; } }
   .co-skip{ position:absolute; z-index:9; left:50%; transform:translateX(-50%); bottom:calc(18px + env(safe-area-inset-bottom)); white-space:nowrap; font:800 var(--fs-small)/1 var(--f-body); letter-spacing:var(--ls-label); color:#fff; padding:8px 14px; border-radius:var(--r-pill); background:rgba(10,2,22,0.6); box-shadow:inset 0 0 0 1.5px rgba(255,214,90,0.6); }   /* (I5: a readable pill) */
   /* The cue card (reusable, C4): the host rises holding a card (his hands on its bottom corners) that flips over in 3D
      from its FLIPSTAX back to the act's name. Between acts a star wipe in the act's world opens behind it and closes
@@ -3452,6 +3483,11 @@
   .lb-host{ position:absolute; z-index:2; left:50%; margin-left:calc(min(52vw, 230px, 30vh) / -2); bottom:calc(60px + env(safe-area-inset-bottom)); width:min(52vw, 230px, 30vh); }   /* (I5: sized by the height too, so he fills the stage) */
   @media (max-height:740px){ .lb-host{ width:min(30vw, 130px); margin-left:calc(min(30vw, 130px) / -2); bottom:calc(50px + env(safe-area-inset-bottom)); } .lb-tonight{ margin-bottom:12px; } .lb-sign{ margin-bottom:10px; } }
   @media (max-height:640px){ .lb-host{ display:none; } }
+  /* Run 4A: a simple Enter screen - one big ENTER (the tap also unlocks sound on phones). The host is sized by the room
+     left under the button (fitHomeHost), so he never covers it. */
+  .home-overlay .home-enter-btn.enter-big{ font-size:clamp(34px, 11vw, 48px); letter-spacing:6px; padding:16px 0 18px; width:min(76vw, 320px); text-align:center; }
+  .home-overlay .lb-host.fitted{ margin-left:calc(var(--hw) / -2); width:var(--hw); }
+  .home-overlay .lb-host.no-room{ display:none; }
   :root.lite .home-overlay .home-enter-btn{ animation:none; }
   .home-overlay.entering .home-enter-btn, .home-overlay.entering .home-legal-links{ pointer-events:none; }
   .home-overlay.entering .st-beam{ opacity:0.85; }   /* (the spotlights swing onto the host and brighten) */
@@ -4353,7 +4389,7 @@
   <div class="home-sound-hint hidden" id="homeSoundHint" role="button" aria-label="Turn on sound">🔊 Tap for sound</div>
   <div class="lb-sign" id="homeSign"><div class="sign-bulbs" aria-hidden="true"></div><img class="home-logo-img" src="images/flipstax-logo-final.png" alt="FlipStax - Flip, Vote, Jumble &amp; Solve"></div>
   <div class="lb-tonight" id="homeTonight">TONIGHT'S SHOW</div>
-  <div class="daily-btn primary home-enter-btn" id="homeEnterBtn" role="button" tabindex="0">START THE SHOW <span aria-hidden="true">&#9654;</span></div>
+  <div class="daily-btn primary home-enter-btn enter-big" id="homeEnterBtn" role="button" tabindex="0" aria-label="Enter the show">ENTER</div>
   <div class="lb-host host-full" id="homeHost" aria-hidden="true"></div>
   <div class="home-legal-links">
     <span class="home-legal-link" id="homeDisclaimerLink">Disclaimer</span>
@@ -10310,7 +10346,7 @@
     // close callback calls startDailyRun again, which then passes this gate.
     // (It replaces the old one-screen intro, runIntroOverlay, which is kept
     // in the markup but no longer shown.)
-    if (!REPLAY && !hasSeenHowTo('daily')){ openHowTo('daily', startDailyRun); return; }
+    // (Run 4A: no How to play walkthrough first - the host's introduction and each game's explainer card teach the show)
     runActive = true; runPhase = 'running';
     runScore = 0; runLetters = []; runThresholdsHit = []; runPowerupThresholdsHit = [];
     runTriviaAttempted = 0; runTriviaCorrect = 0; runRoundResults = [];
@@ -11263,38 +11299,59 @@
   // The cold open (DIRECTION.md): a red velvet curtain with the EPISODE plate; the curtain
   // parts, FLIPSTAX lights up letter by letter on the marquee, the host slides in and three
   // cue cards fan out. 12 s the first time, 3 s for a returning player; a tap skips it.
-  const COLD_OPEN_SEEN_KEY = 'flipstax_coldopen_seen_v1';
+  const COLD_OPEN_SEEN_KEY = 'flipstax_coldopen_seen_v2';   // (Run 4A: v2 - everyone sees the new four-line intro once)
   let coldOpenCancel = null;   // a cold open still listening (a restart opened another): detached without starting the show
+  // ---------- Run 4A: the host on stage, speaking in cue lines ----------
+  // A cue line is the host's line as a caption plate at the foot of the stage, with his voice blips. It stays up for
+  // 1 s plus 0.25 s a word, and never less than CUE_LINE_MIN.
+  const CUE_LINE_MIN = 2000;
+  function lineWords(text){ return String(text || '').trim().split(/\s+/).filter(Boolean).length; }
+  function cueLineMs(text){ return Math.max(CUE_LINE_MIN, 1000 + 250 * lineWords(text)); }
+  function cueLineSay(el, text, voice){
+    if (!el) return;
+    const span = el.querySelector('span');
+    el.classList.remove('on'); void el.offsetWidth;
+    span.textContent = text || '';
+    el.classList.toggle('long', String(text || '').length > 70);
+    if (text) el.classList.add('on');
+    if (text && voice !== false && sfx.hostVoice) sfx.hostVoice(text);
+  }
+  const NAMES_INTRO = (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.intro) || {};
+  const HOST_INTRO_LINES = Array.isArray(NAMES_INTRO.first) && NAMES_INTRO.first.length ? NAMES_INTRO.first : ['Greetings, Earthlings! Let’s play!'];
+  const HOST_INTRO_BACK = NAMES_INTRO.back || 'Welcome back, Earthlings! Let’s play!';
+  const HOST_OUTRO_LINE = NAMES_INTRO.outro || 'That’s our show, Earthlings! See you tomorrow!';
+  const HOST_INTRO_POSES = ['wave', 'presenting', 'point', 'discoPoint'];
   function showColdOpen(then){
     if (coldOpenCancel) coldOpenCancel();
     const ep = showEpisode(runStartDate || todayStr());
     let seen = false; try{ seen = !!localStorage.getItem(COLD_OPEN_SEEN_KEY); }catch(e){}
-    const co = RUNDOWN.coldOpen || {}, total = seen ? (co.returningMs || 3000) : (co.firstMs || 12000);
-    // A3 (Oct 2026): the curtain pulls open (about 4 s the first time: the folds bunch to the sides and sway as they
-    // settle) on the studio set; the host walks to center stage in his silver suit under a follow spot; then two
-    // plates, WELCOME TO FLIPSTAX! and EPISODE n, each on screen at least a second, their bulbs flashing as they land.
-    // The beats for the first time (12 s) and for returning players (3 s).
-    const T = seen ? { open:0, pull:1000, walk:150, walkMs:700, s1:700, s1off:1800, s2:1850 }
-                   : { open:700, pull:4000, walk:2600, walkMs:2000, s1:4900, s1off:7900, s2:8150 };
-    showCard.className = 'show-card curtain';
+    // Run 4A: ENTER opens the curtains, then the host introduces himself in four cue lines (each up for at least
+    // CUE_LINE_MIN); a returning player gets one line, about 3 s in all. A tap skips it (after SKIP_MIN_MS).
+    const lines = seen ? [HOST_INTRO_BACK] : HOST_INTRO_LINES;
+    const T = seen ? { open:0, pull:800, walk:100, walkMs:600, talk:600 }
+                   : { open:300, pull:2200, walk:900, walkMs:1400, talk:2500 };
+    const starts = []; let at = T.talk;
+    lines.forEach(l=>{ starts.push(at); at += cueLineMs(l); });
+    const total = Math.max(seen ? ((RUNDOWN.coldOpen || {}).returningMs || 3000) : 0, at + (seen ? 0 : 300));
+    showCard.className = 'show-card curtain lines';
     showCard.style.setProperty('--pull', T.pull + 'ms'); showCard.style.setProperty('--walk', T.walkMs + 'ms');
     showCard.innerHTML = '<div class="studio co-studio" aria-hidden="true">' + STUDIO_HTML + '</div><i class="co-follow" aria-hidden="true"></i>' +
       '<div class="co-stage-host host-full" aria-hidden="true">' + Host.html({ pose:'wave' }) + '</div>' +
-      '<div class="co-sign w1"><div class="sign-bulbs" aria-hidden="true"></div><span>WELCOME TO<br>FLIPSTAX!</span></div>' +
-      '<div class="co-sign w2"><div class="sign-bulbs" aria-hidden="true"></div><span>EPISODE ' + ep + '</span></div>' +
+      '<div class="fs-line co-line" aria-live="polite"><span></span></div>' +
       '<i class="co-drape l"></i><i class="co-drape r"></i><i class="co-spot"></i><i class="co-valance"></i>' +
       '<div class="co-skip">TAP TO SKIP</div>';
     showCard.classList.remove('hidden');
-    showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'Welcome to FlipStax, episode ' + ep + '. Tap to skip');
-    showCard.querySelectorAll('.co-sign .sign-bulbs').forEach(b=> ringBulbs(b, 22, 8));
+    showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'Welcome to FlipStax, episode ' + ep + ', with your host ' + HOST_NAME + '. Tap to skip');
     if (window.Stage){ Stage.loadWide(); Stage.cue('wide', { over:showCard, cls:'curtain', sign:{ sub:'WELCOME TO', main:'FLIPSTAX' } }); }   // Run 3: the wide shot, then a push in
     const timers = [], later = (ms, f)=> timers.push(setTimeout(f, ms));
-    const sign = (cls, on)=>{ const el = showCard.querySelector('.co-sign.' + cls); if (!el) return; el.classList.toggle('on', on); el.classList.toggle('off', !on); };
+    const lineEl = showCard.querySelector('.co-line'), rig = showCard.querySelector('.co-stage-host');
     later(T.open, ()=>{ showCard.classList.add('open'); if (sfx.bumper) sfx.bumper(false); });
-    later(T.walk, ()=>{ showCard.classList.add('walk'); if (window.Stage) Stage.cue('close', { over:showCard, cls:'curtain', push:true, ms: total - T.walk + 600, sign:{ main:'FLIPSTAX' } }); });   // (the plates below carry the welcome and the episode)
-    later(T.s1, ()=>{ sign('w1', true); sfx.chime(4); sfx.chime(6); });
-    later(T.s1off, ()=> sign('w1', false));
-    later(T.s2, ()=>{ sign('w2', true); sfx.chime(5); sfx.chime(7); });
+    later(T.walk, ()=>{ showCard.classList.add('walk'); if (window.Stage) Stage.cue('close', { over:showCard, cls:'curtain', push:true, ms: total - T.walk + 600, sign:{ sub:'TONIGHT’S SHOW', main:'EPISODE ' + ep } }); });
+    lines.forEach((l, i)=> later(starts[i], ()=>{
+      cueLineSay(lineEl, l);
+      Host.pose(rig, seen ? 'wave' : HOST_INTRO_POSES[i % HOST_INTRO_POSES.length], { hold:0 });
+      if (i === 0) sfx.chime(4);
+    }));
     let gone = false;
     const shownAt = performance.now();
     const go = (e)=>{
@@ -11350,24 +11407,53 @@
     (runActive ? showLater : setTimeout)(()=> go(), cine(TIMING.REWARD_HOLD || 2200));
     if (runActive) showOn(showCard, 'click', go); else showCard.addEventListener('click', go);
   }
+  // Run 4A: a round's title card - the host on the stage announces the round in one cue line, the marquee shows
+  // ROUND N (and the points multiplier), for ACT_CARD_HOLD or as long as the line needs to be read.
+  // The Grand Finale gets the same card with WORD WARP on the marquee.
   function showActCard(st, then){
-    const fin = !!st.finale, w = st.world || 'vs';
-    showCard.className = 'show-card cue' + (fin ? ' finale' : '');
-    showCard.innerHTML = (fin ? '<i class="cue-stage bg w-' + w + '"><i class="rays"></i><i class="glow"></i></i><i class="cue-iris"></i><i class="cue-black"></i>'
-      : '<i class="cue-wipe"><i class="bg w-' + w + '"><i class="rays"></i><i class="glow"></i></i></i>') + cueCardHtml();
-    // The marquee sign already carries the act name (Stage.cue), so the cue card keeps only what the sign does not say: the points.
-    const stageSign = !!(window.Stage && Stage.ready);
-    showCard.querySelector('.cc-sub').textContent = stageSign ? '' : (st.sub || '');
-    showCard.querySelector('.cc-title').textContent = stageSign ? (fin ? 'GRAND PRIZE' : 'POINTS \u00D7' + (st.mult || (RUNDOWN.acts[st.act] || {}).mult || 1)) : (st.title || '');
-    showCard.removeAttribute('role'); showCard.setAttribute('aria-label', (st.sub ? st.sub + ': ' : '') + (st.title || ''));
+    const fin = !!st.finale, a = RUNDOWN.acts[st.act] || RUNDOWN.acts.find(x=> x.id === (fin ? 'finale' : '')) || {};
+    const m = st.mult || a.mult || 1, line = st.announce || a.announce || '', round = st.round || a.round || 0;
+    showCard.className = 'show-card flipstage' + (fin ? ' finale' : '');
+    showCard.innerHTML = '<div class="fs-host host-full" aria-hidden="true">' + Host.html({ pose: fin ? 'cheer' : 'presenting' }) + '</div>' +
+      '<div class="fs-title"><b></b><span></span></div>' +
+      (m > 1 || fin ? '<div class="fs-pill ds-pill gold">' + (fin ? 'GRAND PRIZE' : 'POINTS ×' + m) + '</div>' : '') +
+      '<div class="fs-line" aria-live="polite"><span></span></div>';
+    const signMain = fin ? 'WORD WARP' : (st.title || a.title || ''), signSub = fin ? 'THE GRAND FINALE' : round ? 'ROUND ' + round + ' OF ' + SHOW_ROUND_COUNT : (st.sub || '');
+    showCard.querySelector('.fs-title b').textContent = signMain; showCard.querySelector('.fs-title span').textContent = signSub;
+    showCard.removeAttribute('role'); showCard.setAttribute('aria-label', signMain + (m > 1 ? ', points times ' + m : '') + '. ' + line);
     showCard.classList.remove('hidden');
-    if (window.Stage) Stage.cue('close', { over:showCard, cls:'cue', push:true, ms: cine(TIMING.ACT_CARD_HOLD + (fin ? 300 : 0)), sign:{ sub: st.sub || '', main: st.title || '' } });   // Run 3: the act on the marquee
+    const ms = cine(Math.max(TIMING.ACT_CARD_HOLD + (fin ? 300 : 0), cueLineMs(line) + 500));
+    if (window.Stage) Stage.cue('close', { over:showCard, cls:'flipstage', push:true, ms, sign:{ sub: signSub, main: signMain } });
+    showCard.classList.toggle('staged', !!(window.Stage && Stage.ready));
     clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
     if (sfx.bumper) sfx.bumper(!!st.finale);
     if (fin) setTimeout(()=> sfx.drumrollLong(), 500);   // the finale: a long drumroll under the spotlight
-    const ms = cine(TIMING.ACT_CARD_HOLD + (fin ? 300 : 0));   // G2: ACT_CARD_HOLD (the card is fully up from 28% to 84% of it - about 1.6 s)
-    showCard.style.setProperty('--cue-ms', ms + 'ms'); showCard.style.setProperty('--wipe-ms', TIMING.STAR_WIPE + 'ms');
-    (runActive ? showLater : setTimeout)(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; showCard.style.removeProperty('--cue-ms'); showCard.style.removeProperty('--wipe-ms'); then(); }, ms);
+    const lineEl = showCard.querySelector('.fs-line');
+    (runActive ? showLater : setTimeout)(()=> cueLineSay(lineEl, line), 250);
+    (runActive ? showLater : setTimeout)(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; then(); }, ms);
+  }
+  // Run 4A: the outro - the host waves the show off in one cue line, then the results.
+  function showOutro(then){
+    showCard.className = 'show-card flipstage outro';
+    showCard.innerHTML = '<div class="fs-host host-full" aria-hidden="true">' + Host.html({ pose:'wave' }) + '</div>' +
+      '<div class="fs-title"><b>THAT’S OUR SHOW</b><span>SEE YOU TOMORROW</span></div><div class="fs-line" aria-live="polite"><span></span></div>';
+    showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', HOST_OUTRO_LINE + ' Tap to see your results');
+    showCard.classList.remove('hidden');
+    const ms = cine(cueLineMs(HOST_OUTRO_LINE) + 300);
+    if (window.Stage){ Stage.loadWide(); Stage.cue('close', { over:showCard, cls:'outro', push:true, ms, sign:{ sub:'THAT’S OUR SHOW', main:'SEE YOU TOMORROW' } }); }
+    showCard.classList.toggle('staged', !!(window.Stage && Stage.ready));
+    cueLineSay(showCard.querySelector('.fs-line'), HOST_OUTRO_LINE);
+    const shownAt = performance.now();
+    let gone = false, t = null;
+    const go = (e)=>{
+      if (gone || (e && performance.now() - shownAt < SKIP_MIN_MS)) return;
+      gone = true; clearTimeout(t); showCard.removeEventListener('click', go);
+      showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden';
+      noteOverlayClosed();
+      then();
+    };
+    t = setTimeout(go, ms);
+    showCard.addEventListener('click', go);
   }
   // The commercial break: a 3 s fake 70s ad, skippable. Built as one component (an ad in,
   // done() out) so a real ad can take its place later.
@@ -14723,7 +14809,7 @@
     runResultToday.orbitPoints = runOrbitPts; runResultToday.jackpot = runOrbitJackpot;
     runResultToday.orbit = { stage:'done', chips: runOrbit ? runOrbit.chips : [], dropped: runOrbit ? runOrbit.dropped : 0, base: runScore - runOrbitPts, done:true };
     saveRunResultToday(runResultToday);
-    showRunReadout(true);
+    showOutro(()=> showRunReadout(true));   // (the host waves the show off, then the results)
   }
   // ---------- The episode's results screen (refs/results.jpg) ----------
   function mysteryName(key){
@@ -16847,14 +16933,35 @@
   });
   // A4: on Enter the host slides to centre stage and every spotlight swings onto him (about 0.9 s), then the menu.
   // Lite mode and reduced motion go straight in.
+  // Run 4A: the landing host takes the room under the ENTER button (and between it and the legal links) - never over it.
+  function fitHomeHost(){
+    const host = document.getElementById('homeHost'), btn = els.homeEnterBtn, links = els.homeOverlay.querySelector('.home-legal-links');
+    if (!host || !btn || els.homeOverlay.classList.contains('hidden')) return;
+    host.classList.remove('fitted', 'no-room'); host.style.removeProperty('--hw');
+    const b = btn.getBoundingClientRect(), hr = host.getBoundingClientRect();
+    if (!hr.height) return;
+    const floor = hr.bottom, room = floor - b.bottom - 14;
+    if (hr.top >= b.bottom + 10) return;   // (already clear)
+    const ratio = hr.width / hr.height;
+    if (room < 110){ host.classList.add('no-room'); return; }
+    host.style.setProperty('--hw', Math.floor(room * ratio) + 'px'); host.classList.add('fitted');
+  }
+  addEventListener('resize', ()=> requestAnimationFrame(fitHomeHost));
+  [300, 1200, 2600].forEach(ms=> setTimeout(fitHomeHost, ms));   // (again as the pictures arrive)
   els.homeEnterBtn.addEventListener('click', ()=>{
     const ov = els.homeOverlay;
     if (ov.classList.contains('entering')) return;
+    // (the tap is the gesture phones need before any sound)
+    try{ if (soundOn) getAudioCtx(); }catch(e){}
     const beams = [...ov.querySelectorAll('.st-beam')], host = document.getElementById('homeHost');
     const enter = ()=>{
       ov.classList.add('hidden'); ov.classList.remove('entering');
       beams.concat(host ? [host] : []).forEach(el=>{ el.style.transition = ''; el.style.transform = ''; el.style.animation = ''; });
-      const c = document.documentElement.classList; if (!c.contains('mode-daily') && !c.contains('mode-infinity')) els.modeSelectOverlay.classList.remove('hidden');   // (unless a mode already started)
+      const c = document.documentElement.classList; if (c.contains('mode-daily') || c.contains('mode-infinity')) return;   // (a mode already started)
+      // Run 4A: ENTER goes straight into today's show - the curtains and the host's introduction; once today's show
+      // is done, to the menu as before (results, Infinity).
+      if (!runResultToday || REPLAY) els.modeDailyBtn.click();
+      else els.modeSelectOverlay.classList.remove('hidden');
     };
     if (prefersReducedMotion() || !host){ enter(); return; }
     if (isLite()){ setTimeout(enter, 950); return; }   // (G2: lite mode skips the motion, not the beat)

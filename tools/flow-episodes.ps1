@@ -47,10 +47,15 @@ $worker = {
     Js "localStorage.clear(); localStorage.setItem('flipstax_howto_daily_v3','1'); 'x'" | Out-Null
     Cdp 'Page.navigate' @{ url = $url } | Out-Null; Start-Sleep 4
     $opts = $(if ($real) { "window.__ttOpts = { fast:false, cine:false, vsMin:1500, vsMax:3500, firstMin:1800, firstMax:3600, ansMin:2500, ansMax:6000, mgMin:700, mgMax:1800, luckyMin:1800, luckyMax:3200, wwMin:900, wwMax:1800 };" } else { "window.__ttOpts = { fast:true, vsMin:40, vsMax:2500 };" })
+    # Into the show: wait for the page, tap ENTER, and keep checking until the show has started (ENTER goes straight
+    # into it since Run 4A; older builds go through the menu - tap Daily there). A busy test machine can be slow.
+    for ($w = 0; $w -lt 20; $w++) { if ((Js "!!(document.getElementById('homeEnterBtn') && window.__show)") -eq $true) { break }; Start-Sleep -Milliseconds 500 }
     $enter = Js "(()=>{ const b = document.getElementById('homeEnterBtn'); if (!b) return 'no enter'; b.click(); return 'ok'; })()"
-    Start-Sleep -Milliseconds 800
-    Js "(()=>{ const m = document.getElementById('modeSelectOverlay'), b = document.getElementById('modeDailyBtn'); if (m && !m.classList.contains('hidden') && b) b.click(); return 1; })()" | Out-Null
-    Start-Sleep -Milliseconds 300
+    for ($w = 0; $w -lt 24; $w++) {
+      Start-Sleep -Milliseconds 500
+      $st = Js "(()=>{ if (window.__show && window.__show.scene !== 'idle') return 'on'; const m = document.getElementById('modeSelectOverlay'), b = document.getElementById('modeDailyBtn'); if (m && !m.classList.contains('hidden') && b){ b.click(); return 'menu'; } return 'wait'; })()"
+      if ($st -eq 'on') { break }
+    }
     Js ($opts + $probe) | Out-Null
     $t0 = Get-Date; $rep = $null
     while (((Get-Date) - $t0).TotalSeconds -lt $maxSecs) {
