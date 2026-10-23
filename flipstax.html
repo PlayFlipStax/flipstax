@@ -15066,6 +15066,7 @@
       saveRunSnapshot();
       // The whole word is beamed up (every letter, and the animal), then the reveal.
       els.solveOverlay.classList.add('celebrating');
+      if (window.Juice && document.documentElement.classList.contains('mode-daily')) Juice.correct(els.solveSlots, { count:24 });   // Run 5A: the beam burst over the word
       wwAbduct(runWord.word.split('').map((_, i)=> i), ()=> celebrateSolve(solvedAt, ()=>{ if (runActive) endRun(true, solvedAt); }));
       return;
     }
@@ -15076,7 +15077,11 @@
       missWarp();
       return;
     }
-    if (newRight.length){ renderSolveUI(); wwAbduct(newRight); sfx.correct(); hostMood('cheer'); return; }   // some letters right: they get beamed up
+    if (newRight.length){
+      renderSolveUI(); wwAbduct(newRight); sfx.correct(); hostMood('cheer');   // some letters right: they get beamed up
+      if (window.Juice && document.documentElement.classList.contains('mode-daily')) Juice.ripple(els.solveSlots);   // Run 5A: a light ripple across the word
+      return;
+    }
     sfx.wrong(); wwMiss();
     FX.shake(els.solveSlots); hostMood('sad');
     renderSolveUI();
