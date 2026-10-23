@@ -155,3 +155,20 @@ Verify on Windows: `tools/flow-episodes.ps1` (the 40-episode set in headless Chr
 ## O. VS card import (Oct 23)
 
 - [x] O1. tools/vs-import.ps1 (the driver) + tools/vs-import.js (the importer) + tools/vs-import-rules.js (the data: sources, held-back pairs, category labels, Gemini emoji and eras, the era words) + tools/vs-era-tags.js (the old hand tags): reads incoming-assets/vs-cards/*.txt (not deployed), writes data/vs-cards-new.js (357 cards + an era for each of the 869 cards already in the pool) and data/vs-export.txt. Dedupe by the two sides ignoring order, case, accents and punctuation: 79 of the 437 rows were already in the pool and were skipped; Michael Jackson vs Prince is held back (rules.skip). The pool is now 1,226 cards in 32 categories; new categories tv, cars, albums, actors, internet, toys, cartoons (labels and badges in CAT_META). Every card has an era (80s, 90s, 2000s, 2010s, now, timeless; the newer side). No vs_batch_claude_1.txt was in the folder (the rules list it as optional).
+
+## P. Run 5A - visual juice pass (Oct 23)
+
+1970s/80s sci-fi game show look on the VS card, Brain Beam and Word Warp. Shared pieces in lib/juice.js and lib/juice.css. Each item passed a 5-episode fast check.
+
+- [x] P1. Sunburst backdrop, slow turning rays, still in lite mode (547a7f8)
+- [x] P2. Glossy gold/purple buttons and panels, 0.96 press squish (4757533)
+- [x] P3. Feedback: `Juice.correct` (laser, bulb chase, at most 24 particles) and `Juice.wrong` (dim and shake), lite fallbacks (5b8dc8a)
+- [x] P4. FlipStax wordmark in the HUD: Righteous (OFL, self-hosted, 43 KB), pink-to-cyan, marquee oval (990f2b3)
+- [x] P5. VS card: beveled glowing orange/teal cards, gold VS coin; the winner pops to 1.06 with a burst, the loser dims; the share bar scales instead of changing width (a1f114b)
+- [x] P6. Brain Beam: chevron answer pills, glowing question box, `Juice.correct`/`wrong`; the UFO and ? tile moment kept (f2fb940); the glow made static to save frame time (8f3b04b)
+- [x] P7. Word Warp: glossy tiles, a light ripple when a guess locks new letters, a beam burst on the solve; mechanics and timing unchanged (d558fad)
+- [x] P8. The 2x zones / Noon Rush pill is Infinity-only and no longer shows in Daily (d053f97)
+- Frame times (4x CPU): ALL p95 16.8 ms, full and lite; VS 16.9 ms.
+- Open issues: the Brain Beam screen alone sits at the p95 edge (16.9-33.3 ms between runs); the font is not subset (the OFL reserves the name for unmodified copies); the REPLAY MODE tag overlaps the wordmark (test mode only); particles look faint in screenshots; the VS winner pop and the Word Warp ripple can't be reached in replay (checked with mock tallies and direct calls).
+
+**Next: Run 6 - VS screen redesign** using the art in incoming-assets/gemini/ (mothership, crackle frames and the rest). Not started.
