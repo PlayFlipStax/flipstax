@@ -15379,7 +15379,10 @@
   // One status slot for transient events (2x Flip Zone, Noon Rush). When
   // neither is active it collapses so Daily Run's pill takes the full row.
   function renderStatusBanner(){
-    if (bonusActive){
+    // Run 5A: 2x Points Zones and Noon Rush are Infinity's - Daily never shows them (the Noon Rush pill leaked in at
+    // 12:00-12:59).
+    const inf = inInfinity();
+    if (bonusActive && inf){
       const remain = Math.max(0, Math.ceil((bonusEndsAt - Date.now())/1000));
       els.statusBanner.className = 'status-banner bonus';
       els.statusBanner.textContent = '\u26A1 2x POINTS \u00B7 ' + remain + 's';
@@ -15388,7 +15391,7 @@
       els.runBanner.classList.remove('solo');
       return;
     }
-    if (isNoonRush()){
+    if (isNoonRush() && inf){
       els.statusBanner.className = 'status-banner noon';
       els.statusBanner.textContent = '\uD83D\uDD14 NOON RUSH \u00B7 more 2x zones';   // (2x Points Zones come 2.5x as often between 12:00 and 12:59 on your clock)
       els.runBanner.classList.remove('solo');
@@ -16079,7 +16082,7 @@
   function isNoonRush(){ return new Date().getHours() === 12; }
 
   function maybeTriggerBonusZone(){
-    if (bonusActive) return;
+    if (bonusActive || !inInfinity()) return;   // (Run 5A: Infinity only)
     const now = Date.now();
     if (lastBonusEnd && now - lastBonusEnd < 45000) return;
     if (sessionFlips < 3) return;
