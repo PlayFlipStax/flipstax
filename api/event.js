@@ -16,7 +16,7 @@ const redis = new Redis({ url: process.env.KV_REST_API_URL, token: process.env.K
 const PLAIN = new Set(['show_started', 'reached_results', 'share_clicked']);
 // The games that can be counted (game_started:<name> and game_completed:<name>).
 const GAMES = new Set(['riddle', 'crowdScan', 'emojiDecode', 'timeWarp', 'peakOrPlunge', 'snapSort', 'zapWords',
-  'twinFlip', 'factOrFib', 'saucerShuffle', 'priceProbe', 'oddballAlert', 'luckyLights', 'cosmicSurprise']);
+  'twinFlip', 'factOrFib', 'saucerShuffle', 'priceProbe', 'oddballAlert', 'luckyLights', 'cosmicSurprise', 'door', 'orbitDrop']);   // (Run 4A: the Mystery Door and Round 6's Orbit Drop)
 const MAX_FIELDS = 8;
 const KEEP_SECONDS = 40 * 24 * 3600;
 
