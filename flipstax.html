@@ -733,6 +733,34 @@
   @keyframes s3Lever{ 50%{ transform:scaleY(-0.6); } }
   @media (prefers-reduced-motion: reduce){ .s3-win.stop, .slot3.spinning .s3-lever{ animation:none; } }
   .gift-stage{ display:none; position:relative; width:220px; height:210px; margin:4px auto 0; }
+  /* Run 4B, the wormhole drop: rings of a swirling wormhole (each turning, transform only), a two-half capsule that
+     drops in and tumbles back out, then parts on the prize. No blur, no flashing. */
+  .gift-stage.worm-mode .gift-box, .gift-stage.worm-mode .reel-wrap, .gift-stage.worm-mode .slot3, .gift-stage.worm-mode .gift-glow{ display:none !important; }
+  .gift-stage.worm-mode .gift-prize{ top:auto; bottom:0; font-size:30px; }
+  .worm{ position:absolute; left:50%; top:4px; width:180px; height:170px; margin-left:-90px; }
+  .gift-stage:not(.worm-mode) .worm{ display:none; }
+  .wm-hole{ position:absolute; inset:0; opacity:0; }
+  .wm-ring{ position:absolute; left:50%; top:50%; border-radius:50%; border:6px solid transparent; }
+  .wm-ring.r1{ width:170px; height:170px; margin:-85px 0 0 -85px; border-top-color:#c792ff; border-left-color:#7df9ff; animation:wmSpin 1.6s linear infinite; }
+  .wm-ring.r2{ width:124px; height:124px; margin:-62px 0 0 -62px; border-right-color:#ff3c9d; border-bottom-color:#ffd23f; animation:wmSpin 1.1s linear infinite reverse; }
+  .wm-ring.r3{ width:80px; height:80px; margin:-40px 0 0 -40px; border-top-color:#fff; border-right-color:#7df9ff; animation:wmSpin 0.8s linear infinite; }
+  .wm-core{ position:absolute; left:50%; top:50%; width:64px; height:64px; margin:-32px 0 0 -32px; border-radius:50%;
+    background:radial-gradient(circle, #0a0218 0 40%, #3b0f78 70%, rgba(59,15,120,0) 100%); box-shadow:0 0 30px 10px rgba(125,249,255,0.35); }
+  @keyframes wmSpin{ to{ transform:rotate(360deg); } }
+  .wm-cap{ position:absolute; left:50%; top:50%; width:64px; height:64px; margin:-32px 0 0 -32px; opacity:0; }
+  .wm-half{ position:absolute; left:0; right:0; height:50%; transition:transform 360ms var(--ease-pop), opacity 300ms ease 120ms;
+    background:linear-gradient(180deg, #fff6c8, #ffd23f 55%, #f29b00); border:3px solid #7a3d00; }
+  .wm-half.top{ top:0; border-radius:32px 32px 6px 6px; border-bottom-width:1.5px; }
+  .wm-half.bot{ bottom:0; border-radius:6px 6px 32px 32px; border-top-width:1.5px; background:linear-gradient(180deg, #ff9ad1, #ff3c9d 60%, #c2187a); }
+  .wm-prize{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:38px; line-height:1; opacity:0; transform:scale(0.4);
+    transition:transform 420ms var(--ease-pop) 120ms, opacity 200ms linear 120ms; }
+  .worm.open .wm-cap{ opacity:1; }
+  .worm.open .wm-half.top{ transform:translate(-26px, -34px) rotate(-28deg); opacity:0; }
+  .worm.open .wm-half.bot{ transform:translate(26px, 34px) rotate(24deg); opacity:0; }
+  .worm.open .wm-prize{ opacity:1; transform:scale(1.25); }
+  :root.lite .wm-ring{ animation:none; }
+  :root.lite .wm-half, :root.lite .wm-prize{ transition:opacity 200ms linear; } :root.lite .worm.open .wm-half{ transform:none; } :root.lite .worm.open .wm-prize{ transform:none; }
+  @media (prefers-reduced-motion: reduce){ .wm-ring{ animation:none; } .wm-half, .wm-prize{ transition:opacity 200ms linear; } }
   .event-overlay.gift-mode .gift-stage{ display:block; }
   /* Cosmic Surprise's mini-games and effects (runCosmic*) - game-show style:
      chunky gold tiles, a draining timer, one big line saying what happened. */
@@ -16771,9 +16799,9 @@
   const COSMIC_INTRO = { scramble:'🔀 SCRAMBLE!', clock:'⏱️ TIME WARP!', riddle:'🧩 DOUBLE OR NOTHING!', freeze:'❄️ CLOCK FREEZE!' };
   function runWildGift(){
     const prize = drawWildPrize(), ov = els.eventOverlay, stage = document.getElementById('giftStage'), label = document.getElementById('giftPrize');
-    stage.classList.remove('shaking', 'opened', 'reeling', 'slot-mode'); label.textContent = ''; label.classList.remove('won'); { const w = document.getElementById('reelWrap'); if (w) w.className = 'reel-wrap'; }
+    stage.classList.remove('shaking', 'opened', 'reeling', 'slot-mode', 'worm-mode'); label.textContent = ''; label.classList.remove('won'); { const w = document.getElementById('reelWrap'); if (w) w.className = 'reel-wrap'; }
     ov.classList.remove('cosmic-mode'); ov.classList.add('gift-mode');
-    els.eventPrompt.textContent = 'Three in a row wins a prize!';
+    els.eventPrompt.textContent = 'Through the wormhole…';
     const open = ()=>{
       stage.classList.remove('shaking'); stage.classList.add('opened');
       if (COSMIC_INTRO[prize]){   // the weird ones: a title in the box, then their own screen
@@ -16801,39 +16829,38 @@
 
       setTimeout(finishPowerUp, COSMIC_PRIZE_HOLD);
     };
-    // D4 (Oct 16): a small 3-reel slot machine - the reels spin, stop left to right over about 2 s and line up the prize.
-    stage.classList.add('slot-mode');
-    const keys = Object.keys(COSMIC_REEL), slot = document.getElementById('slot3') || (()=>{
-      const d = document.createElement('div'); d.className = 'slot3'; d.id = 'slot3';
-      d.innerHTML = '<div class="s3-top"><div class="sign-bulbs" aria-hidden="true"></div><span>COSMIC SURPRISE</span></div><div class="s3-row">' +
-        [0, 1, 2].map(()=> '<div class="s3-win"><div class="s3-strip"></div></div>').join('') + '</div><div class="s3-base"></div><i class="s3-lever"></i>';
+    // Run 4B: the wormhole drop (replaces the D4 slot machine; the same prizes, drawn the same way). A wormhole swirls
+    // open, a capsule drops into it and comes tumbling back out toward the player, cracks in two and shows the prize -
+    // about 2.4 s in all. Transform and opacity only; lite mode and reduced motion: a quick fade to the open capsule.
+    stage.classList.add('worm-mode');
+    const worm = document.getElementById('wormDrop') || (()=>{
+      const d = document.createElement('div'); d.className = 'worm'; d.id = 'wormDrop';
+      d.innerHTML = '<div class="wm-hole"><i class="wm-ring r1"></i><i class="wm-ring r2"></i><i class="wm-ring r3"></i><i class="wm-core"></i></div>' +
+        '<div class="wm-cap"><i class="wm-half top"></i><i class="wm-half bot"></i><b class="wm-prize"></b></div>';
       stage.insertBefore(d, label); return d; })();
-    slot.className = 'slot3';
-    const strips = [...slot.querySelectorAll('.s3-strip')];
-    if (prefersReducedMotion() || !stage.animate){ strips.forEach(st=>{ st.style.transform = ''; st.innerHTML = '<b>' + COSMIC_REEL[prize] + '</b>'; }); slot.classList.add('landed'); open(); return; }
-    ringBulbs(slot.querySelector('.s3-top .sign-bulbs'), 16, 5);
-    if (cosmicDaily && !slot.dataset.introDone){ slot.dataset.introDone = '1'; showLater(()=>{ delete slot.dataset.introDone; spinSlot(); }, TIMING.COSMIC_SURPRISE_INTRO); return; }   // G2: COSMIC_SURPRISE_INTRO
-    spinSlot();
-    function spinSlot(){
-    slot.classList.add('spinning'); sfx.drumroll(1900);
-    let stopped = 0;
-    strips.forEach((st, r)=>{
-      const seq = []; let lastK = ''; for (let i = 0; i < 9 + r * 3; i++){ let k; do{ k = keys[Math.floor(Math.random() * keys.length)]; }while(k === lastK); seq.push(k); lastK = k; } seq.push(prize);
-      st.innerHTML = seq.map(k=> '<b>' + COSMIC_REEL[k] + '</b>').join('');
-      const cell = st.parentElement.clientHeight || 60, exact = -(seq.length - 1) * cell; st.style.setProperty('--cell', cell + 'px');
-      const ms = 1150 + r * 420;
-      st.animate([{ transform:'translateY(0)', easing:'cubic-bezier(.15,.55,.25,1)' }, { transform:'translateY(' + (exact - 10) + 'px)', offset:0.88, easing:'ease-out' }, { transform:'translateY(' + exact + 'px)' }], { duration:ms, fill:'forwards' })
-        .onfinish = ()=>{
-          sfx.clack(); st.parentElement.classList.add('stop');
-          if (++stopped < 3) return;
-          slot.classList.remove('spinning'); slot.classList.add('landed');
-          sfx.slam(); sfx.ding(); haptic([40, 30, 60]);
-          FX.burstAt(showFx, slot, { count:16, spread:120, shapes:['star', 'coin'] }); showFlash('win');
-          setTimeout(open, 450);
-        };
-    });
-    for (let k = 0; k < 14; k++) setTimeout(()=> sfx.spinTick(k), 60 + k * 70);
-    }
+    worm.className = 'worm';
+    worm.querySelector('.wm-prize').textContent = COSMIC_REEL[prize] || '✨';
+    const cap = worm.querySelector('.wm-cap'), hole = worm.querySelector('.wm-hole');
+    const quick = prefersReducedMotion() || isLite() || !stage.animate;
+    if (quick){ worm.classList.add('open'); setTimeout(open, 450); return; }
+    worm.classList.add('swirl'); sfx.drumroll(1500);
+    hole.animate([{ transform:'scale(0.2)', opacity:0 }, { transform:'scale(1)', opacity:1 }], { duration:380, easing:'cubic-bezier(.2,.9,.3,1.2)', fill:'forwards' });
+    // the drop: from above into the hole (shrinking, spinning), then back out toward the player (growing), a little bounce
+    cap.animate([
+      { transform:'translateY(-150px) scale(0.9) rotate(-20deg)', opacity:0, offset:0 },
+      { transform:'translateY(-120px) scale(0.9) rotate(0deg)', opacity:1, offset:0.12 },
+      { transform:'translateY(0) scale(0.18) rotate(300deg)', opacity:1, offset:0.5, easing:'cubic-bezier(.3,0,.2,1)' },
+      { transform:'translateY(-6px) scale(1.15) rotate(700deg)', opacity:1, offset:0.85 },
+      { transform:'translateY(0) scale(1) rotate(720deg)', opacity:1, offset:1 },
+    ], { duration:1650, delay:250, easing:'ease-in', fill:'forwards' }).onfinish = ()=>{
+      if (!stage.classList.contains('worm-mode')) return;
+      sfx.slam(); haptic([30, 20, 50]);
+      worm.classList.add('open');   // the two halves part (CSS transition), the prize pops
+      hole.animate([{ transform:'scale(1)', opacity:1 }, { transform:'scale(1.25)', opacity:0 }], { duration:420, easing:'ease-in', fill:'forwards' });
+      FX.burstAt(showFx, cap, { count:16, spread:120, shapes:['star', 'coin'] });
+      setTimeout(()=>{ sfx.ding(); open(); }, 380);
+    };
+    for (let k = 0; k < 10; k++) setTimeout(()=> sfx.spinTick(k), 300 + k * 110);
   }
   const COSMIC_REEL = { points10:'\u26A1', points20:'\uD83D\uDCA5', key:'\uD83D\uDD11', chip:'\uD83E\uDE99', scramble:'\uD83D\uDD00', clock:'\u23F1\uFE0F', riddle:'\uD83E\uDDE9', freeze:'\u2744\uFE0F' };
   // The weird ones play on the power-up screen, in .cosmic-stage.
