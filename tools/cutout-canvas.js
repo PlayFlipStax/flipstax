@@ -3,7 +3,9 @@
 // CDP: it reads window.__cutSrc (default incoming-assets/purple-presenting.jpeg), keys out every pixel that is grey and
 // light (low saturation) and connected to the border - plus any enclosed grey patch over 2500 px (the gap inside a bent
 // arm) - softens the edge, trims, scales to 900 px tall and leaves a WebP data URL in window.__cut.url.
-// Known limit: silver details the colour of the backdrop (star tips) get keyed out too.
+// Silver details the colour of the backdrop (star tips) need a protect box: set window.__cutProtect = [{ x0, y0, x1, y1, T }]
+// (source pixels) first - inside a box a pixel is backdrop only when it is within T of the backdrop colour there (the box's
+// top row). Cleo (purple-presenting, Oct 23): [{ x0:705, y0:195, x1:835, y1:320, T:16 }, { x0:965, y0:195, x1:1095, y1:320, T:16 }].
 (async function(){
   const blob = await (await fetch(window.__cutSrc || '/incoming-assets/purple-presenting.jpeg')).blob();
   const img = await createImageBitmap(new Blob([blob], { type:'image/jpeg' }));
@@ -23,18 +25,29 @@
     const sat = mx - mn, lum = 0.3 * p[i] + 0.59 * p[i + 1] + 0.11 * p[i + 2];
     dist[y * W + x] = Math.max(0, (sat - 6) * 2.2, (110 - lum) * 1.2); }
   // flood fill from the border through backdrop-like pixels
-  const T = 30, isBg = new Uint8Array(W * H), q = new Int32Array(W * H); let qh = 0, qt = 0;
-  const push = (j)=>{ if (!isBg[j] && dist[j] < T){ isBg[j] = 1; q[qt++] = j; } };
+  // the backdrop threshold per pixel: T, or a gentler one inside window.__cutProtect boxes ([{ x0, y0, x1, y1, T }] in
+  // source pixels) - for silver details the colour of the backdrop, like antenna tips
+  const T = 30, thr = new Float32Array(W * H).fill(T);
+  // inside a box the test is the colour distance to the backdrop there (the mean of the box's top row), not the grey test
+  (window.__cutProtect || []).forEach(b=>{
+    let r = 0, g = 0, bl = 0, n = 0;
+    for (let x = b.x0; x < b.x1; x++){ const i = (b.y0 * W + x) * 4; r += p[i]; g += p[i + 1]; bl += p[i + 2]; n++; }
+    r /= n; g /= n; bl /= n;
+    for (let y = Math.max(0, b.y0); y < Math.min(H, b.y1); y++) for (let x = Math.max(0, b.x0); x < Math.min(W, b.x1); x++){
+      const j = y * W + x, i = j * 4; thr[j] = b.T; dist[j] = Math.hypot(p[i] - r, p[i + 1] - g, p[i + 2] - bl); }
+  });
+  const isBg = new Uint8Array(W * H), q = new Int32Array(W * H); let qh = 0, qt = 0;
+  const push = (j)=>{ if (!isBg[j] && dist[j] < thr[j]){ isBg[j] = 1; q[qt++] = j; } };
   for (let x = 0; x < W; x++){ push(x); push((H - 1) * W + x); }
   for (let y = 0; y < H; y++){ push(y * W); push(y * W + W - 1); }
   while (qh < qt){ const j = q[qh++], x = j % W, y = (j / W) | 0;
     if (x > 0) push(j - 1); if (x < W - 1) push(j + 1); if (y > 0) push(j - W); if (y < H - 1) push(j + W); }
   // enclosed backdrop (the gap inside a bent arm): any other backdrop-like patch bigger than 2500 px
   const seen = new Uint8Array(W * H);
-  for (let s = 0; s < W * H; s++){ if (isBg[s] || seen[s] || dist[s] >= T) continue;
+  for (let s = 0; s < W * H; s++){ if (isBg[s] || seen[s] || dist[s] >= thr[s]) continue;
     const comp = [s]; seen[s] = 1;
     for (let h = 0; h < comp.length; h++){ const j = comp[h], x = j % W, y = (j / W) | 0;
-      for (const n of [x > 0 ? j - 1 : -1, x < W - 1 ? j + 1 : -1, y > 0 ? j - W : -1, y < H - 1 ? j + W : -1]) if (n >= 0 && !seen[n] && !isBg[n] && dist[n] < T){ seen[n] = 1; comp.push(n); } }
+      for (const n of [x > 0 ? j - 1 : -1, x < W - 1 ? j + 1 : -1, y > 0 ? j - W : -1, y < H - 1 ? j + W : -1]) if (n >= 0 && !seen[n] && !isBg[n] && dist[n] < thr[n]){ seen[n] = 1; comp.push(n); } }
     if (comp.length > 2500) comp.forEach(j=> isBg[j] = 1); }
   // alpha: 0 on the backdrop; a soft ramp on pixels next to it; unmix the backdrop out of the edge colours
   let x0 = W, y0 = H, x1 = 0, y1 = 0;
@@ -43,7 +56,7 @@
     let edge = false;
     for (let dy = -2; dy <= 2 && !edge; dy++) for (let dx = -2; dx <= 2; dx++){ const xx = x + dx, yy = y + dy; if (xx >= 0 && yy >= 0 && xx < W && yy < H && isBg[yy * W + xx]){ edge = true; break; } }
     let a = 1;
-    if (edge) a = Math.max(0, Math.min(1, (dist[j] - T * 0.9) / 40));
+    if (edge) a = Math.max(0, Math.min(1, (dist[j] - thr[j] * 0.9) / 40));
     if (a > 0 && a < 1){ const k = y * 3; for (let c = 0; c < 3; c++) p[i + c] = Math.max(0, Math.min(255, (p[i + c] - (1 - a) * bg[k + c]) / a)); }
     p[i + 3] = Math.round(a * 255);
     if (a > 0.1){ if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
