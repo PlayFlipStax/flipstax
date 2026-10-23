@@ -171,8 +171,13 @@
   .vol-pop.hidden{ display:none; }
   .vol-mute{ width:40px; height:40px; border-radius:12px; border:2px solid rgba(255,214,90,0.6); background:rgba(255,255,255,0.08); font-size:18px; cursor:pointer; }
   .vol-mute.off{ background:#c0263f; border-color:#ff9aa8; }
-  .vol-pop input{ width:150px; accent-color:#ffd23f; }
+  .vol-pop input{ width:120px; accent-color:#ffd23f; }
   .vol-pop b{ min-width:34px; text-align:right; }
+  /* Run 4B: one row per channel - mute, name, volume, level */
+  .vol-row{ flex:1 1 100%; display:flex; align-items:center; gap:10px; }
+  .vol-name{ min-width:44px; font:800 14px/1 var(--f-body, sans-serif); color:#fff3c4; }
+  .vol-mute.off{ position:relative; }
+  .vol-mute.off::after{ content:''; position:absolute; left:6px; right:6px; top:50%; height:3px; margin-top:-1.5px; background:#fff; border-radius:2px; transform:rotate(-40deg); }
   /* Fixed (not header-relative) so it stays reachable above every gameplay
      overlay - trivia, puzzle, riddle - not just the base VS board, while
      matching the sound-toggle's own bare-icon chrome style. */
@@ -4228,7 +4233,7 @@
 <div class="studio page-set" data-studio aria-hidden="true"></div>
 <div class="show-marquee off" id="showMarquee" aria-hidden="true"></div>
 <!-- The sound panel: one master volume and the mute button (opened from the speaker). -->
-<div class="vol-pop hidden" id="volPop" role="dialog" aria-label="Sound and pace"><button type="button" class="vol-mute" id="volMute" aria-label="Mute">🔊</button><input type="range" id="volSlider" min="0" max="100" step="5" aria-label="Master volume"><b id="volPct"></b><button type="button" class="vol-relax" id="volRelax" role="switch" aria-checked="false"><span class="vr-box"></span><span>Relaxed pace <small>8 s a VS card, not 5</small></span></button></div>
+<div class="vol-pop hidden" id="volPop" role="dialog" aria-label="Sound and pace"><div class="vol-row"><button type="button" class="vol-mute" id="musMute" aria-label="Mute music">🎵</button><span class="vol-name">Music</span><input type="range" id="musSlider" min="0" max="100" step="5" aria-label="Music volume"><b id="musPct"></b></div><div class="vol-row"><button type="button" class="vol-mute" id="sfxMute" aria-label="Mute sound effects">🔔</button><span class="vol-name">SFX</span><input type="range" id="sfxSlider" min="0" max="100" step="5" aria-label="Sound effects volume"><b id="sfxPct"></b></div><button type="button" class="vol-relax" id="volRelax" role="switch" aria-checked="false"><span class="vr-box"></span><span>Relaxed pace <small>8 s a VS card, not 5</small></span></button></div>
 <div class="fx-layer show-fx" id="showFx" aria-hidden="true"></div>
 <div class="show-card hidden" id="showCard"></div>
 <div class="show-host" id="showHost" aria-hidden="true"><div class="alien" id="showAlien"></div><div class="show-say" id="showSay"></div></div>
@@ -6303,20 +6308,27 @@
   // shared FlipStax link often gets opened) restrict storage access and
   // throw here. This runs at script init, before any try/catch further
   // down could help, so an unguarded throw would blank the whole page.
-  let soundOn = true;
-  try{ soundOn = localStorage.getItem('flipstax_sound') !== 'off'; }catch(e){}
-  // One master volume (0-1, saved) for every sound: the synthesized effects go through one gain node (the
-  // context's destination is pointed at it, so every effect's connect(ctx.destination) passes through), and
-  // the music's <audio> elements take it on their own levels. Mute is the sound switch (soundOn).
-  let masterVol = 1;
-  try{ const v = parseFloat(localStorage.getItem('flipstax_volume')); if (!isNaN(v)) masterVol = Math.max(0, Math.min(1, v)); }catch(e){}
+  // Run 4B: two channels, each with its own switch and volume (saved): Music (the recorded tracks' <audio> elements)
+  // and SFX (every synthesized effect - they go through one gain node: the context's destination is pointed at it,
+  // so every effect's connect(ctx.destination) passes through). Muting one never mutes the other. soundOn is "any
+  // sound on" (the header speaker icon, the audio unlock). The old single setting (flipstax_sound / flipstax_volume)
+  // is the starting point for both.
+  const lsGet = (k)=>{ try{ return localStorage.getItem(k); }catch(e){ return null; } };
+  const lsSet = (k, v)=>{ try{ localStorage.setItem(k, v); }catch(e){} };
+  const volOf = (v, d)=>{ const n = parseFloat(v); return isNaN(n) ? d : Math.max(0, Math.min(1, n)); };
+  const oldOn = lsGet('flipstax_sound') !== 'off', oldVol = volOf(lsGet('flipstax_volume'), 1);
+  let musicOn = lsGet('flipstax_music_on') != null ? lsGet('flipstax_music_on') === '1' : oldOn;
+  let sfxOn = lsGet('flipstax_sfx_on') != null ? lsGet('flipstax_sfx_on') === '1' : oldOn;
+  let musicVol = volOf(lsGet('flipstax_music_vol'), oldVol), sfxVol = volOf(lsGet('flipstax_sfx_vol'), oldVol);
+  let soundOn = musicOn || sfxOn;
+  let masterVol = musicVol;   // (the music level - kept under its old name for the music code below)
   let audioCtx = null, masterGain = null;
   function getAudioCtx(){
     if (!audioCtx){
       try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
       catch(e){ return null; }
       try{
-        masterGain = audioCtx.createGain(); masterGain.gain.value = masterVol * masterVol; masterGain.connect(audioCtx.destination);
+        masterGain = audioCtx.createGain(); masterGain.gain.value = sfxVol * sfxVol; masterGain.connect(audioCtx.destination);
         Object.defineProperty(audioCtx, 'destination', { value: masterGain, configurable: true });
       }catch(e){ masterGain = null; }
     }
@@ -6324,7 +6336,7 @@
     return audioCtx;
   }
   function playTone(freq, startDelay, duration, type, vol){
-    if (!soundOn) return;
+    if (!sfxOn) return;
     const ctx = getAudioCtx();
     if (!ctx) return;
     try{
@@ -6341,7 +6353,7 @@
     }catch(e){}
   }
   function haptic(pattern){
-    if (!soundOn) return;
+    if (!sfxOn) return;
     if (navigator.vibrate){ try{ navigator.vibrate(pattern); }catch(e){} }
   }
   // A short, filtered burst of noise - reads as a natural tactile "click"
@@ -6367,7 +6379,7 @@
   };
   const TAP_SIDE_PITCH = { top:1.05, bottom:0.95 };
   function playClick(vol, tone, side){
-    if (!soundOn) return;
+    if (!sfxOn) return;
     const ctx = getAudioCtx();
     if (!ctx) return;
     try{
@@ -6430,7 +6442,7 @@
   // The flick, the landing, the spin slowing down on the table, a last
   // rattle as it settles, and a soft thud - timed to the coin animation.
   function playCoinSpin(){
-    if (!soundOn) return; const ctx = getAudioCtx(); if (!ctx) return;
+    if (!sfxOn) return; const ctx = getAudioCtx(); if (!ctx) return;
     try{
       const t0 = ctx.currentTime;
       coinPing(ctx, t0, 0.11, 2350);                       // thumb flick
@@ -6447,7 +6459,7 @@
   }
   // A cha-ching and a bright run upward.
   function playCoinWin(){
-    if (!soundOn) return; const ctx = getAudioCtx(); if (!ctx) return;
+    if (!sfxOn) return; const ctx = getAudioCtx(); if (!ctx) return;
     try{
       const t0 = ctx.currentTime;
       coinPing(ctx, t0, 0.1, 2900); coinPing(ctx, t0 + 0.09, 0.1, 3700);
@@ -6458,7 +6470,7 @@
   }
   // "Womp womp": two low, falling, wobbling brass-ish notes.
   function playCoinLose(){
-    if (!soundOn) return; const ctx = getAudioCtx(); if (!ctx) return;
+    if (!sfxOn) return; const ctx = getAudioCtx(); if (!ctx) return;
     try{
       const t0 = ctx.currentTime;
       [[0, 0.42, 233, 196], [0.5, 0.85, 196, 139]].forEach(([at, dur, f1, f2])=>{
@@ -6475,7 +6487,7 @@
     haptic([80, 60, 160]);
   }
   function playBoom(vol){
-    if (!soundOn) return;
+    if (!sfxOn) return;
     const ctx = getAudioCtx();
     if (!ctx) return;
     try{
@@ -6498,7 +6510,7 @@
   // sound: three laser sweeps, firework pops with crackle, and a rising
   // fanfare into a held chord (~2.6s).
   function playSecretSolveSound(){
-    if (!soundOn) return;
+    if (!sfxOn) return;
     const ctx = getAudioCtx();
     if (!ctx) return;
     try{
@@ -6536,7 +6548,7 @@
   // Infinity run sounds (keys, the finale's coins and chips), built from the
   // Coin Flip's coin voices at the same levels - Web Audio, so the sound
   // setting and the silent switch apply like every other effect.
-  function withSfxCtx(fn){ if (!soundOn) return; const ctx = getAudioCtx(); if (!ctx) return; try{ fn(ctx, ctx.currentTime); }catch(e){ if (DEBUG_FAST) (window.__sfxErrors = window.__sfxErrors || []).push(String(e && e.stack || e)); } }
+  function withSfxCtx(fn){ if (!sfxOn) return; const ctx = getAudioCtx(); if (!ctx) return; try{ fn(ctx, ctx.currentTime); }catch(e){ if (DEBUG_FAST) (window.__sfxErrors = window.__sfxErrors || []).push(String(e && e.stack || e)); } }
   // ---------- The show's sounds (B9, Oct 2026) ----------
   // All synthesized (no files): the host's voice (gibberish blips under
   // his speech bubble, which is the subtitle), a snare drumroll before a
@@ -6785,25 +6797,32 @@
     riddleTimeout: ()=>{ playTone(110,0,0.6,'square',0.07); playTone(116.5,0,0.6,'square',0.05); playTone(98,0.62,0.5,'square',0.06); haptic([120,60,120]); },
     personality: ()=>{ playTone(392,0,0.14,'sine',0.1); playTone(494,0.12,0.14,'sine',0.1); playTone(587,0.24,0.14,'sine',0.1); playTone(784,0.36,0.32,'sine',0.12); haptic([15,30,15,30,25]); },
   };
-  function setMasterVolume(v){
-    masterVol = Math.max(0, Math.min(1, v));
-    try{ localStorage.setItem('flipstax_volume', String(masterVol)); }catch(e){}
-    if (masterGain && audioCtx) masterGain.gain.setTargetAtTime(masterVol * masterVol, audioCtx.currentTime, 0.02);
+  function setMusicVolume(v){
+    musicVol = masterVol = Math.max(0, Math.min(1, v)); lsSet('flipstax_music_vol', String(musicVol));
     applyMusicVolume();
   }
+  function setSfxVolume(v){
+    sfxVol = Math.max(0, Math.min(1, v)); lsSet('flipstax_sfx_vol', String(sfxVol));
+    if (masterGain && audioCtx) masterGain.gain.setTargetAtTime(sfxVol * sfxVol, audioCtx.currentTime, 0.02);
+  }
+  function setMasterVolume(v){ setMusicVolume(v); setSfxVolume(v); }   // (both channels at once)
+  function syncSoundIcon(){ soundOn = musicOn || sfxOn; if (els.soundToggle) els.soundToggle.textContent = soundOn ? '\uD83D\uDD0A' : '\uD83D\uDD07'; }
+  function setMusicOn(on){
+    musicOn = !!on; lsSet('flipstax_music_on', musicOn ? '1' : '0'); syncSoundIcon();
+    if (isPaused) return;
+    if (musicOn) playTrack(currentTrackKey === 'fanfare' ? 'intro' : (currentTrackKey || 'run')); else pauseAllTracks();
+  }
+  function setSfxOn(on){ sfxOn = !!on; lsSet('flipstax_sfx_on', sfxOn ? '1' : '0'); syncSoundIcon(); if (sfxOn) getAudioCtx(); }
   function applyMusicVolume(){
     Object.keys(trackEls).forEach(k=>{ const a = trackEls[k]; if (a && a._base != null) a.volume = a._base * masterVol; });
     infEls.forEach(a=>{ if (a && a._base != null) a.volume = a._base * masterVol; });
   }
+  // Both channels on or off at once (the "Tap for sound" hint, older callers).
   function setSoundOn(on){
-    soundOn = on;
-    try{ localStorage.setItem('flipstax_sound', on ? 'on' : 'off'); }catch(e){}
-    els.soundToggle.textContent = on ? '\uD83D\uDD0A' : '\uD83D\uDD07';
-    // The fanfare is only ever the page's opening sound - sound switched on
-    // later gets the intro theme instead of a replay.
-    // While paused, only remember the choice - Resume starts the music.
-    if (isPaused) return;
-    if (on) playTrack(currentTrackKey === 'fanfare' ? 'intro' : (currentTrackKey || 'run')); else pauseAllTracks();
+    sfxOn = !!on; lsSet('flipstax_sfx_on', sfxOn ? '1' : '0');
+    // The fanfare is only ever the page's opening sound - sound switched on later gets the intro theme instead of a
+    // replay. While paused, only remember the choice - Resume starts the music.
+    setMusicOn(on);
   }
 
   // ---- Real recorded music, one track per part of the game: "intro"
@@ -6991,7 +7010,7 @@
     const prev = infEls[infIdx];
     infIdx = infNextIdx(); infBagPos++;
     const idx = infIdx, el = getTrackEl('infinity');
-    if (!soundOn){ if (prev && prev !== el) try{ prev.pause(); }catch(e){} return; }
+    if (!musicOn){ if (prev && prev !== el) try{ prev.pause(); }catch(e){} return; }
     el.muted = false;
     const startAt = infStartAt(idx);
     if (Math.abs(el.currentTime - startAt) > 0.005){ try{ el.currentTime = startAt; }catch(e){} }
@@ -7014,7 +7033,7 @@
     // If the browser refuses to start a song outside a tap (it hadn't been
     // unlocked yet), start it on the next tap instead of going silent.
     if (p && p.catch) p.catch(()=>{
-      const retry = ()=>{ if (soundOn && currentTrackKey === 'infinity' && trackEls.infinity === el && el.paused) el.play().catch(()=>{}); };
+      const retry = ()=>{ if (musicOn && currentTrackKey === 'infinity' && trackEls.infinity === el && el.paused) el.play().catch(()=>{}); };
       document.addEventListener('pointerdown', retry, { once:true });
     });
   }
@@ -7055,7 +7074,7 @@
     // top, not adopted mid-song.
     const wasCurrent = currentTrackKey === key;
     currentTrackKey = key;
-    if (!soundOn) return;
+    if (!musicOn) return;
     const already = wasCurrent && trackEls[key] && !trackEls[key].paused && !trackEls[key].muted;
     // Every other track is stopped outright first - a hard stop, never a
     // fade or an overlap.
@@ -7087,7 +7106,7 @@
   // it, same as the rest of the music). The code-built solve sound is only
   // the fallback if the file can't play.
   function playSecretWinFanfare(){
-    if (!soundOn) return;
+    if (!musicOn) return;
     if (!TRACK_SRC.secretWin){ sfx.secretSolve(); return; }
     stopSecretMusic();
     Object.keys(trackEls).forEach(k=>{ if (k !== 'secretWin') try{ trackEls[k].pause(); }catch(e){} });
@@ -7102,7 +7121,7 @@
     stopSecretMusic();
     if (trackEls.secretWin) try{ trackEls.secretWin.pause(); }catch(e){}
     currentTrackKey = 'run';
-    if (!soundOn) return;
+    if (!musicOn) return;
     const el = getTrackEl('run');
     el.muted = false; el.play().catch(()=>{});
   }
@@ -7113,7 +7132,7 @@
     pauseAllTracks();
     const key = solved ? 'win' : 'lose';
     currentTrackKey = key;
-    if (!TRACK_SRC[key] || !soundOn) return;
+    if (!TRACK_SRC[key] || !musicOn) return;
     const el = getTrackEl(key);
     el.muted = false;
     try{ el.currentTime = 0; }catch(e){}
@@ -7126,7 +7145,7 @@
   // that first tap already happens.
   function primeMusic(key){
     currentTrackKey = key;
-    if (!soundOn) return;
+    if (!musicOn) return;
     // Nothing else may be playing while the intro is primed.
     Object.keys(trackEls).forEach(k=>{ if (k !== key) try{ trackEls[k].pause(); }catch(e){} });
     pauseInfinityPlaylist();
@@ -7134,7 +7153,7 @@
     el.muted = true;
     el.play().catch(()=>{});
     const unmute = ()=>{
-      if (soundOn && currentTrackKey === key){
+      if (musicOn && currentTrackKey === key){
         // It has been running silently since launch (browsers won't allow
         // audible sound before a tap); restart so the theme is heard from
         // its beginning rather than joined somewhere in the middle.
@@ -7227,7 +7246,7 @@
   function rampAudioTick(){
     const ctx = audioCtx, el = trackEls.infinity;
     if (ctx && ctx.state === 'suspended') ctx.resume().catch(()=>{});
-    if (!ctx || !rampBus || !el || !soundOn || currentTrackKey !== 'infinity' || el.paused || el.muted || ctx.state !== 'running') return;
+    if (!ctx || !rampBus || !el || !musicOn || currentTrackKey !== 'infinity' || el.paused || el.muted || ctx.state !== 'running') return;
     const now = el.currentTime;
     if (now < rampLastTrackT - 0.5){ rampNextHatStep = 0; rampNextPhrase = -1; rampOff = null; }
     rampLastTrackT = now;
@@ -12897,7 +12916,7 @@
       '<div class="dc-skip">TAP TO SKIP</div>';
     document.body.appendChild(d);
     marquee.classList.remove('strobe'); marquee.classList.add('disco'); marquee.classList.toggle('still', lite);
-    try{ if (window.FLIPSTAX_DISCO_STING && soundOn){ const a = new Audio(window.FLIPSTAX_DISCO_STING); a.volume = Math.max(0, Math.min(1, masterVol)); a.play().catch(()=>{}); d._sting = a; } }catch(e){}
+    try{ if (window.FLIPSTAX_DISCO_STING && sfxOn){ const a = new Audio(window.FLIPSTAX_DISCO_STING); a.volume = Math.max(0, Math.min(1, masterVol)); a.play().catch(()=>{}); d._sting = a; } }catch(e){}
     let over = false;
     const end = ()=>{ if (over) return; over = true; marquee.classList.remove('disco', 'still'); try{ if (d._sting) d._sting.pause(); }catch(e){} d.classList.add('out'); setTimeout(()=> d.remove(), 300); if (done) done(); };
     const discoAt = performance.now();
@@ -14463,7 +14482,7 @@
   function playCollectionFanfare(){
     const prevKey = currentTrackKey, prevEl = prevKey && trackEls[prevKey];
     cmcMusicBefore = { key: prevKey, el: prevEl && !prevEl.paused ? prevEl : null };
-    if (!soundOn) return;
+    if (!musicOn) return;
     pauseAllTracks();
     currentTrackKey = 'collectionWin';
     const el = getTrackEl('collectionWin'); el.muted = false;
@@ -14475,7 +14494,7 @@
     const b = cmcMusicBefore; cmcMusicBefore = null;
     if (!b || currentTrackKey !== 'collectionWin') return;
     currentTrackKey = b.key;
-    if (soundOn && b.el && trackEls[b.key] === b.el) b.el.play().catch(()=>{});
+    if (musicOn && b.el && trackEls[b.key] === b.el) b.el.play().catch(()=>{});
   }
   function showCollectionComplete(){
     const ov = document.getElementById('collectionCompleteOverlay'), stage = document.getElementById('cmcStage'), btn = document.getElementById('cmcContinue');
@@ -15658,7 +15677,7 @@
       if (isPaused) startResumeCountdown();
       if (musicPausedByBackground){
         const el = musicPausedByBackground; musicPausedByBackground = null;
-        if (soundOn && currentTrackKey && trackEls[currentTrackKey] === el) el.play().catch(()=>{});
+        if (musicOn && currentTrackKey && trackEls[currentTrackKey] === el) el.play().catch(()=>{});
       }
     }
   });
@@ -15696,7 +15715,7 @@
     // Music picks up where it stopped. If sound was switched on while
     // paused (nothing was playing), the mode's track starts instead.
     const wasPlaying = musicPausedByPause; musicPausedByPause = null;
-    if (soundOn && currentTrackKey){
+    if (musicOn && currentTrackKey){
       if (wasPlaying && trackEls[currentTrackKey] === wasPlaying) wasPlaying.play().catch(()=>{});
       else playTrack(currentTrackKey);
     }
@@ -17063,11 +17082,15 @@
     try{ localStorage.setItem('flipstax_seen_run_intro','1'); }catch(e){}
     startDailyRun();
   });
-  // The speaker opens the sound panel: the mute button and the master volume.
-  const volPop = document.getElementById('volPop'), volMute = document.getElementById('volMute'), volSlider = document.getElementById('volSlider'), volPct = document.getElementById('volPct');
-  const volRelax = document.getElementById('volRelax');
-  function renderVolPop(){ volRelax.setAttribute('aria-checked', relaxedPace ? 'true' : 'false'); volMute.textContent = soundOn ? '\uD83D\uDD0A' : '\uD83D\uDD07'; volMute.classList.toggle('off', !soundOn); volMute.setAttribute('aria-label', soundOn ? 'Mute' : 'Unmute');
-    volSlider.value = String(Math.round(masterVol * 100)); volPct.textContent = Math.round(masterVol * 100) + '%'; }
+  // The speaker opens the sound panel (Run 4B): Music and SFX, each with its own mute and volume, and Relaxed pace.
+  const volPop = document.getElementById('volPop'), volRelax = document.getElementById('volRelax');
+  const vch = (id)=> ({ mute: document.getElementById(id + 'Mute'), slider: document.getElementById(id + 'Slider'), pct: document.getElementById(id + 'Pct') });
+  const volMus = vch('mus'), volSfx = vch('sfx');
+  function renderVolRow(row, on, vol, label){
+    row.mute.classList.toggle('off', !on); row.mute.setAttribute('aria-pressed', on ? 'false' : 'true'); row.mute.setAttribute('aria-label', (on ? 'Mute ' : 'Unmute ') + label);
+    row.slider.value = String(Math.round(vol * 100)); row.pct.textContent = on ? Math.round(vol * 100) + '%' : 'off';
+  }
+  function renderVolPop(){ volRelax.setAttribute('aria-checked', relaxedPace ? 'true' : 'false'); renderVolRow(volMus, musicOn, musicVol, 'music'); renderVolRow(volSfx, sfxOn, sfxVol, 'sound effects'); }
   let volPopT = 0;
   function closeVolPop(){ volPop.classList.add('hidden'); clearTimeout(volPopT); }
   function openVolPop(){
@@ -17078,9 +17101,12 @@
   }
   els.soundToggle.addEventListener('click', (e)=>{ e.stopPropagation(); if (volPop.classList.contains('hidden')) openVolPop(); else closeVolPop(); });
   els.soundToggle.addEventListener('keydown', (e)=>{ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); els.soundToggle.click(); } });
-  volMute.addEventListener('click', (e)=>{ e.stopPropagation(); setSoundOn(!soundOn); renderVolPop(); clearTimeout(volPopT); volPopT = setTimeout(closeVolPop, 5000); });
-  volSlider.addEventListener('input', ()=>{ setMasterVolume(+volSlider.value / 100); if (masterVol > 0 && !soundOn) setSoundOn(true); renderVolPop(); clearTimeout(volPopT); volPopT = setTimeout(closeVolPop, 5000); });
-  volSlider.addEventListener('change', ()=>{ if (soundOn) sfx.ding(); });
+  const volKeep = ()=>{ clearTimeout(volPopT); volPopT = setTimeout(closeVolPop, 6000); };
+  volMus.mute.addEventListener('click', (e)=>{ e.stopPropagation(); setMusicOn(!musicOn); renderVolPop(); volKeep(); });
+  volSfx.mute.addEventListener('click', (e)=>{ e.stopPropagation(); setSfxOn(!sfxOn); renderVolPop(); if (sfxOn) sfx.ding(); volKeep(); });
+  volMus.slider.addEventListener('input', ()=>{ setMusicVolume(+volMus.slider.value / 100); if (musicVol > 0 && !musicOn) setMusicOn(true); renderVolPop(); volKeep(); });
+  volSfx.slider.addEventListener('input', ()=>{ setSfxVolume(+volSfx.slider.value / 100); if (sfxVol > 0 && !sfxOn) setSfxOn(true); renderVolPop(); volKeep(); });
+  volSfx.slider.addEventListener('change', ()=>{ if (sfxOn) sfx.ding(); });
   volRelax.addEventListener('click', (e)=>{ e.stopPropagation(); setRelaxedPace(!relaxedPace); renderVolPop(); clearTimeout(volPopT); volPopT = setTimeout(closeVolPop, 5000); });
   volPop.addEventListener('click', (e)=> e.stopPropagation());
   document.addEventListener('click', (e)=>{ if (!volPop.classList.contains('hidden') && !volPop.contains(e.target) && !els.soundToggle.contains(e.target)){ closeVolPop(); e.stopPropagation(); e.preventDefault(); } }, true);   // (the tap that closes it does nothing else)
