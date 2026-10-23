@@ -10477,7 +10477,7 @@
     runStartDate = todayStr();
     runWord = dailyWordForPlayer();
     runPlan = buildShowPlan(runStartDate); runShow = { step:0, left:null }; runActIdx = 0; runActPts = []; runMissPts = 0; runGoopLost = 0; runBestMoment = null; runKeys = 0; runBonusChips = 0; runVsMarks = []; runPortalDoors = null; runWarpBonusMs = 0; runBreakSeen = {};
-    runActKeys = []; runActLetter = []; runOrbit = null; runOrbitPts = 0; runOrbitJackpot = false; runOrbitDone = null;
+    runActKeys = []; runActLetter = []; runOrbit = null; runOrbitPts = 0; runOrbitJackpot = false; runOrbitDone = null; runActWon = [];
     runMatchStreak = 0; runComboBank = 0; runComboBonus = 0; runBestStreak = 0; renderComboMeter();
     runLetterPos = []; runWarpPoints = 0; letterIncoming.clear(); runTrayMarks = []; trayIncoming.clear();
     runEndsAt = Date.now() + RUN_DURATION_MS;
@@ -11584,6 +11584,9 @@
     showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', (a.title || 'Round') + ' done: ' + pts + ' points, ' + (letter === 'got' ? 'a letter, ' : '') + keys + ' gold keys. Tap to go on');
     showCard.classList.remove('hidden');
     if (pts > 0) sfx.chime(5);
+    // Run 4B: the round-end game was won - the presenter pops out beside the panel now and then (lib/cast.js; only
+    // pictures listed in data/cast/manifest.js; never takes a tap)
+    if (runActWon[st.act] && window.Cast) Cast.win({ side:'left', hold: Math.min(1900, cine(TIMING.REWARD_HOLD || 2200) - 300), always: CAST_ALWAYS, while: ()=> showCard.classList.contains('reward') && !showCard.classList.contains('hidden') });
     const shownAt = performance.now();
     let gone = false;
     const go = (e)=>{
@@ -13437,6 +13440,7 @@
       const won = o.chips.reduce((a, c)=> a + (c.pts || 0), 0);
       o.done = true; o.stage = 'done';
       runOrbitPts = won; runOrbitJackpot = o.chips.some(c=> c.kind === 'jackpot');
+      if (runOrbitJackpot) castWin();   // (Orbit Drop "won": THE MOTHERSHIP)
       runScore += won;
       if (!runBestMoment || won > runBestMoment.pts) runBestMoment = { pts: won, text: GN.orbitDrop + (runOrbitJackpot ? ': THE MOTHERSHIP!' : '') };
       dailyOrbit = null;
@@ -15940,7 +15944,11 @@
   // Run 4A, reactions on milestones only (lib/cast.js; each about one time in three, never blocking a tap or the next
   // screen): a round-end game won - Cleo (or Kandi) pops out from the side, pointing in toward the score; a failure -
   // the host laughs or winces at the side.
-  function castWin(still){ if (window.Cast) Cast.win({ side:'left', hold:1800, while: still }); }
+  // Run 4B: a round-end game won is only noted here; the presenter's pop-up comes at that round's reward beat
+  // (showRewardBeat), about one time in three - never during play.
+  let runActWon = [];
+  function castWin(){ if (runActive) runActWon[runActIdx] = true; }
+  const CAST_ALWAYS = (()=>{ try{ return /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && new URLSearchParams(location.search).get('castwin') === '1'; }catch(e){ return false; } })();   // (localhost checks: every win pops)
   function castOops(){
     if (!window.Cast) return;
     try{ document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say'); clearTimeout(hostSayT); }catch(e){}   // (the host's own line would sit where his reaction does)

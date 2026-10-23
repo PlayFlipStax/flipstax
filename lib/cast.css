@@ -65,3 +65,9 @@
 /* Run 4A: Cleo's picture points to its left, so it is mirrored on the left side (her open hand points in, toward the score) */
 .cast-m.m-purple.left .cast-fig img{ transform:scaleX(-1); }
 .cast-m.m-purple.right .cast-fig img{ transform:none; }
+/* Run 4B: the win pop-up at the reward beat - wholly on screen with a margin (it fits 360x640 and 390x760), in the
+   free strip under the reward panel; it never takes a tap */
+.cast-m.popup{ height:min(28vh, 220px); bottom:calc(14px + env(safe-area-inset-bottom)); margin:0; }
+.cast-m.popup.left{ left:12px; }
+.cast-m.popup.right{ right:12px; left:auto; }
+@media (max-height:680px){ .cast-m.popup{ height:min(24vh, 150px); } }
