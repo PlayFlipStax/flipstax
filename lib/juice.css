@@ -63,3 +63,20 @@
 .jc-correct.quiet{ animation:jcRing 900ms ease-out forwards; }
 .jc-spark{ position:fixed; width:11px; height:11px; border-radius:3px; pointer-events:none; box-shadow:0 0 6px rgba(255,255,255,0.7); }
 .jc-wrong{ background:rgba(10,2,24,0.5); opacity:0; }
+
+/* ---- 4. The wordmark: "FlipStax" in Righteous (SIL Open Font License, fonts/righteous/OFL.txt - self-hosted, the
+   unmodified 43 KB file: the licence reserves the name, so it is not subsetted), a hot-pink-to-cyan gradient fill, a
+   thin white highlight, in a marquee-oval frame with a ring of small bulbs. In the HUD's logo spot. ---- */
+@font-face{ font-family:'FS Righteous'; src:url(../fonts/righteous/Righteous-Regular.ttf) format('truetype'); font-weight:400; font-style:normal; font-display:swap; }
+header .logo.jc-wordmark{ position:relative; display:inline-flex; align-items:center; padding:3px 12px 4px; border-radius:999px;
+  font-family:'FS Righteous', 'Big Shoulders Display', sans-serif; font-weight:400; font-size:clamp(17px, 5vw, 21px); letter-spacing:0.5px; line-height:1;
+  background:radial-gradient(120% 140% at 50% 0%, #3a1270, #160634 70%); border:2px solid var(--jc-gold);
+  box-shadow:0 0 0 2px rgba(122,61,0,0.8), inset 0 1px 0 rgba(255,255,255,0.35), 0 0 12px rgba(255,60,157,0.45); text-shadow:none !important; }
+header .logo.jc-wordmark::before{ content:''; position:absolute; inset:2px; border-radius:inherit; pointer-events:none;
+  background:radial-gradient(circle, #fff6c8 0 1.3px, rgba(255,246,200,0) 1.8px) 0 0 / 9px 9px; opacity:0.55;
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask-composite:exclude; padding:2px; }
+header .logo.jc-wordmark .flip, header .logo.jc-wordmark .stax{ position:relative; color:transparent !important;
+  background:linear-gradient(90deg, #ff3c9d 0%, #ff7ac0 35%, #9ae8ff 70%, #7df9ff 100%); -webkit-background-clip:text; background-clip:text;
+  -webkit-text-stroke:0.6px rgba(255,255,255,0.9); }
+header .logo.jc-wordmark .flip{ background-size:200% 100%; background-position:0 0; }
+header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:100% 0; }
