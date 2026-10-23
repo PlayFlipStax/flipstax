@@ -80,3 +80,27 @@ header .logo.jc-wordmark .flip, header .logo.jc-wordmark .stax{ position:relativ
   -webkit-text-stroke:0.6px rgba(255,255,255,0.9); }
 header .logo.jc-wordmark .flip{ background-size:200% 100%; background-position:0 0; }
 header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:100% 0; }
+
+/* ---- 5. The VS card (Daily): thick bevelled cards - side A orange, side B teal - with an inner highlight, a drop
+   shadow and a glowing edge; the big emoji on a soft shadow; a glossy gold coin for VS. The reveal (under 0.9 s): the
+   tapped card squishes (0.96, 90 ms), the crowd's winner grows to 1.06 with a burst, the share bar slams in, the other
+   card dims. Transform and opacity only. ---- */
+:root:root.mode-daily #board .half.top{ background:linear-gradient(165deg, var(--jc-orange-1) 0%, #f5801a 45%, var(--jc-orange-2) 100%) !important; --jc-glow:rgba(255,159,28,0.55); }
+:root:root.mode-daily #board .half.bottom{ background:linear-gradient(165deg, var(--jc-teal-1) 0%, #1ea39b 45%, var(--jc-teal-2) 100%) !important; --jc-glow:rgba(46,196,182,0.55); }
+:root:root.mode-daily #board .half:not(.picked){ border:3px solid rgba(255,255,255,0.7); border-radius:22px;
+  box-shadow:inset 0 3px 0 rgba(255,255,255,0.55), inset 0 -7px 0 rgba(0,0,0,0.2), inset 0 0 0 2px rgba(255,255,255,0.18), 0 7px 0 rgba(40,0,60,0.5), 0 14px 26px rgba(20,0,40,0.45), 0 0 22px var(--jc-glow); }
+:root:root.mode-daily #board .half > .gloss{ opacity:1; background:linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 38%); }
+:root:root.mode-daily #board .half .scene .glyph{ filter:drop-shadow(0 8px 8px rgba(40,0,30,0.38)); }
+:root:root.mode-daily #board .divider{ width:60px; height:60px; border:3px solid #7a3d00; animation:none;
+  background:radial-gradient(circle at 34% 28%, #fffbe0 0%, #ffe680 22%, var(--jc-gold) 50%, var(--jc-gold-lo) 85%);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,0.75), inset 0 -4px 0 rgba(122,61,0,0.35), 0 4px 0 #5a2a00, 0 0 18px rgba(255,210,63,0.65);
+  color:#3a1500; font:900 20px/1 var(--f-display); text-shadow:0 1px 0 rgba(255,255,255,0.6); }
+/* the reveal */
+:root:root.mode-daily #board .half{ transition:transform 90ms var(--ease-out, ease-out), opacity 220ms ease; }
+:root:root.mode-daily #board .half.tap-chosen{ transform:scale(0.96); }
+:root:root.mode-daily #board .half.win-side{ transform:scale(1.06); z-index:3; transition:transform 240ms var(--ease-pop, cubic-bezier(.3,1.6,.5,1)) 40ms, opacity 220ms ease; }
+:root:root.mode-daily #board .half.lose-side > :not(.fill){ opacity:0.5; transition:opacity 260ms ease 120ms; }
+:root.mode-daily #board .half.top .fill{ background:rgba(255,236,170,0.42); }
+:root.mode-daily #board .half.bottom .fill{ background:rgba(190,255,248,0.4); }
+:root.lite.mode-daily #board .half.win-side{ transform:none; }
+@media (prefers-reduced-motion: reduce){ :root:root.mode-daily #board .half.win-side, :root:root.mode-daily #board .half.tap-chosen{ transform:none; } }

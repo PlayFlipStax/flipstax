@@ -358,7 +358,7 @@
   .half.has-glyph .scene .glyph.vs-twin{ display:inline-block; transform:scaleX(-1); }
   .half.has-glyph:not(.revealed) .content{ background:none; backdrop-filter:none; -webkit-backdrop-filter:none; border:none; padding:2px 20px; }
 
-  .fill{ position:absolute; inset:0; width:0%; z-index:1; transition: width 0.75s cubic-bezier(.2,.8,.2,1); }
+  .fill{ position:absolute; inset:0; width:100%; z-index:1; transform:scaleX(0); transform-origin:0 50%; transition: transform 0.45s cubic-bezier(.2,1.25,.35,1); }   /* (Run 5A: the share bar scales - no width animation) */
   .half.top .fill{ background: rgba(255,184,51,0.82); }
   .half.bottom .fill{ background: rgba(45,212,196,0.82); }
 
@@ -15570,7 +15570,8 @@
 
   function renderUnvoted(){
     els.halfA.classList.remove('revealed', 'picked'); els.halfB.classList.remove('revealed', 'picked');
-    els.fillA.style.width = '0%'; els.fillB.style.width = '0%';
+    setFill(els.fillA, 0); setFill(els.fillB, 0);
+    els.halfA.classList.remove('win-side', 'lose-side'); els.halfB.classList.remove('win-side', 'lose-side');
     crowdBoardHide();
     els.pctA.textContent=''; els.pctB.textContent='';
     els.votesA.textContent=''; els.votesB.textContent='';
@@ -16422,13 +16423,21 @@
     if (total > 0){ pctA = Math.round((a/total)*100); pctB = 100 - pctA; }
     else { pctA = mockPercentA(current.id, current.a); pctB = 100 - pctA; }
     els.halfA.classList.add('revealed'); els.halfB.classList.add('revealed');
-    els.fillA.style.width = pctA + '%'; els.fillB.style.width = pctB + '%';
+    setFill(els.fillA, pctA); setFill(els.fillB, pctB);
     animateCount(els.pctA, pctA); animateCount(els.pctB, pctB);
     if (isShowMode()){
       // F2: the crowd's numbers only with a real crowd (CROWD_DATA_MIN votes from others); else a note and empty bars.
       const n = others != null ? others : Math.max(0, total - 1);
-      if (n >= CROWD_DATA_MIN_NOW) crowdBoardShow(pctA, pctB, !isLiveUpdate || crowdBoard.classList.contains('note'));   // (a live update that brings the crowd past 30 clacks the numbers in)
-      else { crowdBoardNote(n); els.fillA.style.width = '0%'; els.fillB.style.width = '0%'; }
+      if (n >= CROWD_DATA_MIN_NOW){
+        crowdBoardShow(pctA, pctB, !isLiveUpdate || crowdBoard.classList.contains('note'));   // (a live update that brings the crowd past 30 clacks the numbers in)
+        // Run 5A: the crowd's winner grows with a burst, the other card dims (Daily; not on a live update)
+        if (!isLiveUpdate && pctA !== pctB && document.documentElement.classList.contains('mode-daily')){
+          const win = pctA > pctB ? els.halfA : els.halfB, lose = win === els.halfA ? els.halfB : els.halfA;
+          win.classList.add('win-side'); lose.classList.add('lose-side');
+          if (window.Juice && Juice.burst) setTimeout(()=> Juice.burst(win, { count:16 }), 140);
+        }
+      }
+      else { crowdBoardNote(n); setFill(els.fillA, 0); setFill(els.fillB, 0); }
     }
     // Skip the reveal flash/sound-adjacent pulse on live poll updates - it's
     // a one-time "results are in" beat, not something that should re-fire
@@ -16446,6 +16455,8 @@
     return { pctA, pctB };
   }
 
+  // Run 5A: a share bar is a full-width layer scaled to the share (transform - no width animation).
+  function setFill(el, pct){ el.style.width = ''; el.style.transform = 'scaleX(' + Math.max(0, Math.min(100, pct)) / 100 + ')'; }
   // Tumbles a percentage up from 0 to its target, slot-machine style, instead
   // of just snapping the text in.
   function animateCount(el, target){
