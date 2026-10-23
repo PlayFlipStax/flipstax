@@ -206,3 +206,6 @@
 .zw-cell.found.bad{ background:linear-gradient(180deg, #ff9aa8, #c0263f); } .zw-cell.found.dup{ background:linear-gradient(180deg, #ffd9a8, #e08a1f); }
 .zw-found{ display:flex; flex-wrap:wrap; gap:5px; }
 .zw-chip{ padding:3px 8px; border-radius:99px; font:900 14px/1.2 var(--f-display); letter-spacing:0.5px; color:#101418; background:var(--wc); box-shadow:0 2px 0 rgba(0,0,0,0.4); }
+/* Run 4B: emoji faces (the pool mixes emoji and the line-art icons) - sized to the tile, a soft glow in the tile colour */
+.tf-emo{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:clamp(28px, 9vw, 44px); line-height:1; filter:drop-shadow(0 0 6px currentColor); }
+:root.lite .tf-emo{ filter:none; }
