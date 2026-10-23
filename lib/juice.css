@@ -106,7 +106,7 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 @media (prefers-reduced-motion: reduce){ :root:root.mode-daily #board .half.win-side, :root:root.mode-daily #board .half.tap-chosen{ transform:none; } }
 /* ---- 6. Brain Beam (Daily): chevron-ended answer pills (a light rim layer with a navy depth edge under a glossy
    fill layer, both clip-path chevrons - static), the gold number coins inside the point, and a question box with a
-   pink rim and a cyan glow that breathes (opacity only). The right answer turns gold with its check; a miss red. */
+   pink rim and a cyan glow. The right answer turns gold with its check; a miss red. */
 :root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile{ --chev:24px; isolation:isolate; padding:6px 58px 6px 78px; border:0; border-radius:999px; background:none !important; background-color:transparent !important; box-shadow:0 0 16px rgba(46,196,255,0.25); }
 :root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile::before, :root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile::after{ content:''; display:block; position:absolute; z-index:-1; pointer-events:none; width:auto; height:auto; margin:0; border:0; border-radius:0; box-shadow:none;
   clip-path:polygon(var(--chev) 0, calc(100% - var(--chev)) 0, 100% 50%, calc(100% - var(--chev)) 100%, var(--chev) 100%, 0 50%); }
@@ -124,10 +124,7 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile.is-wrong::after{ background:linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.06) 46%, rgba(0,0,0,0) 52%, rgba(40,0,10,0.3) 100%), #c0263f; }
 :root:root.mode-daily .event-overlay.stack.quiz-beam .event-prompt{ position:relative; box-shadow:0 0 0 3px #5a3d06, 0 0 0 6px var(--jc-pink), 0 0 18px rgba(255,210,63,0.45), inset 0 0 30px rgba(0,0,0,0.55); }
 :root:root.mode-daily .event-overlay.stack.quiz-beam .event-prompt::after{ content:''; display:block; position:absolute; inset:-10px; border-radius:30px; pointer-events:none;
-  box-shadow:0 0 26px 6px rgba(46,220,255,0.6), inset 0 0 0 2px rgba(125,249,255,0.55); animation:jcBreathe 2.4s ease-in-out infinite alternate; will-change:opacity; }
-@keyframes jcBreathe{ from{ opacity:0.4; } to{ opacity:1; } }
-:root.lite.mode-daily .event-overlay.stack.quiz-beam .event-prompt::after{ animation:none; opacity:0.8; }
-@media (prefers-reduced-motion: reduce){ :root.mode-daily .event-overlay.stack.quiz-beam .event-prompt::after{ animation:none; opacity:0.8; } }
+  box-shadow:0 0 26px 6px rgba(46,220,255,0.6), inset 0 0 0 2px rgba(125,249,255,0.55); opacity:0.85; }   /* (static: a breathing glow cost the screen its p95 at 4x CPU) */
 /* ---- 7. Word Warp (Daily): glossy letter tiles - a top shine band and a bevel on the rack tiles and the slots
    (background layers and inset shadows, static) - and the light ripple a guess that locks new letters sends across
    the word (Juice.ripple: a hop per slot and a soft band of light). The solve gets Juice.correct over the word. */
