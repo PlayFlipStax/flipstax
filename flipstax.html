@@ -2698,6 +2698,54 @@
   .curtain.fan .co-cards span:nth-child(3){ transform:translateX(96px) rotate(14deg); transition-delay:.24s; }
   /* One host per screen: the corner host steps out while the curtain or a cue card is up. */
   :root:has(.show-card.curtain:not(.hidden)) .show-host, :root:has(.show-card.cue:not(.hidden)) .show-host, :root:has(.show-card.flipstage:not(.hidden)) .show-host{ display:none !important; }
+  /* Run 4A, the game intro (one component for every round-end game and the finale, about 2 s): a spotlight sweeps
+     once across the stage, the title slams onto a bulb-lit plate in the game's colours (--gi-a, --gi-b), the bulbs
+     chase (each bulb about once a second - well under 3 flashes a second). Transform and opacity only. */
+  .show-card.gintro{ background:#12062a; overflow:hidden; }
+  .gi-bg{ position:absolute; inset:0; background:radial-gradient(120% 90% at 50% 42%, var(--gi-b) 0%, #12062a 78%); opacity:0.92; }
+  .gi-spot{ position:absolute; z-index:1; left:50%; top:-12%; width:150vmax; height:150vh; margin-left:-75vmax; transform-origin:50% 0; pointer-events:none;
+    background:linear-gradient(180deg, rgba(255,248,226,0.55), rgba(255,248,226,0.18) 55%, rgba(255,248,226,0) 85%);
+    clip-path:polygon(47% 0, 53% 0, 64% 100%, 36% 100%); opacity:0; animation:giSweep 1800ms var(--ease-io, ease-in-out) forwards; }
+  @keyframes giSweep{ 0%{ transform:rotate(-38deg); opacity:0; } 15%{ opacity:0.9; } 70%{ transform:rotate(6deg); opacity:0.85; } 100%{ transform:rotate(0deg); opacity:0.6; } }
+  .gi-sign{ position:relative; z-index:2; width:max-content; max-width:90vw; padding:20px 28px 22px; border-radius:22px; text-align:center; --bulb:#fff6c8;
+    background:linear-gradient(180deg, #ffffff, var(--gi-a) 55%, var(--gi-b)); border:4px solid #fff; color:#1c0b3d;
+    box-shadow:0 0 0 4px rgba(20,6,40,0.85), 0 12px 34px rgba(0,0,0,0.55), 0 0 44px var(--gi-a);
+    font:900 clamp(38px, 12vw, 58px)/0.95 var(--f-display); letter-spacing:1.5px; text-shadow:0 2px 0 rgba(255,255,255,0.6);
+    animation:giSlam 520ms var(--ease-pop) 320ms both; }
+  .gi-sign span{ position:relative; z-index:3; display:block; padding:2px 4px; }
+  .gi-sign .sign-bulbs i{ animation:bulbChase 0.9s steps(1) 0.8s infinite; animation-delay:calc(0.8s + var(--k, 0) * -0.225s); }
+  @keyframes giSlam{ 0%{ transform:scale(2.3); opacity:0; } 60%{ transform:scale(0.94); opacity:1; } 100%{ transform:none; opacity:1; } }
+  :root.lite .gi-spot{ animation:none; opacity:0.5; transform:none; }
+  :root.lite .gi-sign{ animation:giFade 300ms linear both; } :root.lite .gi-sign .sign-bulbs i{ animation:none; }
+  @keyframes giFade{ from{ opacity:0; } to{ opacity:1; } }
+  @media (prefers-reduced-motion: reduce){ .gi-spot{ animation:none; opacity:0.5; transform:none; } .gi-sign{ animation:giFade 300ms linear both; } .gi-sign .sign-bulbs i{ animation:none; } }
+  /* the explainer card: full the first time, one line after; a thin bar runs down its time; a long one waits for GOT IT */
+  .show-card.explainer{ background:rgba(10,3,24,0.74); padding:0 var(--gutter, 16px); }
+  .ex-card{ position:relative; width:min(360px, 100%); padding:var(--sp-5, 20px) var(--sp-5, 20px) var(--sp-6, 24px); border-radius:var(--r-lg, 20px); text-align:left; overflow:hidden;
+    background:linear-gradient(180deg, #fffbea, var(--c-cream, #fff6d8)); color:var(--c-ink, #2a1300); box-shadow:0 0 0 4px var(--gi-a), 0 14px 34px rgba(0,0,0,0.55);
+    animation:exIn var(--d-mid, 320ms) var(--ease-pop) both; }
+  .ex-head{ display:flex; align-items:center; gap:var(--sp-3, 12px); margin-bottom:var(--sp-3, 12px); }
+  .ex-q{ flex:0 0 auto; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--gi-b); color:#fff; font:900 26px/1 var(--f-display); box-shadow:inset 0 -3px 0 rgba(0,0,0,0.25); }
+  .ex-head b{ font:900 clamp(24px, 7vw, 30px)/1 var(--f-display); letter-spacing:1px; }
+  .ex-text{ margin:0; font:700 clamp(17px, 4.8vw, 20px)/1.35 var(--f-body, Inter, sans-serif); }
+  .explainer.short .ex-text{ font:900 clamp(26px, 8vw, 34px)/1.05 var(--f-display); letter-spacing:0.5px; text-transform:uppercase; }
+  .ex-skip{ margin-top:var(--sp-4, 16px); font:800 var(--fs-small, 14px)/1 var(--f-body, Inter, sans-serif); letter-spacing:var(--ls-label, 1px); color:var(--c-ink-soft, #5a3a20); text-transform:uppercase; }
+  .ex-time{ position:absolute; left:0; right:0; bottom:0; height:6px; background:var(--gi-b); transform-origin:0 50%; animation:exTime linear forwards; }
+  @keyframes exTime{ from{ transform:scaleX(1); } to{ transform:scaleX(0); } }
+  .ex-go{ margin-top:var(--sp-4, 16px); width:100%; }
+  @keyframes exIn{ from{ transform:translateY(18px) scale(0.92); opacity:0; } to{ transform:none; opacity:1; } }
+  :root.lite .ex-card{ animation:giFade 200ms linear both; }
+  @media (prefers-reduced-motion: reduce){ .ex-card{ animation:giFade 200ms linear both; } .ex-time{ animation:none; display:none; } }
+  /* the ? button: bottom left, in the lane the corner host used to keep clear; it replays the full explainer */
+  .help-btn{ position:fixed; z-index:74; left:10px; bottom:calc(4px + env(safe-area-inset-bottom)); width:38px; height:38px; border-radius:50%; padding:0; cursor:pointer;
+    background:rgba(20,6,40,0.82); color:var(--c-gold, #ffd23f); border:2px solid var(--c-gold, #ffd23f); font:900 22px/1 var(--f-display); box-shadow:0 3px 10px rgba(0,0,0,0.45); }
+  .help-btn::before{ content:''; position:absolute; inset:-4px; }   /* (a 46 px tap target) */
+  .help-btn.hidden{ display:none; }
+  :root:not(.mode-daily) .help-btn{ display:none; }
+  .help-peek{ position:fixed; z-index:75; left:var(--gutter, 16px); right:var(--gutter, 16px); bottom:calc(52px + env(safe-area-inset-bottom)); max-width:420px; margin:0 auto; padding:14px 16px; border-radius:var(--r-md, 14px);
+    background:var(--c-cream, #fff6d8); color:var(--c-ink, #2a1300); box-shadow:0 0 0 3px var(--c-gold, #ffd23f), 0 10px 26px rgba(0,0,0,0.5); animation:exIn 240ms var(--ease-out) both; cursor:pointer; }
+  .help-peek b{ display:block; font:900 20px/1 var(--f-display); letter-spacing:1px; margin-bottom:6px; }
+  .help-peek span{ display:block; font:700 var(--fs-body, 17px)/1.35 var(--f-body, Inter, sans-serif); }
   /* Run 4A: the host on stage speaking in cue lines - the cold open's introduction, a round's title card, the outro.
      The line is a cream caption plate at the foot of the stage (body type, never under 16px); the marquee above the
      arch carries ROUND N (lib/stage.js). Transform and opacity only. */
@@ -10533,6 +10581,7 @@
   // is 'live' until it is voted or times out; while one is live, nothing can deal another (the old skip:
   // a stray reveal timer dealt a second card over the first). ?debug=1 shows it all in a corner overlay.
   const Show = { gen:0, scene:'idle', state:'', info:'', since:0, cardSeq:-1, log:[], timers:new Set(), frames:new Set(), offs:[], stats:{ dealt:[], drops:0, scenes:[] } };
+  let onSceneChange = null;   // (Run 4A: the ? button follows the scene)
   function showLog(kind, detail){
     Show.log.push({ t: Math.round(performance.now()), kind, scene: Show.scene, state: Show.state, step: runShow ? runShow.step : -1, left: runShow ? runShow.left : null, detail: detail || '' });
     if (Show.log.length > 400) Show.log.splice(0, Show.log.length - 400);
@@ -10647,6 +10696,7 @@
     Show.stats.scenes.push(scene + (info && scene !== 'vs' ? ':' + info : ''));
     showLog('enter', info); frScene('enter', scene, info && scene !== 'vs' ? info : (scene === 'vs' && current ? current.id : ''));
     if (scene === 'coldopen') frRundown();
+    if (onSceneChange) onSceneChange();
     return Show.gen;
   }
   function showSetState(s, detail){ Show.state = s; showLog('state', detail); }
@@ -10700,7 +10750,9 @@
         if (runScoreAtHalfway == null && (RUNDOWN.acts[st.act] || {}).id === 'r4') runScoreAtHalfway = runScore;   // (for the comeback check: points before Round 4 vs after)
         runPhase = 'bumper'; saveRunSnapshot();
         const g = showEnter('act', st.title);
-        showActCard(st, ()=> showDone(g, 'act card'));
+        // Run 4A: the first time, the host explains VS on the first round's card (the ? button replays it later).
+        const vsNext = (runPlan[runShow.step] || {}).t === 'vs' || (runPlan[runShow.step] || {}).t === 'cosmic';
+        showActCard(Object.assign({}, st, { vsExplain: vsNext && !explainerSeen.vs }), ()=> showDone(g, 'act card'));
         return true;
       }
       if (st.t === 'ad'){
@@ -10754,9 +10806,27 @@
   // ---------- Run 4A: the round-end games ----------
   const ROUND_GAME_NAMES = { riddle:()=> GN.riddleRound, lucky:()=> 'Lucky Lights', door:()=> 'Mystery Door', orbitDrop:()=> GN.orbitDrop };
   function roundGameName(key){ return ROUND_GAME_NAMES[key] ? ROUND_GAME_NAMES[key]() : mysteryName(key); }
-  function runRoundGame(st, done){
+  // Run 4A: every round-end game opens with the game intro and its explainer card, then plays.
+  function roundGameReady(st){
     const key = st.key;
-    runCurrentGame = roundGameName(key);
+    if (key === 'riddle') return INFINITY_RIDDLES.length > 0;
+    if (key === 'lucky') return typeof runLuckyLights === 'function';
+    if (key === 'door') return (st.doors || []).some(g=> mysteryAvailable(g));
+    if (key === 'orbitDrop') return true;
+    return !!miniGame(key) && mysteryAvailable(key);
+  }
+  function runRoundGame(st, done){
+    if (!roundGameReady(st)) return false;
+    runCurrentGame = roundGameName(st.key);
+    const g = Show.gen;
+    showGameIntro(st.key, ()=> showExplainer(st.key, ()=>{
+      if (!runActive || g !== Show.gen) return;
+      if (!startRoundGame(st, done)) showDone(g, 'game unavailable');
+    }));
+    return true;
+  }
+  function startRoundGame(st, done){
+    const key = st.key;
     if (key === 'riddle'){
       if (!INFINITY_RIDDLES.length) return false;
       runTriviaQuestion(null, null, { t:'quiz', riddle:true, mystery:true, seed: st.seed });   // (a right answer wins a gold key; it ends through advanceAfterTrivia)
@@ -11258,12 +11328,17 @@
       const a = RUNDOWN.acts[fi];
       runPhase = 'finale-bumper'; saveRunSnapshot();
       const g = showEnter('finale', 'act card');
-      showActCard({ title:a.title, sub:a.sub, world:a.world, finale:true }, ()=>{ if (runActive && runPhase === 'finale-bumper' && g === Show.gen){ showEnter('wordwarp'); startSolvePhase(); } else showLog('drop', 'stale finale card'); });
+      showActCard({ title:a.title, sub:a.sub, world:a.world, finale:true, act:fi, announce:a.announce }, ()=>{
+        if (!(runActive && runPhase === 'finale-bumper' && g === Show.gen)){ showLog('drop', 'stale finale card'); return; }
+        const g2 = showEnter('wordwarp');
+        showGameIntro('wordWarp', ()=> showExplainer('wordWarp', ()=>{ if (runActive && runPhase === 'finale-bumper' && g2 === Show.gen) startSolvePhase(); }));
+      });
       return;
     }
     runPhase = 'finale-bumper'; saveRunSnapshot();
-    showEnter('wordwarp');
-    startSolvePhase();
+    const g = showEnter('wordwarp');
+    // Run 4A: the Word Warp gets the game intro and its explainer card too.
+    showGameIntro('wordWarp', ()=> showExplainer('wordWarp', ()=>{ if (runActive && runPhase === 'finale-bumper' && g === Show.gen) startSolvePhase(); }));
   }
   // ---------- A face-down "?" tile flies up to the prize track (the letter stays hidden until the Word Warp) ----------
   function flyTrayMark(i, fromEl){ flyLetter('?', i, fromEl); }
@@ -11436,15 +11511,26 @@
     showCard.querySelector('.fs-title b').textContent = signMain; showCard.querySelector('.fs-title span').textContent = signSub;
     showCard.removeAttribute('role'); showCard.setAttribute('aria-label', signMain + (m > 1 ? ', points times ' + m : '') + '. ' + line);
     showCard.classList.remove('hidden');
-    const ms = cine(Math.max(TIMING.ACT_CARD_HOLD + (fin ? 300 : 0), cueLineMs(line) + 500));
+    const say = Math.max(TIMING.ACT_CARD_HOLD + (fin ? 300 : 0), cueLineMs(line) + 500);
+    const vsText = st.vsExplain ? explainerText('vs', true) : '';
+    const ms = cine(say + (vsText ? explainerMs(vsText) + 300 : 0));
     if (window.Stage) Stage.cue('close', { over:showCard, cls:'flipstage', push:true, ms, sign:{ sub: signSub, main: signMain } });
     showCard.classList.toggle('staged', !!(window.Stage && Stage.ready));
     clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
     if (sfx.bumper) sfx.bumper(!!st.finale);
     if (fin) setTimeout(()=> sfx.drumrollLong(), 500);   // the finale: a long drumroll under the spotlight
-    const lineEl = showCard.querySelector('.fs-line');
-    (runActive ? showLater : setTimeout)(()=> cueLineSay(lineEl, line), 250);
-    (runActive ? showLater : setTimeout)(()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; then(); }, ms);
+    const lineEl = showCard.querySelector('.fs-line'), later = runActive ? showLater : setTimeout;
+    later(()=> cueLineSay(lineEl, line), 250);
+    let ended = false;
+    const end = ()=>{ if (ended) return; ended = true; if (vsText) markExplainerSeen('vs'); showCard.removeEventListener('click', skipVs); showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; then(); };
+    // (the host's VS explanation: a cue line of its own after the announcement; a tap skips it - the announcement itself plays out)
+    let vsAt = 0;
+    const skipVs = ()=>{ if (vsAt && performance.now() - vsAt > 350) end(); };
+    if (vsText){
+      later(()=>{ vsAt = performance.now(); cueLineSay(lineEl, vsText); Host.pose(showCard.querySelector('.fs-host'), 'point', { hold:0 }); showCard.setAttribute('aria-label', vsText); }, say);
+      showCard.addEventListener('click', skipVs);
+    }
+    later(end, ms);
   }
   // Run 4A: the outro - the host waves the show off in one cue line, then the results.
   function showOutro(then){
@@ -11469,6 +11555,116 @@
     t = setTimeout(go, ms);
     showCard.addEventListener('click', go);
   }
+  // ---------- Run 4A: game intros and explainer cards ----------
+  // ONE intro for every round-end game and the finale (GAME_INTRO_MS, about 2 s): a spotlight sweeps the stage, the
+  // game's title slams onto a bulb-lit plate in its own colours, the bulbs chase. Then its explainer card: the full one
+  // the first time a player meets the game, a one-line one after that (data/game-names.js explainers). A card is up for
+  // 1 s plus 0.25 s a word; one longer than EXPLAINER_TAP_WORDS words waits for a tap. A tap always skips. What a
+  // player has seen is kept on this device (EXPLAINER_SEEN_KEY); the small ? button replays the full card.
+  const EXPLAINERS = (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.explainers) || {};
+  const EXPLAINER_SEEN_KEY = 'flipstax_explainers_v1', EXPLAINER_TAP_WORDS = 15;
+  const GAME_INTRO = {
+    riddle:   { name:()=> GN.riddleRound, c:['#c9ff7a', '#18a83a'] },
+    lucky:    { name:()=> 'Lucky Lights', c:['#ffd23f', '#9c1238'] },
+    door:     { name:()=> 'Mystery Door', c:['#ff9ad1', '#6d28d9'] },
+    zapWords: { name:()=> GN.zapWords, c:['#ffe94d', '#4a4f63'] },
+    twinFlip: { name:()=> GN.twinFlip, c:['#ff5ad9', '#3b0a6b'] },
+    orbitDrop:{ name:()=> GN.orbitDrop, c:['#7df9ff', '#1d3fb8'] },
+    wordWarp: { name:()=> GN.wordWarp, c:['#ffd23f', '#e11d74'] },
+    vs:       { name:()=> 'VS', c:['#ff3c9d', '#2f7bff'] },
+  };
+  let explainerSeen = (()=>{ try{ return JSON.parse(localStorage.getItem(EXPLAINER_SEEN_KEY) || '{}') || {}; }catch(e){ return {}; } })();
+  function markExplainerSeen(key){
+    if (explainerSeen[key]) return;
+    explainerSeen = Object.assign({}, explainerSeen, { [key]: 1 });
+    try{ localStorage.setItem(EXPLAINER_SEEN_KEY, JSON.stringify(explainerSeen)); }catch(e){}
+  }
+  function explainerText(key, full){ const x = EXPLAINERS[key]; return x ? (full ? x.full : (x.short || x.full)) : ''; }
+  function explainerMs(text){ return 1000 + 250 * lineWords(text); }
+  function gameIntroColors(key){ const gi = GAME_INTRO[key], mg = miniGame(key); return (gi && gi.c) || (mg && mg.colors) || ['#ffd23f', '#c2275f']; }
+  // The intro: about GAME_INTRO_MS, then `then`. Lite mode and reduced motion: the title fades in, no sweep or slam.
+  function showGameIntro(key, then){
+    const gi = GAME_INTRO[key], c = gameIntroColors(key), ms = (runActive && DEBUG_FAST) ? dt(TIMING.GAME_INTRO_MS || 2000) : (TIMING.GAME_INTRO_MS || 2000);
+    const name = gi ? gi.name() : mysteryName(key);
+    showCard.className = 'show-card gintro';
+    showCard.style.setProperty('--gi-a', c[0]); showCard.style.setProperty('--gi-b', c[1] || c[0]);
+    showCard.innerHTML = '<i class="gi-bg" aria-hidden="true"></i><i class="gi-spot" aria-hidden="true"></i>' +
+      '<div class="gi-sign"><div class="sign-bulbs" aria-hidden="true"></div><span></span></div>';
+    showCard.querySelector('.gi-sign span').textContent = String(name).toUpperCase();
+    showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', name + '. Tap to skip');
+    showCard.classList.remove('hidden');
+    ringBulbs(showCard.querySelector('.gi-sign .sign-bulbs'), 20, 7);
+    clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
+    if (sfx.slam) setTimeout(()=>{ if (showCard.classList.contains('gintro')) sfx.slam(); }, 380);
+    const shownAt = performance.now();
+    let gone = false;
+    const go = (e)=>{
+      if (gone || (e && performance.now() - shownAt < Math.min(SKIP_MIN_MS, ms - 200))) return;
+      gone = true; showCard.removeEventListener('click', go);
+      showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; showCard.style.removeProperty('--gi-a'); showCard.style.removeProperty('--gi-b');
+      then();
+    };
+    (runActive ? showLater : setTimeout)(()=> go(), ms);
+    showCard.addEventListener('click', go);
+  }
+  // The explainer card (or nothing, for a game without one). opts.full: always the full card (the ? button).
+  function showExplainer(key, then, opts){
+    opts = opts || {};
+    const full = !!opts.full || !explainerSeen[key], text = explainerText(key, full);
+    if (!text){ then(); return; }
+    const gi = GAME_INTRO[key], c = gameIntroColors(key), wait = lineWords(text) > EXPLAINER_TAP_WORDS;
+    const ms = (runActive && DEBUG_FAST && !wait) ? dt(explainerMs(text)) : explainerMs(text);
+    showCard.className = 'show-card explainer' + (full ? ' full' : ' short') + (wait ? ' ex-wait' : '');
+    showCard.style.setProperty('--gi-a', c[0]); showCard.style.setProperty('--gi-b', c[1] || c[0]);
+    showCard.innerHTML = '<div class="ex-card"><div class="ex-head"><span class="ex-q" aria-hidden="true">?</span><b></b></div><p class="ex-text"></p>' +
+      (wait ? '<div class="ds-btn ex-go" role="button" tabindex="0">GOT IT ▶</div>' : '<div class="ex-skip">TAP TO SKIP</div><i class="ex-time" aria-hidden="true"></i>') + '</div>';
+    showCard.querySelector('.ex-head b').textContent = (gi ? gi.name() : mysteryName(key)).toUpperCase();
+    showCard.querySelector('.ex-text').textContent = text;
+    if (!wait) showCard.querySelector('.ex-time').style.animationDuration = ms + 'ms';
+    showCard.setAttribute('role', 'dialog'); showCard.setAttribute('aria-label', (gi ? gi.name() : key) + ': ' + text);
+    showCard.classList.remove('hidden');
+    const shownAt = performance.now();
+    let gone = false;
+    const go = (e)=>{
+      if (gone || (e && performance.now() - shownAt < 350)) return;   // (a tap skips - but not the tap that ended the intro)
+      gone = true; showCard.removeEventListener('click', go);
+      markExplainerSeen(key);
+      showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; showCard.style.removeProperty('--gi-a'); showCard.style.removeProperty('--gi-b');
+      noteOverlayClosed();
+      then();
+    };
+    if (!wait) (runActive ? showLater : setTimeout)(()=> go(), ms);
+    showCard.addEventListener('click', go);
+  }
+  // The ? button: replays the full explainer for what is on screen (a VS card, a round-end game, the Word Warp) as a
+  // small card over the top of the screen - it never pauses or covers the play area for long, and a tap closes it.
+  const helpBtn = document.createElement('button');
+  helpBtn.type = 'button'; helpBtn.className = 'help-btn hidden'; helpBtn.id = 'helpBtn'; helpBtn.textContent = '?'; helpBtn.setAttribute('aria-label', 'How this game works');
+  document.body.appendChild(helpBtn);
+  let helpPeek = null, helpPeekT = null;
+  function helpKeyNow(){
+    if (!runActive || !document.documentElement.classList.contains('mode-daily')) return null;
+    if (Show.scene === 'vs') return 'vs';
+    if (Show.scene === 'game' && EXPLAINERS[Show.info]) return Show.info;
+    if (Show.scene === 'wordwarp') return 'wordWarp';
+    return null;
+  }
+  function updateHelpBtn(){ const k = helpKeyNow(); helpBtn.classList.toggle('hidden', !k || !showCard.classList.contains('hidden')); }
+  function closeHelpPeek(){ clearTimeout(helpPeekT); if (helpPeek){ helpPeek.remove(); helpPeek = null; } }
+  helpBtn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    const key = helpKeyNow(); if (!key) return;
+    if (helpPeek){ closeHelpPeek(); return; }
+    const text = explainerText(key, true), gi = GAME_INTRO[key];
+    helpPeek = document.createElement('div'); helpPeek.className = 'help-peek'; helpPeek.setAttribute('role', 'status');
+    helpPeek.innerHTML = '<b></b><span></span>';
+    helpPeek.querySelector('b').textContent = (gi ? gi.name() : key).toUpperCase(); helpPeek.querySelector('span').textContent = text;
+    helpPeek.addEventListener('click', closeHelpPeek);
+    document.body.appendChild(helpPeek);
+    helpPeekT = setTimeout(closeHelpPeek, Math.max(2500, explainerMs(text) + 1000));
+  });
+  new MutationObserver(updateHelpBtn).observe(showCard, { attributes:true, attributeFilter:['class'] });
+  onSceneChange = updateHelpBtn;
   // The commercial break: a 3 s fake 70s ad, skippable. Built as one component (an ad in,
   // done() out) so a real ad can take its place later.
   // D8 (Oct 16): the commercial break as a retro TV spot - a wood-grain TV with a curved screen, scanlines and a

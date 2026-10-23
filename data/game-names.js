@@ -66,6 +66,19 @@ window.FLIPSTAX_NAMES = {
     back: 'Welcome back, Earthlings! Let\u2019s play!',
     outro: 'That\u2019s our show, Earthlings! See you tomorrow!',
   },
+  // Run 4A: the explainer cards - `full` the first time a player meets the game, `short` after that (the ? button
+  // replays the full one). A card stays up 1 s plus 0.25 s a word; over 15 words it waits for a tap. VS is the host's
+  // own line on the first round's card.
+  explainers: {
+    vs:        { full:'Two cards face off. Tap the one most Earthlings picked. Match the crowd to score!', short:'Pick the crowd favorite!' },
+    riddle:    { full:'Read the riddle, then pick the right answer. Think fast, Earthling!', short:'Solve the riddle!' },
+    lucky:     { full:'Three spins. STOP the lights for points, or BANK what you have!', short:'STOP or BANK!' },
+    door:      { full:'Pick a door. Behind it hides a surprise game!', short:'Pick a door!' },
+    zapWords:  { full:'Swipe across letters to spell words before time runs out!', short:'Spell the words!' },
+    twinFlip:  { full:'Flip the cards and match every pair before time runs out!', short:'Match the pairs!' },
+    orbitDrop: { full:'Drop your chips from the UFO. Land in the Mothership slot for the jackpot!', short:'Drop your chips!' },
+    wordWarp:  { full:'Unscramble the six letters you earned. Beat the clock to win big!', short:'Unscramble the word!' },
+  },
   roundTitles: {
     opener:  'THE OPENER',
     riddle:  'HEAD SCRATCHER',
