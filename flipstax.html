@@ -161,6 +161,13 @@
   .sound-toggle:active{ opacity:1; }
   .vol-pop{ position:fixed; z-index:400; display:flex; align-items:center; gap:10px; padding:8px 12px 8px 8px; border-radius:16px; background:rgba(24,8,44,0.96);
     border:2px solid #ffd23f; box-shadow:0 8px 24px rgba(0,0,0,0.5); color:#fff3c4; font:800 13px var(--f-body); }
+  .vol-pop{ flex-wrap:wrap; max-width:calc(100vw - 16px); }
+  .vol-relax{ flex:1 1 100%; display:flex; align-items:center; gap:10px; min-height:44px; padding:4px 8px; border-radius:12px; border:2px solid rgba(255,214,90,0.35); background:rgba(255,255,255,0.06); color:#fff; font:800 15px/1.1 var(--f-body, sans-serif); text-align:left; cursor:pointer; }
+  .vol-relax small{ display:block; margin-top:2px; font:600 12px/1.1 var(--f-body, sans-serif); color:#d9c8ff; }
+  .vr-box{ flex:0 0 auto; width:22px; height:22px; border-radius:7px; border:2px solid #ffd23f; background:transparent; position:relative; }
+  .vol-relax[aria-checked="true"]{ border-color:#ffd23f; background:rgba(255,210,63,0.16); }
+  .vol-relax[aria-checked="true"] .vr-box{ background:#ffd23f; }
+  .vol-relax[aria-checked="true"] .vr-box::after{ content:''; position:absolute; left:5px; top:1px; width:6px; height:11px; border:solid #3a1500; border-width:0 3px 3px 0; transform:rotate(45deg); }
   .vol-pop.hidden{ display:none; }
   .vol-mute{ width:40px; height:40px; border-radius:12px; border:2px solid rgba(255,214,90,0.6); background:rgba(255,255,255,0.08); font-size:18px; cursor:pointer; }
   .vol-mute.off{ background:#c0263f; border-color:#ff9aa8; }
@@ -4155,7 +4162,7 @@
 <div class="studio page-set" data-studio aria-hidden="true"></div>
 <div class="show-marquee off" id="showMarquee" aria-hidden="true"></div>
 <!-- The sound panel: one master volume and the mute button (opened from the speaker). -->
-<div class="vol-pop hidden" id="volPop" role="dialog" aria-label="Sound"><button type="button" class="vol-mute" id="volMute" aria-label="Mute">🔊</button><input type="range" id="volSlider" min="0" max="100" step="5" aria-label="Master volume"><b id="volPct"></b></div>
+<div class="vol-pop hidden" id="volPop" role="dialog" aria-label="Sound and pace"><button type="button" class="vol-mute" id="volMute" aria-label="Mute">🔊</button><input type="range" id="volSlider" min="0" max="100" step="5" aria-label="Master volume"><b id="volPct"></b><button type="button" class="vol-relax" id="volRelax" role="switch" aria-checked="false"><span class="vr-box"></span><span>Relaxed pace <small>8 s a VS card, not 5</small></span></button></div>
 <div class="fx-layer show-fx" id="showFx" aria-hidden="true"></div>
 <div class="show-card hidden" id="showCard"></div>
 <div class="show-host" id="showHost" aria-hidden="true"><div class="alien" id="showAlien"></div><div class="show-say" id="showSay"></div></div>
@@ -5600,8 +5607,11 @@
     out.noVotes = nv === '1' || (nv === null && IS_PREVIEW_HOST) || REPLAY;   // (replay mode never writes votes)
     return out;
   })();
-  const DEBUG_TIME_SCALE = DEBUG_FAST ? 6 : 1;
-  const DEBUG_RUN_SCALE = DEBUG_FAST ? 2 : 1;
+  // ?replay=1&realtime=1 (localhost / preview): the replay plays at real speed - nothing is scaled, even next to ?debug=fast - and
+  // the replay tag carries an episode clock, for timing a whole episode.
+  const REALTIME = REPLAY && new URLSearchParams(location.search).get('realtime') === '1';
+  const DEBUG_TIME_SCALE = DEBUG_FAST && !REALTIME ? 6 : 1;
+  const DEBUG_RUN_SCALE = DEBUG_FAST && !REALTIME ? 2 : 1;
   // Scales the fixed reveal/transition pauses between rounds and events
   // (which dominate real wall-clock time far more than the round timers
   // themselves) by the same debug factor.
@@ -5740,15 +5750,19 @@
   // run clock any more: the show plays its plan through to the Grand Finale.
   const RUNDOWN = (window.FLIPSTAX_RUNDOWN && Array.isArray(window.FLIPSTAX_RUNDOWN.acts)) ? window.FLIPSTAX_RUNDOWN : {
     coldOpen: { firstMs: 12000, returningMs: 3000 },
-    acts: [1, 2, 3, 4, 5, 6].map(n=> ({ id:'r' + n, round:n, title:'ROUND ' + ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX'][n - 1], sub:'ROUND ' + n, mult: n < 3 ? 1 : n < 5 ? 2 : 3, vsTimerMs: n < 5 ? 7000 : 5000, world:'vs',
-      steps:[ { vs:4 }, { beam: n < 3 ? 'easy' : n < 5 ? 'medium' : 'hard' }, { game: ['riddle', 'lucky', 'door', 'zapWords', 'twinFlip', 'orbitDrop'][n - 1] }, { reward:true } ] }))
+    acts: [1, 2, 3, 4, 5, 6].map(n=> ({ id:'r' + n, round:n, title:'ROUND ' + ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX'][n - 1], sub:'ROUND ' + n, mult: n < 3 ? 1 : n < 5 ? 2 : 3, vsTimerMs: 5000, world:'vs',
+      steps:[ { vs:6 }, { beam: n < 3 ? 'easy' : n < 5 ? 'medium' : 'hard' }, { game: ['riddle', 'lucky', 'door', 'zapWords', 'twinFlip', 'orbitDrop'][n - 1] }, { reward:true } ] }))
       .concat([ { id:'finale', title:'GRAND FINALE', sub:'WORD WARP', mult:1, world:'results', steps:[ { wordWarp:true } ] } ]),
     door: { pool: [ 'emojiDecode', 'timeWarp', 'priceProbe' ] },   // (fallback)
     mystery: { pool: [ { game:'emojiDecode', weight:2 }, { game:'timeWarp', weight:1 } ] },
     cosmicSurpriseChance: 0,
     commercial: { ms:3000, ads:[ { brand:'ZING COLA', line:'Tastes like tomorrow!', glyph:'🥤', art:'can', colors:['#ff3c9d', '#ffd23f'] } ] },
   };
-  const ACT_DEFAULT_VS_MS = 7000;
+  const ACT_DEFAULT_VS_MS = 5000, VS_RELAXED_MS = (window.FLIPSTAX_VS_TIMER && window.FLIPSTAX_VS_TIMER.relaxed) || 8000;
+  // 'Relaxed pace' (the sound / settings popover): each VS card waits 8 s for a pick instead of 5. Kept on this device.
+  const RELAXED_KEY = 'flipstax_relaxed_pace';
+  let relaxedPace = false; try{ relaxedPace = localStorage.getItem(RELAXED_KEY) === '1'; }catch(e){}
+  function setRelaxedPace(on){ relaxedPace = !!on; try{ localStorage.setItem(RELAXED_KEY, on ? '1' : '0'); }catch(e){} }
   // G2: the show's hold times live at the top of data/rundown.js (FLIPSTAX_TIMING); these are the fallbacks.
   const TIMING = Object.assign({ ACT_CARD_HOLD:2800, MYSTERY_REVEAL_HOLD:3000, STAR_WIPE:1600, ROUND_BUMPER_HOLD:2200, COSMIC_SURPRISE_INTRO:2000, CINEMATIC_MIN:1500, SKIP_AFTER:1000 }, window.FLIPSTAX_TIMING || {});
   // A cinematic moment (a full-screen card, a reveal, a result) is never on screen for less than CINEMATIC_MIN.
@@ -5861,7 +5875,7 @@
   let runActIdx = 0;
   function runAct(){ return RUNDOWN.acts[runActIdx] || {}; }
   function runActMult(){ return runActive ? (runAct().mult || 1) : 1; }
-  function runVsTimerMs(){ return runAct().vsTimerMs || ACT_DEFAULT_VS_MS; }
+  function runVsTimerMs(){ return relaxedPace ? VS_RELAXED_MS : (runAct().vsTimerMs || ACT_DEFAULT_VS_MS); }
   // ---------- Brain Beam levels (data/beam-levels.js): easy, medium or hard ----------
   const BEAM_LEVELS = (()=>{
     const L = window.FLIPSTAX_BEAM_LEVELS || {}, norm = t=> String(t).toLowerCase().replace(/[^a-z0-9]+/g, '');
@@ -16710,7 +16724,8 @@
   });
   // The speaker opens the sound panel: the mute button and the master volume.
   const volPop = document.getElementById('volPop'), volMute = document.getElementById('volMute'), volSlider = document.getElementById('volSlider'), volPct = document.getElementById('volPct');
-  function renderVolPop(){ volMute.textContent = soundOn ? '\uD83D\uDD0A' : '\uD83D\uDD07'; volMute.classList.toggle('off', !soundOn); volMute.setAttribute('aria-label', soundOn ? 'Mute' : 'Unmute');
+  const volRelax = document.getElementById('volRelax');
+  function renderVolPop(){ volRelax.setAttribute('aria-checked', relaxedPace ? 'true' : 'false'); volMute.textContent = soundOn ? '\uD83D\uDD0A' : '\uD83D\uDD07'; volMute.classList.toggle('off', !soundOn); volMute.setAttribute('aria-label', soundOn ? 'Mute' : 'Unmute');
     volSlider.value = String(Math.round(masterVol * 100)); volPct.textContent = Math.round(masterVol * 100) + '%'; }
   let volPopT = 0;
   function closeVolPop(){ volPop.classList.add('hidden'); clearTimeout(volPopT); }
@@ -16718,12 +16733,14 @@
     const r = els.soundToggle.getBoundingClientRect();
     volPop.style.left = Math.max(8, Math.round(r.left)) + 'px'; volPop.style.top = Math.round(r.bottom + 6) + 'px';
     renderVolPop(); volPop.classList.remove('hidden'); clearTimeout(volPopT); volPopT = setTimeout(closeVolPop, 5000);
+    { const w = volPop.getBoundingClientRect().width; volPop.style.left = Math.max(8, Math.min(parseFloat(volPop.style.left) || 8, innerWidth - w - 8)) + 'px'; }
   }
   els.soundToggle.addEventListener('click', (e)=>{ e.stopPropagation(); if (volPop.classList.contains('hidden')) openVolPop(); else closeVolPop(); });
   els.soundToggle.addEventListener('keydown', (e)=>{ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); els.soundToggle.click(); } });
   volMute.addEventListener('click', (e)=>{ e.stopPropagation(); setSoundOn(!soundOn); renderVolPop(); clearTimeout(volPopT); volPopT = setTimeout(closeVolPop, 5000); });
   volSlider.addEventListener('input', ()=>{ setMasterVolume(+volSlider.value / 100); if (masterVol > 0 && !soundOn) setSoundOn(true); renderVolPop(); clearTimeout(volPopT); volPopT = setTimeout(closeVolPop, 5000); });
   volSlider.addEventListener('change', ()=>{ if (soundOn) sfx.ding(); });
+  volRelax.addEventListener('click', (e)=>{ e.stopPropagation(); setRelaxedPace(!relaxedPace); renderVolPop(); clearTimeout(volPopT); volPopT = setTimeout(closeVolPop, 5000); });
   volPop.addEventListener('click', (e)=> e.stopPropagation());
   document.addEventListener('click', (e)=>{ if (!volPop.classList.contains('hidden') && !volPop.contains(e.target) && !els.soundToggle.contains(e.target)){ closeVolPop(); e.stopPropagation(); e.preventDefault(); } }, true);   // (the tap that closes it does nothing else)
 
@@ -16811,6 +16828,7 @@
       hostSayNow: (t, ms) => hostSay(t, ms),
       showQuizNow: (riddle) => { runActive = true; runPhase = 'running'; runTriviaQuestion(null, null, { t:'quiz', riddle: !!riddle, subject:'science', seed: 12345 }); return window.__debugLastTriviaQ; },
       showPlan: (date) => buildShowPlan(date || runStartDate || todayStr()),
+      cardPools: () => CARD_POOLS,   // (tests: tools/vs-inventory.py counts the VS cards)
       vsVerdict: (side, matched, pts, pct) => vsVerdictFx(side, matched, pts, pct),   // (tests: the VS verdict on the card on screen)
       mysteryGames: (date) => pickMysteryGames(date),
       showReadout: () => { els.finOverlay.classList.add('hidden'); showRunReadout(); return !!runResultToday; },
@@ -17363,6 +17381,17 @@
       '.replay-head{grid-column:1 / -1;margin:8px 0 0;font:800 12px/1 Inter,system-ui,sans-serif;letter-spacing:2px;color:#ffd23f}.replay-list button.wide{grid-column:1 / -1}.replay-list button.restart{background:#ff3c9d;border-color:#fff}.replay-close{margin-top:12px;min-width:140px;background:#150f2b}';
     document.head.appendChild(css);
     const tag = document.createElement('div'); tag.className = 'replay-tag'; tag.textContent = 'REPLAY MODE'; tag.setAttribute('aria-hidden', 'true'); document.body.appendChild(tag);
+    if (REALTIME){   // ?realtime=1: the tag carries the episode clock (from the cold open to the results)
+      let t0 = 0, last = 0;
+      setInterval(()=>{
+        if (runActive && Show.scene === 'coldopen' && !t0) t0 = performance.now();
+        if (runActive && t0) last = performance.now() - t0;
+        else if (!runActive && last && Show.scene === 'idle') { t0 = 0; }
+        const sec = Math.round(last / 1000);
+        tag.textContent = 'REPLAY · REAL TIME' + (last ? ' ' + Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0') : '');
+        window.__episodeMs = last;
+      }, 500);
+    }
 
     // Everything off, back to mode select, today's record forgotten.
     function replayTeardown(){

@@ -48,7 +48,7 @@
     const S = window.__show, now = performance.now();
     const ro = document.getElementById('readoutOverlay');
     if (ro && ro.classList.contains('show')){ finish(); return; }
-    if (S && S.gen !== lastGen){ lastGen = S.gen; sceneAt = now; next = now + (opts.cine === false ? rnd(opts.firstMin || 1500, opts.firstMax || 3500) : rnd(150, 400)); }
+    if (S && S.gen !== lastGen){ lastGen = S.gen; sceneAt = now; next = now + (S.scene === 'vs' && opts.vsMin ? rnd(opts.vsMin, opts.vsMax) : opts.cine === false ? rnd(opts.firstMin || 1500, opts.firstMax || 3500) : rnd(150, 400)); }   // (opts.vsMin: how long a player takes on a VS card)
     if (now >= next){
       const sc = document.getElementById('showCard'), ev = document.getElementById('eventOverlay'), mg = document.getElementById('mgOverlay');
       const lucky = document.getElementById('luckyOverlay'), solve = document.getElementById('solveOverlay'), fin = document.getElementById('finOverlay'), guess = document.getElementById('guessOverlay');
