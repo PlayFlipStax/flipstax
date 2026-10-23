@@ -2698,6 +2698,18 @@
   .curtain.fan .co-cards span:nth-child(3){ transform:translateX(96px) rotate(14deg); transition-delay:.24s; }
   /* One host per screen: the corner host steps out while the curtain or a cue card is up. */
   :root:has(.show-card.curtain:not(.hidden)) .show-host, :root:has(.show-card.cue:not(.hidden)) .show-host, :root:has(.show-card.flipstage:not(.hidden)) .show-host{ display:none !important; }
+  /* Run 4A, the zoom through the marquee (zoomThrough): a warm gold-white bloom swells from the marquee sign to one
+     peak and fades (the swap happens under it); the stage and the host push in (transform). One pulse, never a
+     flicker. Lite mode and reduced motion: a quick dark crossfade. The layer takes the taps while it is up. */
+  .zoom-fx{ position:fixed; inset:0; z-index:90; pointer-events:auto; overflow:hidden; }
+  .zoom-fx.hidden{ display:none; }
+  .zf-veil{ position:absolute; inset:0; opacity:0; background:radial-gradient(circle at var(--zx, 50%) var(--zy, 13%), #fffdf4 0%, #fff0c4 28%, #ffd780 62%, #f0ad3a 100%); }
+  .zf-bloom{ position:absolute; left:var(--zx, 50%); top:var(--zy, 13%); width:120vmax; height:120vmax; border-radius:50%; opacity:0; transform:translate(-50%, -50%) scale(0.35);
+    background:radial-gradient(closest-side, #ffffff 0%, rgba(255,246,214,0.95) 30%, rgba(255,214,120,0.5) 62%, rgba(255,200,90,0) 100%); }
+  .zoom-fx.quick .zf-veil{ background:#12062a; }
+  .zoom-fx.quick .zf-bloom{ display:none; }
+  .stage.zoom-bright .stg-glow{ animation:none; opacity:1; transition:opacity 300ms ease; }
+  .stage.cut-now .stg-shot{ transition:none !important; }
   /* Run 4A, the game intro (one component for every round-end game and the finale, about 2 s): a spotlight sweeps
      once across the stage, the title slams onto a bulb-lit plate in the game's colours (--gi-a, --gi-b), the bulbs
      chase (each bulb about once a second - well under 3 flashes a second). Transform and opacity only. */
@@ -10752,7 +10764,10 @@
         const g = showEnter('act', st.title);
         // Run 4A: the first time, the host explains VS on the first round's card (the ? button replays it later).
         const vsNext = (runPlan[runShow.step] || {}).t === 'vs' || (runPlan[runShow.step] || {}).t === 'cosmic';
-        showActCard(Object.assign({}, st, { vsExplain: vsNext && !explainerSeen.vs }), ()=> showDone(g, 'act card'));
+        // Run 4A: from the play (a round just ended) the show zooms back out to the host on the stage; the card then
+        // zooms in through the marquee to the round's play.
+        const card = ()=>{ if (g === Show.gen) showActCard(Object.assign({}, st, { vsExplain: vsNext && !explainerSeen.vs, zoomIn:true }), ()=> showDone(g, 'act card')); };
+        if (st.act > 0) zoomThrough('out', card); else card();
         return true;
       }
       if (st.t === 'ad'){
@@ -11328,7 +11343,7 @@
       const a = RUNDOWN.acts[fi];
       runPhase = 'finale-bumper'; saveRunSnapshot();
       const g = showEnter('finale', 'act card');
-      showActCard({ title:a.title, sub:a.sub, world:a.world, finale:true, act:fi, announce:a.announce }, ()=>{
+      showActCard({ title:a.title, sub:a.sub, world:a.world, finale:true, act:fi, announce:a.announce, zoomIn:true }, ()=>{
         if (!(runActive && runPhase === 'finale-bumper' && g === Show.gen)){ showLog('drop', 'stale finale card'); return; }
         const g2 = showEnter('wordwarp');
         showGameIntro('wordWarp', ()=> showExplainer('wordWarp', ()=>{ if (runActive && runPhase === 'finale-bumper' && g2 === Show.gen) startSolvePhase(); }));
@@ -11522,7 +11537,11 @@
     const lineEl = showCard.querySelector('.fs-line'), later = runActive ? showLater : setTimeout;
     later(()=> cueLineSay(lineEl, line), 250);
     let ended = false;
-    const end = ()=>{ if (ended) return; ended = true; if (vsText) markExplainerSeen('vs'); showCard.removeEventListener('click', skipVs); showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; then(); };
+    const hide = ()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; };
+    const gen0 = Show.gen;
+    // (st.zoomIn: the card leaves through the marquee - the play is swapped in at the zoom's peak)
+    const end = ()=>{ if (ended) return; ended = true; if (vsText) markExplainerSeen('vs'); showCard.removeEventListener('click', skipVs);
+      if (st.zoomIn) zoomThrough('in', ()=>{ if (runActive && gen0 !== Show.gen) return; hide(); then(); }); else { hide(); then(); } };
     // (the host's VS explanation: a cue line of its own after the announcement; a tap skips it - the announcement itself plays out)
     let vsAt = 0;
     const skipVs = ()=>{ if (vsAt && performance.now() - vsAt > 350) end(); };
@@ -11554,6 +11573,62 @@
     };
     t = setTimeout(go, ms);
     showCard.addEventListener('click', go);
+  }
+  // ---------- Run 4A: the zoom (below) ----------
+  // ---------- Run 4A: the zoom through the marquee ----------
+  // Between a round's title card and its play, the stage - and the host on it - pushes in toward the marquee sign
+  // behind him, the marquee's glow brightens and a warm gold-white bloom swells over it to one peak; at the peak the
+  // game's backdrop is swapped in underneath, then the bloom fades. About ZOOM_MS in all, one smooth pulse, no flicker.
+  // The reverse (zoom out of the play, back to the host on the stage) opens the next round. Faked with transform and
+  // opacity only (no live blur); lite mode and reduced motion get a quick crossfade instead.
+  const ZOOM_SCALE = 2.6;
+  const zoomFx = document.createElement('div');
+  zoomFx.className = 'zoom-fx hidden'; zoomFx.setAttribute('aria-hidden', 'true');
+  zoomFx.innerHTML = '<i class="zf-veil"></i><i class="zf-bloom"></i>';
+  document.body.appendChild(zoomFx);
+  let zoomSeq = 0;
+  function zoomOrigin(){
+    const s = document.querySelector('#stage .stg-close .stg-sign');
+    const r = s && s.getBoundingClientRect();
+    return r && r.width ? [r.left + r.width / 2, r.top + r.height / 2] : [innerWidth / 2, innerHeight * 0.13];
+  }
+  // dir 'in': the stage on screen -> the play (atPeak swaps it in); 'out': the play -> the stage (atPeak puts it up).
+  function zoomThrough(dir, atPeak, done){
+    const seq = ++zoomSeq, quick = isLite() || prefersReducedMotion() || !zoomFx.animate;
+    const total = DEBUG_FAST ? dt(TIMING.ZOOM_MS || 900) : (TIMING.ZOOM_MS || 900);
+    const ms = quick ? Math.min(320, total) : total, rise = Math.round(ms * 0.52), fall = ms - rise;
+    const [x, y] = zoomOrigin(), stage = document.getElementById('stage');
+    zoomFx.style.setProperty('--zx', x + 'px'); zoomFx.style.setProperty('--zy', y + 'px');
+    zoomFx.classList.remove('hidden'); zoomFx.classList.toggle('quick', quick);
+    const veil = zoomFx.querySelector('.zf-veil'), bloom = zoomFx.querySelector('.zf-bloom');
+    const movers = ()=> [stage, showCard].filter(e=> e && !(e === showCard && showCard.classList.contains('hidden')));
+    const origin = x + 'px ' + y + 'px';
+    const push = (from, to, dur, ease)=> quick ? [] : movers().map(e=>{ e.style.transformOrigin = origin; return e.animate([{ transform:'scale(' + from + ')' }, { transform:'scale(' + to + ')' }], { duration:dur, easing:ease, fill:'forwards' }); });
+    const clear = (anims)=> anims.forEach(a=>{ try{ a.cancel(); }catch(e){} });
+    const glow = (on)=>{ if (stage) stage.classList.toggle('zoom-bright', on); };
+    // the bloom: up to full over `rise`, down over `fall` (opacity and a scale on the glow - one pulse)
+    const up = [veil.animate([{ opacity:0 }, { opacity:1 }], { duration:rise, easing:'cubic-bezier(.5,0,.75,0)', fill:'forwards' })];
+    if (!quick) up.push(bloom.animate([{ opacity:0, transform:'translate(-50%, -50%) scale(0.35)' }, { opacity:1, transform:'translate(-50%, -50%) scale(1.6)' }], { duration:rise, easing:'cubic-bezier(.4,0,.6,1)', fill:'forwards' }));
+    let pushIn = dir === 'in' ? push(1, ZOOM_SCALE, rise, 'cubic-bezier(.55,0,.8,.2)') : [];
+    if (dir === 'in') glow(true);
+    setTimeout(()=>{
+      if (seq !== zoomSeq) return;
+      clear(pushIn);
+      movers().forEach(e=> e.style.transformOrigin = '');
+      if (stage) stage.classList.add('cut-now');   // (the swap is under the bloom: no camera crossfade)
+      glow(dir === 'out');
+      try{ if (atPeak) atPeak(); }catch(e){ console.error(e); }
+      requestAnimationFrame(()=> requestAnimationFrame(()=>{ if (stage) stage.classList.remove('cut-now'); }));
+      const pushOut = dir === 'out' ? push(ZOOM_SCALE, 1, fall + 120, 'cubic-bezier(.15,.7,.3,1)') : [];
+      clear(up);
+      const down = [veil.animate([{ opacity:1 }, { opacity:0 }], { duration:fall, easing:'cubic-bezier(.25,1,.5,1)', fill:'forwards' })];
+      if (!quick) down.push(bloom.animate([{ opacity:1, transform:'translate(-50%, -50%) scale(1.6)' }, { opacity:0, transform:'translate(-50%, -50%) scale(2.2)' }], { duration:fall, easing:'ease-out', fill:'forwards' }));
+      setTimeout(()=>{
+        clear(pushOut); clear(down); glow(false);
+        if (seq === zoomSeq) zoomFx.classList.add('hidden');
+        if (done) done();
+      }, fall + 140);
+    }, rise);
   }
   // ---------- Run 4A: game intros and explainer cards ----------
   // ONE intro for every round-end game and the finale (GAME_INTRO_MS, about 2 s): a spotlight sweeps the stage, the
@@ -11664,7 +11739,7 @@
     helpPeekT = setTimeout(closeHelpPeek, Math.max(2500, explainerMs(text) + 1000));
   });
   new MutationObserver(updateHelpBtn).observe(showCard, { attributes:true, attributeFilter:['class'] });
-  onSceneChange = updateHelpBtn;
+  onSceneChange = ()=>{ updateHelpBtn(); if (Show.scene === 'idle'){ zoomSeq++; zoomFx.classList.add('hidden'); closeHelpPeek(); } };   // (leaving the show: no zoom or ? card left up)
   // The commercial break: a 3 s fake 70s ad, skippable. Built as one component (an ad in,
   // done() out) so a real ad can take its place later.
   // D8 (Oct 16): the commercial break as a retro TV spot - a wood-grain TV with a curved screen, scanlines and a
