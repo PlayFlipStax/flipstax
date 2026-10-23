@@ -46,29 +46,29 @@
 #   cartoons: 11
 #   pets: 9
 #
-sports | LeBron James | 🏀 | Michael Jordan | 🏀 | 2000s
-sports | Muhammad Ali | 🥊 | Mike Tyson | 🥊 | 80s
-sports | Tiger Woods | ⛳ | Rory McIlroy | ⛳ | 2010s
+sports | LeBron James | 🏀 | Michael Jordan | 🥇 | 2000s
+sports | Muhammad Ali | 🥊 | Mike Tyson | ⏱️ | 80s
+sports | Tiger Woods | ⛳ | Rory McIlroy | 🔥 | 2010s
 sports | Usain Bolt | 🏃 | Michael Phelps | 🏊 | 2000s
-sports | Steph Curry | 🏀 | Kevin Durant | 🏀 | 2010s
-sports | Novak Djokovic | 🎾 | Roger Federer | 🎾 | 2000s
-sports | Lionel Messi | ⚽ | Pelé | ⚽ | 2000s
-sports | Michael Jordan | 🏀 | Kobe Bryant | 🏀 | 2000s
-sports | Muhammad Ali | 🥊 | Floyd Mayweather | 🥊 | 2000s
-sports | LeBron James | 🏀 | Kobe Bryant | 🏀 | 2000s
-sports | Usain Bolt | 🏃 | Carl Lewis | 🏃 | 2000s
-sports | Shaquille O’Neal | 🏀 | Hakeem Olajuwon | 🏀 | 90s
-sports | Peyton Manning | 🏈 | Aaron Rodgers | 🏈 | 2000s
-music | Kendrick Lamar | 🎤 | Drake | 🎤 | 2010s
-music | Taylor Swift | 🎤 | Beyoncé | 🎤 | 2010s
-music | Queen | 🎸 | Led Zeppelin | 🎸 | timeless
-music | Metallica | 🎸 | Iron Maiden | 🎸 | 80s
-music | Bruno Mars | 🎤 | The Weeknd | 🎤 | 2010s
-music | Kanye West | 🎤 | Jay-Z | 🎤 | 2000s
+sports | Steph Curry | 🏀 | Kevin Durant | 🎽 | 2010s
+sports | Novak Djokovic | 🎾 | Roger Federer | 📣 | 2000s
+sports | Lionel Messi | ⚽ | Pelé | 🔥 | 2000s
+sports | Michael Jordan | 🏀 | Kobe Bryant | 🔥 | 2000s
+sports | Muhammad Ali | 🥊 | Floyd Mayweather | 🥇 | 2000s
+sports | LeBron James | 🏀 | Kobe Bryant | 🥇 | 2000s
+sports | Usain Bolt | 🏃 | Carl Lewis | 🏟️ | 2000s
+sports | Shaquille O’Neal | 🏀 | Hakeem Olajuwon | 🎽 | 90s
+sports | Peyton Manning | 🏈 | Aaron Rodgers | 📣 | 2000s
+music | Kendrick Lamar | 🎤 | Drake | 📻 | 2010s
+music | Taylor Swift | 🎤 | Beyoncé | 🎧 | 2010s
+music | Queen | 🎸 | Led Zeppelin | ⭐ | timeless
+music | Metallica | 🎸 | Iron Maiden | 🥁 | 80s
+music | Bruno Mars | 🎤 | The Weeknd | 🎹 | 2010s
+music | Kanye West | 🎤 | Jay-Z | 🥁 | 2000s
 music | Elvis Presley | 🎸 | Michael Jackson | 🎤 | 80s
-music | Ariana Grande | 🎤 | Billie Eilish | 🎤 | now
-music | Post Malone | 🎤 | Travis Scott | 🎤 | 2010s
-music | Eminem | 🎤 | Kanye West | 🎤 | 2000s
+music | Ariana Grande | 🎤 | Billie Eilish | 📻 | now
+music | Post Malone | 🎤 | Travis Scott | 🎸 | 2010s
+music | Eminem | 🎤 | Kanye West | 🎧 | 2000s
 movies | The Matrix | 💊 | Star Wars | 🌌 | 90s
 movies | Harry Potter | ⚡ | Lord of the Rings | 💍 | timeless
 movies | The Godfather | 🌹 | Goodfellas | 💼 | 90s
@@ -82,32 +82,32 @@ movies | The Office | 📎 | Parks and Recreation | 🌳 | 2000s
 movies | Jurassic Park | 🦖 | King Kong | 🦍 | 90s
 movies | The Simpsons | 🍩 | Family Guy | 📺 | 90s
 movies | Top Gun | ✈️ | Iron Man | 🦾 | 2010s
-brands | Xbox | 🎮 | PlayStation | 🎮 | 2000s
-brands | New Balance | 👟 | Nike | 👟 | timeless
+brands | Xbox | 🎮 | PlayStation | 🛍️ | 2000s
+brands | New Balance | 👟 | Nike | ⭐ | timeless
 brands | Amazon | 📦 | Walmart | 🛒 | 2000s
 brands | Netflix | 🍿 | HBO Max | 📺 | now
 brands | Instagram | 📸 | TikTok | 🎵 | 2010s
 brands | Google | 🔍 | Microsoft | 💻 | 2000s
 brands | Samsung | 📱 | Apple | 🍎 | 2000s
-brands | DoorDash | 🛵 | Uber Eats | 🛵 | 2010s
-brands | FedEx | 📦 | UPS | 📦 | timeless
+brands | DoorDash | 🛵 | Uber Eats | ⭐ | 2010s
+brands | FedEx | 📦 | UPS | 🏷️ | timeless
 brands | PayPal | 💳 | Venmo | 💸 | 2010s
-brands | Costco | 🛒 | Sam’s Club | 🛒 | timeless
+brands | Costco | 🛒 | Sam’s Club | 💼 | timeless
 brands | Chevrolet | 🚙 | Ford | 🚗 | timeless
 food | Chick-fil-A | 🐔 | Popeyes | 🍗 | timeless
-food | Shake Shack | 🍔 | In-N-Out | 🍔 | timeless
-food | Domino’s | 🍕 | Papa John’s | 🍕 | timeless
+food | Shake Shack | 🍔 | In-N-Out | 🥄 | timeless
+food | Domino’s | 🍕 | Papa John’s | 🍽️ | timeless
 food | Panera | 🥖 | Subway | 🥪 | timeless
 food | McDonald’s | 🍟 | Burger King | 👑 | timeless
-food | Pizza Hut | 🍕 | Papa John’s | 🍕 | timeless
-food | In-N-Out | 🍔 | Whataburger | 🍔 | timeless
-food | Five Guys | 🍔 | Shake Shack | 🍔 | timeless
-food | Wingstop | 🍗 | Buffalo Wild Wings | 🍗 | timeless
+food | Pizza Hut | 🍕 | Papa John’s | 🔥 | timeless
+food | In-N-Out | 🍔 | Whataburger | 😋 | timeless
+food | Five Guys | 🍔 | Shake Shack | 🥄 | timeless
+food | Wingstop | 🍗 | Buffalo Wild Wings | 🥄 | timeless
 food | Sonic | 🥤 | Whataburger | 🍔 | timeless
 games | Grand Theft Auto | 🚗 | Red Dead Redemption | 🤠 | 2000s
 games | Minecraft | ⛏️ | Fortnite | 🪂 | 2010s
 games | Call of Duty | 🎖️ | Battlefield | 💥 | 2000s
-games | PlayStation 5 | 🎮 | Xbox Series X | 🎮 | now
+games | PlayStation 5 | 🎮 | Xbox Series X | 👾 | now
 games | The Last of Us | 🧟 | Resident Evil | ☣️ | 2010s
 games | Overwatch | 🛡️ | Valorant | 🎯 | now
 games | FIFA | ⚽ | NBA 2K | 🏀 | 2000s
@@ -215,16 +215,16 @@ movies | Jump Scares | 😱 | Slow-Burn Horror | 🕯️ | timeless
 movies | Friends | ☕ | Seinfeld | 🥨 | 90s
 movies | Spider-Man | 🕷️ | Iron Man | 🦾 | 2010s
 movies | Rom-Coms | 💕 | Action Movies | 💥 | timeless
-movies | Leonardo DiCaprio | 🎭 | Brad Pitt | 🎭 | 2000s
-movies | Tom Hanks | 🎭 | Denzel Washington | 🎭 | 90s
-movies | Dwayne Johnson | 🎭 | Chris Hemsworth | 🎭 | 2010s
-movies | Zendaya | 🎭 | Margot Robbie | 🎭 | 2010s
-movies | Scarlett Johansson | 🎭 | Gal Gadot | 🎭 | 2010s
-movies | Angelina Jolie | 🎭 | Jennifer Aniston | 🎭 | 2000s
-movies | Timothée Chalamet | 🎭 | Tom Holland | 🎭 | 2010s
-movies | Jim Carrey | 🎭 | Adam Sandler | 🎭 | 2000s
-movies | Zendaya | 🎭 | Sydney Sweeney | 🎭 | now
-movies | Glen Powell | 🎭 | Austin Butler | 🎭 | now
+movies | Leonardo DiCaprio | 🎭 | Brad Pitt | 🍿 | 2000s
+movies | Tom Hanks | 🎭 | Denzel Washington | 🎟️ | 90s
+movies | Dwayne Johnson | 🎭 | Chris Hemsworth | 🎥 | 2010s
+movies | Zendaya | 🎭 | Margot Robbie | 🎬 | 2010s
+movies | Scarlett Johansson | 🎭 | Gal Gadot | 🎬 | 2010s
+movies | Angelina Jolie | 🎭 | Jennifer Aniston | 🎟️ | 2000s
+movies | Timothée Chalamet | 🎭 | Tom Holland | 🎬 | 2010s
+movies | Jim Carrey | 🎭 | Adam Sandler | 🎞️ | 2000s
+movies | Zendaya | 🎭 | Sydney Sweeney | 🎥 | now
+movies | Glen Powell | 🎭 | Austin Butler | 🍿 | now
 movies | Spider-Man | 🕷️ | Wolverine | 🦡 | 90s
 movies | Deadpool | ⚔️ | Wolverine | 🦡 | 2010s
 movies | Thor | 🔨 | Hulk | 💚 | 2010s
@@ -232,7 +232,7 @@ movies | Joker | 🃏 | Thanos | 🧤 | 2010s
 movies | Venom | 🖤 | Carnage | ❤️ | 2000s
 movies | Green Lantern | 💍 | Iron Man | 🦾 | 2010s
 movies | Black Panther | 🐆 | Iron Man | 🦾 | 2010s
-movies | Marvel Villains | 🦹 | DC Villains | 🦹 | timeless
+movies | Marvel Villains | 🦹 | DC Villains | ⭐ | timeless
 movies | Wolverine | 🦡 | The Hulk | 💚 | 2000s
 movies | Anchorman | 📰 | Step Brothers | 👬 | 2000s
 movies | Home Alone | 🏠 | Elf | 🎄 | 2000s
@@ -248,17 +248,17 @@ music | Karaoke | 🎤 | Air Guitar | 🎸 | 2010s
 music | Country Music | 🤠 | Rock Music | 🎸 | timeless
 music | Guitar | 🎸 | Piano | 🎹 | timeless
 music | Music Videos | 📹 | Lyric Videos | 📝 | 2010s
-music | Rolling Stones | 🎸 | Led Zeppelin | 🎸 | timeless
-music | Fleetwood Mac | 🎸 | The Eagles | 🎸 | timeless
-music | Queen | 🎸 | Pink Floyd | 🎸 | timeless
-music | Bob Dylan | 🎸 | Neil Young | 🎸 | timeless
-music | David Bowie | 🎸 | Freddie Mercury | 🎸 | timeless
-music | Billie Eilish | 🎤 | Olivia Rodrigo | 🎤 | now
-music | The Weeknd | 🎤 | Bad Bunny | 🎤 | now
-music | Travis Scott | 🎤 | Playboi Carti | 🎤 | now
-music | Ice Spice | 🎤 | Latto | 🎤 | now
-music | SZA | 🎤 | Summer Walker | 🎤 | now
-music | Chappell Roan | 🎤 | Sabrina Carpenter | 🎤 | now
+music | Rolling Stones | 🎸 | Led Zeppelin | ⭐ | timeless
+music | Fleetwood Mac | 🎸 | The Eagles | 📻 | timeless
+music | Queen | 🎸 | Pink Floyd | 🎺 | timeless
+music | Bob Dylan | 🎸 | Neil Young | 🥁 | timeless
+music | David Bowie | 🎸 | Freddie Mercury | 🎷 | timeless
+music | Billie Eilish | 🎤 | Olivia Rodrigo | 🎧 | now
+music | The Weeknd | 🎤 | Bad Bunny | 🎷 | now
+music | Travis Scott | 🎤 | Playboi Carti | 🎧 | now
+music | Ice Spice | 🎤 | Latto | 🎹 | now
+music | SZA | 🎤 | Summer Walker | 📻 | now
+music | Chappell Roan | 🎤 | Sabrina Carpenter | ⭐ | now
 sports | Football | 🏈 | Basketball | 🏀 | timeless
 sports | Soccer | ⚽ | American Football | 🏈 | timeless
 sports | Boxing | 🥊 | Mixed Martial Arts | 🥋 | timeless
@@ -268,9 +268,9 @@ sports | Swimming | 🏊 | Running | 🏃 | timeless
 sports | Bowling | 🎳 | Mini Golf | ⛳ | timeless
 sports | Cheering from the Stands | 📣 | Watching on TV | 📺 | timeless
 sports | Overtime | ⏱️ | A Clean Finish | 🏁 | timeless
-sports | LeBron James | 🏀 | Stephen Curry | 🏀 | 2010s
-sports | Caitlin Clark | 🏀 | Angel Reese | 🏀 | now
-sports | Giannis Antetokounmpo | 🏀 | Joel Embiid | 🏀 | 2010s
+sports | LeBron James | 🏀 | Stephen Curry | 📣 | 2010s
+sports | Caitlin Clark | 🏀 | Angel Reese | 🏆 | now
+sports | Giannis Antetokounmpo | 🏀 | Joel Embiid | 💪 | 2010s
 games | Console | 🎮 | PC Gaming | 🖥️ | 2000s
 games | Mobile Games | 📱 | Console Games | 🎮 | 2000s
 games | Strategy Games | ♟️ | Adventure Games | 🗺️ | timeless
@@ -280,7 +280,7 @@ games | Open World Games | 🗺️ | Linear Story Games | 📖 | timeless
 games | Arcade Games | 🕹️ | Home Consoles | 🎮 | 2000s
 games | Pikachu | ⚡ | Charizard | 🔥 | 90s
 games | Pikachu | ⚡ | Eevee | 🦊 | 90s
-games | Ash Ketchum | 🧢 | Red | 🧢 | 2000s
+games | Ash Ketchum | 🧢 | Red | 🕹️ | 2000s
 games | Mewtwo | 🧬 | Mew | 💗 | 90s
 tech | Laptop | 💻 | Tablet | 📱 | timeless
 tech | Wired Earbuds | 🔌 | Wireless Earbuds | 📶 | 2010s
@@ -331,7 +331,7 @@ ideas | The Past | 📜 | The Future | 🚀 | timeless
 books | Of Mice and Men | 🐭 | The Catcher in the Rye | 🌾 | timeless
 books | The Hunger Games | 🏹 | Divergent | 🧩 | 2010s
 books | Physical Books | 📖 | E-Books | 📱 | 2010s
-books | Stephen King | 📚 | Dean Koontz | 📚 | timeless
+books | Stephen King | 📚 | Dean Koontz | 🔖 | timeless
 books | 1984 | 👁️ | Brave New World | 🧪 | timeless
 books | Agatha Christie | 🕵️ | Arthur Conan Doyle | 🔍 | timeless
 books | Series | 📚 | Standalone Books | 📕 | timeless
@@ -375,22 +375,22 @@ fitness | Free Weights | 🏋️ | Machines | ⚙️ | 2000s
 fitness | CrossFit | 🔥 | Powerlifting | 🏋️ | timeless
 fitness | Gym Workouts | 🏋️ | Home Workouts | 🏠 | timeless
 fitness | Morning Gym Session | 🌅 | Night Gym Session | 🌙 | timeless
-sports | Conor McGregor | 🥊 | Khabib Nurmagomedov | 🥊 | 2010s
-sports | Israel Adesanya | 🥊 | Alex Pereira | 🥊 | 2010s
-sports | Conor McGregor | 🥊 | Nate Diaz | 🥊 | 2010s
-sports | Islam Makhachev | 🥊 | Charles Oliveira | 🥊 | 2010s
-sports | Amanda Nunes | 🥊 | Valentina Shevchenko | 🥊 | 2010s
+sports | Conor McGregor | 🥊 | Khabib Nurmagomedov | 🎽 | 2010s
+sports | Israel Adesanya | 🥊 | Alex Pereira | 🏆 | 2010s
+sports | Conor McGregor | 🥊 | Nate Diaz | 💪 | 2010s
+sports | Islam Makhachev | 🥊 | Charles Oliveira | 🥇 | 2010s
+sports | Amanda Nunes | 🥊 | Valentina Shevchenko | 💪 | 2010s
 sports | Submission Win | 🔒 | Knockout Win | 💥 | timeless
 sports | Strikers | 👊 | Grapplers | 🤼 | timeless
-music | Katy Perry | 🎤 | Rihanna | 🎤 | 2010s
-music | Dua Lipa | 🎤 | Doja Cat | 🎤 | now
-music | Foo Fighters | 🎸 | Red Hot Chili Peppers | 🎸 | 2000s
-music | Guns N' Roses | 🎸 | Metallica | 🎸 | 80s
-music | Jay-Z | 🎤 | Nas | 🎤 | 2000s
-music | Kanye West | 🎤 | Travis Scott | 🎤 | 2010s
-music | Morgan Wallen | 🤠 | Luke Combs | 🤠 | now
+music | Katy Perry | 🎤 | Rihanna | ⭐ | 2010s
+music | Dua Lipa | 🎤 | Doja Cat | 🎷 | now
+music | Foo Fighters | 🎸 | Red Hot Chili Peppers | 🎹 | 2000s
+music | Guns N' Roses | 🎸 | Metallica | ⭐ | 80s
+music | Jay-Z | 🎤 | Nas | 🥁 | 2000s
+music | Kanye West | 🎤 | Travis Scott | 🎺 | 2010s
+music | Morgan Wallen | 🤠 | Luke Combs | 🎧 | now
 music | Johnny Cash | 🎸 | Willie Nelson | 🤠 | timeless
-music | Chris Stapleton | 🤠 | Zach Bryan | 🤠 | now
+music | Chris Stapleton | 🤠 | Zach Bryan | 🎸 | now
 music | An Old Favorite on Repeat | 🔁 | Finding Something New | 🔎 | timeless
 realitytv | The Bachelor | 🌹 | Love Island | 🏝️ | 2010s
 realitytv | Big Brother | 👁️ | Survivor | 🔥 | 2000s
@@ -403,7 +403,7 @@ realitytv | Dancing with the Stars | 💃 | So You Think You Can Dance | 🕺 | 
 realitytv | Queer Eye | 💇 | Fixer Upper | 🔨 | 2010s
 realitytv | Hell's Kitchen | 🔪 | Top Chef | 👨‍🍳 | 2000s
 realitytv | Vanderpump Rules | 🍷 | Selling Sunset | 🏡 | 2010s
-books | Colleen Hoover | ✍️ | Emily Henry | ✍️ | 2010s
+books | Colleen Hoover | ✍️ | Emily Henry | 🔖 | 2010s
 books | When Harry Met Sally | ☕ | Pretty Woman | 👠 | 90s
 books | 10 Things I Hate About You | 📝 | 13 Going on 30 | 🎂 | 90s
 celebrity | Kim Kardashian | 💋 | Paris Hilton | 👜 | 2000s
@@ -415,27 +415,27 @@ books | To Kill a Mockingbird | 🐦 | The Catcher in the Rye | 🌾 | timeless
 books | Brandon Sanderson | ⚔️ | George R.R. Martin | 🐺 | 2010s
 books | Pride and Prejudice | 🎩 | Jane Eyre | 🕯️ | timeless
 books | Reading Before Bed | 🌙 | Reading at the Beach | 🏖️ | timeless
-movies | Brad Pitt | 🎭 | Tom Cruise | 🎭 | 2000s
+movies | Brad Pitt | 🎭 | Tom Cruise | 🎥 | 2000s
 movies | Fight Club | 🧼 | Se7en | 📦 | 90s
 movies | Steven Spielberg | 🦖 | George Lucas | 🌌 | timeless
 movies | The Dark Knight | 🦇 | Joker | 🃏 | 2010s
-movies | Will Smith | 🎭 | Dwayne Johnson | 🎭 | 2000s
+movies | Will Smith | 🎭 | Dwayne Johnson | 🎬 | 2000s
 movies | Greta Gerwig | 🎀 | Sofia Coppola | 🗾 | 2010s
 movies | Barbie | 🎀 | Oppenheimer | 💣 | now
 movies | Avengers: Endgame | 🛡️ | Avengers: Infinity War | 💎 | 2010s
 movies | Parasite | 🪨 | Everything Everywhere All at Once | 🥯 | now
-comedy | Dave Chappelle | 🎤 | Shane Gillis | 🎤 | 2010s
-comedy | George Carlin | 🎤 | Richard Pryor | 🎤 | timeless
-comedy | Kevin Hart | 🎤 | Chris Rock | 🎤 | 2010s
-comedy | Sebastian Maniscalco | 🎤 | Jim Jefferies | 🎤 | 2010s
-comedy | Hasan Minhaj | 🎤 | Trevor Noah | 🎤 | 2010s
-comedy | Amy Schumer | 🎤 | Ali Wong | 🎤 | 2010s
+comedy | Dave Chappelle | 🎤 | Shane Gillis | 🤣 | 2010s
+comedy | George Carlin | 🎤 | Richard Pryor | 🤣 | timeless
+comedy | Kevin Hart | 🎤 | Chris Rock | 🤣 | 2010s
+comedy | Sebastian Maniscalco | 🎤 | Jim Jefferies | 🤣 | 2010s
+comedy | Hasan Minhaj | 🎤 | Trevor Noah | 🎭 | 2010s
+comedy | Amy Schumer | 🎤 | Ali Wong | 🤣 | 2010s
 comedy | Stand-Up Specials | 🎤 | Comedy Movies | 🍿 | timeless
 podcasts | The Joe Rogan Experience | 🎙️ | WTF with Marc Maron | 🎸 | 2010s
 podcasts | Call Her Daddy | 💋 | SmartLess | 🤓 | 2010s
 podcasts | Dateline NBC | 🕵️ | MrBallen Podcast | 🔦 | 2010s
 podcasts | Good Hang with Amy Poehler | 🛋️ | SmartLess | 🤓 | now
-podcasts | The Megyn Kelly Show | 🎙️ | The Ben Shapiro Show | 🎙️ | now
+podcasts | The Megyn Kelly Show | 🎙️ | The Ben Shapiro Show | ⭐ | now
 podcasts | Video Podcasts | 📹 | Audio-Only Podcasts | 🎧 | 2010s
 podcasts | Listening at 1x Speed | 🐢 | Listening at 1.5x or 2x | ⏩ | 2010s
 podcasts | New Episode Day | 📅 | Binging the Back Catalog | 📚 | timeless
@@ -465,20 +465,20 @@ sports | Lakers | 💜 | Celtics | ☘️ | timeless
 sports | Lakers | 💜 | Warriors | 🌉 | 2000s
 sports | Patriots | 🏈 | Chiefs | 🏹 | 2000s
 sports | Packers | 🧀 | Bears | 🐻 | timeless
-sports | Steelers | 🏈 | Ravens | 🏈 | 2000s
-sports | Dodgers | ⚾ | Giants | ⚾ | 2000s
+sports | Steelers | 🏈 | Ravens | 🎽 | 2000s
+sports | Dodgers | ⚾ | Giants | 🔥 | 2000s
 sports | Cubs | 🧸 | Cardinals | 🐦 | timeless
 sports | Penguins | 🐧 | Capitals | 🏛️ | 2000s
 sports | Real Madrid | 👑 | Barcelona | ⚽ | timeless
 sports | Arsenal | 💥 | Tottenham | 🐓 | 2000s
 sports | Michigan | 〽️ | Ohio State | 🌰 | timeless
-sports | Kevin Durant | 🏀 | Giannis Antetokounmpo | 🏀 | 2010s
+sports | Kevin Durant | 🏀 | Giannis Antetokounmpo | 🎽 | 2010s
 sports | Magic Johnson | 🏀 | Larry Bird | ☘️ | 80s
-sports | Jerry Rice | 🏈 | Randy Moss | 🏈 | 2000s
-sports | Aaron Judge | ⚾ | Shohei Ohtani | ⚾ | now
-sports | Mike Trout | ⚾ | Ronald Acuña Jr. | ⚾ | now
-sports | Wayne Gretzky | 🏒 | Mario Lemieux | 🏒 | 80s
-sports | Kylian Mbappé | ⚽ | Erling Haaland | ⚽ | now
+sports | Jerry Rice | 🏈 | Randy Moss | 🥇 | 2000s
+sports | Aaron Judge | ⚾ | Shohei Ohtani | 🏟️ | now
+sports | Mike Trout | ⚾ | Ronald Acuña Jr. | 🏆 | now
+sports | Wayne Gretzky | 🏒 | Mario Lemieux | ⏱️ | 80s
+sports | Kylian Mbappé | ⚽ | Erling Haaland | 📣 | now
 sports | Football Sundays | 🏈 | March Madness | 🏀 | timeless
 sports | Home Jerseys | 🏠 | Away Jerseys | ✈️ | timeless
 celebrity | Kim Kardashian | 💋 | Kylie Jenner | 💄 | 2000s
@@ -486,34 +486,34 @@ celebrity | Blake Lively | 👱‍♀️ | Gwyneth Paltrow | 🌿 | 2000s
 celebrity | Paparazzi Photos | 📸 | Posted Selfies | 🤳 | 2010s
 celebrity | Celebrity Breakup Drama | 💔 | Celebrity Weddings | 💒 | timeless
 celebrity | Old Hollywood Glamour | 🎞️ | Modern Influencer Fame | 📱 | 2010s
-sports | Messi | ⚽ | Cristiano Ronaldo | ⚽ | 2000s
-sports | Serena Williams | 🎾 | Venus Williams | 🎾 | 2000s
-sports | Tom Brady | 🏈 | Patrick Mahomes | 🏈 | 2010s
-sports | Kobe Bryant | 🏀 | Shaquille O’Neal | 🏀 | 2000s
-sports | Wayne Gretzky | 🏒 | Sidney Crosby | 🏒 | 2000s
-sports | Serena Williams | 🎾 | Naomi Osaka | 🎾 | 2010s
-sports | Tom Brady | 🏈 | Joe Montana | 🏈 | 2000s
-sports | Tiger Woods | ⛳ | Jack Nicklaus | ⛳ | 2000s
-sports | Simone Biles | 🤸 | Nadia Comaneci | 🤸 | 2010s
-sports | Cristiano Ronaldo | ⚽ | Lionel Messi | ⚽ | 2000s
-sports | Roger Federer | 🎾 | Rafael Nadal | 🎾 | 2000s
-sports | Babe Ruth | ⚾ | Hank Aaron | ⚾ | timeless
-sports | Michael Phelps | 🏊 | Mark Spitz | 🏊 | 2000s
-music | The Beatles | 🎸 | Rolling Stones | 🎸 | timeless
-music | Jay-Z | 🎤 | Eminem | 🎤 | 2000s
-music | Nirvana | 🎸 | Pearl Jam | 🎸 | 90s
-music | Ariana Grande | 🎤 | Dua Lipa | 🎤 | now
-music | Adele | 🎤 | Whitney Houston | 🎤 | 2000s
-music | Coldplay | 🎸 | Imagine Dragons | 🎸 | 2010s
+sports | Messi | ⚽ | Cristiano Ronaldo | ⏱️ | 2000s
+sports | Serena Williams | 🎾 | Venus Williams | 💪 | 2000s
+sports | Tom Brady | 🏈 | Patrick Mahomes | 🎽 | 2010s
+sports | Kobe Bryant | 🏀 | Shaquille O’Neal | 🥇 | 2000s
+sports | Wayne Gretzky | 🏒 | Sidney Crosby | 🔥 | 2000s
+sports | Serena Williams | 🎾 | Naomi Osaka | 🥇 | 2010s
+sports | Tom Brady | 🏈 | Joe Montana | 📣 | 2000s
+sports | Tiger Woods | ⛳ | Jack Nicklaus | 🏆 | 2000s
+sports | Simone Biles | 🤸 | Nadia Comaneci | 🏆 | 2010s
+sports | Cristiano Ronaldo | ⚽ | Lionel Messi | 🏟️ | 2000s
+sports | Roger Federer | 🎾 | Rafael Nadal | 🏟️ | 2000s
+sports | Babe Ruth | ⚾ | Hank Aaron | 🎽 | timeless
+sports | Michael Phelps | 🏊 | Mark Spitz | 🔥 | 2000s
+music | The Beatles | 🎸 | Rolling Stones | 🎹 | timeless
+music | Jay-Z | 🎤 | Eminem | 🎸 | 2000s
+music | Nirvana | 🎸 | Pearl Jam | 🎤 | 90s
+music | Ariana Grande | 🎤 | Dua Lipa | 🎺 | now
+music | Adele | 🎤 | Whitney Houston | 📻 | 2000s
+music | Coldplay | 🎸 | Imagine Dragons | 🎺 | 2010s
 music | Ed Sheeran | 🎸 | Bruno Mars | 🎤 | 2010s
-music | Rihanna | 🎤 | Nicki Minaj | 🎤 | 2010s
-music | Dua Lipa | 🎤 | Olivia Rodrigo | 🎤 | now
-movies | Quentin Tarantino | 🎬 | Christopher Nolan | 🎬 | 2000s
-movies | Marvel | 🦸 | DC | 🦸 | 2010s
+music | Rihanna | 🎤 | Nicki Minaj | 🎧 | 2010s
+music | Dua Lipa | 🎤 | Olivia Rodrigo | 🎷 | now
+movies | Quentin Tarantino | 🎬 | Christopher Nolan | ⭐ | 2000s
+movies | Marvel | 🦸 | DC | 🎬 | 2010s
 movies | Star Wars | 🌌 | Star Trek | 🖖 | timeless
 movies | Pixar | 💡 | DreamWorks | 🌙 | 2000s
 movies | Breaking Bad | 🧪 | The Sopranos | 🍝 | 2010s
-movies | The Avengers | 🦸 | Justice League | 🦸 | 2010s
+movies | The Avengers | 🦸 | Justice League | ⭐ | 2010s
 movies | Titanic | 🚢 | Avatar | 💙 | 2000s
 movies | Friends | ☕ | The Office | 📎 | 2000s
 movies | The Lion King | 🦁 | Aladdin | 🧞 | 90s
@@ -522,28 +522,28 @@ movies | Stranger Things | 🔦 | The Boys | 💥 | 2010s
 movies | Fast & Furious | 🏎️ | Mission: Impossible | 🕶️ | 2000s
 movies | Squid Game | 🦑 | Money Heist | 💰 | now
 brands | iPhone | 📱 | Android | 🤖 | 2010s
-brands | Coke | 🥤 | Pepsi | 🥤 | timeless
-brands | Adidas | 👟 | Puma | 👟 | timeless
+brands | Coke | 🥤 | Pepsi | 🛍️ | timeless
+brands | Adidas | 👟 | Puma | 🛍️ | timeless
 brands | Tesla | ⚡ | Toyota | 🚗 | 2010s
 brands | Spotify | 🎧 | Apple Music | 🎵 | now
 brands | YouTube | ▶️ | Twitch | 🎮 | 2010s
-brands | Nike | 👟 | Under Armour | 👟 | timeless
+brands | Nike | 👟 | Under Armour | 🏷️ | timeless
 brands | Uber | 🚕 | Lyft | 🚗 | 2010s
-brands | Coca-Cola | 🥤 | Pepsi | 🥤 | timeless
+brands | Coca-Cola | 🥤 | Pepsi | 🛍️ | timeless
 brands | Airbnb | 🏡 | Booking.com | 🏨 | 2010s
 brands | Zoom | 📹 | Microsoft Teams | 💼 | 2010s
 brands | Target | 🎯 | Walmart | 🛒 | timeless
-food | Five Guys | 🍔 | In-N-Out | 🍔 | timeless
+food | Five Guys | 🍔 | In-N-Out | 🥄 | timeless
 food | Chipotle | 🌯 | Taco Bell | 🌮 | timeless
 food | Dunkin’ | 🍩 | Starbucks | ☕ | timeless
 food | Ben & Jerry’s | 🍨 | Häagen-Dazs | 🍦 | timeless
 food | Olive Garden | 🍝 | Applebee’s | 🍽️ | timeless
 food | Wendy’s | 🍔 | Chick-fil-A | 🐔 | timeless
-food | Krispy Kreme | 🍩 | Dunkin’ | 🍩 | timeless
-food | Chipotle | 🌯 | Qdoba | 🌯 | timeless
-food | Taco Bell | 🌮 | Del Taco | 🌮 | timeless
+food | Krispy Kreme | 🍩 | Dunkin’ | 🔥 | timeless
+food | Chipotle | 🌯 | Qdoba | 🧂 | timeless
+food | Taco Bell | 🌮 | Del Taco | 🔥 | timeless
 food | Panda Express | 🥡 | P.F. Chang’s | 🥢 | timeless
-food | Culver’s | 🍔 | In-N-Out | 🍔 | timeless
+food | Culver’s | 🍔 | In-N-Out | 🍽️ | timeless
 games | GTA V | 🚗 | Call of Duty | 🎖️ | 2000s
 games | The Legend of Zelda | 🗡️ | Super Mario | 🍄 | timeless
 games | League of Legends | ⚔️ | Dota 2 | 🛡️ | 2010s
@@ -611,7 +611,7 @@ fitness | Working out completely alone | 🎧 | Working out in a group | 👥 | 
 fitness | A home gym, all to yourself | 🏠 | A gym membership, full of people | 🏟️ | timeless
 geography | Mountains | ⛰️ | Beaches | 🏖️ | timeless
 geography | Visiting every US state | 🗺️ | Visiting every country in Europe | 🏰 | timeless
-geography | Tokyo | 🗼 | Paris | 🗼 | timeless
+geography | Tokyo | 🗼 | Paris | 💫 | timeless
 geography | A cabin in the mountains | 🏔️ | A cottage by the sea | 🌊 | timeless
 geography | A big backyard | 🏡 | A rooftop view | 🏙️ | timeless
 geography | Living in a big city | 🏙️ | Living in a small town | 🏘️ | timeless
@@ -633,7 +633,7 @@ food | Donuts | 🍩 | Muffins | 🧁 | timeless
 food | Nachos | 🌶️ | Mozzarella Sticks | 🧀 | timeless
 food | Spicy Wings | 🌶️ | Chicken Nuggets | 🍗 | timeless
 food | Cereal | 🥣 | Toast | 🍞 | timeless
-food | Cheese Pizza | 🍕 | Pepperoni Pizza | 🍕 | timeless
+food | Cheese Pizza | 🍕 | Pepperoni Pizza | 🍴 | timeless
 food | Popcorn | 🍿 | Pretzels | 🥨 | timeless
 food | Fried Chicken | 🍗 | Rotisserie Chicken | 🐔 | timeless
 food | Bacon | 🥓 | Sausage | 🌭 | timeless
@@ -642,7 +642,7 @@ drinks | Lemonade | 🍋 | Iced Tea | 🧊 | timeless
 drinks | Hot Chocolate | ☕ | Apple Cider | 🍏 | timeless
 drinks | Energy Drinks | ⚡ | Coffee | ☕ | timeless
 drinks | Iced Coffee | 🧊 | Hot Coffee | ☕ | timeless
-drinks | Root Beer | 🥤 | Cola | 🥤 | timeless
+drinks | Root Beer | 🥤 | Cola | 🔥 | timeless
 drinks | Kool-Aid | 🍹 | Capri Sun | 🧃 | timeless
 drinks | Milk | 🥛 | Orange Juice | 🍊 | timeless
 movies | Sitcoms | 📺 | Dramas | 🎭 | timeless
@@ -653,16 +653,16 @@ movies | Animated Movies | 🖍️ | Live-Action Movies | 🎬 | timeless
 movies | Plot Twists | 🌀 | Happy Endings | 🌈 | timeless
 movies | Batman | 🦇 | Superman | 🦸 | timeless
 movies | Godzilla | 🦖 | King Kong | 🦍 | timeless
-movies | Sandra Bullock | 🎭 | Charlize Theron | 🎭 | 2000s
-movies | Meryl Streep | 🎭 | Viola Davis | 🎭 | 2010s
-movies | Ryan Reynolds | 🎭 | Ryan Gosling | 🎭 | 2010s
-movies | Jennifer Lawrence | 🎭 | Emma Stone | 🎭 | 2010s
-movies | Keanu Reeves | 🎭 | Tom Cruise | 🎭 | 2000s
-movies | Chris Evans | 🎭 | Chris Pratt | 🎭 | 2010s
-movies | Morgan Freeman | 🎭 | Samuel L. Jackson | 🎭 | 90s
-movies | Will Ferrell | 🎭 | Steve Carell | 🎭 | 2000s
-movies | Florence Pugh | 🎭 | Anya Taylor-Joy | 🎭 | 2010s
-movies | Will Smith | 🎭 | Denzel Washington | 🎭 | 2000s
+movies | Sandra Bullock | 🎭 | Charlize Theron | 🎥 | 2000s
+movies | Meryl Streep | 🎭 | Viola Davis | 🎬 | 2010s
+movies | Ryan Reynolds | 🎭 | Ryan Gosling | 🎟️ | 2010s
+movies | Jennifer Lawrence | 🎭 | Emma Stone | 🎟️ | 2010s
+movies | Keanu Reeves | 🎭 | Tom Cruise | 🎟️ | 2000s
+movies | Chris Evans | 🎭 | Chris Pratt | ⭐ | 2010s
+movies | Morgan Freeman | 🎭 | Samuel L. Jackson | 🎥 | 90s
+movies | Will Ferrell | 🎭 | Steve Carell | 🎬 | 2000s
+movies | Florence Pugh | 🎭 | Anya Taylor-Joy | 🎟️ | 2010s
+movies | Will Smith | 🎭 | Denzel Washington | 🎟️ | 2000s
 movies | X-Men | ✖️ | Avengers | 🦸 | 2010s
 movies | Iron Man | 🦾 | Batman | 🦇 | 2010s
 movies | Wonder Woman | 👸 | Captain Marvel | ✴️ | 2010s
@@ -682,22 +682,22 @@ music | Vinyl | 💿 | Streaming | 📱 | 2010s
 music | Solo Artists | 🎤 | Bands | 🥁 | timeless
 music | Lyrics | 📝 | Beat | 🥁 | timeless
 music | Headphones | 🎧 | Speakers | 🔊 | timeless
-music | Michael Jackson | 🎤 | Prince | 🎤 | 80s
+music | Michael Jackson | 🎤 | Prince | 🎸 | 80s
 music | EDM | 🎛️ | Hip-Hop | 🎤 | timeless
 music | Singing in the Shower | 🚿 | Singing in the Car | 🚗 | timeless
 music | 80s Music | 📼 | 90s Music | 💿 | 90s
-music | Mick Jagger | 🎸 | Robert Plant | 🎸 | timeless
-music | Eric Clapton | 🎸 | Jimi Hendrix | 🎸 | timeless
-music | Elvis Presley | 🎸 | Johnny Cash | 🎸 | timeless
-music | AC/DC | 🎸 | Guns N' Roses | 🎸 | 80s
-music | The Beatles | 🎸 | The Beach Boys | 🎸 | timeless
-music | Taylor Swift | 🎤 | Olivia Rodrigo | 🎤 | now
-music | Ariana Grande | 🎤 | Selena Gomez | 🎤 | 2010s
-music | Doja Cat | 🎤 | Nicki Minaj | 🎤 | 2010s
-music | Sabrina Carpenter | 🎤 | Olivia Rodrigo | 🎤 | now
+music | Mick Jagger | 🎸 | Robert Plant | 🎧 | timeless
+music | Eric Clapton | 🎸 | Jimi Hendrix | 🥁 | timeless
+music | Elvis Presley | 🎸 | Johnny Cash | 🎹 | timeless
+music | AC/DC | 🎸 | Guns N' Roses | 🎺 | 80s
+music | The Beatles | 🎸 | The Beach Boys | 🎧 | timeless
+music | Taylor Swift | 🎤 | Olivia Rodrigo | 📻 | now
+music | Ariana Grande | 🎤 | Selena Gomez | 🥁 | 2010s
+music | Doja Cat | 🎤 | Nicki Minaj | 🥁 | 2010s
+music | Sabrina Carpenter | 🎤 | Olivia Rodrigo | 🎷 | now
 music | Post Malone | 🎤 | Morgan Wallen | 🤠 | now
-music | Bad Bunny | 🎤 | J Balvin | 🎤 | now
-music | Kendrick Lamar | 🎤 | J. Cole | 🎤 | 2010s
+music | Bad Bunny | 🎤 | J Balvin | 🎧 | now
+music | Kendrick Lamar | 🎤 | J. Cole | ⭐ | 2010s
 sports | Baseball | ⚾ | Hockey | 🏒 | timeless
 sports | Tennis | 🎾 | Golf | ⛳ | timeless
 sports | Individual Sports | 🧍 | Team Sports | 👥 | timeless
@@ -707,9 +707,9 @@ sports | Skateboarding | 🛹 | Surfing | 🏄 | timeless
 sports | Pickup Games | 🏀 | Organized Leagues | 🏆 | timeless
 sports | Underdogs | 🐕 | Favorites | ⭐ | timeless
 sports | Trash Talk | 🗣️ | Good Sportsmanship | 🤝 | timeless
-sports | Luka Dončić | 🏀 | Cooper Flagg | 🏀 | now
-sports | Victor Wembanyama | 🏀 | Luka Dončić | 🏀 | now
-sports | Stephen Curry | 🏀 | Luka Dončić | 🏀 | now
+sports | Luka Dončić | 🏀 | Cooper Flagg | 🎽 | now
+sports | Victor Wembanyama | 🏀 | Luka Dončić | 🔥 | now
+sports | Stephen Curry | 🏀 | Luka Dončić | ⏱️ | now
 games | Single-Player | 👤 | Multiplayer | 👥 | timeless
 games | Racing Games | 🏎️ | Fighting Games | 🥊 | timeless
 games | Retro Games | 👾 | Modern Games | 🎮 | timeless
@@ -749,7 +749,7 @@ life | New Year's Eve | 🎆 | Fourth of July | 🎇 | timeless
 style | Sneakers | 👟 | Boots | 🥾 | timeless
 style | Vintage Fashion | 👒 | Modern Fashion | 🕶️ | timeless
 style | Gold Jewelry | 💛 | Silver Jewelry | 🤍 | timeless
-style | Hoodies | 🧥 | Jackets | 🧥 | timeless
+style | Hoodies | 🧥 | Jackets | ⭐ | timeless
 style | Bold Prints | 🐆 | Solid Colors | 🟦 | timeless
 pets | Dogs | 🐶 | Cats | 🐱 | timeless
 pets | Birds | 🐦 | Fish | 🐠 | timeless
@@ -814,19 +814,19 @@ fitness | Arm Day | 💪 | Ab Day | 🍫 | timeless
 fitness | Yoga | 🧘 | Pilates | 🤸 | timeless
 fitness | Rest Day | 😴 | Extra Workout Day | 💪 | timeless
 fitness | Protein Shakes | 🥤 | Whole Food Meals | 🥦 | timeless
-sports | Jon Jones | 🥊 | Daniel Cormier | 🥊 | 2010s
-sports | Khabib Nurmagomedov | 🥊 | Georges St-Pierre | 🥊 | 2010s
-sports | Anderson Silva | 🥊 | Georges St-Pierre | 🥊 | 80s
-sports | Ronda Rousey | 🥊 | Amanda Nunes | 🥊 | 2010s
+sports | Jon Jones | 🥊 | Daniel Cormier | 🏆 | 2010s
+sports | Khabib Nurmagomedov | 🥊 | Georges St-Pierre | 📣 | 2010s
+sports | Anderson Silva | 🥊 | Georges St-Pierre | 📣 | 80s
+sports | Ronda Rousey | 🥊 | Amanda Nunes | 🎽 | 2010s
 sports | UFC | 🤼 | Boxing | 🥊 | timeless
 sports | The Cage | 🏟️ | The Ring | ⭕ | timeless
-music | Lady Gaga | 🎤 | Madonna | 🎤 | 2010s
-music | Led Zeppelin | 🎸 | Pink Floyd | 🎸 | timeless
-music | Queen | 🎸 | Rolling Stones | 🎸 | timeless
-music | Eminem | 🎤 | 50 Cent | 🎤 | 2000s
-music | Cardi B | 🎤 | Nicki Minaj | 🎤 | 2010s
-music | Carrie Underwood | 🤠 | Miranda Lambert | 🤠 | 2000s
-music | Dolly Parton | 🤠 | Reba McEntire | 🤠 | timeless
+music | Lady Gaga | 🎤 | Madonna | 🥁 | 2010s
+music | Led Zeppelin | 🎸 | Pink Floyd | 🎤 | timeless
+music | Queen | 🎸 | Rolling Stones | 🎤 | timeless
+music | Eminem | 🎤 | 50 Cent | 🎧 | 2000s
+music | Cardi B | 🎤 | Nicki Minaj | 🎹 | 2010s
+music | Carrie Underwood | 🤠 | Miranda Lambert | 🎷 | 2000s
+music | Dolly Parton | 🤠 | Reba McEntire | ⭐ | timeless
 music | Sing-Along Songs | 🎶 | Headphones-Only Songs | 🎧 | timeless
 realitytv | Real Housewives | 🍸 | Below Deck | 🛥️ | 2010s
 realitytv | RuPaul's Drag Race | 👠 | Project Runway | 🧵 | 2010s
@@ -844,24 +844,24 @@ celebrity | Celebrity Gossip Podcasts | 🗣️ | True Crime Podcasts | 🔍 | t
 books | The Shining | 🪓 | It | 🎈 | 80s
 books | Agatha Christie | 🕵️ | Gillian Flynn | 🔪 | 2000s
 books | Dune | 🏜️ | Foundation | 🌌 | timeless
-books | Colleen Hoover | ✍️ | Taylor Jenkins Reid | ✍️ | 2010s
+books | Colleen Hoover | ✍️ | Taylor Jenkins Reid | 📖 | 2010s
 books | Fourth Wing | 🐲 | A Court of Thorns and Roses | 🌹 | now
 books | The Great Gatsby | 🥂 | Of Mice and Men | 🐭 | timeless
 books | Rereading a Favorite | 🔁 | Always Something New | 🆕 | timeless
 movies | Johnny Depp | 🏴‍☠️ | Leonardo DiCaprio | 🎭 | 2000s
 movies | Inception | 🌀 | Shutter Island | 🏝️ | 2010s
 movies | Pulp Fiction | 💼 | Reservoir Dogs | 🕶️ | 90s
-movies | Denzel Washington | 🎭 | Samuel L. Jackson | 🎭 | 90s
-movies | Margot Robbie | 🎭 | Scarlett Johansson | 🎭 | 2010s
+movies | Denzel Washington | 🎭 | Samuel L. Jackson | 🍿 | 90s
+movies | Margot Robbie | 🎭 | Scarlett Johansson | ⭐ | 2010s
 movies | Jordan Peele | 🫖 | M. Night Shyamalan | 👻 | 2010s
 movies | La La Land | 🎹 | Whiplash | 🥁 | 2010s
 movies | Interstellar | 🪐 | The Martian | 🥔 | 2010s
-comedy | Mark Normand | 🎤 | Joe List | 🎤 | 2010s
-comedy | Bill Burr | 🎤 | Jim Gaffigan | 🎤 | 2010s
-comedy | Nikki Glaser | 🎤 | Taylor Tomlinson | 🎤 | 2010s
-comedy | Tom Segura | 🎤 | Theo Von | 🎤 | 2010s
-comedy | John Mulaney | 🎤 | Nate Bargatze | 🎤 | 2010s
-comedy | Eddie Murphy | 🎤 | Robin Williams | 🎤 | 80s
+comedy | Mark Normand | 🎤 | Joe List | 😂 | 2010s
+comedy | Bill Burr | 🎤 | Jim Gaffigan | 🤣 | 2010s
+comedy | Nikki Glaser | 🎤 | Taylor Tomlinson | 😂 | 2010s
+comedy | Tom Segura | 🎤 | Theo Von | 🤣 | 2010s
+comedy | John Mulaney | 🎤 | Nate Bargatze | 😂 | 2010s
+comedy | Eddie Murphy | 🎤 | Robin Williams | 🤣 | 80s
 comedy | Dark Humor | 🖤 | Clean Comedy | 😇 | timeless
 podcasts | Crime Junkie | 🔍 | Morbid | 💀 | 2010s
 podcasts | The Daily | 📰 | Pod Save America | 🗳️ | now
@@ -903,15 +903,15 @@ sports | Manchester United | 😈 | Liverpool | 🔴 | timeless
 sports | Duke | 🔵 | UNC | 🐏 | timeless
 sports | Alabama | 🐘 | Auburn | 🐯 | timeless
 sports | Luka Dončić | 🏀 | Jayson Tatum | ☘️ | now
-sports | Patrick Mahomes | 🏈 | Josh Allen | 🏈 | 2010s
-sports | Lawrence Taylor | 🏈 | J.J. Watt | 🏈 | 2000s
-sports | Derek Jeter | ⚾ | Alex Rodriguez | ⚾ | 2000s
-sports | Connor McDavid | 🏒 | Sidney Crosby | 🏒 | 2010s
-sports | Alexander Ovechkin | 🏒 | Sidney Crosby | 🏒 | 2000s
-sports | Pelé | ⚽ | Diego Maradona | ⚽ | 80s
+sports | Patrick Mahomes | 🏈 | Josh Allen | 🏆 | 2010s
+sports | Lawrence Taylor | 🏈 | J.J. Watt | 💪 | 2000s
+sports | Derek Jeter | ⚾ | Alex Rodriguez | 📣 | 2000s
+sports | Connor McDavid | 🏒 | Sidney Crosby | 🥇 | 2010s
+sports | Alexander Ovechkin | 🏒 | Sidney Crosby | 🏟️ | 2000s
+sports | Pelé | ⚽ | Diego Maradona | 💪 | 80s
 sports | Fantasy Football | 📋 | Fantasy Baseball | ⚾ | 2010s
 celebrity | Taylor Swift | 🎤 | Travis Kelce | 🏈 | now
-celebrity | Zendaya | 🎭 | Florence Pugh | 🎭 | 2010s
+celebrity | Zendaya | 🎭 | Florence Pugh | 🕶️ | 2010s
 celebrity | Celebrity Feuds | 😤 | Celebrity Friendships | 🤝 | timeless
 celebrity | The Met Gala | 👑 | The Oscars Red Carpet | 🏆 | 2010s
 celebrity | Tabloid Headlines | 📰 | Verified Statements | ✅ | timeless
@@ -1068,47 +1068,47 @@ internet | Beach | 🏖️ | Mountains | 🏔️ | timeless
 internet | Road trip | 🚗 | Flying | ✈️ | timeless
 internet | Sweet | 🍰 | Salty | 🥨 | timeless
 internet | Camping | ⛺ | Hotel | 🏨 | timeless
-tv | Breaking Bad | 📺 | Better Call Saul | 📺 | 2010s
-tv | Succession | 📺 | White Lotus | 📺 | now
-tv | Stranger Things | 📺 | Wednesday | 📺 | now
-tv | The Last of Us | 📺 | The Walking Dead | 📺 | now
-tv | Game of Thrones | 📺 | House of the Dragon | 📺 | now
-tv | Ted Lasso | 📺 | Abbott Elementary | 📺 | now
-tv | House of the Dragon | 📺 | The Rings of Power | 📺 | now
-tv | Fallout | 📺 | The Last of Us | 📺 | now
-tv | Yellowjackets | 📺 | Lost | 📺 | now
-tv | The Mandalorian | 📺 | Andor | 📺 | now
-tv | Loki | 📺 | WandaVision | 📺 | now
-tv | Curb Your Enthusiasm | 📺 | It's Always Sunny in Philadelphia | 📺 | 2000s
-tv | Community | 📺 | Arrested Development | 📺 | 2000s
-tv | Parks and Recreation | 📺 | Brooklyn Nine-Nine | 📺 | 2010s
-tv | The Good Place | 📺 | Schitt's Creek | 📺 | 2010s
-tv | How I Met Your Mother | 📺 | The Big Bang Theory | 📺 | 2000s
-tv | Two and a Half Men | 📺 | The Big Bang Theory | 📺 | 2000s
-tv | Malcolm in the Middle | 📺 | Everybody Hates Chris | 📺 | 2000s
-tv | Everybody Loves Raymond | 📺 | King of Queens | 📺 | 90s
-tv | King of the Hill | 📺 | Bob's Burgers | 📺 | 2010s
-tv | Bob's Burgers | 📺 | The Simpsons | 📺 | 2010s
-tv | Family Guy | 📺 | American Dad! | 📺 | 2000s
-tv | South Park | 📺 | Rick and Morty | 📺 | 2010s
-tv | Gossip Girl | 📺 | The O.C. | 📺 | 2000s
-tv | One Tree Hill | 📺 | Dawson's Creek | 📺 | 2000s
-tv | Pretty Little Liars | 📺 | Riverdale | 📺 | 2010s
-tv | Vampire Diaries | 📺 | True Blood | 📺 | 2000s
-tv | Teen Wolf | 📺 | The Vampire Diaries | 📺 | 2010s
-tv | Buffy the Vampire Slayer | 📺 | Charmed | 📺 | 90s
-tv | Supernatural | 📺 | Grimm | 📺 | 2010s
-tv | Reacher | 📺 | Jack Ryan | 📺 | now
-tv | Hannibal | 📺 | Dexter | 📺 | 2010s
-tv | Dexter | 📺 | You | 📺 | 2010s
-tv | Love Is Blind | 📺 | Too Hot to Handle | 📺 | now
-tv | Top Chef | 📺 | Chopped | 📺 | 2000s
-tv | Great British Baking Show | 📺 | MasterChef | 📺 | 2010s
-tv | Keeping Up with the Kardashians | 📺 | The Real Housewives | 📺 | 2000s
-tv | The Sopranos | 📺 | The Wire | 📺 | 2000s
-tv | Ozark | 📺 | Breaking Bad | 📺 | 2010s
-tv | Attack on Titan | 📺 | Demon Slayer | 📺 | 2010s
-tv | Naruto | 📺 | Bleach | 📺 | 2000s
+tv | Breaking Bad | 📺 | Better Call Saul | 🛋️ | 2010s
+tv | Succession | 📺 | White Lotus | 📼 | now
+tv | Stranger Things | 📺 | Wednesday | 📡 | now
+tv | The Last of Us | 📺 | The Walking Dead | 🛋️ | now
+tv | Game of Thrones | 📺 | House of the Dragon | 🛋️ | now
+tv | Ted Lasso | 📺 | Abbott Elementary | 📡 | now
+tv | House of the Dragon | 📺 | The Rings of Power | 🍿 | now
+tv | Fallout | 📺 | The Last of Us | 🍿 | now
+tv | Yellowjackets | 📺 | Lost | 📼 | now
+tv | The Mandalorian | 📺 | Andor | 🎬 | now
+tv | Loki | 📺 | WandaVision | 🍿 | now
+tv | Curb Your Enthusiasm | 📺 | It's Always Sunny in Philadelphia | 📡 | 2000s
+tv | Community | 📺 | Arrested Development | 🎬 | 2000s
+tv | Parks and Recreation | 📺 | Brooklyn Nine-Nine | 🍿 | 2010s
+tv | The Good Place | 📺 | Schitt's Creek | 🛋️ | 2010s
+tv | How I Met Your Mother | 📺 | The Big Bang Theory | 🎬 | 2000s
+tv | Two and a Half Men | 📺 | The Big Bang Theory | 🎬 | 2000s
+tv | Malcolm in the Middle | 📺 | Everybody Hates Chris | 📡 | 2000s
+tv | Everybody Loves Raymond | 📺 | King of Queens | 📡 | 90s
+tv | King of the Hill | 📺 | Bob's Burgers | 🛋️ | 2010s
+tv | Bob's Burgers | 📺 | The Simpsons | 🛋️ | 2010s
+tv | Family Guy | 📺 | American Dad! | 🛋️ | 2000s
+tv | South Park | 📺 | Rick and Morty | 🎬 | 2010s
+tv | Gossip Girl | 📺 | The O.C. | 🎬 | 2000s
+tv | One Tree Hill | 📺 | Dawson's Creek | 🛋️ | 2000s
+tv | Pretty Little Liars | 📺 | Riverdale | 🍿 | 2010s
+tv | Vampire Diaries | 📺 | True Blood | 📼 | 2000s
+tv | Teen Wolf | 📺 | The Vampire Diaries | 🍿 | 2010s
+tv | Buffy the Vampire Slayer | 📺 | Charmed | 🍿 | 90s
+tv | Supernatural | 📺 | Grimm | 🍿 | 2010s
+tv | Reacher | 📺 | Jack Ryan | 🍿 | now
+tv | Hannibal | 📺 | Dexter | 📼 | 2010s
+tv | Dexter | 📺 | You | 📡 | 2010s
+tv | Love Is Blind | 📺 | Too Hot to Handle | 🎬 | now
+tv | Top Chef | 📺 | Chopped | 🛋️ | 2000s
+tv | Great British Baking Show | 📺 | MasterChef | 🍿 | 2010s
+tv | Keeping Up with the Kardashians | 📺 | The Real Housewives | 📡 | 2000s
+tv | The Sopranos | 📺 | The Wire | 🛋️ | 2000s
+tv | Ozark | 📺 | Breaking Bad | 🛋️ | 2010s
+tv | Attack on Titan | 📺 | Demon Slayer | 🎬 | 2010s
+tv | Naruto | 📺 | Bleach | 🎬 | 2000s
 movies | Pulp Fiction | 🎬 | Fight Club | 🍿 | 90s
 movies | Interstellar | 🎥 | Inception | 🎬 | 2010s
 movies | Hereditary | 🎬 | Midsommar | 🍿 | 2010s
@@ -1207,33 +1207,33 @@ music | Iron Maiden | 🎸 | Judas Priest | 🎧 | 80s
 music | Slipknot | 🎤 | Korn | ⭐ | 2000s
 music | System of a Down | 🎸 | Deftones | 🎧 | 90s
 music | Skrillex | 🎤 | Deadmau5 | ⭐ | 2010s
-albums | The Strokes - Is This It | 💿 | Arctic Monkeys - AM | 💿 | 2010s
-albums | Taylor Swift - 1989 | 💿 | Lorde - Melodrama | 💿 | 2010s
-albums | Nirvana - Nevermind | 💿 | Pearl Jam - Ten | 💿 | 90s
-albums | Pink Floyd - The Dark Side of the Moon | 💿 | Led Zeppelin - IV | 💿 | timeless
-albums | The Beatles - Abbey Road | 💿 | The Beach Boys - Pet Sounds | 💿 | timeless
-albums | Amy Winehouse - Back to Black | 💿 | Frank Ocean - channel ORANGE | 💿 | 2010s
-albums | SZA - SOS | 💿 | Billie Eilish - When We All Fall Asleep, Where Do We Go? | 💿 | now
-albums | Olivia Rodrigo - SOUR | 💿 | Lorde - Pure Heroine | 💿 | now
-albums | Eminem - The Marshall Mathers LP | 💿 | 50 Cent - Get Rich or Die Tryin' | 💿 | 2000s
-albums | Dr. Dre - 2001 | 💿 | Snoop Dogg - Doggystyle | 💿 | 90s
-albums | Nas - Illmatic | 💿 | The Notorious B.I.G. - Ready to Die | 💿 | 90s
-albums | Charli XCX - Brat | 💿 | Dua Lipa - Future Nostalgia | 💿 | now
-albums | Beyoncé - Lemonade | 💿 | Rihanna - Anti | 💿 | 2010s
-albums | Green Day - Dookie | 💿 | Blink-182 - Enema of the State | 💿 | 90s
-albums | My Chemical Romance - The Black Parade | 💿 | Fall Out Boy - From Under the Cork Tree | 💿 | 2000s
-albums | Metallica - Master of Puppets | 💿 | Iron Maiden - The Number of the Beast | 💿 | 80s
-albums | Black Sabbath - Paranoid | 💿 | Led Zeppelin - Led Zeppelin II | 💿 | timeless
-albums | Adele - 21 | 💿 | Amy Winehouse - Back to Black | 💿 | 2010s
-albums | Norah Jones - Come Away with Me | 💿 | Alicia Keys - Songs in A Minor | 💿 | 2000s
-albums | The Clash - London Calling | 💿 | Ramones - Ramones | 💿 | timeless
-albums | Tom Petty - Wildflowers | 💿 | Bruce Springsteen - Born to Run | 💿 | 90s
-albums | Joni Mitchell - Blue | 💿 | Carole King - Tapestry | 💿 | timeless
-albums | Eagles - Hotel California | 💿 | Fleetwood Mac - Rumours | 💿 | timeless
-albums | Billie Eilish - Happier Than Ever | 💿 | Olivia Rodrigo - GUTS | 💿 | now
-albums | Sabrina Carpenter - Short n' Sweet | 💿 | Gracie Abrams - The Secret of Us | 💿 | now
-albums | Reneé Rapp - Snow Angel | 💿 | Chappell Roan - The Rise and Fall of a Midwest Princess | 💿 | now
-albums | Noah Kahan - Stick Season | 💿 | Zach Bryan - Zach Bryan | 💿 | now
+albums | The Strokes - Is This It | 💿 | Arctic Monkeys - AM | 📀 | 2010s
+albums | Taylor Swift - 1989 | 💿 | Lorde - Melodrama | 🎶 | 2010s
+albums | Nirvana - Nevermind | 💿 | Pearl Jam - Ten | 🎧 | 90s
+albums | Pink Floyd - The Dark Side of the Moon | 💿 | Led Zeppelin - IV | 🎶 | timeless
+albums | The Beatles - Abbey Road | 💿 | The Beach Boys - Pet Sounds | 🎵 | timeless
+albums | Amy Winehouse - Back to Black | 💿 | Frank Ocean - channel ORANGE | 🎶 | 2010s
+albums | SZA - SOS | 💿 | Billie Eilish - When We All Fall Asleep, Where Do We Go? | 📻 | now
+albums | Olivia Rodrigo - SOUR | 💿 | Lorde - Pure Heroine | 🎧 | now
+albums | Eminem - The Marshall Mathers LP | 💿 | 50 Cent - Get Rich or Die Tryin' | 📀 | 2000s
+albums | Dr. Dre - 2001 | 💿 | Snoop Dogg - Doggystyle | 🎧 | 90s
+albums | Nas - Illmatic | 💿 | The Notorious B.I.G. - Ready to Die | 📻 | 90s
+albums | Charli XCX - Brat | 💿 | Dua Lipa - Future Nostalgia | 📻 | now
+albums | Beyoncé - Lemonade | 💿 | Rihanna - Anti | 📻 | 2010s
+albums | Green Day - Dookie | 💿 | Blink-182 - Enema of the State | 📻 | 90s
+albums | My Chemical Romance - The Black Parade | 💿 | Fall Out Boy - From Under the Cork Tree | 🎶 | 2000s
+albums | Metallica - Master of Puppets | 💿 | Iron Maiden - The Number of the Beast | 🎵 | 80s
+albums | Black Sabbath - Paranoid | 💿 | Led Zeppelin - Led Zeppelin II | 📀 | timeless
+albums | Adele - 21 | 💿 | Amy Winehouse - Back to Black | 📻 | 2010s
+albums | Norah Jones - Come Away with Me | 💿 | Alicia Keys - Songs in A Minor | 🎧 | 2000s
+albums | The Clash - London Calling | 💿 | Ramones - Ramones | 🎵 | timeless
+albums | Tom Petty - Wildflowers | 💿 | Bruce Springsteen - Born to Run | 🎧 | 90s
+albums | Joni Mitchell - Blue | 💿 | Carole King - Tapestry | 📻 | timeless
+albums | Eagles - Hotel California | 💿 | Fleetwood Mac - Rumours | 📻 | timeless
+albums | Billie Eilish - Happier Than Ever | 💿 | Olivia Rodrigo - GUTS | 🎧 | now
+albums | Sabrina Carpenter - Short n' Sweet | 💿 | Gracie Abrams - The Secret of Us | 📀 | now
+albums | Reneé Rapp - Snow Angel | 💿 | Chappell Roan - The Rise and Fall of a Midwest Princess | 📀 | now
+albums | Noah Kahan - Stick Season | 💿 | Zach Bryan - Zach Bryan | 📀 | now
 actors | Meryl Streep | 🎬 | Cate Blanchett | 🎤 | 2000s
 actors | Tom Hanks | ⭐ | Julia Roberts | 🎭 | 90s
 actors | Denzel Washington | 🎬 | Viola Davis | 🎤 | 2010s

@@ -8689,8 +8689,22 @@
       const c = { id:'n-' + i, mode:'match', pick:true, category:r[0], a:r[1], glyphA:r[2], b:r[3], glyphB:r[4], era:r[5] };
       const k = cardKey(c); if (keys.has(k)) return; keys.add(k); all.push(c);
     });
+    // Run 4B: left and right never show the same emoji - where both sides came out the same (🏀 vs 🏀), the right side
+    // takes another from its category's list, picked by the card (the same choice on every device and every day).
+    all.forEach(c=>{
+      const n = s=> String(s || '').replace(/️/g, '');
+      if (!c.glyphA || n(c.glyphA) !== n(c.glyphB)) return;
+      const alts = (VS_ALT_GLYPHS[c.category] || VS_ALT_GLYPHS._).filter(g=> n(g) !== n(c.glyphA));
+      c.glyphB = alts[hashStr(cardKey(c)) % alts.length];
+    });
     return { daily: all, infinity: all };
   }
+  const VS_ALT_GLYPHS = {
+    sports:['🏆','🥇','📣','🏟️','🎽','⏱️','🔥','💪'], music:['🎤','🎸','🎧','🎹','🥁','🎷','🎺','📻','⭐'], tv:['📺','📡','🛋️','🍿','🎬','📼'],
+    movies:['🎬','🍿','🎞️','🎥','⭐','🎟️'], albums:['💿','📀','🎵','🎶','📻','🎧'], food:['🍽️','😋','🔥','🧂','🥄','🍴'], comedy:['😂','🎤','🤣','🎭'],
+    brands:['🏷️','🛍️','⭐','💼'], books:['📚','📖','📕','🔖'], games:['🎮','🕹️','👾','🏆'], actors:['🎬','⭐','🎭','🎤'], celebrity:['📸','⭐','💃','🕶️'],
+    _:['⭐','✨','🔥','💫','🎯','🎉'],
+  };
   const CARD_POOLS = buildCardPools();
   // Which pool the board deals from: Daily only while in Daily mode;
   // Infinity otherwise (including the board shown under the home screen).
