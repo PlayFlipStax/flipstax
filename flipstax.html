@@ -3335,6 +3335,24 @@
   .event-overlay.mdoor .event-tile.portal .pu-label{ font:900 clamp(17px, 5vw, 21px)/1 var(--f-display); letter-spacing:0.5px; text-transform:uppercase; }
   .event-overlay.mdoor .event-tile.portal.other{ opacity:0.55; }
   .event-overlay.mdoor .event-tile.portal.open:not(.other){ box-shadow:0 0 0 4px #fff, 0 0 26px rgba(255,210,63,0.9); }
+  /* Run 4B: four doors standing on the stage - a gold frame, a panelled door with a brass handle and a glowing number;
+     the title is on the marquee (lib/stage.js), the timer a thin line. No pulsing tiles. */
+  .event-overlay.mdoor{ justify-content:flex-end; }
+  .event-overlay.mdoor .event-subtitle{ visibility:hidden; }
+  .event-overlay.mdoor .event-prompt{ font-size:clamp(20px, 5.6vw, 24px); margin-bottom:12px; }
+  .event-overlay.mdoor .event-timerbar{ height:4px; opacity:0.5; max-width:240px; margin:0 auto 14px; }
+  .event-overlay.mdoor .event-grid{ grid-template-columns:repeat(4, 1fr); gap:10px; max-width:400px; margin:0 auto calc(64px + env(safe-area-inset-bottom)); align-items:end; }
+  .event-overlay.mdoor .event-tile.portal{ animation:none !important; min-height:0; height:clamp(150px, 26vh, 210px); border-radius:46px 46px 6px 6px; background:transparent !important;
+    box-shadow:0 0 0 4px #ffd23f, 0 0 0 7px #7a3d00, 0 10px 18px rgba(0,0,0,0.5); }
+  .event-overlay.mdoor .event-tile.portal .pu-door{ border-radius:42px 42px 4px 4px; align-items:flex-start; padding-top:22%;
+    background:linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0) 30%), linear-gradient(180deg, #7b2cbf, #4a1287 60%, #2c0a57);
+    box-shadow:inset 0 0 0 5px rgba(255,214,90,0.28), inset 0 -40px 0 -34px rgba(0,0,0,0.25);
+    font:900 clamp(30px, 9vw, 40px)/1 var(--f-display); color:#fff8d6; text-shadow:0 0 8px #ffd23f, 0 0 18px rgba(255,180,40,0.9); animation:none !important; }
+  .event-overlay.mdoor .event-tile.portal .pu-door::before{ content:''; position:absolute; left:16%; right:16%; top:46%; bottom:12%; border-radius:6px; box-shadow:inset 0 0 0 3px rgba(255,214,90,0.35); }
+  .event-overlay.mdoor .event-tile.portal .pu-door::after{ content:''; position:absolute; right:12%; top:56%; width:9px; height:9px; border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #fff6c8, #ffd23f 55%, #9a5a00); box-shadow:0 1px 2px rgba(0,0,0,0.5); }
+  .event-overlay.mdoor .event-tile.portal .pu-prize{ border-radius:42px 42px 4px 4px; }
+  .event-overlay.mdoor .event-tile.portal .pu-label{ font-size:clamp(14px, 4vw, 17px); line-height:1.05; text-align:center; }
   .event-tile.portal:nth-child(2){ --k:1; } .event-tile.portal:nth-child(3){ --k:2; } .event-tile.portal:nth-child(4){ --k:3; }
   @keyframes doorShimmer{ 0%, 100%{ opacity:1; } 50%{ opacity:0.82; } }
   .event-tile.pu-points10 .pu-prize{ background:linear-gradient(180deg, #fff3a8, #ffc928 50%, #f09d00); color:#3a1d00; text-shadow:none; }
@@ -10938,6 +10956,8 @@
     fitTopChip();
     els.eventSubtitle.textContent = '🚪 MYSTERY DOOR';
     els.eventPrompt.textContent = 'Pick a door — a bonus game waits behind each';
+    // Run 4B: the title goes up on the marquee (the close shot of the stage, behind the doors)
+    if (window.Stage) Stage.cue('close', { over: ov, cls:'mdoor', sign:{ sub:'ROUND ' + ((RUNDOWN.acts[st.act] || {}).round || 3) + ' OF ' + SHOW_ROUND_COUNT, main:'MYSTERY DOOR' } });
     let picked = false;
     const reset = ()=>{ ov.classList.add('hidden'); ov.classList.remove('powerup', 'mdoor'); els.eventTiles.forEach(t=>{ t.classList.remove('portal', 'open', 'other', 'picked-wait'); t.innerHTML = ''; t.onclick = null; }); };
     const open = (i)=>{
