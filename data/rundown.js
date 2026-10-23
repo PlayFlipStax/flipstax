@@ -31,9 +31,9 @@ const REWARD_HOLD = 2200;            // Run 4A: the reward beat after a round-en
 const COMMERCIAL_ENABLED = false;
 window.FLIPSTAX_TIMING = { ACT_CARD_HOLD, MYSTERY_REVEAL_HOLD, STAR_WIPE, ROUND_BUMPER_HOLD, COSMIC_SURPRISE_INTRO, CINEMATIC_MIN, SKIP_AFTER, ZOOM_MS, GAME_INTRO_MS, REWARD_HOLD };
 
-// VS cards per round (Oct 22: 6, was 4) and how long each waits for a pick. The player's tap ends the wait: the card advances as
+// VS cards per round (Oct 23: 8, was 6; Oct 22: 6, was 4) and how long each waits for a pick (5 s, unchanged). The player's tap ends the wait: the card advances as
 // soon as the reveal (VS_REVEAL_HOLD, 1.2 s) has played. 'Relaxed pace' (the sound/settings popover) gives 8 s a card instead of 5.
-const VS_PER_ROUND = 6;
+const VS_PER_ROUND = 8;
 const VS_TIMER_MS = 5000, VS_TIMER_RELAXED_MS = 8000;
 window.FLIPSTAX_VS_TIMER = { normal: VS_TIMER_MS, relaxed: VS_TIMER_RELAXED_MS };
 

@@ -8600,16 +8600,11 @@
       daily: matchCards(DAILY_MATCH_RAW,'d').concat(sceneCards(DAILY_SCENE_RAW,'d'), pairCards(DAILY_PAIRS_RAW,'d')),
       infinity: matchCards(INFINITY_MATCH_RAW,'i').concat(sceneCards(INFINITY_SCENE_RAW,'i'), pairCards(INFINITY_PAIRS_RAW,'i')),
     };
-    const dailyKeys = new Set();
-    pools.daily = pools.daily.filter(c=>{ const k = cardKey(c); if (dailyKeys.has(k)) return false; dailyKeys.add(k); return true; });
-    const infKeys = new Set();
-    pools.infinity = pools.infinity.filter(c=>{
-      const k = cardKey(c);
-      if (dailyKeys.has(k)){ console.error('FlipStax: card in both pools, dropped from Infinity:', c.a, 'vs', c.b); return false; }
-      if (infKeys.has(k)) return false;
-      infKeys.add(k); return true;
-    });
-    return pools;
+    // Oct 23: one VS pool for both modes - the Daily and Infinity lists merged (a card in both, by its two sides, once).
+    // Each mode still keeps its own deck (decks.daily is in the date's order, the same for everyone; Infinity shuffles).
+    const keys = new Set();
+    const all = pools.daily.concat(pools.infinity).filter(c=>{ const k = cardKey(c); if (keys.has(k)) return false; keys.add(k); return true; });
+    return { daily: all, infinity: all };
   }
   const CARD_POOLS = buildCardPools();
   // Which pool the board deals from: Daily only while in Daily mode;

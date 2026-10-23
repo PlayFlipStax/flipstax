@@ -1,0 +1,902 @@
+# FlipStax - every VS card (Oct 23), one pool for Daily and Infinity.
+# Format: category | left | emoji | right | emoji | era
+# Era: classic (peak before ~1995), modern (~1995-2012), now (2013 on), cross-era (the two sides differ), blank = no era
+#   (timeless: foods, habits, ideas). Tagged by hand on people and titles in tools/vs-inventory.py; untagged names count as no era.
+# Cards: 869 (from the Daily list 440, from the Infinity list 429); with no era: 501
+#
+# Per category:
+#   wild: 112
+#   movies: 109
+#   sports: 102
+#   music: 84
+#   food: 77
+#   fitness: 40
+#   books: 39
+#   games: 36
+#   style: 26
+#   brands: 24
+#   life: 23
+#   realitytv: 21
+#   geography: 16
+#   history: 16
+#   drinks: 15
+#   ideas: 15
+#   podcasts: 15
+#   travel: 15
+#   comedy: 14
+#   celebrity: 13
+#   creators: 13
+#   money: 13
+#   tech: 13
+#   nostalgia: 9
+#   pets: 9
+#
+sports | LeBron James | 🏀 | Michael Jordan | 🏀 | cross-era (classic+modern)
+sports | Muhammad Ali | 🥊 | Mike Tyson | 🥊 | classic
+sports | Tiger Woods | ⛳ | Rory McIlroy | ⛳ | cross-era (modern+now)
+sports | Usain Bolt | 🏃 | Michael Phelps | 🏊 | modern
+sports | Steph Curry | 🏀 | Kevin Durant | 🏀 | cross-era (modern+now)
+sports | Novak Djokovic | 🎾 | Roger Federer | 🎾 | modern
+sports | Lionel Messi | ⚽ | Pelé | ⚽ | cross-era (classic+modern)
+sports | Michael Jordan | 🏀 | Kobe Bryant | 🏀 | cross-era (classic+modern)
+sports | Muhammad Ali | 🥊 | Floyd Mayweather | 🥊 | cross-era (classic+modern)
+sports | LeBron James | 🏀 | Kobe Bryant | 🏀 | modern
+sports | Usain Bolt | 🏃 | Carl Lewis | 🏃 | cross-era (classic+modern)
+sports | Shaquille O’Neal | 🏀 | Hakeem Olajuwon | 🏀 | classic
+sports | Peyton Manning | 🏈 | Aaron Rodgers | 🏈 | modern
+music | Kendrick Lamar | 🎤 | Drake | 🎤 | modern
+music | Taylor Swift | 🎤 | Beyoncé | 🎤 | modern
+music | Queen | 🎸 | Led Zeppelin | 🎸 | classic
+music | Metallica | 🎸 | Iron Maiden | 🎸 | classic
+music | Bruno Mars | 🎤 | The Weeknd | 🎤 | cross-era (modern+now)
+music | Kanye West | 🎤 | Jay-Z | 🎤 | modern
+music | Elvis Presley | 🎸 | Michael Jackson | 🎤 | classic
+music | Ariana Grande | 🎤 | Billie Eilish | 🎤 | now
+music | Post Malone | 🎤 | Travis Scott | 🎤 | now
+music | Eminem | 🎤 | Kanye West | 🎤 | modern
+movies | The Matrix | 💊 | Star Wars | 🌌 | classic
+movies | Harry Potter | ⚡ | Lord of the Rings | 💍 | modern
+movies | The Godfather | 🌹 | Goodfellas | 💼 | classic
+movies | James Bond | 🍸 | Jason Bourne | 🕵️ | modern
+movies | Jurassic Park | 🦖 | Jaws | 🦈 | classic
+movies | Toy Story | 🤠 | Shrek | 👹 | cross-era (classic+modern)
+movies | The Dark Knight | 🦇 | The Godfather | 🌹 | cross-era (classic+modern)
+movies | Game of Thrones | 🐉 | Lord of the Rings | 💍 | modern
+movies | Spider-Man | 🕷️ | Batman | 🦇 | classic
+movies | The Office | 📎 | Parks and Recreation | 🌳 | modern
+movies | Jurassic Park | 🦖 | King Kong | 🦍 | classic
+movies | The Simpsons | 🍩 | Family Guy | 📺 | classic
+movies | Top Gun | ✈️ | Iron Man | 🦾 | cross-era (classic+modern)
+brands | Xbox | 🎮 | PlayStation | 🎮 | modern
+brands | New Balance | 👟 | Nike | 👟 | 
+brands | Amazon | 📦 | Walmart | 🛒 | modern
+brands | Netflix | 🍿 | HBO Max | 📺 | now
+brands | Instagram | 📸 | TikTok | 🎵 | now
+brands | Google | 🔍 | Microsoft | 💻 | modern
+brands | Samsung | 📱 | Apple | 🍎 | modern
+brands | DoorDash | 🛵 | Uber Eats | 🛵 | now
+brands | FedEx | 📦 | UPS | 📦 | 
+brands | PayPal | 💳 | Venmo | 💸 | now
+brands | Costco | 🛒 | Sam’s Club | 🛒 | 
+brands | Chevrolet | 🚙 | Ford | 🚗 | 
+food | Chick-fil-A | 🐔 | Popeyes | 🍗 | 
+food | Shake Shack | 🍔 | In-N-Out | 🍔 | 
+food | Domino’s | 🍕 | Papa John’s | 🍕 | 
+food | Panera | 🥖 | Subway | 🥪 | 
+food | McDonald’s | 🍟 | Burger King | 👑 | 
+food | Pizza Hut | 🍕 | Papa John’s | 🍕 | 
+food | In-N-Out | 🍔 | Whataburger | 🍔 | 
+food | Five Guys | 🍔 | Shake Shack | 🍔 | 
+food | Wingstop | 🍗 | Buffalo Wild Wings | 🍗 | 
+food | Sonic | 🥤 | Whataburger | 🍔 | 
+games | Grand Theft Auto | 🚗 | Red Dead Redemption | 🤠 | modern
+games | Minecraft | ⛏️ | Fortnite | 🪂 | now
+games | Call of Duty | 🎖️ | Battlefield | 💥 | modern
+games | PlayStation 5 | 🎮 | Xbox Series X | 🎮 | now
+games | The Last of Us | 🧟 | Resident Evil | ☣️ | modern
+games | Overwatch | 🛡️ | Valorant | 🎯 | cross-era (modern+now)
+games | FIFA | ⚽ | NBA 2K | 🏀 | modern
+games | Among Us | 🚀 | Fall Guys | 🤸 | now
+music | Vinyl, crackle and all | 💿 | Everything on shuffle, streaming | 📱 | 
+music | Live acoustic sets | 🎻 | Full electric production | 🎛️ | 
+music | Learning an instrument as a kid | 🎹 | Learning to sing as a kid | 🎤 | 
+money | The S&P 500, boring and steady | 📈 | Real estate, hands-on and leveraged | 🏘️ | 
+money | Frugal, save aggressively | 🐖 | YOLO, enjoy it now | 💳 | 
+money | Paying off debt aggressively | 📉 | Investing every spare dollar | 📈 | 
+money | Budgeting every dollar | 📊 | Winging it and hoping it works out | 🤞 | 
+money | A steady paycheck | 💵 | Commission-based, uncapped upside | 📈 | 
+money | Renting, with total flexibility | 🔑 | Owning, with a 30-year mortgage | 🏡 | 
+money | Saving aggressively for retirement, starting now | 🐴 | Spending on experiences now, worrying later | 🎉 | 
+style | Tattoos and piercings | 🖋️ | No ink, ever | 🤍 | 
+style | Flats, comfort wins | 🥿 | Heels, always | 👠 | 
+style | Sneakers with everything | 👟 | Dress shoes, always | 👞 | 
+style | A messy, lived-in home | 🏚️ | A spotless, minimalist home | ✨ | 
+style | Thrifted and vintage | 🧵 | Brand new, straight off the shelf | 🏷️ | 
+style | One signature outfit, worn every single day | 👔 | A brand-new outfit every day, never repeated | 👗 | 
+style | Sneakers with absolutely everything | 👟 | Dress shoes with absolutely everything | 👞 | 
+style | A signature scent people always notice | 🧴 | Completely unscented, always | 💨 | 
+wild | Be famous but broke | 🎤 | Be rich but anonymous forever | 🕶️ | 
+wild | Always know when someone is lying to you | 🕵️ | Get away with one lie a day, no matter what | 🤫 | 
+wild | Wake up every day at 5am for the rest of your life | ⏰ | Never be able to sleep past 6am ever again either way | 😴 | 
+wild | You can fly, but only 3 feet off the ground | 🦆 | You're invisible, but only when nobody is looking at you | 👻 | 
+wild | Fight one horse-sized duck | 🦆 | Fight a hundred duck-sized horses | 🐴 | 
+wild | Be the smartest person alive, but have no friends | 🎓 | Be average, but never be alone | 🤝 | 
+wild | Making your bed every single day | 🛏️ | Never making your bed | 🌪️ | 
+wild | Eat a whole raw onion like an apple | 🧅 | Drink a full cup of pickle juice in one go | 🥒 | 
+wild | Sleep in a bathtub full of jello | 🍮 | Sleep in a pile of packing peanuts | 📦 | 
+wild | Never use social media again | 📵 | Post your entire life online, no privacy | 📸 | 
+wild | Trade your sense of smell for perfect memory | 👃 | Trade your sense of taste for perfect eyesight | 👁️ | 
+wild | Never feel physical pain again | 🩹 | Never feel embarrassed again | 😳 | 
+wild | Only communicate in movie quotes for a week | 🎬 | Only communicate in song lyrics for a week | 🎵 | 
+wild | Live without hot water for a month | 🥶 | Live without WiFi for a month | 📴 | 
+wild | Never see color again, only black and white | ⚫ | See every color 10x more vivid | 🌈 | 
+wild | Win an argument you know you’re wrong about | 🏆 | Lose an argument you know you’re right about | 😤 | 
+wild | Everyone forgets your name constantly | ❓ | Everyone remembers everything you’ve ever said | 🧾 | 
+wild | Pause time whenever you want, but you still age while paused | ⏸️ | Rewind the last 10 seconds, but only once a day | ⏪ | 
+wild | Every meal tastes amazing, but it’s all bad for you | 🍔 | Every meal is healthy, but it all tastes bland | 🥗 | 
+wild | Teleport anywhere, but only places you’ve already been | 🌀 | Fly anywhere, but only slower than walking speed | 🐢 | 
+wild | Unlimited vacation days, but half your salary | 🏖️ | Double your salary, but zero vacation days ever again | 💼 | 
+wild | Sing everything you say, out loud, for a week | 🎤 | Rhyme everything you say, out loud, for a month | 📝 | 
+wild | Live inside your favorite show, as a background character | 📺 | Live inside your favorite game, as the final boss | 👾 | 
+wild | Be the funniest person in every room, but never taken seriously | 🤡 | Be the most respected person in every room, but never laugh again | 🎩 | 
+wild | Relive your favorite day, exactly as it happened, one time only | 🎞️ | See exactly one hour into the future, one time only | 🔮 | 
+food | Sweet, always | 🍩 | Salty, always | 🥨 | 
+food | Breakfast for dinner | 🥞 | Dinner for breakfast | 🍝 | 
+food | Cooking every meal at home | 🍳 | Ordering in most nights | 🥡 | 
+food | Homemade bread | 🍞 | Store-bought, no shame | 🛒 | 
+food | A home-cooked holiday meal | 🍗 | A restaurant holiday meal, zero cleanup | 🍽️ | 
+food | Cooking every meal at home | 👨‍🍳 | Eating out for every meal | 🍽️ | 
+food | Coffee, every single morning | ☕ | Tea, every single morning | 🍵 | 
+fitness | Burpees | 🤸 | Deadlifts | 🏋️ | 
+fitness | Yoga | 🧘 | HIIT | 🔥 | 
+fitness | Working out at 5am | 🌅 | Working out at 9pm | 🌙 | 
+fitness | A gym membership you actually use | 💪 | Home workouts, no gym needed | 🏠 | 
+fitness | Group fitness classes | 🧑‍🤝‍🧑 | Working out completely alone | 🎧 | 
+fitness | Morning workouts, every time | 🌅 | Night workouts, every time | 🌙 | 
+fitness | Cardio, no contest | 🏃 | Strength training, no contest | 🤜 | 
+fitness | Swimming laps | 🏊 | Cycling for miles | 🚴 | 
+geography | Africa | 🌍 | South America | 🌎 | 
+geography | The Sahara Desert | 🏜️ | The Amazon Rainforest | 🌳 | 
+geography | A road trip with no plan | 🚗 | A fully scheduled itinerary | 📋 | 
+geography | Living on a boat | ⛵ | Living in an RV | 🚐 | 
+geography | Iceland | 🧊 | Hawaii | 🌺 | 
+geography | A road trip across the whole country | 🚗 | A direct flight straight to the destination | ✈️ | 
+geography | Hiking the mountains of Europe | 🏔️ | Relaxing on the beaches of Southeast Asia | 🏖️ | 
+geography | Exploring a new country by train | 🚆 | Exploring a new country by boat | ⛵ | 
+history | Ancient Egypt | 🏺 | Ancient Rome | 🏛️ | 
+history | Handwritten letters | ✉️ | Text messages | 📱 | 
+history | The invention of the printing press | 📖 | The invention of the internet | 💻 | 
+history | The fall of the Roman Empire | 🏛️ | The fall of the Berlin Wall | 🧱 | 
+history | The first printing press | 📜 | The first computer | 🖥️ | 
+history | Living through the Roaring Twenties | 🍾 | Living through the Swinging Sixties | ✌️ | 
+history | The age of pirates on the high seas | 🏴‍☠️ | The age of knights and castles | ⚔️ | 
+history | Renaissance art and big ideas | 🎨 | Industrial revolution machines | ⚙️ | 
+food | Pizza | 🍕 | Burgers | 🍔 | 
+food | Pancakes | 🥞 | Waffles | 🧇 | 
+food | Cake | 🎂 | Pie | 🥧 | 
+food | Ice Cream | 🍨 | Frozen Yogurt | 🍦 | 
+food | Sushi | 🍣 | Pasta | 🍝 | 
+food | Peanut Butter | 🥜 | Nutella | 🍫 | 
+food | Garlic Bread | 🧄 | Breadsticks | 🥖 | 
+food | Soup | 🍲 | Salad | 🥗 | 
+food | Hot Dogs | 🌭 | Burgers | 🍔 | 
+food | Mac and Cheese | 🧀 | Grilled Cheese | 🥪 | 
+food | Chocolate Cake | 🍫 | Cheesecake | 🍰 | 
+food | Guacamole | 🥑 | Salsa | 🍅 | 
+food | Pancake Syrup | 🍁 | Honey | 🍯 | 
+drinks | Soda | 🥤 | Juice | 🧃 | 
+drinks | Milkshakes | 🥤 | Smoothies | 🍓 | 
+drinks | Sparkling Water | 💦 | Still Water | 💧 | 
+drinks | Orange Juice | 🍊 | Apple Juice | 🍎 | 
+drinks | Chocolate Milk | 🍫 | Regular Milk | 🥛 | 
+drinks | Sweet Tea | 🍯 | Unsweet Tea | 🍋 | 
+drinks | Coconut Water | 🥥 | Sports Drinks | ⚡ | 
+movies | Comedies | 😂 | Horror Movies | 👻 | 
+movies | Reality TV | 📺 | Scripted Shows | 📝 | 
+movies | Sequels | 🔁 | Original Movies | 🎬 | 
+movies | Documentaries | 🎥 | Reality TV | 📺 | 
+movies | Binge-Watching | 🛋️ | One Episode a Week | 📅 | 
+movies | Jump Scares | 😱 | Slow-Burn Horror | 🕯️ | 
+movies | Friends | ☕ | Seinfeld | 🥨 | classic
+movies | Spider-Man | 🕷️ | Iron Man | 🦾 | cross-era (classic+modern)
+movies | Rom-Coms | 💕 | Action Movies | 💥 | 
+movies | Leonardo DiCaprio | 🎭 | Brad Pitt | 🎭 | modern
+movies | Tom Hanks | 🎭 | Denzel Washington | 🎭 | classic
+movies | Dwayne Johnson | 🎭 | Chris Hemsworth | 🎭 | modern
+movies | Zendaya | 🎭 | Margot Robbie | 🎭 | cross-era (modern+now)
+movies | Scarlett Johansson | 🎭 | Gal Gadot | 🎭 | modern
+movies | Angelina Jolie | 🎭 | Jennifer Aniston | 🎭 | modern
+movies | Timothée Chalamet | 🎭 | Tom Holland | 🎭 | now
+movies | Jim Carrey | 🎭 | Adam Sandler | 🎭 | modern
+movies | Zendaya | 🎭 | Sydney Sweeney | 🎭 | now
+movies | Glen Powell | 🎭 | Austin Butler | 🎭 | now
+movies | Spider-Man | 🕷️ | Wolverine | 🦡 | classic
+movies | Deadpool | ⚔️ | Wolverine | 🦡 | cross-era (classic+modern)
+movies | Thor | 🔨 | Hulk | 💚 | modern
+movies | Joker | 🃏 | Thanos | 🧤 | modern
+movies | Venom | 🖤 | Carnage | ❤️ | modern
+movies | Green Lantern | 💍 | Iron Man | 🦾 | modern
+movies | Black Panther | 🐆 | Iron Man | 🦾 | modern
+movies | Marvel Villains | 🦹 | DC Villains | 🦹 | 
+movies | Wolverine | 🦡 | The Hulk | 💚 | cross-era (classic+modern)
+movies | Anchorman | 📰 | Step Brothers | 👬 | modern
+movies | Home Alone | 🏠 | Elf | 🎄 | cross-era (classic+modern)
+movies | Zoolander | 🕶️ | Napoleon Dynamite | 🦙 | classic
+movies | Happy Gilmore | 🏌️ | Billy Madison | 🏫 | classic
+movies | Airplane | ✈️ | The Naked Gun | 🕵️ | classic
+movies | Ferris Bueller's Day Off | 🚗 | Ace Ventura | 🐾 | classic
+music | Pop | 🎤 | Country | 🤠 | 
+music | Concerts | 🎟️ | Music Festivals | 🎪 | 
+music | Old Music | 📻 | New Music | 🎧 | classic
+music | Studio Albums | 💿 | Live Albums | 🎙️ | 
+music | Karaoke | 🎤 | Air Guitar | 🎸 | now
+music | Country Music | 🤠 | Rock Music | 🎸 | 
+music | Guitar | 🎸 | Piano | 🎹 | 
+music | Music Videos | 📹 | Lyric Videos | 📝 | 
+music | Rolling Stones | 🎸 | Led Zeppelin | 🎸 | classic
+music | Fleetwood Mac | 🎸 | The Eagles | 🎸 | classic
+music | Queen | 🎸 | Pink Floyd | 🎸 | classic
+music | Bob Dylan | 🎸 | Neil Young | 🎸 | classic
+music | David Bowie | 🎸 | Freddie Mercury | 🎸 | classic
+music | Billie Eilish | 🎤 | Olivia Rodrigo | 🎤 | now
+music | The Weeknd | 🎤 | Bad Bunny | 🎤 | now
+music | Travis Scott | 🎤 | Playboi Carti | 🎤 | now
+music | Ice Spice | 🎤 | Latto | 🎤 | now
+music | SZA | 🎤 | Summer Walker | 🎤 | now
+music | Chappell Roan | 🎤 | Sabrina Carpenter | 🎤 | now
+sports | Football | 🏈 | Basketball | 🏀 | 
+sports | Soccer | ⚽ | American Football | 🏈 | 
+sports | Boxing | 🥊 | Mixed Martial Arts | 🥋 | 
+sports | Playing Sports | 🏃 | Watching Sports | 📺 | 
+sports | Home Games | 🏟️ | Away Games | 🚌 | 
+sports | Swimming | 🏊 | Running | 🏃 | 
+sports | Bowling | 🎳 | Mini Golf | ⛳ | 
+sports | Cheering from the Stands | 📣 | Watching on TV | 📺 | 
+sports | Overtime | ⏱️ | A Clean Finish | 🏁 | 
+sports | LeBron James | 🏀 | Stephen Curry | 🏀 | cross-era (modern+now)
+sports | Caitlin Clark | 🏀 | Angel Reese | 🏀 | now
+sports | Giannis Antetokounmpo | 🏀 | Joel Embiid | 🏀 | now
+games | Console | 🎮 | PC Gaming | 🖥️ | 
+games | Mobile Games | 📱 | Console Games | 🎮 | 
+games | Strategy Games | ♟️ | Adventure Games | 🗺️ | 
+games | Call of Duty | 🎖️ | Halo | 🛸 | modern
+games | Speedrunning | ⏱️ | 100 Percent Completion | 💯 | 
+games | Open World Games | 🗺️ | Linear Story Games | 📖 | 
+games | Arcade Games | 🕹️ | Home Consoles | 🎮 | 
+games | Pikachu | ⚡ | Charizard | 🔥 | modern
+games | Pikachu | ⚡ | Eevee | 🦊 | modern
+games | Ash Ketchum | 🧢 | Red | 🧢 | modern
+games | Mewtwo | 🧬 | Mew | 💗 | modern
+tech | Laptop | 💻 | Tablet | 📱 | 
+tech | Wired Earbuds | 🔌 | Wireless Earbuds | 📶 | 
+tech | Texting | 💬 | Calling | 📞 | 
+tech | New Technology | 🚀 | Older Reliable Technology | 📟 | 
+tech | Social Media | 📱 | Texting | 💬 | 
+tech | Podcasts | 🎙️ | Audiobooks | 🎧 | 
+travel | Beach Vacations | 🏖️ | Mountain Vacations | 🏔️ | 
+travel | Road Trips | 🚗 | Flying | ✈️ | 
+travel | Camping | 🏕️ | Staying in Hotels | 🏨 | 
+travel | Traveling Alone | 🧳 | Traveling with Friends | 👯 | 
+travel | Museums | 🏛️ | Zoos | 🦁 | 
+travel | Window Seat | 🪟 | Aisle Seat | 💺 | 
+travel | National Parks | 🌲 | Big Cities | 🏙️ | 
+travel | Passport Stamps | 🛂 | Souvenirs | 🎁 | 
+life | Working from Home | 🏠 | Working in an Office | 🏢 | 
+life | Naps | 😴 | Sleeping In | 🛌 | 
+life | Showers | 🚿 | Baths | 🛁 | 
+life | Saving Money | 🐷 | Spending Money | 💸 | 
+life | Early Mornings | 🌅 | Late Nights | 🌙 | 
+life | Cleaning | 🧽 | Organizing | 🗂️ | 
+life | Parties | 🎉 | Small Gatherings | 🕯️ | 
+life | Routine | 🔁 | Spontaneity | 🎲 | 
+life | Christmas | 🎄 | Halloween | 🎃 | 
+life | Birthdays | 🎂 | Anniversaries | 💍 | 
+life | Snow Days | ❄️ | Beach Days | 🏖️ | 
+style | Casual Style | 👕 | Formal Style | 👔 | 
+style | Jeans | 👖 | Sweatpants | 🩳 | 
+style | Tattoos | 🖋️ | Piercings | 💎 | 
+style | Sneakers | 👟 | Sandals | 👡 | 
+style | Name Brands | 🏷️ | Thrifted Finds | ♻️ | 
+pets | Big Dogs | 🐕 | Small Dogs | 🐩 | 
+pets | Adopting a Pet | 🏠 | Buying a Pet | 🛒 | 
+pets | Reptiles | 🦎 | Amphibians | 🐸 | 
+pets | Horses | 🐎 | Elephants | 🐘 | 
+nostalgia | Old Cartoons | 📺 | New Cartoons | 📱 | classic
+nostalgia | Flip Phones | 📟 | Smartphones | 📱 | classic
+nostalgia | Arcades | 🕹️ | Home Gaming | 🎮 | classic
+nostalgia | Disposable Cameras | 📷 | Phone Cameras | 🤳 | classic
+ideas | Heroes | 🦸 | Villains | 🦹 | 
+ideas | Money | 💰 | Free Time | ⏳ | 
+ideas | Intelligence | 🧠 | Creativity | 🎨 | 
+ideas | Freedom | 🕊️ | Security | 🔒 | 
+ideas | Being Right | ✅ | Being Liked | 👍 | 
+ideas | Following Your Heart | ❤️ | Following Your Head | 🧠 | 
+ideas | Honesty | 😇 | Loyalty | 🤝 | 
+ideas | The Past | 📜 | The Future | 🚀 | 
+books | Of Mice and Men | 🐭 | The Catcher in the Rye | 🌾 | classic
+books | The Hunger Games | 🏹 | Divergent | 🧩 | modern
+books | Physical Books | 📖 | E-Books | 📱 | 
+books | Stephen King | 📚 | Dean Koontz | 📚 | classic
+books | 1984 | 👁️ | Brave New World | 🧪 | classic
+books | Agatha Christie | 🕵️ | Arthur Conan Doyle | 🔍 | classic
+books | Series | 📚 | Standalone Books | 📕 | 
+books | Judging a Book by Its Cover | 👀 | Reading the Summary First | 📝 | 
+books | Highlighting While Reading | 🖍️ | Keeping Books Pristine | ✨ | 
+books | Slow Burn Stories | 🕯️ | Fast-Paced Thrillers | ⚡ | 
+wild | Dinosaurs | 🦕 | Dragons | 🐉 | 
+wild | Reading Minds | 🧠 | Turning Invisible | 👻 | 
+wild | Being 10 Feet Tall | 🦒 | Being the Size of a Mouse | 🐭 | 
+wild | Talking to Animals | 🐾 | Speaking Every Language | 🗣️ | 
+wild | A Time Machine | ⏳ | A Cloning Machine | 👯 | 
+wild | Freezing Time | 🧊 | Rewinding Time | ⏪ | 
+wild | Winning the Lottery | 🎰 | Getting Your Dream Job | 💼 | 
+wild | A House That Cleans Itself | 🧹 | A Car That Drives Itself | 🚘 | 
+wild | Being Famous for a Week | 🌟 | Being Rich for a Week | 💰 | 
+wild | Living Without Music | 🙉 | Living Without Movies | 🙈 | 
+wild | A Never-Ending Vacation | 🏝️ | A Never-Ending Payday | 💸 | 
+wild | Fighting One Horse-Sized Duck | 🦆 | Fighting 100 Duck-Sized Horses | 🐴 | 
+wild | Explaining Memes to Your Grandparents | 👵 | Explaining TikTok to Your Boss | 👔 | 
+wild | Being Able to Pause Real Life | ⏸️ | Being Able to Fast-Forward Meetings | ⏩ | 
+wild | Getting Stuck in an Elevator | 🛗 | Getting Stuck in Traffic | 🚗 | 
+wild | Autocorrect Fails | 🤦 | Butt Dials | 📞 | 
+wild | Forgetting Someone's Name | 🏷️ | Forgetting Someone's Birthday | 🎂 | 
+wild | A Bad Haircut | 💇 | A Bad Sunburn | 🥵 | 
+wild | A Song Stuck in Your Head | 🎶 | An Itch You Can't Reach | 😖 | 
+wild | A Typo in a Text | ⌨️ | Sending It to the Wrong Person | 📤 | 
+wild | A Slow Walker in Front of You | 🐢 | A Loud Chewer Next to You | 😬 | 
+wild | A Shirt Soaked in Maple Syrup All Day | 🍁 | A Shirt Soaked in Ranch Dressing All Day | 🥗 | 
+wild | Spaghetti for Hair | 🍝 | Twizzlers for Fingers | 🍬 | 
+wild | Sneezing Confetti | 🎊 | Sneezing Glitter | ✨ | 
+wild | A Nose That Honks Like a Horn | 📯 | Ears That Ring Like a Bell | 🔔 | 
+wild | A Permanent Wet Sock Feeling | 🧦 | A Permanent Sand-in-Your-Shoes Feeling | 🏖️ | 
+wild | A Tail That Wags When You're Happy | 🐕 | Ears That Perk Up When You're Curious | 🐰 | 
+wild | A Static Shock Every Doorknob | ⚡ | A Wet Willy Every Handshake | 👂 | 
+wild | A Permanent Hiccup | 😮 | A Permanent Itchy Nose | 👃 | 
+wild | A Voice That Echoes Everywhere | 🔊 | A Shadow That's Always Late | 👤 | 
+wild | A Permanent Wedgie | 🩲 | A Permanent Bad Hair Day | 🤯 | 
+fitness | Chest Day | 🏋️ | Leg Day | 🦵 | 
+fitness | Push Day | 💪 | Pull Day | 🧗 | 
+fitness | Free Weights | 🏋️ | Machines | ⚙️ | 
+fitness | CrossFit | 🔥 | Powerlifting | 🏋️ | 
+fitness | Gym Workouts | 🏋️ | Home Workouts | 🏠 | 
+fitness | Morning Gym Session | 🌅 | Night Gym Session | 🌙 | 
+sports | Conor McGregor | 🥊 | Khabib Nurmagomedov | 🥊 | modern
+sports | Israel Adesanya | 🥊 | Alex Pereira | 🥊 | now
+sports | Conor McGregor | 🥊 | Nate Diaz | 🥊 | modern
+sports | Islam Makhachev | 🥊 | Charles Oliveira | 🥊 | now
+sports | Amanda Nunes | 🥊 | Valentina Shevchenko | 🥊 | cross-era (modern+now)
+sports | Submission Win | 🔒 | Knockout Win | 💥 | 
+sports | Strikers | 👊 | Grapplers | 🤼 | 
+music | Katy Perry | 🎤 | Rihanna | 🎤 | modern
+music | Dua Lipa | 🎤 | Doja Cat | 🎤 | now
+music | Foo Fighters | 🎸 | Red Hot Chili Peppers | 🎸 | modern
+music | Guns N' Roses | 🎸 | Metallica | 🎸 | classic
+music | Jay-Z | 🎤 | Nas | 🎤 | modern
+music | Kanye West | 🎤 | Travis Scott | 🎤 | cross-era (modern+now)
+music | Morgan Wallen | 🤠 | Luke Combs | 🤠 | now
+music | Johnny Cash | 🎸 | Willie Nelson | 🤠 | classic
+music | Chris Stapleton | 🤠 | Zach Bryan | 🤠 | cross-era (modern+now)
+music | An Old Favorite on Repeat | 🔁 | Finding Something New | 🔎 | 
+realitytv | The Bachelor | 🌹 | Love Island | 🏝️ | cross-era (modern+now)
+realitytv | Big Brother | 👁️ | Survivor | 🔥 | modern
+realitytv | The Kardashians | 💄 | Vanderpump Rules | 🍷 | now
+realitytv | Jersey Shore | 🏖️ | Teen Mom | 🍼 | modern
+realitytv | The Amazing Race | 🗺️ | Survivor | 🔥 | modern
+realitytv | Shark Tank | 🦈 | Dragons' Den | 🐉 | now
+realitytv | The Masked Singer | 🎭 | American Idol | 🎤 | cross-era (modern+now)
+realitytv | Dancing with the Stars | 💃 | So You Think You Can Dance | 🕺 | modern
+realitytv | Queer Eye | 💇 | Fixer Upper | 🔨 | now
+realitytv | Hell's Kitchen | 🔪 | Top Chef | 👨‍🍳 | modern
+realitytv | Vanderpump Rules | 🍷 | Selling Sunset | 🏡 | now
+books | Colleen Hoover | ✍️ | Emily Henry | ✍️ | now
+books | When Harry Met Sally | ☕ | Pretty Woman | 👠 | classic
+books | 10 Things I Hate About You | 📝 | 13 Going on 30 | 🎂 | classic
+celebrity | Kim Kardashian | 💋 | Paris Hilton | 👜 | modern
+celebrity | Red Carpet Fashion | 👗 | Street Style | 🧢 | 
+books | Stephen King | 📚 | J.K. Rowling | ⚡ | cross-era (classic+modern)
+books | Game of Thrones | 🐉 | The Wheel of Time | 🛞 | modern
+books | Gone Girl | 💔 | The Girl on the Train | 🚆 | modern
+books | To Kill a Mockingbird | 🐦 | The Catcher in the Rye | 🌾 | classic
+books | Brandon Sanderson | ⚔️ | George R.R. Martin | 🐺 | modern
+books | Pride and Prejudice | 🎩 | Jane Eyre | 🕯️ | classic
+books | Reading Before Bed | 🌙 | Reading at the Beach | 🏖️ | 
+movies | Brad Pitt | 🎭 | Tom Cruise | 🎭 | modern
+movies | Fight Club | 🧼 | Se7en | 📦 | classic
+movies | Steven Spielberg | 🦖 | George Lucas | 🌌 | classic
+movies | The Dark Knight | 🦇 | Joker | 🃏 | modern
+movies | Will Smith | 🎭 | Dwayne Johnson | 🎭 | modern
+movies | Greta Gerwig | 🎀 | Sofia Coppola | 🗾 | modern
+movies | Barbie | 🎀 | Oppenheimer | 💣 | now
+movies | Avengers: Endgame | 🛡️ | Avengers: Infinity War | 💎 | now
+movies | Parasite | 🪨 | Everything Everywhere All at Once | 🥯 | now
+comedy | Dave Chappelle | 🎤 | Shane Gillis | 🎤 | cross-era (modern+now)
+comedy | George Carlin | 🎤 | Richard Pryor | 🎤 | classic
+comedy | Kevin Hart | 🎤 | Chris Rock | 🎤 | modern
+comedy | Sebastian Maniscalco | 🎤 | Jim Jefferies | 🎤 | modern
+comedy | Hasan Minhaj | 🎤 | Trevor Noah | 🎤 | now
+comedy | Amy Schumer | 🎤 | Ali Wong | 🎤 | cross-era (modern+now)
+comedy | Stand-Up Specials | 🎤 | Comedy Movies | 🍿 | 
+podcasts | The Joe Rogan Experience | 🎙️ | WTF with Marc Maron | 🎸 | now
+podcasts | Call Her Daddy | 💋 | SmartLess | 🤓 | now
+podcasts | Dateline NBC | 🕵️ | MrBallen Podcast | 🔦 | cross-era (modern+now)
+podcasts | Good Hang with Amy Poehler | 🛋️ | SmartLess | 🤓 | now
+podcasts | The Megyn Kelly Show | 🎙️ | The Ben Shapiro Show | 🎙️ | now
+podcasts | Video Podcasts | 📹 | Audio-Only Podcasts | 🎧 | 
+podcasts | Listening at 1x Speed | 🐢 | Listening at 1.5x or 2x | ⏩ | 
+podcasts | New Episode Day | 📅 | Binging the Back Catalog | 📚 | 
+creators | MrBeast | 💰 | Kai Cenat | 📺 | now
+creators | Logan Paul | 🥤 | Jake Paul | 🥊 | now
+creators | Khaby Lame | 🤷 | Charli D’Amelio | 💃 | now
+creators | Livestreams | 🔴 | Edited Videos | ✂️ | 
+creators | Gaming Streamers | 🎮 | Just Chatting Streamers | 💬 | 
+creators | Collab Videos | 🤝 | Solo Videos | 🙋 | 
+creators | Creator Drama | 🍿 | Creator Philanthropy | 💝 | 
+food | Lasagna | 🍝 | Chicken Parm | 🍗 | 
+food | Reuben | 🥪 | Turkey Club | 🦃 | 
+food | Deep Dish Pizza | 🥧 | Thin Crust Pizza | 🍕 | 
+food | Caesar Salad | 🥗 | Greek Salad | 🫒 | 
+food | Sushi | 🍣 | Poke Bowls | 🐟 | 
+food | Apple Pie | 🍎 | Pumpkin Pie | 🎃 | 
+food | Spaghetti and Meatballs | 🍝 | Fettuccine Alfredo | 🧈 | 
+food | Egg Rolls | 🌯 | Dumplings | 🥟 | 
+fitness | Overhead Press | 🙌 | Romanian Deadlifts | 🏋️ | 
+fitness | Swimming Laps | 🏊 | Cycling | 🚴 | 
+fitness | Running Outside | 🌳 | The Treadmill | 🏃 | 
+fitness | Deadlifts | 🏋️ | Squats | 🦵 | 
+fitness | Pull-Ups | 💪 | Lat Pulldowns | ⬇️ | 
+fitness | Working Out Alone | 🎧 | Working Out with a Partner | 👯 | 
+fitness | Rock Climbing | 🧗 | Hiking | 🥾 | 
+sports | Lakers | 💜 | Celtics | ☘️ | classic
+sports | Lakers | 💜 | Warriors | 🌉 | cross-era (classic+modern)
+sports | Patriots | 🏈 | Chiefs | 🏹 | modern
+sports | Packers | 🧀 | Bears | 🐻 | classic
+sports | Steelers | 🏈 | Ravens | 🏈 | cross-era (classic+modern)
+sports | Dodgers | ⚾ | Giants | ⚾ | modern
+sports | Cubs | 🧸 | Cardinals | 🐦 | classic
+sports | Penguins | 🐧 | Capitals | 🏛️ | modern
+sports | Real Madrid | 👑 | Barcelona | ⚽ | classic
+sports | Arsenal | 💥 | Tottenham | 🐓 | modern
+sports | Michigan | 〽️ | Ohio State | 🌰 | classic
+sports | Kevin Durant | 🏀 | Giannis Antetokounmpo | 🏀 | cross-era (modern+now)
+sports | Magic Johnson | 🏀 | Larry Bird | ☘️ | classic
+sports | Jerry Rice | 🏈 | Randy Moss | 🏈 | cross-era (classic+modern)
+sports | Aaron Judge | ⚾ | Shohei Ohtani | ⚾ | now
+sports | Mike Trout | ⚾ | Ronald Acuña Jr. | ⚾ | now
+sports | Wayne Gretzky | 🏒 | Mario Lemieux | 🏒 | classic
+sports | Kylian Mbappé | ⚽ | Erling Haaland | ⚽ | now
+sports | Football Sundays | 🏈 | March Madness | 🏀 | 
+sports | Home Jerseys | 🏠 | Away Jerseys | ✈️ | 
+celebrity | Kim Kardashian | 💋 | Kylie Jenner | 💄 | modern
+celebrity | Blake Lively | 👱‍♀️ | Gwyneth Paltrow | 🌿 | modern
+celebrity | Paparazzi Photos | 📸 | Posted Selfies | 🤳 | now
+celebrity | Celebrity Breakup Drama | 💔 | Celebrity Weddings | 💒 | 
+celebrity | Old Hollywood Glamour | 🎞️ | Modern Influencer Fame | 📱 | cross-era (classic+now)
+sports | Messi | ⚽ | Cristiano Ronaldo | ⚽ | modern
+sports | Serena Williams | 🎾 | Venus Williams | 🎾 | modern
+sports | Tom Brady | 🏈 | Patrick Mahomes | 🏈 | cross-era (modern+now)
+sports | Kobe Bryant | 🏀 | Shaquille O’Neal | 🏀 | cross-era (classic+modern)
+sports | Wayne Gretzky | 🏒 | Sidney Crosby | 🏒 | cross-era (classic+modern)
+sports | Serena Williams | 🎾 | Naomi Osaka | 🎾 | cross-era (modern+now)
+sports | Tom Brady | 🏈 | Joe Montana | 🏈 | cross-era (classic+modern)
+sports | Tiger Woods | ⛳ | Jack Nicklaus | ⛳ | cross-era (classic+modern)
+sports | Simone Biles | 🤸 | Nadia Comaneci | 🤸 | cross-era (classic+modern)
+sports | Cristiano Ronaldo | ⚽ | Lionel Messi | ⚽ | modern
+sports | Roger Federer | 🎾 | Rafael Nadal | 🎾 | modern
+sports | Babe Ruth | ⚾ | Hank Aaron | ⚾ | classic
+sports | Michael Phelps | 🏊 | Mark Spitz | 🏊 | cross-era (classic+modern)
+music | The Beatles | 🎸 | Rolling Stones | 🎸 | classic
+music | Jay-Z | 🎤 | Eminem | 🎤 | modern
+music | Nirvana | 🎸 | Pearl Jam | 🎸 | modern
+music | Ariana Grande | 🎤 | Dua Lipa | 🎤 | now
+music | Adele | 🎤 | Whitney Houston | 🎤 | cross-era (classic+modern)
+music | Coldplay | 🎸 | Imagine Dragons | 🎸 | cross-era (modern+now)
+music | Ed Sheeran | 🎸 | Bruno Mars | 🎤 | modern
+music | Rihanna | 🎤 | Nicki Minaj | 🎤 | modern
+music | Dua Lipa | 🎤 | Olivia Rodrigo | 🎤 | now
+movies | Quentin Tarantino | 🎬 | Christopher Nolan | 🎬 | modern
+movies | Marvel | 🦸 | DC | 🦸 | modern
+movies | Star Wars | 🌌 | Star Trek | 🖖 | classic
+movies | Pixar | 💡 | DreamWorks | 🌙 | modern
+movies | Breaking Bad | 🧪 | The Sopranos | 🍝 | modern
+movies | The Avengers | 🦸 | Justice League | 🦸 | modern
+movies | Titanic | 🚢 | Avatar | 💙 | cross-era (classic+modern)
+movies | Friends | ☕ | The Office | 📎 | cross-era (classic+modern)
+movies | The Lion King | 🦁 | Aladdin | 🧞 | classic
+movies | The Matrix | 💊 | Inception | 🌀 | cross-era (classic+modern)
+movies | Stranger Things | 🔦 | The Boys | 💥 | now
+movies | Fast & Furious | 🏎️ | Mission: Impossible | 🕶️ | modern
+movies | Squid Game | 🦑 | Money Heist | 💰 | now
+brands | iPhone | 📱 | Android | 🤖 | modern
+brands | Coke | 🥤 | Pepsi | 🥤 | modern
+brands | Adidas | 👟 | Puma | 👟 | 
+brands | Tesla | ⚡ | Toyota | 🚗 | now
+brands | Spotify | 🎧 | Apple Music | 🎵 | now
+brands | YouTube | ▶️ | Twitch | 🎮 | now
+brands | Nike | 👟 | Under Armour | 👟 | 
+brands | Uber | 🚕 | Lyft | 🚗 | 
+brands | Coca-Cola | 🥤 | Pepsi | 🥤 | modern
+brands | Airbnb | 🏡 | Booking.com | 🏨 | now
+brands | Zoom | 📹 | Microsoft Teams | 💼 | now
+brands | Target | 🎯 | Walmart | 🛒 | modern
+food | Five Guys | 🍔 | In-N-Out | 🍔 | 
+food | Chipotle | 🌯 | Taco Bell | 🌮 | 
+food | Dunkin’ | 🍩 | Starbucks | ☕ | 
+food | Ben & Jerry’s | 🍨 | Häagen-Dazs | 🍦 | 
+food | Olive Garden | 🍝 | Applebee’s | 🍽️ | 
+food | Wendy’s | 🍔 | Chick-fil-A | 🐔 | 
+food | Krispy Kreme | 🍩 | Dunkin’ | 🍩 | 
+food | Chipotle | 🌯 | Qdoba | 🌯 | 
+food | Taco Bell | 🌮 | Del Taco | 🌮 | 
+food | Panda Express | 🥡 | P.F. Chang’s | 🥢 | 
+food | Culver’s | 🍔 | In-N-Out | 🍔 | 
+games | GTA V | 🚗 | Call of Duty | 🎖️ | modern
+games | The Legend of Zelda | 🗡️ | Super Mario | 🍄 | classic
+games | League of Legends | ⚔️ | Dota 2 | 🛡️ | modern
+games | Halo | 🛸 | Gears of War | ⚙️ | modern
+games | Elden Ring | 💍 | Dark Souls | 🔥 | now
+games | Animal Crossing | 🍃 | Stardew Valley | 🌻 | now
+games | Roblox | 🧱 | Minecraft | ⛏️ | now
+music | 90s grunge, flannel and feedback | 🎸 | 2000s nu metal, turntables and rage | 🤘 | modern
+music | Front row at a sweaty club show | 🎤 | Main stage at a huge festival | 🎪 | 
+music | Discovering music through algorithms | 🤖 | Discovering music through friends | 👥 | 
+music | Concerts, as loud as physically possible | 🔊 | Music at a comfortable volume, always | 🔉 | 
+money | Crypto for the upside | 🪙 | Bonds for the safety | 🛡️ | 
+money | A side hustle that barely breaks even | 💼 | A 9-to-5 with full benefits | 🏢 | 
+money | A guaranteed $50k a year forever | 💵 | A 10% chance at $10 million | 🎰 | 
+money | Owning a home | 🏡 | Renting forever and staying flexible | 🔑 | 
+money | A steady 9-to-5 paycheck | 💼 | Unpredictable freelance income | 🎨 | 
+money | Splitting every bill evenly, always | 🤝 | Whoever earns more pays more, always | ⚖️ | 
+style | Clean-shaven, every time | 🪒 | Full beard, no debate | 🧔 | 
+style | A tiny capsule wardrobe | 🧥 | A closet full of statement pieces | 👗 | 
+style | A summer dress | 👗 | Leggings, no debate | 🧘‍♀️ | 
+style | Bold prints and patterns | 🎨 | Solid neutral colors only | ⬜ | 
+style | A uniform — same outfit every day | 👔 | A different look every single day | 🎭 | 
+style | Long hair | 💇 | Short hair, low maintenance | ✂️ | 
+style | Bold, statement jewelry, always | 💍 | No jewelry at all, ever | ✋ | 
+style | Bright, loud colors only | 🌈 | Black, white, and gray only | ▫️ | 
+wild | Live in a mansion in the Arctic, totally isolated | 🧊 | Live in a hut with no electricity on a tropical island | 🏝️ | 
+wild | Unlimited money, but you can never travel again | 🏠 | Travel forever, but live paycheck to paycheck | ✈️ | 
+wild | Live 200 years, but never leave your hometown | 🏘️ | Live a normal lifespan, but see the whole world | 🌍 | 
+wild | Be able to talk to animals, but they never stop complaining | 🐶 | Be able to talk to plants, but they only gossip about you | 🪴 | 
+wild | Win $10,000 today, guaranteed | 💵 | Flip a coin: $50,000 or nothing, decided in 10 seconds | 🎲 | 
+wild | Read minds, but you can never turn it off | 🧠 | Time travel, but only backward and only by yourself | ⏳ | 
+wild | Cold showers every morning | 🥶 | Hitting snooze three times | 😴 | 
+wild | Cannonball into a pool of spoiled milk | 🥛 | Take a 10-second shower in hot sauce | 🌶️ | 
+wild | Wear a shirt dipped in ranch dressing all day | 🥗 | Wear socks soaked in maple syrup all day | 🥞 | 
+wild | Have hiccups nonstop for a week | 😵 | Have one foot asleep for a week | 🦶 | 
+wild | Live one day as anyone in history | ⏳ | Live one day 200 years in the future | 🚀 | 
+wild | Speak every language fluently | 🗣️ | Play every instrument perfectly | 🎸 | 
+wild | Always be 10 minutes late | ⏰ | Always be 30 minutes early | ⏱️ | 
+wild | Everyone can hear your thoughts for a day | 🧠 | You can hear everyone else’s thoughts for a day | 👂 | 
+wild | Only whisper for a week | 🤫 | Only shout for a week | 📢 | 
+wild | Be famous for something embarrassing | 😅 | Never be famous for anything at all | 👤 | 
+wild | A time machine that only goes forward | ⏩ | A time machine that only goes backward | ⏪ | 
+wild | Live stream your entire day, every day | 📹 | Never be recorded on camera again | 🚫 | 
+wild | Only speak in movie quotes for a month | 🎬 | Only speak in song lyrics for a month | 🎶 | 
+wild | Always guess the right password on the first try | 🔐 | Always guess the perfect gift for anyone | 🎀 | 
+wild | Never be able to lie again, about anything | 😇 | Never be able to tell the truth again, about anything | 😈 | 
+wild | Always score the best parking spot, but it’s always raining on you | ☔ | Never find parking, but the sun always shines on you | ☀️ | 
+wild | Skip every Monday for the rest of your life | 😌 | Get 25 hours in every day, but only on weekends | ⏳ | 
+wild | A rewind button for your own life, usable exactly once | ⏮️ | A fast-forward button for your own life, usable exactly once | ⏭️ | 
+wild | Have to high-five everyone you meet, forever | 🤚 | Have to bow to everyone you meet, forever | 🙏 | 
+food | Italian food, every time | 🍝 | Chinese food, every time | 🥡 | 
+food | Pizza, no contest | 🍕 | Tacos, no contest | 🌮 | 
+food | Spicy food, the hotter the better | 🌶️ | Mild food, no heat at all | 🥛 | 
+food | A buffet, all you can eat | 🍽️ | A tasting menu, small perfect bites | 🍱 | 
+food | Eating the same lunch every day | 🥪 | A different lunch every day | 🍱 | 
+food | Spicy food, always | 🌶️ | Mild food, always | 🥛 | 
+food | A big, indulgent breakfast | 🍳 | A big, indulgent dinner | 🍽️ | 
+food | Dessert before the meal | 🍰 | Dessert after the meal | 🍪 | 
+fitness | Running | 🏃 | Lifting weights | 💪 | 
+fitness | A rest day, guilt-free | 😌 | Never skip a day | ⏰ | 
+fitness | Counting your steps every day | 👣 | No idea and no interest in step count | 🤷 | 
+fitness | Tracking every macro | 📱 | Eating intuitively, no tracking | 🍽️ | 
+fitness | Stretching every day | 🧘 | Never stretching at all | 🤸 | 
+fitness | Working out completely alone | 🎧 | Working out in a group | 👥 | 
+fitness | A home gym, all to yourself | 🏠 | A gym membership, full of people | 🏟️ | 
+geography | Mountains | ⛰️ | Beaches | 🏖️ | 
+geography | Visiting every US state | 🗺️ | Visiting every country in Europe | 🏰 | 
+geography | Tokyo | 🗼 | Paris | 🗼 | 
+geography | A cabin in the mountains | 🏔️ | A cottage by the sea | 🌊 | 
+geography | A big backyard | 🏡 | A rooftop view | 🏙️ | 
+geography | Living in a big city | 🏙️ | Living in a small town | 🏘️ | 
+geography | A cold, snowy winter every year | ❄️ | A hot, humid summer every year | ☀️ | 
+geography | Seeing the Grand Canyon in person | 🏞️ | Seeing Niagara Falls in person | 🌊 | 
+history | The Renaissance | 🎨 | The Industrial Revolution | ⚙️ | 
+history | The Wright Brothers’ first flight | ✈️ | The first Moon landing | 🌕 | 
+history | Ancient Greece | 🏺 | Ancient China | 🐉 | 
+history | The Industrial Revolution | ⚙️ | The Information Age | 💾 | 
+history | The Space Race | 🚀 | The Digital Revolution | 📡 | 
+history | Exploring ancient Egypt | 🐫 | Exploring ancient Rome | 🏛️ | 
+history | The early space race era | 🚀 | The old wild west era | 😠 | 
+history | The dawn of the internet | 💾 | The dawn of the smartphone | 📱 | 
+food | Tacos | 🌮 | Burritos | 🌯 | 
+food | French Fries | 🍟 | Onion Rings | 🧅 | 
+food | Cookies | 🍪 | Brownies | 🟫 | 
+food | Ketchup | 🍅 | Ranch | 🥗 | 
+food | Donuts | 🍩 | Muffins | 🧁 | 
+food | Nachos | 🌶️ | Mozzarella Sticks | 🧀 | 
+food | Spicy Wings | 🌶️ | Chicken Nuggets | 🍗 | 
+food | Cereal | 🥣 | Toast | 🍞 | 
+food | Cheese Pizza | 🍕 | Pepperoni Pizza | 🍕 | 
+food | Popcorn | 🍿 | Pretzels | 🥨 | 
+food | Fried Chicken | 🍗 | Rotisserie Chicken | 🐔 | 
+food | Bacon | 🥓 | Sausage | 🌭 | 
+drinks | Coffee | ☕ | Tea | 🍵 | 
+drinks | Lemonade | 🍋 | Iced Tea | 🧊 | 
+drinks | Hot Chocolate | ☕ | Apple Cider | 🍏 | 
+drinks | Energy Drinks | ⚡ | Coffee | ☕ | 
+drinks | Iced Coffee | 🧊 | Hot Coffee | ☕ | 
+drinks | Root Beer | 🥤 | Cola | 🥤 | 
+drinks | Kool-Aid | 🍹 | Capri Sun | 🧃 | 
+drinks | Milk | 🥛 | Orange Juice | 🍊 | 
+movies | Sitcoms | 📺 | Dramas | 🎭 | 
+movies | Cartoons | 🖍️ | Anime | 🍥 | 
+movies | Subtitles | 💬 | Dubbing | 🎙️ | 
+movies | Movie Theaters | 🍿 | Streaming at Home | 🛋️ | 
+movies | Animated Movies | 🖍️ | Live-Action Movies | 🎬 | 
+movies | Plot Twists | 🌀 | Happy Endings | 🌈 | 
+movies | Batman | 🦇 | Superman | 🦸 | classic
+movies | Godzilla | 🦖 | King Kong | 🦍 | classic
+movies | Sandra Bullock | 🎭 | Charlize Theron | 🎭 | modern
+movies | Meryl Streep | 🎭 | Viola Davis | 🎭 | cross-era (classic+now)
+movies | Ryan Reynolds | 🎭 | Ryan Gosling | 🎭 | modern
+movies | Jennifer Lawrence | 🎭 | Emma Stone | 🎭 | modern
+movies | Keanu Reeves | 🎭 | Tom Cruise | 🎭 | modern
+movies | Chris Evans | 🎭 | Chris Pratt | 🎭 | modern
+movies | Morgan Freeman | 🎭 | Samuel L. Jackson | 🎭 | classic
+movies | Will Ferrell | 🎭 | Steve Carell | 🎭 | modern
+movies | Florence Pugh | 🎭 | Anya Taylor-Joy | 🎭 | now
+movies | Will Smith | 🎭 | Denzel Washington | 🎭 | cross-era (classic+modern)
+movies | X-Men | ✖️ | Avengers | 🦸 | modern
+movies | Iron Man | 🦾 | Batman | 🦇 | cross-era (classic+modern)
+movies | Wonder Woman | 👸 | Captain Marvel | ✴️ | modern
+movies | Superman | 🦸 | Goku | 🐉 | cross-era (classic+modern)
+movies | The Flash | ⚡ | Quicksilver | 💨 | modern
+movies | X-Men | ✖️ | Justice League | 🦸 | modern
+movies | Harley Quinn | 🃏 | Wonder Woman | 👸 | modern
+movies | Captain America | 🛡️ | Batman | 🦇 | cross-era (classic+modern)
+movies | Dumb and Dumber | 🤪 | Billy Madison | 🏫 | classic
+movies | Superbad | 🥳 | Grown Ups | 🧔 | modern
+movies | The Hangover | 🥴 | Superbad | 🥳 | modern
+movies | Ace Ventura | 🐾 | Billy Madison | 🏫 | classic
+movies | Grown Ups | 🧔 | The Hangover | 🥴 | modern
+movies | Bridesmaids | 👰 | Mean Girls | 💅 | modern
+music | Rap | 🎤 | Rock | 🤘 | 
+music | Vinyl | 💿 | Streaming | 📱 | 
+music | Solo Artists | 🎤 | Bands | 🥁 | 
+music | Lyrics | 📝 | Beat | 🥁 | 
+music | Headphones | 🎧 | Speakers | 🔊 | 
+music | Michael Jackson | 🎤 | Prince | 🎤 | classic
+music | EDM | 🎛️ | Hip-Hop | 🎤 | 
+music | Singing in the Shower | 🚿 | Singing in the Car | 🚗 | 
+music | 80s Music | 📼 | 90s Music | 💿 | cross-era (classic+modern)
+music | Mick Jagger | 🎸 | Robert Plant | 🎸 | classic
+music | Eric Clapton | 🎸 | Jimi Hendrix | 🎸 | classic
+music | Elvis Presley | 🎸 | Johnny Cash | 🎸 | classic
+music | AC/DC | 🎸 | Guns N' Roses | 🎸 | classic
+music | The Beatles | 🎸 | The Beach Boys | 🎸 | classic
+music | Taylor Swift | 🎤 | Olivia Rodrigo | 🎤 | cross-era (modern+now)
+music | Ariana Grande | 🎤 | Selena Gomez | 🎤 | now
+music | Doja Cat | 🎤 | Nicki Minaj | 🎤 | cross-era (modern+now)
+music | Sabrina Carpenter | 🎤 | Olivia Rodrigo | 🎤 | now
+music | Post Malone | 🎤 | Morgan Wallen | 🤠 | now
+music | Bad Bunny | 🎤 | J Balvin | 🎤 | now
+music | Kendrick Lamar | 🎤 | J. Cole | 🎤 | modern
+sports | Baseball | ⚾ | Hockey | 🏒 | 
+sports | Tennis | 🎾 | Golf | ⛳ | 
+sports | Individual Sports | 🧍 | Team Sports | 👥 | 
+sports | Offense | ⚔️ | Defense | 🛡️ | 
+sports | Olympics | 🏅 | World Cup | 🏆 | 
+sports | Skateboarding | 🛹 | Surfing | 🏄 | 
+sports | Pickup Games | 🏀 | Organized Leagues | 🏆 | 
+sports | Underdogs | 🐕 | Favorites | ⭐ | 
+sports | Trash Talk | 🗣️ | Good Sportsmanship | 🤝 | 
+sports | Luka Dončić | 🏀 | Cooper Flagg | 🏀 | now
+sports | Victor Wembanyama | 🏀 | Luka Dončić | 🏀 | now
+sports | Stephen Curry | 🏀 | Luka Dončić | 🏀 | now
+games | Single-Player | 👤 | Multiplayer | 👥 | 
+games | Racing Games | 🏎️ | Fighting Games | 🥊 | 
+games | Retro Games | 👾 | Modern Games | 🎮 | 
+games | Board Games | 🎲 | Video Games | 🎮 | 
+games | Local Co-op | 🛋️ | Online Multiplayer | 🌐 | 
+games | Easy Mode | 😌 | Hard Mode | 💀 | 
+games | Pokémon | ⚡ | Digimon | 👾 | modern
+games | Charizard | 🔥 | Blastoise | 💧 | modern
+games | Squirtle | 💧 | Bulbasaur | 🌱 | modern
+games | Gengar | 👻 | Snorlax | 😴 | modern
+tech | Mac | 💻 | PC | 🖥️ | 
+tech | Dark Mode | 🌙 | Light Mode | ☀️ | 
+tech | Smartwatch | ⌚ | Traditional Watch | 🕰️ | 
+tech | Video Calls | 📹 | Phone Calls | 📞 | 
+tech | Physical Buttons | 🔘 | Touchscreens | 👆 | 
+tech | YouTube | ▶️ | Netflix | 🍿 | now
+tech | Voice Assistants | 🗣️ | Typing It Yourself | ⌨️ | 
+travel | Hotels | 🏨 | Vacation Rentals | 🏡 | 
+travel | Backpacking | 🎒 | Luxury Travel | 💎 | 
+travel | Exploring Cities | 🏙️ | Exploring Nature | 🌿 | 
+travel | Theme Parks | 🎢 | Water Parks | 🌊 | 
+travel | Cruises | 🛳️ | Road Trips | 🚗 | 
+travel | Planning Every Detail | 📋 | Winging It | 🤷 | 
+travel | Summer Vacation | ☀️ | Winter Vacation | ⛷️ | 
+life | Mornings | 🌄 | Nights | 🌃 | 
+life | City Living | 🏙️ | Countryside Living | 🌾 | 
+life | Silence | 🤫 | Background Noise | 📻 | 
+life | Cash | 💵 | Cards | 💳 | 
+life | Planning Ahead | 🗓️ | Being Spontaneous | 🎲 | 
+life | Staying In | 🛋️ | Going Out | 🥳 | 
+life | Group Projects | 👥 | Working Solo | 👤 | 
+life | Dating Apps | 📱 | Meeting in Person | ☕ | 
+life | Introverts | 📚 | Extroverts | 🎤 | 
+life | Logic | 🧠 | Emotion | ❤️ | 
+life | Summer | ☀️ | Winter | ❄️ | 
+life | New Year's Eve | 🎆 | Fourth of July | 🎇 | 
+style | Sneakers | 👟 | Boots | 🥾 | 
+style | Vintage Fashion | 👒 | Modern Fashion | 🕶️ | 
+style | Gold Jewelry | 💛 | Silver Jewelry | 🤍 | 
+style | Hoodies | 🧥 | Jackets | 🧥 | 
+style | Bold Prints | 🐆 | Solid Colors | 🟦 | 
+pets | Dogs | 🐶 | Cats | 🐱 | 
+pets | Birds | 🐦 | Fish | 🐠 | 
+pets | Ocean Animals | 🐬 | Jungle Animals | 🐒 | 
+pets | Wolves | 🐺 | Big Cats | 🐅 | 
+pets | Farm Animals | 🐄 | Zoo Animals | 🦒 | 
+nostalgia | 80s | 📼 | 90s | 💿 | cross-era (classic+modern)
+nostalgia | Classic Movies | 🎞️ | New Releases | 🎬 | classic
+nostalgia | Mixtapes | 📼 | Playlists | 🎧 | classic
+nostalgia | Saturday Morning Cartoons | 🥣 | Streaming Anytime | 📺 | classic
+nostalgia | Board Game Nights | 🎲 | Screen Time | 📱 | 
+ideas | Fame | 🌟 | Privacy | 🔒 | 
+ideas | Talent | ✨ | Hard Work | 💪 | 
+ideas | Luck | 🍀 | Skill | 🎯 | 
+ideas | Popularity | 👑 | Respect | 🏅 | 
+ideas | Taking Risks | 🎲 | Playing It Safe | 🦺 | 
+ideas | Adventure | 🧭 | Comfort | 🛋️ | 
+ideas | Confidence | 😎 | Kindness | 💝 | 
+books | Stephen King | 📚 | Edgar Allan Poe | 🖋️ | classic
+books | J.K. Rowling | ⚡ | Suzanne Collins | 🏹 | modern
+books | Harry Potter | ⚡ | Percy Jackson | 🔱 | modern
+books | Audiobooks | 🎧 | Physical Books | 📖 | 
+books | To Kill a Mockingbird | 🐦 | The Great Gatsby | 🥂 | classic
+books | Fantasy Novels | 🐉 | Science Fiction Novels | 🚀 | 
+books | Short Stories | 📄 | Novels | 📖 | 
+books | Reading Before Bed | 🌙 | Reading in the Morning | ☕ | 
+books | Bookstores | 🏪 | Libraries | 🏛️ | 
+books | Plot-Driven Books | 🗺️ | Character-Driven Books | 🎭 | 
+wild | A Rewind Button for Your Life | ⏪ | A Fast-Forward Button for Your Life | ⏩ | 
+wild | Flying | ✈️ | Teleporting | 🌀 | 
+wild | Never Needing Sleep | 👀 | Never Needing Food | 🍽️ | 
+wild | Unlimited Money | 💰 | Unlimited Time | ⏳ | 
+wild | Super Strength | 💪 | Super Speed | ⚡ | 
+wild | Living Underwater | 🐠 | Living in Space | 🚀 | 
+wild | A Personal Chef | 🧑‍🍳 | A Personal Chauffeur | 🚘 | 
+wild | A Mute Button for Everyone Else | 🔇 | A Mute Button for Yourself | 🤐 | 
+wild | A Do-Over Button | 🔄 | A Skip Button | ⏭️ | 
+wild | Losing Your Sense of Smell | 👃 | Losing Your Sense of Taste | 👅 | 
+wild | Being the Funniest Person in the Room | 😂 | Being the Smartest Person in the Room | 🧠 | 
+wild | Only Being Able to Whisper | 🤫 | Only Being Able to Shout | 📢 | 
+wild | A Vending Machine That's Always Free | 🥤 | A Fridge That's Always Full | 🍱 | 
+wild | Waking Up as a Cat | 🐱 | Waking Up as a Dog | 🐶 | 
+wild | A Group Chat That Never Stops | 💬 | A Group Chat That Never Starts | 🦗 | 
+wild | Losing Your Phone | 📱 | Losing Your Wallet | 👛 | 
+wild | Awkward Silence | 😶 | Talking Over Each Other | 🗣️ | 
+wild | Stepping on a Lego | 🧱 | Stubbing Your Toe | 🦶 | 
+wild | Being Put on Hold | ☎️ | Waiting in a Long Line | 🚶 | 
+wild | Running Out of Snacks | 🍿 | Running Out of Wi-Fi | 📶 | 
+wild | Your Alarm Not Going Off | 😱 | Your Alarm Going Off Too Early | ⏰ | 
+wild | A Sock Full of Pudding | 🍮 | A Shoe Full of Jell-O | 👟 | 
+wild | A Permanent Kazoo Voice | 🎺 | A Permanent Whisper Voice | 🤫 | 
+wild | Farting Bubbles | 💨 | Burping Sparkles | ✨ | 
+wild | Walking Backwards Forever | 🔙 | Talking Backwards Forever | 🔁 | 
+wild | Only Eating Room Temperature Food | 🌡️ | Only Eating Ice Cold Food | 🧊 | 
+wild | Hiccups That Sound Like a Duck | 🦆 | A Laugh That Sounds Like a Seal | 🦭 | 
+wild | A Cloud of Gnats Following You | 🦟 | A Cloud of Confetti Following You | 🎊 | 
+wild | Shoes That Squeak With Every Step | 👟 | A Chair That Squeaks Every Time You Move | 🪑 | 
+wild | Eating a Popsicle in Winter | 🍧 | Eating Soup in Summer | 🍲 | 
+wild | Autotune Voice Forever | 🤖 | Elevator Music Following You Everywhere | 🎵 | 
+fitness | Cardio | 🏃 | Weightlifting | 🏋️ | 
+fitness | Arm Day | 💪 | Ab Day | 🍫 | 
+fitness | Yoga | 🧘 | Pilates | 🤸 | 
+fitness | Rest Day | 😴 | Extra Workout Day | 💪 | 
+fitness | Protein Shakes | 🥤 | Whole Food Meals | 🥦 | 
+sports | Jon Jones | 🥊 | Daniel Cormier | 🥊 | modern
+sports | Khabib Nurmagomedov | 🥊 | Georges St-Pierre | 🥊 | cross-era (classic+modern)
+sports | Anderson Silva | 🥊 | Georges St-Pierre | 🥊 | classic
+sports | Ronda Rousey | 🥊 | Amanda Nunes | 🥊 | modern
+sports | UFC | 🤼 | Boxing | 🥊 | 
+sports | The Cage | 🏟️ | The Ring | ⭕ | 
+music | Lady Gaga | 🎤 | Madonna | 🎤 | cross-era (classic+modern)
+music | Led Zeppelin | 🎸 | Pink Floyd | 🎸 | classic
+music | Queen | 🎸 | Rolling Stones | 🎸 | classic
+music | Eminem | 🎤 | 50 Cent | 🎤 | modern
+music | Cardi B | 🎤 | Nicki Minaj | 🎤 | modern
+music | Carrie Underwood | 🤠 | Miranda Lambert | 🤠 | modern
+music | Dolly Parton | 🤠 | Reba McEntire | 🤠 | classic
+music | Sing-Along Songs | 🎶 | Headphones-Only Songs | 🎧 | 
+realitytv | Real Housewives | 🍸 | Below Deck | 🛥️ | cross-era (modern+now)
+realitytv | RuPaul's Drag Race | 👠 | Project Runway | 🧵 | cross-era (modern+now)
+realitytv | Love Is Blind | 🙈 | Married at First Sight | 💍 | now
+realitytv | 90 Day Fiancé | ✈️ | Love Is Blind | 🙈 | now
+realitytv | Dance Moms | 🩰 | Cheer | 📣 | now
+realitytv | Catfish | 🎣 | Say Yes to the Dress | 👗 | now
+realitytv | The Voice | 🎙️ | American Idol | 🎤 | cross-era (modern+now)
+realitytv | Top Chef | 👨‍🍳 | MasterChef | 🍳 | modern
+realitytv | Below Deck | 🛥️ | The Bachelor | 🌹 | cross-era (modern+now)
+realitytv | Naked and Afraid | 🌿 | Survivor | 🔥 | cross-era (modern+now)
+books | The Notebook | 💌 | Titanic | 🚢 | classic
+books | Bridgerton | 👑 | Outlander | ⏳ | now
+celebrity | Celebrity Gossip Podcasts | 🗣️ | True Crime Podcasts | 🔍 | 
+books | The Shining | 🪓 | It | 🎈 | classic
+books | Agatha Christie | 🕵️ | Gillian Flynn | 🔪 | cross-era (classic+modern)
+books | Dune | 🏜️ | Foundation | 🌌 | classic
+books | Colleen Hoover | ✍️ | Taylor Jenkins Reid | ✍️ | now
+books | Fourth Wing | 🐲 | A Court of Thorns and Roses | 🌹 | now
+books | The Great Gatsby | 🥂 | Of Mice and Men | 🐭 | classic
+books | Rereading a Favorite | 🔁 | Always Something New | 🆕 | 
+movies | Johnny Depp | 🏴‍☠️ | Leonardo DiCaprio | 🎭 | modern
+movies | Inception | 🌀 | Shutter Island | 🏝️ | modern
+movies | Pulp Fiction | 💼 | Reservoir Dogs | 🕶️ | classic
+movies | Denzel Washington | 🎭 | Samuel L. Jackson | 🎭 | classic
+movies | Margot Robbie | 🎭 | Scarlett Johansson | 🎭 | modern
+movies | Jordan Peele | 🫖 | M. Night Shyamalan | 👻 | modern
+movies | La La Land | 🎹 | Whiplash | 🥁 | now
+movies | Interstellar | 🪐 | The Martian | 🥔 | modern
+comedy | Mark Normand | 🎤 | Joe List | 🎤 | cross-era (classic+now)
+comedy | Bill Burr | 🎤 | Jim Gaffigan | 🎤 | modern
+comedy | Nikki Glaser | 🎤 | Taylor Tomlinson | 🎤 | cross-era (modern+now)
+comedy | Tom Segura | 🎤 | Theo Von | 🎤 | now
+comedy | John Mulaney | 🎤 | Nate Bargatze | 🎤 | now
+comedy | Eddie Murphy | 🎤 | Robin Williams | 🎤 | classic
+comedy | Dark Humor | 🖤 | Clean Comedy | 😇 | 
+podcasts | Crime Junkie | 🔍 | Morbid | 💀 | now
+podcasts | The Daily | 📰 | Pod Save America | 🗳️ | now
+podcasts | Rotten Mango | 🥭 | Crime Junkie | 🔍 | now
+podcasts | The Herd with Colin Cowherd | 🐄 | Sports Talk Radio | 📻 | now
+podcasts | True Crime Podcasts | 🔍 | Comedy Podcasts | 😂 | 
+podcasts | Solo Hosts | 🙋 | Co-Host Duos | 👯 | 
+podcasts | Podcasts While Driving | 🚗 | Podcasts While Working Out | 🏋️ | 
+creators | Kai Cenat | 📺 | IShowSpeed | ⚡ | now
+creators | PewDiePie | 👊 | MrBeast | 💰 | cross-era (modern+now)
+creators | Addison Rae | 💄 | Bella Poarch | 🎶 | now
+creators | Reaction Content | 😮 | Original Content | 💡 | 
+creators | Long-Form YouTube | 🎬 | Short-Form Videos | 📱 | 
+creators | Subscribing | 🔔 | Just Watching | 👀 | 
+food | Boneless Wings | 🍗 | Bone-In Wings | 🍖 | 
+food | Cookie Dough Ice Cream | 🍪 | Chocolate Ice Cream | 🍫 | 
+food | Buffalo Wings | 🌶️ | BBQ Wings | 🍖 | 
+food | Pad Thai | 🍜 | Lo Mein | 🥡 | 
+food | Chili | 🌶️ | Chowder | 🥣 | 
+food | Cheesecake | 🍰 | Tiramisu | ☕ | 
+food | Nachos | 🌶️ | Loaded Fries | 🍟 | 
+food | Ranch | 🥗 | Blue Cheese | 🧀 | 
+fitness | CrossFit | 🔥 | Strength Training | 💪 | 
+fitness | Squats | 🦵 | Lunges | 🚶 | 
+fitness | HIIT | ⏱️ | Steady-State Cardio | ❤️ | 
+fitness | Bench Press | 🏋️ | Push-Ups | 💪 | 
+fitness | Rest Day | 😴 | Active Recovery | 🚶 | 
+fitness | Marathon Training | 🏃 | Sprint Training | ⚡ | 
+fitness | Boxing | 🥊 | Martial Arts | 🥋 | 
+sports | Warriors | 🌉 | Celtics | ☘️ | cross-era (classic+modern)
+sports | Knicks | 🗽 | Nets | 🏀 | cross-era (classic+modern)
+sports | Cowboys | 🤠 | Eagles | 🦅 | classic
+sports | Chiefs | 🏹 | Bills | 🦬 | modern
+sports | Red Sox | 🧦 | Yankees | ⚾ | classic
+sports | Yankees | ⚾ | Mets | 🍎 | classic
+sports | Bruins | 🏒 | Canadiens | 🍁 | classic
+sports | Rangers | 🏒 | Islanders | 🏝️ | modern
+sports | Manchester United | 😈 | Liverpool | 🔴 | classic
+sports | Duke | 🔵 | UNC | 🐏 | classic
+sports | Alabama | 🐘 | Auburn | 🐯 | classic
+sports | Luka Dončić | 🏀 | Jayson Tatum | ☘️ | now
+sports | Patrick Mahomes | 🏈 | Josh Allen | 🏈 | now
+sports | Lawrence Taylor | 🏈 | J.J. Watt | 🏈 | cross-era (classic+modern)
+sports | Derek Jeter | ⚾ | Alex Rodriguez | ⚾ | modern
+sports | Connor McDavid | 🏒 | Sidney Crosby | 🏒 | cross-era (modern+now)
+sports | Alexander Ovechkin | 🏒 | Sidney Crosby | 🏒 | modern
+sports | Pelé | ⚽ | Diego Maradona | ⚽ | classic
+sports | Fantasy Football | 📋 | Fantasy Baseball | ⚾ | now
+celebrity | Taylor Swift | 🎤 | Travis Kelce | 🏈 | cross-era (modern+now)
+celebrity | Zendaya | 🎭 | Florence Pugh | 🎭 | now
+celebrity | Celebrity Feuds | 😤 | Celebrity Friendships | 🤝 | 
+celebrity | The Met Gala | 👑 | The Oscars Red Carpet | 🏆 | now
+celebrity | Tabloid Headlines | 📰 | Verified Statements | ✅ | 
