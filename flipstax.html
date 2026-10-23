@@ -4830,6 +4830,7 @@
 <script src="data/peak-or-plunge.js"></script>
 <script src="data/snap-sort.js"></script>
 <script src="data/fact-or-fib.js"></script>
+<script src="data/vs-cards-new.js"></script>
 <script src="lib/mini-games.js"></script>
 <script src="lib/orbit-physics.js"></script>
 <script src="lib/host-alien.js"></script>
@@ -4887,6 +4888,14 @@
     comedy: { label:'Comedy', badge:'\uD83D\uDE02 Class Clown' },
     podcasts: { label:'Podcasts', badge:'\uD83C\uDF99\uFE0F Pod Squad' },
     creators: { label:'YouTube & TikTok', badge:'\uD83D\uDCF1 Chronically Online' },
+    // Oct 23: the categories the imported VS cards add (tools/vs-import-rules.js has the same labels)
+    tv: { label:'TV Shows', badge:'🛋️ Couch Critic' },
+    cars: { label:'Cars', badge:'🏎️ Gearhead' },
+    albums: { label:'Albums', badge:'💿 Record Collector' },
+    actors: { label:'Actors', badge:'🎭 Screen Fan' },
+    internet: { label:'Internet', badge:'🌐 Extremely Online' },
+    toys: { label:'Toys', badge:'🧸 Toy Box Kid' },
+    cartoons: { label:'Cartoons', badge:'🖍️ Cartoon Fan' },
   };
   const BADGE_THRESHOLD = 10;
 
@@ -8595,6 +8604,8 @@
     return raw.map(([cat,a,b,kind],i)=>({ id:p+'p-'+i, mode:'match', pick: kind === 'pick', category:cat, a, b, glyphA:cardGlyph(a, cat), glyphB:cardGlyph(b, cat) }));
   }
   function cardKey(c){ return [slugify(c.a), slugify(c.b)].sort().join('|'); }
+  // The era lookup key (tools/vs-import.js uses the same): both sides without accents, case or punctuation, sorted.
+  function vsPairKey(a, b){ const s = t=> String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ''); return [s(a), s(b)].sort().join('|'); }
   function buildCardPools(){
     const pools = {
       daily: matchCards(DAILY_MATCH_RAW,'d').concat(sceneCards(DAILY_SCENE_RAW,'d'), pairCards(DAILY_PAIRS_RAW,'d')),
@@ -8604,6 +8615,14 @@
     // Each mode still keeps its own deck (decks.daily is in the date's order, the same for everyone; Infinity shuffles).
     const keys = new Set();
     const all = pools.daily.concat(pools.infinity).filter(c=>{ const k = cardKey(c); if (keys.has(k)) return false; keys.add(k); return true; });
+    // Oct 23: the imported cards (data/vs-cards-new.js, made by tools/vs-import.js) join the pool, each with its era; the
+    // cards already here get theirs from the same file (era: 80s, 90s, 2000s, 2010s, now or timeless).
+    const eras = window.FLIPSTAX_VS_ERAS || {};
+    all.forEach(c=>{ c.era = eras[vsPairKey(c.a, c.b)] || ''; });
+    (window.FLIPSTAX_VS_NEW || []).forEach((r, i)=>{
+      const c = { id:'n-' + i, mode:'match', pick:true, category:r[0], a:r[1], glyphA:r[2], b:r[3], glyphB:r[4], era:r[5] };
+      const k = cardKey(c); if (keys.has(k)) return; keys.add(k); all.push(c);
+    });
     return { daily: all, infinity: all };
   }
   const CARD_POOLS = buildCardPools();
