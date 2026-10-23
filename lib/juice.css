@@ -28,3 +28,23 @@
 /* with the sunburst behind them, the Word Warp overlay and the stage's dim shot step aside */
 :root.sb-on .solve-overlay{ background:transparent !important; }
 :root.sb-on .solve-overlay .warp-bg{ display:none !important; }
+
+/* ---- 2. Buttons and panels: glossy and bevelled (layered gradients, a top highlight, an inset lower edge, a soft
+   outer glow), a quick press squish (scale 0.96, 90 ms - transform only). One primary style: gold. ---- */
+.ds-btn:not(.secondary):not(.go):not(.stop), :root.mode-daily .daily-btn.primary, :root.mode-daily .daily-btn.primary:hover, .ex-go{
+  position:relative; overflow:hidden; color:#3a1500; border:2px solid #fff3c4; border-radius:16px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 48%), linear-gradient(180deg, var(--jc-gold-hi) 0%, var(--jc-gold) 45%, var(--jc-gold-lo) 100%);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,0.8), inset 0 -4px 0 rgba(122,61,0,0.35), 0 4px 0 #7a3d00, 0 0 18px rgba(255,210,63,0.45);
+  font-family:var(--f-display); font-weight:900; letter-spacing:1px; text-transform:uppercase; text-shadow:0 1px 0 rgba(255,255,255,0.5); }
+:root.mode-daily .daily-btn:not(.primary){ position:relative; border-radius:16px; border:2px solid rgba(255,255,255,0.45);
+  background:linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.04) 50%), linear-gradient(180deg, #4b1d8f, #2a0b55);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,0.3), inset 0 -3px 0 rgba(0,0,0,0.3), 0 3px 0 #14062b, 0 0 14px rgba(125,249,255,0.25); color:#fff;
+  font-family:var(--f-display); font-weight:900; letter-spacing:1px; text-transform:uppercase; }
+.ds-btn, :root.mode-daily .daily-btn, .ex-go{ transition:transform 90ms var(--ease-out, ease-out); -webkit-tap-highlight-color:transparent; }
+.ds-btn:active, :root.mode-daily .daily-btn:active, .ex-go:active, .jc-press{ transform:scale(0.96); }
+:root.mode-daily .daily-btn:active{ background-blend-mode:normal; }
+/* panels: a glossy top sheen over the existing panel (a pseudo-element, so each panel keeps its own colours) */
+.ds-card, .ex-card, .help-peek{ position:relative; }
+.ds-card::before, .ex-card::before, .help-peek::before{ content:''; position:absolute; left:0; right:0; top:0; height:46%; border-radius:inherit; pointer-events:none;
+  background:linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0)); }
+.ds-card.dark{ box-shadow:inset 0 2px 0 rgba(255,255,255,0.18), inset 0 -4px 0 rgba(0,0,0,0.3), 0 10px 26px rgba(0,0,0,0.45), 0 0 22px rgba(255,60,157,0.25); }
