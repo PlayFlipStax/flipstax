@@ -516,7 +516,7 @@
   :root:is(.mode-daily, .mode-infinity) .event-overlay.stack .event-prompt::after{ bottom:3px; background-position:12px 0; animation:bulbB 0.6s steps(1) infinite; }
   @keyframes bulbA{ 0%{ opacity:1; } 50%{ opacity:0.3; } }
   @keyframes bulbB{ 0%{ opacity:0.3; } 50%{ opacity:1; } }
-  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.flash-win .event-prompt::before, :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.flash-win .event-prompt::after{ animation:bbBlink 0.16s steps(1) 6; }
+  :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.flash-win .event-prompt::before, :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.flash-win .event-prompt::after{ animation:bbBlink 0.36s steps(1) 3; }
   @keyframes bbBlink{ 50%{ opacity:0.15; } }
   :root:is(.mode-daily, .mode-infinity) .event-overlay.stack .event-timerbar{ width:100%; max-width:none; height:9px; margin:0 0 12px; flex:0 0 auto; }
   :root:is(.mode-daily, .mode-infinity) .event-overlay.stack .event-grid{ position:relative; flex:1 1 0; min-height:0; display:flex; flex-direction:column; gap:11px; width:100%; max-width:none; }
@@ -1058,7 +1058,7 @@
   .ir-overlay.intro .ir-panel{ visibility:hidden; }
   .irt-static{ position:absolute; inset:0; opacity:0.55; mix-blend-mode:screen;
     background:repeating-linear-gradient(0deg, rgba(255,255,255,0.18) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(201,255,122,0.10) 0 2px, transparent 2px 5px);
-    animation: irtStatic 0.12s steps(3) infinite; }
+    animation: irtStatic 1.08s steps(3) infinite; }
   @keyframes irtStatic{ 0%{ transform:translate(0,0); } 33%{ transform:translate(-6px,3px); } 66%{ transform:translate(5px,-4px); } 100%{ transform:translate(0,0); } }
   .irt-text{ position:relative; display:flex; flex-direction:column; align-items:center; gap:6px; font-family:'Big Shoulders Display', sans-serif; font-weight:900; color:#eaffc9;
     letter-spacing:3px; text-shadow:2px 0 #ff3cac, -2px 0 #19e0ff, 0 0 18px rgba(201,255,122,0.9); animation: irtGlitch 0.4s steps(2) infinite; }
@@ -1441,7 +1441,7 @@
   .vault-ufo.riddle-ufo i{ opacity:0; transition:opacity 0.3s; }
   .fin-vault.open .vault-ufo.riddle-ufo i{ opacity:1; }
   .vault-laser{ left:50%; top:46px; height:calc(26px + var(--vb, 210px) / 2 - 46px); opacity:0; z-index:5; }
-  .fin-vault.dial:not(.open) .vault-laser{ animation:vaultLaser 0.24s steps(1) 0.6s 7; }
+  .fin-vault.dial:not(.open) .vault-laser{ animation:vaultLaser 0.36s steps(1) 0.6s 5; }
   @keyframes vaultLaser{ 0%{ opacity:1; } 50%{ opacity:0; } }
   @keyframes vaultUfoIn{ from{ transform:translate(-160px, -60px) scale(0.6); opacity:0; } to{ transform:none; opacity:1; } }
   .vault-beam-card{ position:absolute; left:50%; top:30px; width:66px; height:90px; margin-left:-33px; z-index:3; opacity:0; border-radius:8px; overflow:hidden; box-shadow:0 0 18px rgba(255,220,90,0.9); }
@@ -2676,7 +2676,7 @@
   .co-sign.on{ transform:translate(-50%, 0) scale(1); opacity:1; }
   .co-sign.off{ transform:translate(-50%, -30%) scale(0.85); opacity:0; transition-duration:.3s; }
   .co-sign .sign-bulbs i{ --bulb:#fff8d0; box-shadow:0 0 7px #ffd23f, 0 0 0 1.5px rgba(90,40,0,0.6); }
-  .co-sign.on .sign-bulbs i{ animation:bulbUnison .2s steps(1) 4, bulbChase .9s steps(1) .8s infinite; animation-delay:0s, calc(.8s + var(--k) * -0.225s); }
+  .co-sign.on .sign-bulbs i{ animation:bulbUnison .36s steps(1) 2, bulbChase .9s steps(1) .8s infinite; animation-delay:0s, calc(.8s + var(--k) * -0.225s); }
   @media (prefers-reduced-motion: reduce){ .curtain.open .co-drape{ animation:none; transform:scaleX(0.225); } .co-stage-host, .co-follow, .co-sign{ transition:none; } .co-sign.on .sign-bulbs i{ animation:none; } }
   .curtain.open .co-plate{ opacity:0; transform:translate(-50%, -80%) scale(0.8); }
   .show-card.curtain{ background:#1d0636; }
@@ -2899,7 +2899,7 @@
   .mw-rim circle.mw-b0, .mw-rim circle.mw-b1{ fill:#fff6c4; stroke:#ffd23f; stroke-width:1.5; animation:mwChase 0.5s steps(1) infinite; }
   .mw-rim circle.mw-b1{ animation-delay:0.25s; }
   @keyframes mwChase{ 0%{ opacity:1; } 50%{ opacity:0.3; } }
-  .landed .mw-rim circle[class]{ animation:mwFlash 0.2s steps(1) 4; fill:#fff; }
+  .landed .mw-rim circle[class]{ animation:mwFlash 0.36s steps(1) 3; fill:#fff; }
   @keyframes mwFlash{ 50%{ opacity:0.2; } }
   .mw-pointer{ position:absolute; left:50%; top:-6px; width:30px; height:38px; margin-left:-15px; z-index:3;
     background:linear-gradient(180deg, #fff, #ff7ad9 40%, #c2187a); clip-path:polygon(0 0, 100% 0, 50% 100%); filter:drop-shadow(0 3px 2px rgba(0,0,0,0.5)); }
@@ -2933,7 +2933,7 @@
   .ll-sq.dbl{ color:#fff; }
   .ll-sq.on{ background:linear-gradient(180deg, #fff6c4, #ffd23f); border-color:#fff; color:#3a1a00; box-shadow:0 0 18px 4px rgba(255,220,90,0.9); }
   .ll-sq.goop.on{ background:linear-gradient(180deg, #c8ff9a, #39d42a); color:#0d3a05; box-shadow:0 0 18px 4px rgba(120,255,90,0.85); }
-  .ll-sq.hit{ animation:llHit 0.25s steps(1) 4; }
+  .ll-sq.hit{ animation:llHit 0.36s steps(1) 3; }
   @keyframes llHit{ 50%{ background:#fff; box-shadow:0 0 26px 8px #fff; } }
   .ll-hub{ position:absolute; left:50%; top:50%; width:calc(var(--r) * 1.12); aspect-ratio:1; transform:translate(-50%, -50%); border-radius:50%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
     background:radial-gradient(circle at 40% 35%, #3a2a08, #0a0702 70%); border:4px solid var(--gold-2); box-shadow:inset 0 0 24px rgba(255,190,40,0.35); padding:10px; }
@@ -3178,15 +3178,15 @@
   .disco.still .dc-floor, .disco.still .dc-spots{ display:none; }
   :root.lite .show-marquee.disco i{ animation:none; }
   .show-marquee.strobe{ display:block !important; z-index:120; }
-  .show-marquee.strobe i{ animation:bulbStrobe .14s steps(1) 16; background:#ffe680; box-shadow:0 0 12px #ffd23f, 0 0 0 1.5px rgba(40,10,70,0.55); }
+  .show-marquee.strobe i{ animation:bulbStrobe .36s steps(1) 6; background:#ffe680; box-shadow:0 0 12px #ffd23f, 0 0 0 1.5px rgba(40,10,70,0.55); }
   @keyframes bulbStrobe{ 0%{ opacity:1; } 50%{ opacity:0.08; } }
   .pk-tractor{ position:absolute; z-index:3; width:96px; margin-left:-48px; transform-origin:50% 0; pointer-events:none; opacity:0;
     clip-path:polygon(38% 0, 62% 0, 100% 100%, 0 100%); background:linear-gradient(180deg, rgba(220,250,255,0.9), rgba(125,249,255,0.45) 60%, rgba(255,214,90,0.5)); }
   .pk-upcoin{ position:absolute; left:-9px; top:-9px; width:18px; height:18px; z-index:4; border-radius:50%; pointer-events:none;
     background:radial-gradient(circle at 35% 30%, #fff6c0, #ffd23f 55%, #c98a00); box-shadow:inset 0 0 0 2px rgba(122,74,0,0.55), 0 0 8px rgba(255,214,90,0.8); }
-  .show-marquee.unison i{ animation:bulbUnison .2s steps(1) 2; background:#fff6d0; box-shadow:0 0 12px #ffe27a, 0 0 0 1.5px rgba(40,10,70,0.55); }
+  .show-marquee.unison i{ animation:bulbUnison .36s steps(1) 2; background:#fff6d0; box-shadow:0 0 12px #ffe27a, 0 0 0 1.5px rgba(40,10,70,0.55); }
   @keyframes bulbUnison{ 0%{ opacity:1; } 50%{ opacity:0.1; } }
-  .show-marquee.miss i{ animation:bulbBlink .12s steps(1) 5; background:#ff3b3b; box-shadow:0 0 9px #ff2a2a, 0 0 0 1.5px rgba(40,10,70,0.55); }
+  .show-marquee.miss i{ animation:bulbBlink .36s steps(1) 2; background:#ff3b3b; box-shadow:0 0 9px #ff2a2a, 0 0 0 1.5px rgba(40,10,70,0.55); }
   .vs-tag{ position:absolute; right:12px; top:12px; z-index:6; padding:6px 13px 7px; border-radius:999px; white-space:nowrap; pointer-events:none; transform:rotate(6deg);
     font:900 clamp(18px, 5.4vw, 22px)/1 var(--f-display); letter-spacing:1px; color:#fff; text-shadow:0 2px 0 rgba(90,0,60,0.55);
     background:linear-gradient(120deg, #ffd23f 0%, #ff9a3c 40%, #ff3c9d 100%); border:3px solid #fff3c4;
@@ -3233,7 +3233,7 @@
   :root.lite .show-marquee .mq-g{ animation:none; }
   @media (prefers-reduced-motion: reduce){ .show-marquee .mq-g{ animation:none; } }
   @keyframes bulbChase{ 0%{ opacity:1; } 25%{ opacity:0.25; } 50%{ opacity:0.25; } 75%{ opacity:0.25; } }
-  .show-marquee.blink i{ animation:bulbBlink 0.16s steps(1) 6; }
+  .show-marquee.blink i{ animation:bulbBlink 0.36s steps(1) 3; }
   @keyframes bulbBlink{ 0%{ opacity:1; } 50%{ opacity:0.15; } }
   :root.tab-hidden .show-marquee i{ animation-play-state:paused; }
   @media (prefers-reduced-motion: reduce){ .show-marquee i{ animation:none; opacity:0.9; } }
@@ -4177,7 +4177,7 @@
   .reel-lights{ position:absolute; inset:-14px; border-radius:30px; pointer-events:none;
     background-image:radial-gradient(circle, #fff6c0 0 3.2px, rgba(255,214,90,0) 4px), radial-gradient(circle, #fff6c0 0 3.2px, rgba(255,214,90,0) 4px), radial-gradient(circle, #fff6c0 0 3.2px, rgba(255,214,90,0) 4px), radial-gradient(circle, #fff6c0 0 3.2px, rgba(255,214,90,0) 4px);
     background-size:20px 12px, 20px 12px, 12px 20px, 12px 20px; background-position:0 0, 0 100%, 0 0, 100% 0; background-repeat:repeat-x, repeat-x, repeat-y, repeat-y; opacity:0.9; }
-  .reel-wrap.spinning .reel-lights{ animation:reelBuzz 0.12s steps(1) infinite; }
+  .reel-wrap.spinning .reel-lights{ animation:reelBuzz 0.36s steps(1) infinite; }
   @keyframes reelBuzz{ 0%{ opacity:1; } 50%{ opacity:0.25; } }
   .reel-window{ position:relative; height:100%; overflow:hidden; border-radius:12px; background:#fffbe6; box-shadow:inset 0 6px 10px rgba(0,0,0,0.35), inset 0 -6px 10px rgba(0,0,0,0.3); }
   .reel-window::before, .reel-window::after{ content:''; position:absolute; left:0; right:0; height:22px; z-index:2; pointer-events:none; }
@@ -11417,7 +11417,7 @@
     const f = document.createElement('div'); f.className = 'letter-fly'; f.textContent = letter; showFx.appendChild(f);
     const x0 = a.left + a.width / 2, y0 = a.top + a.height / 2, x1 = b.left + b.width / 2, y1 = b.top + b.height / 2;
     f.animate([{ transform:'translate(' + x0 + 'px,' + y0 + 'px) scale(0.6)', opacity:0 },
-               { transform:'translate(' + x0 + 'px,' + (y0 - 40) + 'px) scale(2.4)', opacity:1, offset:0.25 },
+               { transform:'translate(' + x0 + 'px,' + (y0 - 30) + 'px) scale(1.7)', opacity:1, offset:0.25 },
                { transform:'translate(' + x1 + 'px,' + y1 + 'px) scale(1)', opacity:1 }], { duration:950, easing:'cubic-bezier(.5,0,.3,1)' }).onfinish = ()=>{ f.remove(); done(); };
   }
 
@@ -12151,7 +12151,7 @@
     const beamLook = true, flipIn = !resumeEndsAt && !FX.reduced();   // (D2: riddles get their own look and flip in too)
     const qMs = q.riddle ? RIDDLE_MS : dt(10000);   // (Run 4A: the Riddle Round gets its 30 s; a Brain Beam 10 s)
     runPendingQEndsAt = resumeEndsAt || (Date.now() + (flipIn ? dt(BEAM_FLIP_MS) : 0) + qMs);
-    if (DEBUG_FAST) window.__debugLastTriviaQ = q;
+    if (DEBUG_FAST || REPLAY) window.__debugLastTriviaQ = q;   // (tests and the TEST menu's screenshot runs)
     els.eventOverlay.classList.remove('hidden', 'powerup'); els.eventOverlay.classList.add('stack'); els.eventOverlay.style.setProperty('--bb', q.riddle ? '#c9ff7a' : '#ffd23f');
     els.powerupIcon.classList.add('hidden');
     fitTopChip();
@@ -12249,7 +12249,9 @@
       els.eventPrompt.textContent = letterLeft ? '✅ Correct! A Word Warp letter is yours' : '✅ Correct! +' + EXTRA_BEAM_POINTS + ' points';
       celebrateTriviaCorrect();
       renderRunBanner();
-      if (trayAt >= 0) flyTrayMark(trayAt, els.eventTiles[runPendingQCorrectIdx]);
+      // Run 4A: the face-down ? tile leaves from the answer's letter badge (left of the UFO, once its beam is down) - it
+      // used to rise from the middle of the answer, straight through the UFO hovering there; it lands before the result closes).
+      if (trayAt >= 0){ const t = els.eventTiles[runPendingQCorrectIdx], from = (t && t.querySelector('.tkey')) || t; setTimeout(()=> flyTrayMark(trayAt, from), FX.reduced() ? 0 : 400); }
     } else {
       sfx.wrong();
       runTriviaStreak = 0;
@@ -16547,7 +16549,9 @@
       const h = 56, top = Math.max(4, Math.round(ref.top - board.top - h - 6));
       el.style.inset = 'auto'; el.style.left = '0'; el.style.right = '0'; el.style.top = top + 'px'; el.style.height = h + 'px';
     }catch(e){}
-    popLetters(el.querySelector('.tc-text'), 'YOU GOT IT!', 0);
+    // Run 4A: no bouncing YOU GOT IT! over the Daily question panel (it already says Correct!, and the letters
+    // bounced up into the bulbs); Infinity keeps it.
+    if (runActive) el.querySelector('.tc-text').textContent = ''; else popLetters(el.querySelector('.tc-text'), 'YOU GOT IT!', 0);
     if (!prefersReducedMotion()){
       FX.shake(els.board);
       const r = els.eventPrompt.getBoundingClientRect(); FX.burst(showFx, r.left + r.width / 2, r.top, { count:26, spread:150, shapes:['strip', 'star', 'coin'], colors: worldConfetti() });

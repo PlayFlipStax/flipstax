@@ -150,28 +150,49 @@ glow, an optional gold sub line above it. One or two short lines - the act, the 
 ## The cast
 
 `lib/cast.js` / `lib/cast.css`, pictures in `data/cast/<name>-<pose>.webp` listed in `data/cast/manifest.js`
-(built by `tools/build-art.py`: trimmed, 900 px tall, feet on the bottom edge - one shared baseline).
+(trimmed, 900 px tall, feet on the bottom edge - one shared baseline).
 
-- Members: `orange` (the sidekick), `pink` and `purple` (presenters; `Cast.presenter()` picks tonight's by the
-  episode seed, the other one when that lady has no picture yet).
-- `Cast.show(name, pose, side, { hold, while, say, peek })`, `Cast.hide()`. A pose without a picture falls back to
-  the member's idle with a gentle bob (a laugh: idle plus a quick wiggle), else any picture of theirs, else they sit
-  the moment out. Entrance: a slide in from the side with a pop; idle bob; exit: a slide back out. Transform and
-  opacity only; lite mode and reduced motion: a plain fade, standing still.
-- **Showcase only**, at between-play moments: the Mystery Game door (the presenter, right), the Cosmic Surprise prize
-  (left), the Word Warp solve fanfare (right), the Lucky Lights bank (left, peek), the results (right, peek). Never
-  during timed play, never on a VS card. On the right-hand side the picture is mirrored so the open hand points in.
-- `peek`: smaller, half past the screen edge - wherever content fills the screen, so nothing that matters is covered.
-  The cast never takes a tap (pointer-events: none).
-- The sidekick's laugh (`Cast.oops`): only after a wrong pick that already shows its red X and buzzer (Brain Beam,
-  the riddle, trivia), at most once per act, never on a time-out or a VS pick; a speech bubble, "Ooh, so close!".
-- The bottom lane (Run 4): the strip under every game screen (36 px) belongs to the corner host (a small head-and-shoulders at the left, the same size everywhere) and, after a wrong answer, the sidekick at the right (a small bust, the bubble to his left; not on screens under 640 px tall). The games' own stage hosts are not shown in image mode, and nothing is centred. On the results panel there is no room on a phone, so the presenter only takes a bow on tablets (700 px and up, left side). Gated with the host: the cast shows only in HOST_IMAGE_MODE (lib/host.js - the host's full rendered pose set is in),
-  so rendered and drawn characters never share a screen; until then the stage shows alone. On localhost
-  `?castpreview=1` lets the cast on for checking the art.
+- Members (Run 4A): `purple` = **Cleo Cosmic**, the presenter (`purple-presenting`, cut out of its studio backdrop on
+  Oct 22); `kandi` = **Kandi Cosmos**, who sits out until a `kandi-*` picture is listed; `flip` = the host himself
+  (`HOST_NAME` in data/game-names.js), his pictures taken from data/host. Barnaby (the orange sidekick) and the old
+  pink presenter are out of the show; their files stay in data/cast, unlisted.
+- `Cast.show(name, pose, side, { hold, while, say, peek })`, `Cast.hide()`. Entrance: a slide in from the side with
+  a pop; idle bob; exit: a slide back out. Transform and opacity only; lite mode and reduced motion: a plain fade.
+  Cleo's picture points to its left, so it is mirrored on the left side - her open hand always points in.
+- **Milestone reactions only**, each about one time in three (`Cast.REACTION_CHANCE`), never taking a tap
+  (pointer-events: none) and never holding up the next screen:
+  - `Cast.win()` - a round-end game won: the presenter (Cleo, or Kandi on alternate wins once she has a picture)
+    pops out from the left, small (`peek`), pointing toward the score.
+  - `Cast.oops()` - a failure (a wrong Brain Beam or riddle pick, a lost round-end game): the host laughs or winces
+    (laugh / oops poses) at the right with a short line.
+- Gated with the host: the cast shows only in HOST_IMAGE_MODE (lib/host.js); on localhost `?castpreview=1` lets the
+  cast on for checking the art.
+
+## The show flow (Run 4A)
+
+The episode: cold open -> six rounds -> the Word Warp finale -> the outro -> results (data/rundown.js). A round:
+title card -> zoom in -> VS block -> Brain Beam -> game intro -> explainer -> round-end game -> reward beat -> (zoom out
+into the next round's title card).
+
+| Piece | What it is | Rules |
+|---|---|---|
+| Cue line (`.fs-line`) | The host's line as a cream caption plate at the foot of the stage, with his voice blips | Up for 1 s + 0.25 s a word, never under 2 s (`CUE_LINE_MIN`). Body type, never under 16 px. |
+| Cold open | ENTER -> the curtains part -> the host's four intro lines (data/game-names.js `intro.first`) | About 20 s the first time, one 3 s line for a returning player; a tap skips (after `SKIP_AFTER`). |
+| Round title card (`.flipstage`) | The host on the stage, one announcement line; the marquee shows ROUND N / OF 6, a POINTS xN pill | `ACT_CARD_HOLD` or as long as the line needs. The first time, the host's VS explanation follows as a second line (a tap skips it). |
+| Zoom through the marquee | The stage and the host push toward the marquee, a gold-white bloom swells to one peak, the play is swapped in under it, the bloom fades | `ZOOM_MS` (0.9 s), one pulse, transform/opacity only, no live blur; reversed (zoom out) at the next round. Lite / reduced motion: a 0.3 s dark crossfade. |
+| Game intro (`.gintro`) | A spotlight sweeps once, the game's title slams onto a bulb-lit plate in its colours, the bulbs chase | `GAME_INTRO_MS` (2 s). Before every round-end game and the Word Warp. Lite / reduced motion: the title fades in. |
+| Explainer card (`.explainer`) | The game's rule: full the first time a player meets it, one line after (data/game-names.js `explainers`) | 1 s + 0.25 s a word; over 15 words it waits for GOT IT. A tap skips. Seen keys in localStorage `flipstax_explainers_v1`. |
+| ? button (`.help-btn`) | Bottom left, in the lane the corner host used to keep: replays the full explainer as a small card | Shown on a VS card, a round-end game and the Word Warp; never pauses play; a tap closes the card. |
+| Reward beat (`.reward`) | ROUND N DONE!: the round's points, its letter (? or X), its gold keys, the running totals | `REWARD_HOLD` (2.2 s); a tap skips after `SKIP_AFTER`. |
+| Round tracker (`.sp-rounds`) | Six segments along the bottom of the HUD pill: done (gold), now (pink, a slow glow), to come | The pill's label reads R3 x2 (the round and its multiplier). |
+
+**Light and motion safety:** no element flashes more than 3 times a second (every steps(1) blink is at least 0.36 s a
+cycle), no large saturated red flash (a wrong answer is a thin red edge and a low glow, one pulse), and
+`prefers-reduced-motion` swaps every fancy transition for a plain crossfade or a still end state.
 
 ## The host
 
-One host per screen (the disco celebration is the only exception). Every host is a **rig** from `lib/host.js`:
+Run 4A: the host appears only in the cold open, the round title cards, the outro and his failure reactions - no corner host on gameplay screens, none at the Mystery Door or in the disco. Every host is a **rig** from `lib/host.js`:
 `Host.html({ kind:'full'|'head', pose })` makes one, `Host.pose(el, name, { hold, then })` changes what he does,
 `Host.poseAll(name)` poses the one on screen. Poses: `idle`, `idleClosed`, `blink`, `wave`, `point`, `cheer`,
 `think`, `shrug`, `wink`, `oops`, `gasp`, `presenting`, `laugh`, and for the disco `discoPoint`, `swayL`, `swayR`,
