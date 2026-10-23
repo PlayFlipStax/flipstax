@@ -16041,12 +16041,19 @@
     if (correct){
       showFlash('win'); hostMood('cheer'); hostSay(hostLine('right')); sfx.cheer();
       els.eventOverlay.classList.add('flash-win');   // the marquee bulbs flash
-      if (right){ FX.beamHit(showFx, [right]); FX.glowSweep(showFx, right); FX.burstAt(showFx, right, { count:14, spread:110, shapes:['star', 'coin'] }); FX.pop(right, 1.12); }
+      if (right){
+        FX.beamHit(showFx, [right]);
+        // Run 5A: Daily's laser sweep, bulb chase and burst (lib/juice.js) in place of the glow sweep and the star burst
+        if (window.Juice && document.documentElement.classList.contains('mode-daily')) Juice.correct(right, { count:18 });
+        else { FX.glowSweep(showFx, right); FX.burstAt(showFx, right, { count:14, spread:110, shapes:['star', 'coin'] }); }
+        FX.pop(right, 1.12);
+      }
     } else {
       showFlash('lose'); hostMood('sad'); hostSay(hostLine(pickIdx == null ? 'slow' : 'wrong')); sfx.crowdOoh();
       if (picked) picked.classList.add('is-wrong');
       if (pickIdx != null) castOops();   // Run 3: the sidekick laughs along (a wrong pick, not a time-out)
-      FX.shake(document.getElementById('eventGrid'));
+      if (window.Juice && document.documentElement.classList.contains('mode-daily') && picked) Juice.wrong(picked);   // Run 5A: the pick dims and shakes
+      else FX.shake(document.getElementById('eventGrid'));
     }
   }
   // Portal Pick (B3): the picked door swings open and its power-up comes out
