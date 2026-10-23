@@ -1,0 +1,30 @@
+/* FlipStax - Run 5A "juice" (lib/juice.js): the shared look of the VS card, Brain Beam and Word Warp screens.
+   Palette: VS side A orange (#FF9F1C -> #E8590C), side B teal (#2EC4B6 -> #0E7C86), accents hot pink and cyan,
+   gold for highlights, deep purple behind. Transform and opacity animations only; lite mode and reduced motion hold
+   still. */
+:root{
+  --jc-orange-1:#FF9F1C; --jc-orange-2:#E8590C; --jc-teal-1:#2EC4B6; --jc-teal-2:#0E7C86;
+  --jc-pink:#ff3c9d; --jc-cyan:#7df9ff; --jc-gold:#ffd23f; --jc-gold-hi:#fff4b8; --jc-gold-lo:#c98a00; --jc-purple:#1c0b3d; --jc-purple-2:#2a0b55;
+}
+
+/* ---- 1. The sunburst backdrop: rays from a point a little above the middle, turning once in 75 s ---- */
+.sunburst{ pointer-events:none; overflow:hidden; opacity:0; visibility:hidden; transition:opacity 300ms ease, visibility 0s linear 300ms;
+  --sb-bg:#1c0b3d; --sb-a:#2f1263; --sb-b:#23094d; --sb-glow:rgba(255,60,157,0.28); }
+.sunburst.on{ opacity:1; visibility:visible; transition:opacity 300ms ease, visibility 0s; }
+.sunburst.sb-page{ position:fixed; inset:0; z-index:-2; background:var(--sb-bg); }
+.sunburst.sb-in{ position:absolute; inset:0; z-index:-1; background:var(--sb-bg); }
+.sb-rays{ position:absolute; left:50%; top:42%; width:140vmax; height:140vmax; margin:-70vmax 0 0 -70vmax; border-radius:50%;
+  background:repeating-conic-gradient(from 0deg, var(--sb-a) 0deg 9deg, var(--sb-b) 9deg 18deg);
+  animation:sbTurn 75s linear infinite; will-change:transform; }
+.sb-vignette{ position:absolute; inset:0;
+  background:radial-gradient(60% 45% at 50% 42%, var(--sb-glow), rgba(0,0,0,0) 70%), radial-gradient(120% 90% at 50% 45%, rgba(10,2,24,0.35) 0%, rgba(10,2,24,0.1) 45%, rgba(10,2,24,0.6) 100%); }
+@keyframes sbTurn{ to{ transform:rotate(360deg); } }
+/* colour schemes, one a game: low contrast between the two ray shades so text on top keeps 4.5:1 */
+.sunburst[data-sb="vs"]{ --sb-bg:#1c0b3d; --sb-a:#34126b; --sb-b:#260a52; --sb-glow:rgba(255,60,157,0.26); }
+.sunburst[data-sb="beam"]{ --sb-bg:#0f1450; --sb-a:#1d2a86; --sb-b:#141d66; --sb-glow:rgba(125,249,255,0.22); }
+.sunburst[data-sb="warp"]{ --sb-bg:#2a0838; --sb-a:#4f1266; --sb-b:#3a0b4f; --sb-glow:rgba(255,210,63,0.2); }
+:root.lite .sb-rays{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .sb-rays{ animation:none; } }
+/* with the sunburst behind them, the Word Warp overlay and the stage's dim shot step aside */
+:root.sb-on .solve-overlay{ background:transparent !important; }
+:root.sb-on .solve-overlay .warp-bg{ display:none !important; }

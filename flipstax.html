@@ -38,6 +38,7 @@
 <link rel="stylesheet" href="lib/host.css">
 <link rel="stylesheet" href="lib/stage.css">
 <link rel="stylesheet" href="lib/cast.css">
+<link rel="stylesheet" href="lib/juice.css">
 <link rel="preload" as="image" href="data/stage/stage-close.webp" type="image/webp">
 <style>
   :root{
@@ -4892,6 +4893,7 @@
 <script src="lib/stage.js"></script>
 <script src="data/cast/manifest.js"></script>
 <script src="lib/cast.js"></script>
+<script src="lib/juice.js"></script>
 <script>
 (function(){
 
@@ -11892,7 +11894,16 @@
     helpPeekT = setTimeout(closeHelpPeek, Math.max(2500, explainerMs(text) + 1000));
   });
   new MutationObserver(updateHelpBtn).observe(showCard, { attributes:true, attributeFilter:['class'] });
-  onSceneChange = ()=>{ updateHelpBtn(); if (Show.scene === 'idle'){ zoomSeq++; zoomFx.classList.add('hidden'); closeHelpPeek(); } };   // (leaving the show: no zoom or ? card left up)
+  // Run 5A: the sunburst behind the VS cards, the Brain Beams and the Word Warp (lib/juice.js); the studio stays for the
+  // cutscenes, title cards, rewards and results.
+  function updateSunburst(){
+    if (!window.Sunburst) return;
+    const sb = runActive && document.documentElement.classList.contains('mode-daily') ? ({ vs:'vs', quiz:'beam', wordwarp:'warp' })[Show.scene] || null : null;
+    Sunburst.set(sb && sb !== 'warp' ? sb : null);
+    Sunburst.set(sb === 'warp' ? 'warp' : null, els.solveOverlay);
+    document.documentElement.classList.toggle('sb-on', !!sb);
+  }
+  onSceneChange = ()=>{ updateHelpBtn(); updateSunburst(); if (Show.scene === 'idle'){ zoomSeq++; zoomFx.classList.add('hidden'); closeHelpPeek(); } };   // (leaving the show: no zoom or ? card left up)
   // The commercial break: a 3 s fake 70s ad, skippable. Built as one component (an ad in,
   // done() out) so a real ad can take its place later.
   // D8 (Oct 16): the commercial break as a retro TV spot - a wood-grain TV with a curved screen, scanlines and a
