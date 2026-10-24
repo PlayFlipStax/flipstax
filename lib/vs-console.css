@@ -217,3 +217,7 @@
    stepped down until picture and label both sit inside the window), so the old fitter's classes do nothing here. */
 :root.vsc-ready.mode-daily:not(.event-open) #board .half.has-glyph.fit-none .scene{ display:flex; }
 :root.vsc-ready.mode-daily:not(.event-open) #board .half.has-glyph.fit-tight .scene .glyph{ font-size:min(calc(var(--vsc-top-h) * 0.4 * var(--vk, 1.4)), 108px); }
+
+/* the stray gold line right under the top HUD: it was the page header's own 2 px bottom border (rgb 232,178,61), full width - a leftover of the
+   old layout; gone on the console screen (the gold outer frame and the bulbs are separate and stay) */
+:root.vsc-ready.mode-daily:not(.event-open) header{ border-bottom:0 !important; box-shadow:none !important; }
