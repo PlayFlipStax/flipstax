@@ -8698,7 +8698,7 @@
     // Oct 24: every card shows an emoji on both sides and the two never match (data/vs/vs-emoji.js): an empty side (or the old
     // sparkle placeholder) takes its category's fallback, and where both sides match one takes another from the category's
     // family, picked by the card (the same choice on every device and every day).
-    all.forEach(c=>{ const g = window.FLIPSTAX_VS_EMOJI.fix(c.category, c.glyphA, c.glyphB, cardKey(c)); c.glyphA = g[0]; c.glyphB = g[1]; });
+    all.forEach(c=>{ const g = window.FLIPSTAX_VS_EMOJI.fix(c.category, c.glyphA, c.glyphB, cardKey(c), c.a, c.b); c.glyphA = g[0]; c.glyphB = g[1]; });
     return { daily: all, infinity: all };
   }
   const CARD_POOLS = buildCardPools();
