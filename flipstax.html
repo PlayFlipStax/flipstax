@@ -14944,15 +14944,18 @@
     els.solveHintBtn.classList.toggle('disabled', runHintsRevealed >= runWord.hints.length);
     els.solveAttempts.textContent = (RUN_MAX_GUESSES - solveGuesses.length) + ' guesses left';
     els.solveSlots.innerHTML = '';
+    const slotSigPrev = renderSolveUI._sig || [], slotSig = [];
     for (let i=0;i<RUN_WORD_LENGTH;i++){
       const filled = solveLockedLetters[i] || solveCurrentGuess[i];
       const div = document.createElement('div');
-      div.className = 'solve-slot' + (solveLockedLetters[i] ? ' locked' : '');
+      slotSig[i] = (solveLockedLetters[i] ? 'L' : 'g') + (filled || '');
+      div.className = 'solve-slot' + (solveLockedLetters[i] ? ' locked' : '') + (slotSig[i] !== slotSigPrev[i] && (filled || slotSigPrev[i] === undefined) ? ' pop' : '');   // (Run 6b: a slot whose letter just changed pops in)
       div.style.setProperty('--i', i);
       div.textContent = filled || '';
       if (!solveLockedLetters[i]) div.onclick = ()=> removeFromGuess(i);
       els.solveSlots.appendChild(div);
     }
+    renderSolveUI._sig = slotSig;
     els.solveRackLabel.textContent = solveRack.length > 0 ? (document.documentElement.classList.contains('mode-daily') ? 'Put these in place' : 'Your letters') : solveBonusNote;
     els.solveRackLabel.classList.toggle('hidden', solveRack.length === 0 && !solveBonusNote);
     els.solveRack.innerHTML = '';
