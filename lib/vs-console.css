@@ -109,9 +109,12 @@
 /* the card itself: its picture, label and tag fade and slide up into the window */
 :root.vsc-ready.mode-daily:not(.event-open) #board.vsc-deal .half > .scene,
 :root.vsc-ready.mode-daily:not(.event-open) #board.vsc-deal .half > .content,
-:root.vsc-ready.mode-daily:not(.event-open) #board.vsc-deal .half > .cat-chip{ animation:vscCardIn 380ms cubic-bezier(.2,.8,.3,1) 60ms both; }
+:root.vsc-ready.mode-daily:not(.event-open) #board.vsc-deal .half > .cat-chip{ animation:vscCardIn 420ms cubic-bezier(.2,.8,.3,1) 40ms both; }
 :root.vsc-ready.mode-daily:not(.event-open) #board.vsc-deal .half.bottom > *{ animation-delay:170ms; }
-@keyframes vscCardIn{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
+@keyframes vscCardIn{ from{ opacity:0; transform:translateX(var(--vsc-in, 0px)); } to{ opacity:1; transform:none; } }
+/* Item 3 (Oct 24): the top card slides in from the left, the bottom one from the right */
+:root.vsc-ready.mode-daily:not(.event-open) #board .half.top{ --vsc-in:-64px; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half.bottom{ --vsc-in:64px; }
 /* lite / reduced motion: no crackle; a plain fade */
 :root.lite .vsc-ring, :root.lite .vsc-cover{ display:none; }
 :root.lite.vsc-ready.mode-daily #board.vsc-deal .half > *{ animation:vscFade 240ms ease-out both !important; }
@@ -238,3 +241,25 @@
 :root.vsc-ready.mode-daily:not(.event-open) #board .half.bottom .cat-chip{ top:-11px !important; }
 :root.vsc-ready.mode-daily:not(.event-open) #board .round-timer{ top:calc(var(--vsc-top-y) + 7px); }
 @media (max-width:370px){ :root.vsc-ready.mode-daily:not(.event-open) #board .half .cat-chip{ font-size:9.5px !important; padding:2px 7px !important; } }
+
+/* after the entrance: the content drifts a few pixels left and right, opposite ways on the two windows (the `translate` property,
+   so it never fights the entrance's transform), and a slow light sweeps across each window */
+@keyframes vscDriftA{ from{ translate:-5px 0; } to{ translate:5px 0; } }
+@keyframes vscDriftB{ from{ translate:5px 0; } to{ translate:-5px 0; } }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half.top > .scene, :root.vsc-ready.mode-daily:not(.event-open) #board .half.top > .content{ animation:vscDriftA 3.6s ease-in-out 0.5s infinite alternate; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half.bottom > .scene, :root.vsc-ready.mode-daily:not(.event-open) #board .half.bottom > .content{ animation:vscDriftB 3.6s ease-in-out 0.5s infinite alternate; }
+:root.vsc-ready.mode-daily:not(.event-open) #board.vsc-deal .half.top > .scene, :root.vsc-ready.mode-daily:not(.event-open) #board.vsc-deal .half.top > .content{ animation:vscCardIn 420ms cubic-bezier(.2,.8,.3,1) 40ms both, vscDriftA 3.6s ease-in-out 0.5s infinite alternate; }
+:root.vsc-ready.mode-daily:not(.event-open) #board.vsc-deal .half.bottom > .scene, :root.vsc-ready.mode-daily:not(.event-open) #board.vsc-deal .half.bottom > .content{ animation:vscCardIn 420ms cubic-bezier(.2,.8,.3,1) 150ms both, vscDriftB 3.6s ease-in-out 0.5s infinite alternate; }
+.vsc-sweep{ position:absolute; overflow:hidden; border-radius:12px; pointer-events:none; }
+.vsc-sweep.top{ left:var(--vsc-top-x); top:var(--vsc-top-y); width:var(--vsc-top-w); height:var(--vsc-top-h); }
+.vsc-sweep.bot{ left:var(--vsc-bot-x); top:var(--vsc-bot-y); width:var(--vsc-bot-w); height:var(--vsc-bot-h); }
+.vsc-sweep i{ position:absolute; top:-10%; bottom:-10%; left:0; width:34%; opacity:0.55; transform:translateX(-120%) skewX(-16deg);
+  background:linear-gradient(100deg, rgba(255,255,255,0) 0%, rgba(255,246,214,0.10) 40%, rgba(255,255,255,0.26) 50%, rgba(255,246,214,0.10) 60%, rgba(255,255,255,0) 100%);
+  animation:vscSweep 5.2s ease-in-out 1.2s infinite; }
+.vsc-sweep.bot i{ animation-delay:3.4s; }
+@keyframes vscSweep{ 0%{ transform:translateX(-120%) skewX(-16deg); } 55%, 100%{ transform:translateX(330%) skewX(-16deg); } }
+:root.vsc-ready.mode-daily.event-open .vsc-sweep, :root.vsc-ready.mode-daily .vsc.lit .vsc-sweep{ opacity:0; }
+/* lite / reduced motion: no drift, no sweep, no slide - the plain fade stays */
+:root.lite .vsc-sweep, :root.vsc-rm .vsc-sweep{ display:none; }
+:root.lite.vsc-ready.mode-daily #board .half > .scene, :root.lite.vsc-ready.mode-daily #board .half > .content, :root.vsc-rm.vsc-ready.mode-daily #board .half > .scene, :root.vsc-rm.vsc-ready.mode-daily #board .half > .content{ translate:none !important; }
+:root.lite.vsc-ready.mode-daily #board .half{ --vsc-in:0px !important; } :root.vsc-rm.vsc-ready.mode-daily #board .half{ --vsc-in:0px !important; }
