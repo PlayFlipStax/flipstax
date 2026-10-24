@@ -30,3 +30,48 @@
 :root.vsc-ready.mode-daily:not(.event-open) header .vibe-wrap{ display:none; }
 /* the real bottom bar (the hint, the corner host, TEST) stays on top of the picture's bottom */
 :root.vsc-ready.mode-daily:not(.event-open) .hint{ position:fixed; left:0; right:0; bottom:0; z-index:3; }
+
+/* ---- Item 3: live content ---- */
+.vsc-frame{ container-type:inline-size; }
+/* the HUD on the dark grill: light text; the six round sockets: done green, current pulsing blue, upcoming dim */
+.vsc-hud{ position:absolute; left:var(--vsc-grill-x); top:var(--vsc-grill-y); width:var(--vsc-grill-w); height:var(--vsc-grill-h);
+  display:flex; align-items:center; justify-content:center; gap:4%; white-space:nowrap; font-family:var(--f-display, 'Big Shoulders Display', sans-serif); color:#eaf6ff;
+  text-shadow:0 0 6px rgba(120,220,255,0.75), 0 1px 0 rgba(0,0,0,0.8); line-height:1; }
+.vsc-pts{ display:flex; align-items:baseline; gap:0.25em; font-weight:900; font-size:calc(var(--vsc-grill-h) * 0.72); letter-spacing:0.02em; }
+.vsc-pts small{ font-size:0.55em; letter-spacing:0.12em; color:#9fe3ff; }
+.vsc-round{ font-weight:800; font-size:calc(var(--vsc-grill-h) * 0.48); letter-spacing:0.08em; color:#ffd9f2; text-shadow:0 0 6px rgba(255,90,200,0.7), 0 1px 0 rgba(0,0,0,0.8); }
+.vsc-combo{ font-style:normal; font-weight:900; font-size:calc(var(--vsc-grill-h) * 0.5); color:#ffe27a; text-shadow:0 0 6px rgba(255,200,60,0.8); }
+.vsc-rs{ position:absolute; inset:0; pointer-events:none; }
+.vsc-rs i{ position:absolute; aspect-ratio:1; border-radius:50%; opacity:0.18;
+  background:radial-gradient(circle at 50% 42%, #e9e5ff 0 18%, #8d86b8 40%, rgba(80,70,130,0) 72%); }
+.vsc-rs i.done{ opacity:1; background:radial-gradient(circle at 50% 42%, #eaffef 0 16%, #4dff7a 36%, rgba(30,200,80,0.55) 56%, rgba(30,200,80,0) 72%); }
+.vsc-rs i.now{ opacity:1; background:radial-gradient(circle at 50% 42%, #f2fbff 0 16%, #4dc6ff 36%, rgba(40,140,255,0.6) 56%, rgba(40,140,255,0) 72%); animation:vscNow 1.1s ease-in-out infinite alternate; }
+@keyframes vscNow{ from{ opacity:0.55; } to{ opacity:1; } }
+/* the VS cog on the coin, a gentle pulse */
+.vsc-badge{ position:absolute; left:var(--vsc-coin-x); top:var(--vsc-coin-y); width:var(--vsc-coin-w); height:var(--vsc-coin-h); object-fit:contain;
+  animation:vscBadge 2.4s ease-in-out infinite; transform-origin:50% 50%; }
+@keyframes vscBadge{ 0%, 100%{ transform:scale(1); } 50%{ transform:scale(1.045); } }
+:root.vsc-ready.mode-daily:not(.event-open) #board .divider{ visibility:hidden; }
+:root.vsc-ready.mode-daily:not(.event-open) header .pill-row{ visibility:hidden; }
+/* the REPLAY MODE tag (test mode) in the small readout box under the sign */
+:root.vsc-ready.mode-daily:not(.event-open) .replay-tag{ left:calc(var(--vsc-x) + var(--vsc-readout-x)); top:calc(var(--vsc-y) + var(--vsc-readout-y)); width:var(--vsc-readout-w); height:var(--vsc-readout-h);
+  transform:none; padding:0; display:flex; align-items:center; justify-content:center; background:none; box-shadow:none; border-radius:4px;
+  font:800 calc(var(--vsc-readout-h) * 0.42)/1 Inter, system-ui, sans-serif; letter-spacing:0.03em; color:#ff8fc8; text-shadow:0 0 6px rgba(255,80,170,0.85); white-space:nowrap; overflow:hidden; }
+/* the cards: no skin of their own - the console's window shows through; a big glyph with a soft shadow, a chunky
+   two-line label, a small category tag top-left. (No live blur: the frosted label panel goes.) */
+:root.vsc-ready.mode-daily:not(.event-open) #board .half{ background:none !important; border:0 !important; box-shadow:none !important; border-radius:14px; clip-path:none;
+  padding:calc(var(--vsc-top-h) * 0.16) 8px calc(var(--vsc-top-h) * 0.06); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; overflow:visible; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half::after,
+:root.vsc-ready.mode-daily:not(.event-open) #board .half > .gloss, :root.vsc-ready.mode-daily:not(.event-open) #board .half > .fill{ display:none; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half .content{ background:none !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; border:0 !important; padding:0 4px !important; max-width:100%; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half .scene{ position:relative; inset:auto; flex:0 1 auto; min-height:0; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half .scene .glyph{ font-size:min(calc(var(--vsc-top-h) * 0.4), 76px); opacity:1; transform:none; filter:drop-shadow(0 6px 5px rgba(10,0,30,0.5)); }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half .scene .glyph img{ max-height:calc(var(--vsc-top-h) * 0.44); width:auto; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half .take{ font:900 clamp(22px, 6.6vw, 34px)/0.98 var(--f-display, 'Big Shoulders Display', sans-serif); letter-spacing:0.01em; color:#fff; text-align:center;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; max-width:100%;
+  text-shadow:0 2px 0 rgba(26,4,48,0.95), 0 0 2px rgba(0,0,0,0.9), 0 4px 10px rgba(10,0,30,0.65); }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half .cat-chip{ position:absolute; top:6px; left:8px; right:auto; bottom:auto; transform:none; margin:0; font-size:11px; padding:3px 8px; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half.revealed .take{ color:#fff; }
+/* lite / reduced motion: the badge and the current-round socket hold still */
+:root.lite .vsc-badge, :root.lite .vsc-rs i.now{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .vsc-badge, .vsc-rs i.now{ animation:none; } }
