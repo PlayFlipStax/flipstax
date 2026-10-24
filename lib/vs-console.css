@@ -230,3 +230,11 @@
   max-width:calc(100% - 24px); box-sizing:border-box; padding:3px 10px; font-size:11px; line-height:1.15; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; }
 @media (max-width:370px){ :root.vsc-ready.mode-daily:not(.event-open) #board .half .cat-chip{ font-size:10px; padding:3px 8px; max-width:calc(100% - 20px); } }
 :root.vsc-ready.mode-daily:not(.event-open) #board .round-timer{ top:calc(var(--vsc-top-y) + 13px); }
+
+/* the chip sits INSIDE the notch tab at the top-centre of each window (it used to straddle the edge): a slim chip, lifted so it lies
+   in the lip under the green tab (top window) and in the notch under the VS cog (bottom window), clear of the timer bar and the cog */
+:root.vsc-ready.mode-daily:not(.event-open) #board .half .cat-chip{ padding:2px 9px !important; font-size:10.5px !important; line-height:1.1 !important; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half.top .cat-chip{ top:-18px !important; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half.bottom .cat-chip{ top:-11px !important; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .round-timer{ top:calc(var(--vsc-top-y) + 7px); }
+@media (max-width:370px){ :root.vsc-ready.mode-daily:not(.event-open) #board .half .cat-chip{ font-size:9.5px !important; padding:2px 7px !important; } }
