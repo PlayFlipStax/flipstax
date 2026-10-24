@@ -181,3 +181,17 @@
 :root.lite .vsr-frame{ transform:none; animation:vscFade 180ms ease-out forwards; }
 :root.lite .vsr-bulbs i, :root.lite .vsc.lit .vsc-bulbs i{ animation:none; opacity:0.9; }
 @media (prefers-reduced-motion: reduce){ .vsr-ring, .vsr-laser{ display:none; } .vsr-frame{ transform:none; animation:vscFade 180ms ease-out forwards; } .vsr-bulbs i, .vsc.lit .vsc-bulbs i{ animation:none; opacity:0.9; } }
+
+/* reduced motion as a class too (lib/vs-console.js sets :root.vsc-rm from the media query): the same as lite */
+:root.vsc-rm .vsc-badge, :root.vsc-rm .vsc-rs i.now{ animation:none; }
+:root.vsc-rm .vsc-bulbs i, :root.vsc-rm .vsc-btns i{ animation:none; }
+:root.vsc-rm .vsc-bulbs i{ opacity:0.55; } :root.vsc-rm .vsc-btns i{ opacity:0.3; }
+:root.vsc-rm .vsc-ring, :root.vsc-rm .vsc-cover{ display:none; }
+:root.vsc-rm.vsc-ready.mode-daily #board.vsc-deal .half > *{ animation:vscFade 240ms ease-out both !important; }
+:root.vsc-rm .vsr-ring, :root.vsc-rm .vsr-laser{ display:none; }
+:root.vsc-rm .vsr-frame{ transform:none; animation:vscFade 180ms ease-out forwards; }
+:root.vsc-rm .vsr-bulbs i, :root.vsc-rm .vsc.lit .vsc-bulbs i{ animation:none; opacity:0.9; }
+
+/* long labels: a size down and up to three lines, never cut short mid-thought */
+:root.vsc-ready.mode-daily:not(.event-open) #board .half .take.vsc-long, .vsr-take.vsc-long{ font-size:clamp(19px, 5.4vw, 28px); -webkit-line-clamp:3; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half .take.vsc-xlong, .vsr-take.vsc-xlong{ font-size:clamp(16px, 4.5vw, 23px); -webkit-line-clamp:4; line-height:1.02; }

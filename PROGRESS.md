@@ -172,3 +172,15 @@ Verify on Windows: `tools/flow-episodes.ps1` (the 40-episode set in headless Chr
 - Open issues: the Brain Beam screen alone sits at the p95 edge (16.9-33.3 ms between runs); the font is not subset (the OFL reserves the name for unmodified copies); the REPLAY MODE tag overlaps the wordmark (test mode only); particles look faint in screenshots; the VS winner pop and the Word Warp ripple can't be reached in replay (checked with mock tallies and direct calls).
 
 **Next: Run 6 - VS screen redesign** using the art in incoming-assets/gemini/ (mothership, crackle frames and the rest). Not started.
+
+## Q. Run 6 - VS screen redesign (Oct 23-24)
+The Daily VS screen on the Gemini console art (lib/vs-console.js + .css, data/vs/). Each item passed a 5-episode fast check; review shots in review-shots/run6/ (not committed).
+- [x] Q1. Assets: tools/build-vs-art.py - console clean/lit 780x1519 (148 / 174 KB; the originals are 736 wide, so a slight upscale), badge 15 KB, 12 crackle frames 45-55 KB; 952 KB in all (2b09f84)
+- [x] Q2. Layout: data/vs/console-layout.js (measured regions), fixed-aspect console, cards in the windows (8110804)
+- [x] Q3. Live content: cards, HUD on the grill + six round sockets, VS cog, REPLAY tag in the readout box (42176aa)
+- [x] Q4. 50 chasing bulbs on the tray's sockets (not 60: the coin and the picture's edges hide the rest), arcade button glow (5b6d947)
+- [x] Q5. Card entrance with the crackle flicker, 8 frames a second (ec13d4a)
+- [x] Q6. The tap reveal, all over by 1.2 s (e1df155)
+- [x] Q7. Lite and reduced motion (also as :root.vsc-rm), long labels step down a size instead of being cut. Frame times on this Mac (WebKit, no CPU throttle): VS p95 18.0 ms full and lite (60 Hz vsync); the 4x-CPU check (tools/frametime.ps1, Chrome) still needs the work PC.
+- Open: incoming-assets/references/ was empty; there is no rewind / forward bar in the game (the hint, corner host and TEST bar stay on top); the HUD shows points, round and combo only - the letter tray and gold keys are not on the VS screen any more.
+
