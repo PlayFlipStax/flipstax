@@ -203,7 +203,7 @@
 /* item 3: the red bar is the VS timer (it drains as the card waits; red = a card's time running low). It was on the tab above
    the window; now a thin bar inside the window's top edge */
 :root.vsc-ready.mode-daily:not(.event-open) #board .round-timer{ left:calc(var(--vsc-top-x) + 14px); top:calc(var(--vsc-top-y) + 5px); width:calc(var(--vsc-top-w) - 28px); height:4px; z-index:4; background:rgba(10,3,24,0.55); }
-:root.vsc-ready.mode-daily:not(.event-open) #board .half.top .cat-chip{ top:14px; }
+
 
 /* the emoji never gets squeezed out: the top window is a little shorter than the bottom one, and a two-line label used to squeeze the picture's
    box to nothing (the flex item shrank, the emoji spilled up out of the window and the label, painted later, covered what was left) */
@@ -221,3 +221,12 @@
 /* the stray gold line right under the top HUD: it was the page header's own 2 px bottom border (rgb 232,178,61), full width - a leftover of the
    old layout; gone on the console screen (the gold outer frame and the bulbs are separate and stay) */
 :root.vsc-ready.mode-daily:not(.event-open) header{ border-bottom:0 !important; box-shadow:none !important; }
+
+/* the category chip: centred in the notch at the top-centre of each window (the lip under the green tab on the top window, the notch
+   under the VS cog on the bottom one) - the same layout in both; it straddles the window's top edge, clear of the timer bar (which sits a
+   little lower, inside the window) and of the cog. Long names shrink and end in an ellipsis. */
+:root.vsc-ready.mode-daily:not(.event-open) #board .half .cat-chip, :root.vsc-ready.mode-daily:not(.event-open) #board .half.top .cat-chip, :root.vsc-ready.mode-daily:not(.event-open) #board .half.bottom .cat-chip{
+  position:absolute !important; top:-10px !important; left:50% !important; right:auto !important; bottom:auto !important; transform:translateX(-50%) !important; margin:0; z-index:5;
+  max-width:calc(100% - 24px); box-sizing:border-box; padding:3px 10px; font-size:11px; line-height:1.15; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:center; }
+@media (max-width:370px){ :root.vsc-ready.mode-daily:not(.event-open) #board .half .cat-chip{ font-size:10px; padding:3px 8px; max-width:calc(100% - 20px); } }
+:root.vsc-ready.mode-daily:not(.event-open) #board .round-timer{ top:calc(var(--vsc-top-y) + 13px); }
