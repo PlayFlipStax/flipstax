@@ -11511,9 +11511,14 @@
     const a = fromEl.getBoundingClientRect(), b = slot.getBoundingClientRect();
     const f = document.createElement('div'); f.className = 'letter-fly'; f.textContent = letter; showFx.appendChild(f);
     const x0 = a.left + a.width / 2, y0 = a.top + a.height / 2, x1 = b.left + b.width / 2, y1 = b.top + b.height / 2;
+    // Run 6b: the tile no longer crosses the header (it used to fly straight over the word CORRECT!): it pops, slides out to the
+    // left edge, climbs the edge (clear of the header's text) and then goes along the top to its slot.
+    const ex = Math.min(x0, 20), ey = y1 + 10;
     f.animate([{ transform:'translate(' + x0 + 'px,' + y0 + 'px) scale(0.6)', opacity:0 },
-               { transform:'translate(' + x0 + 'px,' + (y0 - 30) + 'px) scale(1.7)', opacity:1, offset:0.25 },
-               { transform:'translate(' + x1 + 'px,' + y1 + 'px) scale(1)', opacity:1 }], { duration:950, easing:'cubic-bezier(.5,0,.3,1)' }).onfinish = ()=>{ f.remove(); done(); };
+               { transform:'translate(' + x0 + 'px,' + (y0 - 30) + 'px) scale(1.7)', opacity:1, offset:0.18 },
+               { transform:'translate(' + ex + 'px,' + (y0 - 30) + 'px) scale(1.2)', opacity:1, offset:0.42 },
+               { transform:'translate(' + ex + 'px,' + ey + 'px) scale(1.05)', opacity:1, offset:0.8 },
+               { transform:'translate(' + x1 + 'px,' + y1 + 'px) scale(1)', opacity:1 }], { duration:1150, easing:'cubic-bezier(.4,0,.3,1)' }).onfinish = ()=>{ f.remove(); done(); };
   }
 
   // ---------- The combo meter (B4) ----------
