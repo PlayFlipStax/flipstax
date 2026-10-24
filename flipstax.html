@@ -9787,7 +9787,7 @@
         (runGoldKeys() ? '<span class="sp-sep">·</span><span class="sp-keys" aria-label="' + runGoldKeys() + ' gold keys: Orbit Drop chips">🔑<b>' + runGoldKeys() + '</b></span>' : '') + streakTag +
         roundTrackHtml();
       renderDailyClock();
-      if (window.VsConsole){ const ra = runAct(); VsConsole.hud({ pts: shownScore(runScore), round: ra.id === 'finale' ? SHOW_ROUND_COUNT + 1 : (ra.round || 0), total: SHOW_ROUND_COUNT, combo: comboMult(runMatchStreak) }); }   // Run 6: the console's HUD
+      if (window.VsConsole){ const ra = runAct(); VsConsole.hud({ pts: shownScore(runScore), round: ra.id === 'finale' ? SHOW_ROUND_COUNT + 1 : (ra.round || 0), total: SHOW_ROUND_COUNT, combo: comboMult(runMatchStreak), keys: runGoldKeys(), letters: runLetters.length, lettersTotal: RUN_WORD_LENGTH }); }   // Run 6: the console's HUD (and the key / letter line in its readout box)
     } else {
       els.runBanner.innerHTML = '<span class="sp-mode">\uD83C\uDFAE</span><span class="sp-label">Daily Stax</span>' + streakTag + ' <span class="run-link" id="runPlayLink">Play</span>';
       const link = document.getElementById('runPlayLink');

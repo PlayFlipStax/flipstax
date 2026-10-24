@@ -53,10 +53,9 @@
 @keyframes vscBadge{ 0%, 100%{ transform:scale(1); } 50%{ transform:scale(1.045); } }
 :root.vsc-ready.mode-daily:not(.event-open) #board .divider{ visibility:hidden; }
 :root.vsc-ready.mode-daily:not(.event-open) header .pill-row{ visibility:hidden; }
-/* the REPLAY MODE tag (test mode) in the small readout box under the sign */
-:root.vsc-ready.mode-daily:not(.event-open) .replay-tag{ left:calc(var(--vsc-x) + var(--vsc-readout-x)); top:calc(var(--vsc-y) + var(--vsc-readout-y)); width:var(--vsc-readout-w); height:var(--vsc-readout-h);
-  transform:none; padding:0; display:flex; align-items:center; justify-content:center; background:none; box-shadow:none; border-radius:4px;
-  font:800 calc(var(--vsc-readout-h) * 0.42)/1 Inter, system-ui, sans-serif; letter-spacing:0.03em; color:#ff8fc8; text-shadow:0 0 6px rgba(255,80,170,0.85); white-space:nowrap; overflow:hidden; }
+/* the small readout box under the sign: the key count and the letters collected (🔑2 · 3/6) */
+.vsc-readout{ position:absolute; left:calc(var(--vsc-readout-x)); top:calc(var(--vsc-readout-y)); width:var(--vsc-readout-w); height:var(--vsc-readout-h); display:flex; align-items:center; justify-content:center; white-space:nowrap; overflow:hidden;
+  font:800 calc(var(--vsc-readout-h) * 0.62)/1 var(--f-body, Inter, sans-serif); letter-spacing:0.04em; color:#ffe9a8; text-shadow:0 0 6px rgba(255,200,80,0.8), 0 1px 0 rgba(0,0,0,0.9); font-variant-numeric:tabular-nums; }
 /* the cards: no skin of their own - the console's window shows through; a big glyph with a soft shadow, a chunky
    two-line label, a small category tag top-left. (No live blur: the frosted label panel goes.) */
 :root.vsc-ready.mode-daily:not(.event-open) #board .half{ background:none !important; border:0 !important; box-shadow:none !important; border-radius:14px; clip-path:none;
@@ -65,9 +64,9 @@
 :root.vsc-ready.mode-daily:not(.event-open) #board .half > .gloss, :root.vsc-ready.mode-daily:not(.event-open) #board .half > .fill{ display:none; }
 :root.vsc-ready.mode-daily:not(.event-open) #board .half .content{ background:none !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; border:0 !important; padding:0 4px !important; max-width:100%; }
 :root.vsc-ready.mode-daily:not(.event-open) #board .half .scene{ position:relative; inset:auto; flex:0 1 auto; min-height:0; }
-:root.vsc-ready.mode-daily:not(.event-open) #board .half .scene .glyph{ font-size:min(calc(var(--vsc-top-h) * 0.4), 76px); opacity:1; transform:none; filter:drop-shadow(0 6px 5px rgba(10,0,30,0.5)); }
-:root.vsc-ready.mode-daily:not(.event-open) #board .half .scene .glyph img{ max-height:calc(var(--vsc-top-h) * 0.44); width:auto; }
-:root.vsc-ready.mode-daily:not(.event-open) #board .half .take{ font:900 clamp(22px, 6.6vw, 34px)/0.98 var(--f-display, 'Big Shoulders Display', sans-serif); letter-spacing:0.01em; color:#fff; text-align:center;
+:root.vsc-ready.mode-daily:not(.event-open) #board .half .scene .glyph{ font-size:min(calc(var(--vsc-top-h) * 0.4 * var(--vk, 1.4)), 108px); opacity:1; transform:none; filter:drop-shadow(0 6px 5px rgba(10,0,30,0.5)); }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half .scene .glyph img{ max-height:calc(var(--vsc-top-h) * 0.44 * var(--vk, 1.4)); width:auto; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half .take{ font-family:var(--f-display, 'Big Shoulders Display', sans-serif); font-weight:900; font-size:calc(clamp(22px, 6.6vw, 34px) * var(--vk, 1.4)); line-height:0.98; letter-spacing:0.01em; color:#fff; text-align:center;
   display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; max-width:100%;
   text-shadow:0 2px 0 rgba(26,4,48,0.95), 0 0 2px rgba(0,0,0,0.9), 0 4px 10px rgba(10,0,30,0.65); }
 :root.vsc-ready.mode-daily:not(.event-open) #board .half .cat-chip{ position:absolute; top:6px; left:8px; right:auto; bottom:auto; transform:none; margin:0; font-size:11px; padding:3px 8px; }
@@ -193,5 +192,15 @@
 :root.vsc-rm .vsr-bulbs i, :root.vsc-rm .vsc.lit .vsc-bulbs i{ animation:none; opacity:0.9; }
 
 /* long labels: a size down and up to three lines, never cut short mid-thought */
-:root.vsc-ready.mode-daily:not(.event-open) #board .half .take.vsc-long, .vsr-take.vsc-long{ font-size:clamp(19px, 5.4vw, 28px); -webkit-line-clamp:3; }
-:root.vsc-ready.mode-daily:not(.event-open) #board .half .take.vsc-xlong, .vsr-take.vsc-xlong{ font-size:clamp(16px, 4.5vw, 23px); -webkit-line-clamp:4; line-height:1.02; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half .take.vsc-long{ font-size:calc(clamp(19px, 5.4vw, 28px) * var(--vk, 1.4)); -webkit-line-clamp:3; }
+.vsr-take.vsc-long{ font-size:clamp(19px, 5.4vw, 28px); -webkit-line-clamp:3; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half .take.vsc-xlong{ font-size:calc(clamp(16px, 4.5vw, 23px) * var(--vk, 1.4)); -webkit-line-clamp:4; line-height:1.02; }
+.vsr-take.vsc-xlong{ font-size:clamp(16px, 4.5vw, 23px); -webkit-line-clamp:4; line-height:1.02; }
+
+/* a card with no emoji: the category icon above, the label large and centred */
+:root.vsc-ready.mode-daily:not(.event-open) #board .half.vsc-noglyph .scene .glyph{ font-size:min(calc(var(--vsc-top-h) * 0.3 * var(--vk, 1.5)), 80px); }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half.vsc-noglyph .take{ font-size:calc(clamp(24px, 7.4vw, 38px) * var(--vk, 1.5)); text-align:center; }
+/* item 3: the red bar is the VS timer (it drains as the card waits; red = a card's time running low). It was on the tab above
+   the window; now a thin bar inside the window's top edge */
+:root.vsc-ready.mode-daily:not(.event-open) #board .round-timer{ left:calc(var(--vsc-top-x) + 14px); top:calc(var(--vsc-top-y) + 5px); width:calc(var(--vsc-top-w) - 28px); height:4px; z-index:4; background:rgba(10,3,24,0.55); }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half.top .cat-chip{ top:14px; }
