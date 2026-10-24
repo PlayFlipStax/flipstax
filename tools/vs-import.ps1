@@ -36,6 +36,8 @@ try {
   if ($r -notlike '{*') { throw "the importer failed: $r" }
   [IO.File]::WriteAllText("$Repo\data\vs-cards-new.js", (Js "window.__vsImport.js"), $utf8)
   "report: " + (Js "JSON.stringify(window.__vsImport.report)")
+  $bad = Js "JSON.stringify(window.__vsImport.report.emojiBad)"
+  if ($bad -ne '[]') { throw "the importer found cards with an empty emoji or the same emoji on both sides: $bad" }
   # pass 2: reload with the new data, write data/vs-export.txt
   Load
   "export: " + (Js ([IO.File]::ReadAllText("$T\vs-export.js")))

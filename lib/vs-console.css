@@ -204,3 +204,16 @@
    the window; now a thin bar inside the window's top edge */
 :root.vsc-ready.mode-daily:not(.event-open) #board .round-timer{ left:calc(var(--vsc-top-x) + 14px); top:calc(var(--vsc-top-y) + 5px); width:calc(var(--vsc-top-w) - 28px); height:4px; z-index:4; background:rgba(10,3,24,0.55); }
 :root.vsc-ready.mode-daily:not(.event-open) #board .half.top .cat-chip{ top:14px; }
+
+/* the emoji never gets squeezed out: the top window is a little shorter than the bottom one, and a two-line label used to squeeze the picture's
+   box to nothing (the flex item shrank, the emoji spilled up out of the window and the label, painted later, covered what was left) */
+:root.vsc-ready.mode-daily:not(.event-open) #board .half .scene{ flex:0 0 auto; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half .scene .glyph{ display:block; line-height:1.05; position:relative; z-index:2; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half .content{ flex:0 1 auto; z-index:1; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half{ padding-top:calc(var(--vsc-top-h) * 0.12); }
+/* THE TOP-EMOJI BUG (Oct 24): the board's old fitter (fitHalf) measures the card against its window and, when a picture plus a two-line
+   label does not fit, drops the picture (.fit-tight shrinks it, .fit-none hides it). The top window is a little shorter than the bottom
+   one (152 v 162 px at 390 wide), so the top card lost its emoji while the bottom kept it. On the console the card sizes itself (--vk,
+   stepped down until picture and label both sit inside the window), so the old fitter's classes do nothing here. */
+:root.vsc-ready.mode-daily:not(.event-open) #board .half.has-glyph.fit-none .scene{ display:flex; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half.has-glyph.fit-tight .scene .glyph{ font-size:min(calc(var(--vsc-top-h) * 0.4 * var(--vk, 1.4)), 108px); }

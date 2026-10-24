@@ -78,11 +78,14 @@
       if (skipKeys.has(key)){ report.held.push(a + ' vs ' + b); return; }
       if (existing.has(key)){ report.skippedDuplicate++; return; }
       if (seen.has(key)){ report.skippedInside++; return; }
+      { const E = window.FLIPSTAX_VS_EMOJI, g = E.fix(cat, ga, gb, key); if (g[0] !== ga || g[1] !== gb) report.emojiFixed = (report.emojiFixed || 0) + 1; ga = g[0]; gb = g[1]; }   // (Oct 24: no empty emoji, never the same on both sides - data/vs/vs-emoji.js)
       seen.add(key); out.push([cat, a, ga, b, gb, era]);
       report.byCategory[cat] = (report.byCategory[cat] || 0) + 1; report.erasNew[era] = (report.erasNew[era] || 0) + 1;
     });
   }
   report.added = out.length;
+  // the check that fails the import: any card with an empty emoji or the same emoji on both sides
+  report.emojiBad = window.FLIPSTAX_VS_EMOJI.problems(out.map((r, i)=> ({ id: 'row ' + (i + 1) + ' (' + r[0] + ')', a: r[1], glyphA: r[2], b: r[3], glyphB: r[4] })));
   // the Gemini era lists must be exactly as long as their rows
   for (const cat of Object.keys(R.geminiEras)){
     const want = Object.keys(geminiEra[cat]).length;
