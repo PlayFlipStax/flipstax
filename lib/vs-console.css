@@ -1,0 +1,32 @@
+/* FlipStax - the VS console (lib/vs-console.js): the Daily VS screen on the console picture. Everything here applies only
+   while the Daily show is on the VS board with the picture loaded and no Brain Beam / power-up over it (the selector
+   below); Infinity and every other screen keep their own looks. Transform and opacity animations only. */
+
+/* the picture, at its own aspect ratio, centred; the spare room is a matching dark purple */
+.vsc{ display:none; position:fixed; inset:0; z-index:-1; pointer-events:none; overflow:hidden;
+  background:linear-gradient(180deg, #23254c 0%, #2b1d52 45%, #1d1238 100%); }
+:root.vsc-ready.mode-daily:not(.event-open) .vsc{ display:block; }
+/* (the page's sunburst and the stage step aside behind the console) */
+:root.vsc-ready.mode-daily:not(.event-open) .sunburst.sb-page{ visibility:hidden !important; }
+.vsc-frame{ position:absolute; left:var(--vsc-x); top:var(--vsc-y); width:var(--vsc-w); height:var(--vsc-h); }
+.vsc-img{ position:absolute; inset:0; width:100%; height:100%; display:block; -webkit-user-drag:none; user-select:none; }
+.vsc-lit{ opacity:0; }
+
+/* the board takes the picture's box; the two cards sit in its two windows, the coin on its coin */
+:root.vsc-ready.mode-daily:not(.event-open) #board{ position:fixed; left:var(--vsc-x); top:var(--vsc-y); width:var(--vsc-w); height:var(--vsc-h);
+  padding:0 !important; gap:0 !important; display:block; z-index:1; flex:none; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half{ position:absolute; flex:none; margin:0; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half.top{ left:var(--vsc-top-x); top:var(--vsc-top-y); width:var(--vsc-top-w); height:var(--vsc-top-h); }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half.bottom{ left:var(--vsc-bot-x); top:var(--vsc-bot-y); width:var(--vsc-bot-w); height:var(--vsc-bot-h); }
+:root.vsc-ready.mode-daily:not(.event-open) #board .divider{ position:absolute; left:var(--vsc-coin-x); top:var(--vsc-coin-y); width:var(--vsc-coin-w) !important; height:var(--vsc-coin-h) !important; margin:0 !important; transform:none; }
+/* the VS timer runs along the green tab above the top window */
+:root.vsc-ready.mode-daily:not(.event-open) #board .round-timer{ position:absolute; left:var(--vsc-tab-x); top:var(--vsc-tab-y); width:var(--vsc-tab-w); height:max(5px, var(--vsc-tab-h)); margin:0; border-radius:99px; }
+/* the crowd's split-flap board sits on the coin's line, as before */
+:root.vsc-ready.mode-daily:not(.event-open) #board .crowd-board{ top:calc(var(--vsc-coin-y) + var(--vsc-coin-h) / 2); }
+/* the header: the console's own sign replaces the wordmark; the HUD pill carries the points and the round */
+:root.vsc-ready.mode-daily:not(.event-open) header .logo{ visibility:hidden; }
+:root.vsc-ready.mode-daily:not(.event-open) header .pill-row{ position:fixed; left:calc(var(--vsc-x) + var(--vsc-pill-x)); top:calc(var(--vsc-y) + var(--vsc-pill-y)); width:var(--vsc-pill-w); height:var(--vsc-pill-h);
+  margin:0; padding:0; display:flex; align-items:center; justify-content:center; z-index:2; }
+:root.vsc-ready.mode-daily:not(.event-open) header .vibe-wrap{ display:none; }
+/* the real bottom bar (the hint, the corner host, TEST) stays on top of the picture's bottom */
+:root.vsc-ready.mode-daily:not(.event-open) .hint{ position:fixed; left:0; right:0; bottom:0; z-index:3; }

@@ -39,6 +39,7 @@
 <link rel="stylesheet" href="lib/stage.css">
 <link rel="stylesheet" href="lib/cast.css">
 <link rel="stylesheet" href="lib/juice.css">
+<link rel="stylesheet" href="lib/vs-console.css">
 <link rel="preload" as="image" href="data/stage/stage-close.webp" type="image/webp">
 <style>
   :root{
@@ -4894,6 +4895,8 @@
 <script src="data/cast/manifest.js"></script>
 <script src="lib/cast.js"></script>
 <script src="lib/juice.js"></script>
+<script src="data/vs/console-layout.js"></script>
+<script src="lib/vs-console.js"></script>
 <script>
 (function(){
 
@@ -17395,6 +17398,7 @@
   document.querySelectorAll('[data-studio]').forEach(el=>{ el.innerHTML = STUDIO_HTML; });
   // Run 3: the photo stage behind the show (lib/stage.js picks the shot for the screen on top; the cinematics cue theirs).
   if (window.Stage) Stage.init({ episode: showEpisode(todayStr()) });
+  if (window.VsConsole) VsConsole.init();   // Run 6: the Daily VS screen on the console picture
   if (window.Cast) Cast.init({ episode: showEpisode(todayStr()) });   // (tonight's presenter goes by the episode)
   // Bulbs round a box's edge (inside it by `inset`), every `gap` px, chasing (CSS .sign-bulbs).
   function ringBulbs(holder, gap, inset){
