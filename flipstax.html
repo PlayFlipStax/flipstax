@@ -16219,6 +16219,7 @@
     });
 
     renderUnvoted();
+    if (runActive && window.VsConsole) VsConsole.deal();   // Run 6: the card's entrance on the console (looks only)
     voted = false;
     votedSinceTime = null;
     let roundMs = !inInfinity() ? (runActive ? runVsTimerMs() : DAILY_PICK_MS) : bonusActive ? INF_ZONE_PICK_MS : INF_PICK_MS;

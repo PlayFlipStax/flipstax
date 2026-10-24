@@ -90,3 +90,31 @@
 :root.lite .vsc-bulbs i, :root.lite .vsc-btns i{ animation:none; }
 :root.lite .vsc-bulbs i{ opacity:0.55; } :root.lite .vsc-btns i{ opacity:0.3; }
 @media (prefers-reduced-motion: reduce){ .vsc-bulbs i, .vsc-btns i{ animation:none; } .vsc-bulbs i{ opacity:0.55; } .vsc-btns i{ opacity:0.3; } }
+
+/* ---- Item 5: the card entrance - the windows start dark, the cards fade and slide in under a short crackle flicker ---- */
+.vsc-cover{ position:absolute; background:radial-gradient(120% 120% at 50% 50%, rgba(6,2,18,0.82), rgba(6,2,18,0.92)); border-radius:12px; opacity:0; pointer-events:none; }
+.vsc-cover.top{ left:var(--vsc-top-x); top:var(--vsc-top-y); width:var(--vsc-top-w); height:var(--vsc-top-h); }
+.vsc-cover.bot{ left:var(--vsc-bot-x); top:var(--vsc-bot-y); width:var(--vsc-bot-w); height:var(--vsc-bot-h); }
+.vsc.dealt .vsc-cover{ animation:vscCover 420ms ease-out both; }
+.vsc.dealt .vsc-cover.bot{ animation-delay:110ms; }
+@keyframes vscCover{ from{ opacity:1; } to{ opacity:0; } }
+.vsc-ring{ position:absolute; pointer-events:none; }
+.vsc-ring.top{ left:var(--vsc-ring-top-x); top:var(--vsc-ring-top-y); width:var(--vsc-ring-top-w); height:var(--vsc-ring-top-h); }
+.vsc-ring.bot{ left:var(--vsc-ring-bot-x); top:var(--vsc-ring-bot-y); width:var(--vsc-ring-bot-w); height:var(--vsc-ring-bot-h); }
+.vsc-ring img{ position:absolute; inset:0; width:100%; height:100%; opacity:0; }
+/* the flicker: each version is up for 125 ms in turn (8 frames a second), at half strength (low contrast) */
+.vsc.dealt .vsc-ring img{ animation:vscFlick 125ms linear; }
+.vsc.dealt .vsc-ring img[data-k="1"]{ animation-delay:125ms; } .vsc.dealt .vsc-ring img[data-k="2"]{ animation-delay:250ms; } .vsc.dealt .vsc-ring img[data-k="3"]{ animation-delay:375ms; }
+.vsc.dealt .vsc-ring.bot img{ animation-delay:110ms; } .vsc.dealt .vsc-ring.bot img[data-k="1"]{ animation-delay:235ms; } .vsc.dealt .vsc-ring.bot img[data-k="2"]{ animation-delay:360ms; } .vsc.dealt .vsc-ring.bot img[data-k="3"]{ animation-delay:485ms; }
+@keyframes vscFlick{ 0%, 99%{ opacity:0.5; } 100%{ opacity:0; } }
+/* the card itself: its picture, label and tag fade and slide up into the window */
+:root.vsc-ready.mode-daily:not(.event-open) #board.vsc-deal .half > .scene,
+:root.vsc-ready.mode-daily:not(.event-open) #board.vsc-deal .half > .content,
+:root.vsc-ready.mode-daily:not(.event-open) #board.vsc-deal .half > .cat-chip{ animation:vscCardIn 380ms cubic-bezier(.2,.8,.3,1) 60ms both; }
+:root.vsc-ready.mode-daily:not(.event-open) #board.vsc-deal .half.bottom > *{ animation-delay:170ms; }
+@keyframes vscCardIn{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
+/* lite / reduced motion: no crackle; a plain fade */
+:root.lite .vsc-ring, :root.lite .vsc-cover{ display:none; }
+:root.lite.vsc-ready.mode-daily #board.vsc-deal .half > *{ animation:vscFade 240ms ease-out both !important; }
+@keyframes vscFade{ from{ opacity:0; } to{ opacity:1; } }
+@media (prefers-reduced-motion: reduce){ .vsc-ring, .vsc-cover{ display:none; } :root.vsc-ready.mode-daily #board.vsc-deal .half > *{ animation:vscFade 240ms ease-out both !important; } }
