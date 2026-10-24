@@ -118,3 +118,66 @@
 :root.lite.vsc-ready.mode-daily #board.vsc-deal .half > *{ animation:vscFade 240ms ease-out both !important; }
 @keyframes vscFade{ from{ opacity:0; } to{ opacity:1; } }
 @media (prefers-reduced-motion: reduce){ .vsc-ring, .vsc-cover{ display:none; } :root.vsc-ready.mode-daily #board.vsc-deal .half > *{ animation:vscFade 240ms ease-out both !important; } }
+
+/* ---- Item 6: after the tap (all over by 1.2 s; nothing here takes a tap) ---- */
+/* the console lights up: the lit picture crossfades in over 0.2 s, every bulb on and racing round the tray */
+.vsc-lit{ transition:opacity 300ms ease; }
+.vsc.lit .vsc-lit{ opacity:1; transition:opacity 200ms ease; }
+.vsc.lit .vsc-bulbs i{ animation-duration:0.6s; animation-delay:calc(var(--k) * -0.6s); }
+.vsc.lit .vsc-btns i{ opacity:0.6; animation:none; }
+@keyframes vscRace{ 0%, 12%{ opacity:1; } 30%, 100%{ opacity:0.65; } }
+.vsc.lit .vsc-bulbs i{ animation-name:vscRace; }
+/* the chosen window's crackle ring bursts for 0.5 s at full strength */
+.vsc-ring.burst img{ animation:vscBurst 125ms linear; }
+.vsc-ring.burst img[data-k="1"]{ animation-delay:125ms; } .vsc-ring.burst img[data-k="2"]{ animation-delay:250ms; } .vsc-ring.burst img[data-k="3"]{ animation-delay:375ms; }
+@keyframes vscBurst{ 0%, 99%{ opacity:0.95; } 100%{ opacity:0; } }
+/* the cards: the other one dims; the chosen one hands over to the frame */
+:root.vsc-ready.mode-daily:not(.event-open) #board .half{ transition:transform 90ms ease-out, opacity 200ms ease; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half.vsc-dim{ opacity:0.35; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half.vsc-gone{ opacity:0; transition:opacity 120ms ease; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .half.picked{ background:none !important; }
+:root.vsc-ready.mode-daily:not(.event-open) #board .crowd-board{ visibility:hidden; }
+/* the reveal layer */
+.vsr{ position:fixed; inset:0; z-index:6; pointer-events:none; display:none; }
+:root.vsc-ready.mode-daily:not(.event-open) .vsr.on{ display:block; }
+.vsr-frame{ position:absolute; left:var(--fx); top:var(--fy); width:var(--fw); height:var(--fh); border-radius:18px;
+  background:radial-gradient(120% 120% at 50% 30%, #3b1670, #1d0838 80%);
+  box-shadow:0 0 0 4px #ffd23f, 0 0 0 7px #7a3d00, inset 0 0 0 2px rgba(255,240,180,0.5), 0 10px 28px rgba(10,0,30,0.6), 0 0 26px rgba(255,210,63,0.55);
+  transform:var(--from); opacity:0; animation:vsrIn 300ms cubic-bezier(.2,.9,.3,1.15) forwards; }
+@keyframes vsrIn{ from{ transform:var(--from); opacity:0.6; } to{ transform:none; opacity:1; } }
+.vsr.bottom .vsr-frame{ background:radial-gradient(120% 120% at 50% 30%, #2a1a6e, #120838 80%); }
+.vsr-card{ position:absolute; inset:8% 6%; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; text-align:center; }
+.vsr-glyph{ font-size:min(calc(var(--fh) * 0.42), 72px); line-height:1; filter:drop-shadow(0 6px 5px rgba(10,0,30,0.5)); }
+.vsr-glyph img{ max-height:calc(var(--fh) * 0.46); width:auto; }
+.vsr-take{ font:900 clamp(22px, 6.8vw, 34px)/0.98 var(--f-display, 'Big Shoulders Display', sans-serif); color:#fff; max-width:100%;
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; text-shadow:0 2px 0 rgba(26,4,48,0.95), 0 0 8px rgba(255,210,63,0.45); }
+/* the frame's bulbs (a quick chase) */
+.vsr-bulbs{ position:absolute; inset:0; }
+.vsr-bulbs i{ position:absolute; width:9px; height:9px; margin:-4.5px 0 0 -4.5px; border-radius:50%; background:radial-gradient(circle, #fff 0 25%, #ffe27a 45%, rgba(255,210,63,0) 72%); opacity:0.6;
+  animation:vsrBulb 0.9s linear infinite; }
+@keyframes vsrBulb{ 0%, 15%{ opacity:1; } 35%, 100%{ opacity:0.5; } }
+/* the pink crackle round the frame: four versions at 8 a second */
+.vsr-ring{ position:absolute; left:var(--rx); top:var(--ry); width:var(--rw); height:var(--rh); }
+.vsr-ring img{ position:absolute; inset:0; width:100%; height:100%; opacity:0; }
+.vsr.on .vsr-ring img{ animation:vscBurst 125ms linear 120ms; }
+.vsr.on .vsr-ring img[data-k="1"]{ animation-delay:245ms; } .vsr.on .vsr-ring img[data-k="2"]{ animation-delay:370ms; } .vsr.on .vsr-ring img[data-k="3"]{ animation-delay:495ms; }
+/* the lasers from the screen's top corners to the frame */
+.vsr-laser{ position:absolute; top:0; height:4px; margin-top:-2px; border-radius:2px; transform-origin:0 50%; opacity:0;
+  background:linear-gradient(90deg, rgba(255,90,200,0), #ff5ac8 30%, #fff 92%, rgba(255,255,255,0)); }
+.vsr-laser.l{ left:0; width:var(--llen); transform:rotate(var(--lang)) scaleX(0); }
+.vsr-laser.r{ left:100%; width:var(--rlen); transform:rotate(var(--rang)) scaleX(0); }
+.vsr.on .vsr-laser.l{ animation:vsrLaserL 420ms ease-out 60ms; }
+.vsr.on .vsr-laser.r{ animation:vsrLaserR 420ms ease-out 60ms; }
+@keyframes vsrLaserL{ 0%{ opacity:0; transform:rotate(var(--lang)) scaleX(0); } 40%{ opacity:1; transform:rotate(var(--lang)) scaleX(1); } 100%{ opacity:0; transform:rotate(var(--lang)) scaleX(1); } }
+@keyframes vsrLaserR{ 0%{ opacity:0; transform:rotate(var(--rang)) scaleX(0); } 40%{ opacity:1; transform:rotate(var(--rang)) scaleX(1); } 100%{ opacity:0; transform:rotate(var(--rang)) scaleX(1); } }
+/* the verdict under the frame */
+.vsr-msg{ position:absolute; left:0; right:0; top:calc(var(--fy) + var(--fh) + 14px); display:flex; flex-direction:column; align-items:center; gap:3px; opacity:0; text-align:center; padding:0 12px; }
+.vsr-msg b{ padding:6px 14px; border-radius:12px; background:rgba(20,6,40,0.88); box-shadow:0 0 0 2px #ffd23f; font:900 clamp(18px, 5.6vw, 24px)/1.05 var(--f-display, 'Big Shoulders Display', sans-serif); letter-spacing:0.03em; color:#ffe27a; }
+.vsr-msg small{ font:800 14px/1.2 var(--f-body, Inter, sans-serif); color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.9); }
+.vsr.on.msg .vsr-msg{ opacity:1; transition:opacity 150ms ease; }
+.vsr.out .vsr-frame, .vsr.out .vsr-msg, .vsr.out .vsr-ring{ opacity:0 !important; transition:opacity 160ms ease; }
+/* lite / reduced motion: a static glow - no crackle, no lasers, no chase; the frame simply fades in */
+:root.lite .vsr-ring, :root.lite .vsr-laser{ display:none; }
+:root.lite .vsr-frame{ transform:none; animation:vscFade 180ms ease-out forwards; }
+:root.lite .vsr-bulbs i, :root.lite .vsc.lit .vsc-bulbs i{ animation:none; opacity:0.9; }
+@media (prefers-reduced-motion: reduce){ .vsr-ring, .vsr-laser{ display:none; } .vsr-frame{ transform:none; animation:vscFade 180ms ease-out forwards; } .vsr-bulbs i, .vsc.lit .vsc-bulbs i{ animation:none; opacity:0.9; } }

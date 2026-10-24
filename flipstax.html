@@ -16548,6 +16548,7 @@
     // the Infinity selection outline appears the instant of the tap.
     els.halfA.classList.toggle('picked', side === 'A');
     els.halfB.classList.toggle('picked', side === 'B');
+    if (runActive && window.VsConsole) VsConsole.tap(side);   // Run 6: the console's reveal (looks only)
     const points = current.bonusPoints ? (runActive ? 3 : INF_STAR_POINTS) : 1;
     const ptsShown = runActive ? points * runActMult() : zonePoints(points);
     if (runActive) addRunScore(points); else addRacePoints(zonePoints(points));
@@ -16582,6 +16583,7 @@
       const ra = data.counts[slugA] || 0, rb = data.counts[slugB] || 0; reveal({ a: ra, b: rb }, true, Math.max(0, ra + rb - 1));
     });
     const won = side==='A' ? pctA>=pctB : pctB>=pctA;
+    if (runActive && window.VsConsole) VsConsole.result({ real: realCrowd, others: cv.others, counted: cv.counted, matched: cv.withCrowd, pct: cv.pickPct, pctA, pctB });
     if (!showReveal){ if (won) sfx.revealWin(); else sfx.revealLose(); }
     els.tagA.textContent = side==='A' ? 'Your pick' : '';
     els.tagB.textContent = side==='B' ? 'Your pick' : '';
