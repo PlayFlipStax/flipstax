@@ -140,6 +140,11 @@ def main():
                 ImageDraw.Draw(base).rectangle(((sb['x'] - 0.8) * W / 100, (sb['y'] - 0.9) * H / 100, (sb['x'] + sb['w'] + 0.8) * W / 100, (sb['y'] + sb['h'] + 0.9) * H / 100), fill=(26, 7, 37))
             dim = base.filter(ImageFilter.GaussianBlur(10)).resize((im.width // 2, im.height // 2), Image.LANCZOS)
             out = os.path.join(ROOT, 'data/stage', 'stage-dim.webp'); q = save_webp(dim, out, 60); made.append((out, q))
+            # the warm dim shot behind the play screens (lib/lights.js): less violet, towards gold and amber, darker
+            import numpy as np
+            from PIL import ImageEnhance
+            w = ImageEnhance.Color(dim).enhance(0.55); arr = np.asarray(w).astype('float32') * np.array([1.10, 0.93, 0.74], dtype='float32') * 0.78
+            out = os.path.join(ROOT, 'data/stage', 'stage-dim-warm.webp'); q = save_webp(Image.fromarray(arr.clip(0, 255).astype('uint8')), out, 60); made.append((out, q))
     # host poses: lift all, then one shared crop box
     lifted = {pose: lift(find(pose))[0] for pose in HOST if find(pose)}
     if lifted:
