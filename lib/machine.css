@@ -328,3 +328,10 @@
 :root .mc-orbit .pk-line{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:10.5px !important; }
 :root .mc-orbit .pk-status{ top:calc(var(--mc-status-y) - 3px); flex-wrap:nowrap; }
 :root .mc-orbit .mc-orbit-patch{ background:linear-gradient(180deg, rgba(40,34,44,0) 0%, rgba(40,34,44,0.92) 30%, rgba(30,26,34,0.92) 70%, rgba(40,34,44,0) 100%); }
+
+/* Mystery Door fixes (Oct 25): the prompt sits on the control strip (a dark plate over the coloured squares), not on the pods; the
+   bonus-game names stay hidden until a door is picked, then only the chosen one shows */
+:root .mc-doors #eventPrompt{ background:rgba(12,6,28,0.82) !important; border-radius:10px !important; box-shadow:0 0 0 1.5px rgba(255,214,90,0.55) !important; font-size:11.5px !important; padding:0 8px !important; }
+:root .mc-doors #eventTimerBar{ top:calc(var(--mc-prompt-y) + var(--mc-prompt-h) - 7px); left:calc(var(--mc-prompt-x) + 10px); width:calc(var(--mc-prompt-w) - 20px); height:3px; }
+:root .mc-doors .event-tile .pu-prize{ opacity:0 !important; transition:opacity 200ms ease; pointer-events:none; }
+:root .mc-doors .event-tile.picked-wait .pu-prize, :root .mc-doors .event-tile.open:not(.other) .pu-prize{ opacity:0.98 !important; }

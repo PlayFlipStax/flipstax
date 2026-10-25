@@ -34,9 +34,9 @@
   // the prompt and the pick timer go in the dark recess between the pods and the buttons
   const POD = (cx)=> ({ x: cx - 0.083, y: 0.462, w: 0.166, h: 0.212 }), RING = (cx)=> ({ x: cx - 0.07, y: 0.303, w: 0.14, h: 0.072 }), BTN = (cx)=> ({ x: cx - 0.07, y: 0.822, w: 0.14, h: 0.068 });
   const DX = [0.182, 0.390, 0.615, 0.818], RX = [0.175, 0.392, 0.610, 0.825];
-  const DOORS = { prompt: { x: 0.285, y: 0.738, w: 0.43, h: 0.062 } };
+  const DOORS = { prompt: { x: 0.060, y: 0.9205, w: 0.560, h: 0.054 } };
   DX.forEach((c, k)=>{ DOORS['pod' + (k + 1)] = POD(c); DOORS['ring' + (k + 1)] = RING(RX[k]); DOORS['btn' + (k + 1)] = BTN(RX[k]); });
-  M.register('doors', { img: 'doors', w: 736, h: 1433, lit: true, shiftY: 1, topFrame: 0.0, regions: DOORS,
+  M.register('doors', { img: 'doors', w: 736, h: 1433, lit: true, below: true, regions: DOORS,
     match: ()=>{ const o = $('eventOverlay'); return o && M.visible(o) && o.classList.contains('mdoor') && document.documentElement.classList.contains('mode-daily') ? o : null; } });
   // the four round buttons are real buttons too: each taps its door (only while the doors are up)
   document.addEventListener('DOMContentLoaded', ()=>{
