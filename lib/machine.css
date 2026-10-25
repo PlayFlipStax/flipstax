@@ -235,14 +235,14 @@
 :root .mc-backed.mg-overlay .mg-stage{ position:static !important; }
 :root.mc-active:is(.mc-on-twin, .mc-on-zap, .mc-on-snap) .show-host{ display:none !important; }
 /* ===== Twin Flip (twin) ===== */
-:root .mc-twin .mg-head{ position:fixed; left:var(--mc-screen-x); top:calc(var(--mc-screen-y) + 10px); width:var(--mc-screen-w); margin:0; display:flex; flex-direction:column; align-items:center; gap:6px; }
+:root .mc-twin .mg-head{ position:fixed; left:var(--mc-screen-x); top:calc(var(--mc-screen-y) + 6px); width:var(--mc-screen-w); margin:0; display:flex; flex-direction:column; align-items:center; gap:4px; }
 :root .mc-twin .mg-sign{ background:none !important; border:0 !important; box-shadow:none !important; padding:0 !important; }
 :root .mc-twin .mg-sign .sign-bulbs{ display:none !important; }
-:root .mc-twin .mg-sign span{ font:400 clamp(30px, 9.6vw, 40px)/1 'FS Righteous', sans-serif !important; color:#fff7e8 !important; text-shadow:0 3px 0 rgba(90,10,60,0.8), 0 0 16px rgba(255,180,220,0.6) !important; letter-spacing:0.02em; }
+:root .mc-twin .mg-sign span{ font:400 clamp(26px, 8.2vw, 34px)/1 'FS Righteous', sans-serif !important; color:#fff7e8 !important; text-shadow:0 3px 0 rgba(90,10,60,0.8), 0 0 16px rgba(255,180,220,0.6) !important; letter-spacing:0.02em; }
 :root .mc-twin .mg-act{ font:400 13px/1 'FS Righteous', sans-serif !important; letter-spacing:0.12em; background:rgba(20,6,40,0.65) !important; border:1.5px solid rgba(255,230,160,0.6) !important; color:#ffe9a8 !important; }
-:root .mc-twin .mg-host-zone{ position:fixed; left:var(--mc-screen-x); top:calc(var(--mc-screen-y) + var(--mc-screen-h) - 50px); width:var(--mc-screen-w); margin:0; }
+:root .mc-twin .mg-host-zone{ position:fixed; left:var(--mc-screen-x); top:calc(var(--mc-screen-y) + var(--mc-screen-h) - 62px); width:var(--mc-screen-w); margin:0; }
 :root .mc-twin .mg-rule{ font:400 12px/1.2 'FS Righteous', sans-serif !important; color:#fff2e0 !important; text-shadow:0 1px 2px rgba(60,0,40,0.9); padding:0 12px; }
-:root .mc-twin .tf-pairs{ position:fixed; left:var(--mc-screen-x); top:calc(var(--mc-screen-y) + var(--mc-screen-h) - 28px); width:var(--mc-screen-w); margin:0; text-align:center;
+:root .mc-twin .tf-pairs{ position:fixed; left:var(--mc-screen-x); top:calc(var(--mc-screen-y) + var(--mc-screen-h) - 30px); width:var(--mc-screen-w); margin:0; text-align:center;
   font:400 16px/1 'FS Righteous', sans-serif !important; color:#7df9ff; text-shadow:0 0 8px rgba(125,249,255,0.8), 0 1px 2px rgba(0,0,0,0.8); }
 /* the tiles in the 16 windows (the flip still runs inside each) */
 :root .mc-twin .tf-grid{ position:fixed !important; left:var(--mc-grid-x); top:var(--mc-grid-y); width:var(--mc-grid-w) !important; height:var(--mc-grid-h); margin:0 !important; padding:0 !important; aspect-ratio:auto !important;
