@@ -16,4 +16,18 @@
     match: ()=>{ const o = $('eventOverlay'); return o && M.visible(o) && o.classList.contains('quiz-beam') && document.documentElement.classList.contains('mode-daily') ? o : null; } });
   M.register('riddle', { img: 'riddle-console', w: 768, h: 1376, lit: true, shiftY: 1, regions: QUIZ,
     match: ()=>{ const o = $('eventOverlay'); return o && M.visible(o) && o.classList.contains('quiz-riddle') && document.documentElement.classList.contains('mode-daily') ? o : null; } });
+  // Word Warp: the top screen, the small square (timer), the wide dark panel (the six slots), the plaque (guesses left), the two
+  // button pockets (CLEAR, SUBMIT); the empty purple area right of the square holds the letters to place, the small pocket left of
+  // the plaque the hint button
+  M.register('ww', { img: 'ww-console', w: 768, h: 1376, lit: true, pulse: true, top: 26, regions: {
+      screen: { x: 0.165, y: 0.088, w: 0.670, h: 0.195 },
+      timer:  { x: 0.105, y: 0.380, w: 0.165, h: 0.115 },
+      rack:   { x: 0.300, y: 0.378, w: 0.585, h: 0.120 },
+      slots:  { x: 0.130, y: 0.528, w: 0.730, h: 0.078 },
+      plaque: { x: 0.305, y: 0.662, w: 0.555, h: 0.072 },
+      hint:   { x: 0.095, y: 0.660, w: 0.190, h: 0.076 },
+      clear:  { x: 0.348, y: 0.806, w: 0.200, h: 0.046 },
+      submit: { x: 0.618, y: 0.806, w: 0.200, h: 0.046 },
+    },
+    match: ()=>{ const o = $('solveOverlay'); return o && M.visible(o) && document.documentElement.classList.contains('mode-daily') ? o : null; } });
 })();

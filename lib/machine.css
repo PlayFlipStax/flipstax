@@ -98,3 +98,51 @@
 :root:root #eventOverlay.mc-backed .event-tile.is-wrong .ttxt{ color:#fff2d6 !important; }
 /* the question box reserves the timer's strip at the bottom of the screen (the game's own min-height used to stretch it over the bar) */
 :root :is(.mc-bb, .mc-riddle) #eventPrompt{ min-height:0 !important; max-height:calc(var(--mc-screen-h) - 46px) !important; height:calc(var(--mc-screen-h) - 46px) !important; top:calc(var(--mc-screen-y) + 22px) !important; }
+
+/* ===== Word Warp (ww): title on the top screen, timer in the square, the six slots in the wide dark panel, guesses on the plaque,
+   CLEAR and SUBMIT on the two pockets, the letters to place in the empty purple area, the hint button in the small pocket ===== */
+:root .mc-ww .solve-inner{ position:static !important; transform:none !important; animation:none !important; padding:0 !important; max-width:none !important; }
+:root .mc-ww #solveTitle{ position:fixed; left:var(--mc-screen-x); top:calc(var(--mc-screen-y) + 8px); width:var(--mc-screen-w); margin:0; text-align:center;
+  font:400 clamp(24px, 7.4vw, 31px)/1 'FS Righteous', sans-serif !important; color:#fff7dc !important; text-shadow:0 3px 0 rgba(0,50,60,0.8), 0 0 14px rgba(255,230,160,0.45) !important; text-transform:uppercase; white-space:nowrap; }
+:root .mc-ww #solveTitle small{ display:block; margin-top:6px; font:400 11.5px/1.2 'FS Righteous', sans-serif !important; letter-spacing:0.14em; color:#d6fff8 !important; text-shadow:0 1px 2px rgba(0,30,40,0.9) !important; }
+:root .mc-ww #solveHint{ position:fixed; left:calc(var(--mc-screen-x) + 10px); top:calc(var(--mc-screen-y) + var(--mc-screen-h) - 52px); width:calc(var(--mc-screen-w) - 20px); margin:0; min-height:0;
+  text-align:center; font:400 12px/1.25 'FS Righteous', sans-serif !important; color:#ffe9a8 !important; text-shadow:0 1px 2px rgba(0,30,40,0.9); }
+:root .mc-ww #solveHistory{ position:fixed; left:calc(var(--mc-screen-x) + 10px); top:calc(var(--mc-screen-y) + var(--mc-screen-h) - 32px); width:calc(var(--mc-screen-w) - 20px); height:24px; margin:0;
+  display:flex; flex-wrap:nowrap; justify-content:center; gap:8px; overflow:hidden; }
+:root .mc-ww #solveHistory .solve-history-row{ display:flex; gap:1px; margin:0; }
+:root .mc-ww #solveHistory .solve-history-row:nth-last-child(n+4){ display:none; }
+:root .mc-ww #solveHistory span{ width:13px; height:17px; font:400 11px/17px 'FS Righteous', sans-serif; border-radius:3px; }
+/* the timer: big in the square */
+:root .mc-ww .solve-header{ position:fixed; left:var(--mc-timer-x); top:var(--mc-timer-y); width:var(--mc-timer-w); height:var(--mc-timer-h); margin:0; display:flex; align-items:center; justify-content:center; }
+:root .mc-ww #solveTimer{ font:400 clamp(22px, 7vw, 29px)/1 'FS Righteous', sans-serif !important; color:#7dffb0 !important; background:none !important; border:0 !important; box-shadow:none !important; padding:0 !important;
+  text-shadow:0 0 8px rgba(80,255,150,0.75), 0 0 1px #000 !important; font-variant-numeric:tabular-nums; }
+:root .mc-ww #solveTimer.danger{ color:#ff7f7f !important; text-shadow:0 0 8px rgba(255,80,80,0.8) !important; }
+/* the six slots: dark glass tiles in a bronze frame, cream letters, a pop as each letter lands */
+:root .mc-ww #solveSlots{ position:fixed; left:var(--mc-slots-x); top:var(--mc-slots-y); width:var(--mc-slots-w); height:var(--mc-slots-h); margin:0 !important; padding:0 4%; box-sizing:border-box;
+  display:flex; align-items:center; justify-content:space-between; gap:3px; }
+:root .mc-ww #solveSlots::before, :root .mc-ww #solveSlots::after{ display:none !important; }
+:root .mc-ww .solve-slot{ flex:0 0 auto; width:calc((var(--mc-slots-w) * 0.92 - 15px) / 6); height:calc(var(--mc-slots-h) * 0.8); border-radius:7px !important; box-sizing:border-box;
+  background:linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.03) 44%, rgba(0,0,0,0) 50%), linear-gradient(180deg, #1d1f2a, #0b0c12) !important;
+  border:2px solid #b07a3c !important; box-shadow:inset 0 0 0 1px rgba(255,214,150,0.35), inset 0 -4px 8px rgba(0,0,0,0.55) !important;
+  font:400 clamp(22px, 7vw, 30px)/1 'FS Righteous', sans-serif !important; color:#fff2d0 !important; text-shadow:0 0 8px rgba(255,220,150,0.5) !important; }
+:root .mc-ww .solve-slot::before{ display:none !important; }
+:root .mc-ww .solve-slot.locked{ border-color:#e3b25c !important; color:#ffe9a8 !important; box-shadow:inset 0 0 0 1px rgba(255,226,150,0.55), 0 0 10px rgba(255,200,90,0.45) !important; }
+/* guesses left on the plaque */
+:root .mc-ww #solveAttempts{ position:fixed; left:var(--mc-plaque-x); top:var(--mc-plaque-y); width:var(--mc-plaque-w); height:var(--mc-plaque-h); margin:0; display:flex; align-items:center; justify-content:center;
+  font:400 clamp(16px, 5vw, 20px)/1 'FS Righteous', sans-serif !important; color:#f3e6ff !important; text-shadow:0 2px 0 rgba(30,0,50,0.8); text-transform:uppercase; letter-spacing:0.04em; }
+/* CLEAR and SUBMIT on the two pockets; the hint button in the small pocket left of the plaque */
+:root .mc-ww .solve-buttons{ position:static !important; display:block !important; margin:0 !important; }
+:root .mc-ww #solveClearBtn, :root .mc-ww #solveSubmit, :root .mc-ww #solveHintBtn{ position:fixed !important; margin:0 !important; display:flex !important; align-items:center; justify-content:center; box-sizing:border-box; padding:0 4px !important;
+  min-height:0 !important; border-radius:999px !important; background:none !important; border:0 !important; box-shadow:none !important; font:400 clamp(15px, 4.6vw, 19px)/1 'FS Righteous', sans-serif !important; text-transform:uppercase; }
+:root .mc-ww #solveClearBtn{ left:var(--mc-clear-x); top:var(--mc-clear-y); width:var(--mc-clear-w); height:var(--mc-clear-h); color:#f3e6ff !important; text-shadow:0 2px 0 rgba(20,0,40,0.8) !important; }
+:root .mc-ww #solveSubmit{ left:var(--mc-submit-x); top:var(--mc-submit-y); width:var(--mc-submit-w); height:var(--mc-submit-h); color:#3a1d00 !important; text-shadow:0 1px 0 rgba(255,255,255,0.45) !important; }
+:root .mc-ww #solveHintBtn{ left:var(--mc-hint-x); top:var(--mc-hint-y); width:var(--mc-hint-w); height:var(--mc-hint-h); border-radius:12px !important; font-size:12px !important; line-height:1.15 !important; text-align:center; white-space:normal;
+  color:#ffe9a8 !important; background:rgba(20,8,40,0.55) !important; border:1.5px solid rgba(255,214,90,0.55) !important; }
+:root .mc-ww #solveClearBtn:active, :root .mc-ww #solveSubmit:active, :root .mc-ww #solveHintBtn:active{ transform:scale(0.95); }
+/* the letters to place: round-cornered cream keys in the empty purple area (the keyboard, when shown, joins them there) */
+:root .mc-ww #solveRackLabel{ position:fixed; left:var(--mc-rack-x); top:calc(var(--mc-rack-y) + 2px); width:var(--mc-rack-w); margin:0; text-align:center; font:400 11px/1 'FS Righteous', sans-serif !important; letter-spacing:0.1em; color:#d9c8ff !important; }
+:root .mc-ww #solveRack{ position:fixed; left:var(--mc-rack-x); top:calc(var(--mc-rack-y) + 18px); width:var(--mc-rack-w); height:calc(var(--mc-rack-h) - 22px); margin:0; display:flex; flex-wrap:wrap; align-content:center; justify-content:center; gap:5px; }
+:root .mc-ww #solveRack .solve-tile{ width:calc((var(--mc-rack-w) - 30px) / 6); height:calc((var(--mc-rack-h) - 30px) * 0.62); min-height:0; border-radius:8px !important; font:400 clamp(18px, 5.6vw, 24px)/1 'FS Righteous', sans-serif !important;
+  background:linear-gradient(180deg, #fff6dc, #f0d9a6) !important; color:#2a1300 !important; border:2px solid #b07a3c !important; box-shadow:0 3px 0 #6b4210 !important; text-shadow:none !important; }
+:root .mc-ww .solve-section-label, :root .mc-ww #solveKeyboard{ display:none !important; }
+:root .mc-ww #solveKeyboard[data-shown]{ display:flex !important; }
