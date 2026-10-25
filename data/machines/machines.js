@@ -51,10 +51,10 @@
   M.register('lucky', { img: 'lucky-console', w: 736, h: 1433, lit: true, top: 22, regions: {
       wheel:  { x: 0.075, y: 0.2655, w: 0.850, h: 0.4365 },
       stop:   { x: 0.395, y: 0.715, w: 0.210, h: 0.108 },
-      bank:   { x: 0.290, y: 0.2245, w: 0.420, h: 0.026 },
+      bank:   { x: 0.250, y: 0.7345, w: 0.500, h: 0.026 },
       note:   { x: 0.080, y: 0.874, w: 0.840, h: 0.036 },
-      bankBtn:{ x: 0.115, y: 0.925, w: 0.235, h: 0.046 },
-      againBtn:{ x: 0.365, y: 0.925, w: 0.225, h: 0.046 },
+      bankBtn:{ x: 0.085, y: 0.918, w: 0.270, h: 0.058 },
+      againBtn:{ x: 0.372, y: 0.918, w: 0.270, h: 0.058 },
     },
     match: ()=>{ const o = $('luckyOverlay'); return o && M.visible(o) && document.documentElement.classList.contains('mode-daily') ? o : null; } });
   // The Mystery Games built on the shared template (#mgOverlay, .mg-<game>): Twin Flip, Zap Words (and Snap Sort, when its art arrives)
