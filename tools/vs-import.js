@@ -78,7 +78,7 @@
       if (skipKeys.has(key)){ report.held.push(a + ' vs ' + b); return; }
       if (existing.has(key)){ report.skippedDuplicate++; return; }
       if (seen.has(key)){ report.skippedInside++; return; }
-      { const E = window.FLIPSTAX_VS_EMOJI, g = E.fix(cat, ga, gb, key); if (g[0] !== ga || g[1] !== gb) report.emojiFixed = (report.emojiFixed || 0) + 1; ga = g[0]; gb = g[1]; }   // (Oct 24: no empty emoji, never the same on both sides - data/vs/vs-emoji.js)
+      { const E = window.FLIPSTAX_VS_EMOJI, g = E.fix(cat, ga, gb, key, a, b); if (g[0] !== ga || g[1] !== gb) report.emojiFixed = (report.emojiFixed || 0) + 1; ga = g[0]; gb = g[1]; }   // (Oct 24: no empty emoji, never the same on both sides - data/vs/vs-emoji.js)
       seen.add(key); out.push([cat, a, ga, b, gb, era]);
       report.byCategory[cat] = (report.byCategory[cat] || 0) + 1; report.erasNew[era] = (report.erasNew[era] || 0) + 1;
     });
