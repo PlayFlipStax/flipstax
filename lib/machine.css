@@ -20,3 +20,74 @@
 :root .mc-backed > .mg-bg, :root .mc-backed .ir-bg, :root .mc-backed .ev-bg, :root .mc-backed .warp-bg, :root .mc-backed .sunburst, :root .mc-backed .ll-spot{ display:none !important; }
 /* all machine text: Righteous */
 :root .mc-backed .mc-text{ font-family:'FS Righteous', 'Big Shoulders Display', sans-serif; font-weight:400; }
+
+/* ===== Brain Beam (bb) and the Riddle Round (riddle): the question on the top screen, the four answers on the panels ===== */
+:root:is(.mc-on-bb, .mc-on-riddle) #eventOverlay.mc-backed{ position:fixed !important; inset:0 !important; padding:0 !important; margin:0 !important; animation:none !important; }
+:root :is(.mc-bb, .mc-riddle) > :is(#eventSky, .bb-marquee, .bb-timeline, .riddle-ufo, #coinRays){ display:none !important; }
+/* the subtitle: a small line at the top of the screen; the question fills the rest (cream, auto-fit, up to 3 lines) */
+:root :is(.mc-bb, .mc-riddle) #eventSubtitle{ position:fixed; left:var(--mc-screen-x); top:calc(var(--mc-screen-y) + 6px); width:var(--mc-screen-w); margin:0; padding:0 10px; box-sizing:border-box; text-align:center;
+  font:400 11px/1.2 'FS Righteous', sans-serif; letter-spacing:0.06em; color:#d6fff8; text-shadow:0 1px 2px rgba(0,30,40,0.9); background:none; border:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+:root :is(.mc-bb, .mc-riddle) #eventPrompt{ position:fixed; left:calc(var(--mc-screen-x) + 14px); top:calc(var(--mc-screen-y) + 24px); width:calc(var(--mc-screen-w) - 28px); height:calc(var(--mc-screen-h) - 46px);
+  margin:0; padding:0; box-sizing:border-box; display:flex; align-items:center; justify-content:center; text-align:center; overflow:hidden;
+  font-family:'FS Righteous', sans-serif; font-weight:400; line-height:1.12; color:#fff7dc; text-shadow:0 2px 0 rgba(0,40,50,0.8), 0 0 10px rgba(0,30,40,0.6);
+  background:none !important; border:0 !important; box-shadow:none !important; }
+:root :is(.mc-bb, .mc-riddle) #eventPrompt::before, :root :is(.mc-bb, .mc-riddle) #eventPrompt::after{ display:none !important; }
+/* the timer: a thin bar along the bottom of the top screen */
+:root :is(.mc-bb, .mc-riddle) #eventTimerBar{ position:fixed; left:calc(var(--mc-screen-x) + 14px); top:calc(var(--mc-screen-y) + var(--mc-screen-h) - 10px); width:calc(var(--mc-screen-w) - 28px); height:5px; margin:0; border-radius:3px; background:rgba(0,30,40,0.55); }
+/* the answers: each tile on its panel (no skin of its own), its number on the round button */
+:root :is(.mc-bb, .mc-riddle) #eventGrid{ position:static !important; display:block !important; }
+:root :is(.mc-bb, .mc-riddle) #eventGrid .bb-vs{ display:none !important; }
+:root :is(.mc-bb, .mc-riddle) .event-tile, :root .mc-riddle .ir-opt{ position:fixed !important; margin:0 !important; box-sizing:border-box; display:flex !important; align-items:center; justify-content:center; text-align:center;
+  background:none !important; background-color:transparent !important; border:0 !important; box-shadow:none !important; clip-path:none !important; transform:none; padding:0 16px !important; border-radius:40px;
+  font-family:'FS Righteous', sans-serif !important; font-weight:400 !important; font-size:clamp(16px, 4.8vw, 21px) !important; line-height:1.08; letter-spacing:0.01em; cursor:pointer; overflow:visible;
+  transition:opacity 220ms ease, transform 120ms ease-out; }
+:root :is(.mc-bb, .mc-riddle) .event-tile::before, :root :is(.mc-bb, .mc-riddle) .event-tile::after, :root .mc-riddle .ir-opt::before, :root .mc-riddle .ir-opt::after{ display:none !important; }
+:root :is(.mc-bb, .mc-riddle) .event-tile:active, :root .mc-riddle .ir-opt:active{ transform:scale(0.97); }
+:root :is(.mc-bb, .mc-riddle) .event-tile:nth-child(1), :root .mc-riddle .ir-opt:nth-child(1){ left:var(--mc-p1-x); top:var(--mc-p1-y); width:var(--mc-p1-w); height:var(--mc-p1-h); }
+:root :is(.mc-bb, .mc-riddle) .event-tile:nth-child(2), :root .mc-riddle .ir-opt:nth-child(2){ left:var(--mc-p2-x); top:var(--mc-p2-y); width:var(--mc-p2-w); height:var(--mc-p2-h); }
+:root :is(.mc-bb, .mc-riddle) .event-tile:nth-child(3), :root .mc-riddle .ir-opt:nth-child(3){ left:var(--mc-p3-x); top:var(--mc-p3-y); width:var(--mc-p3-w); height:var(--mc-p3-h); }
+:root :is(.mc-bb, .mc-riddle) .event-tile:nth-child(4), :root .mc-riddle .ir-opt:nth-child(4){ left:var(--mc-p4-x); top:var(--mc-p4-y); width:var(--mc-p4-w); height:var(--mc-p4-h); }
+/* text readable on each panel: dark on the gold, cyan and cream panels, white on the pink and orange ones */
+:root :is(.mc-bb, .mc-riddle) .event-tile .ttxt{ color:inherit; }
+:root .mc-riddle .event-tile, :root :is(.mc-bb, .mc-riddle) .event-tile:nth-child(1), :root :is(.mc-bb, .mc-riddle) .event-tile:nth-child(4){ color:#2a1300 !important; text-shadow:0 1px 0 rgba(255,255,255,0.45) !important; }
+:root .mc-bb .event-tile:nth-child(2), :root .mc-bb .event-tile:nth-child(3){ color:#fff !important; text-shadow:0 2px 0 rgba(80,10,30,0.7) !important; }
+:root .mc-riddle .ir-opt{ color:#2a1300 !important; text-shadow:0 1px 0 rgba(255,255,255,0.5) !important; }
+/* the number sits on the round button beside its panel, and glows when picked */
+:root :is(.mc-bb, .mc-riddle) .event-tile .tkey{ position:absolute !important; left:calc(var(--mc-b1-x) - var(--mc-p1-x)) !important; top:calc(var(--mc-b1-y) - var(--mc-p1-y)) !important; right:auto !important; bottom:auto !important; transform:none !important; margin:0 !important; display:flex !important; align-items:center; justify-content:center; width:var(--mc-b1-w) !important; height:var(--mc-b1-h) !important;
+  border-radius:50%; background:none !important; border:0 !important; box-shadow:none !important; font:400 clamp(22px, 7vw, 30px)/1 'FS Righteous', sans-serif !important; color:#fff !important; text-shadow:0 2px 0 rgba(0,0,0,0.55), 0 0 8px rgba(0,0,0,0.4) !important; }
+
+:root :is(.mc-bb, .mc-riddle) .event-tile.is-picked .tkey, :root :is(.mc-bb, .mc-riddle) .event-tile.is-right .tkey{ text-shadow:0 0 6px #fff, 0 0 16px #ffe27a, 0 0 26px #ffd23f !important; }
+/* correct: a gold flash on the panel; wrong: the picked panel dims */
+:root :is(.mc-bb, .mc-riddle) .event-tile.is-right, :root .mc-riddle .ir-opt.right{ animation:mcGold 900ms ease-out 1; }
+@keyframes mcGold{ 0%{ background-color:rgba(255,226,120,0); } 20%{ background-color:rgba(255,226,120,0.55); } 100%{ background-color:rgba(255,226,120,0); } }
+:root :is(.mc-bb, .mc-riddle) .event-tile.is-right, :root .mc-riddle .ir-opt.right{ background-image:none !important; }
+:root :is(.mc-bb, .mc-riddle) .event-tile.is-wrong, :root .mc-riddle .ir-opt.wrong{ opacity:0.4; }
+:root :is(.mc-bb, .mc-riddle) .event-tile:not(.is-right):not(.is-wrong) { }
+:root.lite .mc-bb .event-tile.is-right, :root.lite .mc-riddle .ir-opt.right{ animation:none; background-color:rgba(255,226,120,0.35) !important; }
+/* ---- the Riddle Round: the question on the screen; the host line, the eyebrow and the timer small in it ---- */
+:root.mc-on-riddle #irOverlay.mc-backed{ padding:0 !important; }
+:root .mc-riddle #irPanel{ position:static !important; background:none !important; border:0 !important; box-shadow:none !important; padding:0 !important; margin:0 !important; transform:none !important; animation:none !important; }
+:root .mc-riddle #irPanel::before, :root .mc-riddle #irPanel::after{ display:none !important; }
+:root .mc-riddle :is(.ir-field, .ir-rings, .ir-flash){ display:none !important; }
+:root .mc-riddle .ir-host{ position:fixed; left:var(--mc-screen-x); top:calc(var(--mc-screen-y) - 34px); width:var(--mc-screen-w); margin:0; justify-content:center; transform:scale(0.82); transform-origin:50% 100%; }
+:root .mc-riddle .ir-eyebrow{ position:fixed; left:var(--mc-screen-x); top:calc(var(--mc-screen-y) + 6px); width:var(--mc-screen-w); margin:0; text-align:center; font:400 11px/1.2 'FS Righteous', sans-serif !important; color:#d6fff8 !important; letter-spacing:0.08em; }
+:root .mc-riddle .ir-eyebrow .ir-hard{ font-size:10px; padding:1px 6px; }
+:root .mc-riddle #irTimer{ position:fixed; left:calc(var(--mc-screen-x) + var(--mc-screen-w) - 62px); top:calc(var(--mc-screen-y) + var(--mc-screen-h) - 26px); width:52px; margin:0; text-align:right;
+  font:400 17px/1 'FS Righteous', sans-serif !important; color:#fff7dc !important; text-shadow:0 1px 2px rgba(0,30,40,0.9); }
+:root .mc-riddle #irQ{ position:fixed; left:calc(var(--mc-screen-x) + 10px); top:calc(var(--mc-screen-y) + 24px); width:calc(var(--mc-screen-w) - 20px); height:calc(var(--mc-screen-h) - 52px); margin:0; padding:0;
+  display:flex; align-items:center; justify-content:center; text-align:center; overflow:hidden; font-family:'FS Righteous', sans-serif !important; font-weight:400 !important; line-height:1.12; color:#fff7dc !important; text-shadow:0 2px 0 rgba(0,40,50,0.8); }
+:root .mc-riddle #irLen{ position:fixed; left:calc(var(--mc-screen-x) + 10px); top:calc(var(--mc-screen-y) + var(--mc-screen-h) - 26px); width:calc(var(--mc-screen-w) - 84px); margin:0; text-align:left; font:600 10.5px/1.2 var(--f-body, Inter, sans-serif) !important; color:#d6fff8 !important; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+:root .mc-riddle #irOpts{ position:static !important; display:block !important; }
+:root .mc-riddle .ir-lose-box{ position:fixed; left:var(--mc-strip-x); top:calc(var(--mc-strip-y) - 6px); width:var(--mc-strip-w); margin:0; }
+
+/* the top HUD (points, round, prize track, multiplier) stays above the machine */
+:root.mc-active:is(.mc-on-bb, .mc-on-riddle) .app > header{ position:relative; z-index:9; }
+
+/* (the game's own right / wrong tile skins - green, gold, red fills - give way on a machine: gold flash for right, a dim for wrong) */
+:root:root #eventOverlay.mc-backed .event-tile.is-right, :root:root #eventOverlay.mc-backed .event-tile.is-wrong{ background:none !important; background-color:transparent !important; background-image:none !important; box-shadow:none !important; border-color:transparent !important; }
+:root:root #eventOverlay.mc-backed .event-tile.is-right{ animation:mcGold 900ms ease-out 1 !important; }
+:root:root #eventOverlay.mc-backed .event-tile.is-wrong{ opacity:0.4 !important; animation:none !important; }
+:root:root #eventOverlay.mc-backed .event-tile.is-right::after, :root:root #eventOverlay.mc-backed .event-tile.is-wrong::after, :root:root #eventOverlay.mc-backed .event-tile.is-right::before, :root:root #eventOverlay.mc-backed .event-tile.is-wrong::before{ display:none !important; }
+/* (a shake on the board would make it a stacking context and pull the whole quiz behind the machine: no board transforms here) */
+:root.mc-active:is(.mc-on-bb, .mc-on-riddle) #board{ transform:none !important; animation:none !important; }
+:root.mc-active:is(.mc-on-bb, .mc-on-riddle) #board{ z-index:9 !important; }
