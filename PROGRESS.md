@@ -184,3 +184,12 @@ The Daily VS screen on the Gemini console art (lib/vs-console.js + .css, data/vs
 - [x] Q7. Lite and reduced motion (also as :root.vsc-rm), long labels step down a size instead of being cut. Frame times on this Mac (WebKit, no CPU throttle): VS p95 18.0 ms full and lite (60 Hz vsync); the 4x-CPU check (tools/frametime.ps1, Chrome) still needs the work PC.
 - Open: incoming-assets/references/ was empty; there is no rewind / forward bar in the game (the hint, corner host and TEST bar stay on top); the HUD shows points, round and combo only - the letter tray and gold keys are not on the VS screen any more.
 
+## R. Run 7 - the round-end games on their own machines (Oct 24-25)
+lib/machine.js + machine.css (one module; per-game regions in data/machines/machines.js); art in data/machines/ (1.38 MB). Each item passed a 5-episode fast check; review shots in review-shots/m2-m10 (not committed).
+- [x] R0 art (f3bdc1e) - snap-console-clean/-lit and ww-tile-reference missing
+- [x] R1 module (6223ed5) - [x] R2 Brain Beam + Riddle (b0d35d3; fixes 0f399fd no UFO, a07c27c timer strip, 6149674 wrong text, 5f7b992 no top band)
+- [x] R3 Word Warp (23fd6dc) - [x] R4 Mystery Door (6d11613; the game does not grow out of the pod) - [x] R5 Lucky Lights (12c575c)
+- [x] R6 Twin Flip (fb1034e) - [x] R7 Zap Words (5b94752; hit-test now row/column separate) - [x] R8 Orbit Drop (6960c70; window.FlipstaxOrbit for the slider and DROP)
+- [ ] R9 Snap Sort - skipped: no snap-console art - [x] R10 real disco ball (2fabe7a)
+- Frame times here (WebKit, no throttle): p95 18-19 ms everywhere but the Brain Beam quiz (21 ms - it was 21-23 before this run); lite: none over 20. The 4x-CPU check needs the work PC.
+
