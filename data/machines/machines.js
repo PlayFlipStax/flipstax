@@ -30,4 +30,20 @@
       submit: { x: 0.618, y: 0.806, w: 0.200, h: 0.046 },
     },
     match: ()=>{ const o = $('solveOverlay'); return o && M.visible(o) && document.documentElement.classList.contains('mode-daily') ? o : null; } });
+  // Mystery Door: four pods (the doors) with a ring above each (the door's number) and a round button below each (taps the door);
+  // the prompt and the pick timer go in the dark recess between the pods and the buttons
+  const POD = (cx)=> ({ x: cx - 0.083, y: 0.462, w: 0.166, h: 0.212 }), RING = (cx)=> ({ x: cx - 0.07, y: 0.303, w: 0.14, h: 0.072 }), BTN = (cx)=> ({ x: cx - 0.07, y: 0.822, w: 0.14, h: 0.068 });
+  const DX = [0.182, 0.390, 0.615, 0.818], RX = [0.175, 0.392, 0.610, 0.825];
+  const DOORS = { prompt: { x: 0.285, y: 0.738, w: 0.43, h: 0.062 } };
+  DX.forEach((c, k)=>{ DOORS['pod' + (k + 1)] = POD(c); DOORS['ring' + (k + 1)] = RING(RX[k]); DOORS['btn' + (k + 1)] = BTN(RX[k]); });
+  M.register('doors', { img: 'doors', w: 736, h: 1433, lit: true, shiftY: 1, topFrame: 0.0, regions: DOORS,
+    match: ()=>{ const o = $('eventOverlay'); return o && M.visible(o) && o.classList.contains('mdoor') && document.documentElement.classList.contains('mode-daily') ? o : null; } });
+  // the four round buttons are real buttons too: each taps its door (only while the doors are up)
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const ov = $('eventOverlay'); if (!ov || $('mcDoorBtns')) return;
+    const box = document.createElement('div'); box.id = 'mcDoorBtns'; box.className = 'mc-door-btns';
+    box.innerHTML = [1, 2, 3, 4].map(n=> '<button type="button" class="mc-door-btn b' + n + '" aria-label="Door ' + n + '"></button>').join('');
+    ov.appendChild(box);
+    box.querySelectorAll('button').forEach((b, k)=> b.addEventListener('click', (e)=>{ e.stopPropagation(); const t = ov.querySelectorAll('.event-tile')[k]; if (t && t.onclick){ b.classList.add('press'); setTimeout(()=> b.classList.remove('press'), 180); t.click(); } }));
+  });
 })();

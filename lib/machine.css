@@ -146,3 +146,55 @@
   background:linear-gradient(180deg, #fff6dc, #f0d9a6) !important; color:#2a1300 !important; border:2px solid #b07a3c !important; box-shadow:0 3px 0 #6b4210 !important; text-shadow:none !important; }
 :root .mc-ww .solve-section-label, :root .mc-ww #solveKeyboard{ display:none !important; }
 :root .mc-ww #solveKeyboard[data-shown]{ display:flex !important; }
+
+/* ===== Mystery Door (doors): the doors are the four pods, each number in its ring, the round buttons tap the doors too ===== */
+:root.mc-on-doors #eventOverlay.mc-backed{ position:fixed !important; inset:0 !important; padding:0 !important; margin:0 !important; animation:none !important; }
+:root.mc-active.mc-on-doors #board{ transform:none !important; animation:none !important; z-index:9 !important; }
+:root .mc-doors > :is(#eventSky, .bb-marquee, .bb-timeline, .riddle-ufo, #coinRays, #eventSubtitle){ display:none !important; }
+:root .mc-doors #eventPrompt{ position:fixed; left:var(--mc-prompt-x); top:var(--mc-prompt-y); width:var(--mc-prompt-w); height:calc(var(--mc-prompt-h) - 8px); margin:0; padding:0 6px; box-sizing:border-box;
+  display:flex; align-items:center; justify-content:center; text-align:center; overflow:hidden; background:none !important; border:0 !important; box-shadow:none !important;
+  font:400 13px/1.15 'FS Righteous', sans-serif !important; color:#f3e9ff !important; text-shadow:0 1px 2px rgba(0,0,0,0.9) !important; }
+:root .mc-doors #eventPrompt::before, :root .mc-doors #eventPrompt::after{ display:none !important; }
+:root .mc-doors #eventTimerBar{ position:fixed; left:calc(var(--mc-prompt-x) + 8px); top:calc(var(--mc-prompt-y) + var(--mc-prompt-h) - 6px); width:calc(var(--mc-prompt-w) - 16px); height:4px; margin:0; border-radius:2px; background:rgba(0,0,0,0.5); }
+:root .mc-doors #eventGrid{ position:static !important; display:block !important; }
+:root .mc-doors #eventGrid .bb-vs{ display:none !important; }
+:root .mc-doors .event-tile{ position:fixed !important; margin:0 !important; padding:0 !important; box-sizing:border-box; display:block !important; border-radius:40px !important; overflow:visible !important;
+  background:none !important; background-color:transparent !important; border:0 !important; box-shadow:none !important; clip-path:none !important; cursor:pointer; transition:opacity 260ms ease, transform 120ms ease-out; }
+:root .mc-doors .event-tile::before, :root .mc-doors .event-tile::after{ display:none !important; }
+:root .mc-doors .event-tile:nth-child(1){ left:var(--mc-pod1-x); top:var(--mc-pod1-y); width:var(--mc-pod1-w); height:var(--mc-pod1-h); }
+:root .mc-doors .event-tile:nth-child(2){ left:var(--mc-pod2-x); top:var(--mc-pod2-y); width:var(--mc-pod2-w); height:var(--mc-pod2-h); }
+:root .mc-doors .event-tile:nth-child(3){ left:var(--mc-pod3-x); top:var(--mc-pod3-y); width:var(--mc-pod3-w); height:var(--mc-pod3-h); }
+:root .mc-doors .event-tile:nth-child(4){ left:var(--mc-pod4-x); top:var(--mc-pod4-y); width:var(--mc-pod4-w); height:var(--mc-pod4-h); }
+:root .mc-doors .event-tile:active{ transform:scale(0.97); }
+/* the door's number in its ring (the ring sits above its pod) */
+:root .mc-doors .event-tile .pu-door{ position:absolute !important; left:calc(var(--mc-ring1-x) - var(--mc-pod1-x)) !important; top:calc(var(--mc-ring1-y) - var(--mc-pod1-y)) !important; width:var(--mc-ring1-w) !important; height:var(--mc-ring1-h) !important;
+  margin:0 !important; transform:none !important; display:flex !important; align-items:center; justify-content:center; background:none !important; border:0 !important; box-shadow:none !important;
+  font:400 clamp(24px, 7.4vw, 32px)/1 'FS Righteous', sans-serif !important; color:#fff !important; text-shadow:0 0 8px rgba(160,240,255,0.9), 0 2px 0 rgba(0,0,0,0.6) !important; }
+:root .mc-doors .event-tile:nth-child(2) .pu-door{ left:calc(var(--mc-ring2-x) - var(--mc-pod2-x)) !important; }
+:root .mc-doors .event-tile:nth-child(3) .pu-door{ left:calc(var(--mc-ring3-x) - var(--mc-pod3-x)) !important; }
+:root .mc-doors .event-tile:nth-child(4) .pu-door{ left:calc(var(--mc-ring4-x) - var(--mc-pod4-x)) !important; }
+/* what's behind the door: a small chip at the foot of its pod (icon and name) */
+:root .mc-doors .event-tile .pu-prize{ position:absolute !important; left:50% !important; bottom:4% !important; top:auto !important; width:118% !important; height:auto !important; margin:0 !important; transform:translateX(-50%) !important;
+  display:flex !important; flex-direction:column; align-items:center; gap:1px; padding:3px 2px !important; border-radius:10px !important; box-shadow:0 2px 6px rgba(0,0,0,0.5) !important; opacity:0.95; }
+:root .mc-doors .event-tile .pu-prize .pu-icon{ font-size:18px !important; line-height:1 !important; margin:0 !important; }
+:root .mc-doors .event-tile .pu-prize .pu-label{ font:400 9.5px/1.05 'FS Righteous', sans-serif !important; color:#fff !important; text-shadow:0 1px 1px rgba(0,0,0,0.8) !important; text-align:center; white-space:normal; }
+/* the pick: a white flare on the chosen pod (it lights up through lightRegion); the others dim */
+:root .mc-doors .event-tile.picked-wait, :root .mc-doors .event-tile.open:not(.other){ animation:mcDoorFlare 700ms ease-out 1 !important; }
+@keyframes mcDoorFlare{ 0%{ background-color:rgba(255,255,255,0); } 25%{ background-color:rgba(255,255,255,0.55); } 100%{ background-color:rgba(255,255,255,0); } }
+:root .mc-doors .event-tile.picked-wait, :root .mc-doors .event-tile.open:not(.other){ background-image:none !important; }
+:root .mc-doors .event-tile.other{ opacity:0.32 !important; }
+:root.lite .mc-doors .event-tile.picked-wait, :root.lite .mc-doors .event-tile.open:not(.other){ animation:none !important; background-color:rgba(255,255,255,0.25) !important; }
+/* the four round buttons: real buttons over the picture's buttons, a squash when pressed */
+.mc-door-btns{ display:none; }
+:root .mc-doors .mc-door-btns{ display:block; }
+:root .mc-doors .mc-door-btn{ position:fixed; width:var(--mc-btn1-w); height:var(--mc-btn1-h); top:var(--mc-btn1-y); margin:0; padding:0; border:0; border-radius:50%; background:transparent; cursor:pointer; transition:transform 110ms ease-out; -webkit-tap-highlight-color:transparent; }
+:root .mc-doors .mc-door-btn.b1{ left:var(--mc-btn1-x); } :root .mc-doors .mc-door-btn.b2{ left:var(--mc-btn2-x); } :root .mc-doors .mc-door-btn.b3{ left:var(--mc-btn3-x); } :root .mc-doors .mc-door-btn.b4{ left:var(--mc-btn4-x); }
+:root .mc-doors .mc-door-btn:active, :root .mc-doors .mc-door-btn.press{ transform:scale(0.86, 0.8); background:radial-gradient(closest-side, rgba(255,255,255,0.45), rgba(255,255,255,0)); }
+:root.mc-active.mc-on-doors .app > header{ position:relative; z-index:9; }
+/* (the stage's own shot steps aside while a machine is up: the machine is the whole screen) */
+:root.mc-active #stage{ display:none !important; }
+:root .mc-doors .event-tile .pu-door::before, :root .mc-doors .event-tile .pu-door::after{ display:none !important; }
+:root .mc-doors .event-tile .pu-prize{ bottom:10% !important; }
+/* the chosen pod: a white flare over it while it opens */
+:root .mc-doors .event-tile.picked-wait, :root .mc-doors .event-tile.open:not(.other){ box-shadow:0 0 0 2px rgba(255,255,255,0.85), 0 0 26px 8px rgba(255,255,255,0.55) !important; }
+@media (max-width:370px){ :root .mc-doors #eventPrompt{ font-size:11.5px !important; } }
