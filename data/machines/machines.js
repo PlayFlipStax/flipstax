@@ -12,14 +12,14 @@
     b3: { x: 0.110, y: 0.660, w: 0.138, h: 0.077 }, b4: { x: 0.110, y: 0.791, w: 0.138, h: 0.077 },
     strip: { x: 0.080, y: 0.915, w: 0.840, h: 0.050 },
   };
-  M.register('bb', { img: 'bb-console', w: 768, h: 1376, lit: true, shiftY: 1, regions: QUIZ,
+  M.register('bb', { bg: ['#020206', '#755826'], img: 'bb-console', w: 768, h: 1376, lit: true, shiftY: 1, regions: QUIZ,
     match: ()=>{ const o = $('eventOverlay'); return o && M.visible(o) && o.classList.contains('quiz-beam') && document.documentElement.classList.contains('mode-daily') ? o : null; } });
-  M.register('riddle', { img: 'riddle-console', w: 768, h: 1376, lit: true, shiftY: 1, regions: QUIZ,
+  M.register('riddle', { bg: ['#030409', '#0a4f3c'], img: 'riddle-console', w: 768, h: 1376, lit: true, shiftY: 1, regions: QUIZ,
     match: ()=>{ const o = $('eventOverlay'); return o && M.visible(o) && o.classList.contains('quiz-riddle') && document.documentElement.classList.contains('mode-daily') ? o : null; } });
   // Word Warp: the top screen, the small square (timer), the wide dark panel (the six slots), the plaque (guesses left), the two
   // button pockets (CLEAR, SUBMIT); the empty purple area right of the square holds the letters to place, the small pocket left of
   // the plaque the hint button
-  M.register('ww', { img: 'ww-console', w: 768, h: 1376, lit: true, pulse: true, top: 26, regions: {
+  M.register('ww', { bg: ['#020206', '#231841'], img: 'ww-console', w: 768, h: 1376, lit: true, pulse: true, top: 26, regions: {
       screen: { x: 0.165, y: 0.088, w: 0.670, h: 0.195 },
       timer:  { x: 0.105, y: 0.380, w: 0.165, h: 0.115 },
       rack:   { x: 0.300, y: 0.378, w: 0.585, h: 0.120 },
@@ -36,7 +36,7 @@
   const DX = [0.182, 0.390, 0.615, 0.818], RX = [0.175, 0.392, 0.610, 0.825];
   const DOORS = { prompt: { x: 0.060, y: 0.9205, w: 0.560, h: 0.054 } };
   DX.forEach((c, k)=>{ DOORS['pod' + (k + 1)] = POD(c); DOORS['ring' + (k + 1)] = RING(RX[k]); DOORS['btn' + (k + 1)] = BTN(RX[k]); });
-  M.register('doors', { img: 'doors', w: 736, h: 1433, lit: true, below: true, regions: DOORS,
+  M.register('doors', { bg: ['#010a1b', '#2d214a'], img: 'doors', w: 736, h: 1433, lit: true, below: true, regions: DOORS,
     match: ()=>{ const o = $('eventOverlay'); return o && M.visible(o) && o.classList.contains('mdoor') && document.documentElement.classList.contains('mode-daily') ? o : null; } });
   // the four round buttons are real buttons too: each taps its door (only while the doors are up)
   document.addEventListener('DOMContentLoaded', ()=>{
@@ -48,10 +48,10 @@
   });
   // Lucky Lights: the game's own wheel covers the picture's (centred on it, under its pointer); the big pink button is STOP;
   // BANK and SPIN AGAIN on the coloured strip buttons; the bank and spin count on a small plaque under the wheel
-  M.register('lucky', { img: 'lucky-console', w: 736, h: 1433, lit: true, top: 22, regions: {
+  M.register('lucky', { bg: ['#020512', '#392a53'], img: 'lucky-console', w: 736, h: 1433, lit: true, top: 22, regions: {
       wheel:  { x: 0.075, y: 0.2655, w: 0.850, h: 0.4365 },
       stop:   { x: 0.395, y: 0.715, w: 0.210, h: 0.108 },
-      bank:   { x: 0.250, y: 0.7345, w: 0.500, h: 0.026 },
+      bank:   { x: 0.018, y: 0.772, w: 0.282, h: 0.056 },
       note:   { x: 0.080, y: 0.874, w: 0.840, h: 0.036 },
       bankBtn:{ x: 0.085, y: 0.918, w: 0.270, h: 0.058 },
       againBtn:{ x: 0.372, y: 0.918, w: 0.270, h: 0.058 },
@@ -60,7 +60,7 @@
   // The Mystery Games built on the shared template (#mgOverlay, .mg-<game>): Twin Flip, Zap Words (and Snap Sort, when its art arrives)
   const mg = (key)=> ()=>{ const o = $('mgOverlay'); return o && M.visible(o) && o.classList.contains('mg-' + key) && document.documentElement.classList.contains('mode-daily') ? o : null; };
   // Twin Flip: the 16 windows hold the tiles; the name, the round and the pairs on the top screen; the score and the timer on the control strip
-  M.register('twin', { img: 'twin-console', w: 736, h: 1433, lit: true, pulse: true, top: 24, regions: {
+  M.register('twin', { bg: ['#030309', '#261943'], img: 'twin-console', w: 736, h: 1433, lit: true, pulse: true, top: 24, regions: {
       screen: { x: 0.150, y: 0.085, w: 0.700, h: 0.195 },
       grid:   { x: 0.118, y: 0.392, w: 0.776, h: 0.486 },
       strip:  { x: 0.100, y: 0.926, w: 0.820, h: 0.046 },
@@ -69,7 +69,7 @@
     }, match: mg('twinFlip') });
   // Zap Words: the letters as lit bulbs in the 36 sockets; the word so far and the points on the small screen of the control panel;
   // the hint on the first big button; the found words along the bottom grille; the baked ROUND 4 x2 plate stays
-  M.register('zap', { img: 'zap-console', w: 736, h: 1433, lit: true, top: 22, regions: {
+  M.register('zap', { bg: ['#080c12', '#0e242b'], img: 'zap-console', w: 736, h: 1433, lit: true, top: 22, regions: {
       grid:   { x: 0.1765, y: 0.3015, w: 0.6510, h: 0.3708 },
       rule:   { x: 0.180, y: 0.2830, w: 0.640, h: 0.016 },
       timer:  { x: 0.180, y: 0.6800, w: 0.640, h: 0.008 },
@@ -79,7 +79,7 @@
     }, match: mg('zapWords') });
   // Orbit Drop: the pegs, the UFO, the chips and the nine slot values drawn live in the empty field, the slots over the tray strip;
   // the slider groove aims the UFO (the UFO stays draggable); the dome under the groove is the DROP button
-  M.register('orbit', { img: 'orbit-console', w: 768, h: 1376, lit: false, top: 4, regions: {
+  M.register('orbit', { bg: ['#01060a', '#1f100a'], img: 'orbit-console', w: 768, h: 1376, lit: false, top: 4, regions: {
       line:   { x: 0.200, y: 0.222, w: 0.600, h: 0.022 },
       field:  { x: 0.168, y: 0.287, w: 0.664, h: 0.548 },
       status: { x: 0.175, y: 0.258, w: 0.650, h: 0.024 },

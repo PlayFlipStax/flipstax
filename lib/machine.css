@@ -1,7 +1,7 @@
 /* FlipStax - the machines (lib/machine.js): a round-end game's screen drawn on its machine picture. Transform and opacity only;
    lite mode and reduced motion: no pulse, instant switches. Each game's own placement rules live in its section below. */
 .mc{ position:fixed; inset:0; z-index:-7; display:none; pointer-events:none; overflow:hidden;
-  background:radial-gradient(120% 70% at 50% 40%, #1c1426 0%, #0d0812 70%, #07040a 100%); }
+  background:linear-gradient(180deg, var(--mc-bg-top, #07040a) 0, var(--mc-bg-top, #07040a) var(--mc-y, 0px), var(--mc-bg-bot, #14081e) calc(var(--mc-y, 0px) + var(--mc-h, 100vh) * 0.94), #0b0612 100%); }
 .mc.on{ display:block; }
 .mc-box{ position:absolute; left:var(--mc-x); top:var(--mc-y); width:var(--mc-w); height:var(--mc-h); }
 .mc-img{ position:absolute; inset:0; width:100%; height:100%; display:block; -webkit-user-drag:none; user-select:none; }
@@ -351,3 +351,9 @@
 :root .mc-lucky .ll-btn.bank::before, :root .mc-lucky .ll-btn.again::before{ inset:-10px -6px; }
 :root .mc-lucky .ll-btn.again{ white-space:normal; line-height:1.0; text-align:center; }
 :root .mc-lucky .ll-bank{ font-size:11.5px !important; z-index:3; }
+
+/* the picture's bottom edge melts into the room round it on a tall phone (no hard line, no black band) */
+.mc-box{ -webkit-mask-image:linear-gradient(180deg, #000 0, #000 93%, rgba(0,0,0,0) 100%); mask-image:linear-gradient(180deg, #000 0, #000 93%, rgba(0,0,0,0) 100%); }
+
+/* Lucky Lights: the plaque sits on the left gear housing (the wheel rim above and the big button beside it stay clear), on two lines */
+:root .mc-lucky .ll-bank{ white-space:normal !important; flex-direction:column; line-height:1.1; text-align:center; font-size:10.5px !important; padding:2px 4px !important; }
