@@ -67,4 +67,14 @@
       score:  { x: 0.610, y: 0.929, w: 0.320, h: 0.040 },
       timer:  { x: 0.115, y: 0.898, w: 0.770, h: 0.010 },
     }, match: mg('twinFlip') });
+  // Zap Words: the letters as lit bulbs in the 36 sockets; the word so far and the points on the small screen of the control panel;
+  // the hint on the first big button; the found words along the bottom grille; the baked ROUND 4 x2 plate stays
+  M.register('zap', { img: 'zap-console', w: 736, h: 1433, lit: true, top: 22, regions: {
+      grid:   { x: 0.1765, y: 0.3015, w: 0.6510, h: 0.3708 },
+      rule:   { x: 0.180, y: 0.2830, w: 0.640, h: 0.016 },
+      timer:  { x: 0.180, y: 0.6800, w: 0.640, h: 0.008 },
+      screen: { x: 0.405, y: 0.7440, w: 0.190, h: 0.050 },
+      hint:   { x: 0.120, y: 0.8260, w: 0.150, h: 0.072 },
+      found:  { x: 0.070, y: 0.9120, w: 0.860, h: 0.060 },
+    }, match: mg('zapWords') });
 })();
