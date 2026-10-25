@@ -76,3 +76,11 @@
 :root.mode-daily .solve-timer.danger{ color:#ff8a8a; border-color:#ff5a5a; text-shadow:0 0 14px rgba(255,80,80,0.9), 0 2px 0 rgba(60,0,0,0.9); box-shadow:0 0 0 3px rgba(122,0,0,0.7), 0 0 22px rgba(255,70,70,0.6); }
 :root.lite .solve-slot::before, :root.lite .solve-slots::before{ animation:none; } :root.lite .solve-slot.pop{ animation:none; }
 @media (prefers-reduced-motion: reduce){ :root .solve-slot::before, :root .solve-slots::before{ animation:none; } :root .solve-slot.pop{ animation:none; } }
+/* Run 7: the real disco ball at the top centre (dim picture, the lit one fading in and out - one fade every 1.6 s), a ~5 degree sway */
+.lt-ball.real{ left:50%; top:-46px; transform-origin:0 0; }
+.lt-dball{ position:absolute; left:-55px; top:0; width:110px; height:auto; pointer-events:none; }
+.lt-dball.lit{ opacity:0; animation:ltBallLit 1.6s ease-in-out infinite alternate; }
+@keyframes ltBallLit{ from{ opacity:0.1; } to{ opacity:0.95; } }
+.lt-ball.real .lt-glints{ position:absolute; left:0; top:0; }
+:root.lite .lt-dball.lit{ animation:none; opacity:0.6; }
+@media (prefers-reduced-motion: reduce){ .lt-dball.lit{ animation:none; opacity:0.6; } }
