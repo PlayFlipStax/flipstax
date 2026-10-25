@@ -1,0 +1,22 @@
+/* FlipStax - the machines (lib/machine.js): a round-end game's screen drawn on its machine picture. Transform and opacity only;
+   lite mode and reduced motion: no pulse, instant switches. Each game's own placement rules live in its section below. */
+.mc{ position:fixed; inset:0; z-index:-7; display:none; pointer-events:none; overflow:hidden;
+  background:radial-gradient(120% 70% at 50% 40%, #1c1426 0%, #0d0812 70%, #07040a 100%); }
+.mc.on{ display:block; }
+.mc-box{ position:absolute; left:var(--mc-x); top:var(--mc-y); width:var(--mc-w); height:var(--mc-h); }
+.mc-img{ position:absolute; inset:0; width:100%; height:100%; display:block; -webkit-user-drag:none; user-select:none; }
+.mc-lit{ opacity:0; transition:opacity 260ms ease; }
+.mc.lit .mc-lit{ opacity:1; }
+.mc-litr{ opacity:0; transition:opacity 180ms ease; }
+.mc-litr.on{ opacity:1; }
+.mc.quiet .mc-lit, .mc.quiet .mc-litr{ transition:none; }
+/* the slow bulb pulse: one fade in, one fade out, 1.1 s each */
+.mc.pulse:not(.lit) .mc-lit{ animation:mcPulse 1.1s ease-in-out infinite alternate; }
+@keyframes mcPulse{ from{ opacity:0.05; } to{ opacity:0.55; } }
+:root.lite .mc-lit, :root.lite .mc-litr{ transition:none !important; animation:none !important; }
+@media (prefers-reduced-motion: reduce){ .mc-lit, .mc-litr{ transition:none !important; animation:none !important; } }
+/* the overlay it backs: its own backdrop and decorative layers step aside; the game's live DOM is placed on the picture's regions */
+:root:root .mc-backed{ background:none !important; }
+:root .mc-backed > .mg-bg, :root .mc-backed .ir-bg, :root .mc-backed .ev-bg, :root .mc-backed .warp-bg, :root .mc-backed .sunburst, :root .mc-backed .ll-spot{ display:none !important; }
+/* all machine text: Righteous */
+:root .mc-backed .mc-text{ font-family:'FS Righteous', 'Big Shoulders Display', sans-serif; font-weight:400; }
