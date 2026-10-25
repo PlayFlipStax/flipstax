@@ -95,3 +95,6 @@
 :root.mc-active:not(.mc-on-orbit) :is(.show-fx .ufo, .ww-ufo, .riddle-ufo, .event-ufo, .daily-sky.ufo-layer){ display:none !important; }
 /* the question box reserves the timer's strip at the bottom of the screen (the game's own min-height used to stretch it over the bar) */
 :root :is(.mc-bb, .mc-riddle) #eventPrompt{ min-height:0 !important; max-height:calc(var(--mc-screen-h) - 46px) !important; height:calc(var(--mc-screen-h) - 46px) !important; top:calc(var(--mc-screen-y) + 22px) !important; }
+/* a wrong pick: the panel darkens behind the text, and the text turns cream so it stays readable */
+:root:root #eventOverlay.mc-backed .event-tile.is-wrong{ opacity:1 !important; background-color:rgba(46,8,20,0.62) !important; color:#fff2d6 !important; text-shadow:0 1px 2px rgba(0,0,0,0.9) !important; }
+:root:root #eventOverlay.mc-backed .event-tile.is-wrong .ttxt{ color:#fff2d6 !important; }
