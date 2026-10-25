@@ -46,4 +46,15 @@
     ov.appendChild(box);
     box.querySelectorAll('button').forEach((b, k)=> b.addEventListener('click', (e)=>{ e.stopPropagation(); const t = ov.querySelectorAll('.event-tile')[k]; if (t && t.onclick){ b.classList.add('press'); setTimeout(()=> b.classList.remove('press'), 180); t.click(); } }));
   });
+  // Lucky Lights: the game's own wheel covers the picture's (centred on it, under its pointer); the big pink button is STOP;
+  // BANK and SPIN AGAIN on the coloured strip buttons; the bank and spin count on a small plaque under the wheel
+  M.register('lucky', { img: 'lucky-console', w: 736, h: 1433, lit: true, top: 22, regions: {
+      wheel:  { x: 0.075, y: 0.2655, w: 0.850, h: 0.4365 },
+      stop:   { x: 0.395, y: 0.715, w: 0.210, h: 0.108 },
+      bank:   { x: 0.290, y: 0.2245, w: 0.420, h: 0.026 },
+      note:   { x: 0.080, y: 0.874, w: 0.840, h: 0.036 },
+      bankBtn:{ x: 0.115, y: 0.925, w: 0.235, h: 0.046 },
+      againBtn:{ x: 0.365, y: 0.925, w: 0.225, h: 0.046 },
+    },
+    match: ()=>{ const o = $('luckyOverlay'); return o && M.visible(o) && document.documentElement.classList.contains('mode-daily') ? o : null; } });
 })();

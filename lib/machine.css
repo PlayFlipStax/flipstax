@@ -198,3 +198,34 @@
 /* the chosen pod: a white flare over it while it opens */
 :root .mc-doors .event-tile.picked-wait, :root .mc-doors .event-tile.open:not(.other){ box-shadow:0 0 0 2px rgba(255,255,255,0.85), 0 0 26px 8px rgba(255,255,255,0.55) !important; }
 @media (max-width:370px){ :root .mc-doors #eventPrompt{ font-size:11.5px !important; } }
+
+/* ===== Lucky Lights (lucky): the game's wheel over the picture's, STOP on the big pink button, BANK / SPIN AGAIN on the strip ===== */
+:root .mc-lucky .ll-inner{ position:static !important; max-width:none !important; }
+:root .mc-lucky .ll-title{ display:none !important; }
+/* the wheel: its own disc (the theme's colours) covers the baked one, the squares on the coloured band, the hub in the middle */
+:root .mc-lucky .ll-ring{ position:fixed !important; left:var(--mc-wheel-x); top:var(--mc-wheel-y); width:var(--mc-wheel-w) !important; height:var(--mc-wheel-w) !important; margin:0 !important;
+  --r:calc(var(--mc-wheel-w) * 0.335); box-shadow:0 0 0 3px rgba(255,214,90,0.55), 0 0 22px rgba(255,190,60,0.35) !important; }
+:root .mc-lucky .ll-sq{ width:calc(var(--mc-wheel-w) * 0.15); height:calc(var(--mc-wheel-w) * 0.128); margin:calc(var(--mc-wheel-w) * -0.064) 0 0 calc(var(--mc-wheel-w) * -0.075);
+  font-family:'FS Righteous', sans-serif !important; font-weight:400 !important; font-size:clamp(14px, 4.4vw, 18px) !important; }
+:root .mc-lucky .ll-sq.goop{ font-size:clamp(11px, 3.3vw, 13px) !important; }
+:root .mc-lucky .ll-hub{ width:calc(var(--mc-wheel-w) * 0.38) !important; }
+:root .mc-lucky .ll-hub-t{ font:400 clamp(17px, 5.4vw, 23px)/1 'FS Righteous', sans-serif !important; }
+:root .mc-lucky .ll-hub-s{ font-size:11px !important; }
+/* the bank and spin count on a small plaque under the wheel */
+:root .mc-lucky .ll-bank{ position:fixed; left:var(--mc-bank-x); top:var(--mc-bank-y); width:var(--mc-bank-w); height:var(--mc-bank-h); margin:0; padding:0 6px; box-sizing:border-box; display:flex; align-items:center; justify-content:center;
+  font:400 12px/1 'FS Righteous', sans-serif !important; letter-spacing:0.06em; color:#ffe9a8; background:rgba(14,6,30,0.85); border:1.5px solid rgba(255,214,90,0.7); border-radius:8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+:root .mc-lucky .ll-note{ position:fixed; left:var(--mc-note-x); top:var(--mc-note-y); width:var(--mc-note-w); height:var(--mc-note-h); margin:0; display:flex; align-items:center; justify-content:center; text-align:center;
+  font:400 12.5px/1.15 'FS Righteous', sans-serif !important; color:#f3e9ff; text-shadow:0 1px 2px rgba(0,0,0,0.95); }
+/* the buttons: STOP is the big pink button itself; BANK and SPIN AGAIN sit on the coloured strip buttons */
+:root .mc-lucky .ll-buttons{ position:static !important; display:block !important; min-height:0 !important; }
+:root .mc-lucky .ll-btn{ position:fixed !important; margin:0 !important; padding:0 !important; min-width:0 !important; min-height:0 !important; box-sizing:border-box; display:flex; align-items:center; justify-content:center;
+  background:none !important; border:0 !important; box-shadow:none !important; font:400 clamp(13px, 3.9vw, 16px)/1 'FS Righteous', sans-serif !important; letter-spacing:0.04em; cursor:pointer; transition:transform 110ms ease-out; }
+:root .mc-lucky .ll-btn.hidden{ display:none !important; }
+:root .mc-lucky .ll-btn.stop{ left:var(--mc-stop-x); top:var(--mc-stop-y); width:var(--mc-stop-w); height:var(--mc-stop-h); border-radius:50% !important; font-size:clamp(20px, 6vw, 26px) !important; color:#fff !important; text-shadow:0 2px 0 rgba(120,0,40,0.8), 0 0 10px rgba(255,255,255,0.5) !important; }
+:root .mc-lucky .ll-btn.bank{ left:var(--mc-bankBtn-x); top:var(--mc-bankBtn-y); width:var(--mc-bankBtn-w); height:var(--mc-bankBtn-h); border-radius:8px !important; color:#1a1400 !important; text-shadow:0 1px 0 rgba(255,255,255,0.6) !important; }
+:root .mc-lucky .ll-btn.again{ left:var(--mc-againBtn-x); top:var(--mc-againBtn-y); width:var(--mc-againBtn-w); height:var(--mc-againBtn-h); border-radius:8px !important; color:#06202a !important; text-shadow:0 1px 0 rgba(255,255,255,0.6) !important; }
+:root .mc-lucky .ll-btn.bank::before, :root .mc-lucky .ll-btn.again::before{ content:''; position:absolute; inset:-8px -2px; }   /* (a taller tap area than the strip button) */
+:root .mc-lucky .ll-btn:active{ transform:scale(0.92); }
+:root.mc-active.mc-on-lucky .app > header{ position:relative; z-index:29; }
+:root .mc-lucky .ll-btn.again{ font-size:clamp(11px, 3.3vw, 13.5px) !important; white-space:nowrap; }
+:root.mc-on-lucky .show-host{ display:none !important; }   /* (the corner host's bubble sat on the strip buttons) */
