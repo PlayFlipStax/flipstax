@@ -69,7 +69,7 @@
     }, match: mg('twinFlip') });
   // Zap Words: the letters as lit bulbs in the 36 sockets; the word so far and the points on the small screen of the control panel;
   // the hint on the first big button; the found words along the bottom grille; the baked ROUND 4 x2 plate stays
-  M.register('zap', { img: 'zap-console', w: 736, h: 1433, lit: true, bg: ['#080c12', '#0e242b'], zoom: { region: 'grid', frac: 0.90, anchorY: 0.084 }, regions: {
+  M.register('zap', { img: 'zap-console', w: 736, h: 1433, lit: true, rest: true, bg: ['#080c12', '#0e242b'], zoom: { region: 'grid', frac: 0.90, anchorY: 0.084 }, regions: {
       grid:   { x: 0.1765, y: 0.3015, w: 0.6510, h: 0.3708 },
       rule:   { x: 0.200, y: 0.2845, w: 0.600, h: 0.015 },
       timer:  { x: 0.200, y: 0.6755, w: 0.600, h: 0.005 },

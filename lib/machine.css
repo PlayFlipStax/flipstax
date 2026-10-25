@@ -389,3 +389,8 @@
 :root .mc-zap .zw-hint{ left:var(--mc-hint-x); top:var(--mc-hint-y); width:var(--mc-hint-w); height:max(44px, var(--mc-hint-h)); min-height:44px !important; border-radius:10px !important; background:linear-gradient(180deg, #ffe9b0, #e0a53c) !important; border:2px solid #fff0c0 !important; box-shadow:0 2px 0 #6b4210 !important; color:#2a1300 !important; font-size:13px !important; }
 :root .mc-zap .zw-found{ left:var(--mc-found-x); top:var(--mc-found-y); width:var(--mc-found-w); height:var(--mc-found-h); }
 :root .mc-zap .mg-rule{ font-size:10px !important; }
+
+/* Item 3 (Oct 25): the Zap Words, Lucky Lights and Mystery Door machines rest in their lit picture (the dim one only for the first 0.35 s);
+   Orbit Drop has no lit picture, so its dim one gets a static brightness lift. Both are still pictures: no animation, no per-frame cost */
+.mc.bright .mc-clean{ filter:brightness(1.45) saturate(1.3) contrast(1.05); }
+.mc.lit .mc-lit{ transition-duration:350ms; }
