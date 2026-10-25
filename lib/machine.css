@@ -335,3 +335,11 @@
 :root .mc-doors #eventTimerBar{ top:calc(var(--mc-prompt-y) + var(--mc-prompt-h) - 7px); left:calc(var(--mc-prompt-x) + 10px); width:calc(var(--mc-prompt-w) - 20px); height:3px; }
 :root .mc-doors .event-tile .pu-prize{ opacity:0 !important; transition:opacity 200ms ease; pointer-events:none; }
 :root .mc-doors .event-tile.picked-wait .pu-prize, :root .mc-doors .event-tile.open:not(.other) .pu-prize{ opacity:0.98 !important; }
+
+/* Orbit Drop: headroom for the UFO - the board sits a little lower and shorter so the UFO (which hovers above the board) clears the
+   instruction line and the status row, which stay above the star field */
+:root .mc-orbit .plinko-board{ top:calc(var(--mc-field-y) + 46px) !important; height:calc(var(--mc-field-h) - 46px) !important; width:calc((var(--mc-field-h) - 46px) * 360 / 560) !important; left:calc(var(--mc-field-x) + (var(--mc-field-w) - (var(--mc-field-h) - 46px) * 360 / 560) / 2) !important; }
+:root .mc-orbit .pk-line{ top:calc(var(--mc-line-y) - 4px); }
+:root .mc-orbit .pk-status{ top:calc(var(--mc-status-y) - 6px); }
+:root .mc-orbit .pk-status > span{ white-space:nowrap; }
+@media (max-width:370px){ :root .mc-orbit .pk-status > span{ font-size:9.5px !important; padding:3px 5px !important; } :root .mc-orbit .pk-status{ gap:4px; } }
