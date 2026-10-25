@@ -93,3 +93,5 @@
 :root.mc-active:is(.mc-on-bb, .mc-on-riddle) #board{ z-index:9 !important; }
 /* no UFO sprite on a machine screen (its fly-across, the beam ship, the Word Warp ship); the UFO stays only in Orbit Drop and the intro */
 :root.mc-active:not(.mc-on-orbit) :is(.show-fx .ufo, .ww-ufo, .riddle-ufo, .event-ufo, .daily-sky.ufo-layer){ display:none !important; }
+/* the question box reserves the timer's strip at the bottom of the screen (the game's own min-height used to stretch it over the bar) */
+:root :is(.mc-bb, .mc-riddle) #eventPrompt{ min-height:0 !important; max-height:calc(var(--mc-screen-h) - 46px) !important; height:calc(var(--mc-screen-h) - 46px) !important; top:calc(var(--mc-screen-y) + 22px) !important; }
