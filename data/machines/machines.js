@@ -69,13 +69,14 @@
     }, match: mg('twinFlip') });
   // Zap Words: the letters as lit bulbs in the 36 sockets; the word so far and the points on the small screen of the control panel;
   // the hint on the first big button; the found words along the bottom grille; the baked ROUND 4 x2 plate stays
-  M.register('zap', { bg: ['#080c12', '#0e242b'], img: 'zap-console', w: 736, h: 1433, lit: true, top: 22, regions: {
+  M.register('zap', { img: 'zap-console', w: 736, h: 1433, lit: true, bg: ['#080c12', '#0e242b'], zoom: { region: 'grid', frac: 0.90, anchorY: 0.084 }, regions: {
       grid:   { x: 0.1765, y: 0.3015, w: 0.6510, h: 0.3708 },
-      rule:   { x: 0.180, y: 0.2830, w: 0.640, h: 0.016 },
-      timer:  { x: 0.180, y: 0.6800, w: 0.640, h: 0.008 },
-      screen: { x: 0.405, y: 0.7440, w: 0.190, h: 0.050 },
-      hint:   { x: 0.120, y: 0.8260, w: 0.150, h: 0.072 },
-      found:  { x: 0.070, y: 0.9120, w: 0.860, h: 0.060 },
+      rule:   { x: 0.200, y: 0.2845, w: 0.600, h: 0.015 },
+      timer:  { x: 0.200, y: 0.6755, w: 0.600, h: 0.005 },
+      word:   { x: 0.185, y: 0.6835, w: 0.270, h: 0.046 },
+      score:  { x: 0.470, y: 0.6835, w: 0.130, h: 0.046 },
+      hint:   { x: 0.625, y: 0.6835, w: 0.190, h: 0.046 },
+      found:  { x: 0.185, y: 0.7330, w: 0.630, h: 0.030 },
     }, match: mg('zapWords') });
   // Orbit Drop: the pegs, the UFO, the chips and the nine slot values drawn live in the empty field, the slots over the tray strip;
   // the slider groove aims the UFO (the UFO stays draggable); the dome under the groove is the DROP button
