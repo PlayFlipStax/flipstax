@@ -293,3 +293,38 @@
 :root .mc-zap .zw-chip{ font:400 11px/1.2 'FS Righteous', sans-serif !important; padding:2px 7px !important; }
 :root .mc-zap .mg-result{ position:fixed; left:var(--mc-grid-x); top:var(--mc-grid-y); width:var(--mc-grid-w); height:var(--mc-grid-h); margin:0; display:flex; align-items:center; justify-content:center; }
 :root .mc-zap .zw-hint{ font-size:10.5px !important; white-space:nowrap; }
+
+/* ===== Orbit Drop (orbit): the board in the empty field, the slider in the groove, the dome is DROP ===== */
+:root .mc-orbit #pkBanner{ display:none !important; }
+:root .mc-orbit #finPlinko{ position:static !important; padding:0 !important; transform:none !important; animation:none !important; }
+:root .mc-orbit .pk-line{ position:fixed; left:var(--mc-line-x); top:var(--mc-line-y); width:var(--mc-line-w); margin:0; text-align:center; font:400 11.5px/1.15 'FS Righteous', sans-serif !important; color:#c9fbff !important; text-shadow:0 1px 2px rgba(0,0,0,0.9); }
+:root .mc-orbit .pk-status{ position:fixed; left:var(--mc-status-x); top:var(--mc-status-y); width:var(--mc-status-w); margin:0; display:flex; justify-content:center; gap:6px; }
+:root .mc-orbit .pk-status > span{ font:400 11px/1 'FS Righteous', sans-serif !important; padding:3px 7px !important; }
+/* the board fills the field, keeping its own aspect; no frame of its own (the machine's is round it) */
+:root .mc-orbit .plinko-board{ position:fixed !important; top:var(--mc-field-y); height:var(--mc-field-h); width:calc(var(--mc-field-h) * 360 / 560) !important; left:calc(var(--mc-field-x) + (var(--mc-field-w) - var(--mc-field-h) * 360 / 560) / 2);
+  margin:0 !important; border-radius:6px !important; box-shadow:none !important; background:none !important; }
+:root .mc-orbit .plinko-tally{ position:fixed; left:var(--mc-tally-x); top:var(--mc-tally-y); width:var(--mc-tally-w); height:var(--mc-tally-h); margin:0; display:flex; flex-wrap:nowrap; justify-content:center; gap:3px; overflow:hidden; }
+:root .mc-orbit .plinko-tally .pt-chip{ font-size:10px !important; padding:1px 5px !important; }
+/* Auto-drop small at the lower left; the results button over the field when every chip is down */
+:root .mc-orbit .pk-buttons{ position:static !important; }
+:root .mc-orbit #plinkoAll{ position:fixed !important; left:var(--mc-auto-x); top:var(--mc-auto-y); width:var(--mc-auto-w); height:var(--mc-auto-h); min-height:0 !important; margin:0 !important; padding:0 !important; display:flex; align-items:center; justify-content:center; font:400 12px/1 'FS Righteous', sans-serif !important; }
+:root .mc-orbit #plinkoAll.hidden{ display:none !important; }
+:root .mc-orbit #plinkoDrop{ position:fixed !important; left:calc(var(--mc-field-x) + 20px); width:calc(var(--mc-field-w) - 40px); top:calc(var(--mc-field-y) + var(--mc-field-h) * 0.42); margin:0 !important; font-family:'FS Righteous', sans-serif !important; font-weight:400 !important; z-index:5; }
+:root .mc-orbit #plinkoDrop.hidden{ display:none !important; }
+/* the live slider in the groove (its handle covers the picture's), the dome as the DROP button */
+.mc-orbit-ctl{ display:none; }
+:root .mc-orbit .mc-orbit-ctl{ display:block; }
+:root .mc-orbit .mc-orbit-patch{ position:fixed; left:var(--mc-handle-x); top:var(--mc-handle-y); width:var(--mc-handle-w); height:var(--mc-handle-h); border-radius:6px;
+  background:linear-gradient(180deg, rgba(20,16,24,0) 0%, #1a1620 22%, #1a1620 78%, rgba(20,16,24,0) 100%); pointer-events:none; }
+:root .mc-orbit .mc-orbit-slider{ position:fixed; left:var(--mc-groove-x); top:var(--mc-groove-y); width:var(--mc-groove-w); height:var(--mc-groove-h); margin:0; padding:0; background:transparent; -webkit-appearance:none; appearance:none; cursor:pointer; touch-action:none; }
+:root .mc-orbit .mc-orbit-slider::-webkit-slider-runnable-track{ height:100%; background:transparent; }
+:root .mc-orbit .mc-orbit-slider::-webkit-slider-thumb{ -webkit-appearance:none; width:26px; height:calc(var(--mc-groove-h) * 1.1); margin-top:calc(var(--mc-groove-h) * -0.05); border-radius:7px;
+  background:linear-gradient(180deg, #fff3c8, #e0a53c 55%, #8a5a14); border:2px solid #fff0c0; box-shadow:0 2px 0 #5a3a08, 0 0 10px rgba(255,200,90,0.55); }
+:root .mc-orbit .mc-orbit-slider::-moz-range-thumb{ width:26px; height:calc(var(--mc-groove-h) * 1.1); border-radius:7px; background:#e0a53c; border:2px solid #fff0c0; }
+:root .mc-orbit .mc-orbit-drop{ position:fixed; left:var(--mc-dome-x); top:var(--mc-dome-y); width:var(--mc-dome-w); height:var(--mc-dome-h); margin:0; padding:0; border:0; border-radius:50%; cursor:pointer;
+  background:radial-gradient(circle at 45% 35%, rgba(255,255,255,0.35), rgba(255,255,255,0) 60%); color:#c9fbff; font:400 11px/1 'FS Righteous', sans-serif; letter-spacing:0.08em; text-shadow:0 0 6px rgba(120,240,255,0.9); transition:transform 110ms ease-out; }
+:root .mc-orbit .mc-orbit-drop:active, :root .mc-orbit .mc-orbit-drop.press{ transform:scale(0.86); }
+:root.mc-on-orbit .show-host{ display:none !important; }
+:root .mc-orbit .pk-line{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:10.5px !important; }
+:root .mc-orbit .pk-status{ top:calc(var(--mc-status-y) - 3px); flex-wrap:nowrap; }
+:root .mc-orbit .mc-orbit-patch{ background:linear-gradient(180deg, rgba(40,34,44,0) 0%, rgba(40,34,44,0.92) 30%, rgba(30,26,34,0.92) 70%, rgba(40,34,44,0) 100%); }

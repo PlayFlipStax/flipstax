@@ -77,4 +77,30 @@
       hint:   { x: 0.120, y: 0.8260, w: 0.150, h: 0.072 },
       found:  { x: 0.070, y: 0.9120, w: 0.860, h: 0.060 },
     }, match: mg('zapWords') });
+  // Orbit Drop: the pegs, the UFO, the chips and the nine slot values drawn live in the empty field, the slots over the tray strip;
+  // the slider groove aims the UFO (the UFO stays draggable); the dome under the groove is the DROP button
+  M.register('orbit', { img: 'orbit-console', w: 768, h: 1376, lit: false, top: 4, regions: {
+      line:   { x: 0.200, y: 0.222, w: 0.600, h: 0.022 },
+      field:  { x: 0.168, y: 0.287, w: 0.664, h: 0.548 },
+      status: { x: 0.175, y: 0.258, w: 0.650, h: 0.024 },
+      groove: { x: 0.245, y: 0.880, w: 0.510, h: 0.044 },
+      handle: { x: 0.548, y: 0.872, w: 0.068, h: 0.060 },
+      dome:   { x: 0.445, y: 0.950, w: 0.110, h: 0.048 },
+      tally:  { x: 0.060, y: 0.926, w: 0.880, h: 0.022 },
+      auto:   { x: 0.090, y: 0.952, w: 0.300, h: 0.040 },
+    },
+    match: ()=>{ const o = $('finOverlay'), p = $('finPlinko'); return o && M.visible(o) && o.classList.contains('daily-orbit') && p && M.visible(p) ? o : null; } });
+  // the slider and the DROP dome: real controls, added once
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const fp = $('finPlinko'); if (!fp || $('mcOrbitCtl')) return;
+    const box = document.createElement('div'); box.id = 'mcOrbitCtl'; box.className = 'mc-orbit-ctl';
+    box.innerHTML = '<i class="mc-orbit-patch" aria-hidden="true"></i><input type="range" class="mc-orbit-slider" min="0" max="1000" value="500" aria-label="Aim the UFO">' +
+      '<button type="button" class="mc-orbit-drop" aria-label="Drop the chip">DROP</button>';
+    fp.appendChild(box);
+    const sl = box.querySelector('input'), go = box.querySelector('button');
+    sl.addEventListener('input', ()=>{ if (window.FlipstaxOrbit) window.FlipstaxOrbit.aimFrac(sl.value / 1000); });
+    go.addEventListener('click', (e)=>{ e.stopPropagation(); go.classList.add('press'); setTimeout(()=> go.classList.remove('press'), 160); if (window.FlipstaxOrbit) window.FlipstaxOrbit.drop(); });
+    // the slider follows the UFO when it is dragged on the board
+    setInterval(()=>{ if (box.offsetParent && window.FlipstaxOrbit && document.activeElement !== sl) sl.value = Math.round(window.FlipstaxOrbit.aimNow() * 1000); }, 200);
+  });
 })();

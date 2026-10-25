@@ -13132,6 +13132,9 @@
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight'){ e.preventDefault(); setAim(pkAim + (e.key === 'ArrowLeft' ? -8 : 8)); }
       else if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); if (canDropNow()) launchChip(pkAim); }
     });
+    // Run 7: the Orbit Drop machine's slider and DROP button use the same two moves as the keyboard (aim, drop)
+    window.FlipstaxOrbit = { live, aimFrac: (f)=>{ if (live()) setAim(OP.AIM_MIN + Math.max(0, Math.min(1, f)) * (OP.AIM_MAX - OP.AIM_MIN)); },
+      aimNow: ()=> (pkAim - OP.AIM_MIN) / (OP.AIM_MAX - OP.AIM_MIN), drop: ()=>{ if (live() && canDropNow()) launchChip(pkAim); } };
     // B4: a resize mid-drop (a phone's address bar sliding, a rotation) used to re-render the board, which cancelled the falling
     // chip and counted it as landed - so 'See your results' showed before the last chip landed. It now waits for the chips in flight.
     addEventListener('resize', ()=>{ if (pkF() && pkF().stage === 'plinko' && !document.getElementById('finPlinko').classList.contains('hidden')){ if (pkFalling.size){ pkResizePending = true; return; } setAim(pkAim); renderPlinko(); } });
