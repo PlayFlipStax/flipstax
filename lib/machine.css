@@ -229,3 +229,32 @@
 :root.mc-active.mc-on-lucky .app > header{ position:relative; z-index:29; }
 :root .mc-lucky .ll-btn.again{ font-size:clamp(11px, 3.3vw, 13.5px) !important; white-space:nowrap; }
 :root.mc-on-lucky .show-host{ display:none !important; }   /* (the corner host's bubble sat on the strip buttons) */
+
+/* ===== the Mystery Game template on a machine (#mgOverlay): shared placement ===== */
+:root .mc-backed.mg-overlay .mg-inner{ position:static !important; max-width:none !important; padding:0 !important; }
+:root .mc-backed.mg-overlay .mg-stage{ position:static !important; }
+:root.mc-active:is(.mc-on-twin, .mc-on-zap, .mc-on-snap) .show-host{ display:none !important; }
+/* ===== Twin Flip (twin) ===== */
+:root .mc-twin .mg-head{ position:fixed; left:var(--mc-screen-x); top:calc(var(--mc-screen-y) + 10px); width:var(--mc-screen-w); margin:0; display:flex; flex-direction:column; align-items:center; gap:6px; }
+:root .mc-twin .mg-sign{ background:none !important; border:0 !important; box-shadow:none !important; padding:0 !important; }
+:root .mc-twin .mg-sign .sign-bulbs{ display:none !important; }
+:root .mc-twin .mg-sign span{ font:400 clamp(30px, 9.6vw, 40px)/1 'FS Righteous', sans-serif !important; color:#fff7e8 !important; text-shadow:0 3px 0 rgba(90,10,60,0.8), 0 0 16px rgba(255,180,220,0.6) !important; letter-spacing:0.02em; }
+:root .mc-twin .mg-act{ font:400 13px/1 'FS Righteous', sans-serif !important; letter-spacing:0.12em; background:rgba(20,6,40,0.65) !important; border:1.5px solid rgba(255,230,160,0.6) !important; color:#ffe9a8 !important; }
+:root .mc-twin .mg-host-zone{ position:fixed; left:var(--mc-screen-x); top:calc(var(--mc-screen-y) + var(--mc-screen-h) - 50px); width:var(--mc-screen-w); margin:0; }
+:root .mc-twin .mg-rule{ font:400 12px/1.2 'FS Righteous', sans-serif !important; color:#fff2e0 !important; text-shadow:0 1px 2px rgba(60,0,40,0.9); padding:0 12px; }
+:root .mc-twin .tf-pairs{ position:fixed; left:var(--mc-screen-x); top:calc(var(--mc-screen-y) + var(--mc-screen-h) - 28px); width:var(--mc-screen-w); margin:0; text-align:center;
+  font:400 16px/1 'FS Righteous', sans-serif !important; color:#7df9ff; text-shadow:0 0 8px rgba(125,249,255,0.8), 0 1px 2px rgba(0,0,0,0.8); }
+/* the tiles in the 16 windows (the flip still runs inside each) */
+:root .mc-twin .tf-grid{ position:fixed !important; left:var(--mc-grid-x); top:var(--mc-grid-y); width:var(--mc-grid-w) !important; height:var(--mc-grid-h); margin:0 !important; padding:0 !important; aspect-ratio:auto !important;
+  display:grid; grid-template-columns:repeat(4, 1fr); grid-template-rows:repeat(4, 1fr); column-gap:calc(var(--mc-w) * 0.066); row-gap:calc(var(--mc-h) * 0.046); background:none !important; border:0 !important; box-shadow:none !important; }
+:root .mc-twin .tf-tile{ border-radius:12px !important; background:radial-gradient(120% 120% at 50% 20%, rgba(150,90,255,0.55), rgba(40,12,90,0.55) 70%) !important; box-shadow:inset 0 0 0 1px rgba(255,220,180,0.25) !important; }
+:root .mc-twin .tf-back{ font:400 clamp(18px, 5.6vw, 24px)/1 'FS Righteous', sans-serif !important; color:rgba(255,230,200,0.55) !important; background:none !important; border:0 !important; text-shadow:none !important; }
+:root .mc-twin .tf-tile.up{ background:radial-gradient(120% 120% at 50% 30%, rgba(30,10,60,0.9), rgba(6,2,16,0.92)) !important; }
+:root .mc-twin .tf-tile.done{ box-shadow:inset 0 0 0 2.5px #ffe27a, 0 0 14px rgba(255,226,122,0.7) !important; }
+/* the score chip on the control strip, the timer as a thin bar just above it */
+:root .mc-twin .mg-foot{ position:static !important; }
+:root .mc-twin .mg-score{ position:fixed !important; left:var(--mc-score-x); top:var(--mc-score-y); width:var(--mc-score-w); height:var(--mc-score-h); margin:0 !important; display:flex; align-items:center; justify-content:center; box-sizing:border-box;
+  font:400 18px/1 'FS Righteous', sans-serif !important; color:#2a1300 !important; background:linear-gradient(180deg, #fff3b0, #ffc93a) !important; border:2px solid #fff3c4 !important; border-radius:999px !important; box-shadow:0 2px 0 #7a4a00 !important; }
+:root .mc-twin .mg-timer{ position:fixed !important; left:var(--mc-timer-x); top:var(--mc-timer-y); width:var(--mc-timer-w) !important; height:5px !important; margin:0 !important; border-radius:3px; }
+:root .mc-twin .mg-result{ position:fixed; left:var(--mc-screen-x); top:var(--mc-screen-y); width:var(--mc-screen-w); height:var(--mc-screen-h); margin:0; display:flex; align-items:center; justify-content:center; }
+:root .mc-twin .mg-rule{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:11px !important; }

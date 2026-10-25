@@ -57,4 +57,14 @@
       againBtn:{ x: 0.365, y: 0.925, w: 0.225, h: 0.046 },
     },
     match: ()=>{ const o = $('luckyOverlay'); return o && M.visible(o) && document.documentElement.classList.contains('mode-daily') ? o : null; } });
+  // The Mystery Games built on the shared template (#mgOverlay, .mg-<game>): Twin Flip, Zap Words (and Snap Sort, when its art arrives)
+  const mg = (key)=> ()=>{ const o = $('mgOverlay'); return o && M.visible(o) && o.classList.contains('mg-' + key) && document.documentElement.classList.contains('mode-daily') ? o : null; };
+  // Twin Flip: the 16 windows hold the tiles; the name, the round and the pairs on the top screen; the score and the timer on the control strip
+  M.register('twin', { img: 'twin-console', w: 736, h: 1433, lit: true, pulse: true, top: 24, regions: {
+      screen: { x: 0.150, y: 0.085, w: 0.700, h: 0.195 },
+      grid:   { x: 0.118, y: 0.392, w: 0.776, h: 0.486 },
+      strip:  { x: 0.100, y: 0.926, w: 0.820, h: 0.046 },
+      score:  { x: 0.610, y: 0.929, w: 0.320, h: 0.040 },
+      timer:  { x: 0.115, y: 0.898, w: 0.770, h: 0.010 },
+    }, match: mg('twinFlip') });
 })();
