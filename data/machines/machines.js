@@ -103,4 +103,14 @@
     // the slider follows the UFO when it is dragged on the board
     setInterval(()=>{ if (box.offsetParent && window.FlipstaxOrbit && document.activeElement !== sl) sl.value = Math.round(window.FlipstaxOrbit.aimNow() * 1000); }, 200);
   });
+  // Snap Sort: the floating word pills live inside the big glass window (the plaque with the category at its top, the rule under it);
+  // progress and score on the small plate at the bottom
+  M.register('snap', { img: 'snap-console', w: 768, h: 1376, lit: true, bg: ['#03080c', '#2a1e12'], below: true, regions: {
+      glass:  { x: 0.196, y: 0.292, w: 0.616, h: 0.608 },
+      plaque: { x: 0.235, y: 0.305, w: 0.530, h: 0.062 },
+      rule:   { x: 0.215, y: 0.372, w: 0.570, h: 0.024 },
+      field:  { x: 0.150, y: 0.405, w: 0.700, h: 0.485 },
+      plate:  { x: 0.105, y: 0.9245, w: 0.790, h: 0.040 },
+      timer:  { x: 0.215, y: 0.9035, w: 0.570, h: 0.008 },
+    }, match: mg('snapSort') });
 })();

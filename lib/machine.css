@@ -357,3 +357,26 @@
 
 /* Lucky Lights: the plaque sits on the left gear housing (the wheel rim above and the big button beside it stay clear), on two lines */
 :root .mc-lucky .ll-bank{ white-space:normal !important; flex-direction:column; line-height:1.1; text-align:center; font-size:10.5px !important; padding:2px 4px !important; }
+
+/* ===== Snap Sort (snap): the word pills float inside the big glass window ===== */
+:root .mc-snap .mg-head{ display:none !important; }   /* (the picture's own SNAP SORT sign and ROUND plate) */
+:root .mc-snap .ss-stage{ position:static !important; }
+/* a dark gradient over the smudges on the glass (behind the pills) */
+:root .mc-snap .ss-stage::before{ content:''; position:fixed; left:var(--mc-glass-x); top:var(--mc-glass-y); width:var(--mc-glass-w); height:var(--mc-glass-h); border-radius:14px; pointer-events:none;
+  background:linear-gradient(180deg, rgba(4,8,12,0.78), rgba(4,8,12,0.55) 45%, rgba(4,8,12,0.72)); }
+:root .mc-snap .ss-cat{ position:fixed; left:var(--mc-plaque-x); top:var(--mc-plaque-y); width:var(--mc-plaque-w); height:var(--mc-plaque-h); margin:0; padding:0 8px; box-sizing:border-box; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  border-radius:12px; background:linear-gradient(180deg, rgba(40,28,16,0.92), rgba(18,12,8,0.94)); border:2px solid #d9a85a; box-shadow:0 0 12px rgba(255,200,110,0.35); font:400 clamp(15px, 4.6vw, 19px)/1.05 'FS Righteous', sans-serif; color:#fff0cc; letter-spacing:0.03em; text-align:center; overflow:hidden; }
+:root .mc-snap .ss-cat small{ margin:0 0 2px; font:400 9.5px/1 'FS Righteous', sans-serif !important; letter-spacing:0.14em; color:#9fe8d8; }
+:root .mc-snap .mg-host-zone{ position:fixed; left:var(--mc-rule-x); top:var(--mc-rule-y); width:var(--mc-rule-w); height:var(--mc-rule-h); margin:0; }
+:root .mc-snap .mg-rule{ font:400 10.5px/1.1 'FS Righteous', sans-serif !important; color:#cfe8e0 !important; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; padding:0 !important; min-height:0 !important; }
+:root .mc-snap .ss-field{ position:fixed !important; left:var(--mc-field-x); top:var(--mc-field-y); width:var(--mc-field-w) !important; height:var(--mc-field-h); margin:0 !important; min-height:0 !important; overflow:hidden; }
+:root .mc-snap .ss-word{ font-family:'FS Righteous', sans-serif !important; font-weight:400 !important; font-size:clamp(17px, 5.2vw, 22px) !important; min-height:48px !important; padding:8px 18px !important; }
+/* progress and score on the small plate at the bottom */
+:root .mc-snap .ss-tally{ position:fixed; left:var(--mc-plate-x); top:var(--mc-plate-y); width:calc(var(--mc-plate-w) * 0.62); height:var(--mc-plate-h); margin:0; min-height:0; display:flex; align-items:center; justify-content:center;
+  font:400 clamp(11px, 3.4vw, 14px)/1 'FS Righteous', sans-serif; color:#e4ff9a; text-shadow:0 1px 2px rgba(0,0,0,0.9); white-space:nowrap; overflow:hidden; }
+:root .mc-snap .mg-foot{ position:static !important; }
+:root .mc-snap .mg-score{ position:fixed !important; left:calc(var(--mc-plate-x) + var(--mc-plate-w) * 0.64); top:var(--mc-plate-y); width:calc(var(--mc-plate-w) * 0.36); height:var(--mc-plate-h); margin:0 !important; padding:0 !important; display:flex; align-items:center; justify-content:center; box-sizing:border-box;
+  font:400 17px/1 'FS Righteous', sans-serif !important; color:#2a1300 !important; background:linear-gradient(180deg, #fff3b0, #ffc93a) !important; border:2px solid #fff3c4 !important; border-radius:999px !important; box-shadow:0 2px 0 #7a4a00 !important; }
+:root .mc-snap .mg-timer{ position:fixed !important; left:var(--mc-timer-x); top:var(--mc-timer-y); width:var(--mc-timer-w) !important; height:5px !important; margin:0 !important; border-radius:3px; }
+:root .mc-snap .mg-result{ position:fixed; left:var(--mc-glass-x); top:var(--mc-glass-y); width:var(--mc-glass-w); height:var(--mc-glass-h); margin:0; display:flex; align-items:center; justify-content:center; }
+:root.mc-active.mc-on-snap .show-host{ display:none !important; }
