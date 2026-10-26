@@ -388,7 +388,7 @@
 :root .mc-doors .event-tile .pu-door{ display:none !important; }
 /* the prompt: larger, on a plate under the doors, with the pick timer under it */
 :root .mc-doors #eventPrompt{ position:fixed; left:var(--mc-prompt-x); top:var(--mc-prompt-y); width:var(--mc-prompt-w); height:calc(var(--mc-prompt-h) - 8px); margin:0; padding:0 12px; box-sizing:border-box; display:flex; align-items:center; justify-content:center; text-align:center;
-  font:400 clamp(15px, 4.4vw, 18px)/1.15 'FS Righteous', sans-serif !important; color:#fff6dc !important; text-shadow:0 2px 0 rgba(30,10,60,0.9) !important; background:rgba(20,10,44,0.82) !important; border-radius:14px !important; border:0 !important; box-shadow:0 0 0 2px rgba(255,214,120,0.6) !important; }
+  font:400 clamp(17px, 5vw, 21px)/1.12 'FS Righteous', sans-serif !important; color:#fff6dc !important; text-shadow:0 2px 0 rgba(30,10,60,0.9) !important; background:rgba(20,10,44,0.86) !important; border-radius:14px !important; border:0 !important; box-shadow:0 0 0 2px rgba(255,214,120,0.6) !important; }
 :root .mc-doors #eventPrompt::before, :root .mc-doors #eventPrompt::after{ display:none !important; }
 :root .mc-doors #eventTimerBar{ position:fixed; left:calc(var(--mc-prompt-x) + 14px); top:calc(var(--mc-prompt-y) + var(--mc-prompt-h) - 4px); width:calc(var(--mc-prompt-w) - 28px); height:4px; margin:0; border-radius:2px; background:rgba(0,0,0,0.5); }
 /* lite and reduced motion: no swing, no twinkle or swirl - the door crossfades away */

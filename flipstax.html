@@ -4799,7 +4799,7 @@
   </div>
   <div class="fin-stage fin-plinko hidden" id="finPlinko">
     <div class="pk-banner" id="pkBanner">ORBIT DROP</div>
-    <div class="pk-line" id="pkLine">Drag the UFO, let go to drop. Every chip pays.</div>
+    <div class="pk-line" id="pkLine">Slide to aim, tap DROP!</div>
     <div class="pk-status"><span class="pk-run" id="pkRunScore"></span><span class="pk-chipno" id="pkChipNo"></span><span class="pk-bonus">Bonus <b id="pkBonus">+0</b></span></div>
     <div class="plinko-board show-flash" id="plinkoBoard" role="slider" tabindex="0" aria-label="Aim the UFO: left and right arrows, Enter to drop" aria-valuemin="0" aria-valuemax="100">
       <svg class="plinko-svg" id="plinkoSvg" aria-hidden="true"></svg>
@@ -13511,7 +13511,7 @@
     if (!runOrbit || runOrbit.done) runOrbit = { stage:'plinko', chips: drawPlinkoOutcomes(dailyChipsFor(runKeys, runBonusChips, false)), dropped:0, base: runScore, done:false, mid:true };
     runPhase = 'orbit'; runOrbitDone = done; saveRunSnapshot();
     const n = runOrbit.chips.length, k = runGoldKeys();
-    openOrbitBoard(runOrbit, (k ? k + ' gold key' + (k === 1 ? '' : 's') + (n > k ? ' + ' + (n - k) + ' free' : '') : n + ' free') + ' = ' + n + ' chips. Drag the UFO, let go to drop.');
+    openOrbitBoard(runOrbit, 'Slide to aim, tap DROP!');   // (the chip row shows 'Chip n of N')
     return true;
   }
   function openDailyOrbit(r){
@@ -13520,7 +13520,7 @@
     if (r.orbit.done){ showRunReadout(); return; }
     saveRunResultToday(r);
     const from = [(r.keys ? r.keys + ' 🔑' : ''), (r.bonusChips ? r.bonusChips + ' 🔑' : ''), (r.warpChip ? '+1 ' + GN.wordWarp : '')].filter(Boolean).join(', ');
-    openOrbitBoard(r.orbit, r.orbit.chips.length + ' chips' + (from ? ' (' + from + ')' : '') + '. Drag the UFO, let go to drop.');
+    openOrbitBoard(r.orbit, r.orbit.chips.length + ' chips' + (from ? ' (' + from + ')' : '') + '. Slide to aim, tap DROP!');
   }
   function openOrbitBoard(o, line){
     dailyOrbit = o;
@@ -13546,7 +13546,7 @@
       runScore += won;
       if (!runBestMoment || won > runBestMoment.pts) runBestMoment = { pts: won, text: GN.orbitDrop + (runOrbitJackpot ? ': THE MOTHERSHIP!' : '') };
       dailyOrbit = null;
-      document.getElementById('pkLine').textContent = 'Drag the UFO, let go to drop. Every chip pays.';
+      document.getElementById('pkLine').textContent = 'Slide to aim, tap DROP!';
       els.finOverlay.classList.add('hidden'); els.finOverlay.classList.remove('daily-orbit'); stopFinSky();
       runPhase = 'running'; renderRunBanner(); saveRunSnapshot();
       const d = runOrbitDone; runOrbitDone = null;
@@ -13560,7 +13560,7 @@
     r.score = o.base + won;
     saveRunResultToday(r);
     dailyOrbit = null;
-    document.getElementById('pkLine').textContent = 'Drag the UFO, let go to drop. Every chip pays.';
+    document.getElementById('pkLine').textContent = 'Slide to aim, tap DROP!';
     els.finOverlay.classList.add('hidden'); els.finOverlay.classList.remove('daily-orbit'); stopFinSky();
     renderRunBanner();
     showRunReadout(true);
