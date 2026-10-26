@@ -571,3 +571,39 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .event-tile.mp:nth-child(1) .mp-scene{ clip-path:polygon(50% 1%, 98% 15.5%, 98% 84.5%, 50% 99%, 2% 84.5%, 2% 15.5%); border-radius:0; }
 .event-tile.mp:nth-child(2) .mp-scene{ border-radius:50% 50% 3% 3% / 33% 33% 3% 3%; inset:1% 2% 1% 2%; }
 .event-tile.mp:nth-child(3) .mp-scene{ border-radius:9% / 4.5%; inset:1% 2% 1% 2%; }
+
+/* ---- A+ tier 2 item 4: Zap Words - a neon title, rounded-hexagon tiles, a rich purple-to-magenta stage ---- */
+:root:root.stage-on .mg-overlay.mg-zapWords, .mg-overlay.mg-zapWords{ background:radial-gradient(ellipse at 50% 30%, #ff9bf0 0%, #c04cf5 40%, #6a24d6 100%) !important; }
+.mg-zapWords .mg-bg{ display:none; }
+.mg-zapWords .mg-sign, .mg-zapWords .mg-act{ display:none; }
+.mg-zapWords .mg-head{ min-height:0; }
+.zw-stage .zw-title{ font:900 clamp(44px, 14vw, 62px)/1 var(--f-display); letter-spacing:4px; text-align:center; text-transform:uppercase; margin-top:2px; }
+.zw-title .zp{ color:#ffe0f6; -webkit-text-stroke:1.5px #ffffff; paint-order:stroke fill; text-shadow:0 0 6px #ff3fb4, 0 0 14px #ff3fb4, 0 0 28px rgba(255,63,180,0.8); }
+.zw-title .zc{ color:#e0ffff; -webkit-text-stroke:1.5px #ffffff; paint-order:stroke fill; text-shadow:0 0 6px #19d3ff, 0 0 14px #19d3ff, 0 0 28px rgba(25,211,255,0.8); }
+.zw-stage{ gap:4px !important; }
+.zw-stage .zw-word{ min-height:36px; line-height:36px; color:#ffffff; text-shadow:0 0 10px #ff3fb4, 0 0 18px rgba(255,63,180,0.7); }
+.zw-stage .zw-grid{ width:min(100%, 380px, calc(100dvh - 370px)); gap:8px; padding:10px; background:rgba(66,14,130,0.6); border:3px solid #7df9ff; box-shadow:0 0 0 3px rgba(255,255,255,0.55), 0 0 26px rgba(125,249,255,0.5); }
+.zw-stage .zw-cell{ background:none; box-shadow:none; border-radius:0; color:#06263f; font-size:clamp(22px, 7vw, 30px); transition:transform .12s; }
+.zw-stage .zw-cell svg{ position:absolute; inset:0; width:100%; height:100%; display:block; overflow:visible; }
+.zw-stage .zw-cell polygon{ fill:#3de0ff; stroke:#c6f6ff; stroke-width:7; stroke-linejoin:round; }
+.zw-stage .zw-cell span{ position:relative; z-index:1; text-shadow:0 1px 0 rgba(255,255,255,0.45); }
+.zw-stage .zw-cell.on{ background:none; transform:scale(1.08); filter:drop-shadow(0 0 7px #ffe640); }
+.zw-stage .zw-cell.on polygon{ fill:#ffe640; stroke:#ffffff; }
+.zw-stage .zw-cell.found, .zw-stage .zw-cell.found.on{ background:none; box-shadow:none; color:#14142a; }
+.zw-stage .zw-cell.found polygon{ fill:var(--wc); stroke:#ffffff; }
+.zw-stage .zw-cell.found.on polygon{ fill:#ffe640; }
+.zw-stage .zw-cell.good{ background:none; } .zw-stage .zw-cell.good polygon{ fill:#6ee98c; }
+.zw-stage .zw-cell.bad, .zw-stage .zw-cell.found.bad{ background:none; } .zw-stage .zw-cell.bad polygon, .zw-stage .zw-cell.found.bad polygon{ fill:#ff7b94; }
+.zw-stage .zw-cell.dup, .zw-stage .zw-cell.found.dup{ background:none; } .zw-stage .zw-cell.dup polygon, .zw-stage .zw-cell.found.dup polygon{ fill:#ffb347; }
+.zw-stage .zw-cell.hint{ box-shadow:none; } .zw-stage .zw-cell.hint polygon{ stroke:#ffffff; stroke-width:11; }
+.zw-stage .zw-cell.missed{ box-shadow:none; } .zw-stage .zw-cell.missed polygon{ stroke:#ffe640; stroke-width:11; }
+.zw-stage .zw-cell.zapped{ animation:zwZap 0.5s ease-out both; animation-delay:var(--zd, 0ms); }
+@keyframes zwZap{ 0%{ transform:scale(1); } 40%{ transform:scale(1.28); } 100%{ transform:scale(1); } }
+.zw-trail polyline.zw-glow{ stroke:rgba(255,230,64,0.4); stroke-width:20; }
+.zw-trail polyline.zw-line{ stroke:#ffe640; stroke-width:6; opacity:0.8; }
+.zw-trail .zw-keep{ fill:none; stroke:var(--wc, #ffffff); stroke-width:6; stroke-linecap:round; stroke-linejoin:round; opacity:0.85; }
+.zw-stage .zw-hint{ background:#fff; color:#b4125f; border-color:#ff3fb4; box-shadow:0 3px 0 #b4125f; }
+.zw-stage .zw-found{ color:#ffffff; }
+.zw-stage .zw-chip{ color:#14142a; }
+:root.lite .zw-stage .zw-cell.zapped{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .zw-stage .zw-cell.zapped{ animation:none; } }
