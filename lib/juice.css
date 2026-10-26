@@ -716,3 +716,35 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root:root.stage-on .mg-overlay.mg-twinFlip .mg-bg, :root:root .mg-overlay.mg-twinFlip .mg-bg{ display:block !important; position:absolute; inset:0; }
 .mg-twinFlip .mg-bg{ z-index:0; }
 .mg-twinFlip .mg-inner{ position:relative; z-index:1; }
+
+/* ---- A+ follow-up item 2: Zap Words - an orange-to-hot-pink sunset room, an indigo board with a thin gold border, ivory hex tiles ---- */
+:root:root.stage-on .mg-overlay.mg-zapWords, .mg-overlay.mg-zapWords{ background:linear-gradient(180deg, #ff9a2a 0%, #ff6a4a 42%, #ff3d94 100%) !important; }
+:root:root.stage-on .mg-overlay.mg-zapWords .mg-bg, :root:root .mg-overlay.mg-zapWords .mg-bg{ display:block !important; position:absolute; inset:0; overflow:hidden; background:none; z-index:0; }
+.mg-zapWords .mg-bg .rays{ display:none; }
+.mg-zapWords .mg-bg::before{ content:''; position:absolute; left:50%; top:34%; width:150vmax; height:150vmax; margin:-75vmax 0 0 -75vmax; border-radius:50%; background:repeating-conic-gradient(from 0deg, rgba(255,240,170,0.22) 0deg 8deg, rgba(255,240,170,0) 8deg 16deg); animation:sbTurn 120s linear infinite; will-change:transform; }
+:root.lite .mg-zapWords .mg-bg::before{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .mg-zapWords .mg-bg::before{ animation:none; } }
+.mg-zapWords .mg-inner{ position:relative; z-index:1; }
+.mg-zapWords .mg-rule{ transition:opacity 0.6s ease; color:#ffffff; text-shadow:0 2px 0 rgba(120,20,60,0.7); }
+.mg-zapWords .mg-rule.fade{ opacity:0; }
+/* declutter: a smaller title with room around it */
+.zw-stage .zw-title{ font-size:clamp(30px, 9vw, 40px); margin:12px 0 10px; letter-spacing:3px; }
+.zw-stage .zw-word{ min-height:34px; line-height:34px; font-size:clamp(24px, 7vw, 30px); text-shadow:0 2px 0 rgba(120,20,60,0.7); }
+/* the board: deep indigo, a thin gold border, tiles a little further apart */
+.zw-stage .zw-grid{ background:radial-gradient(ellipse at 50% 40%, #2c1f78, #1a1252); border:2px solid #e6b94a; box-shadow:0 0 0 3px rgba(26,18,82,0.7), 0 6px 0 3px rgba(120,20,60,0.45); gap:10px; padding:12px; }
+/* warm ivory hex tiles, dark letters; a selected tile glows gold */
+.zw-stage .zw-cell{ color:#2a1630; font-size:clamp(24px, 7.4vw, 31px); }
+.zw-stage .zw-cell polygon{ fill:#fff1d2; stroke:#e8c27a; stroke-width:6; }
+.zw-stage .zw-cell span{ text-shadow:none; }
+.zw-stage .zw-cell.on{ filter:drop-shadow(0 0 8px #ffc928); }
+.zw-stage .zw-cell.on polygon{ fill:#ffe9a0; stroke:#ffc928; stroke-width:8; }
+.zw-stage .zw-cell.found, .zw-stage .zw-cell.found.on{ color:#2a1630; }
+.zw-stage .zw-cell.found polygon{ fill:#fff1d2; stroke:var(--wc); stroke-width:11; }
+.zw-stage .zw-cell.found.on polygon{ fill:#ffe9a0; stroke:#ffc928; }
+.zw-stage .zw-cell.bad polygon, .zw-stage .zw-cell.found.bad polygon{ fill:#ffc0c8; } .zw-stage .zw-cell.dup polygon, .zw-stage .zw-cell.found.dup polygon{ fill:#ffd9a8; }
+.zw-trail polyline.zw-glow{ stroke:rgba(255,201,40,0.4); } .zw-trail polyline.zw-line{ stroke:#ffc928; }
+.zw-trail .zw-keep{ stroke-width:8; opacity:0.9; }
+/* the found words: one row, newest on the right */
+.zw-stage .zw-found{ flex-wrap:nowrap; overflow:hidden; justify-content:flex-end; min-height:26px; }
+.zw-stage .zw-chip{ flex:0 0 auto; white-space:nowrap; }
+.zw-stage .zw-foot{ margin-top:6px; }
