@@ -422,3 +422,36 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .rw-nothing{ width:100%; display:flex; flex-direction:column; align-items:center; gap:6px; padding:6px 4px; text-align:center; }
 .rw-nothing b{ font:900 clamp(30px, 9.5vw, 38px)/1.05 var(--f-display); color:#b4125f; text-shadow:0 2px 0 rgba(255,255,255,0.8); text-transform:uppercase; letter-spacing:1px; }
 .rw-nothing small{ font:800 17px/1.2 var(--f-body, Inter, sans-serif); color:#3a1500; }
+
+/* ---- A+ tier 2 item 2: Lucky Lights is a spinning prize wheel: a bright purple-to-magenta stage, spotlights, a wheel on a stand ---- */
+:root:root .lucky-overlay{ background:radial-gradient(ellipse at 50% 26%, #ffd6f6 0%, #d868ff 38%, #6c37ea 100%) !important; }
+.lucky-overlay .ll-spot{ background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0) 80%) !important; opacity:0.5; }
+.lucky-overlay .ll-title{ background:linear-gradient(180deg, #fff7c2, #ffd23f) !important; color:#5a0a3a !important; border-color:#fff !important; box-shadow:0 0 0 3px #b4125f, 0 6px 0 #b4125f !important; }
+.lucky-overlay .ll-bank{ color:#5a0a3a; background:#fff; border:2px solid #ffd23f; font-size:15px; font-weight:900; }
+.lucky-overlay .ll-note{ color:#fff; text-shadow:0 2px 0 rgba(60,10,110,0.6); font-size:17px; font-weight:800; }
+.lw{ --lw:min(90vw, 440px, calc(100dvh - 360px)); position:relative; width:var(--lw); margin:4px 0 calc(var(--lw) * 0.34); }
+.lw-wheel{ position:relative; width:100%; aspect-ratio:1; z-index:1; }
+.lw-rot{ position:absolute; inset:0; transform-origin:50% 50%; will-change:transform; }
+.lw-svg, .lw-rimsvg{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+.lw-rimsvg{ pointer-events:none; }
+.lw-la{ animation:mqFade 2s ease-in-out infinite; }
+.lw-lb{ animation:mqFade 2s ease-in-out -1s infinite; }
+:root.lite .lw-la, :root.lite .lw-lb{ animation:none; }
+:root.lite .lw-lb{ opacity:0.5; }
+@media (prefers-reduced-motion: reduce){ .lw-la, .lw-lb{ animation:none; } .lw-lb{ opacity:0.5; } }
+.lw-post{ position:absolute; left:50%; top:50%; width:10%; height:86%; margin-left:-5%; border-radius:8px; background:linear-gradient(90deg, #8f95c9, #ffffff 45%, #8f95c9); box-shadow:0 0 0 2px #5a2bd8; z-index:0; }
+.lw-base{ position:absolute; left:50%; top:122%; width:64%; height:12%; margin-left:-32%; border-radius:50%; background:radial-gradient(ellipse at 50% 35%, #ffd23f, #ff8a1f); box-shadow:0 0 0 3px #b4125f, 0 8px 0 #b4125f; z-index:0; }
+.lw-hub{ position:absolute; left:50%; top:50%; width:27%; aspect-ratio:1; transform:translate(-50%, -50%); z-index:3; border-radius:50%; border:4px solid #fff; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:0;
+  background:radial-gradient(circle at 36% 30%, #fff6c2, #ffd23f 55%, #ff9a00); box-shadow:inset 0 -5px 0 rgba(150,60,0,0.3), 0 0 0 4px #b4125f, 0 6px 0 4px #b4125f; }
+.lw-hub:active{ transform:translate(-50%, -50%) scale(0.96); }
+.lw-hub .ll-hub-t{ font:900 clamp(26px, 8vw, 34px)/1 var(--f-display); color:#5a0a3a; text-shadow:0 2px 0 rgba(255,255,255,0.7); }
+.lw-hub .ll-hub-s{ display:none; }
+.lw-pointer{ position:absolute; left:50%; top:-5%; width:13%; aspect-ratio:0.9; margin-left:-6.5%; z-index:4; transform-origin:50% 12%; clip-path:polygon(50% 100%, 0 0, 100% 0); background:linear-gradient(180deg, #ffffff, #ffe14a 55%, #ff3c9d); }
+.lw-pop{ position:absolute; left:50%; top:50%; width:80%; transform:translate(-50%, -50%) scale(0.7); opacity:0; z-index:5; pointer-events:none; text-align:center; padding:14px 18px 12px; border-radius:26px; border:4px solid #fff;
+  background:linear-gradient(180deg, #fff7c2, #ffd23f); box-shadow:0 0 0 4px #b4125f, 0 8px 0 4px #b4125f; }
+.lw-pop.on{ animation:lwPop 0.35s cubic-bezier(.3,1.6,.5,1) both; }
+.lw-pop b{ display:block; font:900 clamp(30px, 9.5vw, 40px)/1 var(--f-display); color:#5a0a3a; text-transform:uppercase; letter-spacing:1px; }
+.lw-pop small{ display:block; margin-top:6px; font:800 16px/1.2 var(--f-body, Inter, sans-serif); color:#3a1500; }
+@keyframes lwPop{ from{ opacity:0; transform:translate(-50%, -50%) scale(0.6); } to{ opacity:1; transform:translate(-50%, -50%) scale(1); } }
+:root.lite .lw-pop.on, :root.mode-daily .lw-pop.on{ }
+@media (prefers-reduced-motion: reduce){ .lw-pop.on{ animation:none; opacity:1; transform:translate(-50%, -50%); } }

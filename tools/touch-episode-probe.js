@@ -67,7 +67,7 @@
         else { const sub = document.getElementById('solveSubmit'); if (sub) tapEl(sub, 'submit'); }
         next = now + rnd(opts.wwMin || 500, opts.wwMax || 1400);
       } else if (lucky && vis(lucky)){
-        const b = [...lucky.querySelectorAll('.ll-btn')].filter(vis)[0]; if (b) tapEl(b, 'lucky ' + b.textContent);
+        const b = [...lucky.querySelectorAll('.ll-btn, .lw-hub')].filter(vis)[0]; if (b) tapEl(b, 'lucky ' + b.textContent);
         next = now + rnd(opts.luckyMin || 1200, opts.luckyMax || 2500);
       } else if (guess && vis(guess)){
         const b = guess.querySelector('.guess-lock'); if (b && vis(b)) tapEl(b, 'crowd scan lock'); else tapEl(guess, 'crowd scan');

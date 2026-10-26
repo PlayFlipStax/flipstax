@@ -29,7 +29,7 @@
     if (tiles.length && !acted.q){ acted.q = 1; setTimeout(()=> tiles[0].click(), 700); }
     document.querySelectorAll('.mg-overlay button').forEach(b=>{ if (vis(b) && !b.disabled && Math.random() < 0.15) b.click(); });
     const lock = document.querySelector('.guess-lock'); if (vis(lock) && !acted.g){ acted.g = 1; setTimeout(()=> lock.click(), 700); }
-    const stop = document.querySelector('.ll-btn.stop'), bank = document.querySelector('.ll-btn.bank');
+    const stop = document.querySelector('.ll-btn.stop, .lw-hub'), bank = document.querySelector('.ll-btn.bank');
     if (vis(stop) && Math.random() < 0.3) stop.click(); if (vis(bank)) bank.click();
     const all = document.getElementById('plinkoAll'), drop = document.getElementById('plinkoDrop');
     if (vis(drop)) drop.click(); else if (vis(all) && performance.now() - (acted.o || 0) > 2000){ acted.o = performance.now(); all.click(); }
