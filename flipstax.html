@@ -5971,7 +5971,7 @@
   }
   // Run 4A, the Mystery Door (Round 3): four different bonus games behind four doors, by the date (the same for
   // everyone that day), from RUNDOWN.door.pool - only games whose data loaded, and none twice in the episode.
-  const DOOR_COUNT = 4;
+  const DOOR_COUNT = 3;   // (A+: the Mystery Portal has exactly three doors)
   function showDoorGames(date){
     const pool = ((RUNDOWN.door && RUNDOWN.door.pool) || []).filter(g=> mysteryAvailable(g));
     return shuffle(pool.slice(), mulberry32(hashStr('flipstax-door-' + date))).slice(0, DOOR_COUNT);
@@ -10963,7 +10963,7 @@
     return false;
   }
   // ---------- Run 4A: the round-end games ----------
-  const ROUND_GAME_NAMES = { riddle:()=> GN.riddleRound, lucky:()=> 'Lucky Lights', door:()=> 'Mystery Door', orbitDrop:()=> GN.orbitDrop };
+  const ROUND_GAME_NAMES = { riddle:()=> GN.riddleRound, lucky:()=> 'Lucky Lights', door:()=> 'Mystery Portal', orbitDrop:()=> GN.orbitDrop };
   function roundGameName(key){ return ROUND_GAME_NAMES[key] ? ROUND_GAME_NAMES[key]() : mysteryName(key); }
   // Run 4A: every round-end game opens with the game intro and its explainer card, then plays.
   function roundGameReady(st){
@@ -11003,6 +11003,33 @@
   // power-ups are not offered here (their code stays).
   const DOOR_PICK_MS = 8000;
   const DOOR_ICONS = { emojiDecode:'😀', timeWarp:'⌛', snapSort:'📸', saucerShuffle:'🛸', factOrFib:'❓', priceProbe:'🏷️' };
+  // A+ tier 2 item 3: the Mystery Portal (was the Mystery Door) - exactly three doors drawn in code (CSS + SVG): a copper door with an
+  // elongated-hexagon silhouette and a gold hand, a wood door with stained glass, a blue hammered door with a purple snake panel.
+  // Labels stay hidden until a pick; the pick swings open on its hinge (rotateY, 0.7 s) onto its own animated scene (a galaxy, a
+  // hyperspace vortex, a spiral of time) and the prize - the bonus game's name - shows there for the shared reveal hold, then the game
+  // plays. The other two portals dim. Lite mode and reduced motion: a crossfade, no swing.
+  function portalDoorSvg(i){
+    const p = 'mp' + i;
+    if (i === 0) return '<svg viewBox="0 0 100 220" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="' + p + 'a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffc58f"/><stop offset="0.5" stop-color="#e5844c"/><stop offset="1" stop-color="#a8541f"/></linearGradient><linearGradient id="' + p + 'g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3a0"/><stop offset="1" stop-color="#e09000"/></linearGradient></defs>' +
+      '<polygon points="50,2 98,34 98,186 50,218 2,186 2,34" fill="url(#' + p + 'a)" stroke="#fff3c4" stroke-width="3.5" stroke-linejoin="round"/><polygon points="50,24 82,44 82,176 50,196 18,176 18,44" fill="none" stroke="#7a3412" stroke-width="3" opacity="0.65"/>' +
+      '<g fill="#fff3c4" stroke="#8a4a1a" stroke-width="1.2"><circle cx="50" cy="12" r="3.4"/><circle cx="12" cy="40" r="3.4"/><circle cx="88" cy="40" r="3.4"/><circle cx="12" cy="180" r="3.4"/><circle cx="88" cy="180" r="3.4"/><circle cx="50" cy="208" r="3.4"/></g>' +
+      '<g transform="translate(54 112)" fill="url(#' + p + 'g)" stroke="#7a4a00" stroke-width="2" stroke-linejoin="round"><rect x="0" y="12" width="26" height="24" rx="8"/><rect x="0" y="-8" width="6" height="26" rx="3"/><rect x="7" y="-13" width="6" height="30" rx="3"/><rect x="14" y="-10" width="6" height="28" rx="3"/><rect x="21" y="-3" width="5" height="22" rx="2.5"/><rect x="-7" y="14" width="9" height="16" rx="4" transform="rotate(-24 -3 20)"/></g></svg>';
+    if (i === 1) return '<svg viewBox="0 0 100 220" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="' + p + 'w" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#d9964f"/><stop offset="0.5" stop-color="#c07a38"/><stop offset="1" stop-color="#a86a2c"/></linearGradient><clipPath id="' + p + 'c"><circle cx="50" cy="74" r="27"/></clipPath></defs>' +
+      '<path d="M2,218 V72 Q2,2 50,2 Q98,2 98,72 V218 Z" fill="url(#' + p + 'w)" stroke="#fff3c4" stroke-width="3.5"/><g stroke="#7a4a1c" stroke-width="2" opacity="0.55"><path d="M27 8 V218"/><path d="M50 2 V218"/><path d="M73 8 V218"/></g>' +
+      '<circle cx="50" cy="74" r="31" fill="#7a4a1c"/><g clip-path="url(#' + p + 'c)"><path d="M50 74 L50 40 L80 56Z" fill="#ff4fa3"/><path d="M50 74 L80 56 L82 90Z" fill="#ffd23f"/><path d="M50 74 L82 90 L50 108Z" fill="#2fd9ff"/><path d="M50 74 L50 108 L18 90Z" fill="#4be683"/><path d="M50 74 L18 90 L20 56Z" fill="#a45cff"/><path d="M50 74 L20 56 L50 40Z" fill="#ff8a1f"/></g>' +
+      '<circle cx="50" cy="74" r="27" fill="none" stroke="#fff3c4" stroke-width="2.5"/><g stroke="#5a3a1a" stroke-width="2"><path d="M50 47 V101"/><path d="M23 74 H77"/><path d="M31 55 L69 93"/><path d="M69 55 L31 93"/></g>' +
+      '<rect x="16" y="130" width="68" height="76" rx="6" fill="none" stroke="#7a4a1c" stroke-width="3" opacity="0.6"/><circle cx="80" cy="150" r="6" fill="#ffd23f" stroke="#7a4a00" stroke-width="1.6"/></svg>';
+    return '<svg viewBox="0 0 100 220" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="' + p + 'b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#58a6ff"/><stop offset="0.55" stop-color="#2f6bff"/><stop offset="1" stop-color="#1a3fc0"/></linearGradient>' +
+      '<pattern id="' + p + 'p" width="13" height="13" patternUnits="userSpaceOnUse"><circle cx="6.5" cy="6.5" r="4.6" fill="rgba(255,255,255,0.2)"/><circle cx="7.4" cy="7.4" r="3.2" fill="rgba(0,0,80,0.16)"/></pattern></defs>' +
+      '<rect x="2" y="2" width="96" height="216" rx="18" fill="url(#' + p + 'b)" stroke="#fff3c4" stroke-width="3.5"/><rect x="2" y="2" width="96" height="216" rx="18" fill="url(#' + p + 'p)"/>' +
+      '<rect x="18" y="34" width="64" height="130" rx="12" fill="#8a3ffc" stroke="#e4ccff" stroke-width="3"/><path d="M36 150 C36 122 66 132 66 102 C66 74 34 84 34 56" fill="none" stroke="#f1e2ff" stroke-width="9" stroke-linecap="round"/>' +
+      '<path d="M36 150 C36 122 66 132 66 102 C66 74 34 84 34 56" fill="none" stroke="#b680ff" stroke-width="3" stroke-dasharray="1 9" stroke-linecap="round"/><circle cx="34" cy="52" r="8" fill="#f1e2ff"/><circle cx="32" cy="50" r="2.6" fill="#2a0a4a"/><circle cx="82" cy="186" r="6" fill="#ffd23f" stroke="#7a4a00" stroke-width="1.6"/></svg>';
+  }
+  function portalSceneHtml(i){
+    if (i === 0){ let st = ''; for (let k = 0; k < 16; k++) st += '<i style="left:' + ((k * 37 + 11) % 92 + 3) + '%;top:' + ((k * 53 + 7) % 88 + 4) + '%;--d:' + ((k % 5) * -0.5).toFixed(1) + 's"></i>'; return '<div class="mp-scene gx"><i class="gx-swirl"></i><span class="gx-stars">' + st + '</span></div>'; }
+    if (i === 1){ let r = ''; for (let k = 0; k < 18; k++) r += '<i style="--a:' + (k * 20) + 'deg;--d:' + (-(k % 6) * 0.2).toFixed(1) + 's"></i>'; return '<div class="mp-scene vx">' + r + '<b class="vx-core"></b></div>'; }
+    return '<div class="mp-scene ts"><i class="r1"></i><i class="r2"></i><i class="r3"></i><i class="r4"></i><b class="ts-h1"></b><b class="ts-h2"></b><b class="ts-hub"></b></div>';
+  }
   function runMysteryDoor(st, done){
     const games = (st.doors || []).filter(g=> mysteryAvailable(g)).slice(0, DOOR_COUNT);
     if (!games.length) return false;
@@ -11012,43 +11039,47 @@
     ov.classList.remove('hidden', 'stack'); ov.classList.add('powerup', 'mdoor'); els.eventPrompt.classList.remove('long');
     els.powerupIcon.classList.add('hidden');
     fitTopChip();
-    els.eventSubtitle.textContent = '🚪 MYSTERY DOOR';
-    els.eventPrompt.textContent = 'Pick a door — a bonus game waits behind each';
-    // Run 4B: the title goes up on the marquee (the close shot of the stage, behind the doors)
-    if (window.Stage) Stage.cue('close', { over: ov, cls:'mdoor', sign:{ sub:'ROUND ' + ((RUNDOWN.acts[st.act] || {}).round || 3) + ' OF ' + SHOW_ROUND_COUNT, main:'MYSTERY DOOR' } });
+    els.eventSubtitle.textContent = '🚪 MYSTERY PORTAL';
+    els.eventPrompt.textContent = 'Pick a portal — a bonus game waits behind each';
+    // the title goes up on the marquee (the close shot of the stage, behind the portals)
+    if (window.Stage) Stage.cue('close', { over: ov, cls:'mdoor', sign:{ sub:'ROUND ' + ((RUNDOWN.acts[st.act] || {}).round || 3) + ' OF ' + SHOW_ROUND_COUNT, main:'MYSTERY PORTAL' } });
     let picked = false;
-    const reset = ()=>{ ov.classList.add('hidden'); ov.classList.remove('powerup', 'mdoor'); els.eventTiles.forEach(t=>{ t.classList.remove('portal', 'open', 'other', 'picked-wait'); t.innerHTML = ''; t.onclick = null; }); };
+    const tiles = els.eventTiles, used = tiles.slice(0, Math.min(DOOR_COUNT, games.length));
+    const reset = ()=>{ ov.classList.add('hidden'); ov.classList.remove('powerup', 'mdoor'); tiles.forEach(t=>{ t.classList.remove('portal', 'mp', 'opened', 'dim', 'open', 'other', 'picked-wait'); t.innerHTML = ''; t.onclick = null; t.style.display = ''; }); };
     const open = (i)=>{
       if (picked || g !== Show.gen) return;
       picked = true; clearTimeout(eventTimeoutId);
-      els.eventTiles.forEach(t=> t.onclick = null);
-      const tile = els.eventTiles[i], game = games[i % games.length];
+      tiles.forEach(t=> t.onclick = null);
+      const tile = tiles[i], game = games[i % games.length];
+      used.forEach((t, k)=>{ if (k !== i) t.classList.add('dim'); });
       tile.classList.add('picked-wait'); sfx.drumroll(QUIZ_DRUMROLL_MS);
       setTimeout(()=>{
         if (g !== Show.gen) return;
-        tile.classList.remove('picked-wait'); tile.classList.add('open'); if (sfx.slam) sfx.slam();
-        els.eventPrompt.textContent = 'Door ' + (i + 1) + ': ' + mysteryName(game) + '!';
-        setTimeout(()=>{ if (g === Show.gen) els.eventTiles.forEach((t, k)=>{ if (k !== i) t.classList.add('open', 'other'); }); }, dt(450));
-        setTimeout(()=>{
+        tile.classList.remove('picked-wait'); tile.classList.add('opened'); if (sfx.slam) sfx.slam();
+        els.eventPrompt.textContent = 'Portal ' + (i + 1) + ': ' + mysteryName(game) + '!';
+        revealThen(()=>{
           if (g !== Show.gen) return;
           reset();
           runCurrentGame = mysteryName(game); Show.info = 'door:' + game;
           const ok = miniGame(game) ? runMiniGame(game, { seed: st.seed, door:true }, done) : runBrainBreak({ game, seed: st.seed }, done);
           if (!ok) showDone(g, 'door game unavailable');
-        }, dt(1700));
+        }, { lead:700 });   // (the swing takes 0.7 s, then the game's name holds for the shared reveal time)
       }, dt(QUIZ_DRUMROLL_MS));
     };
-    els.eventTiles.forEach((tileEl, i)=>{
+    tiles.forEach((tileEl, i)=>{
+      if (i >= used.length){ tileEl.style.display = 'none'; return; }
       const game = games[i % games.length], c = gameIntroColors(game);
-      tileEl.innerHTML = '<span class="pu-door">' + (i + 1) + '</span><span class="pu-prize" style="background:linear-gradient(180deg, ' + c[0] + ', ' + (c[1] || c[0]) + ')"><span class="pu-icon">' + (DOOR_ICONS[game] || '✨') + '</span><span class="pu-label"></span></span>';
+      tileEl.innerHTML = '<div class="mp-door">' + portalSceneHtml(i) + '<div class="mp-prize" style="background:linear-gradient(180deg, ' + c[0] + ', ' + (c[1] || c[0]) + ')"><span class="pu-icon">' + (DOOR_ICONS[game] || '✨') + '</span><span class="pu-label"></span></div>' +
+        '<div class="mp-leaf">' + portalDoorSvg(i) + '</div><b class="mp-num">' + (i + 1) + '</b></div>';
       tileEl.querySelector('.pu-label').textContent = mysteryName(game);
       tileEl.style.backgroundColor = ''; tileEl.dataset.pu = '';
-      tileEl.classList.add('portal'); tileEl.classList.remove('open', 'other', 'is-right', 'is-wrong');
+      tileEl.classList.add('mp'); tileEl.classList.remove('portal', 'open', 'other', 'is-right', 'is-wrong');
+      tileEl.setAttribute('aria-label', 'Portal ' + (i + 1));
       tileEl.onclick = ()=> open(i);
     });
     startEventTimerBar(dt(DOOR_PICK_MS), dt(DOOR_PICK_MS));
     clearTimeout(eventTimeoutId);
-    eventTimeoutId = setTimeout(()=> open(Math.floor(Math.random() * games.length)), dt(DOOR_PICK_MS));
+    eventTimeoutId = setTimeout(()=> open(Math.floor(Math.random() * used.length)), dt(DOOR_PICK_MS));
     return true;
   }
   // ---------- Part E: the new Mystery Games (lib/mini-games.js) ----------
@@ -11909,7 +11940,7 @@
   const GAME_INTRO = {
     riddle:   { name:()=> GN.riddleRound, c:['#c9ff7a', '#18a83a'] },
     lucky:    { name:()=> 'Lucky Lights', c:['#ffd23f', '#9c1238'] },
-    door:     { name:()=> 'Mystery Door', c:['#ff9ad1', '#6d28d9'] },
+    door:     { name:()=> 'Mystery Portal', c:['#ff9ad1', '#6d28d9'] },
     zapWords: { name:()=> GN.zapWords, c:['#ffe94d', '#4a4f63'] },
     twinFlip: { name:()=> GN.twinFlip, c:['#ff5ad9', '#3b0a6b'] },
     orbitDrop:{ name:()=> GN.orbitDrop, c:['#7df9ff', '#1d3fb8'] },
@@ -15442,7 +15473,7 @@
     const tomorrow = dayAfter(r.date || todayStr());
     document.getElementById('eprNextEp').textContent = 'EPISODE ' + showEpisode(tomorrow);
     const g = showDoorGames(tomorrow).filter(Boolean).map(mysteryName);
-    document.getElementById('eprTease').textContent = g.length ? 'Behind the Mystery Door: ' + g.slice(0, -1).join(', ') + (g.length > 1 ? ' or ' : '') + g[g.length - 1] + '. Plus a new crowd, new Brain Beams and a new word.' : '';
+    document.getElementById('eprTease').textContent = g.length ? 'Behind the Mystery Portal: ' + g.slice(0, -1).join(', ') + (g.length > 1 ? ' or ' : '') + g[g.length - 1] + '. Plus a new crowd, new Brain Beams and a new word.' : '';
     const clock = document.getElementById('eprCountdown');
     const tick = (first)=>{
       if (!first && !els.readoutOverlay.classList.contains('show')){ clearInterval(eprClockT); eprClockT = null; return; }
@@ -17850,7 +17881,7 @@
           'Each ' + GN.brainBeam + ' you get right wins a Word Warp letter. Win a round-end game for a 🔑 gold key: each one is a chip in ' + GN.orbitDrop + '.'],
         chipsLabel:'The round-end games',
         chips:[ ['🧩 ' + GN.riddleRound, 'Round 1'], ['💡 Lucky Lights', 'Round 2'],
-                ['🚪 Mystery Door', 'Round 3'], ['⚡ ' + GN.zapWords, 'Round 4'], ['🃏 ' + GN.twinFlip, 'Round 5'], ['🛸 ' + GN.orbitDrop, 'Round 6'] ] },
+                ['🚪 Mystery Portal', 'Round 3'], ['⚡ ' + GN.zapWords, 'Round 4'], ['🃏 ' + GN.twinFlip, 'Round 5'], ['🛸 ' + GN.orbitDrop, 'Round 6'] ] },
       HOWTO_LAST_DAILY,
     ],
     infinity: [
@@ -18126,7 +18157,7 @@
       { label:'Cosmic Surprise', go: atType(s=> s.t === 'vs', 0, 30, 1, (i)=>{ runPlan.splice(i, 0, { t:'cosmic', act:0, seed:7 }); }) },
       { label:'Commercial (off)', go: atType(s=> s.t === 'act' && (RUNDOWN.acts[s.act] || {}).id === 'r3', 0, 70, 2, (i)=>{ runPlan.splice(i, 0, { t:'ad', forced:true, ad: showAd(todayStr()) }); }) },
       { label:'Round 3 card', go: roundCard(3) },
-      { label:'Mystery Door', go: roundGame('door', 96, 3) },
+      { label:'Mystery Portal', go: roundGame('door', 96, 3) },
       { label:'Portal Pick (old)', go: atType(doorStep, 0, 96, 3, (i)=>{ runPlan.splice(i, 0, { t:'portal', act:runPlan[i].act, doors: RUN_POWERUPS.map(p=> p.key) }); }) },
       { label:'Round 5 card', go: roundCard(5) },
       { label:'Lucky Lights', go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = null; }) },

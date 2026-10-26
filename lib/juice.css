@@ -523,3 +523,51 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .lucky-overlay .ll-note{ font-size:17px; }
 .lw-post{ height:64%; }
 .lw{ --lw:min(90vw, 440px, calc(100dvh - 390px)); margin-top:14px; }
+
+/* ---- A+ tier 2 item 3: the Mystery Portal - three tall doors (copper hexagon, wood + stained glass, blue hammered + snake), the same
+   height, large tap targets; the pick swings open on its hinge onto its own animated scene ---- */
+:root.mode-daily .event-overlay.mdoor .event-grid{ display:grid !important; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:12px; width:100%; max-width:420px; margin:0 auto calc(64px + env(safe-area-inset-bottom)); align-items:end; padding:0 4px; }
+:root.mode-daily .event-overlay.mdoor .event-tile.mp{ position:relative; display:block; padding:0; margin:0; min-height:0; height:clamp(210px, 38vh, 310px); background:none !important; border:0 !important; border-radius:0; box-shadow:none !important; animation:none !important; transform:none; opacity:1; cursor:pointer; overflow:visible; }
+:root.mode-daily .event-overlay.mdoor .event-tile.mp.dim{ opacity:0.4; transition:opacity 0.3s ease; }
+.mp-door{ position:absolute; inset:0; perspective:700px; }
+.mp-scene{ position:absolute; inset:0; overflow:hidden; opacity:0; border-radius:50px 50px 6px 6px / 40px 40px 6px 6px; }
+.mp-leaf{ position:absolute; inset:0; transform-origin:0 50%; transition:none; will-change:transform; }
+.mp-leaf svg{ width:100%; height:100%; display:block; }
+.mp-num{ position:absolute; left:50%; bottom:6%; width:44px; height:44px; margin-left:-22px; border-radius:50%; display:flex; align-items:center; justify-content:center; z-index:3; font:900 28px/1 var(--f-display); color:#4a1a00;
+  background:radial-gradient(circle at 35% 30%, #fff6c8, #ffd23f 55%, #d99100); border:3px solid #fff; box-shadow:0 0 0 3px #7a4a00, 0 4px 0 3px #7a4a00; pointer-events:none; transition:opacity 0.25s ease; }
+.mp-prize{ position:absolute; left:6%; right:6%; bottom:9%; z-index:3; display:flex; flex-direction:column; align-items:center; gap:4px; padding:8px 4px; border-radius:14px; border:3px solid #fff; text-align:center; opacity:0; color:#fff; text-shadow:0 2px 0 rgba(30,0,70,0.7); box-shadow:0 0 0 3px #b4125f; }
+.mp-prize .pu-icon{ font-size:30px; line-height:1; }
+.mp-prize .pu-label{ font:900 clamp(15px, 4.4vw, 19px)/1.05 var(--f-display); letter-spacing:0.5px; text-transform:uppercase; }
+.event-tile.mp.opened .mp-scene{ opacity:1; transition:opacity 0.2s ease 0.1s; }
+.event-tile.mp.opened .mp-leaf{ animation:mpSwing 0.7s cubic-bezier(.4,0,.3,1) both; }
+.event-tile.mp.opened .mp-num{ opacity:0; }
+.event-tile.mp.opened .mp-prize{ opacity:1; transition:opacity 0.3s ease 0.7s; }
+@keyframes mpSwing{ from{ transform:rotateY(0deg); } to{ transform:rotateY(-112deg); } }
+:root.lite .event-tile.mp.opened .mp-leaf{ animation:mpFadeOut 0.25s ease both; }
+@keyframes mpFadeOut{ from{ opacity:1; } to{ opacity:0; } }
+@media (prefers-reduced-motion: reduce){ .event-tile.mp.opened .mp-leaf{ animation:mpFadeOut 0.25s ease both; } }
+/* scene 1: a galaxy - purple, teal and gold, twinkling stars (opacity) and a slow swirl (transform) */
+.mp-scene.gx{ background:radial-gradient(circle at 50% 46%, #ffe27a 0 5%, #ff5fd0 15%, #8a3ffc 40%, #1fc8c2 72%, #3a1590 100%); }
+.gx-swirl{ position:absolute; left:50%; top:46%; width:170%; aspect-ratio:1; margin:-85% 0 0 -85%; border-radius:50%; background:conic-gradient(from 0deg, rgba(255,255,255,0) 0deg, rgba(255,255,255,0.4) 40deg, rgba(255,255,255,0) 90deg, rgba(255,210,63,0.45) 190deg, rgba(255,255,255,0) 250deg, rgba(31,200,194,0.5) 310deg, rgba(255,255,255,0)); animation:mpTurn 14s linear infinite; will-change:transform; }
+.gx-stars i{ position:absolute; width:6px; height:6px; border-radius:50%; background:#fff; animation:mpTwinkle 2.2s ease-in-out infinite; animation-delay:var(--d); }
+@keyframes mpTurn{ to{ transform:rotate(360deg); } }
+@keyframes mpTwinkle{ 0%, 100%{ opacity:1; } 50%{ opacity:0.15; } }
+/* scene 2: hyperspace - streaks of light racing toward the centre (transform and opacity) */
+.mp-scene.vx{ background:radial-gradient(circle at 50% 50%, #ffffff 0 4%, #8df4ff 14%, #3d7bff 45%, #6a2bd8 100%); }
+.mp-scene.vx i{ position:absolute; left:50%; top:50%; width:4px; height:48%; margin-left:-2px; transform-origin:50% 0; transform:rotate(var(--a)) translateY(8%); background:linear-gradient(180deg, #ffffff, rgba(141,244,255,0)); border-radius:2px; opacity:0; animation:vxRush 1.2s linear infinite; animation-delay:var(--d); }
+.vx-core{ position:absolute; left:50%; top:50%; width:22%; aspect-ratio:1; margin:-11% 0 0 -11%; border-radius:50%; background:radial-gradient(circle, #fff, rgba(255,255,255,0) 70%); }
+@keyframes vxRush{ 0%{ opacity:0; transform:rotate(var(--a)) translateY(96%) scaleY(0.4); } 25%{ opacity:1; } 100%{ opacity:0; transform:rotate(var(--a)) translateY(6%) scaleY(1); } }
+/* scene 3: a spiral of time - clock-like rings turning in opposite directions */
+.mp-scene.ts{ background:radial-gradient(circle at 50% 50%, #fff3a8 0 8%, #ffb23d 34%, #ff5aa0 70%, #8a3ffc 100%); }
+.mp-scene.ts i{ position:absolute; left:50%; top:50%; aspect-ratio:1; border-radius:50%; transform:translate(-50%, -50%); animation:tsA 9s linear infinite; }
+.ts .r1{ width:36%; border:4px dashed #ffffff; } .ts .r2{ width:62%; border:5px dotted #fff3a8; animation-name:tsB; animation-duration:12s; } .ts .r3{ width:88%; border:4px dashed #7df9ff; animation-duration:16s; } .ts .r4{ width:118%; border:5px dotted #ffffff; animation-name:tsB; animation-duration:22s; }
+@keyframes tsA{ to{ transform:translate(-50%, -50%) rotate(360deg); } } @keyframes tsB{ to{ transform:translate(-50%, -50%) rotate(-360deg); } }
+.ts-h1, .ts-h2{ position:absolute; left:50%; top:50%; width:5px; border-radius:3px; background:#4a1a6a; transform-origin:50% 100%; }
+.ts-h1{ height:24%; margin:-24% 0 0 -2.5px; animation:mpTurn 6s linear infinite; } .ts-h2{ height:17%; margin:-17% 0 0 -2.5px; animation:mpTurn 40s linear infinite; }
+.ts-hub{ position:absolute; left:50%; top:50%; width:9%; aspect-ratio:1; margin:-4.5% 0 0 -4.5%; border-radius:50%; background:#ffd23f; border:3px solid #4a1a6a; }
+:root.lite .gx-swirl, :root.lite .gx-stars i, :root.lite .mp-scene.vx i, :root.lite .mp-scene.ts i, :root.lite .ts-h1, :root.lite .ts-h2{ animation:none; }
+:root.lite .mp-scene.vx i{ opacity:0.7; transform:rotate(var(--a)) translateY(30%); }
+@media (prefers-reduced-motion: reduce){ .gx-swirl, .gx-stars i, .mp-scene.vx i, .mp-scene.ts i, .ts-h1, .ts-h2{ animation:none; } .mp-scene.vx i{ opacity:0.7; transform:rotate(var(--a)) translateY(30%); } }
+.event-tile.mp:nth-child(1) .mp-scene{ clip-path:polygon(50% 1%, 98% 15.5%, 98% 84.5%, 50% 99%, 2% 84.5%, 2% 15.5%); border-radius:0; }
+.event-tile.mp:nth-child(2) .mp-scene{ border-radius:50% 50% 3% 3% / 33% 33% 3% 3%; inset:1% 2% 1% 2%; }
+.event-tile.mp:nth-child(3) .mp-scene{ border-radius:9% / 4.5%; inset:1% 2% 1% 2%; }
