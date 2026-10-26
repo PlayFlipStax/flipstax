@@ -11672,16 +11672,18 @@
     const hasOrbit = (a.steps || []).some(s=> s.game === 'orbitDrop' || s.orbitDrop);
     const pts = Math.round((runActPts[st.act] || 0) + (hasOrbit ? runOrbitPts : 0));
     showCard.className = 'show-card reward';
-    showCard.innerHTML = '<div class="rw-panel ds-card dark"><div class="rw-title"></div><div class="rw-row">' +
+    showCard.innerHTML = '<i class="rw-sun" aria-hidden="true"></i><div class="rw-panel"><div class="rw-title"></div><div class="rw-frame"><i class="mq mq-a" aria-hidden="true"></i><i class="mq mq-b" aria-hidden="true"></i><div class="rw-row">' +
       '<span class="rw-chip pts" style="--i:0"><b>+' + pts + '</b><small>points</small></span>' +
       '<span class="rw-chip letter ' + (letter || 'none') + '" style="--i:1"><b>' + (letter === 'got' ? '?' : letter === 'miss' ? '✕' : '–') + '</b><small>' + (letter === 'got' ? 'letter won' : 'no letter') + '</small></span>' +
-      '<span class="rw-chip keys" style="--i:2"><b>🔑 ' + keys + '</b><small>gold key' + (keys === 1 ? '' : 's') + '</small></span></div>' +
-      '<div class="rw-total"></div></div>';
+      '<span class="rw-chip keys" style="--i:2"><b>🔑 ' + keys + '</b><small>gold key' + (keys === 1 ? '' : 's') + '</small></span></div></div></div>';   // (A+: only points gained, the letter won and keys - no running totals)
     showCard.querySelector('.rw-title').textContent = (a.title || 'ROUND') + ' DONE!';
-    showCard.querySelector('.rw-total').textContent = shownScore(runScore) + ' points · ' + runGoldKeys() + ' gold key' + (runGoldKeys() === 1 ? '' : 's') + ' · ' + runLetters.length + ' of ' + RUN_WORD_LENGTH + ' letters';
     showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', (a.title || 'Round') + ' done: ' + pts + ' points, ' + (letter === 'got' ? 'a letter, ' : '') + keys + ' gold keys. Tap to go on');
     showCard.classList.remove('hidden');
     if (pts > 0) sfx.chime(5);
+    // A+ tier 1 item 3: a celebration - a burst of confetti over the title (not in lite mode or with reduced motion)
+    if (!isLite() && !prefersReducedMotion()){
+      try{ const r = showCard.querySelector('.rw-title').getBoundingClientRect(); FX.burst(showFx, r.left + r.width / 2, r.top + r.height / 2, { count:24, spread:190, shapes:['star', 'coin', 'strip'] }); }catch(e){}
+    }
     // Run 4B: the round-end game was won - the presenter pops out beside the panel now and then (lib/cast.js; only
     // pictures listed in data/cast/manifest.js; never takes a tap)
     if (runActWon[st.act] && window.Cast) Cast.win({ side:'left', hold: Math.min(1900, cine(TIMING.REWARD_HOLD || 2200) - 300), always: CAST_ALWAYS, while: ()=> showCard.classList.contains('reward') && !showCard.classList.contains('hidden') });

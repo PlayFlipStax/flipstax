@@ -379,3 +379,31 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 @media (prefers-reduced-motion: reduce){
   :root.mode-daily #board.deal-first :is(.half, .mq-ring).top, :root.mode-daily #board.deal-first :is(.half, .mq-ring).bottom,
   :root.mode-daily #board.deal-slide :is(.half, .mq-ring).top, :root.mode-daily #board.deal-slide :is(.half, .mq-ring).bottom{ animation:vsFade 0.2s ease-out both; } }
+
+/* ---- A+ tier 1 item 3: the round-done reward screen - bright, a celebration, not a report card. A sunburst turns slowly
+   behind the title, the stats sit in a bulb-ringed marquee frame, big numbers (40 px) with clear labels. ---- */
+:root.mode-daily .show-card.reward{ background:radial-gradient(ellipse at 50% 30%, #fff3a8 0%, #ffb23d 38%, #ff4fa0 100%); overflow:hidden; }
+.rw-sun{ position:absolute; left:50%; top:30%; width:150vmax; height:150vmax; margin:-75vmax 0 0 -75vmax; border-radius:50%; pointer-events:none;
+  background:repeating-conic-gradient(from 0deg, rgba(255,255,255,0.34) 0deg 9deg, rgba(255,255,255,0) 9deg 18deg); animation:sbTurn 70s linear infinite; will-change:transform; }
+:root.lite .rw-sun{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .rw-sun{ animation:none; } }
+:root.mode-daily .rw-panel{ position:relative; z-index:1; background:none; box-shadow:none; border:0; padding:0; width:min(380px, 100%); gap:22px; }
+:root.mode-daily .rw-title{ font:900 clamp(44px, 13.5vw, 62px)/0.95 var(--f-display); letter-spacing:2px; color:#fff; text-transform:uppercase;
+  -webkit-text-stroke:2px #b4125f; paint-order:stroke fill; text-shadow:0 5px 0 #b4125f, 0 9px 0 rgba(120,10,70,0.35), 0 0 26px rgba(255,255,255,0.7); }
+.rw-frame{ position:relative; width:100%; padding:26px 14px 22px; border-radius:28px; background:linear-gradient(180deg, #ffffff, #fff1c9); border:4px solid #ffd23f;
+  box-shadow:0 0 0 3px #b4125f, 0 8px 0 #b4125f, 0 14px 22px rgba(120,10,70,0.4); }
+.rw-frame .mq{ inset:7px; opacity:1; }
+.rw-frame .rw-row{ position:relative; z-index:1; gap:10px; }
+:root.mode-daily .rw-chip{ padding:14px 4px 12px; border-radius:20px; border:3px solid #fff; gap:6px; background:linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.1) 46%, rgba(255,255,255,0) 52%), linear-gradient(180deg, #ffe680, #ffc21a);
+  box-shadow:inset 0 -4px 0 rgba(0,0,0,0.16), 0 5px 0 #b97800; }
+:root.mode-daily .rw-chip b{ font:900 40px/1 var(--f-display); color:#3a1500; text-shadow:0 2px 0 rgba(255,255,255,0.55); }
+:root.mode-daily .rw-chip small{ font:800 15px/1.1 var(--f-body, Inter, sans-serif); letter-spacing:1px; color:#3a1500; }
+:root.mode-daily .rw-chip.letter{ background:linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.1) 46%, rgba(255,255,255,0) 52%), linear-gradient(180deg, #8ff4ff, #19b6e6); box-shadow:inset 0 -4px 0 rgba(0,0,0,0.16), 0 5px 0 #0a6d93; }
+:root.mode-daily .rw-chip.letter b, :root.mode-daily .rw-chip.letter small{ color:#06263f; }
+:root.mode-daily .rw-chip.letter.miss{ background:linear-gradient(180deg, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.08) 46%, rgba(255,255,255,0) 52%), linear-gradient(180deg, #ff9aa8, #e0243f); box-shadow:inset 0 -4px 0 rgba(0,0,0,0.16), 0 5px 0 #8a0c22; }
+:root.mode-daily .rw-chip.letter.miss b, :root.mode-daily .rw-chip.letter.miss small{ color:#fff; text-shadow:0 2px 0 rgba(90,0,20,0.5); }
+:root.mode-daily .rw-chip.letter.none{ background:linear-gradient(180deg, #f2ecff, #cdbff5); box-shadow:inset 0 -4px 0 rgba(0,0,0,0.1), 0 5px 0 #6a55b5; }
+:root.mode-daily .rw-chip.letter.none b, :root.mode-daily .rw-chip.letter.none small{ color:#2a1a5e; }
+:root.mode-daily .rw-chip.keys{ background:linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.1) 46%, rgba(255,255,255,0) 52%), linear-gradient(180deg, #ff9fd0, #ff3c9d); box-shadow:inset 0 -4px 0 rgba(0,0,0,0.16), 0 5px 0 #a3105e; }
+:root.mode-daily .rw-chip.keys b, :root.mode-daily .rw-chip.keys small{ color:#fff; text-shadow:0 2px 0 rgba(110,0,60,0.55); }
+:root.lite .rw-frame .mq, :root.lite .rw-frame .mq.mq-b{ animation:none; }
