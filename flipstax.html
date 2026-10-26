@@ -4372,6 +4372,9 @@
         <div class="you-tag" id="tagA"></div>
       </div>
     </div>
+    <!-- A+ item 2: the Vegas marquee frames - rings of bulbs over each card, kept outside the (clipped) cards so their fade is cheap -->
+    <div class="mq-ring top" aria-hidden="true"><i class="mq mq-a"></i><i class="mq mq-b"></i></div>
+    <div class="mq-ring bottom" aria-hidden="true"><i class="mq mq-a"></i><i class="mq mq-b"></i></div>
     <div class="divider">VS</div>
     <!-- The VS reveal's split-flap board (Daily and Infinity): the crowd's split clacks over after a pick. -->
     <div class="crowd-board" id="crowdBoard" aria-live="polite"><div class="cb-note"></div><div class="cb-label">CROWD SAYS</div><div class="cb-row"><span class="cb-num" id="cbA"></span><span class="cb-sep">/</span><span class="cb-num" id="cbB"></span></div></div>
@@ -10851,7 +10854,7 @@
       runShow.step++; runShow.left = null;
       if (st.t === 'act'){
         // An act opens: the host holds up its cue card; its multiplier and VS timer apply from here.
-        runActIdx = st.act; renderRunBanner();
+        runActIdx = st.act; renderRunBanner(); vsRoundFirst = true;   // (A+: the round's first VS card drops in)
         if (runScoreAtHalfway == null && (RUNDOWN.acts[st.act] || {}).id === 'r4') runScoreAtHalfway = runScore;   // (for the comeback check: points before Round 4 vs after)
         runPhase = 'bumper'; saveRunSnapshot();
         const g = showEnter('act', st.title);
@@ -12088,6 +12091,7 @@
   let runVsMarks = [];   // per act: a string of g (matched the crowd) / r (didn't), one per VS pick
   let runMissPts = 0, runGoopLost = 0;   // points lost to misses (wrong answers, too slow, a Cosmic loss) and the Lucky Lights bank lost to the GOOP, for the results
   let runActPts = [];   // points won in each act (by its index in the rundown), for the results breakdown   // the question on screen is a rundown Brain Beam (it earns a prize-track tile)
+  let vsRoundFirst = false;   // A+: set when a round opens; the next VS card deal is the round's first
   let runPlan = null, runShow = { step:0, left:null }, runPortalDoors = null, runWarpBonusMs = 0, runQuizPick = null;
   let runMatchStreak = 0, runComboBank = 0, runComboBonus = 0, runBestStreak = 0;
   // B5: earned letters land in the tray at the date's own order of
@@ -16198,6 +16202,12 @@
       setScene(els.sceneA, current.glyphA); setScene(els.sceneB, current.glyphB);
     }
     els.takeA.textContent = current.a; els.takeB.textContent = current.b;
+    // A+ item 2: the round's first card - the top one drops in from above, the bottom one rises from below (about 0.9 s,
+    // a small bounce); the other cards slide in quickly (0.25 s). Transform and opacity; lite / reduced motion: a fade.
+    { const first = runActive && vsRoundFirst; vsRoundFirst = false;
+      els.board.classList.remove('deal-first', 'deal-slide'); void els.board.offsetWidth;
+      els.board.classList.add(first ? 'deal-first' : 'deal-slide', 'vs-live');
+      clearTimeout(loadNextImpl._dealT); loadNextImpl._dealT = setTimeout(()=> els.board.classList.remove('deal-first', 'deal-slide'), first ? 1000 : 320); }
     [els.contentA, els.contentB].forEach(c=>{
       if (!c) return;
       c.classList.remove('pop-in');
@@ -16422,6 +16432,7 @@
     }
   }
   function reveal(counts, isLiveUpdate, others){
+    els.board.classList.remove('vs-live');
     const a = (counts && counts.a) || 0;
     const b = (counts && counts.b) || 0;
     const total = a + b;
@@ -16532,6 +16543,7 @@
     fitTopChip();
     // Marks the chosen side immediately (before the network round-trip) so
     // the Infinity selection outline appears the instant of the tap.
+    els.board.classList.remove('vs-live');   // (A+: the marquee bulbs go out at the pick)
     els.halfA.classList.toggle('picked', side === 'A');
     els.halfB.classList.toggle('picked', side === 'B');
     const points = current.bonusPoints ? (runActive ? 3 : INF_STAR_POINTS) : 1;

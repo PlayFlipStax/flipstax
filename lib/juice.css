@@ -138,3 +138,70 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
   box-shadow:inset 0 2px 0 rgba(255,255,255,0.75), inset 0 -4px 0 rgba(122,74,0,0.35), 0 4px 0 #7a4a00, 0 0 14px rgba(255,210,60,0.7); }
 .jc-ripple .jc-band{ position:absolute; top:-20%; bottom:-20%; left:0; width:45%;
   background:linear-gradient(90deg, rgba(125,249,255,0), rgba(200,252,255,0.55) 50%, rgba(125,249,255,0)); opacity:0; }
+
+/* ---- A+ item 2: the VS stage. Behind the cards a darkened stage with two soft spotlight cones sweeping slowly and the
+   sunburst turning; each card wears a Vegas marquee frame (a ring of round bulbs, two phases fading in and out, a
+   phase lighting once every 2 s); a round's first card drops in / rises in (0.9 s), the others slide (0.25 s).
+   Transform and opacity only; lite mode and reduced motion: the cones and bulbs stand still, the deals are a fade. ---- */
+.sb-cone{ display:none; position:absolute; top:-4%; width:78vmax; height:118vmax; margin-left:-39vmax; transform-origin:50% 0; pointer-events:none;
+  clip-path:polygon(47% 0, 53% 0, 100% 100%, 0 100%); background:linear-gradient(180deg, rgba(255,247,205,0.46) 0%, rgba(255,247,205,0.16) 55%, rgba(255,247,205,0.03) 100%); will-change:transform; }
+.sunburst[data-sb="vs"] .sb-cone{ display:block; }
+.sb-cone.l{ left:18%; animation:sbSweepL 9s ease-in-out infinite alternate; }
+.sb-cone.r{ left:82%; animation:sbSweepR 11s ease-in-out infinite alternate; }
+@keyframes sbSweepL{ from{ transform:rotate(-24deg); } to{ transform:rotate(12deg); } }
+@keyframes sbSweepR{ from{ transform:rotate(22deg); } to{ transform:rotate(-14deg); } }
+.sunburst[data-sb="vs"]{ --sb-bg:#12062b; --sb-a:#3a1675; --sb-b:#21094a; --sb-glow:rgba(255,60,157,0.3); }
+:root.lite .sb-cone{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .sb-cone{ animation:none; } }
+
+/* the marquee frame: a ring of bulbs over each card (board-level, so the fade never touches a clipped card): a bulb is a
+   gold dot with a soft halo painted into the gradient; the bulbs light while the card is live and go out at the pick */
+.mq-ring{ display:none; }
+:root.mode-daily #board .mq-ring{ display:block; position:absolute; left:0; right:0; z-index:3; pointer-events:none; height:calc(50% - var(--board-gap, 0px) / 2); opacity:0; transition:opacity 160ms ease; }
+:root.mode-daily #board .mq-ring.top{ top:0; }
+:root.mode-daily #board .mq-ring.bottom{ bottom:0; }
+:root.mode-daily #board.vs-live .mq-ring{ opacity:1; }
+.mq{ position:absolute; inset:5px; --bulb:#ffd23f; --bulb-hi:#fffbe6;
+  background:
+    radial-gradient(circle closest-side, var(--bulb-hi) 0 34%, var(--bulb) 50%, rgba(255,210,63,0.3) 74%, rgba(255,210,63,0) 100%) 50% 0 / 24px 13px repeat-x,
+    radial-gradient(circle closest-side, var(--bulb-hi) 0 34%, var(--bulb) 50%, rgba(255,210,63,0.3) 74%, rgba(255,210,63,0) 100%) 50% 100% / 24px 13px repeat-x,
+    radial-gradient(circle closest-side, var(--bulb-hi) 0 34%, var(--bulb) 50%, rgba(255,210,63,0.3) 74%, rgba(255,210,63,0) 100%) 0 50% / 13px 24px repeat-y,
+    radial-gradient(circle closest-side, var(--bulb-hi) 0 34%, var(--bulb) 50%, rgba(255,210,63,0.3) 74%, rgba(255,210,63,0) 100%) 100% 50% / 13px 24px repeat-y;
+  animation:mqFade 2s ease-in-out infinite; will-change:opacity; }
+.mq.mq-b{ --bulb:#ff7ac8; --bulb-hi:#fff0fa; animation-delay:-1s;
+  background-position:calc(50% + 12px) 0, calc(50% + 12px) 100%, 0 calc(50% + 12px), 100% calc(50% + 12px); }
+@keyframes mqFade{ 0%, 100%{ opacity:1; } 50%{ opacity:0.12; } }
+:root.lite .mq{ animation:none; opacity:0.9; }
+:root.lite .mq.mq-b{ opacity:0.45; }
+@media (prefers-reduced-motion: reduce){ .mq{ animation:none; opacity:0.9; } .mq.mq-b{ opacity:0.45; } }
+:root.mode-daily.event-open #board .mq-ring{ visibility:hidden; }
+
+/* the deals */
+:root.mode-daily #board.deal-first{ clip-path:inset(0 -40px -30px -40px); }
+:root.mode-daily #board.deal-first :is(.half, .mq-ring).top{ animation:vsDropIn 0.9s linear both; }
+:root.mode-daily #board.deal-first :is(.half, .mq-ring).bottom{ animation:vsRiseIn 0.9s linear both; }
+:root.mode-daily #board.deal-first .divider{ animation:vsCoinIn 0.9s linear both; }
+@keyframes vsDropIn{
+  0%{ transform:translateY(-112%); opacity:0; animation-timing-function:cubic-bezier(.3,0,.5,1); }
+  8%{ opacity:1; }
+  58%{ transform:translateY(2.5%); animation-timing-function:ease-out; }
+  78%{ transform:translateY(-1.2%); animation-timing-function:ease-in-out; }
+  100%{ transform:translateY(0); opacity:1; } }
+@keyframes vsRiseIn{
+  0%{ transform:translateY(112%); opacity:0; animation-timing-function:cubic-bezier(.3,0,.5,1); }
+  8%{ opacity:1; }
+  58%{ transform:translateY(-2.5%); animation-timing-function:ease-out; }
+  78%{ transform:translateY(1.2%); animation-timing-function:ease-in-out; }
+  100%{ transform:translateY(0); opacity:1; } }
+@keyframes vsCoinIn{ 0%, 55%{ opacity:0; } 100%{ opacity:1; } }
+:root.mode-daily #board.deal-slide :is(.half, .mq-ring).top{ animation:vsSlideL 0.25s ease-out both; }
+:root.mode-daily #board.deal-slide :is(.half, .mq-ring).bottom{ animation:vsSlideR 0.25s ease-out both; }
+@keyframes vsSlideL{ from{ transform:translateX(-18%); opacity:0.2; } to{ transform:none; opacity:1; } }
+@keyframes vsSlideR{ from{ transform:translateX(18%); opacity:0.2; } to{ transform:none; opacity:1; } }
+:root.lite.mode-daily #board.deal-first :is(.half, .mq-ring), :root.lite.mode-daily #board.deal-slide :is(.half, .mq-ring){ animation:vsFade 0.2s ease-out both; }
+:root.lite.mode-daily #board.deal-first .divider{ animation:none; }
+@keyframes vsFade{ from{ opacity:0; } to{ opacity:1; } }
+@media (prefers-reduced-motion: reduce){
+  :root.mode-daily #board.deal-first :is(.half, .mq-ring), :root.mode-daily #board.deal-slide :is(.half, .mq-ring){ animation:vsFade 0.2s ease-out both; }
+  :root.mode-daily #board.deal-first .divider{ animation:none; }
+  :root.mode-daily #board.deal-first{ clip-path:none; } }
