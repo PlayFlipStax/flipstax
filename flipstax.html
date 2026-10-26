@@ -10803,8 +10803,16 @@
   }
   document.addEventListener('visibilitychange', ()=>{ if (document.hidden) flushEvents(); });
   const EV_GAME = { lucky:'luckyLights', cosmic:'cosmicSurprise' };
+  function handoffVeil(){
+    let v = document.getElementById('handoffVeil');
+    if (!v){ v = document.createElement('div'); v.id = 'handoffVeil'; v.setAttribute('aria-hidden', 'true'); document.body.appendChild(v); }
+    v.classList.remove('go'); void v.offsetWidth; v.classList.add('on'); v.classList.remove('off');
+    clearTimeout(handoffVeil._t); handoffVeil._t = setTimeout(()=>{ v.classList.add('off'); handoffVeil._t = setTimeout(()=> v.classList.remove('on', 'off'), 340); }, 110);
+  }
   function showEnter(scene, info){
     if (runActive && (scene === 'mystery' || scene === 'lucky' || scene === 'cosmic' || scene === 'game')) trackEvent('game_started:' + (scene === 'mystery' ? info : scene === 'game' ? (EV_GAME[info] || info) : EV_GAME[scene]));
+    // Oct 25: VS -> a game: a quick dip through black (the VS cards and console never show through behind the game while it builds)
+    if (runActive && Show.scene === 'vs' && scene !== 'vs') handoffVeil();
     showCancelPending();
     Show.gen++; Show.scene = scene; Show.state = scene === 'vs' ? 'live' : 'playing'; Show.info = info || ''; Show.since = performance.now();
     Show.stats.scenes.push(scene + (info && scene !== 'vs' ? ':' + info : ''));

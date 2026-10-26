@@ -400,3 +400,9 @@
 :root .mc-doors .event-tile.picked-wait[data-door="copper"]::after, :root .mc-doors .event-tile.open[data-door="copper"]::after{ opacity:0; }
 :root .mc-doors .event-tile:nth-child(1) .pu-prize{ left:0 !important; transform:none !important; width:118% !important; }
 :root .mc-doors .event-tile:nth-child(3) .pu-prize{ left:auto !important; right:0 !important; transform:none !important; width:118% !important; }
+
+/* the VS -> game handoff: a quick dip through black over the new screen while it builds (110 ms hold, 0.3 s fade); lite / reduced motion: held, then gone */
+#handoffVeil{ display:none; position:fixed; inset:0; z-index:66; background:#0a0612; pointer-events:none; opacity:1; transition:opacity 300ms ease; }
+#handoffVeil.on{ display:block; } #handoffVeil.off{ opacity:0; }
+:root.lite #handoffVeil{ transition:none; }
+@media (prefers-reduced-motion: reduce){ #handoffVeil{ transition:none; } }

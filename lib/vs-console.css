@@ -10,7 +10,7 @@
 :root.vsc-ready.mode-daily:not(.event-open) .sunburst.sb-page{ visibility:hidden !important; }
 .vsc-frame{ position:absolute; left:var(--vsc-x); top:var(--vsc-y); width:var(--vsc-w); height:var(--vsc-h); }
 .vsc-img{ position:absolute; inset:0; width:100%; height:100%; display:block; -webkit-user-drag:none; user-select:none; }
-.vsc-lit{ opacity:0; }
+.vsc-lit{ opacity:1; }   /* Oct 25: the lit picture is the resting one - the VS screen is brighter */
 
 /* the board takes the picture's box; the two cards sit in its two windows, the coin on its coin */
 :root.vsc-ready.mode-daily:not(.event-open) #board{ position:fixed; left:var(--vsc-x); top:var(--vsc-y); width:var(--vsc-w); height:var(--vsc-h);
