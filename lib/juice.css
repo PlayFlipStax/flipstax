@@ -262,3 +262,9 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .jc-flash{ pointer-events:none; opacity:0; }
 .jc-trace{ pointer-events:none; }
 .jc-trace-dot{ position:absolute; left:0; top:0; border-radius:50%; box-shadow:0 0 10px 3px rgba(93,255,138,0.85); }
+
+/* ---- A+ tier 1 item 0: Word Warp's clue line - large and bright (it was a 14 px line in a pale tint) ---- */
+:root:root.mode-daily .solve-overlay .solve-hint-line{ min-height:0; margin:0 auto 14px; padding:8px 18px; border-radius:18px; font:900 clamp(22px, 6.6vw, 28px)/1.1 var(--f-display); letter-spacing:1px; text-transform:uppercase; color:#3a1f00;
+  background:linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.12) 46%, rgba(255,255,255,0) 52%), linear-gradient(180deg, #fff3b0, #ffd23f 50%, #ffaa00); border:3px solid #fff3c4; text-shadow:none;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,0.8), 0 5px 0 #7a4a00, 0 0 18px rgba(255,210,63,0.6); }
+:root:root.mode-daily .solve-overlay .solve-hint-line:empty{ display:none; }
