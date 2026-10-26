@@ -11232,29 +11232,43 @@
   // wedges are the round's ×2 (the only other outcome in the table). KEY −1 is on the wheel but never landed on: no such outcome
   // exists in the rules, and adding it would change the odds.
   const LW_WEDGES = [
-    { c:'#8a3ffc', ink:'#ffffff', icon:'⭐', t:'+20', kind:'+20' }, { c:'#ff2fb4', ink:'#ffffff', icon:'🔑', t:'KEY +1', kind:'KEY' },
-    { c:'#19c8ff', ink:'#05243a', icon:'🟢', t:'GOOP', kind:'GOOP' }, { c:'#2fd96b', ink:'#052e17', icon:'❓', t:'MYSTERY', kind:'x2' },
-    { c:'#ffd62e', ink:'#3a2a00', icon:'⭐', t:'+50', kind:'+50' }, { c:'#ff8a1f', ink:'#3a1500', icon:'🔑', t:'KEY −1', kind:null },
-    { c:'#ff3b3b', ink:'#ffffff', icon:'🟢', t:'GOOP', kind:'GOOP' }, { c:'#2f6bff', ink:'#ffffff', icon:'❓', t:'MYSTERY', kind:'x2' },
+    { c:'#a45cff', d:'#5b1fd0', icon:'⭐', t:'+20', kind:'+20' }, { c:'#ff4fc8', d:'#c2158f', icon:'🔑', t:'KEY +1', kind:'KEY' },
+    { c:'#2fd9ff', d:'#0a8fc4', icon:'🟢', t:'GOOP', kind:'GOOP' }, { c:'#4be683', d:'#12a04a', icon:'❓', t:'MYSTERY', kind:'x2' },
+    { c:'#ffe640', d:'#f0a800', icon:'⭐', t:'+50', kind:'+50' }, { c:'#ffa032', d:'#e0620a', icon:'🔑', t:'KEY −1', kind:null },
+    { c:'#ff5656', d:'#c4152a', icon:'🟢', t:'GOOP', kind:'GOOP' }, { c:'#5a86ff', d:'#1f3fd0', icon:'❓', t:'MYSTERY', kind:'x2' },
   ];
+  // Wedges: a soft flat-to-light gradient from the hub to the rim, thin white dividers. Every label is white with a dark outline, runs
+  // outward from the hub and stays inside its wedge; the icon sits at the rim end, MYSTERY is set smaller.
   function luckyWheelSvg(){
     const R = 178, cx = 200, cy = 200, W = 360 / LW_WEDGES.length, pt = (a, r)=> (cx + Math.sin(a * Math.PI / 180) * r).toFixed(2) + ' ' + (cy - Math.cos(a * Math.PI / 180) * r).toFixed(2);
-    let s = '<svg class="lw-svg" viewBox="0 0 400 400" aria-hidden="true">';
+    let s = '<svg class="lw-svg" viewBox="0 0 400 400" aria-hidden="true"><defs>';
+    LW_WEDGES.forEach((w, i)=>{ const e = pt(i * W, R).split(' '); s += '<linearGradient id="lwg' + i + '" gradientUnits="userSpaceOnUse" x1="' + cx + '" y1="' + cy + '" x2="' + e[0] + '" y2="' + e[1] + '"><stop offset="0.18" stop-color="' + w.d + '"/><stop offset="1" stop-color="' + w.c + '"/></linearGradient>'; });
+    s += '</defs>';
+    s += '<circle cx="200" cy="200" r="178" fill="#8a52f5"/>';
     LW_WEDGES.forEach((w, i)=>{
-      const a0 = i * W - W / 2, a1 = i * W + W / 2;
-      s += '<path d="M' + cx + ' ' + cy + ' L' + pt(a0, R) + ' A' + R + ' ' + R + ' 0 0 1 ' + pt(a1, R) + ' Z" fill="' + w.c + '" stroke="#ffffff" stroke-width="3"/>';
-      s += '<path d="M' + cx + ' ' + cy + ' L' + pt(a0, R) + ' A' + R + ' ' + R + ' 0 0 1 ' + pt(a1, R) + ' Z" fill="url(#lwShine)"/>';
-      // the label runs out along the wedge's radius (from the hub to the rim), the icon sits near the rim
-      s += '<g transform="rotate(' + (i * W) + ' ' + cx + ' ' + cy + ')"><text x="' + cx + '" y="' + (cy - 158) + '" font-size="26" text-anchor="middle" dominant-baseline="central">' + w.icon + '</text>' +
-        '<text transform="translate(' + cx + ' ' + cy + ') rotate(-90)" x="66" y="0" dominant-baseline="central" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="23" letter-spacing="1" fill="' + w.ink + '" stroke="' + (w.ink === '#ffffff' ? 'rgba(40,0,70,0.55)' : 'rgba(255,255,255,0.55)') + '" stroke-width="3" paint-order="stroke">' + w.t + '</text></g>';
+      const a0 = i * W - W / 2, a1 = i * W + W / 2, d = 'M' + cx + ' ' + cy + ' L' + pt(a0, R) + ' A' + R + ' ' + R + ' 0 0 1 ' + pt(a1, R) + ' Z', small = w.t.length > 6;
+      s += '<g class="lw-wedge"><path d="' + d + '" fill="url(#lwg' + i + ')" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/><path class="lw-hl" d="' + d + '" fill="#ffffff" opacity="0"/>' +
+        '<g transform="rotate(' + (i * W) + ' ' + cx + ' ' + cy + ')"><text x="' + cx + '" y="' + (cy - 154) + '" font-size="24" text-anchor="middle" dominant-baseline="central">' + w.icon + '</text>' +
+        '<text transform="translate(' + cx + ' ' + cy + ') rotate(-90)" x="78" y="0" dominant-baseline="central" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="' + (small ? 15.5 : 20) + '" letter-spacing="0.5" fill="#ffffff" stroke="#2a0a4a" stroke-width="4.5" paint-order="stroke" stroke-linejoin="round">' + w.t + '</text></g></g>';
     });
-    return s + '<defs><radialGradient id="lwShine" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="0.7" stop-color="#fff" stop-opacity="0.04"/><stop offset="1" stop-color="#fff" stop-opacity="0.32"/></radialGradient></defs></svg>';
+    return s + '</svg>';
   }
   function luckyRimSvg(){
     const N = 24, cx = 200, cy = 200, r = 187; let a = '', b = '';
-    for (let k = 0; k < N; k++){ const ang = k * 360 / N, c = '<circle cx="' + (cx + Math.sin(ang * Math.PI / 180) * r).toFixed(1) + '" cy="' + (cy - Math.cos(ang * Math.PI / 180) * r).toFixed(1) + '" r="7"/>'; if (k % 2) b += c; else a += c; }
-    return '<svg class="lw-rimsvg" viewBox="0 0 400 400" aria-hidden="true"><circle cx="200" cy="200" r="187" fill="none" stroke="#ffd23f" stroke-width="18"/><circle cx="200" cy="200" r="187" fill="none" stroke="#b4125f" stroke-width="2" opacity="0.55"/>' +
-      '<g class="lw-la" fill="#fffbe6">' + a + '</g><g class="lw-lb" fill="#ff7ac8">' + b + '</g></svg>';
+    for (let k = 0; k < N; k++){ const ang = k * 360 / N, c = '<circle style="--d:' + (-(k / N) * 2).toFixed(2) + 's" cx="' + (cx + Math.sin(ang * Math.PI / 180) * r).toFixed(1) + '" cy="' + (cy - Math.cos(ang * Math.PI / 180) * r).toFixed(1) + '" r="7"/>'; if (k % 2) b += c; else a += c; }
+    return '<svg class="lw-rimsvg" viewBox="0 0 400 400" aria-hidden="true"><defs><linearGradient id="lwRim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0a0"/><stop offset="0.5" stop-color="#ffd23f"/><stop offset="1" stop-color="#e09000"/></linearGradient></defs>' +
+      '<circle cx="200" cy="200" r="187" fill="none" stroke="url(#lwRim)" stroke-width="18"/><circle cx="200" cy="200" r="178.5" fill="none" stroke="#b4125f" stroke-width="2" opacity="0.5"/>' +
+      '<g class="lw-la" fill="#fff6c2">' + a + '</g><g class="lw-lb" fill="#ffc83a">' + b + '</g></svg>';
+  }
+  // the stand's foot: a soft shadow on the stage floor, a gold-trimmed disc with a chrome top and a ring of small floor lights
+  function luckyFloorSvg(){
+    return '<svg class="lw-foot" viewBox="0 0 400 110" aria-hidden="true"><defs><linearGradient id="lwChr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="0.45" stop-color="#c9d0f0"/><stop offset="1" stop-color="#8f97cc"/></linearGradient>' +
+      '<linearGradient id="lwGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0a0"/><stop offset="1" stop-color="#e09000"/></linearGradient></defs>' +
+      '<ellipse cx="200" cy="82" rx="178" ry="22" fill="rgba(40,0,80,0.32)"/><ellipse cx="200" cy="62" rx="158" ry="30" fill="#6a35e8" stroke="url(#lwGold)" stroke-width="6"/>' +
+      '<ellipse cx="200" cy="56" rx="140" ry="24" fill="url(#lwChr)"/><ellipse cx="200" cy="62" rx="150" ry="27" fill="none" stroke="#fff6c2" stroke-width="5" stroke-linecap="round" stroke-dasharray="0 13"/></svg>';
+  }
+  function luckyStageHtml(){
+    return '<div class="lw-stage" aria-hidden="true"><i class="lw-wall"></i><i class="lw-floorplane"></i><i class="lw-cone a"></i><i class="lw-cone b"></i><i class="lw-pool"></i><i class="lw-curt l"></i><i class="lw-curt r"></i></div>';
   }
   function runLuckyLights(st, done){
     if (!luckyOv){ luckyOv = document.createElement('div'); luckyOv.className = 'lucky-overlay hidden'; luckyOv.id = 'luckyOverlay'; luckyOv.setAttribute('role', 'dialog'); luckyOv.setAttribute('aria-label', 'Lucky Lights'); document.body.appendChild(luckyOv); }
@@ -11264,10 +11278,10 @@
     const act3 = Math.round(runActPts[runActIdx] || 0), gen = ++luckyGen;
     let bank = 0, dbl = false, keys = 0, chips = 0, spins = 0, rot = 0, autoT = null, state = 'idle', raf = 0;
     const n = LUCKY_SQUARES.length;
-    luckyOv.innerHTML = '<i class="ll-spot l"></i><i class="ll-spot r"></i><div class="ll-inner">' +
+    luckyOv.innerHTML = luckyStageHtml() + '<div class="ll-inner">' +
       '<div class="ll-title"><div class="sign-bulbs" aria-hidden="true"></div><span>LUCKY LIGHTS</span></div><div class="ll-bank" aria-live="polite"></div>' +
-      '<div class="lw"><i class="lw-post" aria-hidden="true"></i><i class="lw-base" aria-hidden="true"></i><div class="lw-wheel"><div class="lw-rot">' + luckyWheelSvg() + '</div>' + luckyRimSvg() +
-      '<i class="lw-pointer" aria-hidden="true"></i><button type="button" class="lw-hub" aria-label="Spin the wheel"><b class="ll-hub-t">SPIN</b><span class="ll-hub-s"></span></button>' +
+      '<div class="lw"><i class="lw-post" aria-hidden="true"></i>' + luckyFloorSvg() + '<div class="lw-wheel"><div class="lw-rot">' + luckyWheelSvg() + '</div>' + luckyRimSvg() +
+      '<i class="lw-pointer" aria-hidden="true"><i class="lp-out"></i><i class="lp-fill"></i></i><button type="button" class="lw-hub pulse" aria-label="Spin the wheel"><b class="ll-hub-t">SPIN</b><span class="ll-hub-s"></span></button>' +
       '<div class="lw-pop" aria-live="polite"><b></b><small></small></div></div></div>' +
       '<div class="ll-buttons"><button type="button" class="ll-btn bank hidden">BANK</button><button type="button" class="ll-btn again hidden">SPIN AGAIN</button></div>' +
       '<div class="ll-note"></div></div><div class="ll-slime" aria-hidden="true">' + GOOP_SVG + '</div>';
@@ -11294,8 +11308,11 @@
       }
       setTimeout(()=>{ if (gen !== luckyGen) return; luckyOv.classList.add('hidden'); luckyOv.innerHTML = ''; noteOverlayClosed(); updatePauseBtnVisibility(); done(); }, banked ? 1700 : 2300);
     };
-    const land = (k)=>{
-      spins++; state = 'landed';
+    const wedgeEls = ()=> [...luckyOv.querySelectorAll('.lw-wedge')];
+    const markWin = (wi)=>{ luckyOv.querySelector('.lw-wheel').classList.add('landed'); wedgeEls().forEach((g, i)=>{ g.classList.toggle('win', i === wi); g.classList.toggle('dim', i !== wi); }); };
+    const clearWin = ()=>{ luckyOv.querySelector('.lw-wheel').classList.remove('landed'); wedgeEls().forEach(g=> g.classList.remove('win', 'dim')); };
+    const land = (k, wi)=>{
+      spins++; state = 'landed'; markWin(wi);
       if (k === 'GOOP'){
         runGoopLost += bank + (dbl ? act3 : 0);   // what the GOOP took (for the results' "Gooped" line)
         bank = 0; dbl = false; keys = 0; chips = 0; renderBank();
@@ -11324,7 +11341,7 @@
     let lastTick = 0;
     const spin = ()=>{
       if (state !== 'idle' && state !== 'landed') return;
-      clearTimeout(autoT); popHide(); show([]); note.textContent = '';
+      clearTimeout(autoT); popHide(); show([]); note.textContent = ''; clearWin(); hub.classList.remove('pulse');
       let k = LUCKY_SQUARES[Math.floor(Math.random() * n)];
       if ((REPLAY || DEBUG_FAST) && window.__forceLucky && LUCKY_SQUARES.indexOf(window.__forceLucky) >= 0) k = window.__forceLucky;   // (the TEST menu's GOOP jump)
       const ws = LW_WEDGES.map((w, i)=> w.kind === k ? i : -1).filter(i=> i >= 0), wi = ws.length ? ws[Math.floor(Math.random() * ws.length)] : 0;
@@ -11332,7 +11349,8 @@
       const from = rot, to = from + 1440 + ((((360 - wi * W - jitter) - from) % 360) + 360) % 360;
       state = 'spinning'; hubT.textContent = '...'; hubS.textContent = ''; renderBank();
       const still = prefersReducedMotion() || isLite();
-      if (still){ rot = to; setRot(to); setTimeout(()=>{ if (!gone()) land(k); }, 350); return; }
+      if (still){ rot = to; setRot(to); setTimeout(()=>{ if (!gone()) land(k, wi); }, 350); return; }
+      luckyOv.querySelector('.lw-wheel').classList.add('spinning');
       const dur = 3200 + Math.random() * 600, t0 = performance.now(); let lastIdx = Math.floor((from + 22.5) / W), prevA = from, prevT = t0;
       const frame = (now)=>{
         if (gone()) return;
@@ -11347,7 +11365,7 @@
         }
         prevA = a; prevT = now;
         if (t < 1){ raf = requestAnimationFrame(frame); return; }
-        rot = to; setRot(to); hubT.textContent = 'SPIN'; setTimeout(()=>{ if (!gone()) land(k); }, 200);
+        rot = to; setRot(to); hubT.textContent = 'SPIN'; luckyOv.querySelector('.lw-wheel').classList.remove('spinning'); setTimeout(()=>{ if (!gone()) land(k, wi); }, 200);
       };
       raf = requestAnimationFrame(frame);
     };

@@ -473,3 +473,53 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .sw-bar{ position:absolute; top:-12%; bottom:-12%; left:0; width:44%; transform:translateX(-130%) skewX(-18deg); background:linear-gradient(90deg, rgba(93,255,138,0) 0%, rgba(93,255,138,0.7) 34%, #f0fff4 55%, rgba(93,255,138,0.55) 72%, rgba(93,255,138,0) 100%); }
 .jc-bolts{ position:fixed; inset:0; width:100%; height:100%; z-index:86; pointer-events:none; }
 .ne-spin-wrap{ z-index:5; }
+
+/* ---- A+ job 2: Lucky Lights wheel polish - a lit stage with curtains, a back wall, spotlights and a perspective floor; a bold
+   gold-and-red pointer; two-phase gold rim lights that chase during a spin; a bigger pulsing SPIN hub; a chrome stand ---- */
+:root:root .lucky-overlay{ background:#4a1fb8 !important; }
+.lw-stage{ position:absolute; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+.lw-wall{ position:absolute; inset:0; background:linear-gradient(180deg, #8a4bff 0%, #6a33e0 50%, #4a1fb8 74%); }
+.lw-floorplane{ position:absolute; left:-30%; right:-30%; bottom:-8%; height:44%; transform-origin:50% 0; transform:perspective(520px) rotateX(62deg);
+  background:repeating-linear-gradient(90deg, rgba(255,255,255,0.34) 0 3px, rgba(255,255,255,0) 3px 60px), repeating-linear-gradient(0deg, rgba(255,255,255,0.26) 0 3px, rgba(255,255,255,0) 3px 60px), linear-gradient(180deg, #ffc468, #ff8a3d 55%, #ff5a8a); }
+.lw-cone{ position:absolute; top:-6%; width:56%; height:92%; transform-origin:50% 0; clip-path:polygon(46% 0, 54% 0, 100% 100%, 0 100%); background:linear-gradient(180deg, rgba(255,255,255,0.5), rgba(255,255,255,0.08) 85%, rgba(255,255,255,0)); will-change:transform; }
+.lw-cone.a{ left:-4%; animation:lwSweepA 9s ease-in-out infinite alternate; }
+.lw-cone.b{ right:-4%; animation:lwSweepB 11s ease-in-out infinite alternate; }
+@keyframes lwSweepA{ from{ transform:rotate(-16deg); } to{ transform:rotate(14deg); } }
+@keyframes lwSweepB{ from{ transform:rotate(15deg); } to{ transform:rotate(-12deg); } }
+.lw-pool{ position:absolute; left:50%; top:26%; width:120%; aspect-ratio:1; transform:translate(-50%, 0); background:radial-gradient(circle closest-side, rgba(255,255,255,0.5), rgba(255,255,255,0.14) 62%, rgba(255,255,255,0)); }
+.lw-curt{ position:absolute; top:0; bottom:24%; width:15%; background:repeating-linear-gradient(90deg, #b8122f 0 12px, #7c0a1f 12px 20px, #cf2040 20px 32px, #8f0f27 32px 42px); box-shadow:inset 0 -26px 30px -18px rgba(60,0,15,0.6); }
+.lw-curt::before{ content:''; position:absolute; left:0; right:0; top:0; height:5%; background:linear-gradient(180deg, #ffe27a, #e09000); }
+.lw-curt.l{ left:0; border-bottom-right-radius:60% 9%; } .lw-curt.r{ right:0; border-bottom-left-radius:60% 9%; }
+:root.lite .lw-cone, :root.lite .lw-la, :root.lite .lw-lb{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .lw-cone{ animation:none; } }
+.lw-post{ background:linear-gradient(90deg, #6b73b0 0%, #c9d0f0 18%, #ffffff 34%, #aeb6e0 52%, #7d86c2 80%, #5a63a0 100%); box-shadow:0 0 0 2px #4a2bb0; border-radius:10px; z-index:0; }
+.lw-foot{ position:absolute; left:50%; top:106%; width:84%; margin-left:-42%; z-index:0; display:block; }
+.lw-base{ display:none; }
+.lw{ margin-bottom:calc(var(--lw) * 0.34); }
+/* the pointer: a solid gold body with a red tip, outlined, overlapping the top of the rim (14% of the wheel's width) */
+.lw-pointer{ position:absolute; left:50%; top:-7%; width:14%; aspect-ratio:0.86; margin-left:-7%; z-index:4; transform-origin:50% 14%; clip-path:none; background:none; }
+.lp-out, .lp-fill{ position:absolute; display:block; }
+.lp-out{ inset:0; background:#6a0a22; clip-path:polygon(50% 100%, 0 14%, 14% 0, 86% 0, 100% 14%); }
+.lp-fill{ inset:7% 9% 11% 9%; background:linear-gradient(180deg, #fff3a0 0%, #ffd23f 42%, #ff3b3b 43%, #c8102e 100%); clip-path:polygon(50% 100%, 0 16%, 14% 0, 86% 0, 100% 16%); }
+/* the hub: bigger, a proper button, a gentle pulse until tapped */
+.lw-hub{ width:32%; }
+.lw-hub.pulse{ animation:lwHub 1.6s ease-in-out infinite alternate; }
+@keyframes lwHub{ from{ transform:translate(-50%, -50%) scale(1); } to{ transform:translate(-50%, -50%) scale(1.07); } }
+:root.lite .lw-hub.pulse{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .lw-hub.pulse{ animation:none; } }
+.lw-hub .ll-hub-t{ font-size:clamp(28px, 8.6vw, 38px); letter-spacing:1px; }
+/* rim lights: two alternating phases at rest, a chase round the rim during a spin (each bulb fades once in 2 s) */
+.lw-wheel.spinning .lw-la, .lw-wheel.spinning .lw-lb{ animation:none; opacity:1; }
+.lw-wheel.spinning .lw-rimsvg circle{ animation:rimChase 2s linear infinite; animation-delay:var(--d); }
+@keyframes rimChase{ 0%, 100%{ opacity:1; } 50%{ opacity:0.2; } }
+:root.lite .lw-wheel.spinning .lw-rimsvg circle{ animation:none; }
+/* landing: the winning wedge pulses bright, the others dim */
+.lw-wedge{ transition:opacity 0.3s ease; }
+.lw-wedge.dim{ opacity:0.4; }
+.lw-wedge.win .lw-hl{ animation:lwHl 1s ease-in-out infinite alternate; }
+@keyframes lwHl{ from{ opacity:0.05; } to{ opacity:0.5; } }
+:root.lite .lw-wedge.win .lw-hl{ animation:none; opacity:0.3; }
+@media (prefers-reduced-motion: reduce){ .lw-wedge.win .lw-hl{ animation:none; opacity:0.3; } }
+.lucky-overlay .ll-note{ font-size:17px; }
+.lw-post{ height:64%; }
+.lw{ --lw:min(90vw, 440px, calc(100dvh - 390px)); margin-top:14px; }
