@@ -6831,6 +6831,26 @@
     revealLose: ()=>{ playTone(320,0,0.15,'sine',0.07); },
     combo: ()=>{ playTone(784,0,0.06,'triangle',0.09); playTone(988,0.05,0.08,'triangle',0.09); haptic(12); },
     levelUp: ()=>{ playTone(523,0,0.14,'triangle',0.12); playTone(659,0.11,0.14,'triangle',0.12); playTone(784,0.22,0.3,'triangle',0.14); haptic([15,40,15]); },
+    // A+ item 3: the trivia / riddle answer sounds (Web Audio, muted with the sound setting): a short bell chime for a right
+    // answer, a flat game-show buzzer for a miss.
+    chime: ()=> withSfxCtx((ctx, t)=>{
+      [[1046.5, 0, 0.5], [1568, 0.1, 0.55], [2093, 0.2, 0.6]].forEach(([f, s, d])=>{
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = 'sine'; o.frequency.setValueAtTime(f, t + s);
+        g.gain.setValueAtTime(0.0001, t + s); g.gain.linearRampToValueAtTime(0.11, t + s + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + s + d);
+        o.connect(g).connect(ctx.destination); o.start(t + s); o.stop(t + s + d + 0.03);
+      });
+      haptic([10, 30, 10]);
+    }),
+    buzzer: ()=> withSfxCtx((ctx, t)=>{
+      [110, 116.5, 220].forEach((f, k)=>{
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = k === 2 ? 'square' : 'sawtooth'; o.frequency.setValueAtTime(f, t);
+        g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(k === 2 ? 0.025 : 0.06, t + 0.02); g.gain.setValueAtTime(k === 2 ? 0.025 : 0.06, t + 0.5); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.62);
+        o.connect(g).connect(ctx.destination); o.start(t); o.stop(t + 0.66);
+      });
+      haptic([30, 40, 30]);
+    }),
     correct: ()=>{ playTone(660,0,0.09,'sine',0.11); playTone(990,0.09,0.2,'sine',0.11); haptic([10,30,10]); },
     wrong: ()=>{ playTone(220,0,0.22,'sawtooth',0.06); },
     powerUp: ()=>{ playTone(440,0,0.07,'square',0.09); playTone(660,0.06,0.09,'square',0.09); playTone(880,0.13,0.18,'square',0.1); haptic([10,20,10]); },
@@ -11892,7 +11912,7 @@
   // cutscenes, title cards, rewards and results.
   function updateSunburst(){
     if (!window.Sunburst) return;
-    const sb = runActive && document.documentElement.classList.contains('mode-daily') ? ({ vs:'vs', quiz:'beam', wordwarp:'warp' })[Show.scene] || null : null;
+    const sb = runActive && document.documentElement.classList.contains('mode-daily') ? (Show.scene === 'game' && Show.info === 'riddle' ? 'riddle' : ({ vs:'vs', quiz:'beam', wordwarp:'warp' })[Show.scene] || null) : null;
     Sunburst.set(sb && sb !== 'warp' ? sb : null);
     Sunburst.set(sb === 'warp' ? 'warp' : null, els.solveOverlay);
     document.documentElement.classList.toggle('sb-on', !!sb);
@@ -12205,15 +12225,21 @@
     }).join('');
   }
   // The answer bars flip open one by one, a clack each; done() starts the clock.
-  const BEAM_FLIP_GAP = 170, BEAM_FLIP_MS = 150 + 3 * BEAM_FLIP_GAP + 300;
+  // (A+ item 3: the question card slides in first, then the four answers come in 60 ms apart.)
+  const BEAM_FLIP_START = 380, BEAM_FLIP_GAP = 60, BEAM_FLIP_MS = BEAM_FLIP_START + 3 * BEAM_FLIP_GAP + 280;
   function beamFlipIn(done){
     const tiles = els.eventTiles;
     tiles.forEach(t=> t.classList.remove('fw', 'fin'));
+    els.eventPrompt.classList.remove('qa-slide');
     if (FX.reduced()){ done(); return; }
     tiles.forEach(t=> t.classList.add('fw'));
-    tiles.forEach((t, k)=> setTimeout(()=>{ t.classList.remove('fw'); t.classList.add('fin'); sfx.clack(); }, dt(150 + k * BEAM_FLIP_GAP)));
-    setTimeout(()=>{ tiles.forEach(t=> t.classList.remove('fin')); done(); }, dt(BEAM_FLIP_MS));
+    els.eventPrompt.classList.add('qa-slide');
+    tiles.forEach((t, k)=> setTimeout(()=>{ t.classList.remove('fw'); t.classList.add('fin'); if (!k) sfx.clack(); }, dt(BEAM_FLIP_START + k * BEAM_FLIP_GAP)));
+    setTimeout(()=>{ tiles.forEach(t=> t.classList.remove('fin')); els.eventPrompt.classList.remove('qa-slide'); done(); }, dt(BEAM_FLIP_MS));
   }
+  // Daily's Brain Beam and Riddle Round: the A+ look (sunburst, marquee card, candy answers, light-strip clock, the
+  // Family Feud flip, chime / buzzer).
+  function aplusQuiz(){ const ov = els.eventOverlay; return document.documentElement.classList.contains('mode-daily') && (ov.classList.contains('quiz-beam') || ov.classList.contains('quiz-riddle')); }
   function setBeamLook(on, question, riddle){
     els.eventOverlay.classList.toggle('quiz-beam', on && !riddle);
     els.eventOverlay.classList.toggle('quiz-riddle', on && !!riddle);   // D2: the riddle show's own look (split-flap answers)
@@ -12324,7 +12350,7 @@
     runRoundResults.push(!!correct);
     progress.triviaN++; if (correct) progress.triviaCorrect++; saveProgress();
     if (correct){
-      sfx.correct();
+      if (!aplusQuiz()) sfx.correct();   // (A+: the chime is quizFxA's)
       runTriviaCorrect++;
       runTriviaStreak++;
       // The show repeats, so there can be more right answers than letters:
@@ -12360,7 +12386,7 @@
       // used to rise from the middle of the answer, straight through the UFO hovering there; it lands before the result closes).
       if (trayAt >= 0){ const t = els.eventTiles[runPendingQCorrectIdx], from = (t && t.querySelector('.tkey')) || t; setTimeout(()=> flyTrayMark(trayAt, from), FX.reduced() ? 0 : 400); }
     } else {
-      sfx.wrong();
+      if (!aplusQuiz()) sfx.wrong();   // (A+: the buzzer is quizFxA's)
       runTriviaStreak = 0;
       if (runQuizBeam && runTrayMarks.length < RUN_WORD_LENGTH) runTrayMarks.push('miss');   // the prize track: a red X
       if (runQuizBeam) runActLetter[runActIdx] = 'miss';
@@ -12418,14 +12444,14 @@
     els.eventTiles.forEach(t=> t.onclick = null);
     els.eventSubtitle.textContent = '';
     if (correct){
-      sfx.correct();
+      if (aplusQuiz()) sfx.chime(); else sfx.correct();
       const pos = letterOrderFor(runStartDate || todayStr())[runLetters.length], nextLetter = runWord.word[pos];
       runLetters.push(nextLetter); runLetterPos.push(pos);
       runSecondChanceOutcome = 'recovered';
       els.eventPrompt.textContent = '✅ Second chance! A letter recovered';
       celebrateTriviaCorrect();
     } else {
-      sfx.wrong();
+      if (aplusQuiz()) sfx.buzzer(); else sfx.wrong();
       runSecondChanceOutcome = 'missed';
       els.eventPrompt.textContent = '❌ Not this time — no letter recovered';
     }
@@ -16038,7 +16064,27 @@
   // frame glows round the screen, the UFO beams down on the right answer
   // and the host cheers; wrong = a red flash and a shake, the right answer
   // lights up green and the host winces. Transforms and opacity only.
+  // A+ item 3: the chosen answer flips over (rotateX, 0.2 s out + 0.2 s in, like Family Feud) and shows its result. Right:
+  // it turns gold, a short chime and one gold flash. Wrong: it turns red with a buzzer, then a green light travels round
+  // the correct answer's border. Lite mode and reduced motion: no flip, the result just appears.
+  function quizFxA(correct, pickIdx, correctIdx){
+    const tiles = els.eventTiles, right = tiles[correctIdx], picked = tiles[pickIdx];
+    const still = FX.reduced() || document.documentElement.classList.contains('lite') || !Element.prototype.animate;
+    const mid = ()=>{
+      if (correct){ if (right) right.classList.add('is-right', 'gold'); sfx.chime(); }
+      else { if (picked) picked.classList.add('is-wrong'); sfx.buzzer(); }
+    };
+    const end = ()=>{
+      if (correct){ if (right && window.Juice) Juice.flash(right); hostMood('cheer'); hostSay(hostLine('right')); }
+      else { if (right){ right.classList.add('is-right'); if (window.Juice) Juice.trace(right, '#5dff8a', 1000); } hostMood('sad'); hostSay(hostLine(pickIdx == null ? 'slow' : 'wrong')); }
+    };
+    if (!picked || still){ mid(); end(); return; }
+    const f = (a, b, ms, ease)=> picked.animate([{ transform:'perspective(700px) rotateX(' + a + 'deg)' }, { transform:'perspective(700px) rotateX(' + b + 'deg)' }], { duration:ms, easing:ease, fill:'forwards' });
+    const a1 = f(0, -90, 200, 'ease-in');
+    a1.onfinish = ()=>{ mid(); const a2 = f(90, 0, 200, 'ease-out'); a1.cancel(); a2.onfinish = ()=>{ a2.cancel(); end(); }; };
+  }
   function quizFx(correct, pickIdx, correctIdx){
+    if (aplusQuiz()){ quizFxA(correct, pickIdx, correctIdx); return; }
     const tiles = els.eventTiles, right = tiles[correctIdx], picked = tiles[pickIdx];
     if (right) right.classList.add('is-right');
     if (correct){
@@ -16682,6 +16728,7 @@
   // answer. Restarts its CSS animations from scratch every call (forced
   // reflow) so back-to-back correct answers each get a fresh burst.
   function celebrateTriviaCorrect(){
+    if (aplusQuiz()) return;   // A+ item 3: a right answer is a chime and one gold flash - no shake, no confetti
     const el = els.triviaCelebrate;
     el.classList.add('hidden');
     void el.offsetWidth; // force a reflow so display:none->flex restarts the child CSS animations

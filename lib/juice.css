@@ -104,27 +104,6 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root.mode-daily #board .half.bottom .fill{ background:rgba(190,255,248,0.4); }
 :root.lite.mode-daily #board .half.win-side{ transform:none; }
 @media (prefers-reduced-motion: reduce){ :root:root.mode-daily #board .half.win-side, :root:root.mode-daily #board .half.tap-chosen{ transform:none; } }
-/* ---- 6. Brain Beam (Daily): chevron-ended answer pills (a light rim layer with a navy depth edge under a glossy
-   fill layer, both clip-path chevrons - static), the gold number coins inside the point, and a question box with a
-   pink rim and a cyan glow. The right answer turns gold with its check; a miss red. */
-:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile{ --chev:24px; isolation:isolate; padding:6px 58px 6px 78px; border:0; border-radius:999px; background:none !important; background-color:transparent !important; box-shadow:0 0 16px rgba(46,196,255,0.25); }
-:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile::before, :root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile::after{ content:''; display:block; position:absolute; z-index:-1; pointer-events:none; width:auto; height:auto; margin:0; border:0; border-radius:0; box-shadow:none;
-  clip-path:polygon(var(--chev) 0, calc(100% - var(--chev)) 0, 100% 50%, calc(100% - var(--chev)) 100%, var(--chev) 100%, 0 50%); }
-:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile::before{ inset:0 0 -6px 0; background:linear-gradient(180deg, #eef4ff 0%, #a4c2ff calc(100% - 10px), #0b1a5c calc(100% - 9px)); }
-:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile::after{ inset:3px; --chev:22px; background:linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 46%, rgba(0,0,0,0) 52%, rgba(0,0,40,0.32) 100%), #2453e0; }
-:root:root.mode-daily .event-overlay.stack.quiz-beam .tkey{ left:calc(var(--chev) - 2px); }
-:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile.is-right{ box-shadow:0 0 30px 8px rgba(255,210,63,0.7); }
-:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile.is-right::before{ background:linear-gradient(180deg, #fffbe6 0%, #ffe27a calc(100% - 10px), #7a4a00 calc(100% - 9px)); }
-:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile.is-right::after{ inset:3px; right:3px; top:3px; width:auto; height:auto; margin:0; border:0; border-radius:0; box-shadow:none;
-  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='white' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") right 37px center / 26px 26px no-repeat,
-    radial-gradient(circle closest-side, #8dff9c 0, #19a33d 80%, #fff 82%, #fff 97%, rgba(255,255,255,0) 100%) right 29px center / 42px 42px no-repeat,
-    linear-gradient(180deg, #fff3b0 0%, #ffd23f 42%, #e9a100 100%); }
-:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile.is-wrong{ box-shadow:0 0 18px rgba(255,60,90,0.45); }
-:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile.is-wrong::before{ background:linear-gradient(180deg, #ffd0d6 0%, #ff9aa8 calc(100% - 10px), #5a0414 calc(100% - 9px)); }
-:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile.is-wrong::after{ background:linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.06) 46%, rgba(0,0,0,0) 52%, rgba(40,0,10,0.3) 100%), #c0263f; }
-:root:root.mode-daily .event-overlay.stack.quiz-beam .event-prompt{ position:relative; box-shadow:0 0 0 3px #5a3d06, 0 0 0 6px var(--jc-pink), 0 0 18px rgba(255,210,63,0.45), inset 0 0 30px rgba(0,0,0,0.55); }
-:root:root.mode-daily .event-overlay.stack.quiz-beam .event-prompt::after{ content:''; display:block; position:absolute; inset:-10px; border-radius:30px; pointer-events:none;
-  box-shadow:0 0 26px 6px rgba(46,220,255,0.6), inset 0 0 0 2px rgba(125,249,255,0.55); opacity:0.85; }   /* (static: a breathing glow cost the screen its p95 at 4x CPU) */
 /* ---- 7. Word Warp (Daily): glossy letter tiles - a top shine band and a bevel on the rack tiles and the slots
    (background layers and inset shadows, static) - and the light ripple a guess that locks new letters sends across
    the word (Juice.ripple: a hop per slot and a soft band of light). The solve gets Juice.correct over the word. */
@@ -205,3 +184,81 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
   :root.mode-daily #board.deal-first :is(.half, .mq-ring), :root.mode-daily #board.deal-slide :is(.half, .mq-ring){ animation:vsFade 0.2s ease-out both; }
   :root.mode-daily #board.deal-first .divider{ animation:none; }
   :root.mode-daily #board.deal-first{ clip-path:none; } }
+
+/* ---- A+ item 3: the trivia (Brain Beam: electric blue and gold) and riddle (green) screens - a turning sunburst behind; the
+   question on a marquee-framed card that slides in; the four answers staggering in 60 ms apart as chunky candy buttons;
+   the clock a chunky glowing light strip; no UFO. The chosen answer flips (rotateX, 0.4 s) and shows red or gold; a miss
+   sends a green light round the right answer's border. Transform and opacity only; lite and reduced motion: still
+   bulbs, fades, no travelling light. ---- */
+.sunburst[data-sb="beam"]{ --sb-bg:#051a74; --sb-a:#1d55e8; --sb-b:#0f36b8; --sb-glow:rgba(255,210,63,0.34); }
+.sunburst[data-sb="beam"] .sb-rays{ animation-duration:60s; }
+.sunburst[data-sb="riddle"]{ --sb-bg:#04200f; --sb-a:#12803a; --sb-b:#0a5426; --sb-glow:rgba(190,255,110,0.3); }
+.sunburst[data-sb="riddle"] .sb-rays{ animation-duration:60s; }
+:root.mode-daily.event-open .event-ufo, :root.mode-daily.event-open .daily-ufo{ display:none !important; }
+:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-ufo{ display:none !important; }
+
+/* the question card: a ring of bulbs round a bright panel */
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-prompt{ border:4px solid var(--jc-gold); border-radius:24px; color:#fff; text-transform:uppercase; padding:20px 20px;
+  box-shadow:0 0 0 3px #5a3d06, 0 7px 0 #5a3d06, 0 0 22px rgba(255,210,63,0.5), inset 0 0 26px rgba(0,0,20,0.45); }
+:root:root.mode-daily .event-overlay.stack.quiz-beam .event-prompt{ background:radial-gradient(circle, rgba(255,255,255,0.1) 1.2px, rgba(0,0,0,0) 1.9px) 0 0 / 7px 7px, linear-gradient(180deg, #2f7bff 0%, #1745d6 55%, #0c2896 100%); }
+:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-prompt{ border-color:#d6ff7a; background:radial-gradient(circle, rgba(255,255,255,0.07) 1.2px, rgba(0,0,0,0) 1.9px) 0 0 / 7px 7px, linear-gradient(180deg, #1f8a3b 0%, #0f5f26 55%, #08401a 100%); }
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-prompt .kw{ color:#ffe066; text-shadow:0 0 10px rgba(255,210,63,0.6); }
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-prompt::before,
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-prompt::after{ content:''; display:block; position:absolute; inset:5px; height:auto; pointer-events:none; --bulb:#ffd23f; --bulb-hi:#fffbe6;
+  background:
+    radial-gradient(circle closest-side, var(--bulb-hi) 0 34%, var(--bulb) 50%, rgba(255,210,63,0.3) 74%, rgba(255,210,63,0) 100%) 50% 0 / 22px 12px repeat-x,
+    radial-gradient(circle closest-side, var(--bulb-hi) 0 34%, var(--bulb) 50%, rgba(255,210,63,0.3) 74%, rgba(255,210,63,0) 100%) 50% 100% / 22px 12px repeat-x,
+    radial-gradient(circle closest-side, var(--bulb-hi) 0 34%, var(--bulb) 50%, rgba(255,210,63,0.3) 74%, rgba(255,210,63,0) 100%) 0 50% / 12px 22px repeat-y,
+    radial-gradient(circle closest-side, var(--bulb-hi) 0 34%, var(--bulb) 50%, rgba(255,210,63,0.3) 74%, rgba(255,210,63,0) 100%) 100% 50% / 12px 22px repeat-y;
+  opacity:0.95; }   /* (static: the question card's bulbs hold still - two phases, one gold and one pink, interleaved) */
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-prompt::after{ --bulb:#ff7ac8; --bulb-hi:#fff0fa; opacity:0.6;
+  background-position:calc(50% + 11px) 0, calc(50% + 11px) 100%, 0 calc(50% + 11px), 100% calc(50% + 11px); }
+:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-prompt::before{ --bulb:#d6ff7a; }
+:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-prompt::after{ --bulb:#ffd23f; --bulb-hi:#fffbe6; }
+
+/* the card slides in */
+:root.mode-daily .event-overlay.stack .event-prompt.qa-slide{ animation:qaCardIn 0.4s cubic-bezier(.2,1.1,.4,1) both; }
+@keyframes qaCardIn{ from{ transform:translateX(-70%) scale(0.96); opacity:0; } to{ transform:none; opacity:1; } }
+
+/* the answers: chunky candy buttons, large text, staggering in */
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-tile{ --c1:#ff6fb5; --c2:#d81b78; --c3:#8e0f4c; isolation:isolate; position:relative; justify-content:center; text-align:center; padding:6px 52px 6px 70px; border:3px solid rgba(255,255,255,0.92); border-radius:24px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.12) 46%, rgba(255,255,255,0) 52%), linear-gradient(180deg, var(--c1), var(--c2) 60%, var(--c3)) !important;
+  color:#fff; text-transform:uppercase; font-size:clamp(22px, 6.8vw, 30px); line-height:1.05; text-shadow:0 2px 0 rgba(0,0,0,0.38);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,0.7), inset 0 -5px 0 rgba(0,0,0,0.2), 0 7px 0 var(--c3), 0 10px 14px rgba(0,0,30,0.4); }
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-tile::before{ content:none; display:none; }
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-tile::after{ content:none; display:none; }
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-tile:nth-child(2){ --c1:#ffa23a; --c2:#d4570a; --c3:#8a3100; }
+:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile:nth-child(3){ --c1:#4ee26f; --c2:#17913a; --c3:#0b5c22; }
+:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:nth-child(3){ --c1:#22b9da; --c2:#087a9a; --c3:#04485c; }
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-tile:nth-child(4){ --c1:#a77bff; --c2:#6a32e0; --c3:#3a1494; }
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .tkey{ position:absolute; left:12px; top:50%; width:46px; height:46px; margin-top:-23px; color:#4a2600; font-size:26px; text-shadow:none; border:3px solid #fff1b0;
+  background:radial-gradient(circle at 35% 30%, #fff6c8, #ffd23f 55%, #d99100); box-shadow:0 0 0 2px #7a4a00, 0 3px 6px rgba(0,0,0,0.4); }
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .ttxt{ position:relative; z-index:1; }
+/* the right answer: gold (when it was picked) or just ringed in green (when it is shown after a miss), with a check */
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-tile.is-right{ animation:none; color:#fff; text-shadow:0 2px 0 rgba(0,0,0,0.38); box-shadow:inset 0 2px 0 rgba(255,255,255,0.7), inset 0 -5px 0 rgba(0,0,0,0.2), 0 7px 0 var(--c3), 0 0 0 5px #5dff8a, 0 0 18px 6px rgba(93,255,138,0.7); }
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-tile.is-right.gold{ color:#3a1f00; text-shadow:none; border-color:#fff3c4;
+  background:linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.12) 46%, rgba(255,255,255,0) 52%), linear-gradient(180deg, #fff3b0, #ffd23f 48%, #e9a100) !important;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,0.8), inset 0 -5px 0 rgba(122,74,0,0.3), 0 7px 0 #7a4a00, 0 0 24px 6px rgba(255,210,63,0.65); }
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-tile.is-right::after{ content:''; display:block; position:absolute; right:12px; top:50%; width:40px; height:40px; margin-top:-20px; border-radius:50%; border:3px solid #fff; z-index:2; box-shadow:0 2px 6px rgba(0,0,0,0.4);
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5' fill='none' stroke='white' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 62% no-repeat, radial-gradient(circle at 35% 30%, #8dff9c, #19a33d); }
+/* a wrong pick: the bar turns red */
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-tile.is-wrong{ animation:none; opacity:1; border-color:#ffb3bd; color:#fff;
+  background:linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.08) 46%, rgba(255,255,255,0) 52%), linear-gradient(180deg, #ff6b7e, #d6203d 60%, #8a0c22) !important;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,0.6), inset 0 -5px 0 rgba(0,0,0,0.25), 0 7px 0 #5a0414, 0 0 16px rgba(255,60,90,0.6); }
+/* the entrance: hidden, then in over 0.26 s (the script stages them 60 ms apart) */
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-tile.fw{ opacity:0; transform:translateY(26px) scale(0.92); pointer-events:none; }
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-tile.fin{ animation:qaTileIn 0.26s cubic-bezier(.3,1.5,.5,1) both; }
+@keyframes qaTileIn{ from{ opacity:0; transform:translateY(26px) scale(0.92); } to{ opacity:1; transform:none; } }
+:root.lite.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-tile.fin, :root.lite.mode-daily .event-overlay.stack .event-prompt.qa-slide{ animation:vsFade 0.2s ease-out both; }
+@media (prefers-reduced-motion: reduce){ :root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-tile.fin, :root.mode-daily .event-overlay.stack .event-prompt.qa-slide{ animation:vsFade 0.2s ease-out both; } }
+
+/* the clock: a chunky strip of lamps - the lit bar shrinks (transform), a fixed grid of dark gaps cuts it into bulbs */
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-timerbar{ position:relative; height:20px; margin:0 0 14px; border-radius:11px; background:#10061f; border:3px solid #fff3c4; box-shadow:0 0 0 2px #5a3d06, 0 0 18px rgba(255,210,63,0.6); }
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-timerbar-fill{ background:linear-gradient(180deg, #fff9d2, #ffd23f 45%, #ff9a00); box-shadow:none; }
+:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-timerbar-fill{ background:linear-gradient(180deg, #f4ffd2, #b6ff5a 45%, #43c21c); }
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-timerbar::after{ content:''; position:absolute; inset:0; pointer-events:none;
+  background:repeating-linear-gradient(90deg, rgba(16,6,31,0) 0 16px, #10061f 16px 20px), linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0) 50%); }
+/* the answer feedback layers (lib/juice.js flash / trace) */
+.jc-flash{ pointer-events:none; opacity:0; }
+.jc-trace{ pointer-events:none; }
+.jc-trace-dot{ position:absolute; left:0; top:0; border-radius:50%; box-shadow:0 0 10px 3px rgba(93,255,138,0.85); }
