@@ -858,3 +858,29 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 #mpCaption.on{ opacity:1; transition:opacity 0.3s ease 0.7s; }
 :root.lite #mpCaption.on, #mpCaption.on:where(.rm){ transition-delay:0.25s; }
 @media (prefers-reduced-motion: reduce){ #mpCaption.on{ transition-delay:0.25s; } }
+
+/* ---- A+ follow-up: Zap Words honeycomb. Flat-top hexagons in a true honeycomb, 6 x 6, the odd columns half a tile lower, edge to edge with a
+   thin line between; the board fills the width. Tiles are placed in % by the game (left/top/width/height). While drawing, the line and the
+   selected tiles use the word's colour (lock-in ring + pop); a valid word's tiles keep a glowing outline (--kc) in that colour to the end of
+   the round. Transform and opacity only in motion; the glows are static. ---- */
+.zw-stage .zw-grid.hc{ width:min(100%, 400px, calc((100dvh - 325px) * 0.8438)); aspect-ratio:4.75 / 5.6292; height:auto; display:block; padding:0; gap:0; border:0; background:none; box-shadow:none; position:relative; margin:0 auto; touch-action:none; }
+.zw-grid.hc .zw-cell{ position:absolute; display:flex; align-items:center; justify-content:center; padding:0; margin:0; border-radius:0; background:none; box-shadow:none; font-size:clamp(30px, 8.8vw, 40px); line-height:1; }
+.zw-grid.hc .zw-cell svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+.zw-stage .zw-grid.hc .zw-cell svg polygon{ vector-effect:non-scaling-stroke; stroke-linejoin:round; }
+.zw-stage .zw-grid.hc .zw-cell svg .hx{ fill:#fff1d2; stroke:#e8c27a; stroke-width:1.5; }
+.zw-stage .zw-grid.hc .zw-cell svg .lk{ fill:var(--tint); stroke:var(--tc); stroke-width:3.5; opacity:0; }
+.zw-stage .zw-grid.hc .zw-cell svg .kp{ fill:none; stroke:var(--kc, transparent); stroke-width:4; opacity:0; }
+.zw-stage .zw-grid.hc .zw-cell.kept svg{ filter:drop-shadow(0 0 4px var(--kc)); }
+.zw-stage .zw-grid.hc .zw-cell.kept svg .kp{ opacity:1; }
+.zw-stage .zw-grid.hc .zw-cell.on svg{ filter:drop-shadow(0 0 6px var(--tc)); }
+.zw-stage .zw-grid.hc .zw-cell.on svg .hx{ fill:#fff1d2; stroke:#e8c27a; stroke-width:1.5; }
+.zw-stage .zw-grid.hc .zw-cell.hint{ animation:none; box-shadow:none; } .zw-stage .zw-grid.hc .zw-cell.hint svg .hx{ stroke:#ffffff; stroke-width:4; }
+.zw-stage .zw-grid.hc .zw-cell.missed svg .hx{ stroke:#ffe640; stroke-width:4; }
+.zw-stage .zw-grid.hc .zw-cell.dup svg .hx, .zw-stage .zw-grid.hc .zw-cell.bad svg .hx{ fill:#ffd9a8; }
+.zw-stage .zw-grid.hc .zw-cell.zapped svg .hx{ fill:#ffffff; stroke:var(--wc); stroke-width:4; }
+.zw-stage .zw-grid.hc .zw-cell > span{ z-index:3; }
+.zw-stage .zw-grid.hc .zw-trail{ z-index:2; }
+.zw-grid.hc .zw-trail polyline.zw-glow{ stroke-width:16; } .zw-grid.hc .zw-trail polyline.zw-line{ stroke-width:7; opacity:0.9; }
+.zw-stage .zw-grid.hc .zw-cell.on svg .lk, .zw-stage .zw-grid.hc .zw-cell.fl-ok svg .lk, .zw-stage .zw-grid.hc .zw-cell.fl-bad svg .lk{ opacity:1; }
+:root.lite .zw-stage .zw-grid.hc .zw-cell.fl-ok svg .lk, :root.lite .zw-stage .zw-grid.hc .zw-cell.fl-bad svg .lk{ opacity:0; }
+@media (prefers-reduced-motion: reduce){ .zw-stage .zw-grid.hc .zw-cell.fl-ok svg .lk, .zw-stage .zw-grid.hc .zw-cell.fl-bad svg .lk{ opacity:0; } }
