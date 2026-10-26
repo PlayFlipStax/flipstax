@@ -11367,26 +11367,44 @@
         autoT = setTimeout(()=>{ if (gen === luckyGen) finish(true); }, dt(LUCKY_AUTO_BANK_MS));
       });
     };
-    // the wheel: SPIN picks the outcome from the same table as before, then turns to it
-    let lastTick = 0;
+    // The wheel is a skill control now: tap SPIN and it spins up to a fast continuous speed (about 2 turns a second) and the hub becomes
+    // STOP; tap STOP (or wait 5 s) and it coasts to a halt over 1.5-2.5 s (ease-out, a small random drift) and the wedge under the
+    // pointer decides the outcome - landing -> land(kind, wedge), the same outcome handling as before. The pointer flicks and the tick
+    // slows with the wheel. Reduced motion / lite: a short spin straight to a random wedge.
+    let lastTick = 0, stopNow = null;
+    const WEDGE = 360 / LW_WEDGES.length, V_FAST = 0.72;   // degrees a millisecond: 2 turns a second
+    const wedgeAt = (a)=> ((Math.round(-a / WEDGE) % LW_WEDGES.length) + LW_WEDGES.length) % LW_WEDGES.length;   // the wedge under the pointer at rotation a
     const spin = ()=>{
       if (state !== 'idle' && state !== 'landed') return;
       clearTimeout(autoT); popHide(); show([]); note.textContent = ''; clearWin(); hub.classList.remove('pulse');
-      let k = LUCKY_SQUARES[Math.floor(Math.random() * n)];
-      if ((REPLAY || DEBUG_FAST) && window.__forceLucky && LUCKY_SQUARES.indexOf(window.__forceLucky) >= 0) k = window.__forceLucky;   // (the TEST menu's GOOP jump)
-      const ws = LW_WEDGES.map((w, i)=> w.kind === k ? i : -1).filter(i=> i >= 0), wi = ws.length ? ws[Math.floor(Math.random() * ws.length)] : 0;
-      const W = 360 / LW_WEDGES.length, jitter = (Math.random() - 0.5) * W * 0.6;
-      const from = rot, to = from + 1440 + ((((360 - wi * W - jitter) - from) % 360) + 360) % 360;
-      state = 'spinning'; hubT.textContent = '...'; hubS.textContent = ''; renderBank();
-      const still = prefersReducedMotion() || isLite();
-      if (still){ rot = to; setRot(to); setTimeout(()=>{ if (!gone()) land(k, wi); }, 350); return; }
-      luckyOv.querySelector('.lw-wheel').classList.add('spinning');
-      const dur = 3200 + Math.random() * 600, t0 = performance.now(); let lastIdx = Math.floor((from + 22.5) / W), prevA = from, prevT = t0;
+      const wheelEl = luckyOv.querySelector('.lw-wheel');
+      const from = rot, still = prefersReducedMotion() || isLite();
+      state = 'spinning'; hubS.textContent = ''; renderBank();
+      if (still){
+        const wi = Math.floor(Math.random() * LW_WEDGES.length); rot = from + 720 + ((((-wi * WEDGE) - from) % 360) + 360) % 360; setRot(rot);
+        hubT.textContent = '...'; setTimeout(()=>{ if (!gone()) land(LW_WEDGES[wi].kind, wi); }, 350); return;
+      }
+      hubT.textContent = 'STOP'; hub.classList.add('pulse'); wheelEl.classList.add('spinning');
+      const t0 = performance.now(), UP = 600; let phase = 'up', a = from, lastIdx = Math.floor((from + WEDGE / 2) / WEDGE), prevA = from, prevT = t0, coast = null;
+      const angleFast = (ms)=> ms < UP ? from + 0.5 * (V_FAST / UP) * ms * ms : from + 0.5 * V_FAST * UP + V_FAST * (ms - UP);
+      stopNow = ()=>{
+        if (phase === 'coast' || state !== 'spinning') return; stopNow = null;
+        clearTimeout(autoT); hub.classList.remove('pulse'); hubT.textContent = '...';
+        const ms = performance.now() - t0, v = ms < UP ? V_FAST * ms / UP : V_FAST, dur = 1500 + Math.random() * 1000;
+        let D = v * dur / 3 + (Math.random() - 0.5) * WEDGE * 0.8;   // distance of an ease-out cubic from speed v, plus a small random drift
+        if ((REPLAY || DEBUG_FAST) && window.__forceLucky){   // (the TEST menu's GOOP jump: aim at a wedge of that outcome)
+          const ws = LW_WEDGES.map((w, i)=> w.kind === window.__forceLucky ? i : -1).filter(i=> i >= 0);
+          if (ws.length){ const aim = -ws[0] * WEDGE; D = ((((aim - a) % 360) + 360) % 360) + 360; }
+        }
+        coast = { from:a, D, dur, t0:performance.now() }; phase = 'coast';
+      };
+      autoT = setTimeout(()=>{ if (stopNow) stopNow(); }, dt(5000));   // (no tap in 5 s: it coasts down by itself)
       const frame = (now)=>{
         if (gone()) return;
-        const t = Math.min(1, (now - t0) / dur), a = from + (to - from) * (1 - Math.pow(1 - t, 3));
+        if (phase !== 'coast') a = angleFast(now - t0);
+        else { const s = Math.min(1, (now - coast.t0) / coast.dur); a = coast.from + coast.D * (1 - Math.pow(1 - s, 3)); }
         setRot(a);
-        const idx = Math.floor((a + W / 2) / W);
+        const idx = Math.floor((a + WEDGE / 2) / WEDGE);
         if (idx !== lastIdx){
           lastIdx = idx;
           const speed = Math.abs(a - prevA) / Math.max(1, now - prevT);   // degrees a millisecond
@@ -11394,17 +11412,21 @@
           if (now - lastTick > 38){ lastTick = now; sfx.wheelTick(Math.min(1, speed / 0.9)); }
         }
         prevA = a; prevT = now;
-        if (t < 1){ raf = requestAnimationFrame(frame); return; }
-        rot = to; setRot(to); hubT.textContent = 'SPIN'; luckyOv.querySelector('.lw-wheel').classList.remove('spinning'); setTimeout(()=>{ if (!gone()) land(k, wi); }, 200);
+        if (phase === 'coast' && now - coast.t0 >= coast.dur){
+          rot = coast.from + coast.D; setRot(rot); wheelEl.classList.remove('spinning'); hubT.textContent = 'SPIN';
+          const wi = wedgeAt(rot); setTimeout(()=>{ if (!gone()) land(LW_WEDGES[wi].kind, wi); }, 200); return;
+        }
+        if (phase === 'up' && now - t0 > UP) phase = 'fast';
+        raf = requestAnimationFrame(frame);
       };
       raf = requestAnimationFrame(frame);
     };
-    hub.onclick = e=>{ e.stopPropagation(); if (state === 'idle') spin(); };
+    hub.onclick = e=>{ e.stopPropagation(); if (state === 'idle') spin(); else if (state === 'spinning' && stopNow) stopNow(); };
     bBank.onclick = e=>{ e.stopPropagation(); if (state === 'landed') finish(true); };
     bAgain.onclick = e=>{ e.stopPropagation(); if (state === 'landed') spin(); };
     luckyOv.classList.remove('hidden', 'slimed');
     updatePauseBtnVisibility();
-    hostSay('Lucky Lights! Tap SPIN, Earthling!', 2000);
+    hostSay('Lucky Lights! Tap SPIN, then STOP, Earthling!', 2000);
     renderBank();
     autoT = setTimeout(()=>{ if (!gone() && state === 'idle') spin(); }, dt(LUCKY_AUTO_STOP_MS));
     return true;

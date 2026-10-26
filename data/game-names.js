@@ -72,7 +72,7 @@ window.FLIPSTAX_NAMES = {
   explainers: {
     vs:        { full:'Two cards face off. Tap the one most Earthlings picked. Match the crowd to score!', short:'Pick the crowd favorite!' },
     riddle:    { full:'Read the riddle, then pick the right answer. Think fast, Earthling!', short:'Solve the riddle!' },
-    lucky:     { full:'Spin the wheel! Three spins for points and keys - or BANK what you have. Beware the GOOP!', short:'SPIN or BANK!' },
+    lucky:     { full:'Spin the wheel, then hit STOP! Three spins for points and keys - or BANK what you have. Beware the GOOP!', short:'SPIN, STOP or BANK!' },
     door:      { full:'Pick a portal. Behind it hides a surprise game!', short:'Pick a portal!' },
     zapWords:  { full:'Swipe across letters to spell words before time runs out!', short:'Spell the words!' },
     twinFlip:  { full:'Flip the cards and match every pair before time runs out!', short:'Match the pairs!' },
