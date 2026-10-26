@@ -634,3 +634,24 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .tf-stage .tf-pairs{ color:#ffffff; font-size:20px; text-shadow:0 2px 0 rgba(120,20,90,0.6); -webkit-text-stroke:0; }
 :root.lite .tf-stage .tf-tile.done::after{ animation:none; }
 @media (prefers-reduced-motion: reduce){ .tf-stage .tf-tile.done::after{ animation:none; } }
+
+/* ---- A+ tier 2 item 6: Emoji Decode - a bright, saturated arcade-neon look (hot pink, sunny yellow, orange, violet) in place of the
+   carbon-fibre and neon-teal; a calm few bulbs instead of rows of blinking dots; no flicker ---- */
+:root.mode-daily .event-overlay.stack.bb-emojiDecode{ --bb:#ffe033 !important; background:radial-gradient(ellipse at 50% 24%, #ffe27a 0%, #ff9a2a 26%, #ff3d94 58%, #8a3ffc 100%) !important; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .bb-marquee{ background-color:rgba(255,255,255,0.35); background-image:radial-gradient(circle, #ffe033 0 5px, transparent 5.8px); background-size:56px 14px; box-shadow:0 0 0 2px #ffffff; animation:mqFade 2.4s ease-in-out infinite alternate; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt::before, :root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt::after{ display:none; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt{ animation:none; background:linear-gradient(180deg, #a56bff, #7a3df0); border:4px solid #ffe033; outline:3px solid #ff3d94; outline-offset:-13px; border-radius:24px;
+  box-shadow:0 0 0 3px #b4125f, 0 0 14px 2px rgba(255,224,51,0.8), 0 7px 0 3px #b4125f; text-shadow:0 3px 0 rgba(60,10,110,0.45); }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile{ background-image:linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.1) 46%, rgba(255,255,255,0) 52%) !important; background-color:var(--nc) !important; background-size:100% 100% !important; background-position:0 0 !important; background-repeat:no-repeat !important;
+  border:4px solid #ffffff; border-radius:22px; color:#ffffff; font-size:clamp(24px, 7.2vw, 32px); text-shadow:0 2px 0 rgba(60,10,110,0.55);
+  box-shadow:0 0 0 3px var(--nd, #8a1050), 0 0 14px 2px rgba(255,255,255,0.65), 0 6px 0 3px var(--nd, #8a1050); }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile::before{ display:none; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(1){ --nc:#ff3d94; --nd:#8a1050; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(2){ --nc:#ffd92e; --nd:#9a6a00; color:#3a2200; text-shadow:0 1px 0 rgba(255,255,255,0.6); }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(3){ --nc:#ff8a1f; --nd:#a84300; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(4){ --nc:#8a3ffc; --nd:#4a1a9a; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.is-right{ box-shadow:0 0 0 4px #5dff8a, 0 0 22px 6px rgba(93,255,138,0.8), 0 6px 0 3px var(--nd, #8a1050); }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.is-wrong{ background-color:#d6203d !important; color:#ffffff; border-color:#ffb3bd; box-shadow:0 0 0 3px #5a0414, 0 6px 0 3px #5a0414; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode.bb-revealed .event-tile:not(.is-right):not(.is-wrong){ opacity:0.5; }
+:root.lite.mode-daily .event-overlay.stack.bb-emojiDecode .bb-marquee{ animation:none; }
+@media (prefers-reduced-motion: reduce){ :root.mode-daily .event-overlay.stack.bb-emojiDecode .bb-marquee{ animation:none; } }
