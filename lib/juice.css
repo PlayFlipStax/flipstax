@@ -156,7 +156,7 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root.mode-daily.event-open #board .mq-ring{ visibility:hidden; }
 
 /* the deals */
-:root.mode-daily #board.deal-first{ clip-path:inset(0 -40px -30px -40px); }
+:root.mode-daily #board.deal-first{ clip-path:inset(-220px -40px -220px -40px); z-index:30; }   /* (the cards come down over the header, on their cables) */
 :root.mode-daily #board.deal-first :is(.half, .mq-ring).top{ animation:vsDropIn 0.9s linear both; }
 :root.mode-daily #board.deal-first :is(.half, .mq-ring).bottom{ animation:vsRiseIn 0.9s linear both; }
 :root.mode-daily #board.deal-first .divider{ animation:vsCoinIn 0.9s linear both; }
@@ -304,3 +304,78 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .ne-arc.a0{ right:-20px; top:-16px; }
 .ne-arc.a1{ left:-18px; bottom:-16px; transform:rotate(180deg); }
 .ne-arc.a2{ left:34%; top:-20px; transform:rotate(-8deg); }
+
+/* ---- A+ tier 1 item 2: the VS cards ---- */
+/* a) colour by topic: a bright pair for each (side A on top, side B below); any other topic keeps the orange / teal pair */
+#board{ --va1:#FF9F1C; --va2:#E8590C; --vb1:#2EC4B6; --vb2:#0E7C86; --vga:rgba(255,159,28,0.55); --vgb:rgba(46,196,182,0.55); }
+#board[data-vsg="sports"]{ --va1:#3ae870; --va2:#0b9a3e; --vb1:#ffd93f; --vb2:#ff9a00; --vga:rgba(58,232,112,0.55); --vgb:rgba(255,217,63,0.6); }
+#board[data-vsg="movies"]{ --va1:#52a0ff; --va2:#1a45d6; --vb1:#ff62e8; --vb2:#a3109a; --vga:rgba(82,160,255,0.55); --vgb:rgba(255,98,232,0.55); }
+#board[data-vsg="food"]{ --va1:#ffa42e; --va2:#e8590c; --vb1:#ff6060; --vb2:#c0182b; --vga:rgba(255,164,46,0.55); --vgb:rgba(255,96,96,0.55); }
+#board[data-vsg="pop"]{ --va1:#ff70ba; --va2:#d41a78; --vb1:#4aeaff; --vb2:#0a8fc4; --vga:rgba(255,112,186,0.55); --vgb:rgba(74,234,255,0.55); }
+#board[data-vsg="geo"]{ --va1:#2fdccb; --va2:#0e8a8e; --vb1:#c6f744; --vb2:#5fae00; --vga:rgba(47,220,203,0.55); --vgb:rgba(198,247,68,0.55); }
+:root:root.mode-daily #board .half.top{ background:linear-gradient(165deg, var(--va1) 0%, var(--va2) 100%) !important; --jc-glow:var(--vga); }
+:root:root.mode-daily #board .half.bottom{ background:linear-gradient(165deg, var(--vb1) 0%, var(--vb2) 100%) !important; --jc-glow:var(--vgb); }
+/* readable text on every card: a deep indigo plate behind the name (no brown), white text */
+:root:root.mode-daily #board .half:not(.revealed) .content{ background:rgba(38,10,84,0.68) !important; backdrop-filter:none; -webkit-backdrop-filter:none; border:2px solid rgba(255,255,255,0.38); }
+:root:root.mode-daily #board .half:not(.revealed) .take{ color:#fff; text-shadow:0 2px 0 rgba(20,0,50,0.55); }
+:root:root.mode-daily #board .cat-chip{ background:rgba(38,10,84,0.72); color:#fff; border:2px solid rgba(255,255,255,0.35); }
+
+/* b) lowered and raised on cables: the round's first card eases down from the ceiling and up from the floor with a small
+   settle (1.2 s); the other seven slide in over 0.4 s */
+:root.mode-daily #board.deal-first :is(.half, .mq-ring).top{ animation:vsCableDown 1.2s linear both; }
+:root.mode-daily #board.deal-first :is(.half, .mq-ring).bottom{ animation:vsCableUp 1.2s linear both; }
+:root.mode-daily #board.deal-first .divider{ animation:vsCoinIn 1.2s linear both; }
+@keyframes vsCableDown{
+  0%{ transform:translateY(-114%); opacity:0; animation-timing-function:ease-in-out; }
+  6%{ opacity:1; }
+  80%{ transform:translateY(1.8%); animation-timing-function:ease-out; }
+  92%{ transform:translateY(-0.7%); animation-timing-function:ease-in-out; }
+  100%{ transform:translateY(0); opacity:1; } }
+@keyframes vsCableUp{
+  0%{ transform:translateY(114%); opacity:0; animation-timing-function:ease-in-out; }
+  6%{ opacity:1; }
+  80%{ transform:translateY(-1.8%); animation-timing-function:ease-out; }
+  92%{ transform:translateY(0.7%); animation-timing-function:ease-in-out; }
+  100%{ transform:translateY(0); opacity:1; } }
+:root.mode-daily #board.deal-slide :is(.half, .mq-ring).top{ animation:vsSlideL 0.4s ease-out both; }
+:root.mode-daily #board.deal-slide :is(.half, .mq-ring).bottom{ animation:vsSlideR 0.4s ease-out both; }
+.mq-ring .cable{ display:none; position:absolute; width:6px; height:240px; border-radius:3px; background:linear-gradient(90deg, #7d86a0, #f6f8ff 45%, #7d86a0); box-shadow:0 0 0 1px rgba(30,20,60,0.5); }
+.mq-ring.top .cable{ bottom:calc(100% - 8px); }
+.mq-ring.bottom .cable{ top:calc(100% - 8px); }
+.mq-ring .cable.l{ left:15%; } .mq-ring .cable.r{ right:15%; }
+:root.mode-daily #board.deal-first .mq-ring .cable{ display:block; animation:cableOut 1.2s linear both; }
+@keyframes cableOut{ 0%, 90%{ opacity:1; } 100%{ opacity:0; } }
+:root.lite.mode-daily #board .mq-ring .cable{ display:none; }
+@media (prefers-reduced-motion: reduce){ :root.mode-daily #board .mq-ring .cable{ display:none !important; } }
+
+/* c) a pick: the picked card's bulbs flash bright once and stay lit; every other bulb stops */
+:root.mode-daily #board.pick-top .mq-ring.top, :root.mode-daily #board.pick-bottom .mq-ring.bottom{ opacity:1; animation:mqPick 0.5s ease-out both; }
+:root.mode-daily #board.pick-top .mq-ring.top .mq, :root.mode-daily #board.pick-bottom .mq-ring.bottom .mq{ animation:none; opacity:1; }
+@keyframes mqPick{ 0%{ opacity:0.25; transform:scale(1); } 35%{ opacity:1; transform:scale(1.035); } 100%{ opacity:1; transform:none; } }
+:root.lite.mode-daily #board.pick-top .mq-ring.top, :root.lite.mode-daily #board.pick-bottom .mq-ring.bottom{ animation:none; }
+@media (prefers-reduced-motion: reduce){ :root.mode-daily #board.pick-top .mq-ring.top, :root.mode-daily #board.pick-bottom .mq-ring.bottom{ animation:none; } }
+
+/* e) livelier backgrounds: two layers of stars, dice, clocks and sparkles behind the card - the front layer drifts right, the
+   back layer left; soft, a little depth (each shape has a faint shadow), always behind the text */
+.dd{ display:none; }
+:root.mode-daily #board .half > .dd{ display:block; position:absolute; top:0; bottom:0; z-index:0; pointer-events:none; background-repeat:repeat; will-change:transform; }
+:root.mode-daily #board .half > .dd-back{ left:0; width:calc(100% + 240px); background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cdefs%3E%3Cpath id='st' d='M0,-12 L3.5,-4 12,-3.5 5.5,2 7.5,10.5 0,6 -7.5,10.5 -5.5,2 -12,-3.5 -3.5,-4Z'/%3E%3Cpath id='sp' d='M0,-12 Q1.5,-1.5 12,0 Q1.5,1.5 0,12 Q-1.5,1.5 -12,0 Q-1.5,-1.5 0,-12Z'/%3E%3Cg id='di'%3E%3Crect x='-12' y='-12' width='24' height='24' rx='5'/%3E%3Cg fill='%23000' opacity='.35'%3E%3Ccircle cx='-5' cy='-5' r='2'/%3E%3Ccircle cx='5' cy='5' r='2'/%3E%3Ccircle cx='0' cy='0' r='2'/%3E%3Ccircle cx='5' cy='-5' r='2'/%3E%3Ccircle cx='-5' cy='5' r='2'/%3E%3C/g%3E%3C/g%3E%3Cg id='ck'%3E%3Ccircle r='12' fill='none' stroke='%23fff' stroke-width='3'/%3E%3Cpath d='M0,-7 V0 L5,3' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round'/%3E%3C/g%3E%3C/defs%3E%3Cg fill='%2338003f' opacity='.28' transform='translate(3,4)'%3E%3Cuse href='%23st' transform='translate(44,52) scale(1.7) rotate(-12)'/%3E%3Cuse href='%23di' transform='translate(164,46) scale(1.5) rotate(10)'/%3E%3Cuse href='%23sp' transform='translate(180,176) scale(1.9)'/%3E%3Cuse href='%23st' transform='translate(118,118) scale(1) rotate(18)'/%3E%3Cuse href='%23sp' transform='translate(22,124) scale(1)'/%3E%3Cuse href='%23di' transform='translate(86,206) scale(1.1) rotate(-8)'/%3E%3C/g%3E%3Cg fill='%23fff'%3E%3Cuse href='%23st' transform='translate(44,52) scale(1.7) rotate(-12)'/%3E%3Cuse href='%23di' transform='translate(164,46) scale(1.5) rotate(10)'/%3E%3Cuse href='%23sp' transform='translate(180,176) scale(1.9)'/%3E%3Cuse href='%23st' transform='translate(118,118) scale(1) rotate(18)'/%3E%3Cuse href='%23sp' transform='translate(22,124) scale(1)'/%3E%3Cuse href='%23di' transform='translate(86,206) scale(1.1) rotate(-8)'/%3E%3C/g%3E%3Cg transform='translate(62,166) scale(1.5)'%3E%3Cuse href='%23ck'/%3E%3C/g%3E%3C/svg%3E"); background-size:240px 240px; opacity:0.24; animation:ddLeft 80s linear infinite; }
+:root.mode-daily #board .half > .dd-front{ left:-180px; width:calc(100% + 180px); background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cdefs%3E%3Cpath id='st' d='M0,-12 L3.5,-4 12,-3.5 5.5,2 7.5,10.5 0,6 -7.5,10.5 -5.5,2 -12,-3.5 -3.5,-4Z'/%3E%3Cpath id='sp' d='M0,-12 Q1.5,-1.5 12,0 Q1.5,1.5 0,12 Q-1.5,1.5 -12,0 Q-1.5,-1.5 0,-12Z'/%3E%3Cg id='di'%3E%3Crect x='-12' y='-12' width='24' height='24' rx='5'/%3E%3Cg fill='%23000' opacity='.35'%3E%3Ccircle cx='-5' cy='-5' r='2'/%3E%3Ccircle cx='5' cy='5' r='2'/%3E%3Ccircle cx='0' cy='0' r='2'/%3E%3C/g%3E%3C/g%3E%3C/defs%3E%3Cg fill='%2338003f' opacity='.25' transform='translate(2,3)'%3E%3Cuse href='%23sp' transform='translate(30,34) scale(.8)'/%3E%3Cuse href='%23st' transform='translate(120,28) scale(.7) rotate(20)'/%3E%3Cuse href='%23di' transform='translate(146,118) scale(.8) rotate(-14)'/%3E%3Cuse href='%23sp' transform='translate(70,96) scale(.6)'/%3E%3Cuse href='%23st' transform='translate(30,142) scale(.8) rotate(-6)'/%3E%3Cuse href='%23sp' transform='translate(110,160) scale(.5)'/%3E%3C/g%3E%3Cg fill='%23fff'%3E%3Cuse href='%23sp' transform='translate(30,34) scale(.8)'/%3E%3Cuse href='%23st' transform='translate(120,28) scale(.7) rotate(20)'/%3E%3Cuse href='%23di' transform='translate(146,118) scale(.8) rotate(-14)'/%3E%3Cuse href='%23sp' transform='translate(70,96) scale(.6)'/%3E%3Cuse href='%23st' transform='translate(30,142) scale(.8) rotate(-6)'/%3E%3Cuse href='%23sp' transform='translate(110,160) scale(.5)'/%3E%3C/g%3E%3C/svg%3E"); background-size:180px 180px; opacity:0.4; animation:ddRight 52s linear infinite; }
+@keyframes ddLeft{ to{ transform:translateX(-240px); } }
+@keyframes ddRight{ to{ transform:translateX(180px); } }
+:root.mode-daily #board .half .doodle-scatter{ display:none; }
+:root.lite.mode-daily #board .half > .dd{ animation:none; }
+@media (prefers-reduced-motion: reduce){ :root.mode-daily #board .half > .dd{ animation:none; } }
+
+/* d) the real FlipStax logo, centred in the header (Daily) */
+.hud-logo{ display:none; }
+:root.mode-daily header .top-row{ position:relative; }
+:root.mode-daily header .logo.jc-wordmark{ position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); z-index:3; padding:0; border:0; background:none; box-shadow:none; }
+:root.mode-daily header .logo.jc-wordmark::before, :root.mode-daily header .logo.jc-wordmark::after{ display:none; }
+:root.mode-daily header .logo.jc-wordmark .flip, :root.mode-daily header .logo.jc-wordmark .stax{ display:none; }
+:root.mode-daily .hud-logo{ display:block; height:46px; width:auto; filter:drop-shadow(0 2px 3px rgba(20,0,50,0.5)); }
+:root.lite.mode-daily #board.deal-first :is(.half, .mq-ring).top, :root.lite.mode-daily #board.deal-first :is(.half, .mq-ring).bottom,
+:root.lite.mode-daily #board.deal-slide :is(.half, .mq-ring).top, :root.lite.mode-daily #board.deal-slide :is(.half, .mq-ring).bottom{ animation:vsFade 0.2s ease-out both; }
+@media (prefers-reduced-motion: reduce){
+  :root.mode-daily #board.deal-first :is(.half, .mq-ring).top, :root.mode-daily #board.deal-first :is(.half, .mq-ring).bottom,
+  :root.mode-daily #board.deal-slide :is(.half, .mq-ring).top, :root.mode-daily #board.deal-slide :is(.half, .mq-ring).bottom{ animation:vsFade 0.2s ease-out both; } }

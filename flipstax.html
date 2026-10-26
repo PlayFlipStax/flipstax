@@ -4300,7 +4300,7 @@
     <div class="top-row">
       <div class="left-group">
         <span class="sound-toggle" id="soundToggle" role="button" tabindex="0" aria-label="Sound" aria-haspopup="dialog">🔊</span>
-        <div class="logo jc-wordmark" aria-label="FlipStax"><span class="flip">Flip</span><span class="stax">Stax</span></div>
+        <div class="logo jc-wordmark" aria-label="FlipStax"><img class="hud-logo" src="images/flipstax-logo-final.png" alt="FlipStax" width="56" height="50" decoding="async"><span class="flip">Flip</span><span class="stax">Stax</span></div>
       </div>
       <!-- You, lifetime: tier name over your Flipz (votes, ever) and play streak. -->
       <div class="me-chip" id="meChip">
@@ -4361,6 +4361,7 @@
 
     <div class="half top" id="halfA">
       <i class="gloss" aria-hidden="true"></i>
+      <i class="dd dd-back" aria-hidden="true"></i><i class="dd dd-front" aria-hidden="true"></i>
       <div class="cat-chip" id="chipA"></div>
       <div class="scene" id="sceneA"></div>
       <div class="fill" id="fillA"></div>
@@ -4373,13 +4374,14 @@
       </div>
     </div>
     <!-- A+ item 2: the Vegas marquee frames - rings of bulbs over each card, kept outside the (clipped) cards so their fade is cheap -->
-    <div class="mq-ring top" aria-hidden="true"><i class="mq mq-a"></i><i class="mq mq-b"></i></div>
-    <div class="mq-ring bottom" aria-hidden="true"><i class="mq mq-a"></i><i class="mq mq-b"></i></div>
+    <div class="mq-ring top" aria-hidden="true"><i class="cable l"></i><i class="cable r"></i><i class="mq mq-a"></i><i class="mq mq-b"></i></div>
+    <div class="mq-ring bottom" aria-hidden="true"><i class="cable l"></i><i class="cable r"></i><i class="mq mq-a"></i><i class="mq mq-b"></i></div>
     <div class="divider">VS</div>
     <!-- The VS reveal's split-flap board (Daily and Infinity): the crowd's split clacks over after a pick. -->
     <div class="crowd-board" id="crowdBoard" aria-live="polite"><div class="cb-note"></div><div class="cb-label">CROWD SAYS</div><div class="cb-row"><span class="cb-num" id="cbA"></span><span class="cb-sep">/</span><span class="cb-num" id="cbB"></span></div></div>
     <div class="half bottom" id="halfB">
       <i class="gloss" aria-hidden="true"></i>
+      <i class="dd dd-back" aria-hidden="true"></i><i class="dd dd-front" aria-hidden="true"></i>
       <div class="cat-chip" id="chipB"></div>
       <div class="scene" id="sceneB"></div>
       <div class="fill" id="fillB"></div>
@@ -16198,6 +16200,10 @@
       setTimeout(loadNext, 400);
     }
   }
+  // A+ tier 1 item 2: the card colours by topic - a bright pair a card (side A, side B); any other topic gets the default pair.
+  const VS_PALETTE_GROUP = { sports:'sports', fitness:'sports', movies:'movies', tv:'movies', actors:'movies', cartoons:'movies', realitytv:'movies', food:'food', drinks:'food',
+    music:'pop', albums:'pop', celebrity:'pop', comedy:'pop', creators:'pop', internet:'pop', podcasts:'pop', style:'pop', nostalgia:'pop', geography:'geo', travel:'geo', history:'geo' };
+  function vsPaletteGroup(cat){ return VS_PALETTE_GROUP[cat] || 'default'; }
   function loadNextImpl(){
     if (runActive && runPhase === 'solving') return;
     // A finished Daily run is over until a mode is picked again - no stray
@@ -16282,9 +16288,10 @@
     // A+ item 2: the round's first card - the top one drops in from above, the bottom one rises from below (about 0.9 s,
     // a small bounce); the other cards slide in quickly (0.25 s). Transform and opacity; lite / reduced motion: a fade.
     { const first = runActive && vsRoundFirst; vsRoundFirst = false;
-      els.board.classList.remove('deal-first', 'deal-slide'); void els.board.offsetWidth;
+      els.board.classList.remove('deal-first', 'deal-slide', 'vs-picked', 'pick-top', 'pick-bottom'); void els.board.offsetWidth;
+      els.board.dataset.vsg = vsPaletteGroup(current.category);   // (A+: each topic its own bright colour pair)
       els.board.classList.add(first ? 'deal-first' : 'deal-slide', 'vs-live');
-      clearTimeout(loadNextImpl._dealT); loadNextImpl._dealT = setTimeout(()=> els.board.classList.remove('deal-first', 'deal-slide'), first ? 1000 : 320); }
+      clearTimeout(loadNextImpl._dealT); loadNextImpl._dealT = setTimeout(()=> els.board.classList.remove('deal-first', 'deal-slide'), first ? 1300 : 460); }
     [els.contentA, els.contentB].forEach(c=>{
       if (!c) return;
       c.classList.remove('pop-in');
@@ -16620,7 +16627,8 @@
     fitTopChip();
     // Marks the chosen side immediately (before the network round-trip) so
     // the Infinity selection outline appears the instant of the tap.
-    els.board.classList.remove('vs-live');   // (A+: the marquee bulbs go out at the pick)
+    els.board.classList.remove('vs-live');   // (A+: at the pick the other bulbs go out; the picked card's flash once and stay lit)
+    els.board.classList.add('vs-picked', side === 'A' ? 'pick-top' : 'pick-bottom');
     els.halfA.classList.toggle('picked', side === 'A');
     els.halfB.classList.toggle('picked', side === 'B');
     const points = current.bonusPoints ? (runActive ? 3 : INF_STAR_POINTS) : 1;
