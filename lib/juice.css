@@ -748,3 +748,16 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .zw-stage .zw-found{ flex-wrap:nowrap; overflow:hidden; justify-content:flex-end; min-height:26px; }
 .zw-stage .zw-chip{ flex:0 0 auto; white-space:nowrap; }
 .zw-stage .zw-foot{ margin-top:6px; }
+
+/* ---- A+ follow-up: Twin Flip board size - a much larger board, portrait playing-card tiles (about 3:4), still 4 x 4 ---- */
+.tf-stage.tf-stage .tf-grid{ width:min(100%, 420px, calc((100dvh - 350px) * 0.76)); aspect-ratio:auto; gap:8px; padding:10px; grid-template-rows:none; }
+.tf-stage.tf-stage .tf-tile{ aspect-ratio:3 / 4; width:100%; min-height:0; }
+.tf-stage.tf-stage .tf-back{ font-size:clamp(34px, 11vw, 46px); }
+.tf-stage.tf-stage .tf-emo{ font-size:clamp(44px, 14.5vw, 62px); }
+.tf-stage.tf-stage .tf-face{ inset:8%; }
+.tf-stage.tf-stage .tf-title{ margin:2px auto 8px; padding:7px 20px; }
+.tf-stage.tf-stage .tf-title span{ font-size:clamp(26px, 8.4vw, 34px); }
+.tf-stage.tf-stage .tf-pairs{ margin-top:2px; }
+.tf-stage.tf-stage{ position:relative; }
+.tf-stage.tf-stage .tf-grid{ position:relative; width:min(100%, 420px, calc((100dvh - 300px) * 0.77)); margin-bottom:14px; }
+.tf-stage.tf-stage .tf-pairs{ position:absolute; left:50%; bottom:0; transform:translate(-50%, 50%); margin:0; padding:3px 14px; border-radius:99px; background:#5a0a20; border:2px solid #e6b94a; font-size:15px; letter-spacing:1px; white-space:nowrap; z-index:2; }
