@@ -11045,7 +11045,7 @@
     if (window.Stage) Stage.cue('close', { over: ov, cls:'mdoor', sign:{ sub:'ROUND ' + ((RUNDOWN.acts[st.act] || {}).round || 3) + ' OF ' + SHOW_ROUND_COUNT, main:'MYSTERY PORTAL' } });
     let picked = false;
     const tiles = els.eventTiles, used = tiles.slice(0, Math.min(DOOR_COUNT, games.length));
-    const reset = ()=>{ ov.classList.add('hidden'); ov.classList.remove('powerup', 'mdoor'); tiles.forEach(t=>{ t.classList.remove('portal', 'mp', 'opened', 'dim', 'open', 'other', 'picked-wait'); t.innerHTML = ''; t.onclick = null; t.style.display = ''; }); };
+    const reset = ()=>{ ov.classList.add('hidden'); ov.classList.remove('powerup', 'mdoor'); { const c = document.getElementById('mpCaption'); if (c) c.remove(); } tiles.forEach(t=>{ t.classList.remove('portal', 'mp', 'opened', 'dim', 'open', 'other', 'picked-wait'); t.innerHTML = ''; t.onclick = null; t.style.display = ''; }); };
     const open = (i)=>{
       if (picked || g !== Show.gen) return;
       picked = true; clearTimeout(eventTimeoutId);
@@ -11057,6 +11057,9 @@
         if (g !== Show.gen) return;
         tile.classList.remove('picked-wait'); tile.classList.add('opened'); if (sfx.slam) sfx.slam();
         els.eventPrompt.textContent = 'Portal ' + (i + 1) + ': ' + mysteryName(game) + '!';
+        { let cap = document.getElementById('mpCaption'); if (!cap){ cap = document.createElement('div'); cap.id = 'mpCaption'; ov.appendChild(cap); }
+          cap.innerHTML = '<span class="mc-ic"></span><b></b>'; cap.firstChild.textContent = DOOR_ICONS[game] || '\u2728'; cap.lastChild.textContent = mysteryName(game);
+          cap.classList.remove('on'); void cap.offsetWidth; cap.classList.add('on'); }   // (the name sits on a plaque under the doors, after the door has opened)
         revealThen(()=>{
           if (g !== Show.gen) return;
           reset();
