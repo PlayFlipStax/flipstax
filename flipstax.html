@@ -11255,21 +11255,20 @@
     return '1';
   }
   function luckyLabel(k){ return k === 'KEY' ? '🔑' : k === 'CHIP' ? '🪙' : k === 'x2' ? '×2' : k; }
-  // A+ tier 2 item 2: Lucky Lights is a spinning prize wheel. Eight bright wedges - points, keys, GOOP and mystery - turn on a
+  // A+ tier 2 item 2: Lucky Lights is a spinning prize wheel. Eight bright wedges - points, keys, GOOP and DOUBLE - turn on a
   // stand under the spotlights; the wheel spins 3 to 4 seconds (ease-out) and lands on the outcome the game already chose from
   // the same table and odds as before (LUCKY_SQUARES, picked at random when SPIN is tapped); a pointer flicks at every peg with a
   // soft tick that slows with the wheel. Prizes, the GOOP, BANK / SPIN AGAIN and the 3 spins are exactly the old rules.
-  // Wedge -> outcome: the two points wedges are +20 and +50; KEY +1 is the key; both GOOP wedges are the GOOP; the two MYSTERY
-  // wedges are the round's ×2 (the only other outcome in the table). KEY −1 is on the wheel but never landed on: no such outcome
-  // exists in the rules, and adding it would change the odds.
+  // Wedge -> outcome (every label is a real outcome of the table, picked at the same odds as before): +20 twice, +50, KEY +1 twice, GOOP twice and
+  // DOUBLE (the round's points x2). Landing picks the outcome first, then one of its wedges.
   const LW_WEDGES = [
     { c:'#a45cff', d:'#5b1fd0', icon:'⭐', t:'+20', kind:'+20' }, { c:'#ff4fc8', d:'#c2158f', icon:'🔑', t:'KEY +1', kind:'KEY' },
-    { c:'#2fd9ff', d:'#0a8fc4', icon:'🟢', t:'GOOP', kind:'GOOP' }, { c:'#4be683', d:'#12a04a', icon:'❓', t:'MYSTERY', kind:'x2' },
-    { c:'#ffe640', d:'#f0a800', icon:'⭐', t:'+50', kind:'+50' }, { c:'#ffa032', d:'#e0620a', icon:'🔑', t:'KEY −1', kind:null },
-    { c:'#ff5656', d:'#c4152a', icon:'🟢', t:'GOOP', kind:'GOOP' }, { c:'#5a86ff', d:'#1f3fd0', icon:'❓', t:'MYSTERY', kind:'x2' },
+    { c:'#2fd9ff', d:'#0a8fc4', icon:'🟢', t:'GOOP', kind:'GOOP' }, { c:'#4be683', d:'#12a04a', icon:'✨', t:'DOUBLE', kind:'x2' },
+    { c:'#ffe640', d:'#f0a800', icon:'⭐', t:'+50', kind:'+50' }, { c:'#ffa032', d:'#e0620a', icon:'⭐', t:'+20', kind:'+20' },
+    { c:'#ff5656', d:'#c4152a', icon:'🟢', t:'GOOP', kind:'GOOP' }, { c:'#5a86ff', d:'#1f3fd0', icon:'🔑', t:'KEY +1', kind:'KEY' },
   ];
   // Wedges: a soft flat-to-light gradient from the hub to the rim, thin white dividers. Every label is white with a dark outline, runs
-  // outward from the hub and stays inside its wedge; the icon sits at the rim end, MYSTERY is set smaller.
+  // outward from the hub and stays inside its wedge; the icon sits at the rim end, a long label (DOUBLE) is set a little smaller.
   function luckyWheelSvg(){
     const R = 178, cx = 200, cy = 200, W = 360 / LW_WEDGES.length, pt = (a, r)=> (cx + Math.sin(a * Math.PI / 180) * r).toFixed(2) + ' ' + (cy - Math.cos(a * Math.PI / 180) * r).toFixed(2);
     let s = '<svg class="lw-svg" viewBox="0 0 400 400" aria-hidden="true"><defs>';
@@ -11356,7 +11355,7 @@
       else if (k === 'KEY') keys++;
       else if (k === 'CHIP') chips++;
       sfx.correct(); FX.pop(pop, 1.1);
-      popShow(k === 'KEY' || k === 'CHIP' ? '🔑 GOLD KEY!' : k === 'x2' ? 'MYSTERY: ×2!' : k + ' POINTS!', k === 'x2' ? 'This round’s points doubled: +' + act3 : k === 'KEY' || k === 'CHIP' ? 'One more Orbit Drop chip' : 'into the bank');
+      popShow(k === 'KEY' || k === 'CHIP' ? '🔑 GOLD KEY!' : k === 'x2' ? 'DOUBLE!' : k + ' POINTS!', k === 'x2' ? 'This round’s points doubled: +' + act3 : k === 'KEY' || k === 'CHIP' ? 'One more Orbit Drop chip' : 'into the bank');
       renderBank();
       // the result holds for the shared reveal time, then the old flow: bank at the 3rd spin, else BANK or SPIN AGAIN
       revealThen(()=>{
