@@ -761,3 +761,15 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .tf-stage.tf-stage{ position:relative; }
 .tf-stage.tf-stage .tf-grid{ position:relative; width:min(100%, 420px, calc((100dvh - 300px) * 0.77)); margin-bottom:14px; }
 .tf-stage.tf-stage .tf-pairs{ position:absolute; left:50%; bottom:0; transform:translate(-50%, 50%); margin:0; padding:3px 14px; border-radius:99px; background:#5a0a20; border:2px solid #e6b94a; font-size:15px; letter-spacing:1px; white-space:nowrap; z-index:2; }
+
+/* ---- A+ follow-up: Zap Words - a bigger board with bigger letters (the hexes keep their square-grid positions: a true honeycomb
+   would break the planted words, see the report), thin dividing lines, colour trails only while drawing ---- */
+.zw-stage .zw-grid{ gap:3px; padding:7px; width:min(100%, 400px, calc(100dvh - 345px)); }
+.zw-stage .zw-cell{ font-size:clamp(28px, 8.3vw, 36px); }
+.zw-stage .zw-cell polygon{ stroke:#e8c27a; stroke-width:3; }
+.zw-stage .zw-cell.on polygon{ stroke-width:6; }
+.zw-stage .zw-cell.zapped polygon{ fill:#ffffff; stroke:var(--wc); stroke-width:12; }
+.zw-stage .zw-title{ margin:4px 0 2px; font-size:clamp(26px, 8vw, 34px); }
+.zw-stage .zw-word{ min-height:30px; line-height:30px; font-size:clamp(22px, 6.6vw, 28px); }
+.zw-stage .zw-foot{ margin-top:2px; }
+.zw-trail .zw-keep{ stroke-width:9; opacity:1; }
