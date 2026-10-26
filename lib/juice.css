@@ -688,3 +688,31 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .tf-stage.tf-stage .tf-tile .ne-spin-wrap{ --ne:#39a7ff; }
 .tf-stage.tf-stage .tf-pairs{ color:#fff3d0; text-shadow:0 2px 0 rgba(60,0,15,0.7); }
 :root.lite .tf-stage.tf-stage .tf-tile.done::after{ animation:none; }
+
+/* ---- A+ follow-up: Twin Flip polish - floor spotlights, a Vegas marquee sign, an emerald felt board ---- */
+.tf-beam{ position:absolute; bottom:-3%; width:30%; height:80%; margin-left:-15%; transform-origin:50% 100%; clip-path:polygon(46% 100%, 54% 100%, 100% 0, 0 0); background:linear-gradient(0deg, rgba(255,240,190,0.55), rgba(255,240,190,0.18) 55%, rgba(255,240,190,0)); opacity:0.25; will-change:transform; animation:tfSway 6s ease-in-out infinite alternate; }
+.tf-beam.b1{ animation-duration:5s; animation-delay:-1s; } .tf-beam.b2{ animation-duration:6.5s; animation-delay:-3.5s; } .tf-beam.b3{ animation-duration:7s; animation-delay:-2s; } .tf-beam.b4{ animation-duration:5.5s; animation-delay:-4.5s; }
+@keyframes tfSway{ from{ transform:rotate(-25deg); } to{ transform:rotate(25deg); } }
+.tf-pool{ position:absolute; bottom:-1.5%; width:22%; height:3%; margin-left:-11%; border-radius:50%; background:radial-gradient(ellipse closest-side, rgba(255,240,190,0.55), rgba(255,240,190,0)); }
+.mg-twinFlip .mg-bg::after{ z-index:2; pointer-events:none; }
+:root.lite .tf-beam{ animation:none; transform:rotate(0deg); }
+@media (prefers-reduced-motion: reduce){ .tf-beam{ animation:none; } }
+/* the sign: a Vegas marquee - gold chrome letters with a red neon outline, a ring of white bulbs chasing in two phases, card suits and sparkles */
+.tf-stage.tf-stage .tf-title{ display:flex; align-items:center; justify-content:center; gap:10px; padding:9px 22px; margin:6px auto 12px; border-radius:16px; background:linear-gradient(180deg, #4a0714, #2a030b); border:3px solid #e6b94a; box-shadow:0 0 0 3px #6a3d00, 0 0 0 5px rgba(255,255,255,0.35), 0 5px 0 5px #6a3d00; }
+.tf-stage.tf-stage .tf-title span{ display:block; font:900 clamp(30px, 9.6vw, 40px)/1 var(--f-display); letter-spacing:3px; color:transparent; background:linear-gradient(180deg, #fff8cc 0%, #ffd23f 38%, #a8730a 50%, #ffe27a 66%, #c28a1c 100%); -webkit-background-clip:text; background-clip:text; -webkit-text-stroke:2.5px #ff2a4a; paint-order:stroke fill; filter:drop-shadow(0 0 5px rgba(255,42,74,0.9)); text-shadow:none; }
+.tf-title .ts{ font:900 20px/1 var(--f-body, serif); color:#ffd23f; letter-spacing:2px; text-shadow:0 1px 0 #6a3d00; }
+.tf-title .tw{ position:absolute; font-style:normal; font-size:15px; color:#fff6c2; animation:mqFade 1.6s ease-in-out infinite; }
+.tf-title .t1{ left:26%; top:-9px; } .tf-title .t2{ right:24%; bottom:-9px; animation-delay:-0.8s; } .tf-title .t3{ right:-8px; top:6px; animation-delay:-0.4s; font-size:12px; }
+.tf-title::before, .tf-title::after{ content:''; position:absolute; inset:4px; border-radius:12px; height:auto; pointer-events:none;
+  background:radial-gradient(circle closest-side, #ffffff 0 45%, rgba(255,255,255,0.35) 75%, rgba(255,255,255,0) 100%) 50% 0 / 20px 9px repeat-x, radial-gradient(circle closest-side, #ffffff 0 45%, rgba(255,255,255,0.35) 75%, rgba(255,255,255,0) 100%) 50% 100% / 20px 9px repeat-x,
+    radial-gradient(circle closest-side, #ffffff 0 45%, rgba(255,255,255,0.35) 75%, rgba(255,255,255,0) 100%) 0 50% / 9px 20px repeat-y, radial-gradient(circle closest-side, #ffffff 0 45%, rgba(255,255,255,0.35) 75%, rgba(255,255,255,0) 100%) 100% 50% / 9px 20px repeat-y; animation:mqFade 2s ease-in-out infinite; }
+.tf-title::after{ animation-delay:-1s; background-position:calc(50% + 10px) 0, calc(50% + 10px) 100%, 0 calc(50% + 10px), 100% calc(50% + 10px); }
+:root.lite .tf-title::before, :root.lite .tf-title::after, :root.lite .tf-title .tw{ animation:none; }
+:root.lite .tf-title::after{ opacity:0.5; }
+@media (prefers-reduced-motion: reduce){ .tf-title::before, .tf-title::after, .tf-title .tw{ animation:none; } .tf-title::after{ opacity:0.5; } }
+/* the board: deep emerald casino felt with a faint woven texture, a soft inner edge shadow and a thick gold trim */
+.tf-stage.tf-stage .tf-grid{ background:repeating-linear-gradient(45deg, rgba(255,255,255,0.035) 0 1px, rgba(255,255,255,0) 1px 4px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.12) 0 1px, rgba(0,0,0,0) 1px 4px), radial-gradient(ellipse at 50% 45%, #0d5a3e 0%, #073d2b 70%, #052a1e 100%);
+  border:5px solid #e6b94a; box-shadow:inset 0 0 34px rgba(0,0,0,0.6), 0 0 0 3px #5a0a20, 0 0 0 5px #e6b94a, 0 0 0 7px rgba(90,10,32,0.8); }
+:root:root.stage-on .mg-overlay.mg-twinFlip .mg-bg, :root:root .mg-overlay.mg-twinFlip .mg-bg{ display:block !important; position:absolute; inset:0; }
+.mg-twinFlip .mg-bg{ z-index:0; }
+.mg-twinFlip .mg-inner{ position:relative; z-index:1; }
