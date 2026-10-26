@@ -781,3 +781,30 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
   box-shadow:0 0 0 2px #d8aa3c, inset 0 0 0 2px rgba(255,255,255,0.18); }
 .tf-stage.tf-stage .tf-back::before{ content:''; position:absolute; left:50%; top:50%; width:30%; aspect-ratio:0.72; transform:translate(-50%, -50%) rotate(0deg); clip-path:polygon(50% 0, 100% 50%, 50% 100%, 0 50%); background:linear-gradient(135deg, #fff3a8, #e6b94a 55%, #b8841a); }
 .tf-stage.tf-stage .tf-back::after{ content:''; position:absolute; left:50%; top:50%; width:46%; aspect-ratio:0.72; transform:translate(-50%, -50%); clip-path:polygon(50% 0, 100% 50%, 50% 100%, 0 50%); background:#7c0d22; z-index:-1; }
+
+/* ---- A+ follow-up: Zap Words neon lock-in. A tile added to the word pops (1.12, 0.15 s), gets a neon ring in the word's colour and a lighter
+   tint of it, and stays lit until the word is submitted. The trail draws behind the letters. A valid word flashes once and fades in 0.5 s;
+   an invalid one drops back with a short shake. Nothing stays on the board afterwards. ---- */
+.zw-stage .zw-grid{ --tc:#ff3d94; }
+.zw-stage .zw-cell{ --tint:color-mix(in srgb, var(--tc) 40%, #ffffff); }
+.zw-stage .zw-cell svg .lk{ fill:var(--tint); stroke:var(--tc); stroke-width:9; stroke-linejoin:round; opacity:0; }
+.zw-stage .zw-cell.on, .zw-stage .zw-cell.on:nth-child(n){ transform:none; filter:none; background:none; }
+.zw-stage .zw-cell.on svg{ filter:drop-shadow(0 0 7px var(--tc)); }
+.zw-stage .zw-cell.on polygon.hx{ fill:#fff1d2; stroke:#e8c27a; stroke-width:3; }
+.zw-stage .zw-cell.on svg .lk{ opacity:1; }
+.zw-stage .zw-cell.fl-ok svg .lk{ opacity:1; animation:zwOk 0.5s ease-out both; }
+.zw-stage .zw-cell.fl-ok svg{ filter:drop-shadow(0 0 8px var(--tc)); }
+.zw-stage .zw-cell.fl-bad svg .lk{ opacity:1; animation:zwBadFade 0.32s ease-out both; }
+.zw-stage .zw-cell.fl-bad svg{ animation:zwShake 0.3s ease-out; }
+@keyframes zwOk{ 0%{ opacity:1; fill:#ffffff; } 22%{ opacity:1; fill:var(--tint); } 100%{ opacity:0; } }
+@keyframes zwBadFade{ from{ opacity:1; } to{ opacity:0; } }
+@keyframes zwShake{ 0%, 100%{ transform:translateX(0); } 25%{ transform:translateX(-5px); } 55%{ transform:translateX(5px); } 80%{ transform:translateX(-3px); } }
+:root.lite .zw-stage .zw-cell.fl-ok svg .lk, :root.lite .zw-stage .zw-cell.fl-bad svg .lk, :root.lite .zw-stage .zw-cell.fl-bad svg{ animation:none; opacity:0; }
+@media (prefers-reduced-motion: reduce){ .zw-stage .zw-cell.fl-ok svg .lk, .zw-stage .zw-cell.fl-bad svg .lk, .zw-stage .zw-cell.fl-bad svg{ animation:none; opacity:0; } }
+/* letters above the trail, the trail above the hexes: the cells make no stacking context of their own */
+.zw-stage .zw-cell{ z-index:auto; }
+.zw-stage .zw-cell > span{ position:relative; z-index:3; }
+.zw-stage .zw-trail{ z-index:2; }
+.zw-trail polyline.zw-glow{ stroke:var(--tc, #ff3d94); opacity:0.3; }
+.zw-trail polyline.zw-line{ stroke:var(--tc, #ff3d94); opacity:0.85; }
+.zw-stage .zw-grid > .zw-trail{ position:absolute; }
