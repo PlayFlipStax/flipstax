@@ -16026,7 +16026,7 @@
   function castWin(){ if (runActive) runActWon[runActIdx] = true; }
   const CAST_ALWAYS = (()=>{ try{ return /^(localhost|127\.0\.0\.1)$/.test(location.hostname) && new URLSearchParams(location.search).get('castwin') === '1'; }catch(e){ return false; } })();   // (localhost checks: every win pops)
   function castOops(){
-    if (!window.Cast) return;
+    if (!window.Cast || !Cast.enabled()) return;   // (A+: the pop-outs are off - the host keeps his own line)
     try{ document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say'); clearTimeout(hostSayT); }catch(e){}   // (the host's own line would sit where his reaction does)
     Cast.oops({ side:'right', while: ()=> !els.eventOverlay.classList.contains('hidden') || !els.irOverlay.classList.contains('hidden') || !!document.getElementById('mgOverlay') });
   }
