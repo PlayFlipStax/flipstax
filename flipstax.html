@@ -42,6 +42,7 @@
 <link rel="stylesheet" href="lib/vs-console.css">
 <link rel="stylesheet" href="lib/lights.css">
 <link rel="stylesheet" href="lib/machine.css">
+<link rel="stylesheet" href="lib/intro.css">
 <link rel="preload" as="image" href="data/stage/stage-close.webp" type="image/webp">
 <style>
   :root{
@@ -4902,6 +4903,7 @@
 <script src="lib/vs-console.js"></script>
 <script src="lib/lights.js"></script>
 <script src="lib/machine.js"></script>
+<script src="lib/intro.js"></script>
 <script src="data/machines/machines.js"></script>
 <script>
 (function(){
@@ -17478,6 +17480,7 @@
   }
   addEventListener('resize', ()=> requestAnimationFrame(fitHomeHost));
   [300, 1200, 2600].forEach(ms=> setTimeout(fitHomeHost, ms));   // (again as the pictures arrive)
+  if (window.Intro) Intro.init({ testing:()=> REPLAY || DEBUG_FAST || SHOW_DEBUG });
   els.homeEnterBtn.addEventListener('click', ()=>{
     const ov = els.homeOverlay;
     if (ov.classList.contains('entering')) return;
@@ -17493,6 +17496,8 @@
       if (!runResultToday || REPLAY) els.modeDailyBtn.click();
       else els.modeSelectOverlay.classList.remove('hidden');
     };
+    // Oct 25: the mothership intro (lib/intro.js) - the video (first visit), a cyan flash, then the curtains; ?oldintro=1 keeps the host slide below
+    if (window.Intro && Intro.enabled){ ov.classList.add('entering'); Intro.run(enter); return; }
     if (prefersReducedMotion() || !host){ enter(); return; }
     if (isLite()){ setTimeout(enter, 950); return; }   // (G2: lite mode skips the motion, not the beat)
     ov.classList.add('entering');
