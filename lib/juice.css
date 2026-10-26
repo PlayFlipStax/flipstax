@@ -655,3 +655,36 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root.mode-daily .event-overlay.stack.bb-emojiDecode.bb-revealed .event-tile:not(.is-right):not(.is-wrong){ opacity:0.5; }
 :root.lite.mode-daily .event-overlay.stack.bb-emojiDecode .bb-marquee{ animation:none; }
 @media (prefers-reduced-motion: reduce){ :root.mode-daily .event-overlay.stack.bb-emojiDecode .bb-marquee{ animation:none; } }
+
+/* ---- A+ follow-up item 1: Twin Flip recolour - crimson velvet, gold trim, ivory playing-card tiles, electric-blue matches ---- */
+:root:root.stage-on .mg-overlay.mg-twinFlip, .mg-overlay.mg-twinFlip{ background:radial-gradient(ellipse at 50% 38%, #b01a3c 0%, #8a1130 52%, #5a0a20 100%) !important; }
+.mg-twinFlip .mg-bg{ display:block; background:repeating-linear-gradient(90deg, rgba(0,0,0,0) 0 26px, rgba(40,0,10,0.16) 26px 34px, rgba(255,255,255,0.04) 34px 44px); overflow:hidden; -webkit-mask-image:none; mask-image:none; }
+.mg-twinFlip .mg-bg .rays{ display:none; }
+.mg-twinFlip .mg-bg::before{ content:''; position:absolute; left:50%; top:40%; width:150vmax; height:150vmax; margin:-75vmax 0 0 -75vmax; border-radius:50%; background:repeating-conic-gradient(from 0deg, rgba(255,214,120,0.13) 0deg 7deg, rgba(255,214,120,0) 7deg 14deg); animation:sbTurn 140s linear infinite; will-change:transform; }
+.mg-twinFlip .mg-bg::after{ content:''; position:absolute; inset:9px; border:2px solid #e6b94a; border-radius:20px; box-shadow:0 0 0 5px rgba(90,10,30,0.8), 0 0 0 7px rgba(230,185,74,0.55); }
+:root.lite .mg-twinFlip .mg-bg::before{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .mg-twinFlip .mg-bg::before{ animation:none; } }
+.mg-twinFlip .mg-rule{ color:#fff3d0; text-shadow:0 2px 0 rgba(60,0,15,0.7); }
+/* the sign: gold, with bulbs along its top and bottom edges */
+.tf-stage.tf-stage .tf-title{ position:relative; display:block; align-self:center; margin:6px auto 12px; padding:12px 26px; border-radius:16px; background:linear-gradient(180deg, #ffe9a0, #e6b94a 55%, #c28a1c); border:3px solid #fff3c4; box-shadow:0 0 0 3px #6a3d00, 0 6px 0 3px #6a3d00; }
+.tf-title span{ display:block; font:900 clamp(34px, 11vw, 46px)/1 var(--f-display); letter-spacing:4px; color:#5a0a20; -webkit-text-stroke:0; paint-order:normal; text-shadow:0 2px 0 rgba(255,255,255,0.55); }
+.tf-title::before, .tf-title::after{ content:''; position:absolute; left:10px; right:10px; height:9px; background:radial-gradient(circle, #fffbe6 0 3px, #ffd23f 3.8px, rgba(255,210,63,0) 5px) 0 50% / 20px 9px repeat-x; animation:mqFade 2s ease-in-out infinite; }
+.tf-title::before{ top:2px; } .tf-title::after{ bottom:2px; animation-delay:-1s; }
+:root.lite .tf-title::before, :root.lite .tf-title::after{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .tf-title::before, .tf-title::after{ animation:none; } }
+/* the board: a velvet panel with gold trim */
+.tf-stage.tf-stage .tf-grid{ width:min(100%, 372px, calc(100dvh - 390px)); gap:12px; padding:14px; background:rgba(60,4,18,0.55); border:3px solid #e6b94a; box-shadow:0 0 0 3px #5a0a20, 0 0 0 5px rgba(230,185,74,0.5); }
+/* tiles: ivory playing cards, a thin gold border, a gold FS monogram */
+.tf-stage.tf-stage .tf-tile, .tf-stage.tf-stage .tf-tile:nth-child(n){ border-radius:12px; background:linear-gradient(180deg, #fffdf4, #f3ead2); border:2px solid #d8aa3c; box-shadow:inset 0 0 0 3px rgba(255,255,255,0.7), 0 4px 0 #8a6414; translate:0 0; transition:translate 0.15s ease; }
+.tf-stage.tf-stage .tf-back{ color:#c8921f; text-shadow:0 1px 0 rgba(255,255,255,0.85); font-size:clamp(24px, 7.6vw, 32px); }
+.tf-stage.tf-stage .tf-tile.up{ background:linear-gradient(180deg, #fffdf4, #f3ead2); box-shadow:inset 0 0 0 3px rgba(255,255,255,0.7), 0 4px 0 #8a6414; translate:0 -4px; }
+.tf-stage.tf-stage .tf-tile.up:not(.done){ border-color:#ffd23f; box-shadow:inset 0 0 0 3px rgba(255,255,255,0.7), 0 6px 0 #8a6414, 0 0 0 3px rgba(255,210,63,0.9), 0 0 16px 3px rgba(255,210,63,0.85); }
+.tf-stage.tf-stage .tf-face{ color:#7a1230; }
+.tf-stage.tf-stage .tf-face svg{ filter:none; }
+.tf-stage.tf-stage .tf-emo{ filter:none; }
+/* matches: the electric-blue ring (a spark travels round it, a bolt joins the pair), then a steady blue pulse for the round */
+.tf-stage.tf-stage .tf-tile.done{ translate:0 -4px; border-color:#39a7ff; box-shadow:inset 0 0 0 3px rgba(255,255,255,0.7), 0 4px 0 #8a6414; }
+.tf-stage.tf-stage .tf-tile.done::after{ border:4px solid #8fd0ff; box-shadow:0 0 14px 4px #39a7ff, inset 0 0 10px #39a7ff; animation:tfPulse 2s ease-in-out infinite alternate; }
+.tf-stage.tf-stage .tf-tile .ne-spin-wrap{ --ne:#39a7ff; }
+.tf-stage.tf-stage .tf-pairs{ color:#fff3d0; text-shadow:0 2px 0 rgba(60,0,15,0.7); }
+:root.lite .tf-stage.tf-stage .tf-tile.done::after{ animation:none; }
