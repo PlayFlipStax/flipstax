@@ -407,3 +407,18 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root.mode-daily .rw-chip.keys{ background:linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.1) 46%, rgba(255,255,255,0) 52%), linear-gradient(180deg, #ff9fd0, #ff3c9d); box-shadow:inset 0 -4px 0 rgba(0,0,0,0.16), 0 5px 0 #a3105e; }
 :root.mode-daily .rw-chip.keys b, :root.mode-daily .rw-chip.keys small{ color:#fff; text-shadow:0 2px 0 rgba(110,0,60,0.55); }
 :root.lite .rw-frame .mq, :root.lite .rw-frame .mq.mq-b{ animation:none; }
+
+/* ---- A+ tier 2 item 1: cleanup ---- */
+/* a) the winning gold panel: dark brown text with a light outline, always readable; the arcs are bigger and sit ON the border */
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-tile.is-right.gold, :root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-tile.is-right.gold .ttxt{ color:#2a1000; text-shadow:0 1px 0 rgba(255,255,255,0.75), 0 0 6px rgba(255,255,255,0.5); }
+.ne-arc{ width:92px; height:50px; }
+.ne-arc svg{ width:92px; height:50px; }
+.ne-arc.a0{ right:auto; left:14%; top:-32px; transform:none; }
+.ne-arc.a1{ left:auto; right:-52px; top:calc(50% - 25px); bottom:auto; transform:rotate(90deg); }
+.ne-arc.a2{ left:46%; top:auto; bottom:-32px; transform:rotate(180deg); }
+/* c) the VS time-out toast: a clear pill below the category chip */
+:root.mode-daily .toast.under-header{ font-size:18px; font-weight:900; }
+/* d) a round that paid nothing: a friendly line */
+.rw-nothing{ width:100%; display:flex; flex-direction:column; align-items:center; gap:6px; padding:6px 4px; text-align:center; }
+.rw-nothing b{ font:900 clamp(30px, 9.5vw, 38px)/1.05 var(--f-display); color:#b4125f; text-shadow:0 2px 0 rgba(255,255,255,0.8); text-transform:uppercase; letter-spacing:1px; }
+.rw-nothing small{ font:800 17px/1.2 var(--f-body, Inter, sans-serif); color:#3a1500; }

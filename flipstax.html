@@ -7582,7 +7582,7 @@
               'Commission-based, uncapped upside', '\uD83D\uDCC8', 'linear-gradient(165deg,#3d1a0f,#8a3a1f)'],
     ['money', 'Renting, with total flexibility', '\uD83D\uDD11', 'linear-gradient(165deg,#0f2740,#2e7bb5)',
               'Owning, with a 30-year mortgage', '\uD83C\uDFE1', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)'],
-    ['money', 'Saving aggressively for retirement, starting now', '\uD83D\uDC34', 'linear-gradient(165deg,#152e0f,#3a6b1f)',
+    ['money', 'Saving aggressively for retirement, starting now', '🏦', 'linear-gradient(165deg,#152e0f,#3a6b1f)',
               'Spending on experiences now, worrying later', '\uD83C\uDF89', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
     // style
     ['style', 'Tattoos and piercings', '🖋️', 'linear-gradient(165deg,#1f0f3d,#5a2f8a)',
@@ -7591,9 +7591,9 @@
               'Heels, always', '👠', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
     ['style', 'Sneakers with everything', '\uD83D\uDC5F', 'linear-gradient(165deg,#1c2733,#3f5b70)',
               'Dress shoes, always', '\uD83D\uDC5E', 'linear-gradient(165deg,#2b1e12,#6b4a28)'],
-    ['style', 'A messy, lived-in home', '\uD83C\uDFDA\uFE0F', 'linear-gradient(165deg,#2b1e12,#6b4a28)',
-              'A spotless, minimalist home', '\uD83D\uDC57', 'linear-gradient(165deg,#1c2733,#3f5b70)'],
-    ['style', 'Thrifted and vintage', '\uD83E\uDDF5', 'linear-gradient(165deg,#2b1e12,#6b4a28)',
+    ['style', 'A messy, lived-in home', '🛋️', 'linear-gradient(165deg,#2b1e12,#6b4a28)',
+              'A spotless, minimalist home', '🧼', 'linear-gradient(165deg,#1c2733,#3f5b70)'],
+    ['style', 'Thrifted and vintage', '🧥', 'linear-gradient(165deg,#2b1e12,#6b4a28)',
               'Brand new, straight off the shelf', '\uD83C\uDFF7\uFE0F', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
     ['style', 'One signature outfit, worn every single day', '\uD83D\uDC54', 'linear-gradient(165deg,#232733,#4a5568)',
               'A brand-new outfit every day, never repeated', '\uD83D\uDC57', 'linear-gradient(165deg,#3d150f,#8a2f1f)'],
@@ -7847,7 +7847,7 @@
                    'Beaches', '🏖️', 'linear-gradient(165deg,#0d3b36,#2f9e8f)'],
     ['geography', 'Visiting every US state', '🗺️', 'linear-gradient(165deg,#0f2740,#2e7bb5)',
                    'Visiting every country in Europe', '🏰', 'linear-gradient(165deg,#2a0f3d,#7b2d8b)'],
-    ['geography', 'Tokyo', '\uD83D\uDDFC', 'linear-gradient(165deg,#3d150f,#8a2f1f)',
+    ['geography', 'Tokyo', '🏯', 'linear-gradient(165deg,#3d150f,#8a2f1f)',
                    'Paris', '\uD83D\uDDFC', 'linear-gradient(165deg,#1f0f3d,#5a2f8a)'],
     ['geography', 'A cabin in the mountains', '\uD83C\uDFD4\uFE0F', 'linear-gradient(165deg,#1c2733,#3f5b70)',
                    'A cottage by the sea', '\uD83C\uDF0A', 'linear-gradient(165deg,#0d3b36,#2f9e8f)'],
@@ -7873,7 +7873,7 @@
     ['history', 'Exploring ancient Egypt', '\uD83D\uDC2B', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)',
                 'Exploring ancient Rome', '\uD83C\uDFDB\uFE0F', 'linear-gradient(165deg,#331a1f,#7a3f4a)'],
     ['history', 'The early space race era', '\uD83D\uDE80', 'linear-gradient(165deg,#0f1a3d,#2f4a8a)',
-                'The old wild west era', '\uD83D\uDE20', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)'],
+                'The old wild west era', '🤠', 'linear-gradient(165deg,#3d2a0f,#8a6a2f)'],
     ['history', 'The dawn of the internet', '\uD83D\uDCBE', 'linear-gradient(165deg,#0f2740,#2e7bb5)',
                 'The dawn of the smartphone', '\uD83D\uDCF1', 'linear-gradient(165deg,#152e0f,#3a6b1f)'],
   ];
@@ -11677,6 +11677,9 @@
       '<span class="rw-chip letter ' + (letter || 'none') + '" style="--i:1"><b>' + (letter === 'got' ? '?' : letter === 'miss' ? '✕' : '–') + '</b><small>' + (letter === 'got' ? 'letter won' : 'no letter') + '</small></span>' +
       '<span class="rw-chip keys" style="--i:2"><b>🔑 ' + keys + '</b><small>gold key' + (keys === 1 ? '' : 's') + '</small></span></div></div></div>';   // (A+: only points gained, the letter won and keys - no running totals)
     showCard.querySelector('.rw-title').textContent = (a.title || 'ROUND') + ' DONE!';
+    // A+: nothing earned - a friendly line in place of a bare +0 and a grey "no letter" tile (a round that paid something drops just the empty letter tile)
+    if (pts <= 0 && letter !== 'got' && !keys){ showCard.querySelector('.rw-row').innerHTML = '<div class="rw-nothing"><b>Next round' + "'" + 's yours!</b><small>Keep going - the points are coming</small></div>'; showCard.classList.add('rw-empty'); }
+    else if (letter !== 'got' && letter !== 'miss'){ const lc = showCard.querySelector('.rw-chip.letter'); if (lc) lc.remove(); }
     showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', (a.title || 'Round') + ' done: ' + pts + ' points, ' + (letter === 'got' ? 'a letter, ' : '') + keys + ' gold keys. Tap to go on');
     showCard.classList.remove('hidden');
     if (pts > 0) sfx.chime(5);
@@ -15663,8 +15666,8 @@
       // value, 2. Daily's star cards still cost DAILY_TOO_SLOW_STAR_PENALTY.)
       const penalty = current.bonusPoints && runActive ? DAILY_TOO_SLOW_STAR_PENALTY : TOO_SLOW_PENALTY;
       if (runActive) addRunScore(-penalty); else addRacePoints(-penalty);
-      showToast(runActive ? '\u23F1\uFE0F Time\u2019s up, we picked for you! \u2212' + penalty + ' point' + (penalty>1?'s':'')   // (A+: the Daily wording; the cost is unchanged)
-        : '\u23F1\uFE0F Too slow \u2014 \u2212' + penalty + ' point' + (penalty>1?'s':''), true);
+      showToast(runActive ? '\u23F1\uFE0F Too slow! \u2212' + penalty + ' point' + (penalty>1?'s':'')   // (A+: the Daily wording; the cost is unchanged)
+        : '\u23F1\uFE0F Too slow \u2014 \u2212' + penalty + ' point' + (penalty>1?'s':''), true, runActive);
     }
     scheduleNext(dt(TOO_SLOW_NEXT_MS));
   }
@@ -16574,7 +16577,7 @@
     requestAnimationFrame(tick);
   }
 
-  function showToast(msg, underHeader){
+  function showToast(msg, underHeader, belowChip){
     els.toast.textContent = msg;
     els.toast.classList.toggle('under-header', !!underHeader);
     // Round feedback: Daily's sits just under the header; Infinity's goes in
@@ -16583,7 +16586,7 @@
     const belowCards = !!underHeader && inInfinity();
     els.toast.classList.toggle('below-cards', belowCards);
     document.documentElement.classList.toggle('toast-below-cards', belowCards);   // the helper line steps aside while it shows
-    if (underHeader && !belowCards){ const h = document.querySelector('.app > header'); els.toast.style.top = (h ? Math.round(h.getBoundingClientRect().bottom) + 4 : 8) + 'px'; }
+    if (underHeader && !belowCards){ const h = document.querySelector('.app > header'), ch = belowChip && els.chipA; els.toast.style.top = (ch ? Math.round(ch.getBoundingClientRect().bottom) + 8 : h ? Math.round(h.getBoundingClientRect().bottom) + 4 : 8) + 'px'; }   // (A+: a VS time-out sits below the category chip)
     else els.toast.style.top = '';
     els.toast.classList.add('show');
     clearTimeout(showToast._t);
