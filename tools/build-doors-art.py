@@ -66,4 +66,14 @@ a = np.minimum(np.asarray(cu.getchannel('A')), np.asarray(mask)); cu.putalpha(Im
 save(fit(cu), 'door-copper.webp', 100)
 
 # --- the stage
-st = Image.open(os.path.join(SRC, 'doors2-clean.jpg')).convert('RGB'); save(st, 'stage.webp', 150)
+st = Image.open(os.path.join(SRC, 'doors2-clean.jpg')).convert('RGB')
+# the stage picture has three small doors baked into its lower third; the live doors replace them, so smear the band just above them
+# down over that area (blurred, darkened a little) and melt the foot into the floor
+W0, H0 = st.size; y0 = int(H0 * 0.632)
+band = st.crop((0, int(H0 * 0.585), W0, y0)).resize((W0, H0 - y0), Image.BICUBIC).filter(ImageFilter.GaussianBlur(14))
+arr = np.asarray(band).astype('float32'); ramp = np.linspace(1.0, 0.72, arr.shape[0])[:, None, None]; arr = arr * ramp
+floor = np.array([120, 98, 78], dtype='float32'); fade = np.clip((np.linspace(0, 1, arr.shape[0]) - 0.55) / 0.45, 0, 1)[:, None, None]
+arr = arr * (1 - fade * 0.7) + floor * fade * 0.7
+patch = Image.fromarray(arr.clip(0, 255).astype('uint8'))
+blend = Image.linear_gradient('L').resize((W0, 40)); mask = Image.new('L', patch.size, 255); mask.paste(blend, (0, 0))
+st.paste(patch, (0, y0), mask); save(st, 'stage.webp', 150)

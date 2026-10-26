@@ -10960,9 +10960,11 @@
   // the other three open too so the player sees what else was there, and the picked game plays. The old Portal Pick's
   // power-ups are not offered here (their code stays).
   const DOOR_PICK_MS = 8000;
+  const DOOR_SHOWN = 3;   // Oct 25: three doors on the stage (blue, copper, wood); the plan still draws four games, the first three show
+  const DOOR_ART = ['blue', 'copper', 'wood'];
   const DOOR_ICONS = { emojiDecode:'😀', timeWarp:'⌛', snapSort:'📸', saucerShuffle:'🛸', factOrFib:'❓', priceProbe:'🏷️' };
   function runMysteryDoor(st, done){
-    const games = (st.doors || []).filter(g=> mysteryAvailable(g)).slice(0, DOOR_COUNT);
+    const games = (st.doors || []).filter(g=> mysteryAvailable(g)).slice(0, DOOR_SHOWN);
     if (!games.length) return false;
     const g = Show.gen, ov = els.eventOverlay;
     runPhase = 'break';
@@ -10971,14 +10973,18 @@
     els.powerupIcon.classList.add('hidden');
     fitTopChip();
     els.eventSubtitle.textContent = '🚪 MYSTERY DOOR';
-    els.eventPrompt.textContent = 'Pick a door — a bonus game waits behind each';
+    els.eventPrompt.textContent = 'Pick a door \u2014 a bonus game waits behind each';
+    // Oct 25: the live title on the stage's blank sign (MYSTERY DOORS, ROUND n \u2022 PICK A DOOR) - real text, set here each time
+    { let t = document.getElementById('mdTitle'); if (!t){ t = document.createElement('div'); t.id = 'mdTitle'; t.className = 'md-title'; t.innerHTML = '<b>MYSTERY DOORS</b><small></small>'; ov.appendChild(t); }
+      t.querySelector('small').textContent = 'ROUND ' + ((RUNDOWN.acts[st.act] || {}).round || 3) + ' \u2022 PICK A DOOR'; }
+    ov.classList.remove('md-picked');
     // Run 4B: the title goes up on the marquee (the close shot of the stage, behind the doors)
     if (window.Stage) Stage.cue('close', { over: ov, cls:'mdoor', sign:{ sub:'ROUND ' + ((RUNDOWN.acts[st.act] || {}).round || 3) + ' OF ' + SHOW_ROUND_COUNT, main:'MYSTERY DOOR' } });
     let picked = false;
-    const reset = ()=>{ ov.classList.add('hidden'); ov.classList.remove('powerup', 'mdoor'); els.eventTiles.forEach(t=>{ t.classList.remove('portal', 'open', 'other', 'picked-wait'); t.innerHTML = ''; t.onclick = null; }); };
+    const reset = ()=>{ ov.classList.add('hidden'); ov.classList.remove('powerup', 'mdoor', 'md-picked'); els.eventTiles.forEach(t=>{ t.classList.remove('portal', 'open', 'other', 'picked-wait'); t.innerHTML = ''; t.onclick = null; }); };
     const open = (i)=>{
       if (picked || g !== Show.gen) return;
-      picked = true; clearTimeout(eventTimeoutId);
+      picked = true; clearTimeout(eventTimeoutId); ov.classList.add('md-picked');   // (the other doors dim, the picked one swings open)
       els.eventTiles.forEach(t=> t.onclick = null);
       const tile = els.eventTiles[i], game = games[i % games.length];
       tile.classList.add('picked-wait'); sfx.drumroll(QUIZ_DRUMROLL_MS);
@@ -10998,7 +11004,8 @@
     };
     els.eventTiles.forEach((tileEl, i)=>{
       const game = games[i % games.length], c = gameIntroColors(game);
-      tileEl.innerHTML = '<span class="pu-door">' + (i + 1) + '</span><span class="pu-prize" style="background:linear-gradient(180deg, ' + c[0] + ', ' + (c[1] || c[0]) + ')"><span class="pu-icon">' + (DOOR_ICONS[game] || '✨') + '</span><span class="pu-label"></span></span>';
+      tileEl.innerHTML = '<span class="md-space" aria-hidden="true"><i></i><i></i><i></i></span><img class="md-img" alt="" draggable="false" src="data/doors/door-' + (DOOR_ART[i] || 'wood') + '.webp"><span class="pu-prize" style="background:linear-gradient(180deg, ' + c[0] + ', ' + (c[1] || c[0]) + ')"><span class="pu-icon">' + (DOOR_ICONS[game] || '\u2728') + '</span><span class="pu-label"></span></span>';
+      tileEl.dataset.door = DOOR_ART[i] || 'wood'; tileEl.setAttribute('aria-label', 'Door ' + (i + 1));
       tileEl.querySelector('.pu-label').textContent = mysteryName(game);
       tileEl.style.backgroundColor = ''; tileEl.dataset.pu = '';
       tileEl.classList.add('portal'); tileEl.classList.remove('open', 'other', 'is-right', 'is-wrong');

@@ -30,22 +30,13 @@
       submit: { x: 0.618, y: 0.806, w: 0.200, h: 0.046 },
     },
     match: ()=>{ const o = $('solveOverlay'); return o && M.visible(o) && document.documentElement.classList.contains('mode-daily') ? o : null; } });
-  // Mystery Door: four pods (the doors) with a ring above each (the door's number) and a round button below each (taps the door);
-  // the prompt and the pick timer go in the dark recess between the pods and the buttons
-  const POD = (cx)=> ({ x: cx - 0.083, y: 0.462, w: 0.166, h: 0.212 }), RING = (cx)=> ({ x: cx - 0.07, y: 0.303, w: 0.14, h: 0.072 }), BTN = (cx)=> ({ x: cx - 0.07, y: 0.822, w: 0.14, h: 0.068 });
-  const DX = [0.182, 0.390, 0.615, 0.818], RX = [0.175, 0.392, 0.610, 0.825];
-  const DOORS = { prompt: { x: 0.060, y: 0.9205, w: 0.560, h: 0.054 } };
-  DX.forEach((c, k)=>{ DOORS['pod' + (k + 1)] = POD(c); DOORS['ring' + (k + 1)] = RING(RX[k]); DOORS['btn' + (k + 1)] = BTN(RX[k]); });
-  M.register('doors', { bg: ['#010a1b', '#2d214a'], img: 'doors', w: 736, h: 1433, lit: true, below: true, regions: DOORS,
+  // Mystery Doors (Oct 25 redo): the stage picture (data/doors/stage.webp) behind three live doors; the title on its blank sign
+  M.register('doors', { img: 'doors', clean: 'data/doors/stage.webp', w: 768, h: 1376, lit: false, bright: true, below: true, alignTop: true, bg: ['#28201c', '#6a563f'], regions: {
+      sign:  { x: 0.250, y: 0.205, w: 0.500, h: 0.185 },
+      row:   { x: 0.000, y: 0.470, w: 1.000, h: 0.380 },
+      prompt:{ x: 0.080, y: 0.870, w: 0.840, h: 0.075 },
+    },
     match: ()=>{ const o = $('eventOverlay'); return o && M.visible(o) && o.classList.contains('mdoor') && document.documentElement.classList.contains('mode-daily') ? o : null; } });
-  // the four round buttons are real buttons too: each taps its door (only while the doors are up)
-  document.addEventListener('DOMContentLoaded', ()=>{
-    const ov = $('eventOverlay'); if (!ov || $('mcDoorBtns')) return;
-    const box = document.createElement('div'); box.id = 'mcDoorBtns'; box.className = 'mc-door-btns';
-    box.innerHTML = [1, 2, 3, 4].map(n=> '<button type="button" class="mc-door-btn b' + n + '" aria-label="Door ' + n + '"></button>').join('');
-    ov.appendChild(box);
-    box.querySelectorAll('button').forEach((b, k)=> b.addEventListener('click', (e)=>{ e.stopPropagation(); const t = ov.querySelectorAll('.event-tile')[k]; if (t && t.onclick){ b.classList.add('press'); setTimeout(()=> b.classList.remove('press'), 180); t.click(); } }));
-  });
   // Lucky Lights: the game's own wheel covers the picture's (centred on it, under its pointer); the big pink button is STOP;
   // BANK and SPIN AGAIN on the coloured strip buttons; the bank and spin count on a small plaque under the wheel
   M.register('lucky', { bg: ['#020512', '#392a53'], img: 'lucky-console', w: 736, h: 1433, lit: true, top: 22, regions: {
