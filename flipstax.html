@@ -4396,6 +4396,7 @@
       <div class="bg ev-bg w-powerup" id="evBg" aria-hidden="true"><i class="rays"></i><i class="glow"></i></div>
       <canvas class="coin-rays" id="coinRays" aria-hidden="true"></canvas>
       <canvas class="event-sky" id="eventSky" aria-hidden="true"></canvas>
+      <div class="ov-tint" aria-hidden="true"></div>
       <div class="riddle-ufo event-ufo" aria-hidden="true"><span>🛸</span><i></i></div>
       <div class="powerup-icon hidden" id="powerupIcon">🎁</div>
       <div class="bb-marquee" aria-hidden="true"></div>
@@ -12301,7 +12302,8 @@
     const qMs = q.riddle ? RIDDLE_MS : dt(10000);   // (Run 4A: the Riddle Round gets its 30 s; a Brain Beam 10 s)
     runPendingQEndsAt = resumeEndsAt || (Date.now() + (flipIn ? dt(BEAM_FLIP_MS) : 0) + qMs);
     if (DEBUG_FAST || REPLAY) window.__debugLastTriviaQ = q;   // (tests and the TEST menu's screenshot runs)
-    els.eventOverlay.classList.remove('hidden', 'powerup'); els.eventOverlay.classList.add('stack'); els.eventOverlay.style.setProperty('--bb', q.riddle ? '#c9ff7a' : '#ffd23f');
+    if (window.Juice) Juice.electricOff();
+    els.eventOverlay.classList.remove('hidden', 'powerup', 'wrong-tint'); els.eventOverlay.classList.add('stack'); els.eventOverlay.style.setProperty('--bb', q.riddle ? '#c9ff7a' : '#ffd23f');
     els.powerupIcon.classList.add('hidden');
     fitTopChip();
     els.eventSubtitle.textContent = second ? '🔁 SECOND CHANCE · answer right, recover a letter'
@@ -12311,7 +12313,7 @@
     els.eventPrompt.textContent = q.question; els.eventPrompt.classList.toggle('long', q.question.length > 90);
     runQuizPick = null;
     els.eventTiles.forEach((tileEl,i)=>{
-      tileEl.classList.remove('portal', 'open', 'is-right', 'is-wrong');
+      tileEl.classList.remove('portal', 'open', 'is-right', 'is-wrong', 'gold', 'dim', 'lit');
       fillQuizTile(tileEl, i, q.opts[i]);
       tileEl.style.backgroundColor = TILE_COLORS[i];
       tileEl.onclick = ()=>{
@@ -12414,8 +12416,9 @@
     saveRunSnapshot();
     revealThen(()=>{
       if (DEBUG_FAST && window.__holdResult) return;   // tests: keep the result on screen
-      els.eventOverlay.classList.add('hidden');
-      els.eventTiles.forEach(t=> t.classList.remove('is-right', 'is-wrong'));
+      if (window.Juice) Juice.electricOff();
+      els.eventOverlay.classList.add('hidden'); els.eventOverlay.classList.remove('wrong-tint');
+      els.eventTiles.forEach(t=> t.classList.remove('is-right', 'is-wrong', 'gold', 'dim', 'lit'));
       if (!runActive) return;
       advanceAfterTrivia();
     }, { lead:400, min: runPerfect ? 1900 : 0 });   // (A+: the answer flips first (0.4 s), then 1.4 s of the result; a perfect run's banner holds a beat longer; a tap skips after 0.8 s)
@@ -16087,15 +16090,26 @@
   function quizFxA(correct, pickIdx, correctIdx){
     const tiles = els.eventTiles, right = tiles[correctIdx], picked = tiles[pickIdx];
     const still = FX.reduced() || document.documentElement.classList.contains('lite') || !Element.prototype.animate;
+    // A+ tier 1 item 1. Right: the answer flips and locks gold, then gets a neon outline (a spark round the border, three
+    // electric arcs, then a steady slow-pulsing glow). Wrong: the whole screen goes game-show red with the buzzer, the wrong
+    // bar turns red, every other answer dims, and the correct answer lights up with a green travelling light that stays lit
+    // for the whole hold. One electric effect at a time; the next question clears it all.
     const mid = ()=>{
       if (correct){ if (right) right.classList.add('is-right', 'gold'); sfx.chime(); }
-      else { if (picked) picked.classList.add('is-wrong'); sfx.buzzer(); }
+      else {
+        if (picked) picked.classList.add('is-wrong'); sfx.buzzer();
+        els.eventOverlay.classList.add('wrong-tint');
+        tiles.forEach(t=>{ if (t !== picked && t !== right) t.classList.add('dim'); });
+      }
     };
     const end = ()=>{
-      if (correct){ if (right && window.Juice) Juice.flash(right); hostMood('cheer'); hostSay(hostLine('right')); }
-      else { if (right){ right.classList.add('is-right'); if (window.Juice) Juice.trace(right, '#5dff8a', 1000); } hostMood('sad'); hostSay(hostLine(pickIdx == null ? 'slow' : 'wrong')); }
+      if (correct){ if (right && window.Juice){ Juice.flash(right); Juice.electric(right, { color:'#ffe066', arcs:true }); } hostMood('cheer'); hostSay(hostLine('right')); }
+      else {
+        if (right){ right.classList.add('is-right', 'lit'); if (window.Juice) Juice.electric(right, { color:'#5dff8a', arcs:false }); }
+        hostMood('sad'); hostSay(hostLine(pickIdx == null ? 'slow' : 'wrong'));
+      }
     };
-    if (!picked || still){ mid(); end(); return; }
+    if (!picked || still){ if (!picked) els.eventOverlay.classList.add('wrong-tint'); mid(); end(); return; }
     const f = (a, b, ms, ease)=> picked.animate([{ transform:'perspective(700px) rotateX(' + a + 'deg)' }, { transform:'perspective(700px) rotateX(' + b + 'deg)' }], { duration:ms, easing:ease, fill:'forwards' });
     const a1 = f(0, -90, 200, 'ease-in');
     a1.onfinish = ()=>{ mid(); const a2 = f(90, 0, 200, 'ease-out'); a1.cancel(); a2.onfinish = ()=>{ a2.cancel(); end(); }; };

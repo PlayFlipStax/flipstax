@@ -268,3 +268,39 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
   background:linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.12) 46%, rgba(255,255,255,0) 52%), linear-gradient(180deg, #fff3b0, #ffd23f 50%, #ffaa00); border:3px solid #fff3c4; text-shadow:none;
   box-shadow:inset 0 2px 0 rgba(255,255,255,0.8), 0 5px 0 #7a4a00, 0 0 18px rgba(255,210,63,0.6); }
 :root:root.mode-daily .solve-overlay .solve-hint-line:empty{ display:none; }
+
+/* ---- A+ tier 1 item 1: Brain Beam (cool answers) and Riddle (warm answers), and the answer effects ---- */
+/* Brain Beam: blue, indigo, teal and violet, light text, gold edges */
+:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile{ border-color:#ffe27a; --c1:#4d9bff; --c2:#1f63e6; --c3:#0b3aa8; }
+:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile:nth-child(2){ --c1:#8a7bff; --c2:#5236e0; --c3:#2a1a9a; }
+:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile:nth-child(3){ --c1:#22d3c8; --c2:#0b9c9c; --c3:#056468; }
+:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile:nth-child(4){ --c1:#c07bff; --c2:#8f3de6; --c3:#5a1ea8; }
+/* Riddle: hot pink, orange, sunny yellow and lime, dark readable text */
+:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile{ --c1:#ff8cc4; --c2:#ff3d94; --c3:#a8105a; color:#2b0a1a; text-shadow:0 1px 0 rgba(255,255,255,0.5); }
+:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:nth-child(2){ --c1:#ffc25a; --c2:#ff8a00; --c3:#a85200; }
+:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:nth-child(3){ --c1:#fff27a; --c2:#ffd900; --c3:#b08a00; }
+:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:nth-child(4){ --c1:#d6ff5a; --c2:#9be000; --c3:#4f8a00; }
+:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile.is-right:not(.gold){ color:#2b0a1a; text-shadow:0 1px 0 rgba(255,255,255,0.5); }
+/* a wrong pick: red, white text on both screens; the other answers dim */
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-tile.is-wrong{ color:#fff; text-shadow:0 2px 0 rgba(0,0,0,0.4); }
+:root:root.mode-daily .event-overlay.stack:is(.quiz-beam, .quiz-riddle) .event-tile.dim{ opacity:0.45; }
+/* the game-show red tint (a wrong answer): a layer behind the question and answers, fading in */
+.ov-tint{ position:absolute; inset:0; z-index:-1; pointer-events:none; opacity:0; transition:opacity 0.3s ease;
+  background:radial-gradient(ellipse at 50% 42%, rgba(224,24,63,0.86) 0%, rgba(150,8,40,0.95) 100%); }
+.event-overlay.wrong-tint .ov-tint{ opacity:1; }
+:root.lite .ov-tint{ transition:none; }
+@media (prefers-reduced-motion: reduce){ .ov-tint{ transition:none; } }
+/* the neon outline on the correct answer: a steady glowing outline (a slow opacity pulse), a spark that travels once round
+   the border (a rotating conic gradient, masked to the border), and three electric arcs that flicker for about 1.2 s */
+.ne-glow, .ne-spin-wrap, .ne-arc{ position:absolute; pointer-events:none; z-index:4; }
+.ne-glow{ inset:-7px; border-radius:30px; border:4px solid var(--ne, #ffe066); box-shadow:0 0 14px 3px var(--ne, #ffe066), inset 0 0 12px 1px var(--ne, #ffe066); animation:neGlow 2s ease-in-out infinite alternate; }
+@keyframes neGlow{ from{ opacity:0.72; } to{ opacity:1; } }
+.ne-glow.still{ animation:none; opacity:1; }
+.ne-spin-wrap{ inset:-7px; border-radius:30px; padding:5px; overflow:hidden; -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite:xor; mask:linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); }
+.ne-spin{ position:absolute; left:50%; top:50%; width:170%; aspect-ratio:1; transform:translate(-50%, -50%);
+  background:conic-gradient(from 0deg, rgba(255,255,255,0) 0deg 285deg, var(--ne, #ffe066) 325deg, #fff 352deg, rgba(255,255,255,0) 360deg); will-change:transform; }
+.ne-arc{ width:44px; height:26px; }
+.ne-arc svg{ display:block; }
+.ne-arc.a0{ right:-20px; top:-16px; }
+.ne-arc.a1{ left:-18px; bottom:-16px; transform:rotate(180deg); }
+.ne-arc.a2{ left:34%; top:-20px; transform:rotate(-8deg); }
