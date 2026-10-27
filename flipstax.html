@@ -11987,11 +11987,14 @@
   function showGameIntro(key, then){
     const gi = GAME_INTRO[key], c = gameIntroColors(key), ms = (runActive && DEBUG_FAST) ? dt(TIMING.GAME_INTRO_MS || 2000) : (TIMING.GAME_INTRO_MS || 2000);
     const name = gi ? gi.name() : mysteryName(key);
-    showCard.className = 'show-card gintro';
+    showCard.className = 'show-card gintro' + (key === 'door' ? ' gi-portal' : '');
     showCard.style.setProperty('--gi-a', c[0]); showCard.style.setProperty('--gi-b', c[1] || c[0]);
     showCard.innerHTML = '<i class="gi-bg" aria-hidden="true"></i><i class="gi-spot" aria-hidden="true"></i>' +
       '<div class="gi-sign"><div class="sign-bulbs" aria-hidden="true"></div><span></span></div>';
     showCard.querySelector('.gi-sign span').textContent = String(name).toUpperCase();
+    if (key === 'door'){   // the Mystery Portal's title card: a shine sweep across the sign and six sparkles around it (lib/juice.css)
+      const sg = showCard.querySelector('.gi-sign'); sg.insertAdjacentHTML('beforeend', '<i class="gi-shine" aria-hidden="true"></i>' + [[-5, -16], [48, -26], [103, -12], [-7, 112], [50, 126], [105, 110]].map((q, k)=> '<i class="gi-spk" aria-hidden="true" style="left:' + q[0] + '%;top:' + q[1] + '%;animation-delay:' + (-(k * 0.37)).toFixed(2) + 's"></i>').join(''));
+    }
     showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', name + '. Tap to skip');
     showCard.classList.remove('hidden');
     ringBulbs(showCard.querySelector('.gi-sign .sign-bulbs'), 20, 7);

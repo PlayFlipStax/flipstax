@@ -884,3 +884,22 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .zw-stage .zw-grid.hc .zw-cell.on svg .lk, .zw-stage .zw-grid.hc .zw-cell.fl-ok svg .lk, .zw-stage .zw-grid.hc .zw-cell.fl-bad svg .lk{ opacity:1; }
 :root.lite .zw-stage .zw-grid.hc .zw-cell.fl-ok svg .lk, :root.lite .zw-stage .zw-grid.hc .zw-cell.fl-bad svg .lk{ opacity:0; }
 @media (prefers-reduced-motion: reduce){ .zw-stage .zw-grid.hc .zw-cell.fl-ok svg .lk, .zw-stage .zw-grid.hc .zw-cell.fl-bad svg .lk{ opacity:0; } }
+
+/* ---- A+ follow-up: the Mystery Portal title card (key 'door' -> .gi-portal on the card; the spotlights stay as they were). A shine crosses the
+   sign every 2 s (translateX + opacity), the ring of bulbs chases in two alternating phases (the phase swaps once a second), six sparkles
+   twinkle around the sign (opacity, each every 2.2 s), and the sign bounces in (transform). Static in lite mode and reduced motion. ---- */
+.gi-portal .gi-sign{ animation:giBounce 620ms cubic-bezier(.3,1.5,.5,1) 300ms both; }
+@keyframes giBounce{ 0%{ transform:scale(0.55) translateY(26px); opacity:0; } 55%{ transform:scale(1.07) translateY(-6px); opacity:1; } 78%{ transform:scale(0.97) translateY(2px); } 100%{ transform:none; opacity:1; } }
+.gi-portal .gi-sign .sign-bulbs i{ animation:giBulb 2s steps(1) 0.9s infinite; }
+.gi-portal .gi-sign .sign-bulbs i:nth-child(odd){ animation-delay:0.9s; } .gi-portal .gi-sign .sign-bulbs i:nth-child(even){ animation-delay:-0.1s; }
+@keyframes giBulb{ 0%{ opacity:1; } 50%{ opacity:0.3; } 100%{ opacity:1; } }
+.gi-shine{ position:absolute; inset:0; border-radius:inherit; overflow:hidden; pointer-events:none; z-index:4; }
+.gi-shine::before{ content:''; position:absolute; top:-10%; bottom:-10%; left:0; width:34%; background:linear-gradient(100deg, rgba(255,255,255,0), rgba(255,255,255,0.8), rgba(255,255,255,0)); transform:translateX(-130%) skewX(-18deg); opacity:0; animation:giShine 2s linear 1.1s infinite; }
+@keyframes giShine{ 0%{ transform:translateX(-130%) skewX(-18deg); opacity:0; } 8%{ opacity:1; } 55%{ transform:translateX(330%) skewX(-18deg); opacity:1; } 62%, 100%{ transform:translateX(330%) skewX(-18deg); opacity:0; } }
+.gi-spk{ position:absolute; z-index:5; width:22px; height:22px; margin:-11px 0 0 -11px; pointer-events:none; opacity:0; background:radial-gradient(circle, #fff 0 22%, rgba(255,246,200,0.9) 24%, rgba(255,246,200,0) 62%);
+  clip-path:polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%); animation:giSpark 2.2s ease-in-out 1.1s infinite; }
+@keyframes giSpark{ 0%, 100%{ opacity:0; } 40%{ opacity:1; } 70%{ opacity:0; } }
+:root.lite .gi-portal .gi-sign, .rm .gi-portal .gi-sign{ animation:giFade 300ms linear both; }
+:root.lite .gi-portal .gi-sign .sign-bulbs i, :root.lite .gi-shine::before, :root.lite .gi-spk{ animation:none; }
+:root.lite .gi-shine{ display:none; } :root.lite .gi-spk{ opacity:0.85; }
+@media (prefers-reduced-motion: reduce){ .gi-portal .gi-sign{ animation:giFade 300ms linear both; } .gi-portal .gi-sign .sign-bulbs i, .gi-shine::before, .gi-spk{ animation:none; } .gi-shine{ display:none; } .gi-spk{ opacity:0.85; } }
