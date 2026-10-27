@@ -2642,7 +2642,7 @@
   @media (prefers-reduced-motion: reduce){ .show-card .sc-title, .sc-name, .sc-tap{ animation:none; } .sc-flash{ animation:none; display:none; } }
   @media (max-height:660px){ .show-card .sc-title{ font-size:44px; } .sc-host{ width:56px; height:64px; } .show-card .sc-inner{ gap:9px; } .sc-rules{ font-size:14px; } }
   /* Run 4A, the reward beat: what the round paid - points, the Brain Beam's letter, gold keys - over the dimmed stage. */
-  .show-card.reward{ background:rgba(10,3,24,0.62); padding:0 var(--gutter, 16px); }
+  .show-card.reward{ background:radial-gradient(120% 90% at 50% 40%, #3a1268 0%, #12062a 78%); padding:0 var(--gutter, 16px); }
   .rw-panel{ width:min(360px, 100%); padding:var(--sp-6, 24px) var(--sp-4, 16px) var(--sp-5, 20px); display:flex; flex-direction:column; align-items:center; gap:var(--sp-4, 16px);
     animation:rwIn var(--d-mid, 320ms) var(--ease-pop) both; }
   .rw-title{ font:900 var(--fs-title, 30px)/1 var(--f-display); letter-spacing:1px; color:var(--c-gold, #ffd23f); text-shadow:0 3px 0 rgba(122,61,0,0.8); }
@@ -2766,7 +2766,7 @@
   @keyframes giFade{ from{ opacity:0; } to{ opacity:1; } }
   @media (prefers-reduced-motion: reduce){ .gi-spot{ animation:none; opacity:0.5; transform:none; } .gi-sign{ animation:giFade 300ms linear both; } .gi-sign .sign-bulbs i{ animation:none; } }
   /* the explainer card: full the first time, one line after; a thin bar runs down its time; a long one waits for GOT IT */
-  .show-card.explainer{ background:rgba(10,3,24,0.74); padding:0 var(--gutter, 16px); }
+  .show-card.explainer{ background:radial-gradient(120% 90% at 50% 42%, var(--gi-b, #3a1268) 0%, #12062a 78%); padding:0 var(--gutter, 16px); }   /* (A+: its own opaque backdrop in the game's colours - never a scrim over the screen before it) */
   .ex-card{ position:relative; width:min(360px, 100%); padding:var(--sp-5, 20px) var(--sp-5, 20px) var(--sp-6, 24px); border-radius:var(--r-lg, 20px); text-align:left; overflow:hidden;
     background:linear-gradient(180deg, #fffbea, var(--c-cream, #fff6d8)); color:var(--c-ink, #2a1300); box-shadow:0 0 0 4px var(--gi-a), 0 14px 34px rgba(0,0,0,0.55);
     animation:exIn var(--d-mid, 320ms) var(--ease-pop) both; }
