@@ -39,6 +39,7 @@
 <link rel="stylesheet" href="lib/stage.css">
 <link rel="stylesheet" href="lib/cast.css">
 <link rel="stylesheet" href="lib/juice.css">
+<link rel="stylesheet" href="lib/intro.css">
 <link rel="preload" as="image" href="data/stage/stage-close.webp" type="image/webp">
 <style>
   :root{
@@ -2642,7 +2643,7 @@
   @media (prefers-reduced-motion: reduce){ .show-card .sc-title, .sc-name, .sc-tap{ animation:none; } .sc-flash{ animation:none; display:none; } }
   @media (max-height:660px){ .show-card .sc-title{ font-size:44px; } .sc-host{ width:56px; height:64px; } .show-card .sc-inner{ gap:9px; } .sc-rules{ font-size:14px; } }
   /* Run 4A, the reward beat: what the round paid - points, the Brain Beam's letter, gold keys - over the dimmed stage. */
-  .show-card.reward{ background:rgba(10,3,24,0.62); padding:0 var(--gutter, 16px); }
+  .show-card.reward{ background:radial-gradient(120% 90% at 50% 40%, #3a1268 0%, #12062a 78%); padding:0 var(--gutter, 16px); }
   .rw-panel{ width:min(360px, 100%); padding:var(--sp-6, 24px) var(--sp-4, 16px) var(--sp-5, 20px); display:flex; flex-direction:column; align-items:center; gap:var(--sp-4, 16px);
     animation:rwIn var(--d-mid, 320ms) var(--ease-pop) both; }
   .rw-title{ font:900 var(--fs-title, 30px)/1 var(--f-display); letter-spacing:1px; color:var(--c-gold, #ffd23f); text-shadow:0 3px 0 rgba(122,61,0,0.8); }
@@ -2766,7 +2767,7 @@
   @keyframes giFade{ from{ opacity:0; } to{ opacity:1; } }
   @media (prefers-reduced-motion: reduce){ .gi-spot{ animation:none; opacity:0.5; transform:none; } .gi-sign{ animation:giFade 300ms linear both; } .gi-sign .sign-bulbs i{ animation:none; } }
   /* the explainer card: full the first time, one line after; a thin bar runs down its time; a long one waits for GOT IT */
-  .show-card.explainer{ background:rgba(10,3,24,0.74); padding:0 var(--gutter, 16px); }
+  .show-card.explainer{ background:radial-gradient(120% 90% at 50% 42%, var(--gi-b, #3a1268) 0%, #12062a 78%); padding:0 var(--gutter, 16px); }   /* (A+: its own opaque backdrop in the game's colours - never a scrim over the screen before it) */
   .ex-card{ position:relative; width:min(360px, 100%); padding:var(--sp-5, 20px) var(--sp-5, 20px) var(--sp-6, 24px); border-radius:var(--r-lg, 20px); text-align:left; overflow:hidden;
     background:linear-gradient(180deg, #fffbea, var(--c-cream, #fff6d8)); color:var(--c-ink, #2a1300); box-shadow:0 0 0 4px var(--gi-a), 0 14px 34px rgba(0,0,0,0.55);
     animation:exIn var(--d-mid, 320ms) var(--ease-pop) both; }
@@ -4901,6 +4902,7 @@
 <script src="data/cast/manifest.js"></script>
 <script src="lib/cast.js"></script>
 <script src="lib/juice.js"></script>
+<script src="lib/intro.js"></script>
 <script>
 (function(){
 
@@ -11045,7 +11047,7 @@
     if (window.Stage) Stage.cue('close', { over: ov, cls:'mdoor', sign:{ sub:'ROUND ' + ((RUNDOWN.acts[st.act] || {}).round || 3) + ' OF ' + SHOW_ROUND_COUNT, main:'MYSTERY PORTAL' } });
     let picked = false;
     const tiles = els.eventTiles, used = tiles.slice(0, Math.min(DOOR_COUNT, games.length));
-    const reset = ()=>{ ov.classList.add('hidden'); ov.classList.remove('powerup', 'mdoor'); tiles.forEach(t=>{ t.classList.remove('portal', 'mp', 'opened', 'dim', 'open', 'other', 'picked-wait'); t.innerHTML = ''; t.onclick = null; t.style.display = ''; }); };
+    const reset = ()=>{ ov.classList.add('hidden'); ov.classList.remove('powerup', 'mdoor'); { const c = document.getElementById('mpCaption'); if (c) c.remove(); } tiles.forEach(t=>{ t.classList.remove('portal', 'mp', 'opened', 'dim', 'open', 'other', 'picked-wait'); t.innerHTML = ''; t.onclick = null; t.style.display = ''; }); };
     const open = (i)=>{
       if (picked || g !== Show.gen) return;
       picked = true; clearTimeout(eventTimeoutId);
@@ -11057,6 +11059,9 @@
         if (g !== Show.gen) return;
         tile.classList.remove('picked-wait'); tile.classList.add('opened'); if (sfx.slam) sfx.slam();
         els.eventPrompt.textContent = 'Portal ' + (i + 1) + ': ' + mysteryName(game) + '!';
+        { let cap = document.getElementById('mpCaption'); if (!cap){ cap = document.createElement('div'); cap.id = 'mpCaption'; ov.appendChild(cap); }
+          cap.innerHTML = '<span class="mc-ic"></span><b></b>'; cap.firstChild.textContent = DOOR_ICONS[game] || '\u2728'; cap.lastChild.textContent = mysteryName(game);
+          cap.classList.remove('on'); void cap.offsetWidth; cap.classList.add('on'); }   // (the name sits on a plaque under the doors, after the door has opened)
         revealThen(()=>{
           if (g !== Show.gen) return;
           reset();
@@ -11066,6 +11071,9 @@
         }, { lead:700 });   // (the swing takes 0.7 s, then the game's name holds for the shared reveal time)
       }, dt(QUIZ_DRUMROLL_MS));
     };
+    { const oc = document.getElementById('mpCaption'); if (oc) oc.remove(); }
+    // A+: every door starts solid, opaque and CLOSED - nothing from an earlier quiz, run or Jump-to visit (dim, opened, a swing, an inline style) carries over
+    tiles.forEach(t=>{ t.classList.remove('opened', 'dim', 'picked-wait', 'open', 'other', 'is-right', 'is-wrong', 'bb-press', 'portal', 'pick', 'correct', 'wrong', 'locked'); t.removeAttribute('style'); t.getAnimations && t.getAnimations({ subtree:true }).forEach(an=> an.cancel()); });
     tiles.forEach((tileEl, i)=>{
       if (i >= used.length){ tileEl.style.display = 'none'; return; }
       const game = games[i % games.length], c = gameIntroColors(game);
@@ -11741,12 +11749,15 @@
     let seen = false; try{ seen = !!localStorage.getItem(COLD_OPEN_SEEN_KEY); }catch(e){}
     // Run 4A: ENTER opens the curtains, then the host introduces himself in four cue lines (each up for at least
     // CUE_LINE_MIN); a returning player gets one line, about 3 s in all. A tap skips it (after SKIP_MIN_MS).
-    const lines = seen ? [HOST_INTRO_BACK] : HOST_INTRO_LINES;
-    const T = seen ? { open:0, pull:800, walk:100, walkMs:600, talk:600 }
+    // after the CGI intro (lib/intro.js) the curtains are ALREADY open and the host already on his mark: no second curtain
+    const afterIntro = window.__introCurtainsOpen === true; window.__introCurtainsOpen = false;
+    const lines = seen && !afterIntro ? [HOST_INTRO_BACK] : HOST_INTRO_LINES;
+    const T = afterIntro ? { open:0, pull:0, walk:0, walkMs:0, talk:700 }
+            : seen ? { open:0, pull:800, walk:100, walkMs:600, talk:600 }
                    : { open:300, pull:2200, walk:900, walkMs:1400, talk:2500 };
     const starts = []; let at = T.talk;
     lines.forEach(l=>{ starts.push(at); at += cueLineMs(l); });
-    const total = Math.max(seen ? ((RUNDOWN.coldOpen || {}).returningMs || 3000) : 0, at + (seen ? 0 : 300));
+    const total = Math.max(seen && !afterIntro ? ((RUNDOWN.coldOpen || {}).returningMs || 3000) : 0, at + (seen && !afterIntro ? 0 : 300));
     showCard.className = 'show-card curtain lines';
     showCard.style.setProperty('--pull', T.pull + 'ms'); showCard.style.setProperty('--walk', T.walkMs + 'ms');
     showCard.innerHTML = '<div class="studio co-studio" aria-hidden="true">' + STUDIO_HTML + '</div><i class="co-follow" aria-hidden="true"></i>' +
@@ -11759,7 +11770,7 @@
     if (window.Stage){ Stage.loadWide(); Stage.cue('wide', { over:showCard, cls:'curtain', sign:{ sub:'WELCOME TO', main:'FLIPSTAX' } }); }   // Run 3: the wide shot, then a push in
     const timers = [], later = (ms, f)=> timers.push(setTimeout(f, ms));
     const lineEl = showCard.querySelector('.co-line'), rig = showCard.querySelector('.co-stage-host');
-    later(T.open, ()=>{ showCard.classList.add('open'); if (sfx.bumper) sfx.bumper(false); });
+    if (afterIntro){ showCard.classList.add('open', 'walk'); } else later(T.open, ()=>{ showCard.classList.add('open'); if (sfx.bumper) sfx.bumper(false); });
     later(T.walk, ()=>{ showCard.classList.add('walk'); if (window.Stage) Stage.cue('close', { over:showCard, cls:'curtain', push:true, ms: total - T.walk + 600, sign:{ sub:'TONIGHT’S SHOW', main:'EPISODE ' + ep } }); });
     lines.forEach((l, i)=> later(starts[i], ()=>{
       cueLineSay(lineEl, l);
@@ -11981,11 +11992,14 @@
   function showGameIntro(key, then){
     const gi = GAME_INTRO[key], c = gameIntroColors(key), ms = (runActive && DEBUG_FAST) ? dt(TIMING.GAME_INTRO_MS || 2000) : (TIMING.GAME_INTRO_MS || 2000);
     const name = gi ? gi.name() : mysteryName(key);
-    showCard.className = 'show-card gintro';
+    showCard.className = 'show-card gintro' + (key === 'door' ? ' gi-portal' : '');
     showCard.style.setProperty('--gi-a', c[0]); showCard.style.setProperty('--gi-b', c[1] || c[0]);
     showCard.innerHTML = '<i class="gi-bg" aria-hidden="true"></i><i class="gi-spot" aria-hidden="true"></i>' +
       '<div class="gi-sign"><div class="sign-bulbs" aria-hidden="true"></div><span></span></div>';
     showCard.querySelector('.gi-sign span').textContent = String(name).toUpperCase();
+    if (key === 'door'){   // the Mystery Portal's title card: a shine sweep across the sign and six sparkles around it (lib/juice.css)
+      const sg = showCard.querySelector('.gi-sign'); sg.insertAdjacentHTML('beforeend', '<i class="gi-shine" aria-hidden="true"></i>' + [[-5, -16], [48, -26], [103, -12], [-7, 112], [50, 126], [105, 110]].map((q, k)=> '<i class="gi-spk" aria-hidden="true" style="left:' + q[0] + '%;top:' + q[1] + '%;animation-delay:' + (-(k * 0.37)).toFixed(2) + 's"></i>').join(''));
+    }
     showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', name + '. Tap to skip');
     showCard.classList.remove('hidden');
     ringBulbs(showCard.querySelector('.gi-sign .sign-bulbs'), 20, 7);
@@ -17675,6 +17689,7 @@
   }
   addEventListener('resize', ()=> requestAnimationFrame(fitHomeHost));
   [300, 1200, 2600].forEach(ms=> setTimeout(fitHomeHost, ms));   // (again as the pictures arrive)
+  if (window.Intro) Intro.init({ testing:()=> REPLAY || DEBUG_FAST || SHOW_DEBUG });
   els.homeEnterBtn.addEventListener('click', ()=>{
     const ov = els.homeOverlay;
     if (ov.classList.contains('entering')) return;
@@ -17690,6 +17705,8 @@
       if (!runResultToday || REPLAY) els.modeDailyBtn.click();
       else els.modeSelectOverlay.classList.remove('hidden');
     };
+    // Oct 25: the mothership intro (lib/intro.js) - the video (first visit), a cyan flash, then the show; ?oldintro=1 keeps the host slide below
+    if (window.Intro && Intro.enabled){ ov.classList.add('entering'); Intro.run(enter); return; }
     if (prefersReducedMotion() || !host){ enter(); return; }
     if (isLite()){ setTimeout(enter, 950); return; }   // (G2: lite mode skips the motion, not the beat)
     ov.classList.add('entering');

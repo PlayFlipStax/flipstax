@@ -847,3 +847,59 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .ff-stage .ff-btn:disabled{ opacity:1; }
 .ff-stage .ff-btn.dim, .ff-stage .ff-btn.dim:disabled{ opacity:0.4; }
 .ff-stage .ff-btn.glow{ box-shadow:inset 0 3px 0 rgba(255,255,255,0.45), inset 0 -6px 0 rgba(0,0,0,0.25), 0 6px 0 var(--c3), 0 0 0 5px #fff3b0, 0 0 26px 10px rgba(255,236,150,0.85); }
+
+/* ---- A+ follow-up: Mystery Portal caption - the bonus game's name on a gold-trimmed plaque below the doors (never over the door or its scene),
+   fading in (opacity) once the door has opened; the name inside the door is gone ---- */
+.event-overlay.mdoor .mp-prize{ display:none; }
+#mpCaption{ position:absolute; left:50%; bottom:calc(10px + env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:6; max-width:92%; display:flex; align-items:center; justify-content:center; gap:10px; padding:8px 20px; border-radius:14px; white-space:nowrap;
+  background:linear-gradient(180deg, #2a1050, #170830); border:3px solid #ffd23f; box-shadow:0 0 0 2px #7a3d00, 0 4px 0 2px #7a3d00; opacity:0; pointer-events:none; }
+#mpCaption .mc-ic{ font-size:28px; line-height:1; }
+#mpCaption b{ font:900 clamp(22px, 6.4vw, 28px)/1 var(--f-display); letter-spacing:0.5px; text-transform:uppercase; color:#fff8d6; text-shadow:0 0 8px rgba(255,210,63,0.8), 0 2px 0 rgba(0,0,0,0.5); }
+#mpCaption.on{ opacity:1; transition:opacity 0.3s ease 0.7s; }
+:root.lite #mpCaption.on, #mpCaption.on:where(.rm){ transition-delay:0.25s; }
+@media (prefers-reduced-motion: reduce){ #mpCaption.on{ transition-delay:0.25s; } }
+
+/* ---- A+ follow-up: Zap Words honeycomb. Flat-top hexagons in a true honeycomb, 6 x 6, the odd columns half a tile lower, edge to edge with a
+   thin line between; the board fills the width. Tiles are placed in % by the game (left/top/width/height). While drawing, the line and the
+   selected tiles use the word's colour (lock-in ring + pop); a valid word's tiles keep a glowing outline (--kc) in that colour to the end of
+   the round. Transform and opacity only in motion; the glows are static. ---- */
+.zw-stage .zw-grid.hc{ width:min(100%, 400px, calc((100dvh - 325px) * 0.8438)); aspect-ratio:4.75 / 5.6292; height:auto; display:block; padding:0; gap:0; border:0; background:none; box-shadow:none; position:relative; margin:0 auto; touch-action:none; }
+.zw-grid.hc .zw-cell{ position:absolute; display:flex; align-items:center; justify-content:center; padding:0; margin:0; border-radius:0; background:none; box-shadow:none; font-size:clamp(30px, 8.8vw, 40px); line-height:1; }
+.zw-grid.hc .zw-cell svg{ position:absolute; inset:0; width:100%; height:100%; overflow:visible; }
+.zw-stage .zw-grid.hc .zw-cell svg polygon{ vector-effect:non-scaling-stroke; stroke-linejoin:round; }
+.zw-stage .zw-grid.hc .zw-cell svg .hx{ fill:#fff1d2; stroke:#e8c27a; stroke-width:1.5; }
+.zw-stage .zw-grid.hc .zw-cell svg .lk{ fill:var(--tint); stroke:var(--tc); stroke-width:3.5; opacity:0; }
+.zw-stage .zw-grid.hc .zw-cell svg .kp{ fill:none; stroke:var(--kc, transparent); stroke-width:4; opacity:0; }
+.zw-stage .zw-grid.hc .zw-cell.kept svg{ filter:drop-shadow(0 0 4px var(--kc)); }
+.zw-stage .zw-grid.hc .zw-cell.kept svg .kp{ opacity:1; }
+.zw-stage .zw-grid.hc .zw-cell.on svg{ filter:drop-shadow(0 0 6px var(--tc)); }
+.zw-stage .zw-grid.hc .zw-cell.on svg .hx{ fill:#fff1d2; stroke:#e8c27a; stroke-width:1.5; }
+.zw-stage .zw-grid.hc .zw-cell.hint{ animation:none; box-shadow:none; } .zw-stage .zw-grid.hc .zw-cell.hint svg .hx{ stroke:#ffffff; stroke-width:4; }
+.zw-stage .zw-grid.hc .zw-cell.missed svg .hx{ stroke:#ffe640; stroke-width:4; }
+.zw-stage .zw-grid.hc .zw-cell.dup svg .hx, .zw-stage .zw-grid.hc .zw-cell.bad svg .hx{ fill:#ffd9a8; }
+.zw-stage .zw-grid.hc .zw-cell.zapped svg .hx{ fill:#ffffff; stroke:var(--wc); stroke-width:4; }
+.zw-stage .zw-grid.hc .zw-cell > span{ z-index:3; }
+.zw-stage .zw-grid.hc .zw-trail{ z-index:2; }
+.zw-grid.hc .zw-trail polyline.zw-glow{ stroke-width:16; } .zw-grid.hc .zw-trail polyline.zw-line{ stroke-width:7; opacity:0.9; }
+.zw-stage .zw-grid.hc .zw-cell.on svg .lk, .zw-stage .zw-grid.hc .zw-cell.fl-ok svg .lk, .zw-stage .zw-grid.hc .zw-cell.fl-bad svg .lk{ opacity:1; }
+:root.lite .zw-stage .zw-grid.hc .zw-cell.fl-ok svg .lk, :root.lite .zw-stage .zw-grid.hc .zw-cell.fl-bad svg .lk{ opacity:0; }
+@media (prefers-reduced-motion: reduce){ .zw-stage .zw-grid.hc .zw-cell.fl-ok svg .lk, .zw-stage .zw-grid.hc .zw-cell.fl-bad svg .lk{ opacity:0; } }
+
+/* ---- A+ follow-up: the Mystery Portal title card (key 'door' -> .gi-portal on the card; the spotlights stay as they were). A shine crosses the
+   sign every 2 s (translateX + opacity), the ring of bulbs chases in two alternating phases (the phase swaps once a second), six sparkles
+   twinkle around the sign (opacity, each every 2.2 s), and the sign bounces in (transform). Static in lite mode and reduced motion. ---- */
+.gi-portal .gi-sign{ animation:giBounce 620ms cubic-bezier(.3,1.5,.5,1) 300ms both; }
+@keyframes giBounce{ 0%{ transform:scale(0.55) translateY(26px); opacity:0; } 55%{ transform:scale(1.07) translateY(-6px); opacity:1; } 78%{ transform:scale(0.97) translateY(2px); } 100%{ transform:none; opacity:1; } }
+.gi-portal .gi-sign .sign-bulbs i{ animation:giBulb 2s steps(1) 0.9s infinite; }
+.gi-portal .gi-sign .sign-bulbs i:nth-child(odd){ animation-delay:0.9s; } .gi-portal .gi-sign .sign-bulbs i:nth-child(even){ animation-delay:-0.1s; }
+@keyframes giBulb{ 0%{ opacity:1; } 50%{ opacity:0.3; } 100%{ opacity:1; } }
+.gi-shine{ position:absolute; inset:0; border-radius:inherit; overflow:hidden; pointer-events:none; z-index:4; }
+.gi-shine::before{ content:''; position:absolute; top:-10%; bottom:-10%; left:0; width:34%; background:linear-gradient(100deg, rgba(255,255,255,0), rgba(255,255,255,0.8), rgba(255,255,255,0)); transform:translateX(-130%) skewX(-18deg); opacity:0; animation:giShine 2s linear 1.1s infinite; }
+@keyframes giShine{ 0%{ transform:translateX(-130%) skewX(-18deg); opacity:0; } 8%{ opacity:1; } 55%{ transform:translateX(330%) skewX(-18deg); opacity:1; } 62%, 100%{ transform:translateX(330%) skewX(-18deg); opacity:0; } }
+.gi-spk{ position:absolute; z-index:5; width:22px; height:22px; margin:-11px 0 0 -11px; pointer-events:none; opacity:0; background:radial-gradient(circle, #fff 0 22%, rgba(255,246,200,0.9) 24%, rgba(255,246,200,0) 62%);
+  clip-path:polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%); animation:giSpark 2.2s ease-in-out 1.1s infinite; }
+@keyframes giSpark{ 0%, 100%{ opacity:0; } 40%{ opacity:1; } 70%{ opacity:0; } }
+:root.lite .gi-portal .gi-sign, .rm .gi-portal .gi-sign{ animation:giFade 300ms linear both; }
+:root.lite .gi-portal .gi-sign .sign-bulbs i, :root.lite .gi-shine::before, :root.lite .gi-spk{ animation:none; }
+:root.lite .gi-shine{ display:none; } :root.lite .gi-spk{ opacity:0.85; }
+@media (prefers-reduced-motion: reduce){ .gi-portal .gi-sign{ animation:giFade 300ms linear both; } .gi-portal .gi-sign .sign-bulbs i, .gi-shine::before, .gi-spk{ animation:none; } .gi-shine{ display:none; } .gi-spk{ opacity:0.85; } }

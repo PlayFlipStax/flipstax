@@ -85,3 +85,9 @@
 :root.stage-on :is(.mg-overlay, .ir-overlay, .guess-overlay, .solve-overlay, .event-overlay, .riddle-overlay) :is(.mg-bg, .ir-bg, .guess-bg, .warp-bg, .ev-bg){ background:none !important; }
 :root.stage-on :is(.mg-overlay, .ir-overlay, .guess-overlay, .solve-overlay, .event-overlay, .riddle-overlay) :is(.mg-bg, .ir-bg, .guess-bg, .warp-bg, .ev-bg) > :is(.rays, .glow){ display:none; }
 :root.stage-on .mg-overlay .mg-bg{ display:none; }
+
+/* ---- A+ follow-up (screen bleed): a Mystery Game sits on its OWN opaque backdrop in its own colours - never the stage picture, which showed the
+   portal arches behind it as it started. (Zap Words, Twin Flip and Fact or Fib paint their own, as before.) ---- */
+:root.stage-on .mg-overlay{ background:radial-gradient(120% 75% at 50% 25%, var(--mg-a) 0%, var(--mg-b) 48%, var(--mg-c) 100%), #12062a !important; }
+:root.stage-on .mg-overlay.mg-saucerShuffle{ background:radial-gradient(120% 75% at 50% 25%, #3b2a9a 0%, #1d1566 52%, #0a0630 100%), #0a0630 !important; }
+:root.stage-on .mg-overlay.mg-saucerShuffle .mg-bg{ display:block; }
