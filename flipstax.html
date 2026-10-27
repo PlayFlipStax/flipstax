@@ -11069,6 +11069,9 @@
         }, { lead:700 });   // (the swing takes 0.7 s, then the game's name holds for the shared reveal time)
       }, dt(QUIZ_DRUMROLL_MS));
     };
+    { const oc = document.getElementById('mpCaption'); if (oc) oc.remove(); }
+    // A+: every door starts solid, opaque and CLOSED - nothing from an earlier quiz, run or Jump-to visit (dim, opened, a swing, an inline style) carries over
+    tiles.forEach(t=>{ t.classList.remove('opened', 'dim', 'picked-wait', 'open', 'other', 'is-right', 'is-wrong', 'bb-press', 'portal', 'pick', 'correct', 'wrong', 'locked'); t.removeAttribute('style'); t.getAnimations && t.getAnimations({ subtree:true }).forEach(an=> an.cancel()); });
     tiles.forEach((tileEl, i)=>{
       if (i >= used.length){ tileEl.style.display = 'none'; return; }
       const game = games[i % games.length], c = gameIntroColors(game);
