@@ -15,6 +15,7 @@
 // `announce` is the host's one line on the round's title card.
 
 // ---- Hold times (ms) - every cinematic moment's length, in one place (G2, Oct 16; Run 4A) ----
+// (A+ pacing pass: these are the base values - flipstax.html multiplies them by PACE (1.35) and gives title cards at least 2.5 s.)
 const ACT_CARD_HOLD = 2800;          // a round's title card: the host's line and ROUND N on the marquee
 const MYSTERY_REVEAL_HOLD = 3000;    // the Mystery Door opening on its game's name
 const STAR_WIPE = 1600;              // (the old act card's star wipe; kept for the TEST menu)

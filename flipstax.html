@@ -5765,9 +5765,21 @@
   const DAILY_PICK_MS = 5000;
   const INF_PICK_MS = 6500;
   const INF_ZONE_PICK_MS = 4500;              // Infinity's 2x Points Zone rounds
-  const VS_REVEAL_HOLD = 1200;                // how long a VS result stays up before the next card (was 1650; never under 1200 so it stays readable)
+  // ---- ONE PACING SYSTEM (A+ pacing pass). Every hold, card and reveal in the show is timed from these, never a one-off number:
+  //   PACE            multiplies the show's existing animation-and-hold timings (testers: everything was too fast to read)
+  //   readMs(text)    a screen with text stays up 1.5 s + 0.3 s a word, at least READ.MIN and at most READ.MAX
+  //   TITLE_CARD_MIN  explainer and game-title cards stay at least this long
+  //   TAP_AFTER_MS    a tap may skip a card after this long (answer reveals: REVEAL_TAP_MS)
+  //   XFADE_OUT_MS / XFADE_IN_MS   the scene crossfade (sceneOut / sceneIn below)
+  const PACE = 1.35;
+  const READ = { BASE:1500, PER_WORD:300, MIN:2200, MAX:6000 };
+  const TITLE_CARD_MIN = 2500, TAP_AFTER_MS = 1000, XFADE_OUT_MS = 400, XFADE_IN_MS = 600;
+  const paced = (ms)=> Math.round((ms || 0) * PACE);
+  function readMs(text){ const w = String(text || '').trim().split(/\s+/).filter(Boolean).length; return Math.min(READ.MAX, Math.max(READ.MIN, READ.BASE + READ.PER_WORD * w)); }
+  window.FLIPSTAX_PACE = { PACE, READ, TITLE_CARD_MIN, TAP_AFTER_MS, XFADE_OUT_MS, XFADE_IN_MS, readMs };
+  const VS_REVEAL_HOLD = paced(1200);   // (A+ pacing: PACE x the old 1.2 s)                // how long a VS result stays up before the next card (was 1650; never under 1200 so it stays readable)
   const REVEAL_MS = VS_REVEAL_HOLD;           // both modes
-  const TOO_SLOW_NEXT_MS = 900;               // after a "Too slow", before the next matchup
+  const TOO_SLOW_NEXT_MS = paced(900);   // (A+ pacing: PACE x the old 0.9 s)               // after a "Too slow", before the next matchup
   const TOO_SLOW_PENALTY = 1, DAILY_TOO_SLOW_STAR_PENALTY = 3;   // (Infinity star cards: INF_STAR_POINTS)
   // Timing restructure: 6min voting/trivia phase + 75s fixed solve phase
   // (7:15 baseline; +45s if the riddle fires, 8:00 total). Thresholds
@@ -5902,17 +5914,26 @@
   let relaxedPace = false; try{ relaxedPace = localStorage.getItem(RELAXED_KEY) === '1'; }catch(e){}
   function setRelaxedPace(on){ relaxedPace = !!on; try{ localStorage.setItem(RELAXED_KEY, on ? '1' : '0'); }catch(e){} }
   // G2: the show's hold times live at the top of data/rundown.js (FLIPSTAX_TIMING); these are the fallbacks.
-  const TIMING = Object.assign({ ACT_CARD_HOLD:2800, MYSTERY_REVEAL_HOLD:3000, STAR_WIPE:1600, ROUND_BUMPER_HOLD:2200, COSMIC_SURPRISE_INTRO:2000, CINEMATIC_MIN:1500, SKIP_AFTER:1000 }, window.FLIPSTAX_TIMING || {});
+  // G2: the show's hold times live at the top of data/rundown.js (FLIPSTAX_TIMING); these are the fallbacks. Each is scaled by PACE here
+  // (title cards at least TITLE_CARD_MIN); SKIP_AFTER is the shared TAP_AFTER_MS.
+  const TIMING = (()=>{
+    const t = Object.assign({ ACT_CARD_HOLD:2800, MYSTERY_REVEAL_HOLD:3000, STAR_WIPE:1600, ROUND_BUMPER_HOLD:2200, COSMIC_SURPRISE_INTRO:2000, CINEMATIC_MIN:1500, SKIP_AFTER:1000, ZOOM_MS:900, GAME_INTRO_MS:2000, REWARD_HOLD:2200 }, window.FLIPSTAX_TIMING || {});
+    ['ACT_CARD_HOLD', 'MYSTERY_REVEAL_HOLD', 'STAR_WIPE', 'ROUND_BUMPER_HOLD', 'COSMIC_SURPRISE_INTRO', 'CINEMATIC_MIN', 'ZOOM_MS', 'GAME_INTRO_MS', 'REWARD_HOLD'].forEach(k=> t[k] = paced(t[k]));
+    t.GAME_INTRO_MS = Math.max(TITLE_CARD_MIN, t.GAME_INTRO_MS); t.MYSTERY_REVEAL_HOLD = Math.max(TITLE_CARD_MIN, t.MYSTERY_REVEAL_HOLD);
+    t.SKIP_AFTER = TAP_AFTER_MS;
+    return t;
+  })();
   // A cinematic moment (a full-screen card, a reveal, a result) is never on screen for less than CINEMATIC_MIN.
   const cine = (ms)=> Math.max(TIMING.CINEMATIC_MIN, ms);
   // A+ tier 1: every right / wrong reveal stays fully visible for REVEAL_HOLD_MS before the game moves on; after REVEAL_TAP_MS a
   // tap anywhere skips the rest of the wait (the tap is swallowed, so it never lands on the next screen). lead = how long the
-  // result takes to appear (a flip); opts.min = a longer hold where a game wants one. Returns go(), the early finish.
+  // result takes to appear (a flip); opts.min = a longer hold where a game wants one (scaled by PACE); opts.text = the result's
+  // text, which gets its reading time. Returns go(), the early finish.
   const REVEAL_HOLD_MS = 1400, REVEAL_TAP_MS = 800;
   window.FLIPSTAX_REVEAL = { HOLD_MS: REVEAL_HOLD_MS, TAP_MS: REVEAL_TAP_MS };
   function revealThen(fn, opts){
     opts = opts || {};
-    const lead = opts.lead || 0, hold = Math.max(REVEAL_HOLD_MS, opts.min || 0);
+    const lead = opts.lead || 0, hold = Math.max(REVEAL_HOLD_MS, paced(opts.min), opts.text ? readMs(opts.text) : 0);
     let fired = false, t = 0, armT = 0;
     const onTap = (e)=>{ e.stopPropagation(); e.preventDefault(); go(); };
     const go = ()=>{ if (fired) return; fired = true; clearTimeout(t); clearTimeout(armT); document.removeEventListener('click', onTap, true); fn(); };
@@ -5920,9 +5941,8 @@
     armT = setTimeout(()=>{ if (!fired) document.addEventListener('click', onTap, true); }, dt(lead + REVEAL_TAP_MS));
     return go;
   }
-  // J2: a skip tap only counts once a cinematic has had its minimum time (SKIP_AFTER was shorter than CINEMATIC_MIN,
-  // so a tap at 1 s ended a cold open under its 1.5 s minimum).
-  const SKIP_MIN_MS = Math.max(TIMING.SKIP_AFTER, TIMING.CINEMATIC_MIN);
+  // A tap may skip a card once it has been up TAP_AFTER_MS (the pacing pass: 1 s for every card).
+  const SKIP_MIN_MS = TAP_AFTER_MS;
   // G3: the commercial break is out of the rundown; COMMERCIAL_ENABLED at the top of data/rundown.js brings it back
   // (after the act named in commercial.after). The ad code and the "Brought to you by" sponsor field stay.
   const COMMERCIAL_ON = !!(RUNDOWN.commercial && RUNDOWN.commercial.enabled);
@@ -11068,7 +11088,7 @@
           runCurrentGame = mysteryName(game); Show.info = 'door:' + game;
           const ok = miniGame(game) ? runMiniGame(game, { seed: st.seed, door:true }, done) : runBrainBreak({ game, seed: st.seed }, done);
           if (!ok) showDone(g, 'door game unavailable');
-        }, { lead:700 });   // (the swing takes 0.7 s, then the game's name holds for the shared reveal time)
+        }, { lead:700, text: els.eventPrompt.textContent });   // (the swing takes 0.7 s, then the game's name holds for the shared reveal time)
       }, dt(QUIZ_DRUMROLL_MS));
     };
     { const oc = document.getElementById('mpCaption'); if (oc) oc.remove(); }
@@ -11165,11 +11185,11 @@
         if (pts && runActive) addRunScore(pts);
         if (win && runActive) addRunKey('mystery');
         resEl.className = 'mg-result on ' + (pts ? 'win' : 'miss'); resEl.textContent = pts ? '+' + (pts * api.mult) : 'MISSED';
-        if (res && res.line) api.say(res.line, 1800);
+        if (res && res.line) api.say(res.line, readMs(res.line));
         if (pts){ sfx.cashRegister(); api.flash('win'); hostMood('cheer'); } else { hostMood('sad'); }
         if (runActive && win && Show.scene === 'game') castWin(()=> !!document.getElementById('mgOverlay'));   // (Run 4A: a round-end game won)
         else if (runActive && !pts && Show.scene === 'game') castOops();
-        setTimeout(()=> close(false), 1700);
+        setTimeout(()=> close(false), dt(Math.max(paced(1700), readMs(res && res.line))));   // (A+ pacing: the result holds for its reading time)
       },
     };
     api.rng = mulberry32((api.seed ^ hashStr('mg-' + key)) >>> 0);
@@ -11344,7 +11364,7 @@
         hubT.textContent = 'BANKED!'; hubS.textContent = ''; popShow('BANKED!', sub);
         if (total || keys || chips){ sfx.cashRegister(); sfx.jackpot(); FX.burstAt(showFx, luckyOv.querySelector('.lw-hub'), { count:18, spread:130, shapes:['star', 'coin'] }); castWin(()=> gen === luckyGen && !luckyOv.classList.contains('hidden')); }
       }
-      setTimeout(()=>{ if (gen !== luckyGen) return; luckyOv.classList.add('hidden'); luckyOv.innerHTML = ''; noteOverlayClosed(); updatePauseBtnVisibility(); done(); }, banked ? 1700 : 2300);
+      setTimeout(()=>{ if (gen !== luckyGen) return; luckyOv.classList.add('hidden'); luckyOv.innerHTML = ''; noteOverlayClosed(); updatePauseBtnVisibility(); done(); }, dt(paced(banked ? 1700 : 2300)));
     };
     const wedgeEls = ()=> [...luckyOv.querySelectorAll('.lw-wedge')];
     const markWin = (wi)=>{ luckyOv.querySelector('.lw-wheel').classList.add('landed'); wedgeEls().forEach((g, i)=>{ g.classList.toggle('win', i === wi); g.classList.toggle('dim', i !== wi); }); };
@@ -11373,7 +11393,7 @@
         note.textContent = 'Bank it, or spin again and risk the GOOP?';
         show(['bank', 'again']);
         autoT = setTimeout(()=>{ if (gen === luckyGen) finish(true); }, dt(LUCKY_AUTO_BANK_MS));
-      });
+      }, { text: pop.textContent });   // (A+ pacing: the banner gets its reading time)
     };
     // The wheel is a skill control now: tap SPIN and it spins up to a fast continuous speed (about 2 turns a second) and the hub becomes
     // STOP; tap STOP (or wait 5 s) and it coasts to a halt over 1.5-2.5 s (ease-out, a small random drift) and the wedge under the
@@ -11631,7 +11651,7 @@
         playTone(150, 0, 0.16, 'triangle', 0.05); playTone(120, 0.14, 0.2, 'triangle', 0.05);   // a gentle buzz
       }
       saveRunSnapshot();
-      revealThen(finish, { lead:300, min: key === 'priceProbe' ? 2200 : 0 });   // (Price Probe: long enough for both tags to roll; A+: every result at least REVEAL_HOLD_MS)
+      revealThen(finish, { lead:300, min: key === 'priceProbe' ? 2200 : 0, text: els.eventPrompt.textContent });   // (Price Probe: long enough for both tags to roll; A+: every result at least REVEAL_HOLD_MS)
     };
     tiles.forEach((tileEl, i)=>{ if (i < n) tileEl.onclick = ()=>{ tileEl.classList.add('bb-press'); resolve(i); }; });
     startEventTimerBar(dt(BRAIN_BREAK_MS), dt(BRAIN_BREAK_MS));
@@ -11726,9 +11746,8 @@
   // ---------- Run 4A: the host on stage, speaking in cue lines ----------
   // A cue line is the host's line as a caption plate at the foot of the stage, with his voice blips. It stays up for
   // 1 s plus 0.25 s a word, and never less than CUE_LINE_MIN.
-  const CUE_LINE_MIN = 2000;
   function lineWords(text){ return String(text || '').trim().split(/\s+/).filter(Boolean).length; }
-  function cueLineMs(text){ return Math.max(CUE_LINE_MIN, 1000 + 250 * lineWords(text)); }
+  function cueLineMs(text){ return readMs(text); }   // (A+ pacing: the shared reading time)
   function cueLineSay(el, text, voice){
     if (!el) return;
     const span = el.querySelector('span');
@@ -11986,7 +12005,7 @@
     try{ localStorage.setItem(EXPLAINER_SEEN_KEY, JSON.stringify(explainerSeen)); }catch(e){}
   }
   function explainerText(key, full){ const x = EXPLAINERS[key]; return x ? (full ? x.full : (x.short || x.full)) : ''; }
-  function explainerMs(text){ return 1000 + 250 * lineWords(text); }
+  function explainerMs(text){ return Math.max(TITLE_CARD_MIN, readMs(text)); }   // (A+ pacing: reading time, at least TITLE_CARD_MIN)
   function gameIntroColors(key){ const gi = GAME_INTRO[key], mg = miniGame(key); return (gi && gi.c) || (mg && mg.colors) || ['#ffd23f', '#c2275f']; }
   // The intro: about GAME_INTRO_MS, then `then`. Lite mode and reduced motion: the title fades in, no sweep or slam.
   function showGameIntro(key, then){
@@ -12008,7 +12027,7 @@
     const shownAt = performance.now();
     let gone = false;
     const go = (e)=>{
-      if (gone || (e && performance.now() - shownAt < Math.min(SKIP_MIN_MS, ms - 200))) return;
+      if (gone || (e && performance.now() - shownAt < TAP_AFTER_MS)) return;
       gone = true; showCard.removeEventListener('click', go);
       showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; showCard.style.removeProperty('--gi-a'); showCard.style.removeProperty('--gi-b');
       then();
@@ -12035,7 +12054,7 @@
     const shownAt = performance.now();
     let gone = false;
     const go = (e)=>{
-      if (gone || (e && performance.now() - shownAt < 350)) return;   // (a tap skips - but not the tap that ended the intro)
+      if (gone || (e && performance.now() - shownAt < TAP_AFTER_MS)) return;   // (a tap skips after TAP_AFTER_MS - never the tap that ended the intro)
       gone = true; showCard.removeEventListener('click', go);
       markExplainerSeen(key);
       showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; showCard.style.removeProperty('--gi-a'); showCard.style.removeProperty('--gi-b');
@@ -12570,7 +12589,7 @@
       els.eventTiles.forEach(t=> t.classList.remove('is-right', 'is-wrong', 'gold', 'dim', 'dim30', 'lit', 'glow-red'));
       if (!runActive) return;
       advanceAfterTrivia();
-    }, { lead: aq ? 0 : 400, min: aq ? (correct ? 2200 : 2600) : (runPerfect ? 1900 : 0) });   // (A+ job 1: 2.2 s after a right Brain Beam / riddle answer, 2.6 s after a miss)   // (A+: the answer flips first (0.4 s), then 1.4 s of the result; a perfect run's banner holds a beat longer; a tap skips after 0.8 s)
+    }, { lead: aq ? 0 : 400, min: aq ? (correct ? 2200 : 2600) : (runPerfect ? 1900 : 0), text: els.eventPrompt.textContent });   // (A+ job 1: 2.2 s after a right Brain Beam / riddle answer, 2.6 s after a miss)   // (A+: the answer flips first (0.4 s), then 1.4 s of the result; a perfect run's banner holds a beat longer; a tap skips after 0.8 s)
   }
   // Where the run goes after a trivia (or the riddle that can follow one).
   // Once all six trivia shots have been taken the solve phase is next -
@@ -12628,7 +12647,7 @@
       els.eventOverlay.classList.add('hidden');
       if (!runActive) return;
       startSolvePhase();
-    });
+    }, { text: els.eventPrompt.textContent });   // (A+ pacing: the result gets its reading time)
   }
 
   function runPowerUpRoundForRun(resumeEndsAt){
@@ -14007,7 +14026,7 @@
   // in GUESS_COUNT_MS (it used to take 1.3s with a long slow tail, a second
   // of dead time before the verdict), then the round moves on after
   // GUESS_REVEAL_HOLD_MS; a tap anywhere skips ahead.
-  const GUESS_COUNT_MS = 900, GUESS_REVEAL_HOLD_MS = 1800, GUESS_SKIP_SHIELD_MS = 1000;   // (G2: a tap skips the reveal only after 1 s)
+  const GUESS_COUNT_MS = 900, GUESS_REVEAL_HOLD_MS = paced(1800), GUESS_SKIP_SHIELD_MS = TAP_AFTER_MS;   // (G2: a tap skips the reveal only after 1 s)
   let guessLockedAt = 0, guessFinish = null;
   function skipGuessReveal(){
     if (guessFinish){   // the count is still running: settle it (points and all) first, and say what it paid
@@ -15128,7 +15147,7 @@
     const rv = warpReveal(runWord.word, 'miss');
     solveLockedLetters = runWord.word.split(''); solveCurrentGuess = [];
     setTimeout(()=>{ renderSolveUI(); hostSay('So close! It was ' + runWord.word + '.', 2000); if (sfx.warpMiss) sfx.warpMiss(); else sfx.wrong(); }, rv.ms);
-    setTimeout(()=>{ warpMissing = false; els.solveOverlay.classList.remove('missed'); rv.remove(); if (runActive) endRun(false); }, rv.ms + 1500);
+    setTimeout(()=>{ warpMissing = false; els.solveOverlay.classList.remove('missed'); rv.remove(); if (runActive) endRun(false); }, rv.ms + paced(1500));
   }
   function renderSolveUI(){
     els.solveHint.textContent = runHintsRevealed > 0 ? '\uD83D\uDCA1 ' + runWord.hints.slice(0, runHintsRevealed).join(' \u00B7 ') : '';
@@ -15345,7 +15364,7 @@
       els.solveOverlay.classList.remove('celebrating');
       rv.remove();
       done();
-    }, rv.ms + (reduced ? 1400 : 1500));
+    }, rv.ms + paced(reduced ? 1400 : 1500));
   }
   // Confetti on a canvas: one burst fanning up and out of `box` (a screen
   // rect), then a lighter shower from the top. Stops itself after `life` ms.
