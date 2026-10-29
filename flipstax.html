@@ -13169,6 +13169,7 @@
     setAim(OP.C.W / 2);
     renderPlinkoTally();
   }
+  let pkAutoNext = null;   // (the Orbit Drop whose automatic hand-off is already scheduled)
   function plinkoAllLanded(){ const f = pkF(); return f.dropped >= f.chips.length && pkLanded.length >= f.chips.length && pkFalling.size === 0; }
   function renderPlinkoTally(){
     const f = pkF(), n = f.chips.length, left = n - f.dropped;
@@ -13180,7 +13181,13 @@
     const drop = document.getElementById('plinkoDrop'), all = document.getElementById('plinkoAll'), board = document.getElementById('plinkoBoard');
     const done = plinkoAllLanded();
     drop.textContent = dailyOrbit ? (dailyOrbit.mid ? 'On with the show ▶' : '🏆 See your results ▶') : '🔐 Open ' + GN.vault + ' ▶';
-    drop.classList.toggle('hidden', !done);
+    // A+ pacing: in the show there is no continue button - once every chip has landed the result holds (REVEAL_HOLD_MS, or its reading
+    // time; a tap after 0.8 s skips it) and the show moves on by itself: Round 6 to the Word Warp finale, the final drop to the results.
+    drop.classList.toggle('hidden', !done || !!dailyOrbit);
+    if (done && dailyOrbit && pkAutoNext !== dailyOrbit){
+      const o = dailyOrbit; pkAutoNext = o;
+      revealThen(()=>{ const ff = pkF(); if (dailyOrbit === o && ff && ff.stage === 'plinko') goToVault(); }, { text: 'All chips in! +' + won + ' points' });
+    }
     all.classList.toggle('hidden', left <= 0 || pkAuto);
     board.classList.toggle('done', left <= 0);
     board.classList.toggle('locked', pkAuto);
@@ -14259,7 +14266,8 @@
     secretCelebrateTimer = setTimeout(()=>{
       secretCanContinue = true;
       document.getElementById('riddleContinue').classList.remove('hidden');
-    }, SECRET_HOLD_MS);
+      secretCelebrateTimer = setTimeout(continueAfterSecret, readMs('Tap to continue'));   // (A+ pacing: it goes on by itself too - the button is never required)
+    }, paced(SECRET_HOLD_MS));
     let reduced = false;
     try{ reduced = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); }catch(e){}
     if (reduced) return;
@@ -17552,6 +17560,29 @@
     }
   }, 2000);
   setInterval(renderStatusBanner, 30000);
+
+  // A+ pacing: the screen watchdog - no screen may ever hang. Every timed card ends by itself; this catches anything that slips: a show
+  // card (title, explainer, round card, reward) still up after SCREEN_STUCK_MS is tapped on (its own skip path), a mini-game overlay
+  // still open after GAME_STUCK_MS is closed through its own close, a finished Orbit Drop goes on, and a show scene that has not moved
+  // for SCENE_STUCK_MS with no player input is ended through showDone. Each recovery is logged.
+  const SCREEN_STUCK_MS = 30000, GAME_STUCK_MS = 150000, SCENE_STUCK_MS = 180000, INPUT_IDLE_MS = 60000;
+  let lastInputAt = performance.now(), cardUpSince = 0, gameUpSince = 0;
+  ['pointerdown', 'keydown'].forEach(t=> document.addEventListener(t, ()=>{ lastInputAt = performance.now(); }, true));
+  setInterval(()=>{
+    const now = performance.now();
+    const cardUp = !showCard.classList.contains('hidden');
+    cardUpSince = cardUp ? (cardUpSince || now) : 0;
+    if (cardUp && now - cardUpSince > SCREEN_STUCK_MS){
+      console.warn('FlipStax: watchdog closing a stuck card', showCard.className); if (runActive) showLog('watchdog', 'card ' + showCard.className);
+      cardUpSince = now; const btn = showCard.querySelector('.ex-go'); (btn || showCard).dispatchEvent(new MouseEvent('click', { bubbles:true }));
+    }
+    gameUpSince = mgOpen ? (gameUpSince || now) : 0;
+    if (mgOpen && now - gameUpSince > GAME_STUCK_MS){ console.warn('FlipStax: watchdog closing a stuck game'); if (runActive) showLog('watchdog', 'mini-game'); gameUpSince = 0; try{ mgOpen.close(false); }catch(e){} }
+    if (dailyOrbit && plinkoAllLanded() && pkAutoNext !== dailyOrbit) renderPlinkoTally();   // (re-arms the Orbit Drop hand-off)
+    if (runActive && !isPaused && !dailyOrbit && ['vs', 'idle', 'wordwarp', 'results', 'orbit'].indexOf(Show.scene) < 0 && now - Show.since > SCENE_STUCK_MS && now - lastInputAt > INPUT_IDLE_MS){
+      console.warn('FlipStax: watchdog ending a stuck scene', Show.scene); showLog('watchdog', 'scene ' + Show.scene); showDone(Show.gen, 'watchdog');
+    }
+  }, 3000);
 
   // DEV/TESTING ONLY: exposes internal run state for verification scripts,
   // gated the same way as the rest of ?debug=fast. Not needed for normal
