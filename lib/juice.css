@@ -979,3 +979,14 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .outro-share:active{ transform:scale(0.97); }
 .outro-donate{ min-height:46px; max-width:320px; font-size:16px; }
 @media (max-height:700px){ .outro-share{ min-height:58px !important; } .outro-donate{ min-height:42px; } }
+
+/* ---- A+ outro item 4: the donation button - large gold 'Buy Flip a coffee' with the Ko-fi logo as a 40 px circle, a gentle pulse once every 2 s
+   after the curtain has closed (transform only; still in lite mode and reduced motion) ---- */
+.outro-donate{ gap:12px; min-height:56px !important; max-width:340px; padding:6px 20px 6px 8px; font-size:20px !important; background:linear-gradient(180deg, #ffe27a, #e6a817 58%, #c98a00) !important; border:3px solid #fff3c4 !important; box-shadow:0 0 0 3px #6a4300, 0 4px 0 3px #6a4300 !important; color:#2a1700 !important; }
+.outro-donate .od-icon{ width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid #fff; box-shadow:0 1px 0 rgba(0,0,0,0.35); flex:0 0 auto; }
+.outro-donate span{ letter-spacing:0.3px; text-shadow:0 1px 0 rgba(255,255,255,0.45); }
+.outro.end .outro-donate{ animation:odPulse 2s ease-in-out 2.2s infinite; }
+@keyframes odPulse{ 0%, 100%{ transform:scale(1); } 50%{ transform:scale(1.045); } }
+:root.lite .outro.end .outro-donate{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .outro.end .outro-donate{ animation:none; } }
+@media (max-height:700px){ .outro-donate{ min-height:50px !important; } }
