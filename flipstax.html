@@ -4732,6 +4732,7 @@
     <video class="outro-video" id="outroVideo" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
     <img class="outro-poster" id="outroPoster" src="data/outro/poster.webp" alt="" decoding="async" draggable="false">
     <div class="outro-badge" id="outroBadge" aria-live="polite"><span>FINAL SCORE</span><b id="outroScore">0</b></div>
+    <button type="button" class="outro-details" id="outroDetails" aria-expanded="false">details</button>
     <div class="outro-lower">
       <h2 class="outro-head" id="outroHead">CONGRATULATIONS!</h2>
       <div class="daily-btn primary outro-share" id="outroShare" role="button" tabindex="0">📤 SHARE</div>
@@ -15623,6 +15624,7 @@
     outroClear(); outroState = 'idle';
     const o = document.getElementById('outro'), v = document.getElementById('outroVideo');
     els.readoutOverlay.classList.remove('outro-on', 'show-details');
+    { const d = document.getElementById('outroDetails'); d.textContent = 'details'; d.setAttribute('aria-expanded', 'false'); }
     document.documentElement.classList.remove('outro-up');
     if (!o) return;
     o.classList.remove('end', 'instant', 'poster-on');
@@ -17564,6 +17566,13 @@
   els.readoutShare.addEventListener('click', shareRunResult);
   document.getElementById('outroShare').addEventListener('click', shareRunResult);
   document.getElementById('outroAgain').addEventListener('click', finishDailySession);
+  // the 'details' toggle: the full results panel (breakdown, cards, tomorrow) behind a small button, so the end screen itself is one screen
+  document.getElementById('outroDetails').addEventListener('click', (e)=>{
+    e.stopPropagation();
+    const on = els.readoutOverlay.classList.toggle('show-details');
+    e.currentTarget.textContent = on ? 'back' : 'details'; e.currentTarget.setAttribute('aria-expanded', on ? 'true' : 'false');
+    if (on && outroState === 'playing') outroEnd(true);
+  });
   document.getElementById('readoutCopy').addEventListener('click', copyEpisodeShare);
   els.solveSubmit.addEventListener('click', submitSolveGuess);
   els.solveClearBtn.addEventListener('click', ()=>{ solveCurrentGuess = []; solveCurrentGuessSource = []; rackUsedFlags = []; renderSolveUI(); });

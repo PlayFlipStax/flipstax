@@ -949,3 +949,26 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .outro.instant .outro-again{ transition-delay:0s; transition-duration:0.25s; }
 #readoutOverlay.ep.outro-on .personality-inner, #readoutOverlay.ep.outro-on .contact-footer{ display:none; }
 :root.outro-up .ms-coffee-btn, :root.outro-up .help-btn{ display:none !important; }   /* (the outro has its own donation button) */
+
+/* ---- A+ outro item 2: one screen. The badge, headline, SHARE, donation and 'Play again tomorrow' fit 390 x 844 and 360 x 640 with no scrolling;
+   everything else (breakdown, cards, tomorrow) is behind the small 'details' toggle ---- */
+.outro-details{ display:none; }
+#readoutOverlay.ep.outro-on .outro-details{ display:block; position:absolute; right:12px; top:calc(18px + env(safe-area-inset-top)); z-index:7; min-height:44px; min-width:44px; padding:0 14px; border-radius:99px; border:2px solid rgba(255,255,255,0.7);
+  background:rgba(6,10,40,0.72); color:#fff; font:800 14px/1 var(--f-body, Inter, sans-serif); letter-spacing:0.5px; cursor:pointer; }
+#readoutOverlay.ep.outro-on.show-details .personality-inner{ display:block; position:absolute; inset:0; z-index:6; max-width:none; width:auto; margin:0; padding:calc(70px + env(safe-area-inset-top)) 14px calc(24px + env(safe-area-inset-bottom)); overflow-y:auto; background:#2a0b4e; }
+#readoutOverlay.ep.outro-on.show-details .contact-footer{ display:block; position:absolute; left:0; right:0; bottom:0; z-index:6; }
+@media (max-height:700px){
+  .outro-lower{ gap:8px; padding-top:34px; padding-bottom:calc(10px + env(safe-area-inset-bottom)); }
+  .outro-head{ font-size:clamp(28px, 8.6vw, 34px); }
+  .outro-share{ min-height:54px; }
+  .outro-donate{ min-height:44px; font-size:16px; }
+  .outro-again{ min-height:32px; padding:4px 18px; }
+}
+:root.outro-up .ms-coffee-wrap, :root.outro-up .ms-coffee-label{ display:none !important; }
+@media (max-width:380px){
+  .outro-badge{ gap:7px; padding:4px 13px 5px; }
+  .outro-badge span{ font-size:12px; letter-spacing:1px; }
+  .outro-badge b{ font-size:26px; }
+  #readoutOverlay.ep.outro-on .outro-details{ padding:0 11px; min-width:44px; right:8px; }
+}
+#readoutOverlay.ep.outro-on.show-details .personality-inner{ padding-bottom:calc(76px + env(safe-area-inset-bottom)); }
