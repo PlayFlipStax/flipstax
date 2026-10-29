@@ -5996,6 +5996,10 @@
   // G3: the commercial break is out of the rundown; COMMERCIAL_ENABLED at the top of data/rundown.js brings it back
   // (after the act named in commercial.after). The ad code and the "Brought to you by" sponsor field stay.
   const COMMERCIAL_ON = !!(RUNDOWN.commercial && RUNDOWN.commercial.enabled);
+  // A+ outro: the SPONSOR BREAK - a 5 s skippable card between Round 3 and Round 4 (scene-sponsor art, 'Brought to you by' and a
+  // replaceable logo: swap images/sponsor-logo.svg, or set SPONSOR_LOGO). OFF: nothing changes in the show until this is true. The TEST
+  // menu's 'Sponsor break (off)' jump shows it without turning it on.
+  const SPONSOR_BREAK_ON = false, SPONSOR_LOGO = 'images/sponsor-logo.svg', SPONSOR_MS = 5000;
   function seedOf(rng){ return (rng() * 4294967296) >>> 0; }
   // The day's two Mystery Games (see pickMysteryGames).
   function showMysteryGames(date){ return pickMysteryGames(date); }
@@ -6075,6 +6079,7 @@
         // (orbitDrop: the Word Warp's finish opens it - see endRun)
       });
       if (COMMERCIAL_ON && RUNDOWN.commercial.after === act.id) steps.push({ t:'ad', ad: showAd(date) });
+      if (SPONSOR_BREAK_ON && act.id === 'r3') steps.push({ t:'sponsor' });   // (between Round 3 and Round 4)
     });
     // About one episode in three, a Cosmic Surprise takes one random VS card's place.
     if (rng() < (RUNDOWN.cosmicSurpriseChance || 0)){
@@ -11020,6 +11025,13 @@
         if (st.act > 0) zoomThrough('out', card); else card();
         return true;
       }
+      if (st.t === 'sponsor'){
+        if (!SPONSOR_BREAK_ON && !st.forced) continue;
+        runPhase = 'bumper'; saveRunSnapshot();
+        const g = showEnter('ad', 'sponsor');
+        showSponsor(()=> showDone(g, 'sponsor'));
+        return true;
+      }
       if (st.t === 'ad'){
         if (!COMMERCIAL_ON && !st.forced) continue;   // (G3: the commercial break is off; the TEST menu can still show it)
         runPhase = 'bumper'; saveRunSnapshot();
@@ -12212,6 +12224,22 @@
     robot:'<rect x="28" y="40" width="64" height="50" rx="10" fill="var(--ad1)" stroke="#1a0a1a" stroke-width="4"/><rect x="38" y="16" width="44" height="26" rx="8" fill="#e9eef5" stroke="#1a0a1a" stroke-width="4"/><circle cx="50" cy="29" r="5" fill="var(--ad2)"/><circle cx="70" cy="29" r="5" fill="var(--ad2)"/><circle cx="42" cy="98" r="8" fill="#1a0a1a"/><circle cx="78" cy="98" r="8" fill="#1a0a1a"/><path d="M60 16 V6" stroke="#1a0a1a" stroke-width="4"/><circle cx="60" cy="5" r="4" fill="var(--ad2)"/>',
     pudding:'<path d="M26 92 L34 40 Q60 26 86 40 L94 92 Z" fill="var(--ad1)" stroke="#1a0a1a" stroke-width="4" stroke-linejoin="round"/><path d="M34 40 Q60 26 86 40 Q80 52 74 44 Q66 56 58 44 Q50 54 44 44 Q38 52 34 40 Z" fill="var(--ad2)" stroke="#1a0a1a" stroke-width="3"/><path d="M18 96 H102" stroke="#1a0a1a" stroke-width="6" stroke-linecap="round"/><circle cx="60" cy="24" r="6" fill="#ff3c5a" stroke="#1a0a1a" stroke-width="3"/>',
   };
+  // The sponsor card: the scene, 'Brought to you by' and the logo, up for SPONSOR_MS (paced), a tap skips after 1 s.
+  function showSponsor(done){
+    showCard.className = 'show-card sponsor';
+    showCard.innerHTML = '<div class="sp-inner"><span class="sp-by">Brought to you by</span><img class="sp-logo" src="' + SPONSOR_LOGO + '" alt="Our sponsor"><span class="sp-skip">TAP TO SKIP</span></div>';
+    showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'Brought to you by our sponsor. Tap to skip');
+    showCard.classList.remove('hidden');
+    const shownAt = performance.now(); let gone = false;
+    const go = (e)=>{
+      if (gone || (e && performance.now() - shownAt < TAP_AFTER_MS)) return;
+      gone = true; showCard.removeEventListener('click', go);
+      showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden';
+      noteOverlayClosed(); done();
+    };
+    (runActive ? showLater : setTimeout)(()=> go(), runActive && DEBUG_FAST ? dt(SPONSOR_MS) : SPONSOR_MS);
+    showCard.addEventListener('click', go);
+  }
   function showCommercial(ad, done){
     if (!ad){ done(); return; }
     const ms = (RUNDOWN.commercial && RUNDOWN.commercial.ms) || 3000, sponsor = (RUNDOWN.commercial && RUNDOWN.commercial.sponsor) || ad.brand || '';
@@ -18400,6 +18428,7 @@
       { label:'Reward beat', go: atType(s=> s.t === 'reward', 0, 40, 1) },
       { label:'Crowd Scan', go: mysteryAs('crowdScan') },
       { label:'Cosmic Surprise', go: atType(s=> s.t === 'vs', 0, 30, 1, (i)=>{ runPlan.splice(i, 0, { t:'cosmic', act:0, seed:7 }); }) },
+      { label:'Sponsor break (off)', go: atType(s=> s.t === 'act' && (RUNDOWN.acts[s.act] || {}).id === 'r3', 0, 70, 2, (i)=>{ runPlan.splice(i, 0, { t:'sponsor', forced:true }); }) },
       { label:'Commercial (off)', go: atType(s=> s.t === 'act' && (RUNDOWN.acts[s.act] || {}).id === 'r3', 0, 70, 2, (i)=>{ runPlan.splice(i, 0, { t:'ad', forced:true, ad: showAd(todayStr()) }); }) },
       { label:'Round 3 card', go: roundCard(3) },
       { label:'Mystery Portal', go: roundGame('door', 96, 3) },
