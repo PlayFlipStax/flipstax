@@ -10331,7 +10331,41 @@
   // 1080 x 1920, the results screen in one picture: the bulb frame, CONGRATULATIONS!, the
   // final score with its breakdown, the three cards (best moment, personality card,
   // streak), the VS squares, and Tomorrow on FlipStax.
+  // A+ outro: the shared picture IS the end screen - the goodbye video's last frame (the closed curtain and the FLIPSTAX sign) full-bleed,
+  // the gold score badge at the top, the headline in the dark lower third, and "Can you beat ...?" with GAME_URL. One design, drawn here
+  // from the same poster and the same colours the screen uses (lib/juice.css .outro-*), so what is shared looks like what the player saw.
+  let outroPosterImg = null, outroPosterP = null;
+  function loadOutroPoster(){
+    if (outroPosterImg) return Promise.resolve(outroPosterImg);
+    if (!outroPosterP) outroPosterP = new Promise(res=>{ const i = new Image(); i.onload = ()=>{ outroPosterImg = i; res(i); }; i.onerror = ()=> res(null); i.src = 'data/outro/poster.webp'; });
+    return outroPosterP;
+  }
   function renderEpisodeShare(r){
+    const W = SHARE_CARD_W, H = SHARE_CARD_H, c = document.createElement('canvas'); c.width = W; c.height = H;
+    const ctx = c.getContext('2d'), D = SHARE_FONT_D, T = SHARE_FONT_T, score = shownScore(r.score);
+    ctx.fillStyle = '#04102e'; ctx.fillRect(0, 0, W, H);
+    if (outroPosterImg){ const s = Math.max(W / outroPosterImg.naturalWidth, H / outroPosterImg.naturalHeight), dw = outroPosterImg.naturalWidth * s, dh = outroPosterImg.naturalHeight * s; ctx.drawImage(outroPosterImg, (W - dw) / 2, (H - dh) / 2, dw, dh); }
+    // the dark lower third
+    const lg = ctx.createLinearGradient(0, H * 0.58, 0, H); lg.addColorStop(0, 'rgba(3,8,30,0)'); lg.addColorStop(0.45, 'rgba(3,8,30,0.82)'); lg.addColorStop(1, 'rgba(3,8,30,0.94)');
+    ctx.fillStyle = lg; ctx.fillRect(0, H * 0.58, W, H * 0.42);
+    const gold = (y0, y1)=>{ const g = ctx.createLinearGradient(0, y0, 0, y1); g.addColorStop(0, '#fff3a8'); g.addColorStop(0.55, '#ffcb2b'); g.addColorStop(1, '#ff9900'); return g; };
+    const center = (text, y, font, fill, stroke, sw)=>{ ctx.font = font; ctx.textAlign = 'center'; if (stroke){ ctx.lineWidth = sw || 8; ctx.strokeStyle = stroke; ctx.lineJoin = 'round'; ctx.strokeText(text, W / 2, y); } ctx.fillStyle = fill; ctx.fillText(text, W / 2, y); };
+    // the score badge (the screen's .outro-badge)
+    ctx.font = '900 34px ' + T; const lw = ctx.measureText('FINAL SCORE').width; ctx.font = '900 80px ' + D; const nw = ctx.measureText(score.toLocaleString()).width;
+    const bw = lw + nw + 100, bh = 104, bx = (W - bw) / 2, by = 34;
+    roundRectPath(ctx, bx - 7, by - 7, bw + 14, bh + 19, 59); ctx.fillStyle = '#7a4a00'; ctx.fill();
+    roundRectPath(ctx, bx, by, bw, bh, 52); ctx.fillStyle = gold(by, by + bh); ctx.fill(); ctx.lineWidth = 7; ctx.strokeStyle = '#ffffff'; ctx.stroke();
+    ctx.textAlign = 'left'; ctx.font = '900 34px ' + T; ctx.fillStyle = '#5a2a00'; ctx.fillText('FINAL SCORE', bx + 40, by + bh / 2 + 12);
+    ctx.font = '900 80px ' + D; ctx.fillStyle = '#3a1500'; ctx.fillText(score.toLocaleString(), bx + 40 + lw + 20, by + bh / 2 + 28);
+    // the headline and the invitation
+    center('CONGRATULATIONS!', 1500, '900 124px ' + D, '#fff3a8', '#7a3a00', 14);
+    center('EPISODE ' + (r.episode || showEpisode(r.date || todayStr())) + ' · ' + (r.solved ? 'Word Warp solved' : 'Word Warp: so close'), 1590, '800 44px ' + T, '#e9f1ff');
+    center('Can you beat ' + score.toLocaleString() + '?', 1700, '900 84px ' + D, gold(1640, 1710), '#5a2a00', 8);
+    center(GAME_URL.replace(/^https?:\/\//, ''), 1790, '800 50px ' + T, '#ffffff');
+    return c;
+  }
+  // (the earlier results-screen picture - the bulb frame, breakdown and three cards - kept for reference; the share sheet uses the one above)
+  function renderEpisodeShareLegacy(r){
     const W = SHARE_CARD_W, H = SHARE_CARD_H, c = document.createElement('canvas'); c.width = W; c.height = H;
     const ctx = c.getContext('2d'), D = SHARE_FONT_D, T = SHARE_FONT_T;
     const bg = ctx.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#4a1680'); bg.addColorStop(0.55, '#2c0b52'); bg.addColorStop(1, '#1c0636');
@@ -10415,7 +10449,7 @@
     if (r.actPts || r.orbit){   // an episode: the results screen's own picture
       const p = { r, done:false, canvas:null, blob:null, promise:null };
       const type = PERSONALITY_META[r.personalityType] ? r.personalityType : 'fence_sitter';
-      p.promise = waitRunShareAssets({ personality: type }, 3000).then(()=>{
+      p.promise = Promise.all([waitRunShareAssets({ personality: type }, 3000), loadOutroPoster()]).then(()=>{
         try{ const canvas = renderEpisodeShare(r); p.blob = dataUrlToBlob(canvas.toDataURL('image/png')); p.canvas = canvas; }catch(e){ console.warn('FlipStax: episode share image failed', e); }
         p.done = true; return p;
       });
@@ -15631,7 +15665,7 @@
     try{ v.pause(); }catch(e){} v.removeAttribute('src'); try{ v.load(); }catch(e){}
   }
   function startOutro(r){
-    stopOutro();
+    stopOutro(); loadOutroPoster();
     const o = document.getElementById('outro'), v = document.getElementById('outroVideo'); if (!o) return;
     els.readoutOverlay.classList.add('outro-on');
     document.documentElement.classList.add('outro-up');
@@ -15649,6 +15683,7 @@
       outroLater(OUTRO_START_MS, ()=>{ if (!started) fail(); });   // (never stuck on a stalled load)
     }catch(e){ fail(); }
   }
+  if (DEBUG_FAST || REPLAY) window.__shareImage = ()=> renderEpisodeShare(runResultToday).toDataURL('image/png');   // (tests: the picture the share sheet would send)
   document.getElementById('outro').addEventListener('click', (e)=>{
     if (outroState === 'playing' && !e.target.closest('a, .daily-btn')) outroEnd(true);   // a tap anywhere while it plays: straight to the end state
   });
