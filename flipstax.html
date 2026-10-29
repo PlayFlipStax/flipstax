@@ -4726,6 +4726,19 @@
 
 <div class="personality-overlay" id="readoutOverlay">
   <div class="bg w-results warp-bg" aria-hidden="true"><i class="rays"></i><i class="glow"></i></div>
+  <!-- The end-of-episode screen (A+ outro): the goodbye video full-screen behind the result - a compact score badge from the start, then,
+       when the curtain has closed on the FLIPSTAX sign, the headline, SHARE and the donation button fade in. A tap skips to that end state. -->
+  <div class="outro" id="outro">
+    <video class="outro-video" id="outroVideo" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
+    <img class="outro-poster" id="outroPoster" src="data/outro/poster.webp" alt="" decoding="async" draggable="false">
+    <div class="outro-badge" id="outroBadge" aria-live="polite"><span>FINAL SCORE</span><b id="outroScore">0</b></div>
+    <div class="outro-lower">
+      <h2 class="outro-head" id="outroHead">CONGRATULATIONS!</h2>
+      <div class="daily-btn primary outro-share" id="outroShare" role="button" tabindex="0">📤 SHARE</div>
+      <a class="outro-donate" id="outroDonate" href="https://ko-fi.com/flipstax" target="_blank" rel="noopener noreferrer">☕ Support FlipStax on Ko-fi</a>
+      <div class="outro-again" id="outroAgain" role="button" tabindex="0">Play again tomorrow</div>
+    </div>
+  </div>
   <div class="personality-inner">
     <!-- The episode's results (DIRECTION.md, style-board/refs/results.jpg): the ribbon, the final
          score counting up, the breakdown, three cards and the Tomorrow on FlipStax tease. -->
@@ -10420,7 +10433,7 @@
     if (!runResultToday || dailyShareBusy) return;
     trackEvent('share_clicked'); flushEvents();
     dailyShareBusy = true;
-    const btn = els.readoutShare, label = btn ? btn.textContent : '';
+    const btn = els.readoutOverlay.classList.contains('outro-on') ? document.getElementById('outroShare') : els.readoutShare, label = btn ? btn.textContent : '';
     try{
       const r = runResultToday, pre = prebuildDailyShare(r);
       if (!pre.done){   // not ready yet: a short "Preparing..." state, then share
@@ -15589,6 +15602,55 @@
     clearInterval(eprClockT); tick(true); eprClockT = setInterval(tick, 1000);
     document.getElementById('readoutShare').textContent = '📤 SHARE YOUR GLORY';
   }
+  // ---- The outro video (A+): data/outro/outro.mp4, 540 x 960, 10 s, about 1 MB, with data/outro/poster.webp (its last frame).
+  // States: 'playing' (the badge only) -> 'end' (the headline, SHARE and the donation button fade in, 0.5 s apart, over 1.5 s). A tap
+  // while it plays skips straight to the end. Muted unless the player has sound on. If the video cannot play (error, blocked, stalled,
+  // lite mode, reduced motion) the poster shows and the end state follows after 1.5 s. OUTRO_WATCHDOG_MS guarantees the buttons within 12 s.
+  // The video never blocks SHARE or the donation button: they are ordinary elements, and everything starts at the end state on a skip.
+  const OUTRO_WATCHDOG_MS = 11000, OUTRO_FALLBACK_MS = 1500, OUTRO_START_MS = 3500;
+  let outroTimers = [], outroState = 'idle';
+  function outroLater(ms, fn){ const t = setTimeout(fn, ms); outroTimers.push(t); return t; }
+  function outroClear(){ outroTimers.forEach(clearTimeout); outroTimers = []; }
+  function outroEnd(instant){
+    const o = document.getElementById('outro'); if (!o || outroState === 'end') return;
+    outroState = 'end'; outroClear();
+    const v = document.getElementById('outroVideo');
+    if (instant || !v.ended){ try{ v.pause(); }catch(e){} o.classList.add('poster-on'); }   // (a skip or a failure freezes on the poster: the same last frame)
+    o.classList.toggle('instant', !!instant);
+    o.classList.add('end');
+  }
+  function stopOutro(){
+    outroClear(); outroState = 'idle';
+    const o = document.getElementById('outro'), v = document.getElementById('outroVideo');
+    els.readoutOverlay.classList.remove('outro-on', 'show-details');
+    document.documentElement.classList.remove('outro-up');
+    if (!o) return;
+    o.classList.remove('end', 'instant', 'poster-on');
+    try{ v.pause(); }catch(e){} v.removeAttribute('src'); try{ v.load(); }catch(e){}
+  }
+  function startOutro(r){
+    stopOutro();
+    const o = document.getElementById('outro'), v = document.getElementById('outroVideo'); if (!o) return;
+    els.readoutOverlay.classList.add('outro-on');
+    document.documentElement.classList.add('outro-up');
+    document.getElementById('outroScore').textContent = shownScore(r.score).toLocaleString();
+    outroState = 'playing';
+    outroLater(OUTRO_WATCHDOG_MS, ()=> outroEnd(true));   // (the watchdog: whatever happens, the buttons are there within 12 s)
+    const quiet = isLite() || prefersReducedMotion() || (DEBUG_FAST && !REALTIME);   // (test runs and quiet modes: the poster, then the end state)
+    if (quiet){ o.classList.add('poster-on'); outroLater(DEBUG_FAST && !REALTIME ? 300 : OUTRO_FALLBACK_MS, ()=> outroEnd(false)); return; }
+    const fail = ()=>{ if (outroState !== 'playing') return; o.classList.add('poster-on'); outroClear(); outroLater(OUTRO_FALLBACK_MS, ()=> outroEnd(false)); outroLater(OUTRO_WATCHDOG_MS, ()=> outroEnd(true)); };
+    try{
+      v.muted = !soundOn; v.src = 'data/outro/outro.mp4'; v.currentTime = 0;
+      v.onended = ()=> outroEnd(false); v.onerror = fail;
+      let started = false; v.onplaying = ()=>{ started = true; };
+      const p = v.play(); if (p && p.catch) p.catch(()=>{ if (!v.muted){ v.muted = true; v.play().catch(fail); } else fail(); });
+      outroLater(OUTRO_START_MS, ()=>{ if (!started) fail(); });   // (never stuck on a stalled load)
+    }catch(e){ fail(); }
+  }
+  document.getElementById('outro').addEventListener('click', (e)=>{
+    if (outroState === 'playing' && !e.target.closest('a, .daily-btn')) outroEnd(true);   // a tap anywhere while it plays: straight to the end state
+  });
+  new MutationObserver(()=>{ if (!els.readoutOverlay.classList.contains('show') && outroState !== 'idle') stopOutro(); }).observe(els.readoutOverlay, { attributes:true, attributeFilter:['class'] });
   function showRunReadout(fromOrbit){
     showEnter('results');
     if (fromOrbit === true && !evResultsSent){   // (only the fresh arrival from Orbit Drop - not a later visit to a saved result)
@@ -15631,6 +15693,7 @@
     };
     if (!ep && !(pre.done && asImage(pre))) pre.promise.then(p=>{ if (performance.now() - shownAt < 4000 && els.readoutOverlay.classList.contains('show')) asImage(p); });
     els.readoutOverlay.classList.add('show');
+    if (ep) startOutro(r); else stopOutro();
     // (Run 4A: the presenter's bow is gone from the results - the host's outro plays just before them)   // (was: tablets and up only: the phone's results panel fills the whole width, no room
     updatePauseBtnVisibility();
     sfx.personality();
@@ -17499,6 +17562,8 @@
   renderRunBanner();
   els.readoutDone.addEventListener('click', finishDailySession);
   els.readoutShare.addEventListener('click', shareRunResult);
+  document.getElementById('outroShare').addEventListener('click', shareRunResult);
+  document.getElementById('outroAgain').addEventListener('click', finishDailySession);
   document.getElementById('readoutCopy').addEventListener('click', copyEpisodeShare);
   els.solveSubmit.addEventListener('click', submitSolveGuess);
   els.solveClearBtn.addEventListener('click', ()=>{ solveCurrentGuess = []; solveCurrentGuessSource = []; rackUsedFlags = []; renderSolveUI(); });
