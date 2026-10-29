@@ -5777,6 +5777,42 @@
   const paced = (ms)=> Math.round((ms || 0) * PACE);
   function readMs(text){ const w = String(text || '').trim().split(/\s+/).filter(Boolean).length; return Math.min(READ.MAX, Math.max(READ.MIN, READ.BASE + READ.PER_WORD * w)); }
   window.FLIPSTAX_PACE = { PACE, READ, TITLE_CARD_MIN, TAP_AFTER_MS, XFADE_OUT_MS, XFADE_IN_MS, readMs };
+  // ---- The scene crossfade (A+ pacing pass), used by every scene change: sceneOut(el) leaves a frozen copy of the outgoing scene on top
+  // that fades out over XFADE_OUT_MS and swallows taps until it is gone (so the next scene is never tapped through the old one), while the
+  // real element is hidden or removed at once; sceneIn(el) shows the incoming scene's own opaque backdrop at once and fades its content in
+  // over XFADE_IN_MS - nothing behind it shows through. sceneHook(el) wires both to el.classList.add / remove('hidden'), so every existing
+  // show / hide of that element crossfades. Opacity only; lite and reduced motion get the same simple fade.
+  const SCENE_BG_RE = /(^|[\s-])(bg|studio|stage|sun|sky|backdrop|spot|cone|curt|wall|floorplane|pool|tint|slime)(\s|$)/;
+  function sceneOut(el, removing){
+    if (!el || !el.parentNode || !Element.prototype.animate || el.classList.contains('hidden')) return;
+    let cs; try{ cs = getComputedStyle(el); }catch(e){ return; }
+    if (cs.display === 'none' || cs.visibility === 'hidden') return;
+    const g = el.cloneNode(true);
+    g.classList.remove('hidden'); g.classList.add('scene-ghost'); g.setAttribute('aria-hidden', 'true');
+    if (removing){ g.removeAttribute('id'); g.querySelectorAll('[id]').forEach(n=> n.removeAttribute('id')); }   // (a removed scene's id must not live on in its copy)
+    const src = el.querySelectorAll('canvas'), dst = g.querySelectorAll('canvas');
+    src.forEach((c, i)=>{ try{ const d = dst[i]; d.width = c.width; d.height = c.height; d.getContext('2d').drawImage(c, 0, 0); }catch(e){} });
+    const swallow = (e)=>{ e.stopPropagation(); e.preventDefault(); };
+    ['click', 'pointerdown', 'pointerup', 'touchstart'].forEach(t=> g.addEventListener(t, swallow, true));
+    el.parentNode.insertBefore(g, el.nextSibling);   // (after the original: getElementById still finds the real one first)
+    const a = g.animate([{ opacity:1 }, { opacity:0 }], { duration:XFADE_OUT_MS, easing:'ease-in', fill:'forwards' });
+    a.onfinish = ()=> g.remove();
+    setTimeout(()=> g.remove(), XFADE_OUT_MS + 250);
+  }
+  function sceneIn(el){
+    if (!el || !Element.prototype.animate) return;
+    Array.from(el.children).forEach(c=>{
+      const cls = c.getAttribute('class') || '';
+      if (c.classList.contains('scene-ghost') || c.tagName === 'CANVAS' || SCENE_BG_RE.test(cls)) return;   // (backdrops are opaque at once)
+      c.animate([{ opacity:0 }, { opacity:1 }], { duration:XFADE_IN_MS, easing:'ease-out' });
+    });
+  }
+  function sceneHook(el){
+    if (!el || el._sceneHooked) return; el._sceneHooked = true;
+    const cl = el.classList, add = cl.add.bind(cl), rem = cl.remove.bind(cl);
+    cl.add = (...a)=>{ if (a.indexOf('hidden') >= 0 && !cl.contains('hidden')){ sceneOut(el); el._sceneOff = true; } return add(...a); };
+    cl.remove = (...a)=>{ const was = cl.contains('hidden'); const r = rem(...a); if (a.indexOf('hidden') >= 0 && (was || el._sceneOff !== false) && !cl.contains('hidden')){ el._sceneOff = false; sceneIn(el); } return r; };
+  }
   const VS_REVEAL_HOLD = paced(1200);   // (A+ pacing: PACE x the old 1.2 s)                // how long a VS result stays up before the next card (was 1650; never under 1200 so it stays readable)
   const REVEAL_MS = VS_REVEAL_HOLD;           // both modes
   const TOO_SLOW_NEXT_MS = paced(900);   // (A+ pacing: PACE x the old 0.9 s)               // after a "Too slow", before the next matchup
@@ -11153,7 +11189,7 @@
     gameBgFor(key, ov);
     ov.querySelector('.mg-sign span').textContent = mysteryName(key).toUpperCase();
     ov.querySelector('.mg-rule').textContent = g.rule || '';
-    document.body.appendChild(ov);
+    document.body.appendChild(ov); sceneIn(ov);   // (A+ pacing: the game fades in on its own opaque backdrop)
     ringBulbs(ov.querySelector('.mg-sign .sign-bulbs'), 18, 6);
     marquee.style.setProperty('--bulb', g.bulb || c[0]);
     const stage = ov.querySelector('.mg-stage'), fill = ov.querySelector('.mg-timer i'), scoreEl = ov.querySelector('.mg-score'), resEl = ov.querySelector('.mg-result');
@@ -11196,7 +11232,7 @@
     api.shuffle = (a)=> shuffle(a.slice(), api.rng);
     const close = (silent)=>{
       over = true; stopTimer(); if (api.onClose) try{ api.onClose(); }catch(e){}
-      ov.remove(); mgOpen = null; noteOverlayClosed(); updatePauseBtnVisibility();
+      sceneOut(ov, true); ov.remove(); mgOpen = null; noteOverlayClosed(); updatePauseBtnVisibility();
       if (!silent && done) done();
     };
     mgOpen = { close };
@@ -11329,7 +11365,7 @@
     return '<div class="lw-stage" aria-hidden="true"><i class="lw-wall"></i><i class="lw-floorplane"></i><i class="lw-cone a"></i><i class="lw-cone b"></i><i class="lw-pool"></i><i class="lw-curt l"></i><i class="lw-curt r"></i></div>';
   }
   function runLuckyLights(st, done){
-    if (!luckyOv){ luckyOv = document.createElement('div'); luckyOv.className = 'lucky-overlay hidden'; luckyOv.id = 'luckyOverlay'; luckyOv.setAttribute('role', 'dialog'); luckyOv.setAttribute('aria-label', 'Lucky Lights'); document.body.appendChild(luckyOv); }
+    if (!luckyOv){ luckyOv = document.createElement('div'); luckyOv.className = 'lucky-overlay hidden'; luckyOv.id = 'luckyOverlay'; luckyOv.setAttribute('role', 'dialog'); luckyOv.setAttribute('aria-label', 'Lucky Lights'); document.body.appendChild(luckyOv); sceneHook(luckyOv); }
     stopTallyPolling(); clearRoundTimer(); voted = false; votedSinceTime = null;
     luckyOv.dataset.ll = luckyTheme();
     runCurrentGame = 'Lucky Lights';
@@ -11738,6 +11774,7 @@
 
   // ---------- The cold open and the round bumpers ----------
   const showCard = document.getElementById('showCard');
+  [showCard, els.eventOverlay, els.solveOverlay, els.finOverlay, els.irOverlay, els.guessOverlay].forEach(sceneHook);   // (A+ pacing: every show / hide of these crossfades)
   // The cold open (DIRECTION.md): a red velvet curtain with the EPISODE plate; the curtain
   // parts, FLIPSTAX lights up letter by letter on the marquee, the host slides in and three
   // cue cards fan out. 12 s the first time, 3 s for a returning player; a tap skips it.

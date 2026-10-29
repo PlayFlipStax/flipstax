@@ -903,3 +903,7 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root.lite .gi-portal .gi-sign .sign-bulbs i, :root.lite .gi-shine::before, :root.lite .gi-spk{ animation:none; }
 :root.lite .gi-shine{ display:none; } :root.lite .gi-spk{ opacity:0.85; }
 @media (prefers-reduced-motion: reduce){ .gi-portal .gi-sign{ animation:giFade 300ms linear both; } .gi-portal .gi-sign .sign-bulbs i, .gi-shine::before, .gi-spk{ animation:none; } .gi-shine{ display:none; } .gi-spk{ opacity:0.85; } }
+
+/* ---- A+ pacing pass: the frozen copy of an outgoing scene (flipstax.html sceneOut) - its animations stop where they are and it only fades ---- */
+.scene-ghost, .scene-ghost *{ animation-delay:-30s !important; animation-play-state:paused !important; transition:none !important; }
+.scene-ghost{ pointer-events:auto !important; }
