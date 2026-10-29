@@ -11919,7 +11919,11 @@
     const a = RUNDOWN.acts[st.act] || {}, letter = runActLetter[st.act], keys = runActKeys[st.act] || 0;
     const hasOrbit = (a.steps || []).some(s=> s.game === 'orbitDrop' || s.orbitDrop);
     const pts = Math.round((runActPts[st.act] || 0) + (hasOrbit ? runOrbitPts : 0));
-    showCard.className = 'show-card reward';
+    // A+ outro: the Round Done card sits on a scene - the group celebration (data/scenes/win-group.webp) for a perfect run or a high round,
+    // Flip alone (data/scenes/win.webp) otherwise; a soft gradient keeps the text readable (lib/juice.css .rw-art)
+    const high = !!runPerfect || pts >= 60, art = high ? 'win-group' : 'win';
+    showCard.className = 'show-card reward has-art art-' + art;
+    showCard.style.setProperty('--rw-art', 'url(../data/scenes/' + art + '.webp)');
     showCard.innerHTML = '<i class="rw-sun" aria-hidden="true"></i><div class="rw-panel"><div class="rw-title"></div><div class="rw-frame"><i class="mq mq-a" aria-hidden="true"></i><i class="mq mq-b" aria-hidden="true"></i><div class="rw-row">' +
       '<span class="rw-chip pts" style="--i:0"><b>+' + pts + '</b><small>points</small></span>' +
       '<span class="rw-chip letter ' + (letter || 'none') + '" style="--i:1"><b>' + (letter === 'got' ? '?' : letter === 'miss' ? '✕' : '–') + '</b><small>' + (letter === 'got' ? 'letter won' : 'no letter') + '</small></span>' +
