@@ -907,3 +907,10 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 /* ---- A+ pacing pass: the frozen copy of an outgoing scene (flipstax.html sceneOut) - its animations stop where they are and it only fades ---- */
 .scene-ghost, .scene-ghost *{ animation-delay:-30s !important; animation-play-state:paused !important; transition:none !important; }
 .scene-ghost{ pointer-events:auto !important; }
+
+/* ---- A+ pacing pass: every game's title card shows its icon over its name ---- */
+.show-card.gintro{ flex-direction:column; gap:16px; }
+.gi-icon{ position:relative; z-index:2; font-size:clamp(66px, 20vw, 96px); line-height:1; filter:drop-shadow(0 6px 0 rgba(30,0,40,0.35)); animation:giIcon 0.5s cubic-bezier(.3,1.5,.5,1) 0.2s both; }
+@keyframes giIcon{ from{ opacity:0; transform:scale(0.5); } to{ opacity:1; transform:none; } }
+:root.lite .gi-icon{ animation:vsFade 0.3s ease-out both; }
+@media (prefers-reduced-motion: reduce){ .gi-icon{ animation:vsFade 0.3s ease-out both; } }

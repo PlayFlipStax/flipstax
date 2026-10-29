@@ -11061,6 +11061,8 @@
   // power-ups are not offered here (their code stays).
   const DOOR_PICK_MS = 8000;
   const DOOR_ICONS = { emojiDecode:'😀', timeWarp:'⌛', snapSort:'📸', saucerShuffle:'🛸', factOrFib:'❓', priceProbe:'🏷️' };
+  // A+ pacing: every game's icon, for its title card
+  const GAME_ICONS = Object.assign({ riddle:'🧩', lucky:'🎡', door:'🚪', zapWords:'⚡', twinFlip:'🃏', orbitDrop:'🛸', wordWarp:'🌀', peakOrPlunge:'⛰️', oddballAlert:'🔍', crowdScan:'👥', vs:'🆚' }, DOOR_ICONS);
   // A+ tier 2 item 3: the Mystery Portal (was the Mystery Door) - exactly three doors drawn in code (CSS + SVG): a copper door with an
   // elongated-hexagon silhouette and a gold hand, a wood door with stained glass, a blue hammered door with a purple snake panel.
   // Labels stay hidden until a pick; the pick swings open on its hinge (rotateY, 0.7 s) onto its own animated scene (a galaxy, a
@@ -11122,8 +11124,12 @@
           if (g !== Show.gen) return;
           reset();
           runCurrentGame = mysteryName(game); Show.info = 'door:' + game;
-          const ok = miniGame(game) ? runMiniGame(game, { seed: st.seed, door:true }, done) : runBrainBreak({ game, seed: st.seed }, done);
-          if (!ok) showDone(g, 'door game unavailable');
+          // A+ pacing: the game behind the portal gets its own title card (its name and icon, GAME_INTRO_MS) before it starts - no cut
+          showGameIntro(game, ()=>{
+            if (g !== Show.gen) return;
+            const ok = miniGame(game) ? runMiniGame(game, { seed: st.seed, door:true }, done) : runBrainBreak({ game, seed: st.seed }, done);
+            if (!ok) showDone(g, 'door game unavailable');
+          });
         }, { lead:700, text: els.eventPrompt.textContent });   // (the swing takes 0.7 s, then the game's name holds for the shared reveal time)
       }, dt(QUIZ_DRUMROLL_MS));
     };
@@ -12051,7 +12057,8 @@
     showCard.className = 'show-card gintro' + (key === 'door' ? ' gi-portal' : '');
     showCard.style.setProperty('--gi-a', c[0]); showCard.style.setProperty('--gi-b', c[1] || c[0]);
     showCard.innerHTML = '<i class="gi-bg" aria-hidden="true"></i><i class="gi-spot" aria-hidden="true"></i>' +
-      '<div class="gi-sign"><div class="sign-bulbs" aria-hidden="true"></div><span></span></div>';
+      '<div class="gi-icon" aria-hidden="true"></div><div class="gi-sign"><div class="sign-bulbs" aria-hidden="true"></div><span></span></div>';
+    showCard.querySelector('.gi-icon').textContent = GAME_ICONS[key] || '✨';   // (A+ pacing: the game's icon over its name)
     showCard.querySelector('.gi-sign span').textContent = String(name).toUpperCase();
     if (key === 'door'){   // the Mystery Portal's title card: a shine sweep across the sign and six sparkles around it (lib/juice.css)
       const sg = showCard.querySelector('.gi-sign'); sg.insertAdjacentHTML('beforeend', '<i class="gi-shine" aria-hidden="true"></i>' + [[-5, -16], [48, -26], [103, -12], [-7, 112], [50, 126], [105, 110]].map((q, k)=> '<i class="gi-spk" aria-hidden="true" style="left:' + q[0] + '%;top:' + q[1] + '%;animation-delay:' + (-(k * 0.37)).toFixed(2) + 's"></i>').join(''));
@@ -12203,7 +12210,7 @@
       '<div class="mr-frame"><div class="sign-bulbs" aria-hidden="true"></div><div class="mr-door" style="--c0:' + c[0] + ';--c1:' + c[1] + '">' +
       '<div class="mr-name" aria-live="polite"></div><i class="mr-curt l"></i><i class="mr-curt r"></i></div></div></div>' +
       '';   // (Run 4A: no host at the door - he appears only in the intro, the round announcements, the outro and failure reactions)
-    showCard.querySelector('.mr-name').textContent = mysteryName(game).toUpperCase();
+    showCard.querySelector('.mr-name').textContent = (GAME_ICONS[game] ? GAME_ICONS[game] + ' ' : '') + mysteryName(game).toUpperCase();   // (A+ pacing: name and icon)
     showCard.removeAttribute('role'); showCard.setAttribute('aria-label', 'Mystery game: ' + mysteryName(game));
     showCard.classList.remove('hidden');
     clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
