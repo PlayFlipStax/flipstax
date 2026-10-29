@@ -58,10 +58,10 @@ window.FLIPSTAX_NAMES = {
   // a returning player gets (about 3 s), and his outro before the results.
   intro: {
     first: [
-      'Greetings, Earthlings! I\u2019m ' + HOST_NAME + ', host of FlipStax. Yes, I named it after myself.',
-      'We crossed the galaxy because we are obsessed with your game shows.',
-      'Humans fascinate us, so every card you flip tells us what you like.',
-      'We love games, we love disco, and we REALLY love funk. Let\u2019s play!',
+      'Greetings, Earthlings! I\u2019m ' + HOST_NAME + ', and welcome to Galactic Game Night!',
+      'My whole planet is hooked on game shows, and yours are the best in the galaxy. So here I am!',
+      'We aliens think you humans are the coolest creatures in the Milky Way. I\u2019m here to learn what you like and how you think, and bring the funk back to my dull home galaxy!',
+      'Tonight: VS matchups, trivia, riddles, mini-games and a Word Warp finale. Ready? Let\u2019s play!',
     ],
     back: 'Welcome back, Earthlings! Let\u2019s play!',
     outro: 'That\u2019s our show, Earthlings! See you tomorrow!',
@@ -70,7 +70,7 @@ window.FLIPSTAX_NAMES = {
   // replays the full one). A card stays up 1 s plus 0.25 s a word; over 15 words it waits for a tap. VS is the host's
   // own line on the first round's card.
   explainers: {
-    vs:        { full:'Two cards face off. Tap the one most Earthlings picked. Match the crowd to score!', short:'Pick the crowd favorite!' },
+    vs:        { full:'Pick the one YOU prefer. There\u2019s no right or wrong answer! We\u2019re learning from the coolest cats in the Milky Way.', short:'Pick the one YOU prefer!' },
     riddle:    { full:'Read the riddle, then pick the right answer. Think fast, Earthling!', short:'Solve the riddle!' },
     lucky:     { full:'Spin the wheel, then hit STOP! Three spins for points and keys - or BANK what you have. Beware the GOOP!', short:'SPIN, STOP or BANK!' },
     door:      { full:'Pick a portal. Behind it hides a surprise game!', short:'Pick a portal!' },
