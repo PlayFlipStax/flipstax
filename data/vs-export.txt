@@ -673,9 +673,7 @@ movies | Harley Quinn | 🃏 | Wonder Woman | 👸 | 2010s
 movies | Captain America | 🛡️ | Batman | 🦇 | 2010s
 movies | Dumb and Dumber | 🤪 | Billy Madison | 🏫 | 90s
 movies | Superbad | 🥳 | Grown Ups | 🧔 | 2000s
-movies | The Hangover | 🥴 | Superbad | 🥳 | 2000s
 movies | Ace Ventura | 🐾 | Billy Madison | 🏫 | 90s
-movies | Grown Ups | 🧔 | The Hangover | 🥴 | 2000s
 movies | Bridesmaids | 👰 | Mean Girls | 💅 | 2000s
 music | Rap | 🎤 | Rock | 🤘 | timeless
 music | Vinyl | 💿 | Streaming | 📱 | 2010s
