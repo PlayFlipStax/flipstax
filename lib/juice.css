@@ -1148,3 +1148,22 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.is-right{ background-color:#bdebd0 !important; border-color:#2fb86e; box-shadow:0 0 0 4px #2fb86e, 0 6px 0 3px #14633a; }
 :root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.is-wrong{ background-color:#f2907a !important; color:#3a0f08; border-color:#fff0e8; box-shadow:0 0 0 3px #7a2a18, 0 6px 0 3px #7a2a18; }
 :root.mode-daily .event-overlay.stack.bb-emojiDecode.bb-revealed .event-tile:not(.is-right):not(.is-wrong){ opacity:0.45; }
+
+/* ---- A+ job 2 item 9: the Play Today studio screen, re-laid so nothing overlaps the neon sign frame: the FlipStax logo above the sign, the tagline under it,
+   TONIGHT'S EPISODE below the sign, the PLAY button, 'How to play' as a small link below it (moved there in flipstax.html), a readable contact line.
+   The cards button (top left) and the donations button (top right) stay. ---- */
+:root .split-select-overlay.one-show .split-select-header{ padding:calc(8px + env(safe-area-inset-top)) 78px 0; }
+:root .split-select-overlay.one-show .split-select-header .logo{ font-size:28px; line-height:1; }
+:root .split-select-overlay.one-show .split-select-title{ margin-top:3px; font-size:12px; line-height:1.1; letter-spacing:1.5px; text-transform:uppercase; }
+:root .split-select-overlay.one-show .ms-body-daily{ top:calc(166px + env(safe-area-inset-top)); bottom:auto; padding-top:0; gap:8px; align-items:center; }
+:root .split-select-overlay.one-show .ms-body-daily .ms-desc{ display:none; }
+:root .split-select-overlay.one-show .ms-body-daily .ms-desc-short{ display:block; font-size:16px; text-align:center; }
+:root .split-select-overlay.one-show .ms-title-ep small{ font-size:clamp(15px, 4.4vw, 18px); }
+:root .split-select-overlay.one-show .ms-title-ep b{ font-size:clamp(40px, 12vw, 54px); }
+:root .split-select-overlay.one-show .ms-ufo{ display:none; }
+:root .split-select-overlay.one-show .ms-body-daily .ms-howto{ margin-top:0; font-size:14px; opacity:1; color:#e9dcff; text-shadow:0 1px 3px rgba(20,0,40,0.9); }
+:root .split-select-overlay.one-show .ms-body-daily .ms-howto span{ display:inline-block; min-height:36px; padding:8px 10px; }
+:root .split-select-overlay.one-show .contact-footer{ left:50%; right:auto; transform:translateX(-50%); width:max-content; max-width:92%; padding:6px 12px; border-radius:12px; background:rgba(20,4,36,0.82); color:#f1e6ff; font-size:13px; pointer-events:none; }
+:root .split-select-overlay.one-show .contact-footer a{ color:#ffd0f0; }
+:root .split-select-overlay.one-show .contact-copyright{ display:none; }
+@media (max-height:700px){ :root .split-select-overlay.one-show .ms-body-daily{ top:calc(150px + env(safe-area-inset-top)); gap:5px; } :root .split-select-overlay.one-show .ms-title-ep b{ font-size:38px; } }

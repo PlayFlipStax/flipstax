@@ -18303,6 +18303,7 @@
   document.addEventListener('keydown', e=>{ if (e.key === 'Escape' && !els.howtoOverlay.classList.contains('hidden')) closeHowTo(); });
   // Infinity's line on the mode picker, with the names from data/game-names.js.
   { const d = document.getElementById('msInfDesc'); if (d) d.textContent = 'Vote, scan the crowd, crack riddles, drop chips in ' + GN.orbitDrop + ' and open ' + GN.vault + '.'; }
+  { const h = document.querySelector('#modeSelectOverlay .ms-howto'), c = document.querySelector('#modeSelectOverlay .ms-body-daily .ms-cta'); if (h && c) c.after(h); }   // (A+ job 2: 'How to play' sits under the PLAY button)
   document.querySelectorAll('[data-howto]').forEach(b=> b.addEventListener('click', e=>{ e.stopPropagation(); openHowTo(b.dataset.howto); }));
 
   els.modeInfinityBtn.addEventListener('click', ()=>{
