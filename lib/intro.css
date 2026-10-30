@@ -38,6 +38,10 @@
 /* one soft cyan flash */
 #introFlash{ position:fixed; inset:0; z-index:210; background:radial-gradient(120% 90% at 50% 45%, rgba(190,255,255,0.95), rgba(60,220,255,0.75) 60%, rgba(30,160,230,0.6)); opacity:0; pointer-events:none; }
 #introFlash.go{ animation:ilFlash 700ms ease-out 1 both; }
+/* the ship-to-video warp flash: one bright white-gold flash, 0.4 s, opacity only; fully opaque from 35% to 55% (the swap happens at 45%) */
+#introWarp{ position:fixed; inset:0; z-index:215; background:radial-gradient(120% 90% at 50% 45%, #ffffff 0%, #fffbe8 55%, #fff1b8 100%); opacity:0; pointer-events:none; }
+#introWarp.go{ animation:ilWarp 400ms linear 1 both; }
+@keyframes ilWarp{ 0%{ opacity:0; } 35%{ opacity:1; } 55%{ opacity:1; } 100%{ opacity:0; } }
 @keyframes ilFlash{ 0%{ opacity:0; } 33%{ opacity:0.85; } 100%{ opacity:0; } }
 :root.lite .il-img.b, :root.lite .il-stars i, :root.lite .home-enter-btn::after{ animation:none !important; }
 :root.lite .il-stars i{ opacity:0.6; } :root.lite .home-enter-btn::after{ display:none; }
