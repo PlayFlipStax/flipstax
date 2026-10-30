@@ -261,3 +261,16 @@
 .sc-play{ z-index:1; }
 .sc-panel{ bottom:calc(44px + env(safe-area-inset-bottom)); }
 @media (max-height:700px){ .sc-panel{ bottom:calc(34px + env(safe-area-inset-bottom)); } }
+
+/* ---- A+ job 2 item 8: Fact or Fib - the statement and the fact fit their box (auto-fit in lib/mini-games.js: down to 14 px, up to 3 lines); the host's pop-up and
+   its reaction stay inside the stage (overflow hidden) and are toned down ---- */
+.ff-text, .ff-fact{ display:block; max-width:100%; overflow-wrap:anywhere; hyphens:auto; line-height:1.2; }
+.ff-bubble{ overflow:hidden; }
+.ff-stage{ position:relative; overflow:hidden !important; }
+.ff-host{ max-width:100%; }
+.ff-host.up{ animation:ffPopCalm .35s ease-out forwards !important; }
+@keyframes ffPopCalm{ from{ transform:translateY(40%); opacity:0; } to{ transform:none; opacity:1; } }
+.ff-host .host-rig, .ff-host svg{ max-width:100%; }
+:root.lite .ff-host.up{ animation:none !important; opacity:1; transform:none; }
+@media (prefers-reduced-motion: reduce){ .ff-host.up{ animation:none !important; opacity:1; transform:none; } }
+.ff-stage{ padding-bottom:18px !important; }
