@@ -96,3 +96,8 @@
 :root.stage-on .mg-overlay{ background:radial-gradient(120% 75% at 50% 25%, var(--mg-a) 0%, var(--mg-b) 48%, var(--mg-c) 100%), #12062a !important; }
 :root.stage-on .mg-overlay.mg-saucerShuffle{ background:radial-gradient(120% 75% at 50% 25%, #3b2a9a 0%, #1d1566 52%, #0a0630 100%), #0a0630 !important; }
 :root.stage-on .mg-overlay.mg-saucerShuffle .mg-bg{ display:block; }
+/* A+: the sign frame on the Play Today screen shows the logo and, under it, the show's EPISODE N */
+.stg-ep{ display:none; font-style:normal; font-family:var(--f-display, 'Big Shoulders Display', 'Arial Narrow', sans-serif); font-weight:900; text-transform:uppercase; line-height:1; white-space:nowrap;
+  font-size:min(20cqh, 7cqw); letter-spacing:0.2em; padding-left:0.2em; color:#ffe9a0; text-shadow:0 0 0.3em rgba(255,200,80,0.9); }
+.stg-sign.logo.ep .stg-ep{ display:block; }
+.stg-sign.logo.ep .stg-logo{ max-height:70%; }
