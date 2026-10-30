@@ -18139,6 +18139,13 @@
   addEventListener('resize', ()=> requestAnimationFrame(fitHomeHost));
   [300, 1200, 2600].forEach(ms=> setTimeout(fitHomeHost, ms));   // (again as the pictures arrive)
   if (window.Intro) Intro.init({ testing:()=> REPLAY || DEBUG_FAST || SHOW_DEBUG });
+  // Overnight job 6: a returning visitor (the intro played on an earlier visit) lands straight on the Play Today studio screen; its small
+  // 'Watch intro' link plays the intro again. A first visit gets ENTER, the ship flight, the intro, then the show.
+  if (window.Intro && Intro.returning){ els.homeOverlay.classList.add('hidden'); els.modeSelectOverlay.classList.remove('hidden'); }
+  { const ms = els.modeSelectOverlay;
+    if (ms && window.Intro && Intro.enabled){ const w = document.createElement('button'); w.type = 'button'; w.className = 'ms-watch-intro'; w.textContent = 'Watch intro';
+      w.addEventListener('click', (e)=>{ e.stopPropagation(); Intro.run(null, { force:true }); });
+      ms.appendChild(w); } }
   els.homeEnterBtn.addEventListener('click', ()=>{
     const ov = els.homeOverlay;
     if (ov.classList.contains('entering')) return;

@@ -1349,7 +1349,7 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root.results-open #runBanner, :root.results-open .status-banner, :root.results-open .run-clock{ visibility:hidden !important; }
 #readoutOverlay.ep.outro-on .outro-details{ display:none !important; }
 /* Play Today in replay mode: the REPLAY MODE pill moves down by the contact line so it never covers the logo (testers only) */
-:root:has(#modeSelectOverlay:not(.hidden)) .replay-tag{ top:auto !important; bottom:calc(64px + env(safe-area-inset-bottom)) !important; }
+:root:has(#modeSelectOverlay:not(.hidden)) .replay-tag{ top:auto !important; bottom:calc(104px + env(safe-area-inset-bottom)) !important; }
 
 /* ---- Overnight job 7: game title cards hold 3.6 s. Three beams sweep and rotate round the stage, converge on the title (it settles into place
    as they land) and fade. Transform and opacity only; lite and reduced motion: the title fades in, no beams. ---- */
@@ -1371,3 +1371,5 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root.mode-daily .show-card.reward.art-round .rw-title{ font-size:clamp(28px, 8.6vw, 38px); }
 :root.mode-daily .show-card.reward.art-round .rw-frame{ padding:10px 10px 10px; }
 :root.mode-daily .show-card.reward.art-round .rw-chip b{ font-size:28px; }
+.ms-watch-intro{ display:block; position:fixed; top:auto !important; left:50%; transform:translateX(-50%); bottom:calc(60px + env(safe-area-inset-bottom)); margin:0; min-height:36px; padding:6px 14px; background:none; border:0; color:#cfe8ff; font:800 14px/1 var(--f-body); letter-spacing:1px; text-decoration:underline; text-underline-offset:3px; cursor:pointer; position:relative; z-index:3; }
+#modeSelectOverlay .ms-watch-intro{ position:fixed !important; top:auto !important; bottom:calc(60px + env(safe-area-inset-bottom)) !important; }

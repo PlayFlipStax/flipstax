@@ -43,3 +43,17 @@
 :root.lite .il-stars i{ opacity:0.6; } :root.lite .home-enter-btn::after{ display:none; }
 :root.lite #introFlash.go{ animation-duration:300ms; }
 @media (prefers-reduced-motion: reduce){ .il-img.b, .il-stars i, :root.intro-new .home-enter-btn::after{ animation:none !important; } .il-stars i{ opacity:0.6; } :root.intro-new .home-enter-btn::after{ display:none; } #introFlash.go{ animation-duration:300ms; } }
+
+/* ---- Overnight job 6: the ENTER landing (the video's twilight sky, framed exactly like the video), the real logo, the ship flight ---- */
+.il-img.sky{ object-position:50% 50%; animation:none; opacity:1; }
+.il-title{ top:calc(7% + env(safe-area-inset-top)); gap:4px; }
+.il-logo{ width:min(78vw, 330px); height:auto; display:block; filter:drop-shadow(0 6px 14px rgba(0,0,0,0.5)); }
+@media (max-height:700px){ .il-logo{ width:min(62vw, 260px); } }
+.il-title, :root.intro-new .home-overlay .home-enter-btn, #introWatch, :root.intro-new .home-overlay .home-legal-links{ transition:opacity .45s ease; }
+:root.il-leaving .il-title, :root.il-leaving.intro-new .home-overlay .home-enter-btn, :root.il-leaving #introWatch, :root.il-leaving.intro-new .home-overlay .home-legal-links{ opacity:0; pointer-events:none; }
+.il-shipwrap{ position:absolute; left:0; top:0; z-index:2; display:none; will-change:transform, opacity; }
+.il-shipwrap.on{ display:block; }
+.il-ship{ position:relative; width:100%; height:auto; display:block; filter:drop-shadow(0 0 10px rgba(190,220,255,0.75)); }
+.il-shipglow{ position:absolute; left:-20%; right:-20%; top:-30%; bottom:-50%; border-radius:50%; background:radial-gradient(closest-side, rgba(170,210,255,0.45), rgba(170,210,255,0)); }
+#introPlayer.xin{ opacity:0; } #introPlayer{ transition:opacity .5s ease; }
+#introPlayer.fade{ transition:opacity 800ms ease-in-out; }
