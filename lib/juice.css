@@ -1041,3 +1041,22 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 @media (prefers-reduced-motion: reduce){ .solve-overlay.tray .solve-slot.ring::after{ animation:none; opacity:0; } .solve-bar b{ transition:none; } }
 .solve-overlay.tray .sunburst, .solve-overlay.tray::before{ display:none !important; }
 .solve-overlay.tray .ww-ufo:not(.beaming){ opacity:0; pointer-events:none; }   /* (the saucer only shows when it beams a word up: it never covers the clock) */
+
+/* ---- A+ follow-up: Orbit Drop controls. A horizontal slider under the board aims the UFO and a big DROP button drops the chip (dragging the
+   UFO on the board still works). The board moves up and grows into the room the old header left. The background is data/orbit/bg.webp
+   (bg-orbitdrop.jpg with 2% cropped off every edge) under a soft dark gradient. ---- */
+.pk-ctrl{ display:flex; align-items:center; gap:12px; width:min(100%, 420px); margin:10px auto 0; padding:0 4px; }
+.pk-slider{ flex:1 1 auto; min-width:0; height:44px; margin:0; background:none; -webkit-appearance:none; appearance:none; touch-action:pan-y; }
+.pk-slider::-webkit-slider-runnable-track{ height:14px; border-radius:99px; background:linear-gradient(90deg, rgba(125,249,255,0.55), rgba(255,226,122,0.55)); box-shadow:inset 0 0 0 2px rgba(255,255,255,0.7); }
+.pk-slider::-moz-range-track{ height:14px; border-radius:99px; background:linear-gradient(90deg, rgba(125,249,255,0.55), rgba(255,226,122,0.55)); box-shadow:inset 0 0 0 2px rgba(255,255,255,0.7); }
+.pk-slider::-webkit-slider-thumb{ -webkit-appearance:none; width:40px; height:40px; margin-top:-13px; border-radius:50%; border:3px solid #fff; background:radial-gradient(circle at 35% 30%, #fff6c8, #ffd23f 55%, #d99100); box-shadow:0 3px 0 #7a4a00; }
+.pk-slider::-moz-range-thumb{ width:34px; height:34px; border-radius:50%; border:3px solid #fff; background:radial-gradient(circle at 35% 30%, #fff6c8, #ffd23f 55%, #d99100); }
+.pk-go{ flex:0 0 auto; min-width:112px; min-height:56px; padding:0 22px; border:3px solid #fff; border-radius:16px; font:900 26px/1 var(--f-display); letter-spacing:1.5px; color:#3a1800; cursor:pointer;
+  background:linear-gradient(180deg, #fff3a8, #ffcb2b 55%, #ff9900); box-shadow:0 5px 0 #8a4a00, 0 0 18px rgba(255,200,60,0.55); }
+.pk-go:active:not(:disabled){ transform:translateY(3px); box-shadow:0 2px 0 #8a4a00; }
+.pk-ctrl.off{ opacity:0.4; } .pk-go:disabled{ cursor:default; }
+.fin-plinko{ gap:6px; }
+.fin-plinko .pk-banner{ display:none; }   /* (the board moves up: the title is on the sign above) */
+.fin-plinko .plinko-board{ margin-top:16px; width:max(200px, min(100%, 420px, calc((100dvh - 305px) * 0.643))); }
+.fin-plinko .pk-line{ font-size:17px; font-weight:900; }
+:root.stage-on .fin-overlay.daily-orbit.stage-backed, .fin-overlay.daily-orbit{ background:linear-gradient(180deg, rgba(8,2,24,0.5), rgba(8,2,24,0.2) 40%, rgba(8,2,24,0.55)), url(../data/orbit/bg.webp) center / cover no-repeat, #12062a !important; }

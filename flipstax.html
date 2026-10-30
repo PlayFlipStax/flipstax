@@ -4818,7 +4818,7 @@
   </div>
   <div class="fin-stage fin-plinko hidden" id="finPlinko">
     <div class="pk-banner" id="pkBanner">ORBIT DROP</div>
-    <div class="pk-line" id="pkLine">Drag the UFO, let go to drop. Every chip pays.</div>
+    <div class="pk-line" id="pkLine">Slide to aim, then tap DROP! Every chip pays.</div>
     <div class="pk-status"><span class="pk-run" id="pkRunScore"></span><span class="pk-chipno" id="pkChipNo"></span><span class="pk-bonus">Bonus <b id="pkBonus">+0</b></span></div>
     <div class="plinko-board show-flash" id="plinkoBoard" role="slider" tabindex="0" aria-label="Aim the UFO: left and right arrows, Enter to drop" aria-valuemin="0" aria-valuemax="100">
       <svg class="plinko-svg" id="plinkoSvg" aria-hidden="true"></svg>
@@ -4826,6 +4826,7 @@
       <div class="pk-ufo riddle-ufo" id="pkUfo" aria-hidden="true"><span>🛸</span><i></i><b class="pk-held"></b></div>
       <div class="plinko-chip-layer" id="plinkoChips" aria-hidden="true"></div>
     </div>
+    <div class="pk-ctrl" id="pkCtrl"><input type="range" class="pk-slider" id="pkSlider" min="0" max="1000" value="500" step="1" aria-label="Aim the UFO: slide left and right"><button type="button" class="pk-go" id="pkGo">DROP</button></div>
     <div class="plinko-tally" id="plinkoTally" aria-live="polite"></div>
     <div class="fin-buttons pk-buttons">
       <div class="daily-btn primary fin-go pk-drop hidden" id="plinkoDrop" role="button" tabindex="0"></div>
@@ -13270,6 +13271,7 @@
       revealThen(()=>{ const ff = pkF(); if (dailyOrbit === o && ff && ff.stage === 'plinko') goToVault(); }, { text: 'All chips in! +' + won + ' points' });
     }
     all.classList.toggle('hidden', left <= 0 || pkAuto);
+    { const g = document.getElementById('pkGo'), sl = document.getElementById('pkSlider'), idle = left <= 0 || pkAuto; if (g) g.disabled = idle; if (sl) sl.disabled = idle; document.getElementById('pkCtrl').classList.toggle('off', idle); }
     board.classList.toggle('done', left <= 0);
     board.classList.toggle('locked', pkAuto);
     document.getElementById('pkUfo').classList.toggle('empty', left <= 0 || performance.now() - pkLastDrop < PK_DROP_GAP_MS);
@@ -13284,6 +13286,7 @@
     board.style.setProperty('--guide-y', (OP.C.DROP_Y * k).toFixed(1) + 'px');
     board.style.setProperty('--guide-h', ((OP.C.SLOT_TOP - OP.C.DROP_Y) * k).toFixed(1) + 'px');
     board.setAttribute('aria-valuenow', Math.round((pkAim - OP.AIM_MIN) / (OP.AIM_MAX - OP.AIM_MIN) * 100));
+    { const sl = document.getElementById('pkSlider'); if (sl) sl.value = Math.round((pkAim - OP.AIM_MIN) / (OP.AIM_MAX - OP.AIM_MIN) * 1000); }
   }
   function chipEl(i){
     const c = document.createElement('div'); c.className = 'pk-chip'; c.dataset.i = i;
@@ -13440,6 +13443,12 @@
     };
     go();
   }
+  // A+: the slider under the board aims the UFO and the DROP button drops (dragging the UFO on the board still works)
+  (function(){
+    const sl = document.getElementById('pkSlider'), go = document.getElementById('pkGo');
+    sl.addEventListener('input', ()=>{ const f = pkF(); if (!f || f.stage !== 'plinko' || pkAuto) return; setAim(OP.AIM_MIN + sl.value / 1000 * (OP.AIM_MAX - OP.AIM_MIN)); });
+    go.addEventListener('click', ()=>{ const f = pkF(); if (f && f.stage === 'plinko' && canDropNow()) launchChip(pkAim); });
+  })();
   // Aiming: press anywhere on the board, slide, let go to drop. Keyboard:
   // arrows aim, Enter or Space drops.
   (function(){
@@ -13825,7 +13834,7 @@
     if (!runOrbit || runOrbit.done) runOrbit = { stage:'plinko', chips: drawPlinkoOutcomes(dailyChipsFor(runKeys, runBonusChips, false)), dropped:0, base: runScore, done:false, mid:true };
     runPhase = 'orbit'; runOrbitDone = done; saveRunSnapshot();
     const n = runOrbit.chips.length, k = runGoldKeys();
-    openOrbitBoard(runOrbit, (k ? k + ' gold key' + (k === 1 ? '' : 's') + (n > k ? ' + ' + (n - k) + ' free' : '') : n + ' free') + ' = ' + n + ' chips. Drag the UFO, let go to drop.');
+    openOrbitBoard(runOrbit, (k ? k + ' gold key' + (k === 1 ? '' : 's') + (n > k ? ' + ' + (n - k) + ' free' : '') : n + ' free') + ' = ' + n + ' chips. Slide to aim, then tap DROP!');
     return true;
   }
   function openDailyOrbit(r){
@@ -13834,7 +13843,7 @@
     if (r.orbit.done){ showRunReadout(); return; }
     saveRunResultToday(r);
     const from = [(r.keys ? r.keys + ' 🔑' : ''), (r.bonusChips ? r.bonusChips + ' 🔑' : ''), (r.warpChip ? '+1 ' + GN.wordWarp : '')].filter(Boolean).join(', ');
-    openOrbitBoard(r.orbit, r.orbit.chips.length + ' chips' + (from ? ' (' + from + ')' : '') + '. Drag the UFO, let go to drop.');
+    openOrbitBoard(r.orbit, r.orbit.chips.length + ' chips' + (from ? ' (' + from + ')' : '') + '. Slide to aim, then tap DROP!');
   }
   function openOrbitBoard(o, line){
     dailyOrbit = o;
@@ -13860,7 +13869,7 @@
       runScore += won;
       if (!runBestMoment || won > runBestMoment.pts) runBestMoment = { pts: won, text: GN.orbitDrop + (runOrbitJackpot ? ': THE MOTHERSHIP!' : '') };
       dailyOrbit = null;
-      document.getElementById('pkLine').textContent = 'Drag the UFO, let go to drop. Every chip pays.';
+      document.getElementById('pkLine').textContent = 'Slide to aim, then tap DROP! Every chip pays.';
       els.finOverlay.classList.add('hidden'); els.finOverlay.classList.remove('daily-orbit'); stopFinSky();
       runPhase = 'running'; renderRunBanner(); saveRunSnapshot();
       const d = runOrbitDone; runOrbitDone = null;
@@ -13874,7 +13883,7 @@
     r.score = o.base + won;
     saveRunResultToday(r);
     dailyOrbit = null;
-    document.getElementById('pkLine').textContent = 'Drag the UFO, let go to drop. Every chip pays.';
+    document.getElementById('pkLine').textContent = 'Slide to aim, then tap DROP! Every chip pays.';
     els.finOverlay.classList.add('hidden'); els.finOverlay.classList.remove('daily-orbit'); stopFinSky();
     renderRunBanner();
     showRunReadout(true);
