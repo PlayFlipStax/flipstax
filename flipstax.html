@@ -15272,9 +15272,9 @@
     const rr = mulberry32(hashStr('flipstax-warp-' + (runStartDate || todayStr())));
     solveRack = shuffle(rest, rr);
     for (let k = 0; k < 6 && rest.length > 1 && solveRack.join('') === rest.join(''); k++) solveRack = shuffle(rest, rr);
-    // A+ (Daily): the letter tray - exactly 10 tiles: every missing letter plus decoys (letters not in the word), shuffled
+    // A+ (Daily): the letter tray - exactly WARP_TRAY tiles (15, in 3 rows of 5): every missing letter plus decoys (letters not in the word), shuffled
     if (warpTrayOn()){
-      const decoys = shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(c=> runWord.word.indexOf(c) < 0), rr).slice(0, Math.max(0, 10 - rest.length));
+      const decoys = shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(c=> runWord.word.indexOf(c) < 0), rr).slice(0, Math.max(0, WARP_TRAY - rest.length));
       solveRack = shuffle(rest.concat(decoys), rr);
     }
     applyTrayMode();
@@ -15392,9 +15392,12 @@
   }
   // ---- A+ the Word Warp letter tray (Daily): 10 tiles, 5 strikes, 30 s. A tile that fits locks into every blank needing it (it flies in, a neon ring
   // runs round the blank); one that doesn't shakes, dims and costs a strike. Ends on the solve, the 5th strike or the clock.
-  let warpTray = false, solveTotalMs = 0;
+  const WARP_TRAY = 15;
+  // When true, after a wrong tile is replaced all the tiles shuffle with a 0.9 s whoosh (taps locked, the clock paused while it plays).
+  const SHUFFLE_ON_WRONG = false;
+  let warpTray = false, solveTotalMs = 0, warpBusy = false;
   function warpTrayOn(){ return document.documentElement.classList.contains('mode-daily'); }
-  function applyTrayMode(){ warpTray = warpTrayOn() && solveRack.length === 10; els.solveOverlay.classList.toggle('tray', warpTray); }
+  function applyTrayMode(){ warpTray = warpTrayOn() && solveRack.length === WARP_TRAY; els.solveOverlay.classList.toggle('tray', warpTray); }
   function winWarp(){
     clearInterval(solveInterval);
     const solvedAt = Date.now(); runSolvedAt = solvedAt;
@@ -15426,7 +15429,7 @@
     setTimeout(()=>{ layer.remove(); done(); }, 2 * STEP + DUR + 100);
   }
   function trayPick(letter, tileEl){
-    if (!runActive || warpMissing || els.solveOverlay.classList.contains('celebrating') || els.solveOverlay.classList.contains('revealing')) return;
+    if (!runActive || warpBusy || warpMissing || els.solveOverlay.classList.contains('celebrating') || els.solveOverlay.classList.contains('revealing')) return;
     const word = runWord.word, spots = []; word.split('').forEach((c, i)=>{ if (c === letter && !solveLockedLetters[i]) spots.push(i); });
     const from = tileEl && tileEl.getBoundingClientRect();
     if (spots.length){
@@ -15446,9 +15449,38 @@
     sfx.wrong(); hostMood('sad');
     if (tileEl && tileEl.animate && !FX.reduced() && !document.documentElement.classList.contains('lite')) tileEl.animate([{ transform:'translateX(0)' }, { transform:'translateX(-7px)' }, { transform:'translateX(7px)' }, { transform:'translateX(-4px)' }, { transform:'none' }], { duration:300 });
     if (solveGuesses.length >= RUN_MAX_GUESSES){ clearInterval(solveInterval); renderSolveUI(); missWarp(); return; }
-    setTimeout(()=>{ if (runPhase === 'solving' && !warpMissing) renderSolveUI(); }, 300);
-    if (tileEl) tileEl.classList.add('tried');
     renderSolveStrikes();
+    wwReplaceTile(tileEl, letter);
+  }
+  // A wrong tile pops off and is gone for the rest of the game; a new letter - never one already tried or already on the tray - drops into the
+  // same slot. Nothing else moves. (Lite and reduced motion: a plain swap.)
+  function wwReplaceTile(tileEl, letter){
+    const idx = solveRack.indexOf(letter); if (idx < 0) return;
+    const word = runWord.word, tried = new Set(solveGuesses.filter(g=> g.length === 1).map(g=> g[0]));
+    const free = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(c=> word.indexOf(c) < 0 && !tried.has(c) && solveRack.indexOf(c) < 0);
+    const nl = free.length ? free[Math.floor(Math.random() * free.length)] : null;
+    const still = FX.reduced() || isLite() || !Element.prototype.animate;
+    const swap = ()=>{
+      if (runPhase !== 'solving' || warpMissing) return;
+      if (nl) solveRack[idx] = nl; else solveRack.splice(idx, 1);
+      saveRunSnapshot(); renderSolveUI();
+      const nt = els.solveRack.children[idx];
+      if (nl && nt && !still) nt.animate([{ transform:'translateY(-70px) scale(0.8)', opacity:0 }, { transform:'translateY(6px) scale(1.04)', opacity:1, offset:0.7 }, { transform:'none', opacity:1 }], { duration:380, easing:'ease-out' });
+      if (SHUFFLE_ON_WRONG && nl) wwShuffleTray(still);
+    };
+    if (still || !tileEl){ swap(); return; }
+    warpBusy = true;
+    tileEl.animate([{ transform:'scale(1)', opacity:1 }, { transform:'scale(1.35)', opacity:0 }], { duration:220, easing:'ease-out', fill:'forwards' }).onfinish = ()=>{ warpBusy = false; swap(); };
+  }
+  function wwShuffleTray(still){
+    const old = Array.from(els.solveRack.children).map(t=> ({ l: t.textContent, r: t.getBoundingClientRect() }));
+    solveRack = shuffle(solveRack.slice(), Math.random); saveRunSnapshot(); renderSolveUI();
+    if (still) return;
+    warpBusy = true; sfx.whoosh && sfx.whoosh();
+    let last = Date.now(); const pause = setInterval(()=>{ const n = Date.now(); solveEndsAt += n - last; last = n; }, 50);   // (the clock waits)
+    Array.from(els.solveRack.children).forEach(t=>{ const o = old.find(x=> x.l === t.textContent); if (!o) return; const r = t.getBoundingClientRect();
+      t.animate([{ transform:'translate(' + (o.r.left - r.left) + 'px,' + (o.r.top - r.top) + 'px)' }, { transform:'none' }], { duration:900, easing:'cubic-bezier(.5,0,.2,1)' }); });
+    setTimeout(()=>{ clearInterval(pause); warpBusy = false; }, 900);
   }
   function renderSolveStrikes(){ if (!warpTray) return; els.solveAttempts.querySelectorAll('.strikes i').forEach((e, k)=> e.classList.toggle('x', k < solveGuesses.length)); }
   function nextOpenSlot(){

@@ -1296,3 +1296,8 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .zw-stage .zw-grid.sq .zw-cell.on svg{ filter:drop-shadow(0 0 6px var(--tc)); }
 .zw-grid.sq .zw-cell > span{ position:relative; color:#2a0f3a; text-shadow:none; }
 @media (max-height:700px){ .mg-zapWords .mg-rule{ display:none; } .mg-zapWords .mg-head{ margin-top:14px; } .zw-stage .zw-grid.sq{ width:min(100%, 372px, calc((100dvh - 292px) * 0.8333)); } .zw-stage .zw-title{ margin:0; font-size:clamp(24px, 7vw, 30px); } }
+
+/* Word Warp tray: 15 coin tiles, 3 rows of 5 */
+:root:root .solve-overlay.tray .solve-tile{ max-width:58px; }
+.solve-overlay.tray .solve-rack{ gap:clamp(6px, 2vw, 10px); padding:10px 10px 12px; }
+@media (max-height:700px){ :root:root .solve-overlay.tray .solve-tile{ max-width:50px; } .solve-overlay.tray .solve-rack{ gap:6px; padding:8px 8px 10px; } .solve-overlay.tray .solve-slots{ margin:6px 0 4px; } }
