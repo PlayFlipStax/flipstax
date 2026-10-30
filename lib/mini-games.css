@@ -243,3 +243,21 @@
 .mg-saucerShuffle .mg-head, .mg-saucerShuffle .mg-host-zone{ display:none !important; }
 .mg-saucerShuffle .mg-inner{ padding-top:max(36px, env(safe-area-inset-top)); }
 .mg-saucerShuffle .mg-stage{ flex:1 1 auto; min-height:0; width:100%; max-width:none; }
+
+/* ---- A+ job 2 item 5, second pass: bigger, dimensional saucers (a soft coloured glow and an elliptical shadow on the felt), a textured felt,
+   three spotlight cones (opacity only), a highlight on the gold rail, a bigger star ---- */
+.su-saucer{ min-height:0; }
+.su-saucer::before{ content:''; position:absolute; left:-6%; right:-6%; bottom:-14%; height:34%; border-radius:50%; z-index:-1; background:radial-gradient(ellipse at 50% 50%, rgba(120,230,255,0.55), rgba(190,120,255,0.28) 55%, rgba(190,120,255,0) 75%); pointer-events:none; }
+.su-saucer::after{ content:''; position:absolute; left:8%; right:8%; bottom:-20%; height:20%; border-radius:50%; z-index:-1; background:radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.55), rgba(0,0,0,0) 70%); pointer-events:none; }
+.su-saucer.up::before, .su-saucer.up::after{ opacity:0.7; }
+.su-star{ width:76px; margin-left:-38px; font-size:64px; filter:drop-shadow(0 3px 0 rgba(0,0,0,0.45)) drop-shadow(0 0 10px rgba(255,214,80,0.8)); }
+.sc-table{ background:repeating-linear-gradient(45deg, rgba(255,255,255,0.035) 0 2px, rgba(0,0,0,0.04) 2px 4px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.03) 0 2px, rgba(0,0,0,0) 2px 4px), radial-gradient(ellipse at 50% 42%, #2a9a5a 0%, #167a42 45%, #0b4a28 100%); overflow:hidden; }
+.sc-table::before{ content:''; position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:0; box-shadow:inset 6px 6px 8px -4px rgba(255,255,255,0.45), inset -5px -5px 8px -4px rgba(0,0,0,0.35); }
+.sc-cone{ position:absolute; top:0; width:30%; height:70%; z-index:0; pointer-events:none; background:linear-gradient(180deg, rgba(255,240,170,0.32), rgba(255,240,170,0) 90%); clip-path:polygon(38% 0, 62% 0, 100% 100%, 0 100%); animation:scCone 5s ease-in-out infinite alternate; }
+.sc-cone.a{ left:4%; } .sc-cone.b{ left:35%; animation-delay:-1.7s; } .sc-cone.c{ right:4%; animation-delay:-3.3s; }
+@keyframes scCone{ from{ opacity:0.55; } to{ opacity:1; } }
+:root.lite .sc-cone{ animation:none; opacity:0.8; }
+@media (prefers-reduced-motion: reduce){ .sc-cone{ animation:none; opacity:0.8; } }
+.sc-play{ z-index:1; }
+.sc-panel{ bottom:calc(44px + env(safe-area-inset-bottom)); }
+@media (max-height:700px){ .sc-panel{ bottom:calc(34px + env(safe-area-inset-bottom)); } }
