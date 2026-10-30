@@ -389,3 +389,9 @@
 .tf-beamsweep{ position:absolute; left:50%; top:62%; width:150px; height:min(60vh, 420px); margin-left:-75px; background:linear-gradient(180deg, rgba(255,226,110,0.8), rgba(255,226,110,0.05)); clip-path:polygon(42% 0, 58% 0, 100% 100%, 0 100%); }
 .tf-stage.tf-gold .tf-grid{ box-shadow:0 0 0 4px #ffd23f, 0 0 26px 8px rgba(255,210,60,0.8); border-radius:16px; }
 .tf-rain.coin{ width:1em; height:1em; border-radius:50%; background:radial-gradient(circle at 35% 30%, #fffbd0, #ffd23f 50%, #c88a00); border:2px solid #fff3a8; box-sizing:border-box; }
+/* Snap Sort polish (overnight job 8): the bin labels sit at the bottom of the bins (a sign hanging from the UFO never covers them), and the toy cars
+   and mini UFOs ride just under their sign instead of behind it. */
+.ss-bin{ justify-content:flex-end; padding-bottom:6px; }
+.ss-car{ margin-top:2px; } .ss-mini{ margin-top:4px; }
+.ss-item.ground .ss-word::after{ bottom:-9px; height:9px; }
+@media (max-height:700px){ .ss-car{ font-size:46px; } .ss-mini{ width:70px; } }
