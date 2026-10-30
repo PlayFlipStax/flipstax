@@ -6005,7 +6005,7 @@
   // A+ outro: the SPONSOR BREAK - a 5 s skippable card between Round 3 and Round 4 (scene-sponsor art, 'Brought to you by' and a
   // replaceable logo: swap images/sponsor-logo.svg, or set SPONSOR_LOGO). OFF: nothing changes in the show until this is true. The TEST
   // menu's 'Sponsor break (off)' jump shows it without turning it on.
-  const SPONSOR_BREAK_ON = true, SPONSOR_LOGO = 'images/sponsor-logo.svg';   // (A+ job 2: the commercial break is on)
+  const SPONSOR_BREAK_ON = true, SPONSOR_LOGO = '';   /* set to a real logo path (e.g. 'images/sponsor-logo.svg') to show the Brought to you by bar */   // (A+ job 2: the commercial break is on)
   function seedOf(rng){ return (rng() * 4294967296) >>> 0; }
   // The day's two Mystery Games (see pickMysteryGames).
   function showMysteryGames(date){ return pickMysteryGames(date); }
@@ -12239,8 +12239,8 @@
   // the last card then holds a few seconds, or a tap (outside the button) goes on. The sponsor logo slot (SPONSOR_LOGO) stays at the bottom.
   const CB_PRODUCTS = [
     { e:'🧀', brand:'Zorp’s Moon Cheese', line:'Now with 40% more craters!' },
-    { e:'💇', brand:'Gleep-Gloop Hair Gel', line:'Hold your antennae up high!' },
-    { e:'🛸', brand:'Saucer-Wax Deluxe', line:'So shiny, pilots need sunglasses!' },
+    { e:'🧴', brand:'Gleep-Gloop Hair Gel', line:'Hold your antennae up high!' },
+    { e:'✨', brand:'Saucer-Wax Deluxe', line:'So shiny, pilots need sunglasses!' },
   ];
   const CB_PRODUCT_MS = 2000, CB_INTRO_MS = 1500, CB_SKIP_MS = 2000, CB_COFFEE_MS = 4500;
   function showSponsor(done){
@@ -12248,7 +12248,7 @@
     showCard.innerHTML = '<div class="cb-say">A word from our sponsors!</div><div class="cb-tv"><div class="cb-prod"><span class="cb-e"></span><b class="cb-brand"></b><small class="cb-line"></small></div>' +
       '<div class="cb-last"><b>Want to support the show?</b><small>Buy Flip a coffee</small></div></div>' +
       '<div class="cb-low"><a class="outro-donate cb-coffee" href="https://ko-fi.com/flipstax" target="_blank" rel="noopener noreferrer"><img class="od-icon" src="images/kofi-logo.webp" width="40" height="40" alt="" decoding="async"><span>Buy Flip a coffee</span></a>' +
-      '<div class="cb-by"><span>Brought to you by</span><img class="sp-logo" src="' + SPONSOR_LOGO + '" alt="Our sponsor"></div></div>';
+      (SPONSOR_LOGO ? '<div class="cb-by"><span>Brought to you by</span><img class="sp-logo" src="' + SPONSOR_LOGO + '" alt="Our sponsor"></div>' : '') + '</div>';
     showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'Commercial break: a word from our sponsors. Tap to skip');
     showCard.classList.remove('hidden');
     const prod = showCard.querySelector('.cb-prod'), shownAt = performance.now(); let gone = false, stage = 'intro', timers = [];
