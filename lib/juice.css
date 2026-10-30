@@ -1069,3 +1069,24 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root.lite .rw-title, :root.mode-daily.lite .show-card.reward .rw-title{ animation:rwFadeIn 0.25s ease-out both; }
 @keyframes rwFadeIn{ from{ opacity:0; } to{ opacity:1; } }
 @media (prefers-reduced-motion: reduce){ :root.mode-daily .show-card.reward .rw-title{ animation:rwFadeIn 0.25s ease-out both; } }
+
+/* ---- A+ job 2 item 2: the outro. The FINAL SCORE badge sits BELOW the neon FLIPSTAX sign (the sign is the top ~14% of the video), the stats
+   (points gained, letter won, orbs) and the headline are front and centre when the curtain closes - no button needed - then SHARE, the
+   coffee button and 'Play again tomorrow'. Opacity only. ---- */
+.outro-badge{ top:calc(16.5vh + env(safe-area-inset-top)); }
+.outro-mid{ position:absolute; left:0; right:0; top:38%; z-index:3; display:flex; flex-direction:column; align-items:center; gap:14px; padding:0 16px; pointer-events:none; }
+.outro-mid .outro-head{ opacity:0; transition:opacity 0.5s ease; }
+.outro.end .outro-mid .outro-head{ opacity:1; }
+.outro-stats{ display:flex; gap:8px; width:100%; max-width:360px; justify-content:center; opacity:0; transition:opacity 0.5s ease 0.35s; }
+.outro.end .outro-stats{ opacity:1; }
+.outro.instant .outro-stats, .outro.instant .outro-mid .outro-head{ transition-duration:0.25s; transition-delay:0s; }
+.outro-stats .os{ flex:1 1 0; min-width:0; display:flex; flex-direction:column; align-items:center; gap:4px; padding:12px 4px 10px; border-radius:18px; border:3px solid #fff; background:linear-gradient(180deg, #fff3a8, #ffc21a); box-shadow:0 4px 0 #7a4a00; }
+.outro-stats .os.ltr{ background:linear-gradient(180deg, #a8f4ff, #19b6e6); box-shadow:0 4px 0 #0a6d93; }
+.outro-stats .os.orb{ background:linear-gradient(180deg, #ffc4e4, #ff5fb0); box-shadow:0 4px 0 #a3105e; }
+.outro-stats .os b{ font:900 34px/1 var(--f-display); color:#2a1000; white-space:nowrap; }
+.outro-stats .os small{ font:800 13px/1.1 var(--f-body, Inter, sans-serif); letter-spacing:0.5px; text-transform:uppercase; color:#2a1000; text-align:center; }
+@media (max-height:700px){ .outro-mid{ top:31%; gap:8px; } .outro-stats .os{ padding:8px 4px 7px; } .outro-stats .os b{ font-size:28px; } }
+@media (max-width:380px){ .outro-stats .os small{ font-size:12px; } }
+@media (prefers-reduced-motion: reduce){ .outro-mid .outro-head, .outro-stats{ transition-duration:0.2s; transition-delay:0s; } }
+:root.lite .outro-mid .outro-head, :root.lite .outro-stats{ transition-duration:0.2s; transition-delay:0s; }
+#readoutOverlay.ep.outro-on .outro-details{ top:calc(16.5vh + env(safe-area-inset-top)); right:8px; min-height:40px; padding:0 10px; }

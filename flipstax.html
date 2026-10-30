@@ -4734,8 +4734,11 @@
     <img class="outro-poster" id="outroPoster" src="data/outro/poster.webp" alt="" decoding="async" draggable="false">
     <div class="outro-badge" id="outroBadge" aria-live="polite"><span>FINAL SCORE</span><b id="outroScore">0</b></div>
     <button type="button" class="outro-details" id="outroDetails" aria-expanded="false">details</button>
-    <div class="outro-lower">
+    <div class="outro-mid" id="outroMid">
       <h2 class="outro-head" id="outroHead">CONGRATULATIONS!</h2>
+      <div class="outro-stats" id="outroStats"></div>
+    </div>
+    <div class="outro-lower">
       <div class="daily-btn primary outro-share" id="outroShare" role="button" tabindex="0">📤 SHARE</div>
       <a class="outro-donate" id="outroDonate" href="https://ko-fi.com/flipstax" target="_blank" rel="noopener noreferrer"><img class="od-icon" src="images/kofi-logo.webp" width="40" height="40" alt="" decoding="async"><span>Buy Flip a coffee</span></a>
       <div class="outro-again" id="outroAgain" role="button" tabindex="0">Play again tomorrow</div>
@@ -11774,7 +11777,10 @@
   }).observe(els.eventOverlay, { attributes:true, attributeFilter:['class'] });
   // The Grand Finale: the Word Warp (its cue card has already played - the finale act opens
   // with one - unless the show is cutting straight here, e.g. from a resume or the TEST menu).
-  function goToFinale(){
+  // A+ job 2: the outro video (about 2 MB) starts loading as the last games begin, so it plays at once
+  let outroPreloaded = false;
+  function preloadOutro(){ if (outroPreloaded || isLite() || prefersReducedMotion()) return; outroPreloaded = true; try{ fetch('data/outro/outro.mp4').catch(()=>{}); }catch(e){} }
+  function goToFinale(){ preloadOutro();
     if (!runActive || runPhase === 'solving' || runPhase === 'finale-bumper') return;
     stopTallyPolling(); clearRoundTimer();
     els.eventOverlay.classList.add('hidden');
@@ -15692,6 +15698,8 @@
     if (missShown > 0) rows.push(['Missed', -missShown, 'miss']);
     if (r.goopLost > 0) rows.push(['Gooped', -Math.round(r.goopLost), 'goop']);   // (a prize the GOOP took, never in the score)
     rows.push([GN.orbitDrop + (r.jackpot ? ' · THE MOTHERSHIP!' : ''), orbit, 'roll']);
+    { const st = document.getElementById('outroStats'), L = r.letters || 0, O = r.orbitChips != null ? r.orbitChips : ((r.orbit && r.orbit.chips) || []).length;
+      if (st) st.innerHTML = '<span class="os pts"><b>+' + orbit + '</b><small>points gained</small></span><span class="os ltr"><b>' + L + '</b><small>letter' + (L === 1 ? '' : 's') + ' won</small></span><span class="os orb"><b>' + O + '</b><small>orb' + (O === 1 ? '' : 's') + '</small></span>'; }
     const br = document.getElementById('eprBreak'); br.textContent = '';
     rows.forEach(([label, pts, cls])=>{ const s = document.createElement('span'), b = document.createElement('b'); s.textContent = label; b.textContent = pts > 0 ? '+' + pts : pts < 0 ? '\u2212' + Math.abs(pts) : '0'; if (cls){ s.className = cls; b.className = cls; } br.appendChild(s); br.appendChild(b); });
     // The score counts up; straight from the Orbit Drop, the winnings roll in on top.
@@ -15729,7 +15737,7 @@
     clearInterval(eprClockT); tick(true); eprClockT = setInterval(tick, 1000);
     document.getElementById('readoutShare').textContent = '📤 SHARE YOUR GLORY';
   }
-  // ---- The outro video (A+): data/outro/outro.mp4, 540 x 960, 10 s, about 1 MB, with data/outro/poster.webp (its last frame).
+  // ---- The outro video (A+): data/outro/outro.mp4, 720 x 1280, 10 s, about 2 MB, with data/outro/poster.webp (its last frame).
   // States: 'playing' (the badge only) -> 'end' (the headline, SHARE and the donation button fade in, 0.5 s apart, over 1.5 s). A tap
   // while it plays skips straight to the end. Muted unless the player has sound on. If the video cannot play (error, blocked, stalled,
   // lite mode, reduced motion) the poster shows and the end state follows after 1.5 s. OUTRO_WATCHDOG_MS guarantees the buttons within 12 s.
