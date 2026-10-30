@@ -1112,3 +1112,27 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .event-tile.mp.dim .mp-door::after{ opacity:0.86; }
 .event-tile.mp.dim .mp-num{ opacity:0.5; }
 .mp-scene{ contain:paint; }
+
+/* ---- A+ job 2 item 6: the commercial break. The scene (Flip beside a big TV screen) fills the card; Flip's line on top, the products appear on the
+   screen (a pop: transform and opacity), then the coffee card; a replaceable sponsor logo slot at the bottom. ---- */
+.show-card.sponsor{ background:linear-gradient(180deg, rgba(10,4,30,0.35), rgba(10,4,30,0) 30%, rgba(10,4,30,0.4)), url(../data/scenes/sponsor.webp) 50% 100% / cover no-repeat, #1a0a38; flex-direction:column; justify-content:flex-start; padding:0; cursor:pointer; }
+.cb-say{ position:absolute; left:50%; top:calc(max(46px, 6vh) + env(safe-area-inset-top)); transform:translateX(-50%); width:min(86%, 340px); padding:10px 14px; border-radius:99px; text-align:center; background:linear-gradient(180deg, #fff3a8, #ffcb2b); border:3px solid #fff; box-shadow:0 0 0 3px #7a4a00, 0 4px 0 3px #7a4a00; font:900 clamp(18px, 5.6vw, 22px)/1.1 var(--f-display); color:#3a1500; letter-spacing:0.5px; text-transform:uppercase; }
+.cb-tv{ position:absolute; left:21%; width:58%; top:23.5%; height:18.5%; display:flex; align-items:center; justify-content:center; text-align:center; color:#2a1450; overflow:hidden; border-radius:18px; }
+.cb-prod, .cb-last{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:4px 8px; opacity:0; }
+.show-card.has-prod .cb-prod{ opacity:1; }
+.cb-prod.pop{ animation:cbPop 0.35s cubic-bezier(.3,1.5,.5,1) both; }
+@keyframes cbPop{ from{ opacity:0; transform:scale(0.6); } to{ opacity:1; transform:none; } }
+.cb-e{ font-size:clamp(48px, 15vw, 64px); line-height:1; }
+.cb-brand{ font:900 clamp(17px, 5.2vw, 21px)/1.05 var(--f-display); color:#5a0a3a; text-transform:uppercase; letter-spacing:0.5px; }
+.cb-line{ font:800 clamp(13px, 3.8vw, 15px)/1.15 var(--f-body, Inter, sans-serif); color:#2a1450; }
+.cb-last b{ font:900 clamp(20px, 6.4vw, 25px)/1.05 var(--f-display); color:#5a0a3a; text-transform:uppercase; }
+.cb-last small{ font:800 clamp(14px, 4.2vw, 17px)/1.1 var(--f-body, Inter, sans-serif); color:#2a1450; }
+.show-card.last .cb-last{ opacity:1; animation:cbPop 0.35s cubic-bezier(.3,1.5,.5,1) both; }
+.cb-low{ position:absolute; left:0; right:0; bottom:calc(18px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; align-items:center; gap:10px; padding:0 18px; }
+.cb-coffee{ opacity:0; pointer-events:none; transition:opacity 0.3s ease; width:100%; max-width:340px; }
+.show-card.last .cb-coffee{ opacity:1; pointer-events:auto; }
+.cb-by{ display:flex; align-items:center; gap:10px; padding:6px 14px; border-radius:99px; background:rgba(255,248,224,0.94); border:2px solid #e6b94a; }
+.cb-by span{ font:900 12px/1 var(--f-body, Inter, sans-serif); letter-spacing:1px; text-transform:uppercase; color:#5a0a3a; }
+.cb-by .sp-logo{ width:auto; height:28px; max-width:140px; display:block; }
+:root.lite .cb-prod.pop, :root.lite .show-card.last .cb-last{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .cb-prod.pop, .show-card.last .cb-last{ animation:none; } }
