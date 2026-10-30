@@ -1415,3 +1415,24 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .rw-video.on{ opacity:1; }
 :root.lite .rw-video, :root.lite .rw-video.on{ display:none; }
 @media (prefers-reduced-motion: reduce){ .rw-video{ display:none; } }
+
+/* ---- A+ round screens, polish: the picture fills ALL the room above the text, so there is no dead band ----
+   Round title cards: a column - the picture takes whatever is left above the points pill, the sign and the host's line, which follow it with small
+   fixed gaps (so the bubble can never touch the sign, however many lines it has). Round Done: a grid - the video (or its poster) fills the first row
+   and the title and the three tiles sit right under it. */
+.show-card.flipstage.art-title{ display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:12px; padding:0 0 calc(64px + env(safe-area-inset-bottom)); }
+.show-card.flipstage.art-title::before{ position:relative; left:auto; right:auto; top:auto; flex:1 1 auto; align-self:stretch; width:100%; height:auto; min-height:0; z-index:0;
+  background:var(--rw-art) 50% 18% / cover no-repeat; margin-bottom:-10px; }
+.show-card.flipstage.art-title .fs-pill, .show-card.flipstage.art-title .fs-title, .show-card.flipstage.art-title .fs-line{ position:relative; left:auto; right:auto; top:auto; bottom:auto; margin:0; transform:none; animation:none; flex:0 0 auto; }
+.show-card.flipstage.art-title .fs-line{ width:min(92vw, 420px); transition:opacity 0.25s linear; }
+.show-card.flipstage.art-title .fs-line.on{ transform:none; }
+.show-card.flipstage.art-title .fs-title{ max-width:92vw; }
+@media (max-height:660px){ .show-card.flipstage.art-title{ padding-bottom:calc(16px + env(safe-area-inset-bottom)); gap:8px; } .show-card.flipstage.art-title .fs-title b{ font-size:clamp(22px, 7vw, 30px); } }
+:root.mode-daily .show-card.reward.has-art.art-round{ display:grid; grid-template-rows:minmax(0, 1fr) auto; grid-template-columns:minmax(0, 1fr); justify-items:center; align-items:end; padding-top:0; }
+:root.mode-daily .show-card.reward.art-round::before{ position:relative; grid-area:1 / 1; align-self:stretch; justify-self:stretch; top:auto; left:auto; right:auto; width:auto; height:auto; min-height:0; margin-bottom:-14px; }
+:root.mode-daily .show-card.reward.art-round .rw-video{ position:relative; grid-area:1 / 1; align-self:stretch; justify-self:stretch; top:auto; left:auto; width:100%; height:100%; min-height:0; margin-bottom:-14px; }
+:root.mode-daily .show-card.reward.art-round .rw-panel{ grid-area:2 / 1; margin:0; align-self:end; }
+:root.mode-daily .show-card.reward.art-round::after{ height:24%; }
+.show-card.flipstage.art-title::before{ order:0; } .show-card.flipstage.art-title .fs-pill{ order:1; } .show-card.flipstage.art-title .fs-title{ order:2; } .show-card.flipstage.art-title .fs-line{ order:3; margin-top:6px; }
+:root.mode-daily .show-card.reward.has-art.art-round{ padding:0 0 calc(18px + env(safe-area-inset-bottom)); }
+@media (max-height:700px){ :root.mode-daily .show-card.reward.art-round::before{ background-position:50% 96%; } .rw-video{ object-position:50% 96%; } }
