@@ -1,8 +1,10 @@
 /* FlipStax - the stage (lib/stage.js): the photo studio set in three shots - close, wide, dim. Transform and opacity
    only; lite mode and reduced motion hold the pictures still. DESIGN.md "The stage" has the scene -> shot table. */
 .stage{ position:fixed; inset:0; z-index:-5; overflow:hidden; pointer-events:none; background:#12062a; container-type:size; }
-.stg-shot{ position:absolute; inset:0; overflow:hidden; opacity:0; visibility:hidden; transition:opacity 600ms var(--ease-io, ease-in-out), visibility 0s linear 600ms; }
-.stg-shot.on{ opacity:1; visibility:visible; transition:opacity 600ms var(--ease-io, ease-in-out), visibility 0s; }
+.stg-shot{ position:absolute; inset:0; overflow:hidden; opacity:0; visibility:hidden; transition:opacity 0s linear 600ms, visibility 0s linear 600ms; }
+/* a camera cut: the incoming shot fades in ON TOP of the outgoing one, which stays fully opaque until the new one is fully on (then it goes at once),
+   so the picture is solid the whole time - two shots fading at once left a quarter of the screen showing the dark stage under them */
+.stg-shot.on{ opacity:1; visibility:visible; z-index:2; transition:opacity 600ms var(--ease-io, ease-in-out), visibility 0s; }
 .stg-shot:not(.on) *{ animation-play-state:paused !important; }
 .stg-img{ position:absolute; inset:0; width:100%; height:100%; display:block; -webkit-user-drag:none; user-select:none; }
 
