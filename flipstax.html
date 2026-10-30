@@ -4737,13 +4737,14 @@
   <div class="outro" id="outro">
     <video class="outro-video" id="outroVideo" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
     <img class="outro-poster" id="outroPoster" src="data/outro/poster.webp" alt="" decoding="async" draggable="false">
+    <img class="outro-art" id="outroArt" alt="" decoding="async" draggable="false">
     <div class="outro-badge" id="outroBadge" aria-live="polite"><span>FINAL SCORE</span><b id="outroScore">0</b></div>
     <button type="button" class="outro-details" id="outroDetails" aria-expanded="false">details</button>
     <div class="outro-mid" id="outroMid">
       <h2 class="outro-head" id="outroHead">CONGRATULATIONS!</h2>
-      <div class="outro-stats" id="outroStats"></div>
     </div>
     <div class="outro-lower">
+      <div class="outro-stats" id="outroStats"></div>
       <div class="daily-btn primary outro-share" id="outroShare" role="button" tabindex="0">📤 SHARE</div>
       <a class="outro-donate" id="outroDonate" href="https://ko-fi.com/flipstax" target="_blank" rel="noopener noreferrer"><img class="od-icon" src="images/kofi-logo.webp" width="40" height="40" alt="" decoding="async"><span>Buy Flip a coffee</span></a>
       <div class="outro-again" id="outroAgain" role="button" tabindex="0">Play again tomorrow</div>
@@ -12001,6 +12002,8 @@
   // scene-group in rotation, never the same picture two rounds running where it can help it. The files are probed once a session.
   const ROUND_ART = ['scene-win-flip', 'scene-girl-green', 'scene-girl-purple', 'scene-girl-pink', 'scene-girls-pose', 'scene-all-group'];
   const ROUND_ART_FALLBACK = ['scene-win-flip', 'scene-win', 'scene-group'];
+  // The round title cards (A+): Round 2 to 6 each have a different picture, no picture on two rounds running; the last round is the whole group.
+  const ROUND_TITLE_ART = { 2:'scene-girl-green', 3:'scene-girl-purple', 4:'scene-girl-pink', 5:'scene-girls-pose', 6:'scene-all-group' };
   const roundArtOk = {};
   function probeRoundArt(){ ROUND_ART.forEach(n=>{ if (n in roundArtOk) return; roundArtOk[n] = null; const im = new Image(); im.onload = ()=>{ roundArtOk[n] = true; }; im.onerror = ()=>{ roundArtOk[n] = false; }; im.src = 'data/scenes/round/' + n + '.webp'; }); }
   probeRoundArt();
@@ -12045,7 +12048,7 @@
     const shownAt = performance.now();
     let gone = false;
     const go = (e)=>{
-      if (gone || (e && performance.now() - shownAt < SKIP_MIN_MS)) return;
+      if (gone || window.__previewHold || (e && performance.now() - shownAt < SKIP_MIN_MS)) return;   // (__previewHold: screenshots only)
       gone = true; showCard.removeEventListener('click', go);
       showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden';
       noteOverlayClosed();
@@ -12060,7 +12063,11 @@
   function showActCard(st, then){
     const fin = !!st.finale, a = RUNDOWN.acts[st.act] || RUNDOWN.acts.find(x=> x.id === (fin ? 'finale' : '')) || {};
     const m = st.mult || a.mult || 1, line = st.announce || a.announce || '', round = st.round || a.round || 0;
-    showCard.className = 'show-card flipstage' + (fin ? ' finale' : '');
+    // A+ round art: Rounds 2-6 open on their own picture (data/scenes/round/, ROUND_TITLE_ART) instead of the stage's arch - the girls on top,
+    // the sign, the points pill and the host's line in the dark gradient at the bottom; the host is not drawn over the picture.
+    const tArt = !fin && ROUND_TITLE_ART[round] || null;
+    showCard.className = 'show-card flipstage' + (fin ? ' finale' : '') + (tArt ? ' has-art art-title' : '');
+    if (tArt) showCard.style.setProperty('--rw-art', 'url(../data/scenes/round/' + tArt + '.webp)'); else showCard.style.removeProperty('--rw-art');
     showCard.innerHTML = '<div class="fs-host host-full" aria-hidden="true">' + Host.html({ pose: fin ? 'cheer' : 'presenting' }) + '</div>' +
       '<div class="fs-title"><b></b><span></span></div>' +
       (m > 1 || fin ? '<div class="fs-pill ds-pill gold">' + (fin ? 'GRAND PRIZE' : 'POINTS ×' + m) + '</div>' : '') +
@@ -12074,8 +12081,8 @@
     const say = Math.max(TIMING.ACT_CARD_HOLD + (fin ? 300 : 0), cueLineMs(line) + 500);
     const vsText = st.vsExplain ? explainerText('vs', true) : '';
     const ms = cine(say + (vsText ? explainerMs(vsText) + 300 : 0));
-    if (window.Stage) Stage.cue('close', { over:showCard, cls:'flipstage', push:true, ms, sign:{ sub: signSub, main: signMain } });
-    showCard.classList.toggle('staged', !!(window.Stage && Stage.ready));
+    if (window.Stage && !tArt) Stage.cue('close', { over:showCard, cls:'flipstage', push:true, ms, sign:{ sub: signSub, main: signMain } });
+    showCard.classList.toggle('staged', !!(window.Stage && Stage.ready) && !tArt);
     clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
     if (sfx.bumper) sfx.bumper(!!st.finale);
     if (fin) setTimeout(()=> sfx.drumrollLong(), 500);   // the finale: a long drumroll under the spotlight
@@ -12085,7 +12092,7 @@
     const hide = ()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; };
     const gen0 = Show.gen;
     // (st.zoomIn: the card leaves through the marquee - the play is swapped in at the zoom's peak)
-    const end = ()=>{ if (ended) return; ended = true; if (vsText) markExplainerSeen('vs'); showCard.removeEventListener('click', skipVs);
+    const end = ()=>{ if (ended || window.__previewHold) return; ended = true; if (vsText) markExplainerSeen('vs'); showCard.removeEventListener('click', skipVs);
       if (st.zoomIn) zoomThrough('in', ()=>{ if (runActive && gen0 !== Show.gen) return; hide(); then(); }); else { hide(); then(); } };
     // (the host's VS explanation: a cue line of its own after the announcement; a tap skips it - the announcement itself plays out)
     let vsAt = 0;
@@ -15976,6 +15983,7 @@
   function startOutro(r){
     stopOutro(); loadOutroPoster();
     const o = document.getElementById('outro'), v = document.getElementById('outroVideo'); if (!o) return;
+    { const art = document.getElementById('outroArt'); if (art && !art.getAttribute('src')) art.src = 'data/scenes/round/scene-all-group.webp'; }   // (the end-of-show picture, loaded when the outro starts)
     els.readoutOverlay.classList.add('outro-on');
     // Launch prep: one 'game_completed' analytics event per finished episode (Vercel Web Analytics; a no-op when it is blocked or in test modes),
     // and the feedback link only when FEEDBACK_URL is set.
@@ -18020,6 +18028,8 @@
   // shipping, or leave gated (off by default) if kept for future testing.
   if (DEBUG_FAST){
     window.__debug = {
+      // (screenshots only: shows one round's title card or Round Done card by act index, with nothing after it)
+      previewCard: (kind, act, extra) => { const a = RUNDOWN.acts[act] || {}; if (kind === 'outro'){ startOutro({ score: 1234 }); outroEnd(true); return; } if (kind === 'title') showActCard({ title:a.title, sub:a.sub, world:a.world, act, announce:a.announce, finale: a.id === 'finale' }, ()=>{}); else { runActPts[act] = (extra && extra.pts) || 120; runActKeys[act] = 1; runActLetter[act] = 'got'; showRewardBeat({ act }, ()=>{}); } },
       getRunWord: () => runWord,
       getRunLetters: () => runLetters,
       getStats: () => stats,

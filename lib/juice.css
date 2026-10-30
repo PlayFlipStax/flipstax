@@ -1380,3 +1380,30 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 /* Play Today: the FlipStax logo sits inside the sign frame (lib/stage.js), so the text logo above it goes. 'Watch intro' sits in the bottom-right corner, clear of Flip's feet. */
 :root.stage-on .split-select-overlay.one-show .split-select-header .logo{ display:none; }
 #modeSelectOverlay .ms-watch-intro{ left:auto !important; right:10px; transform:none !important; }
+
+/* ---- A+ round art: the scene pictures behind the round title cards (Rounds 2-6) and the end-of-show screen. The picture sits in the top part at its own
+   proportions (780 x 1044) so nobody is cut or covered; a dark gradient over the bottom 35% keeps the sign, buttons and text readable ---- */
+.show-card.flipstage.art-title{ background:#12062a; }
+.show-card.art-title::before, :root.mode-daily .show-card.reward.art-round::before{ content:''; position:absolute; left:0; right:0; top:0; height:min(69%, 133.8vw); z-index:0; background:var(--rw-art) 50% 0 / cover no-repeat;
+  -webkit-mask-image:linear-gradient(180deg, #000 88%, transparent); mask-image:linear-gradient(180deg, #000 88%, transparent); pointer-events:none; }
+.show-card.art-title::after, :root.mode-daily .show-card.reward.art-round::after{ content:''; position:absolute; left:0; right:0; bottom:0; height:35%; z-index:1; pointer-events:none;
+  background:linear-gradient(0deg, rgba(10,3,24,0.94) 0%, rgba(10,3,24,0.6) 55%, rgba(10,3,24,0) 100%); }
+.show-card.art-title .fs-host{ display:none; }
+.show-card.art-title .fs-title{ top:auto; bottom:calc(162px + env(safe-area-inset-bottom)); padding:8px 18px; }
+.show-card.art-title .fs-title b{ font-size:clamp(26px, 8vw, 36px); }
+.show-card.art-title .fs-pill{ top:auto; bottom:calc(262px + env(safe-area-inset-bottom)); }
+.show-card.art-title .fs-line{ z-index:5; }
+.outro-art{ position:absolute; left:0; top:0; width:100%; height:calc(100% - 290px); max-height:133.8vw; object-fit:cover; object-position:50% 0; opacity:0; transition:opacity 0.5s ease; pointer-events:none;
+  -webkit-mask-image:linear-gradient(180deg, #000 88%, transparent); mask-image:linear-gradient(180deg, #000 88%, transparent); }
+.outro.end .outro-art{ opacity:1; }
+.outro.instant .outro-art, :root.lite .outro-art{ transition-duration:0.2s; }
+@media (prefers-reduced-motion: reduce){ .outro-art{ transition-duration:0.2s; } }
+/* the end-of-show picture: the headline moves up under the score badge and the three stat tiles into the dark panel at the bottom, so nothing sits on the group */
+.outro-mid{ top:calc(68px + env(safe-area-inset-top)); }
+.outro-lower .outro-stats{ max-width:340px; }
+.outro-lower .outro-stats .os{ padding:7px 4px 6px; border-radius:14px; }
+.outro-lower .outro-stats .os b{ font-size:26px; }
+.outro-art{ height:calc(100% - 350px); object-position:50% 30%; }
+@media (max-height:700px){ .outro-art{ height:calc(100% - 300px); } }
+.outro-badge{ top:calc(12px + env(safe-area-inset-top)); }
+.outro-mid{ top:calc(70px + env(safe-area-inset-top)); }

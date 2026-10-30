@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # FlipStax - the Round Done art (overnight job 7). Converts any of these from incoming-assets/gemini/ that exist into
-# data/scenes/round/<name>.webp (2% cropped off each edge, 900 px wide, under 150 KB):
+# data/scenes/round/<name>.webp (2% cropped off each edge, 780 px wide, under 150 KB):
 #   round 1 scene-win-flip, round 2 scene-girl-green, round 3 scene-girl-purple, round 4 scene-girl-pink,
 #   round 5 scene-girls-pose, round 6 scene-all-group, and the fallbacks scene-win-flip, scene-win, scene-group.
 # The game tries each round's own file first and uses the fallbacks in rotation for any that are missing, so a new
@@ -16,7 +16,7 @@ for n in NAMES:
     if not src: print('missing', n); continue
     im = Image.open(src).convert('RGB'); w, h = im.size; dx, dy = round(w * 0.02), round(h * 0.02)
     im = im.crop((dx, dy, w - dx, h - dy))
-    if im.size[0] > 900: im = im.resize((900, round(im.size[1] * 900 / im.size[0])), Image.LANCZOS)
+    if im.size[0] > 780: im = im.resize((780, round(im.size[1] * 780 / im.size[0])), Image.LANCZOS)
     for q in range(84, 30, -4):
         b = io.BytesIO(); im.save(b, 'WEBP', quality=q, method=6)
         if b.tell() <= 150 * 1024: break
