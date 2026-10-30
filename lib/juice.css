@@ -1348,3 +1348,5 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 /* End screen tidy (overnight job 8): no leftover timer pill or floating details button on the main path */
 :root.results-open #runBanner, :root.results-open .status-banner, :root.results-open .run-clock{ visibility:hidden !important; }
 #readoutOverlay.ep.outro-on .outro-details{ display:none !important; }
+/* Play Today in replay mode: the REPLAY MODE pill moves down by the contact line so it never covers the logo (testers only) */
+:root:has(#modeSelectOverlay:not(.hidden)) .replay-tag{ top:auto !important; bottom:calc(64px + env(safe-area-inset-bottom)) !important; }
