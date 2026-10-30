@@ -24,7 +24,7 @@ const COSMIC_SURPRISE_INTRO = 2000;  // the Cosmic Surprise machine on screen be
 const CINEMATIC_MIN = 1500;          // no cinematic moment is shorter than this
 const SKIP_AFTER = 1000;             // tap-to-skip works only after this long
 const ZOOM_MS = 900;                 // Run 4A: the zoom through the marquee (one glow pulse), in and out
-const GAME_INTRO_MS = 2000;          // Run 4A: a round-end game's intro (spotlight sweep, title slam, bulb chase)
+const GAME_INTRO_MS = 3600;          // Run 4A: a round-end game's intro (overnight job 7: 3.6 s - three beams sweep and converge on the title, it settles, they fade)
 const REWARD_HOLD = 2200;            // Run 4A: the reward beat after a round-end game
 
 // G3 (Oct 16): the commercial break is cut from the show. Its code and the "Brought to you by" sponsor field stay;

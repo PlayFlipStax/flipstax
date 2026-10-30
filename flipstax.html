@@ -12130,6 +12130,8 @@
     showCard.innerHTML = '<i class="gi-bg" aria-hidden="true"></i><i class="gi-spot" aria-hidden="true"></i>' +
       '<div class="gi-icon" aria-hidden="true"></div><div class="gi-sign"><div class="sign-bulbs" aria-hidden="true"></div><span></span></div>';
     showCard.querySelector('.gi-icon').textContent = GAME_ICONS[key] || '✨';   // (A+ pacing: the game's icon over its name)
+    // Overnight job 7: three spotlight beams from the top sweep round the stage and converge on the title, which then settles; the beams fade.
+    showCard.insertAdjacentHTML('afterbegin', [0.12, 0.5, 0.88].map((x, k)=> '<i class="gi-beam b' + k + '" aria-hidden="true" style="left:' + (x * 100) + '%"></i>').join(''));
     showCard.querySelector('.gi-sign span').textContent = String(name).toUpperCase();
     if (key === 'door'){   // the Mystery Portal's title card: a shine sweep across the sign and six sparkles around it (lib/juice.css)
       const sg = showCard.querySelector('.gi-sign'); sg.insertAdjacentHTML('beforeend', '<i class="gi-shine" aria-hidden="true"></i>' + [[-5, -16], [48, -26], [103, -12], [-7, 112], [50, 126], [105, 110]].map((q, k)=> '<i class="gi-spk" aria-hidden="true" style="left:' + q[0] + '%;top:' + q[1] + '%;animation-delay:' + (-(k * 0.37)).toFixed(2) + 's"></i>').join(''));
@@ -12137,6 +12139,9 @@
     showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', name + '. Tap to skip');
     showCard.classList.remove('hidden');
     ringBulbs(showCard.querySelector('.gi-sign .sign-bulbs'), 20, 7);
+    { const sr = showCard.querySelector('.gi-sign').getBoundingClientRect(), tx = sr.left + sr.width / 2, ty = sr.top + sr.height / 2, W = innerWidth, oy = -0.08 * innerHeight;
+      showCard.querySelectorAll('.gi-beam').forEach((b, k)=>{ const ox = W * [0.12, 0.5, 0.88][k], aim = Math.atan2(-(tx - ox), ty - oy) * 180 / Math.PI;
+        b.style.setProperty('--aim', aim.toFixed(1) + 'deg'); b.style.setProperty('--a0', [-38, 32, 38][k] + 'deg'); b.style.setProperty('--a1', [22, -30, -22][k] + 'deg'); }); }
     clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
     if (sfx.slam) setTimeout(()=>{ if (showCard.classList.contains('gintro')) sfx.slam(); }, 380);
     const shownAt = performance.now();

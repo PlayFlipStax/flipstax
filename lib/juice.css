@@ -1350,3 +1350,16 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 #readoutOverlay.ep.outro-on .outro-details{ display:none !important; }
 /* Play Today in replay mode: the REPLAY MODE pill moves down by the contact line so it never covers the logo (testers only) */
 :root:has(#modeSelectOverlay:not(.hidden)) .replay-tag{ top:auto !important; bottom:calc(64px + env(safe-area-inset-bottom)) !important; }
+
+/* ---- Overnight job 7: game title cards hold 3.6 s. Three beams sweep and rotate round the stage, converge on the title (it settles into place
+   as they land) and fade. Transform and opacity only; lite and reduced motion: the title fades in, no beams. ---- */
+.show-card.gintro .gi-spot{ display:none; }
+.gi-beam{ position:absolute; z-index:1; top:-8%; width:34vmin; height:150vmax; margin-left:-17vmin; transform-origin:50% 0; pointer-events:none; opacity:0;
+  background:linear-gradient(180deg, rgba(255,250,232,0.85), rgba(255,246,214,0.35) 50%, rgba(255,246,214,0) 80%); clip-path:polygon(45% 0, 55% 0, 100% 100%, 0 100%);
+  animation:giBeam 2.3s cubic-bezier(.45,0,.3,1) forwards; will-change:transform, opacity; }
+.gi-beam.b1{ animation-delay:0.08s; } .gi-beam.b2{ animation-delay:0.16s; }
+@keyframes giBeam{ 0%{ transform:rotate(var(--a0)); opacity:0; } 12%{ opacity:0.9; } 38%{ transform:rotate(var(--a1)); } 64%{ transform:rotate(var(--aim)); opacity:0.9; } 100%{ transform:rotate(var(--aim)); opacity:0; } }
+.show-card.gintro .gi-sign{ animation-delay:1.35s; }
+.show-card.gintro .gi-icon{ animation-delay:1.25s; }
+:root.lite .gi-beam{ display:none; } @media (prefers-reduced-motion: reduce){ .gi-beam{ display:none; } }
+:root.lite .show-card.gintro .gi-sign, :root.lite .show-card.gintro .gi-icon{ animation-delay:0s; } @media (prefers-reduced-motion: reduce){ .show-card.gintro .gi-sign, .show-card.gintro .gi-icon{ animation-delay:0s; } }
