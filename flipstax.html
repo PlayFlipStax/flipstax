@@ -4695,6 +4695,7 @@
 </div>
 
 <div class="solve-overlay hidden" id="solveOverlay">
+  <div class="ww-galaxy" aria-hidden="true"><i></i></div>
   <div class="bg w-jumble warp-bg" aria-hidden="true"><i class="rays"></i><i class="glow"></i></div>
   <div class="solve-inner">
     <div class="solve-title" id="solveTitle">🌀 Word Warp<small>Unscramble today's word</small></div>
@@ -13390,6 +13391,8 @@
     setTimeout(end, 4600);   // (G2: lite mode is the still look - the same length)
     return true;
   }
+  window.__warpWord = (DEBUG_FAST || REPLAY) ? ()=> (runWord && runWord.word) : undefined;
+  window.__warpWin = (DEBUG_FAST || REPLAY) ? ()=> winWarp() : undefined;
   window.__discoTest = (DEBUG_FAST || REPLAY) ? ()=>{ discoShownFor = null; discoCelebrate('test'); } : undefined;
   function pkJackpotShow(c){
     hostMood('laugh');
@@ -15254,7 +15257,7 @@
     solveGuesses = [];
     solveCurrentGuess = [];
     solveCurrentGuessSource = [];
-    solveLockedLetters = new Array(RUN_WORD_LENGTH).fill(null);
+    solveLockedLetters = new Array(RUN_WORD_LENGTH).fill(null); slotLockedPrev = [];
     // Zero letters earned (all trivia missed, or the clock ran out first):
     // don't hand the player a blind 6-letter guess - lock in the first
     // letter for free and make the first hint cost no solve time.
@@ -15323,7 +15326,7 @@
     const remain = Math.max(0, solveEndsAt - Date.now());
     const totalSec = Math.ceil(remain/1000);
     els.solveTimer.textContent = Math.floor(totalSec/60) + ':' + (totalSec%60<10?'0':'') + (totalSec%60);
-    els.solveTimer.classList.toggle('danger', remain <= 20000);
+    els.solveTimer.classList.toggle('danger', remain <= 20000); els.solveTimer.classList.toggle('late', remain <= 8000); { const sb = document.getElementById('solveBar'); if (sb) sb.classList.toggle('late', remain <= 8000); }
     { const bar = document.querySelector('#solveBar b'); if (bar) bar.style.transform = 'scaleX(' + Math.min(1, remain / Math.max(1, solveTotalMs || RUN_SOLVE_MS)).toFixed(3) + ')'; }
     if (remain <= 0){ clearInterval(solveInterval); missWarp(); }
   }
@@ -15342,7 +15345,9 @@
     setTimeout(()=>{ renderSolveUI(); hostSay(warpTray ? 'Nice try, Earthling! It was ' + runWord.word + '!' : 'So close! It was ' + runWord.word + '.', 2000); if (sfx.warpMiss) sfx.warpMiss(); else sfx.wrong(); }, rv.ms);
     setTimeout(()=>{ warpMissing = false; els.solveOverlay.classList.remove('missed'); rv.remove(); if (runActive) endRun(false); }, rv.ms + (warpTray ? Math.max(paced(1500), REVEAL_HOLD_MS) : paced(1500)));
   }
+  let slotLockedPrev = [];
   function renderSolveUI(){
+    let flipN = 0;
     els.solveHint.textContent = runHintsRevealed > 0 ? '\uD83D\uDCA1 ' + runWord.hints.slice(0, runHintsRevealed).join(' \u00B7 ') : '';
     els.solveHintBtn.textContent = solveFreeHints > 0 ? '\uD83D\uDCA1 Hint (free)' : '\uD83D\uDCA1 Hint (\u22125s)';
     els.solveHintBtn.classList.toggle('disabled', runHintsRevealed >= runWord.hints.length);
@@ -15354,10 +15359,14 @@
       const div = document.createElement('div');
       div.className = 'solve-slot' + (solveLockedLetters[i] ? ' locked' : '');
       div.style.setProperty('--i', i);
-      div.textContent = filled || '';
+      if (warpTray && solveLockedLetters[i]){   // the panel flips over like a trilon to a cream panel (a tiny stagger when several flip at once)
+        div.innerHTML = '<span class="sl-new"></span>'; div.firstChild.textContent = filled;
+        if (!slotLockedPrev[i]){ div.classList.add('flip'); div.style.setProperty('--fd', (flipN++ * 70) + 'ms'); }
+      } else div.textContent = filled || '';
       if (!solveLockedLetters[i]) div.onclick = ()=> removeFromGuess(i);
       els.solveSlots.appendChild(div);
     }
+    slotLockedPrev = solveLockedLetters.map(Boolean);
     els.solveRackLabel.textContent = solveRack.length > 0 ? (document.documentElement.classList.contains('mode-daily') ? 'Put these in place' : 'Your letters') : solveBonusNote;
     els.solveRackLabel.classList.toggle('hidden', solveRack.length === 0 && !solveBonusNote);
     els.solveRack.innerHTML = '';
@@ -15395,7 +15404,26 @@
     saveRunSnapshot();
     els.solveOverlay.classList.add('celebrating');
     if (window.Juice) Juice.correct(els.solveSlots, { count:24 });
-    wwAbduct(runWord.word.split('').map((_, i)=> i), ()=> celebrateSolve(solvedAt, ()=>{ if (runActive) endRun(true, solvedAt); }));
+    wwAbduct(runWord.word.split('').map((_, i)=> i), ()=> wwBarnyard(()=> celebrateSolve(solvedAt, ()=>{ if (runActive) endRun(true, solvedAt); })));
+  }
+  // The win (Daily tray): after the beam lifts the letters, a cow, then a pig, then a horse bob up from the bottom to mid-screen with a happy wiggle and
+  // settle back off the bottom, under chasing winner lights. (Lite and reduced motion: each one fades in and out in place.)
+  function wwBarnyard(done){
+    const lite = FX.reduced() || isLite() || !Element.prototype.animate, H = innerHeight;
+    const layer = document.createElement('div'); layer.className = 'ww-barn'; layer.setAttribute('aria-hidden', 'true');
+    layer.innerHTML = '<i class="wb-m a"></i><i class="wb-m b"></i>'; els.solveOverlay.appendChild(layer);
+    sfx.cheer();
+    const STEP = lite ? 700 : 800, DUR = lite ? 800 : 1500;
+    ['\uD83D\uDC04', '\uD83D\uDC16', '\uD83D\uDC0E'].forEach((em, k)=>{
+      setTimeout(()=>{
+        const a = document.createElement('div'); a.className = 'wb-an' + (lite ? ' still' : ''); a.textContent = em; a.style.left = (22 + k * 28) + '%'; layer.appendChild(a);
+        const up = -(H * 0.55);
+        if (lite) a.animate([{ opacity:0 }, { opacity:1, offset:0.3 }, { opacity:1, offset:0.7 }, { opacity:0 }], { duration:DUR, fill:'both' });
+        else a.animate([{ transform:'translate(-50%,0) rotate(0deg)' }, { transform:'translate(-50%,' + up + 'px) rotate(-9deg)', offset:0.3, easing:'ease-out' },
+          { transform:'translate(-50%,' + (up + 14) + 'px) rotate(9deg)', offset:0.5 }, { transform:'translate(-50%,' + up + 'px) rotate(-9deg)', offset:0.7 }, { transform:'translate(-50%,0) rotate(0deg)' }], { duration:DUR, easing:'ease-in-out', fill:'both' });
+      }, k * STEP);
+    });
+    setTimeout(()=>{ layer.remove(); done(); }, 2 * STEP + DUR + 100);
   }
   function trayPick(letter, tileEl){
     if (!runActive || warpMissing || els.solveOverlay.classList.contains('celebrating') || els.solveOverlay.classList.contains('revealing')) return;
@@ -15407,6 +15435,8 @@
       const still = FX.reduced() || document.documentElement.classList.contains('lite') || !Element.prototype.animate;
       spots.forEach(i=>{ const sl = els.solveSlots.children[i]; if (!sl) return; sl.classList.add('ring');
         if (!still && from){ const r = sl.getBoundingClientRect(); sl.animate([{ transform:'translate(' + (from.left + from.width / 2 - r.left - r.width / 2) + 'px,' + (from.top + from.height / 2 - r.top - r.height / 2) + 'px) scale(0.8)', opacity:0.5 }, { transform:'none', opacity:1 }], { duration:360, easing:'cubic-bezier(.3,1.2,.5,1)' }); }
+        if (!still){ const r = sl.getBoundingClientRect(), d = document.createElement('i'); d.className = 'ring-dot'; sl.appendChild(d); const w = r.width - 8, h = r.height - 8;
+          d.animate([{ transform:'translate(0,0)' }, { transform:'translate(' + w + 'px,0)', offset:0.25 }, { transform:'translate(' + w + 'px,' + h + 'px)', offset:0.5 }, { transform:'translate(0,' + h + 'px)', offset:0.75 }, { transform:'translate(0,0)' }], { duration:700, easing:'linear' }).onfinish = ()=> d.remove(); }
         setTimeout(()=> sl.classList.remove('ring'), 900); });
       saveRunSnapshot();
       if (solveLockedLetters.every(Boolean)) winWarp();
@@ -15600,7 +15630,7 @@
       els.solveOverlay.classList.remove('celebrating');
       rv.remove();
       done();
-    }, rv.ms + paced(reduced ? 1400 : 1500));
+    }, rv.ms + (warpTray ? Math.max(paced(1500), REVEAL_HOLD_MS + 1000) : paced(reduced ? 1400 : 1500)));
   }
   // Confetti on a canvas: one burst fanning up and out of `box` (a screen
   // rect), then a lighter shower from the top. Stops itself after `life` ms.
@@ -18555,6 +18585,7 @@
       { label:'Saucer Shuffle', go: mysteryAs('saucerShuffle') },
       // The finale's cue card, then the Word Warp with all six letters in.
       { label:'Grand finale (6 letters)', wide:true, go: atType(s=> s.t === 'act' && s.finale, 0, 210, 6) },
+      { label:'Grand finale (3 letters)', wide:true, go: atType(s=> s.t === 'act' && s.finale, 0, 210, 3) },
       { label:'Orbit Drop', go: roundGame('orbitDrop', 300, 6, ()=>{ runKeys = 3; runBonusChips = 1; }) },
       { label:'Results (sample)', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); runResultToday = replaySampleEpisode(); showRunReadout(); updatePauseBtnVisibility(); }) },
       { label:'Share image', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); runResultToday = replaySampleEpisode(); showRunReadout(); updatePauseBtnVisibility();

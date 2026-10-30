@@ -1210,3 +1210,59 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .show-card.sponsor:not(.has-prod):not(.last) .cb-tv{ opacity:0; }
 @media (max-height:700px){ .cb-tv{ top:15%; height:21%; } .cb-e{ font-size:clamp(50px, 15vw, 58px); } .cb-brand{ font-size:clamp(20px, 6vw, 23px); } .cb-line{ font-size:clamp(14px, 4.2vw, 16px); } .cb-prod{ gap:2px; padding:4px 8px; } }
 @media (max-height:700px){ .cb-tv{ top:15.5%; height:17.5%; } .cb-e{ font-size:44px; } .cb-brand{ font-size:20px; } .cb-line{ font-size:14px; } .cb-prod{ gap:1px; padding:2px 8px; } }
+
+/* ---- Word Warp finale look (A+, Oct 2026): a classic game-show puzzle board. Gold marquee frame round deep-blue panels that flip (trilon style) to cream
+   when a letter locks in; a gold rack of coin tiles; five strike bulbs; a big clock under the board; the nebula turning behind. Transform and opacity motion. ---- */
+.ww-galaxy{ display:none; position:fixed; inset:0; overflow:hidden; z-index:0; pointer-events:none; }
+.solve-overlay.tray .ww-galaxy{ display:block; }
+.ww-galaxy i{ position:absolute; left:50%; top:50%; width:170vmax; height:170vmax; margin:-85vmax 0 0 -85vmax; background:url(../data/wordwarp/bg.webp) center / cover no-repeat; animation:pkSpin 120s linear infinite; will-change:transform; }
+:root:root .solve-overlay.tray{ background:linear-gradient(180deg, rgba(6,2,22,0.5), rgba(6,2,22,0.12) 40%, rgba(6,2,22,0.6)), #0a0620 !important; }
+.solve-overlay.tray::before{ display:block !important; content:''; position:fixed; inset:0; z-index:0; pointer-events:none; animation:starTwinkle 4s ease-in-out infinite alternate;
+  background-size:300px 280px; background-image:radial-gradient(1.6px 1.6px at 40px 50px, #fff, rgba(255,255,255,0)), radial-gradient(1.4px 1.4px at 200px 120px, rgba(200,235,255,1), rgba(255,255,255,0)),
+    radial-gradient(1.8px 1.8px at 120px 220px, #fff, rgba(255,255,255,0)), radial-gradient(1.2px 1.2px at 260px 250px, rgba(255,220,240,1), rgba(255,255,255,0)); }
+:root.lite .ww-galaxy i, :root.lite .solve-overlay.tray::before{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .ww-galaxy i, .solve-overlay.tray::before{ animation:none !important; } }
+.solve-overlay.tray .solve-inner{ z-index:2; }
+.solve-overlay.tray .solve-title{ order:0; } .solve-overlay.tray .solve-slots{ order:1; } .solve-overlay.tray .solve-header{ order:2; } .solve-overlay.tray .solve-bar{ order:3; }
+.solve-overlay.tray .solve-attempts{ order:4; } .solve-overlay.tray .solve-rack{ order:5; }
+/* the board */
+:root:root .solve-overlay.tray .solve-slots{ position:relative; gap:clamp(4px, 1.5vw, 7px); margin:10px 0 8px; padding:11px 10px; border-radius:16px; background:linear-gradient(180deg, #0b1450, #060a30); border:4px solid #ffd23f; box-shadow:0 0 0 3px #7a4a00, 0 6px 0 3px #4a2c00; }
+.solve-overlay.tray .solve-slots::before{ content:''; position:absolute; inset:-11px; border-radius:22px; border:5px dotted #fff6c2; pointer-events:none; opacity:0.9; }
+:root:root .solve-overlay.tray .solve-slot{ position:relative; width:clamp(40px, 12.2vw, 54px); height:clamp(54px, 16vw, 68px); font-size:clamp(28px, 8.4vw, 36px); border-radius:8px; color:transparent; perspective:500px;
+  background:linear-gradient(180deg, #1c3aa8, #0c1c66); border:2px solid #ffd23f; box-shadow:inset 0 0 14px rgba(130,170,255,0.55); }
+:root:root .solve-overlay.tray .solve-slot.locked{ background:none; border-color:#ffd23f; box-shadow:none; color:#2a1a00; }
+.solve-overlay.tray .sl-new{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; border-radius:6px; background:linear-gradient(180deg, #fffdf0, #ffe9b0); color:#2a1a00; text-shadow:none; }
+.solve-overlay.tray .solve-slot.flip::before{ content:''; position:absolute; inset:0; border-radius:6px; background:linear-gradient(180deg, #1c3aa8, #0c1c66); animation:wtOld 0.225s ease-in both; animation-delay:var(--fd, 0ms); }
+.solve-overlay.tray .solve-slot.flip .sl-new{ animation:wtNew 0.225s ease-out both; animation-delay:calc(var(--fd, 0ms) + 0.225s); }
+@keyframes wtOld{ from{ transform:rotateY(0); opacity:1; } to{ transform:rotateY(90deg); opacity:1; } }
+@keyframes wtNew{ from{ transform:rotateY(-90deg); } to{ transform:rotateY(0); } }
+.solve-overlay.tray .solve-slot.ring::after{ inset:-4px; border:3px solid #ffd23f; border-radius:11px; animation:wtGold 0.9s ease-out both; }
+@keyframes wtGold{ 0%{ opacity:0; } 20%{ opacity:1; } 100%{ opacity:0.55; } }
+.ring-dot{ position:absolute; left:2px; top:2px; width:9px; height:9px; margin:-5px 0 0 -5px; border-radius:50%; background:#fff6b0; box-shadow:0 0 8px 3px #ffd23f; pointer-events:none; z-index:2; }
+:root.lite .solve-overlay.tray .solve-slot.flip::before{ display:none; } :root.lite .solve-overlay.tray .solve-slot.flip .sl-new{ animation:wtFade 0.3s ease-out both; }
+@keyframes wtFade{ from{ opacity:0; } to{ opacity:1; } }
+@media (prefers-reduced-motion: reduce){ .solve-overlay.tray .solve-slot.flip::before{ display:none; } .solve-overlay.tray .solve-slot.flip .sl-new{ animation:wtFade 0.3s ease-out both; } .solve-overlay.tray .solve-slot.ring::after{ animation:none; opacity:0.6; } }
+/* the clock, directly under the board */
+.solve-overlay.tray .solve-header{ margin:0; }
+:root:root .solve-overlay.tray .solve-timer{ font-size:clamp(44px, 13vw, 56px); line-height:1; color:#fff; text-shadow:0 3px 0 rgba(0,0,0,0.5); }
+:root:root .solve-overlay.tray .solve-timer.danger{ animation:none; } .solve-overlay.tray .solve-timer.late{ color:#ff5a6e; }
+.solve-overlay.tray .solve-bar{ height:14px; margin:4px auto 10px; box-shadow:inset 0 0 0 2px rgba(255,255,255,0.4); }
+.solve-overlay.tray .solve-bar.late b{ background:#ff4d6a; }
+/* five strike bulbs */
+.solve-overlay.tray .solve-attempts{ margin:0 0 12px; }
+:root:root .solve-overlay.tray .solve-attempts .strikes i{ width:24px; height:24px; background:radial-gradient(circle at 38% 32%, #fffbe0, #ffd23f 55%, #c88a00); border:2px solid #fff3c4; box-shadow:0 0 8px rgba(255,210,60,0.8); }
+:root:root .solve-overlay.tray .solve-attempts .strikes i.x{ background:#3a1218; border-color:#7a2a38; box-shadow:none; }
+:root:root .solve-overlay.tray .solve-attempts .strikes i.x::after{ color:#ff5a6e; }
+/* the gold rack and its coin tiles */
+.solve-overlay.tray .solve-rack{ padding:12px 12px 14px; border-radius:18px; background:linear-gradient(180deg, #fff2a8 0%, #e8b52e 38%, #b57a10 100%); box-shadow:inset 0 3px 0 rgba(255,255,255,0.7), 0 6px 0 #6a4300, 0 10px 18px rgba(0,0,0,0.4); margin-bottom:8px; }
+:root:root .solve-overlay.tray .solve-tile{ aspect-ratio:1; height:auto; width:100%; border-radius:50%; justify-self:center; max-width:64px; background:radial-gradient(circle at 35% 28%, #fffbd0, #ffe066 45%, #e0a010); border:3px solid #7a4a00; color:#2a1a00; text-shadow:none; box-shadow:inset 0 0 0 3px rgba(255,255,255,0.55), 0 3px 0 #6a4300; }
+:root:root .solve-overlay.tray .solve-tile.tried{ opacity:0.3; filter:grayscale(0.6); }
+/* the win: winner lights and the barnyard */
+.ww-barn{ position:fixed; inset:0; z-index:40; pointer-events:none; overflow:hidden; }
+.wb-m{ position:absolute; inset:6px; border-radius:24px; border:6px dotted #fff6c2; opacity:0; } .wb-m.b{ border-color:#ffd23f; inset:9px; }
+.wb-m.a{ animation:prChase 0.8s steps(1) infinite; } .wb-m.b{ animation:prChase 0.8s steps(1) infinite 0.4s; }
+.wb-an{ position:absolute; bottom:-130px; font-size:clamp(72px, 22vw, 96px); line-height:1; will-change:transform; transform:translate(-50%,0); }
+.wb-an.still{ bottom:38%; }
+:root.lite .wb-m.a, :root.lite .wb-m.b{ animation:none; } :root.lite .wb-m.a{ opacity:1; }
+@media (prefers-reduced-motion: reduce){ .wb-m.a, .wb-m.b{ animation:none; } .wb-m.a{ opacity:1; } }
+.ww-galaxy::after{ content:''; position:absolute; inset:0; background:rgba(6,2,22,0.6); }
