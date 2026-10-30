@@ -11065,7 +11065,7 @@
       if (st.t === 'lucky'){
         runPhase = 'break'; saveRunSnapshot();
         const g = showEnter('lucky');
-        if (typeof runLuckyLights === 'function' && runLuckyLights(st, ()=> showDone(g, 'lucky lights'))) return true;
+        if (typeof runLuckyLights === 'function' && runLuckyLights(st, ()=> showDone(g, 'mystery wheel'))) return true;
         runPhase = 'running';
         continue;
       }
@@ -11088,7 +11088,7 @@
     return false;
   }
   // ---------- Run 4A: the round-end games ----------
-  const ROUND_GAME_NAMES = { riddle:()=> GN.riddleRound, lucky:()=> 'Lucky Lights', door:()=> 'Mystery Portal', orbitDrop:()=> GN.orbitDrop };
+  const ROUND_GAME_NAMES = { riddle:()=> GN.riddleRound, lucky:()=> 'Mystery Wheel', door:()=> 'Mystery Portal', orbitDrop:()=> GN.orbitDrop };
   function roundGameName(key){ return ROUND_GAME_NAMES[key] ? ROUND_GAME_NAMES[key]() : mysteryName(key); }
   // Run 4A: every round-end game opens with the game intro and its explainer card, then plays.
   function roundGameReady(st){
@@ -11392,166 +11392,165 @@
     return '1';
   }
   function luckyLabel(k){ return k === 'KEY' ? '◉' : k === 'CHIP' ? '🪙' : k === 'x2' ? '×2' : k; }
-  // A+ tier 2 item 2: Lucky Lights is a spinning prize wheel. Eight bright wedges - points, keys, GOOP and DOUBLE - turn on a
-  // stand under the spotlights; the wheel spins 3 to 4 seconds (ease-out) and lands on the outcome the game already chose from
-  // the same table and odds as before (LUCKY_SQUARES, picked at random when SPIN is tapped); a pointer flicks at every peg with a
-  // soft tick that slows with the wheel. Prizes, the GOOP, BANK / SPIN AGAIN and the 3 spins are exactly the old rules.
-  // Wedge -> outcome (every label is a real outcome of the table, picked at the same odds as before): +20 twice, +50, KEY +1 twice, GOOP twice and
-  // DOUBLE (the round's points x2). Landing picks the outcome first, then one of its wedges.
-  const LW_WEDGES = [
-    { c:'#a45cff', d:'#5b1fd0', icon:'⭐', t:'+20', kind:'+20' }, { c:'#ff4fc8', d:'#c2158f', icon:'◉', t:'ORB +1', kind:'KEY'},
-    { c:'#2fd9ff', d:'#0a8fc4', icon:'🟢', t:'GOOP', kind:'GOOP' }, { c:'#4be683', d:'#12a04a', icon:'✨', t:'DOUBLE', kind:'x2' },
-    { c:'#ffe640', d:'#f0a800', icon:'⭐', t:'+50', kind:'+50' }, { c:'#ffa032', d:'#e0620a', icon:'⭐', t:'+20', kind:'+20' },
-    { c:'#ff5656', d:'#c4152a', icon:'🟢', t:'GOOP', kind:'GOOP' }, { c:'#5a86ff', d:'#1f3fd0', icon:'◉', t:'ORB +1', kind:'KEY'},
+  // Overnight job 12: the MYSTERY WHEEL (it was Lucky Lights). The stage art (data/wheel/stage.webp, cover-fit) has an empty ring with a hub
+  // bolt; the painted wheel (data/wheel/face.webp) is sized and placed in JS so it exactly fills that ring and turns about the hub. The face
+  // has 10 equal wedges from 12 o'clock, clockwise: gold, cyan, magenta, green, amber, deep blue, purple, red, teal, pink, and 30 rim
+  // bulbs every 12 degrees; live labels and soft bulb glows ride on top. SPIN, then STOP; 3 spins. Ten results, one wedge each (10% each),
+  // the pairs never side by side. GOOP takes points (never below zero), a MYSTERY GAME plays Saucer Shuffle or Snap Sort as a bonus round
+  // and comes back, DANCE PARTY plays the dance video (+10), LOSE A SPIN takes one of the spins left.
+  const MW_STAGE = { src:'data/wheel/stage.webp', w:1080, h:1935, cx:543, cy:616, r:469 };   // the ring in the stage art (measured)
+  const MW_FACE = { src:'data/wheel/face.webp', disc:0.957 };   // the painted wheel's disc is 95.7% of the image width
+  const MW_WEDGES = [
+    { kind:'JACKPOT', t:'JACKPOT', s:'+100', icon:'💰', ink:'#3a2400', out:'#fff6c2' },
+    { kind:'ORB',     t:'ORB',     s:'+1',   icon:'ORB', ink:'#06343c', out:'#e8fdff' },
+    { kind:'GOOP25',  t:'GOOP',    s:'-25',  icon:'🟢', ink:'#ffffff', out:'#5a0050' },
+    { kind:'SAUCER',  t:'MYSTERY', s:'GAME', icon:'🛸', ink:'#0d3a05', out:'#eaffd6' },
+    { kind:'P25',     t:'+25',     s:'POINTS', icon:'⭐', ink:'#3a1a00', out:'#fff0d0' },
+    { kind:'GOOP50',  t:'GOOP',    s:'-50',  icon:'🟢', ink:'#ffffff', out:'#0a1a5a' },
+    { kind:'ORB',     t:'ORB',     s:'+1',   icon:'ORB', ink:'#ffffff', out:'#3a0a6a' },
+    { kind:'LOSE',    t:'LOSE A',  s:'SPIN', icon:'💨', ink:'#ffffff', out:'#6a0010' },
+    { kind:'SNAP',    t:'MYSTERY', s:'GAME', icon:'📸', ink:'#04323a', out:'#e0fffb' },
+    { kind:'DANCE',   t:'DANCE',   s:'PARTY', icon:'🪩', ink:'#5a0a3a', out:'#fff0fa' },
   ];
-  // Wedges: a soft flat-to-light gradient from the hub to the rim, thin white dividers. Every label is white with a dark outline, runs
-  // outward from the hub and stays inside its wedge; the icon sits at the rim end, a long label (DOUBLE) is set a little smaller.
-  function luckyWheelSvg(){
-    const R = 178, cx = 200, cy = 200, W = 360 / LW_WEDGES.length, pt = (a, r)=> (cx + Math.sin(a * Math.PI / 180) * r).toFixed(2) + ' ' + (cy - Math.cos(a * Math.PI / 180) * r).toFixed(2);
-    let s = '<svg class="lw-svg" viewBox="0 0 400 400" aria-hidden="true"><defs>';
-    LW_WEDGES.forEach((w, i)=>{ const e = pt(i * W, R).split(' '); s += '<linearGradient id="lwg' + i + '" gradientUnits="userSpaceOnUse" x1="' + cx + '" y1="' + cy + '" x2="' + e[0] + '" y2="' + e[1] + '"><stop offset="0.18" stop-color="' + w.d + '"/><stop offset="1" stop-color="' + w.c + '"/></linearGradient>'; });
-    s += '</defs>';
-    s += '<circle cx="200" cy="200" r="178" fill="#8a52f5"/>';
-    LW_WEDGES.forEach((w, i)=>{
-      const a0 = i * W - W / 2, a1 = i * W + W / 2, d = 'M' + cx + ' ' + cy + ' L' + pt(a0, R) + ' A' + R + ' ' + R + ' 0 0 1 ' + pt(a1, R) + ' Z', small = w.t.length > 6;
-      s += '<g class="lw-wedge"><path d="' + d + '" fill="url(#lwg' + i + ')" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round"/><path class="lw-hl" d="' + d + '" fill="#ffffff" opacity="0"/>' +
-        '<g transform="rotate(' + (i * W) + ' ' + cx + ' ' + cy + ')"><text x="' + cx + '" y="' + (cy - 154) + '" font-size="24" text-anchor="middle" dominant-baseline="central">' + w.icon + '</text>' +
-        '<text transform="translate(' + cx + ' ' + cy + ') rotate(-90)" x="78" y="0" dominant-baseline="central" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="' + (small ? 15.5 : 20) + '" letter-spacing="0.5" fill="#ffffff" stroke="#2a0a4a" stroke-width="4.5" paint-order="stroke" stroke-linejoin="round">' + w.t + '</text></g></g>';
+  const MW_N = MW_WEDGES.length, MW_W = 360 / MW_N, MW_SPINS = 3;
+  function mwOverlaySvg(){
+    const cx = 200, cy = 200, R = 168, pt = (a, r)=> (cx + Math.sin(a * Math.PI / 180) * r).toFixed(2) + ' ' + (cy - Math.cos(a * Math.PI / 180) * r).toFixed(2);
+    let s = '<svg class="mw-labels" viewBox="0 0 400 400" aria-hidden="true">';
+    MW_WEDGES.forEach((w, i)=>{
+      const a0 = i * MW_W, a1 = a0 + MW_W, mid = a0 + MW_W / 2, d = 'M' + cx + ' ' + cy + ' L' + pt(a0, R) + ' A' + R + ' ' + R + ' 0 0 1 ' + pt(a1, R) + ' Z';
+      s += '<g class="mw-wedge" data-i="' + i + '"><path class="mw-dim" d="' + d + '"/><path class="mw-hl" d="' + d + '"/>' +
+        '<g transform="rotate(' + mid + ' ' + cx + ' ' + cy + ')">' +
+        (w.icon === 'ORB' ? '<circle cx="200" cy="52" r="13" fill="url(#orbGrad)" stroke="#fff" stroke-width="1.5"/><ellipse cx="196" cy="47" rx="4.5" ry="3" fill="#fff" opacity="0.8"/>'
+          : '<text x="200" y="53" font-size="25" text-anchor="middle" dominant-baseline="central">' + w.icon + '</text>') +
+        '<g transform="translate(200 ' + (cy - 112) + ') rotate(90)"><text text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="' + (w.t.length > 5 ? 17 : 22) + '" letter-spacing="0.5" y="-9" fill="' + w.ink + '" stroke="' + w.out + '" stroke-width="3" paint-order="stroke">' + w.t + '</text>' +
+        '<text text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="' + (w.s.length > 4 ? 15 : 19) + '" y="11" fill="' + w.ink + '" stroke="' + w.out + '" stroke-width="3" paint-order="stroke">' + w.s + '</text></g></g></g>';
     });
-    return s + '</svg>';
-  }
-  function luckyRimSvg(){
-    const N = 24, cx = 200, cy = 200, r = 187; let a = '', b = '';
-    for (let k = 0; k < N; k++){ const ang = k * 360 / N, c = '<circle style="--d:' + (-(k / N) * 2).toFixed(2) + 's" cx="' + (cx + Math.sin(ang * Math.PI / 180) * r).toFixed(1) + '" cy="' + (cy - Math.cos(ang * Math.PI / 180) * r).toFixed(1) + '" r="7"/>'; if (k % 2) b += c; else a += c; }
-    return '<svg class="lw-rimsvg" viewBox="0 0 400 400" aria-hidden="true"><defs><linearGradient id="lwRim" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0a0"/><stop offset="0.5" stop-color="#ffd23f"/><stop offset="1" stop-color="#e09000"/></linearGradient></defs>' +
-      '<circle cx="200" cy="200" r="187" fill="none" stroke="url(#lwRim)" stroke-width="18"/><circle cx="200" cy="200" r="178.5" fill="none" stroke="#b4125f" stroke-width="2" opacity="0.5"/>' +
-      '<g class="lw-la" fill="#fff6c2">' + a + '</g><g class="lw-lb" fill="#ffc83a">' + b + '</g></svg>';
-  }
-  // the stand's foot: a soft shadow on the stage floor, a gold-trimmed disc with a chrome top and a ring of small floor lights
-  function luckyFloorSvg(){
-    return '<svg class="lw-foot" viewBox="0 0 400 110" aria-hidden="true"><defs><linearGradient id="lwChr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="0.45" stop-color="#c9d0f0"/><stop offset="1" stop-color="#8f97cc"/></linearGradient>' +
-      '<linearGradient id="lwGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0a0"/><stop offset="1" stop-color="#e09000"/></linearGradient></defs>' +
-      '<ellipse cx="200" cy="82" rx="178" ry="22" fill="rgba(40,0,80,0.32)"/><ellipse cx="200" cy="62" rx="158" ry="30" fill="#6a35e8" stroke="url(#lwGold)" stroke-width="6"/>' +
-      '<ellipse cx="200" cy="56" rx="140" ry="24" fill="url(#lwChr)"/><ellipse cx="200" cy="62" rx="150" ry="27" fill="none" stroke="#fff6c2" stroke-width="5" stroke-linecap="round" stroke-dasharray="0 13"/></svg>';
-  }
-  function luckyStageHtml(){
-    return '<div class="lw-stage" aria-hidden="true"><i class="lw-wall"></i><i class="lw-floorplane"></i><i class="lw-cone a"></i><i class="lw-cone b"></i><i class="lw-pool"></i><i class="lw-curt l"></i><i class="lw-curt r"></i></div>';
+    let ga = '', gb = '';
+    for (let k = 0; k < 30; k++){ const c = '<circle cx="' + (cx + Math.sin(k * 12 * Math.PI / 180) * 180).toFixed(1) + '" cy="' + (cy - Math.cos(k * 12 * Math.PI / 180) * 180).toFixed(1) + '" r="7.5"/>'; if (k % 2) gb += c; else ga += c; }
+    return s + '<g class="mw-glow a">' + ga + '</g><g class="mw-glow b">' + gb + '</g></svg>';
   }
   function runLuckyLights(st, done){
-    if (!luckyOv){ luckyOv = document.createElement('div'); luckyOv.className = 'lucky-overlay hidden'; luckyOv.id = 'luckyOverlay'; luckyOv.setAttribute('role', 'dialog'); luckyOv.setAttribute('aria-label', 'Lucky Lights'); document.body.appendChild(luckyOv); sceneHook(luckyOv); }
+    if (!luckyOv){ luckyOv = document.createElement('div'); luckyOv.className = 'lucky-overlay hidden'; luckyOv.id = 'luckyOverlay'; luckyOv.setAttribute('role', 'dialog'); document.body.appendChild(luckyOv); sceneHook(luckyOv); }
+    luckyOv.setAttribute('aria-label', 'Mystery Wheel'); luckyOv.classList.add('mw');
     stopTallyPolling(); clearRoundTimer(); voted = false; votedSinceTime = null;
-    luckyOv.dataset.ll = luckyTheme();
-    runCurrentGame = 'Lucky Lights';
-    const act3 = Math.round(runActPts[runActIdx] || 0), gen = ++luckyGen;
-    let bank = 0, dbl = false, keys = 0, chips = 0, spins = 0, rot = 0, autoT = null, state = 'idle', raf = 0;
-    const n = LUCKY_SQUARES.length;
-    luckyOv.innerHTML = luckyStageHtml() + '<div class="ll-inner">' +
-      '<div class="ll-title"><div class="sign-bulbs" aria-hidden="true"></div><span>LUCKY LIGHTS</span></div><div class="ll-bank" aria-live="polite"></div>' +
-      '<div class="lw"><i class="lw-post" aria-hidden="true"></i>' + luckyFloorSvg() + '<div class="lw-wheel"><div class="lw-rot">' + luckyWheelSvg() + '</div>' + luckyRimSvg() +
-      '<i class="lw-pointer" aria-hidden="true"><i class="lp-out"></i><i class="lp-fill"></i></i><button type="button" class="lw-hub pulse" aria-label="Spin the wheel"><b class="ll-hub-t">SPIN</b><span class="ll-hub-s"></span></button>' +
-      '<div class="lw-pop" aria-live="polite"><b></b><small></small></div></div></div>' +
-      '<div class="ll-buttons"><button type="button" class="ll-btn bank hidden">BANK</button><button type="button" class="ll-btn again hidden">SPIN AGAIN</button></div>' +
-      '<div class="ll-note"></div></div><div class="ll-slime" aria-hidden="true">' + GOOP_SVG + '</div>';
+    runCurrentGame = 'Mystery Wheel';
+    const gen = ++luckyGen;
+    let won = 0, used = 0, lost = 0, rot = 0, autoT = null, state = 'idle', raf = 0, stopNow = null, lastTick = 0;
+    luckyOv.innerHTML = '<div class="mw-bg" aria-hidden="true"></div><div class="ll-inner mw-inner"><div class="ll-title"><div class="sign-bulbs" aria-hidden="true"></div><span>MYSTERY WHEEL</span></div>' +
+      '<div class="ll-bank" aria-live="polite"></div></div>' +
+      '<div class="mw-wheel"><div class="mw-rot"><img class="mw-face" src="' + MW_FACE.src + '" alt="" draggable="false">' + mwOverlaySvg() + '</div><i class="mw-cap" aria-hidden="true"></i>' +
+      '<svg class="mw-pointer" viewBox="0 0 40 56" aria-hidden="true"><defs><linearGradient id="mwPtr" x1="0" x2="1"><stop offset="0" stop-color="#8a90a8"/><stop offset="0.45" stop-color="#ffffff"/><stop offset="0.6" stop-color="#d8dcea"/><stop offset="1" stop-color="#6a7088"/></linearGradient></defs>' +
+      '<path d="M4 4 Q20 -2 36 4 L22 52 Q20 56 18 52 Z" fill="url(#mwPtr)" stroke="#3a3f55" stroke-width="2" stroke-linejoin="round"/><circle cx="20" cy="12" r="5" fill="#ffd23f" stroke="#7a4a00" stroke-width="1.5"/></svg></div>' +
+      '<button type="button" class="lw-hub mw-btn pulse" aria-label="Spin the wheel"><b class="ll-hub-t">SPIN</b></button>' +
+      '<div class="lw-pop mw-pop" aria-live="polite"><b></b><small></small></div><div class="ll-slime" aria-hidden="true">' + GOOP_SVG + '</div>';
     { const tb = luckyOv.querySelector('.ll-title .sign-bulbs'); if (tb) requestAnimationFrame(()=> ringBulbs(tb, 18, 6)); }
-    const rotEl = luckyOv.querySelector('.lw-rot'), pointer = luckyOv.querySelector('.lw-pointer'), hub = luckyOv.querySelector('.lw-hub'), pop = luckyOv.querySelector('.lw-pop');
-    const hubT = luckyOv.querySelector('.ll-hub-t'), hubS = luckyOv.querySelector('.ll-hub-s');
-    const bBank = luckyOv.querySelector('.bank'), bAgain = luckyOv.querySelector('.again'), note = luckyOv.querySelector('.ll-note');
-    const renderBank = ()=>{ luckyOv.querySelector('.ll-bank').textContent = 'BANK +' + bank + (dbl ? ' · ×2 ROUND' : '') + (keys ? ' · ◉' + keys : '') + (chips ? ' · 🪙' + chips : '') + ' · SPIN ' + Math.min(LUCKY_SPINS, spins + (state === 'spinning' ? 1 : 0)) + '/' + LUCKY_SPINS; };
-    const show = (btns)=>{ bBank.classList.toggle('hidden', btns.indexOf('bank') < 0); bAgain.classList.toggle('hidden', btns.indexOf('again') < 0); };
-    const popShow = (big, small)=>{ pop.querySelector('b').textContent = big; pop.querySelector('small').textContent = small || ''; pop.classList.remove('on'); void pop.offsetWidth; pop.classList.add('on'); };
+    const wheel = luckyOv.querySelector('.mw-wheel'), rotEl = luckyOv.querySelector('.mw-rot'), pointer = luckyOv.querySelector('.mw-pointer'), hub = luckyOv.querySelector('.mw-btn'), hubT = hub.querySelector('b'), pop = luckyOv.querySelector('.mw-pop');
+    // the wheel sits exactly on the ring of the cover-fit stage art (recomputed on resize)
+    const place = ()=>{
+      // (a phone narrower than the art: the art is fitted to the width and sits on the bottom edge, so the whole ring shows; otherwise cover-fit)
+      // (and never so big that the ring's top tucks under the title and its counter: then the art shrinks, sitting on the bottom edge)
+      const W = innerWidth, H = innerHeight, narrow = W / H < MW_STAGE.w / MW_STAGE.h, hdr = luckyOv.querySelector('.mw-inner').getBoundingClientRect().bottom;
+      const kBase = narrow ? W / MW_STAGE.w : Math.max(W / MW_STAGE.w, H / MW_STAGE.h), kFit = (H - hdr - 34) / (MW_STAGE.h - MW_STAGE.cy + MW_STAGE.r), k = Math.min(kBase, kFit);
+      const ox = (W - MW_STAGE.w * k) / 2, oy = narrow || k < kBase ? H - MW_STAGE.h * k : (H - MW_STAGE.h * k) / 2;
+      const bg = luckyOv.querySelector('.mw-bg'); bg.style.cssText = 'left:' + ox.toFixed(1) + 'px;top:' + oy.toFixed(1) + 'px;width:' + (MW_STAGE.w * k).toFixed(1) + 'px;height:' + (MW_STAGE.h * k).toFixed(1) + 'px';
+      const D = MW_STAGE.r * 2 * k / MW_FACE.disc * 1.012, x = ox + MW_STAGE.cx * k, y = oy + MW_STAGE.cy * k;
+      wheel.style.width = wheel.style.height = D.toFixed(1) + 'px'; wheel.style.left = (x - D / 2).toFixed(1) + 'px'; wheel.style.top = (y - D / 2).toFixed(1) + 'px';
+      hub.style.top = Math.min(H - 80, y + MW_STAGE.r * k + 26).toFixed(0) + 'px';
+    };
+    place(); const onResize = ()=>{ if (gen === luckyGen) place(); }; addEventListener('resize', onResize);
+    const left = ()=> Math.max(0, MW_SPINS - used - lost);
+    const renderBank = ()=>{ luckyOv.querySelector('.ll-bank').textContent = 'SPINS LEFT ' + left() + ' · WON ' + (won >= 0 ? '+' : '') + won; };
+    const popShow = (big, small)=>{ pop.querySelector('b').innerHTML = big; pop.querySelector('small').textContent = small || ''; pop.classList.remove('on'); void pop.offsetWidth; pop.classList.add('on'); };
     const popHide = ()=> pop.classList.remove('on');
-    const gone = ()=> gen !== luckyGen || luckyOv.classList.contains('hidden') || !runActive;   // (left mid-spin: stop the wheel)
+    const gone = ()=> gen !== luckyGen || luckyOv.classList.contains('hidden') || !runActive;
     const setRot = (a)=>{ rotEl.style.transform = 'rotate(' + a.toFixed(2) + 'deg)'; };
-    const finish = (banked)=>{
-      clearTimeout(autoT); cancelAnimationFrame(raf); state = 'done'; show([]); note.textContent = '';
-      if (banked){
-        const extra = dbl ? act3 : 0, total = bank + extra;
-        if (total) addRunScore(total, true);
-        for (let k = 0; k < keys; k++) addRunKey('lucky');
-        if (chips) addRunBonusKey(chips);
-        const sub = [total ? '+' + total + ' points' : '', keys + chips ? '◉ ' + (keys + chips) + ' orb' + (keys + chips > 1 ? 's' : '') : ''].filter(Boolean).join(' · ') || 'Nothing ventured!';
-        hubT.textContent = 'BANKED!'; hubS.textContent = ''; popShow('BANKED!', sub);
-        if (total || keys || chips){ sfx.cashRegister(); sfx.jackpot(); FX.burstAt(showFx, luckyOv.querySelector('.lw-hub'), { count:18, spread:130, shapes:['star', 'coin'] }); castWin(()=> gen === luckyGen && !luckyOv.classList.contains('hidden')); }
-      }
-      setTimeout(()=>{ if (gen !== luckyGen) return; luckyOv.classList.add('hidden'); luckyOv.innerHTML = ''; noteOverlayClosed(); updatePauseBtnVisibility(); done(); }, dt(paced(banked ? 1700 : 2300)));
+    const wedgeEls = ()=> [...luckyOv.querySelectorAll('.mw-wedge')];
+    const markWin = (wi)=>{ wheel.classList.add('landed'); wedgeEls().forEach((g, i)=>{ g.classList.toggle('win', i === wi); g.classList.toggle('dim', i !== wi); }); };
+    const clearWin = ()=>{ wheel.classList.remove('landed'); wedgeEls().forEach(g=> g.classList.remove('win', 'dim')); };
+    const close = ()=>{
+      clearTimeout(autoT); cancelAnimationFrame(raf); state = 'done'; removeEventListener('resize', onResize);
+      setTimeout(()=>{ if (gen !== luckyGen) return; luckyOv.classList.add('hidden'); luckyOv.innerHTML = ''; noteOverlayClosed(); updatePauseBtnVisibility(); done(); }, dt(paced(900)));
     };
-    const wedgeEls = ()=> [...luckyOv.querySelectorAll('.lw-wedge')];
-    const markWin = (wi)=>{ luckyOv.querySelector('.lw-wheel').classList.add('landed'); wedgeEls().forEach((g, i)=>{ g.classList.toggle('win', i === wi); g.classList.toggle('dim', i !== wi); }); };
-    const clearWin = ()=>{ luckyOv.querySelector('.lw-wheel').classList.remove('landed'); wedgeEls().forEach(g=> g.classList.remove('win', 'dim')); };
-    const land = (k, wi)=>{
-      spins++; state = 'landed'; markWin(wi);
-      if (k === 'GOOP'){
-        runGoopLost += bank + (dbl ? act3 : 0);   // what the GOOP took (for the results' "Gooped" line)
-        bank = 0; dbl = false; keys = 0; chips = 0; renderBank();
-        hubT.textContent = 'SPIN'; popShow('GOOPED!', 'The GOOP got the Lucky Lights bonus');
+    const next = ()=>{
+      if (gone()) return;
+      popHide(); clearWin(); luckyOv.classList.remove('slimed'); renderBank();
+      if (left() <= 0){ hubT.textContent = 'DONE'; close(); return; }
+      state = 'idle'; hubT.textContent = 'SPIN'; hub.classList.add('pulse');
+      autoT = setTimeout(()=>{ if (!gone() && state === 'idle') spin(); }, dt(LUCKY_AUTO_STOP_MS));
+    };
+    const points = (n)=>{ if (n > 0){ addRunScore(n, true); won += n; } else if (n < 0){ const take = Math.min(runScore, -n); runScore -= take; runGoopLost += take; won -= take; renderRunBanner(); saveRunSnapshot(); return take; } return n; };
+    // DANCE PARTY: the dance video full-screen (muted unless the sound is on), confetti on top, then on; the code-made disco if the file fails
+    const danceParty = (then)=>{
+      const v = document.createElement('div'); v.className = 'mw-dance'; v.innerHTML = '<video src="data/wheel/dance-party.mp4" playsinline autoplay preload="auto"></video><div class="mw-dance-skip">TAP TO SKIP</div>';
+      document.body.appendChild(v); const vid = v.querySelector('video'), t0 = performance.now(); vid.muted = !sfxOn; vid.volume = Math.max(0, Math.min(1, masterVol));
+      let over = false; const end = ()=>{ if (over) return; over = true; clearTimeout(cap); v.classList.add('out'); setTimeout(()=> v.remove(), 300); then(); };
+      const cap = setTimeout(end, 12000);   // (a safety net)
+      vid.addEventListener('ended', end); v.addEventListener('click', ()=>{ if (performance.now() - t0 > 1000) end(); });
+      vid.addEventListener('error', ()=>{ if (over) return; over = true; clearTimeout(cap); v.remove(); discoShownFor = null; if (!discoCelebrate('wheel', then)) setTimeout(then, 4000); });
+      const pr = vid.play(); if (pr && pr.catch) pr.catch(()=>{ vid.muted = true; vid.play().catch(()=>{}); });
+      if (!isLite() && !FX.reduced()){ FX.confettiBurst(showFx); setTimeout(()=>{ if (!over) FX.confettiBurst(showFx); }, 2500); }
+    };
+    const bonusGame = (key, then)=>{
+      luckyOv.classList.add('hidden');
+      const ok = typeof runMiniGame === 'function' && miniGame(key) && runMiniGame(key, { seed: (st.seed || 1) ^ hashStr('mw-' + key), door:true }, ()=>{ if (gen !== luckyGen) return; luckyOv.classList.remove('hidden'); place(); then(); });
+      if (!ok){ luckyOv.classList.remove('hidden'); then(); }
+    };
+    const land = (wi)=>{
+      used++; state = 'landed'; markWin(wi); const w = MW_WEDGES[wi]; let after = null;
+      if (w.kind === 'JACKPOT'){ points(100); sfx.jackpot(); sfx.cashRegister(); popShow('JACKPOT!', '+100 points'); FX.burstAt(showFx, wheel, { count:22, spread:160, shapes:['star', 'coin'] }); }
+      else if (w.kind === 'P25'){ points(25); sfx.correct(); popShow('+25 POINTS!', 'Straight into your score'); }
+      else if (w.kind === 'ORB'){ addRunKey('lucky'); sfx.correct(); popShow('◉ ORB +1', 'One more orb for ' + GN.orbitDrop); }
+      else if (w.kind === 'GOOP25' || w.kind === 'GOOP50'){
+        const took = points(w.kind === 'GOOP25' ? -25 : -50);
         luckyOv.classList.add('slimed'); hostMood('gasp'); sfx.squelch(); setTimeout(()=> sfx.wahwah(), 380); haptic([60, 40, 60]);
-        finish(false); return;
+        popShow('GOOPED!', took ? '-' + took + ' points' : 'Nothing to lose - phew!');
       }
-      if (k === '+20' || k === '+50') bank += +k.slice(1);
-      else if (k === 'x2'){ if (dbl) bank += 50; dbl = true; }
-      else if (k === 'KEY') keys++;
-      else if (k === 'CHIP') chips++;
-      sfx.correct(); FX.pop(pop, 1.1);
-      popShow(k === 'KEY' || k === 'CHIP' ? '◉ ORB!' : k === 'x2' ? 'DOUBLE!' : k + ' POINTS!', k === 'x2' ? 'This round’s points doubled: +' + act3 : k === 'KEY' || k === 'CHIP' ? 'One more Orbit Drop chip' : 'into the bank');
-      renderBank();
-      // the result holds for the shared reveal time, then the old flow: bank at the 3rd spin, else BANK or SPIN AGAIN
-      revealThen(()=>{
-        if (gen !== luckyGen) return;
-        popHide();
-        if (spins >= LUCKY_SPINS){ finish(true); return; }
-        note.textContent = 'Bank it, or spin again and risk the GOOP?';
-        show(['bank', 'again']);
-        autoT = setTimeout(()=>{ if (gen === luckyGen) finish(true); }, dt(LUCKY_AUTO_BANK_MS));
-      }, { text: pop.textContent });   // (A+ pacing: the banner gets its reading time)
+      else if (w.kind === 'LOSE'){ const had = left(); if (had > 0) lost++; sfx.wrong(); popShow('LOSE A SPIN!', had > 0 ? 'One spin gone' : 'No spins left to lose'); }
+      else if (w.kind === 'SAUCER' || w.kind === 'SNAP'){ const key = w.kind === 'SAUCER' ? 'saucerShuffle' : 'snapSort'; sfx.correct(); popShow('MYSTERY GAME!', mysteryName(key) + ' - a bonus round'); after = (go)=> bonusGame(key, go); }
+      else if (w.kind === 'DANCE'){ points(10); sfx.cheer(); popShow('DANCE PARTY!', '+10 points - get down!'); after = (go)=> danceParty(go); }
+      renderBank(); FX.pop(pop, 1.1);
+      revealThen(()=>{ if (gen !== luckyGen) return; popHide(); if (after) after(next); else next(); }, { text: pop.textContent });   // (the result holds REVEAL_HOLD_MS)
     };
-    // The wheel is a skill control now: tap SPIN and it spins up to a fast continuous speed (about 2 turns a second) and the hub becomes
-    // STOP; tap STOP (or wait 5 s) and it coasts to a halt over 1.5-2.5 s (ease-out, a small random drift) and the wedge under the
-    // pointer decides the outcome - landing -> land(kind, wedge), the same outcome handling as before. The pointer flicks and the tick
-    // slows with the wheel. Reduced motion / lite: a short spin straight to a random wedge.
-    let lastTick = 0, stopNow = null;
-    const WEDGE = 360 / LW_WEDGES.length, V_FAST = 0.72;   // degrees a millisecond: 2 turns a second
-    const wedgeAt = (a)=> ((Math.round(-a / WEDGE) % LW_WEDGES.length) + LW_WEDGES.length) % LW_WEDGES.length;   // the wedge under the pointer at rotation a
+    const wedgeAt = (a)=> Math.floor((((-a) % 360) + 360) % 360 / MW_W) % MW_N;   // the wedge under the top pointer at rotation a
+    const V_FAST = 0.72;
     const spin = ()=>{
-      if (state !== 'idle' && state !== 'landed') return;
-      clearTimeout(autoT); popHide(); show([]); note.textContent = ''; clearWin(); hub.classList.remove('pulse');
-      const wheelEl = luckyOv.querySelector('.lw-wheel');
+      if (state !== 'idle') return;
+      clearTimeout(autoT); popHide(); clearWin(); hub.classList.remove('pulse');
       const from = rot, still = prefersReducedMotion() || isLite();
-      state = 'spinning'; hubS.textContent = ''; renderBank();
+      const forced = (REPLAY || DEBUG_FAST) && window.__forceLucky != null ? (typeof window.__forceLucky === 'number' ? window.__forceLucky : MW_WEDGES.findIndex(w=> w.kind === window.__forceLucky)) : -1;
+      const aimAt = (i)=> -(i * MW_W + MW_W / 2);   // the rotation that puts wedge i's middle under the pointer
+      state = 'spinning'; renderBank();
       if (still){
-        const wi = Math.floor(Math.random() * LW_WEDGES.length); rot = from + 720 + ((((-wi * WEDGE) - from) % 360) + 360) % 360; setRot(rot);
-        hubT.textContent = '...'; setTimeout(()=>{ if (!gone()) land(LW_WEDGES[wi].kind, wi); }, 350); return;
+        const wi = forced >= 0 ? forced : Math.floor(Math.random() * MW_N); rot = from + 720 + ((((aimAt(wi) - from) % 360) + 360) % 360); setRot(rot);
+        hubT.textContent = '...'; setTimeout(()=>{ if (!gone()) land(wi); }, 350); return;
       }
-      hubT.textContent = 'STOP'; hub.classList.add('pulse'); wheelEl.classList.add('spinning');
-      const t0 = performance.now(), UP = 600; let phase = 'up', a = from, lastIdx = Math.floor((from + WEDGE / 2) / WEDGE), prevA = from, prevT = t0, coast = null;
+      hubT.textContent = 'STOP'; hub.classList.add('pulse'); wheel.classList.add('spinning');
+      const t0 = performance.now(), UP = 600; let phase = 'up', a = from, lastPeg = Math.floor(from / 12), prevA = from, prevT = t0, coast = null;
       const angleFast = (ms)=> ms < UP ? from + 0.5 * (V_FAST / UP) * ms * ms : from + 0.5 * V_FAST * UP + V_FAST * (ms - UP);
       stopNow = ()=>{
         if (phase === 'coast' || state !== 'spinning') return; stopNow = null;
         clearTimeout(autoT); hub.classList.remove('pulse'); hubT.textContent = '...';
         const ms = performance.now() - t0, v = ms < UP ? V_FAST * ms / UP : V_FAST, dur = 1500 + Math.random() * 1000;
-        let D = v * dur / 3 + (Math.random() - 0.5) * WEDGE * 0.8;   // distance of an ease-out cubic from speed v, plus a small random drift
-        if ((REPLAY || DEBUG_FAST) && window.__forceLucky){   // (the TEST menu's GOOP jump: aim at a wedge of that outcome)
-          const ws = LW_WEDGES.map((w, i)=> w.kind === window.__forceLucky ? i : -1).filter(i=> i >= 0);
-          if (ws.length){ const aim = -ws[0] * WEDGE; D = ((((aim - a) % 360) + 360) % 360) + 360; }
-        }
+        let D = v * dur / 3 + (Math.random() - 0.5) * MW_W * 0.8;
+        if (forced >= 0) D = ((((aimAt(forced) - a) % 360) + 360) % 360) + 360;
         coast = { from:a, D, dur, t0:performance.now() }; phase = 'coast';
       };
-      autoT = setTimeout(()=>{ if (stopNow) stopNow(); }, dt(5000));   // (no tap in 5 s: it coasts down by itself)
+      autoT = setTimeout(()=>{ if (stopNow) stopNow(); }, dt(5000));
       const frame = (now)=>{
         if (gone()) return;
         if (phase !== 'coast') a = angleFast(now - t0);
         else { const s = Math.min(1, (now - coast.t0) / coast.dur); a = coast.from + coast.D * (1 - Math.pow(1 - s, 3)); }
         setRot(a);
-        const idx = Math.floor((a + WEDGE / 2) / WEDGE);
-        if (idx !== lastIdx){
-          lastIdx = idx;
-          const speed = Math.abs(a - prevA) / Math.max(1, now - prevT);   // degrees a millisecond
-          if (pointer.animate) pointer.animate([{ transform:'rotate(-26deg)' }, { transform:'rotate(0deg)' }], { duration:Math.min(260, 70 + (1 - Math.min(1, speed / 0.9)) * 190), easing:'ease-out' });
-          if (now - lastTick > 38){ lastTick = now; sfx.wheelTick(Math.min(1, speed / 0.9)); }
+        const peg = Math.floor(a / 12);   // a peg between every two rim bulbs: the pointer flicks and ticks softly
+        if (peg !== lastPeg){
+          lastPeg = peg; const speed = Math.abs(a - prevA) / Math.max(1, now - prevT);
+          if (pointer.animate) pointer.animate([{ transform:'rotate(-22deg)' }, { transform:'rotate(0deg)' }], { duration:Math.min(240, 60 + (1 - Math.min(1, speed / 0.9)) * 180), easing:'ease-out' });
+          if (now - lastTick > 45){ lastTick = now; sfx.wheelTick(Math.min(1, speed / 0.9) * 0.7); }
         }
         prevA = a; prevT = now;
         if (phase === 'coast' && now - coast.t0 >= coast.dur){
-          rot = coast.from + coast.D; setRot(rot); wheelEl.classList.remove('spinning'); hubT.textContent = 'SPIN';
-          const wi = wedgeAt(rot); setTimeout(()=>{ if (!gone()) land(LW_WEDGES[wi].kind, wi); }, 200); return;
+          rot = coast.from + coast.D; setRot(rot); wheel.classList.remove('spinning'); hubT.textContent = 'SPIN';
+          const wi = wedgeAt(rot); setTimeout(()=>{ if (!gone()) land(wi); }, 200); return;
         }
         if (phase === 'up' && now - t0 > UP) phase = 'fast';
         raf = requestAnimationFrame(frame);
@@ -11559,11 +11558,9 @@
       raf = requestAnimationFrame(frame);
     };
     hub.onclick = e=>{ e.stopPropagation(); if (state === 'idle') spin(); else if (state === 'spinning' && stopNow) stopNow(); };
-    bBank.onclick = e=>{ e.stopPropagation(); if (state === 'landed') finish(true); };
-    bAgain.onclick = e=>{ e.stopPropagation(); if (state === 'landed') spin(); };
     luckyOv.classList.remove('hidden', 'slimed');
     updatePauseBtnVisibility();
-    hostSay('Lucky Lights! Tap SPIN, then STOP, Earthling!', 2000);
+    hostSay('The Mystery Wheel! Tap SPIN, then STOP, Earthling!', 2000);
     renderBank();
     autoT = setTimeout(()=>{ if (!gone() && state === 'idle') spin(); }, dt(LUCKY_AUTO_STOP_MS));
     return true;
@@ -12107,7 +12104,7 @@
   const EXPLAINER_SEEN_KEY = 'flipstax_explainers_v1', EXPLAINER_TAP_WORDS = 15;
   const GAME_INTRO = {
     riddle:   { name:()=> GN.riddleRound, c:['#c9ff7a', '#18a83a'] },
-    lucky:    { name:()=> 'Lucky Lights', c:['#ffd23f', '#9c1238'] },
+    lucky:    { name:()=> 'Mystery Wheel', c:['#ffd23f', '#9c1238'] },
     door:     { name:()=> 'Mystery Portal', c:['#ff9ad1', '#6d28d9'] },
     zapWords: { name:()=> GN.zapWords, c:['#ffe94d', '#4a4f63'] },
     twinFlip: { name:()=> GN.twinFlip, c:['#ff5ad9', '#3b0a6b'] },
@@ -18347,7 +18344,7 @@
         lines:['Rounds 1 and 2 score normal points, Rounds 3 and 4 points ×2, Rounds 5 and 6 points ×3.',
           'Each ' + GN.brainBeam + ' you get right wins a Word Warp letter. Win a round-end game for an ◉ orb: each one is a drop in ' + GN.orbitDrop + '.'],
         chipsLabel:'The round-end games',
-        chips:[ ['🧩 ' + GN.riddleRound, 'Round 1'], ['💡 Lucky Lights', 'Round 2'],
+        chips:[ ['🧩 ' + GN.riddleRound, 'Round 1'], ['🎡 Mystery Wheel', 'Round 2'],
                 ['🚪 Mystery Portal', 'Round 3'], ['⚡ ' + GN.zapWords, 'Round 4'], ['🃏 ' + GN.twinFlip, 'Round 5'], ['🛸 ' + GN.orbitDrop, 'Round 6'] ] },
       HOWTO_LAST_DAILY,
     ],
@@ -18628,9 +18625,8 @@
       { label:'Mystery Portal', go: roundGame('door', 96, 3) },
       { label:'Portal Pick (old)', go: atType(doorStep, 0, 96, 3, (i)=>{ runPlan.splice(i, 0, { t:'portal', act:runPlan[i].act, doors: RUN_POWERUPS.map(p=> p.key) }); }) },
       { label:'Round 5 card', go: roundCard(5) },
-      { label:'Lucky Lights', go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = null; }) },
-      { label:'Lucky: GOOP', go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = 'GOOP'; }) },
-      ...[1, 2, 3].map(n=> ({ label:'Lucky palette ' + n, go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = null; try{ localStorage.setItem('flipstax_lucky_theme', String(n)); }catch(e){} }) })),
+      { label:'Mystery Wheel', go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = null; }) },
+      ...['JACKPOT +100', 'ORB +1', 'GOOP -25', 'Mystery: Saucer Shuffle', '+25', 'GOOP -50', 'ORB +1 (2)', 'LOSE A SPIN', 'Mystery: Snap Sort', 'DANCE PARTY'].map((t, i)=> ({ label:'Wheel: ' + t, go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = i; }) })),
       { label:'Price Probe', go: mysteryAs('priceProbe') },
       { label:'Oddball Alert', go: mysteryAs('oddballAlert') },
       { label:'Emoji Decode', go: mysteryAs('emojiDecode') },
