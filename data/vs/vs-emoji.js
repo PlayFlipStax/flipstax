@@ -26,7 +26,7 @@
   // ---- people and teams (Oct 24): a PERSON or TEAM never wears a decorative emoji (a star, medal, crown, ticket, stopwatch...) ----
   // music artists 🎤, actors and actresses 🎬, football (soccer) clubs ⚽, other clubs and athletes their sport (fighters 🥊).
   // A specific emoji the data already has (🤠 Dolly Parton, 🦸 a hero, 🏀 a basketballer) is kept: only decorative ones change.
-  const DECORATIVE = new Set('⭐ 🌟 ✨ 🏅 🥇 🥈 🥉 🏆 🎠 👑 💫 🎉 🎊 🏟️ ⏱️ 📣 🎟️ 🕶️ 🎖️ 🔖 🎪 🪩'.split(' ').map(g=> g.replace(/\uFE0F/g, '')));
+  const DECORATIVE = new Set('⭐ 🌟 ✨ 🏅 🥇 🥈 🥉 🏆 🎠 👑 💫 🎉 🎊 🏟️ ⏱️ 📣 🎟️ 🕶️ 🎖️ 🔖 🎪 🪩 💥 🔥 🎯 🎲 💎'.split(' ').map(g=> g.replace(/\uFE0F/g, '')));
   const decorative = g=> DECORATIVE.has(String(g || '').replace(/\uFE0F/g, '').trim());
   const nk = n=> String(n || '').toLowerCase().replace(/[’`]/g, "'").replace(/\s+/g, ' ').trim();
   const SPORT = {};
@@ -55,9 +55,21 @@
     return null;
   }
   // a decorative emoji on a person or team becomes theirs; anything else is kept
-  const betterGlyph = (cat, name, g)=> decorative(g) ? (personGlyph(cat, name) || g) : g;
+  // A+ content pass: names whose emoji does not fit them (an actor with a microphone, a singer on drums, a cola in a juice box, a rugby ball for football...)
+  // are set by name here; the actors rule changes a microphone to a clapperboard.
+  const OVERRIDE = {};
+  const ov = (g, names)=> names.split('|').forEach(n=> OVERRIDE[nk(n)] = g);
+  ov('🎤', 'Whitney Houston|Madonna|Bad Bunny|Freddie Mercury|Sabrina Carpenter|Noah Kahan|Billie Eilish|Latto|Robert Plant|Evanescence');
+  ov('🎸', 'Iron Maiden|Pearl Jam|Green Day|The Beach Boys|The Strokes');
+  ov('🥫', 'Cola|Pepsi'); ov('🕹️', 'PlayStation'); ov('🤘', 'Metallica'); ov('🌹', "Guns N' Roses"); ov('🛋️', 'Sweatpants'); ov('🥼', 'Jackets'); ov('🐺', 'Wolverine');
+  ov('🍕', "Papa John's|Pepperoni Pizza"); ov('🍔', 'In-N-Out|Whataburger'); ov('🌯', 'Qdoba'); ov('🍗', 'Buffalo Wild Wings'); ov('🌮', 'Del Taco|Nachos');
+  const betterGlyph = (cat, name, g)=>{
+    const o = OVERRIDE[nk(name)]; if (o) return o;
+    if (cat === 'actors' && norm(g) === '🎤') return '🎬';
+    return decorative(g) ? (personGlyph(cat, name) || g) : g;
+  };
   // when two sides of one sport / job end up with the same emoji, the right one takes this look-alike
-  const ALT = { '🏀':['⛹️'], '🥊':['🥋'], '🏈':['🏉'], '⚾':['🧢'], '🏒':['🥅'], '⚽':['🥅'], '🎾':['🏸'], '⛳':['🏌️'], '🏃':['👟'], '🤸':['🤾'], '🏊':['🤽'], '🎤':['🎸','🎧','🎹','🎵','🥁'], '🎬':['🎭','🎥','🍿'] };
+  const ALT = { '🏀':['⛹️'], '🥊':['🥋'], '🏈':['🎽'], '⚾':['🧢'], '🏒':['🥅'], '⚽':['🥅'], '🎾':['🏸'], '⛳':['🏌️'], '🏃':['👟'], '🤸':['🤾'], '🏊':['🤽'], '🎸':['🎶','🪕','🎻'], '🎤':['🎸','🎧','🎹','🎵','🥁'], '🎬':['🎭','🎥','🍿'] };
   const norm = s=> String(s || '').replace(/️/g, '').trim();
   const missing = g=> !norm(g) || norm(g) === norm(PLACEHOLDER);
   const hash = s=>{ let h = 0; for (const ch of String(s)) h = (h * 31 + ch.codePointAt(0)) >>> 0; return h; };
