@@ -1090,3 +1090,12 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 @media (prefers-reduced-motion: reduce){ .outro-mid .outro-head, .outro-stats{ transition-duration:0.2s; transition-delay:0s; } }
 :root.lite .outro-mid .outro-head, :root.lite .outro-stats{ transition-duration:0.2s; transition-delay:0s; }
 #readoutOverlay.ep.outro-on .outro-details{ top:calc(16.5vh + env(safe-area-inset-top)); right:8px; min-height:40px; padding:0 10px; }
+
+/* ---- A+ job 2 item 3: the cables. Two thin gold chains hang from the TOP corners of the top card's frame (children of it, so they move with it
+   and never detach; long enough to reach above the screen during the drop, fading as the card settles); the bottom card rises with no poles. ---- */
+.mq-ring.bottom .cable{ display:none !important; }
+.mq-ring .cable{ width:4px; height:200px; border-radius:2px; background:repeating-linear-gradient(180deg, #ffe27a 0 6px, #b8860b 6px 9px); box-shadow:none; }
+.mq-ring.top .cable{ bottom:calc(100% - 6px); }
+.mq-ring .cable.l{ left:12px; } .mq-ring .cable.r{ right:12px; }
+:root.mode-daily #board.deal-first .mq-ring.top .cable{ animation:cableOut 1.2s linear both; }
+@keyframes cableOut{ 0%, 78%{ opacity:1; } 100%{ opacity:0; } }

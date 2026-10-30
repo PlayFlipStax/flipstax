@@ -4438,7 +4438,7 @@
     </div>
   </div>
 
-  <div class="hint" id="hint">Tap the one you'd pick</div>
+  <div class="hint" id="hint">Tap the one you prefer</div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -16044,7 +16044,7 @@
     els.pctA.textContent=''; els.pctB.textContent='';
     els.votesA.textContent=''; els.votesB.textContent='';
     els.tagA.textContent=''; els.tagB.textContent='';
-    els.hint.innerHTML = current && current.mode === 'match' && !current.pick ? 'Tap who wins' : "Tap the one you'd pick";
+    els.hint.innerHTML = current && current.mode === 'match' && !current.pick ? 'Tap who wins' : "Tap the one you prefer";
   }
 
   function clearRoundTimer(){ clearTimeout(roundTimeoutId); roundTimeoutId = null; }
@@ -16325,7 +16325,7 @@
   [els.eventOverlay, els.irOverlay, els.guessOverlay, els.finOverlay, els.pauseOverlay].forEach(ov=>{
     let open = !ov.classList.contains('hidden');
     new MutationObserver(()=>{ const now = !ov.classList.contains('hidden'); if (open && !now) noteOverlayClosed(); open = now; updatePauseBtnVisibility();
-      // The board's footer ("Tap the one you'd pick") doesn't apply while a popup covers the board.
+      // The board's footer ("Tap the one you prefer") doesn't apply while a popup covers the board.
       if (ov === els.eventOverlay) document.documentElement.classList.toggle('event-open', now);
     }).observe(ov, { attributes:true, attributeFilter:['class'] });
   });
