@@ -27,18 +27,61 @@
 .pp-dots i{ width:14px; height:14px; border-radius:50%; background:rgba(255,255,255,0.25); box-shadow:inset 0 0 0 2px rgba(255,255,255,0.5); }
 .pp-dots i.right{ background:var(--c-ok-hi); } .pp-dots i.wrong{ background:#ff5a6e; }
 
-/* ---- E2 Snap Sort: neon lime on black ---- */
-.ss-stage{ justify-content:flex-start !important; }
-.ss-cat{ width:100%; padding:12px 14px 14px; border-radius:var(--r-md); background:#0c1405; border:3px solid #e4ff7a; box-shadow:0 0 22px rgba(228,255,122,0.5);
-  font:900 clamp(26px, 8vw, 36px)/1 var(--f-display); letter-spacing:1px; color:#e4ff7a; text-shadow:0 0 12px rgba(228,255,122,0.7); }
-.ss-cat small{ display:block; margin-bottom:4px; font:800 var(--fs-small) var(--f-body); letter-spacing:3px; color:#fff; text-shadow:none; }
-.ss-field{ position:relative; width:calc(100% + 28px); margin:0 -14px; flex:1; min-height:240px; overflow:hidden; }
-.ss-word{ position:absolute; left:0; top:50%; min-height:52px; padding:10px 20px; border-radius:var(--r-pill); white-space:nowrap; cursor:pointer; will-change:transform;
-  font:900 clamp(22px, 6.6vw, 28px)/1 var(--f-display); letter-spacing:0.5px; color:#0c1405; background:linear-gradient(180deg, #ffffff, #e9f5d0);
-  border:3px solid #e4ff7a; box-shadow:0 5px 0 rgba(0,0,0,0.45), 0 0 16px rgba(228,255,122,0.45); -webkit-tap-highlight-color:transparent; }
-.ss-word.right{ background:linear-gradient(180deg, #e2ffc8, #6ed94c); border-color:#fff; }
-.ss-word.wrong{ background:linear-gradient(180deg, #ff7d8e, var(--c-bad-lo)); color:#fff; border-color:#ffc2cb; }
-.ss-tally{ min-height:22px; font:800 16px var(--f-body); color:#e4ff7a; }
+/* ---- E2 Snap Sort (A+ redesign, Oct 2026): an orange and teal showroom - a marquee sign, a conveyor belt, a red bin and a blue bin at the sides,
+   a UFO with a tractor beam over the belt, toy cars and tiny UFOs on the floor. Transform and opacity motion only. ---- */
+.mg-overlay.mg-snapSort{ background:linear-gradient(90deg, #0d5560 0 13%, #f08a2e 13% 87%, #0d5560 87%), #f08a2e !important; }
+.mg-snapSort .mg-bg{ background:radial-gradient(70% 40% at 50% 8%, rgba(255,236,170,0.5), transparent 70%) !important; }
+.ss-stage{ justify-content:flex-start !important; gap:6px; }
+.ss-cat{ position:relative; width:100%; padding:8px 14px 9px; border-radius:18px; text-align:center; background:linear-gradient(180deg, #fff6dc, #ffe2a6); border:4px solid #ffd23f; box-shadow:0 0 0 3px #8a4a0c, 0 5px 0 3px #6a3408;
+  font:900 clamp(24px, 7.4vw, 32px)/1 var(--f-display); letter-spacing:1px; color:#5a2a08; }
+.ss-cat::before{ content:''; position:absolute; inset:-9px; border-radius:24px; border:5px dotted #fff6c2; pointer-events:none; }
+.ss-cat small{ display:block; margin-bottom:3px; font:800 12px var(--f-body); letter-spacing:3px; color:#8a4a0c; }
+.ss-combo{ display:flex; align-items:center; justify-content:center; gap:8px; min-height:26px; font:900 14px var(--f-display); letter-spacing:1.5px; color:#fff; text-shadow:0 2px 0 rgba(90,40,0,0.6); }
+.ss-pips{ display:flex; gap:4px; } .ss-pips i{ width:16px; height:12px; border-radius:6px; background:rgba(60,20,0,0.35); box-shadow:inset 0 0 0 1.5px rgba(255,255,255,0.6); }
+.ss-pips i.on{ background:linear-gradient(180deg, #fff6a0, #ffb020); box-shadow:inset 0 0 0 1.5px #fff, 0 0 6px rgba(255,200,40,0.8); }
+.ss-combo.hot .ss-cl{ color:#fff6a0; }
+.ss-tally{ min-width:60px; font:800 13px var(--f-body); letter-spacing:0; color:#fff3c4; }
+.ss-field{ position:relative; width:calc(100% + 28px); margin:0 -14px; flex:1; min-height:250px; overflow:hidden; }
+.ss-lane{ position:absolute; inset:0; z-index:3; }
+.ss-bin{ position:absolute; z-index:1; top:24%; width:24%; height:27%; display:flex; align-items:flex-end; justify-content:center; padding-bottom:6%; font:900 22px var(--f-display); color:rgba(255,255,255,0.9);
+  border-top:7px solid #ffd23f; border-radius:8px 8px 0 0; clip-path:polygon(0 0, 100% 0, 92% 100%, 8% 100%); box-shadow:inset 0 -10px 0 rgba(0,0,0,0.18); will-change:transform; }
+.ss-bin.red{ left:-9%; background:linear-gradient(90deg, #ff6a5a, #d6182b 55%, #a50f20); } .ss-bin.blue{ right:-9%; background:linear-gradient(90deg, #5cc8ff, #1b86e0 55%, #1160b3); }
+.ss-bin.red b{ margin-left:22%; } .ss-bin.blue b{ margin-right:22%; }
+.ss-belt{ position:absolute; z-index:2; left:0; right:0; top:52%; height:15%; }
+.ss-belt-top{ position:absolute; left:0; right:0; top:0; height:55%; overflow:hidden; background:#6b3a1a; border-top:4px solid #ffd23f; border-bottom:3px solid #3a1c08; }
+.ss-belt-bot{ position:absolute; left:0; right:0; top:55%; height:45%; overflow:hidden; background:#4a2610; border-bottom:4px solid #ffd23f; }
+.ss-pat{ position:absolute; top:0; bottom:0; left:0; width:calc(100% + 96px); will-change:transform; animation:ssBelt 2.4s linear infinite; }
+.ss-belt-top .ss-pat{ background:radial-gradient(circle at 10px 50%, #ffb020 0 5px, transparent 6px) 0 0 / 48px 100%, radial-gradient(circle at 34px 50%, #3ec1d3 0 5px, transparent 6px) 0 0 / 48px 100%; opacity:0.9; }
+.ss-belt-bot .ss-pat{ background:radial-gradient(circle at 16px 50%, #ffd23f 0 6px, #b8801a 7px, transparent 8px) 0 0 / 32px 100%; }
+@keyframes ssBelt{ to{ transform:translateX(-96px); } }
+.ss-leg{ position:absolute; top:100%; width:10%; height:90%; background:linear-gradient(90deg, #d08a3a, #8a4a12); border-radius:0 0 8px 8px; } .ss-leg.l{ left:14%; } .ss-leg.r{ right:14%; }
+.ss-road{ position:absolute; z-index:0; left:0; right:0; top:76%; bottom:0; background:linear-gradient(180deg, #c8601a, #a84a10); border-top:3px solid #ffb347;
+  box-shadow:inset 0 3px 0 rgba(255,255,255,0.18); }
+.ss-road::after{ content:''; position:absolute; left:0; right:0; top:62%; height:4px; background:repeating-linear-gradient(90deg, rgba(255,240,200,0.7) 0 22px, transparent 22px 44px); }
+.ss-item{ position:absolute; left:0; will-change:transform; display:flex; flex-direction:column; align-items:center; gap:0; }
+.ss-item.ground{ gap:1px; }
+.ss-car{ font-size:30px; line-height:1; margin-top:-4px; } .ss-item.flip .ss-car{ transform:scaleX(-1); }
+.ss-mini{ width:46px; height:auto; display:block; margin-top:-2px; pointer-events:none; }
+.ss-ufo{ position:absolute; z-index:4; left:0; top:1%; width:76px; will-change:transform; pointer-events:none; }
+.ss-ufo img{ width:100%; height:auto; display:block; }
+.ss-beam{ position:absolute; left:50%; top:78%; width:112px; height:84px; margin-left:-56px; opacity:0; background:linear-gradient(180deg, rgba(190,250,255,0.75), rgba(190,250,255,0)); clip-path:polygon(40% 0, 60% 0, 100% 100%, 0 100%); transition:opacity .2s; }
+.ss-ufo.has .ss-beam{ opacity:0.9; }
+.ss-carry{ position:absolute; left:50%; top:104%; transform:translateX(-50%); pointer-events:auto; white-space:nowrap; }
+.ss-word{ min-height:44px; padding:8px 16px; border-radius:14px; white-space:nowrap; cursor:pointer; font:900 clamp(17px, 5.2vw, 22px)/1.05 var(--f-display); letter-spacing:0.4px; color:#4a2308;
+  background:linear-gradient(180deg, #fffdf2, #ffeec2); border:3px solid #ffd23f; box-shadow:0 4px 0 rgba(90,40,0,0.55), 0 0 0 2px #8a4a0c; -webkit-tap-highlight-color:transparent; }
+.ss-fly{ position:absolute; z-index:6; pointer-events:none; will-change:transform; }
+.ss-fly.right{ background:linear-gradient(180deg, #e2ffc8, #6ed94c); border-color:#fff; }
+.ss-fly.wrong{ background:linear-gradient(180deg, #ff9aa8, #d6182b); color:#fff; border-color:#ffc2cb; }
+.ss-spark{ position:absolute; z-index:7; width:14px; height:14px; pointer-events:none; background:#fff6a0; clip-path:polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); }
+.ss-spark.bad{ background:#ff8090; }
+.ss-glow{ position:absolute; inset:0; z-index:5; pointer-events:none; opacity:0; }
+.ss-glow.win{ background:radial-gradient(70% 60% at 50% 50%, rgba(255,240,150,0.55), rgba(255,200,60,0.1) 70%, transparent); }
+.ss-glow.lose{ background:radial-gradient(90% 80% at 50% 50%, rgba(255,40,70,0.25), rgba(60,0,20,0.35)); }
+.ss-glow.hold{ opacity:1; }
+.ss-field.lost .ss-lane, .ss-field.lost .ss-ufo{ opacity:0.5; }
+.ss-lights{ position:absolute; z-index:5; left:0; right:0; top:0; height:6px; pointer-events:none; background:radial-gradient(circle, #fff6c2 2px, transparent 2.5px) 0 0 / 22px 6px; opacity:0.7; }
+:root.lite .ss-pat, .reduced-motion .ss-pat{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .ss-pat{ animation:none; } }
 
 /* ---- E3 Zap Words: electric yellow on storm grey ---- */
 .zw-stage{ justify-content:flex-start !important; gap:8px !important; }
@@ -172,8 +215,6 @@
     linear-gradient(135deg, transparent 49.5%, #2a2366 50%) 22% 100% / 38% 24% no-repeat,
     linear-gradient(225deg, transparent 49.5%, #2a2366 50%) 60% 100% / 38% 24% no-repeat; opacity:0.9; }
 /* Snap Sort: camera-flash dots on near-black, brighter toward the top */
-.mg-snapSort .mg-bg::after{ background:radial-gradient(circle, rgba(228,255,122,0.22) 2px, transparent 2.5px) 0 0 / 26px 26px;
-  -webkit-mask-image:linear-gradient(180deg, #000, transparent 90%); mask-image:linear-gradient(180deg, #000, transparent 90%); }
 /* Zap Words: faint diagonal lightning stripes */
 .mg-zapWords .mg-bg::after{ background:repeating-linear-gradient(115deg, transparent 0 46px, rgba(255,242,122,0.08) 46px 52px, transparent 52px 92px); }
 /* Twin Flip: the neon grid floor is its own pattern (above); a magenta horizon glow on top */
@@ -279,3 +320,4 @@
 .su-saucer{ aspect-ratio:900 / 407; height:auto; }
 .su-saucer .su-img{ display:block; width:100%; height:100%; object-fit:contain; pointer-events:none; -webkit-user-drag:none; }
 .su-saucer .su-ufo{ position:absolute; left:0; top:0; width:100%; height:100%; pointer-events:none; }
+@media (max-height:700px){ .mg-snapSort .mg-rule{ display:none; } .mg-snapSort .mg-head{ margin-top:12px; } .ss-cat small{ display:none; } .ss-cat{ padding:6px 12px 7px; } .ss-field{ min-height:170px; } }
