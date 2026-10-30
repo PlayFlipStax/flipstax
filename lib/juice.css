@@ -1436,3 +1436,5 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .show-card.flipstage.art-title::before{ order:0; } .show-card.flipstage.art-title .fs-pill{ order:1; } .show-card.flipstage.art-title .fs-title{ order:2; } .show-card.flipstage.art-title .fs-line{ order:3; margin-top:6px; }
 :root.mode-daily .show-card.reward.has-art.art-round{ padding:0 0 calc(18px + env(safe-area-inset-bottom)); }
 @media (max-height:700px){ :root.mode-daily .show-card.reward.art-round::before{ background-position:50% 96%; } .rw-video{ object-position:50% 96%; } }
+/* the end-of-show screen on a short phone (360 x 640): the headline is smaller and the group sits a little lower, so the headline stays on the arch, clear of the faces */
+@media (max-height:700px){ .outro-mid{ top:calc(56px + env(safe-area-inset-top)); } .outro-mid .outro-head{ font-size:28px; } .outro-art{ top:46px; height:calc(100% - 346px); object-position:50% 20%; } }
