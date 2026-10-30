@@ -4901,6 +4901,7 @@
 <script src="data/infinity-riddles.js"></script>
 <script src="data/game-names.js"></script>
 <script src="data/price-probe.js"></script>
+<script src="data/price-sets.js"></script>
 <script src="data/oddball-alert.js"></script>
 <script src="data/emoji-decode.js"></script>
 <script src="data/time-warp.js"></script>
@@ -11281,7 +11282,7 @@
       setRule: (t)=>{ ov.querySelector('.mg-rule').textContent = t || ''; },
       timer: (ms, cb)=>{ if (DEBUG_FAST) ms = dt(ms); startTimer(ms, cb); return { stop: stopTimer, left: ()=> Math.max(0, timerEnd - Date.now()), add: (d)=>{ const left = Math.max(0, timerEnd - Date.now()) + d; startTimer(Math.max(0, left), timerCb); } }; },
       score: (n)=>{ scoreEl.textContent = n; FX.pop(scoreEl, 1.2); },
-      say: (t, ms)=> hostSay(t, ms), mood: (m)=> hostMood(m),
+      say: (t, ms)=> hostSay(t, ms), mood: (m)=> hostMood(m), dt: (v)=> dt(v),
       hold: (fn, opts)=> revealThen(fn, opts),   // (A+: the shared reveal hold - at least REVEAL_HOLD_MS, a tap skips after REVEAL_TAP_MS)
       flash: (kind)=>{ if (kind === 'win'){ marquee.classList.remove('unison', 'miss'); void marquee.offsetWidth; marquee.classList.add('unison'); setTimeout(()=> marquee.classList.remove('unison'), 700); showFlash('win'); }
         else { marquee.classList.remove('unison', 'miss'); void marquee.offsetWidth; marquee.classList.add('miss'); setTimeout(()=> marquee.classList.remove('miss'), 800); } },
