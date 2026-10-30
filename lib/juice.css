@@ -1057,7 +1057,7 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .pk-ctrl.off{ opacity:0.4; } .pk-go:disabled{ cursor:default; }
 .fin-plinko{ gap:6px; }
 .fin-plinko .pk-banner{ display:none; }   /* (the board moves up: the title is on the sign above) */
-.fin-plinko .plinko-board{ margin-top:16px; width:max(200px, min(100%, 420px, calc((100dvh - 305px) * 0.643))); }
+.fin-plinko .plinko-board{ margin-top:44px; width:max(200px, min(100%, 420px, calc((100dvh - 292px) * 0.643))); }
 .fin-plinko .pk-line{ font-size:17px; font-weight:900; }
 :root.stage-on .fin-overlay.daily-orbit.stage-backed, .fin-overlay.daily-orbit{ background:linear-gradient(180deg, rgba(8,2,24,0.5), rgba(8,2,24,0.2) 40%, rgba(8,2,24,0.55)), url(../data/orbit/bg.webp) center / cover no-repeat, #12062a !important; }
 
@@ -1167,3 +1167,35 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root .split-select-overlay.one-show .contact-footer a{ color:#ffd0f0; }
 :root .split-select-overlay.one-show .contact-copyright{ display:none; }
 @media (max-height:700px){ :root .split-select-overlay.one-show .ms-body-daily{ top:calc(150px + env(safe-area-inset-top)); gap:5px; } :root .split-select-overlay.one-show .ms-title-ep b{ font-size:38px; } }
+
+/* Orbit Drop, casino plinko look (Oct 2026): marquee bulbs, bright shaped pegs, neon slots, glowing orbs with a short trail, a "You have N orbs" counter and a slow galaxy behind. Transform and opacity only. */
+.pk-galaxy{ display:none; position:fixed; inset:0; overflow:hidden; z-index:0; pointer-events:none; }
+.fin-overlay:has(.fin-plinko:not(.hidden)) .pk-galaxy{ display:block; }
+.pk-galaxy i{ position:absolute; left:50%; top:50%; width:170vmax; height:170vmax; margin:-85vmax 0 0 -85vmax; background:url(../data/orbit/bg.webp) center / cover no-repeat; opacity:0.55; animation:pkSpin 90s linear infinite; will-change:transform; }
+@keyframes pkSpin{ to{ transform:rotate(360deg); } }
+.pk-bulb{ fill:#ffe9a0; opacity:0.95; }
+.pk-bulb.b{ fill:#ff9ad8; }
+.pk-bulb.a{ animation:pkBulbA 2.4s ease-in-out infinite; } .pk-bulb.b{ animation:pkBulbB 2.4s ease-in-out infinite; }
+@keyframes pkBulbA{ 0%,100%{ opacity:1; } 50%{ opacity:0.45; } } @keyframes pkBulbB{ 0%,100%{ opacity:0.45; } 50%{ opacity:1; } }
+.plinko-svg .pk-slot text{ letter-spacing:0.5px; }
+.fin-plinko .pk-status .pk-chipno{ display:inline-flex; align-items:center; gap:7px; padding:5px 12px; font-size:16px; font-weight:900; color:#fff; background:rgba(60,20,110,0.75); box-shadow:inset 0 0 0 2px #7df9ff, 0 0 10px rgba(125,249,255,0.5); }
+.fin-plinko .pk-status .pk-chipno b{ color:#ffe066; font-size:20px; line-height:1; }
+.pk-wait{ display:inline-flex; gap:3px; background:none !important; box-shadow:none !important; padding:0 !important; }
+.pk-wdot{ width:11px; height:11px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #fffbe0, #ffc928 55%, #b86a00); box-shadow:0 0 6px rgba(255,210,60,0.9); }
+:root .pk-chip{ background:radial-gradient(circle at 35% 30%, #fff, #bff6ff 30%, #35c8ff 70%, #1a6fd0); border-color:#e6fdff; box-shadow:0 0 12px 3px rgba(125,249,255,0.85); }
+.pk-chip.pk-trail{ border:0; box-shadow:none; background:radial-gradient(circle, rgba(125,249,255,0.9), rgba(125,249,255,0.2)); }
+:root .pk-ufo .pk-held{ background:radial-gradient(circle at 35% 30%, #fff, #bff6ff 30%, #35c8ff 70%, #1a6fd0); box-shadow:0 0 10px 2px rgba(125,249,255,0.85); }
+:root.lite .pk-galaxy i, :root.lite .pk-bulb{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .pk-galaxy i, .pk-bulb{ animation:none !important; } }
+
+.fin-plinko .pk-status{ flex-wrap:nowrap; gap:5px; font-size:12px; }
+.fin-plinko .pk-status > span{ padding:3px 8px; white-space:nowrap; }
+.fin-plinko .pk-status .pk-chipno{ font-size:14px; padding:4px 9px; } .fin-plinko .pk-status .pk-chipno b{ font-size:17px; }
+.fin-plinko .pk-status .pk-bonus b{ font-size:13px; }
+.fin-plinko .pk-line{ font-size:14px; line-height:1.15; }
+.fin-plinko .pk-all{ margin-top:0; }
+.fin-plinko .plinko-tally:empty{ display:none; }
+.fin-plinko .pk-wdot{ width:9px; height:9px; } .fin-plinko .pk-status{ gap:4px; }
+.fin-plinko .pk-status > span{ padding:3px 7px; }
+@media (max-width:380px){ .fin-plinko .pk-wait{ display:none; } }
+@media (max-height:700px){ .fin-plinko .pk-line{ display:none; } .fin-plinko .plinko-board{ margin-top:38px; width:max(200px, min(100%, 420px, calc((100dvh - 232px) * 0.643))); } .pk-ctrl{ margin-top:4px; } .pk-go{ min-height:48px; } .pk-slider{ height:38px; } }

@@ -4800,7 +4800,7 @@
 </div>
 
 <!-- Infinity run finale: Run Complete -> Plinko -> the Vault (see openInfFinale). -->
-<div class="fin-overlay hidden" id="finOverlay" role="dialog" aria-modal="true" aria-label="Run complete">
+<div class="fin-overlay hidden" id="finOverlay" role="dialog" aria-modal="true" aria-label="Run complete"><div class="pk-galaxy" aria-hidden="true"><i></i></div>
   <canvas class="fin-sky" id="finSky" aria-hidden="true"></canvas>
   <div class="fin-rays" aria-hidden="true"></div>
   <div class="fin-stage fin-complete hidden" id="finComplete">
@@ -13230,7 +13230,14 @@
       '<linearGradient id="pkSlot" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="rgba(255,255,255,0.22)"/><stop offset="1" stop-color="rgba(255,255,255,0.04)"/></linearGradient>' +
       '<linearGradient id="pkJack" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#7df9ff"/><stop offset="1" stop-color="#3b1d8f"/></linearGradient>' +
       '<linearGradient id="pkBeamUp" x1="0" x2="0" y1="1" y2="0"><stop offset="0" stop-color="rgba(125,249,255,0.55)"/><stop offset="1" stop-color="rgba(125,249,255,0)"/></linearGradient></defs>';
-    g += '<rect x="2" y="2" width="' + (W - 4) + '" height="' + (H - 4) + '" rx="20" fill="rgba(30,8,60,0.55)" stroke="#ffd23f" stroke-width="3"/>';
+    g += '<rect x="2" y="2" width="' + (W - 4) + '" height="' + (H - 4) + '" rx="20" fill="rgba(30,8,60,0.55)" stroke="#ffd23f" stroke-width="3"/>' +
+      '<rect x="9" y="9" width="' + (W - 18) + '" height="' + (H - 18) + '" rx="15" fill="none" stroke="rgba(255,226,122,0.35)" stroke-width="1"/>';
+    // The marquee: calm bulbs round the frame, two sets taking turns (a slow fade, no hard flashing).
+    { const bulbs = [], sx = 20, sy = 20, bw = W - 40, bh = H - 40, per = 2 * (bw + bh), nB = Math.round(per / 26);
+      for (let k = 0; k < nB; k++){ let d = k * per / nB, x, y;
+        if (d < bw){ x = sx + d; y = sy; } else if ((d -= bw) < bh){ x = sx + bw; y = sy + d; } else if ((d -= bh) < bw){ x = sx + bw - d; y = sy + bh; } else { d -= bw; x = sx; y = sy + bh - d; }
+        bulbs.push('<circle class="pk-bulb ' + (k % 2 ? 'b' : 'a') + '" cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="3.4"/>'); }
+      g += '<g class="pk-bulbs">' + bulbs.join('') + '</g>'; }
     let jackSign = '';
     OP.SLOTS.forEach(([kind], i)=>{
       const l = e[i], r = e[i + 1], w = r - l, cx = (l + r) / 2, jack = kind === 'jackpot', big = kind === 'x3' || kind === '+50';
@@ -13242,13 +13249,21 @@
         jackSign = '<g class="pk-jsign"><rect x="' + (cx - 47) + '" y="' + (my - 8.5) + '" width="94" height="17" rx="8.5" fill="rgba(12,4,34,0.88)" stroke="#7df9ff" stroke-width="1.2"/>' +
           '<text x="' + cx + '" y="' + (my + 4.2) + '" text-anchor="middle" font-family="Big Shoulders Display, Arial Narrow, Arial" font-weight="900" font-size="11.5" letter-spacing="0.6" fill="#e6fdff">THE MOTHERSHIP</text></g>';
       }
-      g += '<g class="pk-slot" data-i="' + i + '"><rect x="' + (l + 1.5) + '" y="' + top + '" width="' + (w - 3) + '" height="' + (floor - top) + '" rx="5" fill="' + (jack ? 'url(#pkJack)' : 'url(#pkSlot)') + '" stroke="' + (jack ? '#7df9ff' : '#ffd23f') + '" stroke-width="1.5"' + (jack ? ' class="pk-jglow"' : '') + '/>' +
-        '<text x="' + cx + '" y="' + (top + 34) + '" text-anchor="middle" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="' + (jack ? 34 : kind === '+50' ? 22 : kind === 'x3' ? 28 : 26) + '" fill="' + (jack ? '#e6fdff' : '#fff6c2') + '" stroke="rgba(40,0,60,0.55)" stroke-width="3" paint-order="stroke">' + plinkoLabel(kind) + '</text>' +
-        '<text x="' + cx + '" y="' + (top + 58) + '" text-anchor="middle" font-family="Inter, Arial" font-weight="800" font-size="13" fill="rgba(255,246,194,0.8)">' + (kind === '+50' ? '' : '+' + OP.SLOT_POINTS[kind]) + '</text></g>';
+      const neon = jack ? '#7df9ff' : kind === 'x3' ? '#ff7ae0' : kind === '+50' ? '#7dffa8' : kind === 'x2' ? '#ffa24d' : '#ffe27a';
+      g += '<g class="pk-slot" data-i="' + i + '"><rect x="' + (l + 1.5) + '" y="' + top + '" width="' + (w - 3) + '" height="' + (floor - top) + '" rx="6" fill="' + (jack ? 'url(#pkJack)' : 'rgba(14,4,40,0.8)') + '" stroke="' + neon + '" stroke-width="2.4"' + (jack ? ' class="pk-jglow"' : '') + '/>' +
+        '<rect x="' + (l + 4) + '" y="' + (top + 2.5) + '" width="' + (w - 8) + '" height="' + (floor - top - 5) + '" rx="4" fill="none" stroke="' + neon + '" stroke-opacity="0.35" stroke-width="1"/>' +
+        '<text x="' + cx + '" y="' + (top + 36) + '" text-anchor="middle" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="' + (jack ? 38 : kind === '+50' ? 28 : kind === 'x3' ? 36 : 34) + '" fill="' + neon + '" stroke="rgba(10,0,30,0.8)" stroke-width="3.5" paint-order="stroke">' + plinkoLabel(kind) + '</text>' +
+        '<text x="' + cx + '" y="' + (top + 64) + '" text-anchor="middle" font-family="Inter, Arial" font-weight="900" font-size="' + Math.min(15, Math.round(w * 0.36)) + '" fill="#fff" stroke="rgba(10,0,30,0.7)" stroke-width="3" paint-order="stroke">' + (kind === '+50' ? '' : '+' + OP.SLOT_POINTS[kind]) + '</text></g>';
     });
+    const PC = ['#7df9ff', '#ff7ae0', '#ffe27a', '#7dffa8', '#ffa24d'], PR = OP.C.PEG_R;
+    const starPts = (x, y, R)=>{ const o = []; for (let k = 0; k < 10; k++){ const r = k % 2 ? R * 0.48 : R, a = -Math.PI / 2 + k * Math.PI / 5; o.push((x + r * Math.cos(a)).toFixed(1) + ',' + (y + r * Math.sin(a)).toFixed(1)); } return o.join(' '); };
     OP.pegs.forEach((p, i)=>{
-      g += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y + '" r="' + (OP.C.PEG_R * 2.2) + '" fill="url(#' + (p.guard ? 'pkHaloG' : 'pkHalo') + ')"/>' +
-        '<circle class="pk-peg' + (p.guard ? ' pk-guardpeg' : '') + '" data-p="' + i + '" cx="' + p.x.toFixed(1) + '" cy="' + p.y + '" r="' + OP.C.PEG_R + '" fill="url(#' + (p.guard ? 'pkGuard' : 'pkPeg') + ')" stroke="rgba(255,255,255,0.7)" stroke-width="1.2"/>';
+      const x = p.x, y = p.y, col = p.guard ? '#ff7ae0' : PC[(i * 7 + Math.floor(i / 3)) % PC.length], shape = p.guard ? 0 : i % 3;
+      g += '<circle cx="' + x.toFixed(1) + '" cy="' + y + '" r="' + (PR * 2.6) + '" fill="' + col + '" fill-opacity="0.22"/>';
+      const at = ' class="pk-peg' + (p.guard ? ' pk-guardpeg' : '') + '" data-p="' + i + '" fill="' + col + '" stroke="#fff" stroke-width="1.4"';
+      if (shape === 0) g += '<circle' + at + ' cx="' + x.toFixed(1) + '" cy="' + y + '" r="' + (PR * 1.2) + '"/>';
+      else if (shape === 1) g += '<polygon' + at + ' points="' + x.toFixed(1) + ',' + (y - PR * 1.55) + ' ' + (x + PR * 1.3).toFixed(1) + ',' + y + ' ' + x.toFixed(1) + ',' + (y + PR * 1.55) + ' ' + (x - PR * 1.3).toFixed(1) + ',' + y + '"/>';
+      else g += '<polygon' + at + ' points="' + starPts(x, y, PR * 1.75) + '"/>';
     });
     svg.innerHTML = g + jackSign;
   }
@@ -13280,8 +13295,8 @@
   function renderPlinkoTally(){
     const f = pkF(), n = f.chips.length, left = n - f.dropped;
     const landed = pkLanded.map(i=> f.chips[i]), won = landed.reduce((a, c)=> a + c.pts, 0);
-    document.getElementById('pkRunScore').textContent = 'Run score: ' + pkRunScore();
-    document.getElementById('pkChipNo').textContent = left > 0 ? 'Chip ' + (f.dropped + 1) + ' of ' + n : 'All ' + n + ' chips in';
+    document.getElementById('pkRunScore').textContent = 'Score ' + pkRunScore();
+    document.getElementById('pkChipNo').innerHTML = left > 0 ? 'You have <b>' + left + '</b> orb' + (left === 1 ? '' : 's') + ' <span class="pk-wait" aria-hidden="true">' + '<i class="pk-wdot"></i>'.repeat(Math.min(left, 10)) + '</span>' : 'All ' + n + ' orbs in';
     document.getElementById('pkBonus').textContent = '+' + won;
     document.getElementById('plinkoTally').innerHTML = landed.map(c=> '<span class="pt-chip' + (c.kind === 'jackpot' ? ' jack' : '') + '">' + plinkoLabel(c.kind) + ' <b>+' + c.pts + '</b></span>').join('');
     const drop = document.getElementById('plinkoDrop'), all = document.getElementById('plinkoAll'), board = document.getElementById('plinkoBoard');
@@ -13426,6 +13441,10 @@
     const dur = T * 1000 / PK_PLAY_SPEED;
     const anim = el.animate(frames, { duration: dur, fill:'forwards' });
     pkFalling.set(i, anim);
+    if (!isLite()) for (let t = 1; t <= 3; t++){   // a short trail: three fading ghosts follow the orb a moment behind
+      const gh = chipEl(i); gh.classList.add('pk-trail'); gh.style.opacity = String(0.5 - t * 0.12); gh.style.scale = String(1 - t * 0.15);
+      const ga = gh.animate(frames, { duration: dur, delay: t * 45, fill:'both' }); ga.finished.then(()=> gh.remove(), ()=> gh.remove());
+    }
     for (let h = 0; h < hits.length; h += 2){ const idx = hits[h], n = h / 2; setTimeout(()=>{ if (pkFalling.get(i) === anim) pingPeg(idx, n); }, hits[h + 1] * 1000 / PK_PLAY_SPEED); }
     anim.finished.then(()=>{ if (pkFalling.get(i) !== anim) return; pkFalling.delete(i); el.remove(); landChip(i); }, ()=>{});
     renderPlinkoTally();
