@@ -17273,7 +17273,10 @@
       if (left > 0){ await new Promise(r=> setTimeout(r, left)); if (roundMovedOn()) return; }
     }
 
-    const cv = crowdVerdict(side, counts, myVote), realCrowd = cv.others >= CROWD_DATA_MIN_NOW;
+    // The crowd board's rule and the verdict's rule are the same one: MIN_VOTES_FOR_PERCENT votes on the card (the board's total, the player's vote included).
+    // Below it the board shows its note, so there is no verdict, no agree/disagree mark and no crowd points either.
+    const cv = crowdVerdict(side, counts, myVote), realCrowd = (counts.a + counts.b) >= PERCENT_MIN_NOW;
+    if (!realCrowd) cv.counted = false;
     const { pctA, pctB } = reveal(counts, false, cv.others);
     if (testTagEl) requestAnimationFrame(()=> noteTapTiming(performance.now() - tapAt, talliesMs));
     // Keep the result ticking live while it's on screen, in case other
