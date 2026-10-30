@@ -105,6 +105,7 @@
       else if (st.t === 'cosmic') want.push('cosmic');
       else if (st.t === 'finale') want.push('wordwarp');
       else if (st.t === 'ad' && st.forced) want.push('ad');
+      else if (st.t === 'sponsor') want.push('ad');   // (the commercial break between Rounds 3 and 4 is on)
     });
     const got = scenes.map(s=> s.scene).filter(s=> s !== 'coldopen' && s !== 'orbit' && s !== 'results' && s !== 'end');
     const cosmicIdx = scenes.filter(s=> s.scene === 'cosmic').length;

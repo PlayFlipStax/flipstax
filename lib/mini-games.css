@@ -274,3 +274,8 @@
 :root.lite .ff-host.up{ animation:none !important; opacity:1; transform:none; }
 @media (prefers-reduced-motion: reduce){ .ff-host.up{ animation:none !important; opacity:1; transform:none; } }
 .ff-stage{ padding-bottom:18px !important; }
+
+/* ---- Saucer Shuffle: the saucer is a sprite (images/saucer-sprite.webp, 2.2 : 1) with the decoy lights drawn over its ring ---- */
+.su-saucer{ aspect-ratio:900 / 407; height:auto; }
+.su-saucer .su-img{ display:block; width:100%; height:100%; object-fit:contain; pointer-events:none; -webkit-user-drag:none; }
+.su-saucer .su-ufo{ position:absolute; left:0; top:0; width:100%; height:100%; pointer-events:none; }
