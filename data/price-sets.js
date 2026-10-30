@@ -26,7 +26,7 @@ window.FLIPSTAX_PRICE_SETS = [
   [["⌚", "Smartwatch", "new", 400], ["⌚", "Digital watch", "basic", 30], ["⌚", "Swiss watch", "luxury", 8000]],
   [["⌚", "Fitness tracker", "band", 120], ["⌚", "Dress watch", "automatic", 600], ["⌚", "Kids watch", "simple", 25]],
   [["⌚", "Smartwatch", "new", 350], ["📱", "Smartphone", "mid-range", 800], ["🎧", "Earbuds", "wireless", 150]],
-  [["📱", "Smartphone", "new flagship", 1000], ["📱", "Smartphone", "budget", 200], ["📱", "Smartphone", "mid-range", 500]],
+  [["📱", "Flagship phone", "new", 1000], ["📱", "Budget phone", "new", 200], ["📱", "Midrange phone", "new", 500]],
   [["📱", "Foldable phone", "new", 1800], ["📱", "Smartphone", "refurbished", 300], ["📱", "Tablet", "10-inch", 450]],
   [["💻", "Laptop", "mid-range", 900], ["📱", "Smartphone", "mid-range", 500], ["🎧", "Earbuds", "wireless", 150]],
   [["🚲", "Kids bike", "16-inch", 150], ["🚲", "Road bike", "aluminum", 1500], ["🚲", "Cruiser bike", "beach", 400]],
