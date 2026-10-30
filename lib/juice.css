@@ -1363,3 +1363,11 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .show-card.gintro .gi-icon{ animation-delay:1.25s; }
 :root.lite .gi-beam{ display:none; } @media (prefers-reduced-motion: reduce){ .gi-beam{ display:none; } }
 :root.lite .show-card.gintro .gi-sign, :root.lite .show-card.gintro .gi-icon{ animation-delay:0s; } @media (prefers-reduced-motion: reduce){ .show-card.gintro .gi-sign, .show-card.gintro .gi-icon{ animation-delay:0s; } }
+/* Round Done art (overnight job 7): full-bleed cover art per round, the scoreboard compact in the bottom third so no character is covered */
+:root.mode-daily .show-card.reward.has-art.art-round{ background:radial-gradient(120% 60% at 50% 100%, #3a1268, #12062a 70%) !important; justify-content:flex-end; padding-bottom:calc(18px + env(safe-area-inset-bottom)); }
+:root.mode-daily .show-card.reward.art-round::before{ content:''; position:absolute; left:0; right:0; top:0; height:69%; z-index:0; background:var(--rw-art) 50% 55% / cover no-repeat;
+  -webkit-mask-image:linear-gradient(180deg, #000 82%, transparent); mask-image:linear-gradient(180deg, #000 82%, transparent); }
+:root.mode-daily .show-card.reward.art-round .rw-panel{ margin-top:auto; width:min(92%, 360px); gap:6px; }
+:root.mode-daily .show-card.reward.art-round .rw-title{ font-size:clamp(28px, 8.6vw, 38px); }
+:root.mode-daily .show-card.reward.art-round .rw-frame{ padding:10px 10px 10px; }
+:root.mode-daily .show-card.reward.art-round .rw-chip b{ font-size:28px; }

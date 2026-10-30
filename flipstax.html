@@ -11933,6 +11933,24 @@
         ? '</div><div class="cue-fig host-full">' + Host.html({ pose:'presenting' }) + '</div>'
         : '<div class="cue-host cue-bust host-full">' + Host.html({ pose:'presenting' }) + '</div></div>');   // F6: the drawn host, head and shoulders with the mic
   }
+  // Overnight job 7: the Round Done art rotates by round. Each round has its own picture (data/scenes/round/<name>.webp, made by
+  // tools/build-round-art.py from incoming-assets/gemini/); a round whose picture isn't there yet uses scene-win-flip, scene-win and
+  // scene-group in rotation, never the same picture two rounds running where it can help it. The files are probed once a session.
+  const ROUND_ART = ['scene-win-flip', 'scene-girl-green', 'scene-girl-purple', 'scene-girl-pink', 'scene-girls-pose', 'scene-all-group'];
+  const ROUND_ART_FALLBACK = ['scene-win-flip', 'scene-win', 'scene-group'];
+  const roundArtOk = {};
+  function probeRoundArt(){ ROUND_ART.forEach(n=>{ if (n in roundArtOk) return; roundArtOk[n] = null; const im = new Image(); im.onload = ()=>{ roundArtOk[n] = true; }; im.onerror = ()=>{ roundArtOk[n] = false; }; im.src = 'data/scenes/round/' + n + '.webp'; }); }
+  probeRoundArt();
+  function roundArtFor(act){
+    const r = RUNDOWN.acts[act] && RUNDOWN.acts[act].round ? RUNDOWN.acts[act].round - 1 : act;
+    let prev = null, fb = 0, pick = ROUND_ART_FALLBACK[0];
+    for (let i = 0; i <= Math.min(r, ROUND_ART.length - 1); i++){
+      if (roundArtOk[ROUND_ART[i]] === true) pick = ROUND_ART[i];
+      else { pick = ROUND_ART_FALLBACK[fb % ROUND_ART_FALLBACK.length]; if (pick === prev){ fb++; pick = ROUND_ART_FALLBACK[fb % ROUND_ART_FALLBACK.length]; } fb++; }
+      prev = pick;
+    }
+    return pick;
+  }
   // Run 4A: the reward beat - the round's points (Orbit Drop's winnings in Round 6), its letter and its gold keys.
   function showRewardBeat(st, then){
     const a = RUNDOWN.acts[st.act] || {}, letter = runActLetter[st.act], keys = runActKeys[st.act] || 0;
@@ -11940,9 +11958,9 @@
     const pts = Math.round((runActPts[st.act] || 0) + (hasOrbit ? runOrbitPts : 0));
     // A+ outro: the Round Done card sits on a scene - the group celebration (data/scenes/win-group.webp) for a perfect run or a high round,
     // Flip alone (data/scenes/win.webp) otherwise; a soft gradient keeps the text readable (lib/juice.css .rw-art)
-    const high = !!runPerfect || pts >= 60, art = high ? 'win-group' : 'win';
-    showCard.className = 'show-card reward has-art art-' + art;
-    showCard.style.setProperty('--rw-art', 'url(../data/scenes/' + art + '.webp)');
+    const art = roundArtFor(st.act);
+    showCard.className = 'show-card reward has-art art-round';
+    showCard.style.setProperty('--rw-art', 'url(../data/scenes/round/' + art + '.webp)');
     showCard.innerHTML = '<i class="rw-sun" aria-hidden="true"></i><div class="rw-panel"><div class="rw-title"></div><div class="rw-frame"><i class="mq mq-a" aria-hidden="true"></i><i class="mq mq-b" aria-hidden="true"></i><div class="rw-row">' +
       '<span class="rw-chip pts" style="--i:0"><b>+' + pts + '</b><small>points</small></span>' +
       '<span class="rw-chip letter ' + (letter || 'none') + '" style="--i:1"><b>' + (letter === 'got' ? '?' : letter === 'miss' ? '✕' : '–') + '</b><small>' + (letter === 'got' ? 'letter won' : 'no letter') + '</small></span>' +
