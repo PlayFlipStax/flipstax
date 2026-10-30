@@ -1136,3 +1136,15 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .cb-by .sp-logo{ width:auto; height:28px; max-width:140px; display:block; }
 :root.lite .cb-prod.pop, :root.lite .show-card.last .cb-last{ animation:none; }
 @media (prefers-reduced-motion: reduce){ .cb-prod.pop, .show-card.last .cb-last{ animation:none; } }
+
+/* ---- A+ job 2 item 7: Emoji Decode, a calmer quiz-show set: deep midnight blue and teal, warm gold and coral accents, soft cream tiles with dark text
+   (no hot pink or neon yellow floods). Layout and rules unchanged. ---- */
+:root.mode-daily .event-overlay.stack.bb-emojiDecode{ --bb:#e6b94a !important; background:radial-gradient(ellipse at 50% 22%, #1f6b86 0%, #123a63 40%, #0a1d42 75%, #060f2a 100%) !important; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .bb-marquee{ background-color:rgba(255,255,255,0.1); background-image:radial-gradient(circle, #f0c969 0 4.5px, transparent 5.2px); box-shadow:0 0 0 2px rgba(240,201,105,0.7); }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt{ background:linear-gradient(180deg, #123a63, #0a2347); border:4px solid #e6b94a; outline:3px solid #2fb8b0; box-shadow:0 0 0 3px #5a3d00, 0 6px 0 3px #5a3d00; text-shadow:0 2px 0 rgba(0,0,0,0.4); }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile{ background-image:linear-gradient(180deg, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 50%) !important; background-color:#f7ecd2 !important; border:4px solid #e6b94a; color:#1c2440; text-shadow:none;
+  box-shadow:0 0 0 3px #5a3d00, 0 6px 0 3px #5a3d00; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(n){ color:#1c2440; text-shadow:none; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.is-right{ background-color:#bdebd0 !important; border-color:#2fb86e; box-shadow:0 0 0 4px #2fb86e, 0 6px 0 3px #14633a; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.is-wrong{ background-color:#f2907a !important; color:#3a0f08; border-color:#fff0e8; box-shadow:0 0 0 3px #7a2a18, 0 6px 0 3px #7a2a18; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode.bb-revealed .event-tile:not(.is-right):not(.is-wrong){ opacity:0.45; }
