@@ -16994,6 +16994,9 @@
   // The minimum in use: CROWD_DATA_MIN, unless a test session lowered it
   // (?crowdmin=, localhost / preview only - see TEST_SWITCHES).
   const CROWD_DATA_MIN_NOW = TEST_SWITCHES.crowdMin || CROWD_DATA_MIN;
+  // A VS card shows how the crowd voted (the percentages) only once it has this many votes in all; before that it says "Be one of the first to vote!".
+  const MIN_VOTES_FOR_PERCENT = 15;
+  const PERCENT_MIN_NOW = TEST_SWITCHES.crowdMin || MIN_VOTES_FOR_PERCENT;
   // The TEST tag also shows how long the last vote took from tap to result
   // and how much of that was the tallies request (the reveal waits for it),
   // so a slow tap on a phone can be told apart from a slow network.
@@ -17067,7 +17070,7 @@
   // F2: no fake crowd. With fewer than CROWD_DATA_MIN real votes from others, the board shows a friendly note instead of numbers.
   function crowdBoardNote(others){
     clearInterval(cbFlapT); cbNums.forEach(n=> n.classList.remove('win'));
-    crowdBoard.querySelector('.cb-note').innerHTML = others > 0 ? 'EARLY CROWD<small>only ' + others + ' vote' + (others === 1 ? '' : 's') + ' so far</small>' : 'YOU\u2019RE THE FIRST TO VOTE!';
+    crowdBoard.querySelector('.cb-note').textContent = 'Be one of the first to vote!';
     crowdBoard.classList.add('on', 'note'); els.board.classList.add('cb-on'); cbSettled = Promise.resolve();
   }
   function crowdBoardHide(){ crowdBoard.classList.remove('note'); clearInterval(cbFlapT); document.querySelectorAll('.vs-stamp, .pts-pop, .vs-tag').forEach(e=> e.remove()); crowdBoard.classList.remove('on'); els.board.classList.remove('cb-on'); cbNums.forEach(n=> n.classList.remove('win')); }
@@ -17136,12 +17139,14 @@
     if (total > 0){ pctA = Math.round((a/total)*100); pctB = 100 - pctA; }
     else { pctA = mockPercentA(current.id, current.a); pctB = 100 - pctA; }
     els.halfA.classList.add('revealed'); els.halfB.classList.add('revealed');
-    setFill(els.fillA, pctA); setFill(els.fillB, pctB);
-    animateCount(els.pctA, pctA); animateCount(els.pctB, pctB);
+    const fewVotes = total < PERCENT_MIN_NOW;   // (MIN_VOTES_FOR_PERCENT: too few votes on this card for a percentage)
+    setFill(els.fillA, fewVotes ? 0 : pctA); setFill(els.fillB, fewVotes ? 0 : pctB);
+    if (fewVotes){ els.pctA.textContent = ''; els.pctB.textContent = ''; } else { animateCount(els.pctA, pctA); animateCount(els.pctB, pctB); }
+    if (!isShowMode() && fewVotes) crowdBoardNote(total);
     if (isShowMode()){
       // F2: the crowd's numbers only with a real crowd (CROWD_DATA_MIN votes from others); else a note and empty bars.
       const n = others != null ? others : Math.max(0, total - 1);
-      if (n >= CROWD_DATA_MIN_NOW){
+      if (!fewVotes){
         crowdBoardShow(pctA, pctB, !isLiveUpdate || crowdBoard.classList.contains('note'));   // (a live update that brings the crowd past 30 clacks the numbers in)
         // Run 5A: the crowd's winner grows with a burst, the other card dims (Daily; not on a live update)
         if (!isLiveUpdate && pctA !== pctB && document.documentElement.classList.contains('mode-daily')){
@@ -17150,7 +17155,7 @@
           if (window.Juice && Juice.burst) setTimeout(()=> Juice.burst(win, { count:16 }), 140);
         }
       }
-      else { crowdBoardNote(n); setFill(els.fillA, 0); setFill(els.fillB, 0); }
+      else { crowdBoardNote(n); }
     }
     // Skip the reveal flash/sound-adjacent pulse on live poll updates - it's
     // a one-time "results are in" beat, not something that should re-fire
