@@ -12006,7 +12006,7 @@
   const ROUND_TITLE_ART = { 2:'scene-girl-green', 3:'scene-girl-purple', 4:'scene-girl-pink', 5:'scene-girls-pose', 6:'scene-all-group' };
   const roundArtOk = {};
   function probeRoundArt(){ ROUND_ART.forEach(n=>{ if (n in roundArtOk) return; roundArtOk[n] = null; const im = new Image(); im.onload = ()=>{ roundArtOk[n] = true; }; im.onerror = ()=>{ roundArtOk[n] = false; }; im.src = 'data/scenes/round/' + n + '.webp'; }); }
-  probeRoundArt();
+  // (the Round Done card no longer uses these pictures - probeRoundArt() is not called)
   function roundArtFor(act){
     const r = RUNDOWN.acts[act] && RUNDOWN.acts[act].round ? RUNDOWN.acts[act].round - 1 : act;
     let prev = null, fb = 0, pick = ROUND_ART_FALLBACK[0];
@@ -12024,13 +12024,22 @@
     const pts = Math.round((runActPts[st.act] || 0) + (hasOrbit ? runOrbitPts : 0));
     // A+ outro: the Round Done card sits on a scene - the group celebration (data/scenes/win-group.webp) for a perfect run or a high round,
     // Flip alone (data/scenes/win.webp) otherwise; a soft gradient keeps the text readable (lib/juice.css .rw-art)
-    const art = roundArtFor(st.act);
+    // A+ round art: the Round Done card plays dance-girls.mp4 (muted, looping, 540 px, its end faded into its start) over a still poster of its
+    // first frame; lite mode and reduced motion get only the poster. (The round pictures themselves are on the round title cards.)
     showCard.className = 'show-card reward has-art art-round';
-    showCard.style.setProperty('--rw-art', 'url(../data/scenes/round/' + art + '.webp)');
+    showCard.style.setProperty('--rw-art', 'url(../data/scenes/round/dance-poster.webp)');
     showCard.innerHTML = '<i class="rw-sun" aria-hidden="true"></i><div class="rw-panel"><div class="rw-title"></div><div class="rw-frame"><i class="mq mq-a" aria-hidden="true"></i><i class="mq mq-b" aria-hidden="true"></i><div class="rw-row">' +
       '<span class="rw-chip pts" style="--i:0"><b>+' + pts + '</b><small>points</small></span>' +
       '<span class="rw-chip letter ' + (letter || 'none') + '" style="--i:1"><b>' + (letter === 'got' ? '?' : letter === 'miss' ? '✕' : '–') + '</b><small>' + (letter === 'got' ? 'letter won' : 'no letter') + '</small></span>' +
       '<span class="rw-chip keys" style="--i:2"><b>◉ ' + keys + '</b><small>orb' + (keys === 1 ? '' : 's') + '</small></span></div></div></div>';   // (A+: only points gained, the letter won and keys - no running totals)
+    if (!isLite() && !prefersReducedMotion()){
+      try{
+        const vid = document.createElement('video'); vid.className = 'rw-video'; vid.muted = true; vid.loop = true; vid.playsInline = true; vid.preload = 'auto'; vid.setAttribute('aria-hidden', 'true'); vid.setAttribute('disablepictureinpicture', '');
+        vid.addEventListener('playing', ()=> vid.classList.add('on'));
+        vid.src = 'data/scenes/round/dance-girls.mp4'; showCard.insertBefore(vid, showCard.firstChild);
+        const p = vid.play(); if (p && p.catch) p.catch(()=>{});   // (blocked or failed: the poster stays)
+      }catch(e){}
+    }
     showCard.querySelector('.rw-title').textContent = (a.title || 'ROUND') + ' DONE!';
     // A+: nothing earned - a friendly line in place of a bare +0 and a grey "no letter" tile (a round that paid something drops just the empty letter tile)
     if (pts <= 0 && letter !== 'got' && !keys){ showCard.querySelector('.rw-row').innerHTML = '<div class="rw-nothing"><b>Next round' + "'" + 's yours!</b><small>Keep going - the points are coming</small></div>'; showCard.classList.add('rw-empty'); }

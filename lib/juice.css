@@ -1407,3 +1407,11 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 @media (max-height:700px){ .outro-art{ height:calc(100% - 300px); } }
 .outro-badge{ top:calc(12px + env(safe-area-inset-top)); }
 .outro-mid{ top:calc(70px + env(safe-area-inset-top)); }
+
+/* ---- A+ Round Done: dance-girls.mp4 over its own poster frame (transform/opacity only; lite and reduced motion: the poster alone, no video element) ---- */
+:root.mode-daily .show-card.reward.art-round::before{ background-position:50% 70%; }
+.rw-video{ position:absolute; left:0; top:0; width:100%; height:min(69%, 133.8vw); object-fit:cover; object-position:50% 70%; z-index:0; opacity:0; transition:opacity 0.35s ease; pointer-events:none;
+  -webkit-mask-image:linear-gradient(180deg, #000 88%, transparent); mask-image:linear-gradient(180deg, #000 88%, transparent); }
+.rw-video.on{ opacity:1; }
+:root.lite .rw-video, :root.lite .rw-video.on{ display:none; }
+@media (prefers-reduced-motion: reduce){ .rw-video{ display:none; } }
