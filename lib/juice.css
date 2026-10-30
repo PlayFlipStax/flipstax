@@ -1373,3 +1373,5 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root.mode-daily .show-card.reward.art-round .rw-chip b{ font-size:28px; }
 .ms-watch-intro{ display:block; position:fixed; top:auto !important; left:50%; transform:translateX(-50%); bottom:calc(60px + env(safe-area-inset-bottom)); margin:0; min-height:36px; padding:6px 14px; background:none; border:0; color:#cfe8ff; font:800 14px/1 var(--f-body); letter-spacing:1px; text-decoration:underline; text-underline-offset:3px; cursor:pointer; position:relative; z-index:3; }
 #modeSelectOverlay .ms-watch-intro{ position:fixed !important; top:auto !important; bottom:calc(60px + env(safe-area-inset-bottom)) !important; }
+.outro-feedback{ display:block; margin:2px auto 0; font:700 13px/1.4 var(--f-body); color:#cfe8ff; text-decoration:underline; text-underline-offset:3px; }
+.outro-feedback[hidden]{ display:none; }

@@ -10,20 +10,24 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="FlipStax">
 <meta property="og:url" content="https://flipstax-one.vercel.app/">
-<meta property="og:title" content="FlipStax - Flip, Vote, Jumble & Solve">
-<meta property="og:description" content="Daily Stax: one run, once a day. Infinity Flips: race to the finish line - vote, scan the crowd, crack riddles, drop chips, open the vault.">
-<meta property="og:image" content="https://flipstax-one.vercel.app/images/og-preview-v2.jpg">
+<meta property="og:title" content="FlipStax: Galactic Game Night">
+<meta property="og:description" content="A new episode every day: Flip the alien hosts a quick galactic game show of votes, trivia and mini-games - can you win the grand prize?">
+<meta property="og:image" content="https://flipstax-one.vercel.app/images/og-flipstax.jpg">
+<meta property="og:image:alt" content="Flip the alien host and the FlipStax cast on the game show stage">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="FlipStax - Flip, Vote, Jumble & Solve">
-<meta name="twitter:description" content="Daily Stax: one run, once a day. Infinity Flips: race to the finish line - vote, scan the crowd, crack riddles, drop chips, open the vault.">
-<meta name="twitter:image" content="https://flipstax-one.vercel.app/images/og-preview-v2.jpg">
+<meta name="twitter:title" content="FlipStax: Galactic Game Night">
+<meta name="twitter:description" content="A new episode every day: Flip the alien hosts a quick galactic game show of votes, trivia and mini-games - can you win the grand prize?">
+<meta name="twitter:image" content="https://flipstax-one.vercel.app/images/og-flipstax.jpg">
 
 <!-- Favicon / home-screen icons -->
 <link rel="icon" href="favicon.ico" sizes="48x48">
+<!-- Vercel Web Analytics (same-origin script; harmless if blocked: va() just queues) -->
+<script>window.va = window.va || function(){ (window.vaq = window.vaq || []).push(arguments); };</script>
+<script defer src="/_vercel/insights/script.js"></script>
 <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
 <link rel="icon" type="image/png" sizes="192x192" href="images/favicon-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
@@ -4743,6 +4747,7 @@
       <div class="daily-btn primary outro-share" id="outroShare" role="button" tabindex="0">📤 SHARE</div>
       <a class="outro-donate" id="outroDonate" href="https://ko-fi.com/flipstax" target="_blank" rel="noopener noreferrer"><img class="od-icon" src="images/kofi-logo.webp" width="40" height="40" alt="" decoding="async"><span>Buy Flip a coffee</span></a>
       <div class="outro-again" id="outroAgain" role="button" tabindex="0">Play again tomorrow</div>
+      <a class="outro-feedback" id="outroFeedback" href="#" target="_blank" rel="noopener noreferrer" hidden>Tell us what you think</a>
     </div>
   </div>
   <div class="personality-inner">
@@ -6006,6 +6011,8 @@
   // A+ outro: the SPONSOR BREAK - a 5 s skippable card between Round 3 and Round 4 (scene-sponsor art, 'Brought to you by' and a
   // replaceable logo: swap images/sponsor-logo.svg, or set SPONSOR_LOGO). OFF: nothing changes in the show until this is true. The TEST
   // menu's 'Sponsor break (off)' jump shows it without turning it on.
+  // Launch prep: a feedback form URL (empty = no 'Tell us what you think' link on the end screen).
+  const FEEDBACK_URL = '';
   const SPONSOR_BREAK_ON = true, SPONSOR_LOGO = '';   /* set to a real logo path (e.g. 'images/sponsor-logo.svg') to show the Brought to you by bar */   // (A+ job 2: the commercial break is on)
   function seedOf(rng){ return (rng() * 4294967296) >>> 0; }
   // The day's two Mystery Games (see pickMysteryGames).
@@ -15914,6 +15921,10 @@
     stopOutro(); loadOutroPoster();
     const o = document.getElementById('outro'), v = document.getElementById('outroVideo'); if (!o) return;
     els.readoutOverlay.classList.add('outro-on');
+    // Launch prep: one 'game_completed' analytics event per finished episode (Vercel Web Analytics; a no-op when it is blocked or in test modes),
+    // and the feedback link only when FEEDBACK_URL is set.
+    if (!REPLAY && !DEBUG_FAST && !TEST_SWITCHES.noVotes){ try{ if (typeof window.va === 'function') window.va('event', { name:'game_completed', data:{ score: Math.round(r && r.score || runScore || 0) } }); }catch(e){} }
+    { const fb = document.getElementById('outroFeedback'); if (fb){ fb.hidden = !FEEDBACK_URL; if (FEEDBACK_URL) fb.href = FEEDBACK_URL; } }
     document.documentElement.classList.add('outro-up');
     document.getElementById('outroScore').textContent = shownScore(r.score).toLocaleString();
     outroState = 'playing';
