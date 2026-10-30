@@ -14189,7 +14189,7 @@
   let guessPrep = null, guessState = 'idle', guessCard = null, guessTruth = null, guessCloseTimer = null;
   function resetGuessGap(){ if (!infRun) return; infRun.sinceGuess = 0; infRun.nextGuessAt = GUESS_GAP[0] + Math.floor(Math.random() * (GUESS_GAP[1] - GUESS_GAP[0] + 1)); saveInfRun(); }
   function upcomingCards(n){ const d = decks[contentPoolKey()]; return d.cards.slice(d.next, d.next + n); }
-  function guessCounts(c){ const a = tallyCache.get(slugify(c.a)), b = tallyCache.get(slugify(c.b)); return (a != null && b != null && a + b >= CROWD_DATA_MIN_NOW) ? { a, b } : null; }
+  function guessCounts(c){ const a = tallyCache.get(slugify(c.a)), b = tallyCache.get(slugify(c.b)); return (a != null && b != null && a + b >= PERCENT_MIN_NOW) ? { a, b } : null; }
   // Looks a couple of rounds ahead for a qualifying card (one read at most
   // per guess round).
   function prepareGuess(){
@@ -17369,7 +17369,7 @@
           if (infRun.matchStreak % INF_MATCHES_PER_KEY === 0 && addInfKey('streak')) showToast('\u25C9 ' + infRun.matchStreak + ' crowd matches in a row \u2014 +1 orb');
           if (infRun.matchStreak === ABDUCTION_STREAK) abductStack();
         } else infRun.matchStreak = 0;
-        if (!cv.withCrowd && cv.others >= CROWD_DATA_MIN_NOW){
+        if (!cv.withCrowd && realCrowd){
           const against = 100 - cv.pickPct;
           if (!infRun.boldest || against > infRun.boldest.against)
             infRun.boldest = { pick: side === 'A' ? current.a : current.b, other: side === 'A' ? current.b : current.a, against, n: cv.others };
