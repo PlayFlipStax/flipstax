@@ -1375,3 +1375,4 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 #modeSelectOverlay .ms-watch-intro{ position:fixed !important; top:auto !important; bottom:calc(60px + env(safe-area-inset-bottom)) !important; }
 .outro-feedback{ display:block; margin:2px auto 0; font:700 13px/1.4 var(--f-body); color:#cfe8ff; text-decoration:underline; text-underline-offset:3px; }
 .outro-feedback[hidden]{ display:none; }
+:root:root .solve-overlay.tray .solve-timer.late{ color:#ff5a6e; }   /* (QA: the red last-8-seconds clock lost to the white rule above) */
