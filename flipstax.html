@@ -4701,6 +4701,7 @@
     <div class="solve-header">
       <span class="solve-timer" id="solveTimer">1:00</span>
     </div>
+    <div class="solve-bar" id="solveBar" aria-hidden="true"><b></b></div>
     <div class="solve-hint-line" id="solveHint"></div>
     <div class="solve-slots" id="solveSlots"></div>
     <div class="solve-section-label hidden" id="solveRackLabel">Your letters</div>
@@ -5844,7 +5845,7 @@
   const DAILY_SHOW_SECONDS = 360;
   const RUN_DURATION_MS = (DAILY_SHOW_SECONDS * 1000) / DEBUG_RUN_SCALE;
   const RUN_WORD_LENGTH = 6;
-  const WORD_WARP_SECONDS = 45;               // the Word Warp timer (was 60), plus any time banked in Portal Picks
+  const WORD_WARP_SECONDS = 30;               // the Word Warp timer (60 -> 45 -> 30 with the letter tray), plus any time banked in Portal Picks
   const RUN_SOLVE_MS = (WORD_WARP_SECONDS * 1000) / DEBUG_TIME_SCALE;
   // B5: solving the Word Warp scores WARP_SOLVE_POINTS plus a point for
   // every WARP_SECONDS_PER_POINT seconds left on its clock.
@@ -15215,9 +15216,15 @@
     const rr = mulberry32(hashStr('flipstax-warp-' + (runStartDate || todayStr())));
     solveRack = shuffle(rest, rr);
     for (let k = 0; k < 6 && rest.length > 1 && solveRack.join('') === rest.join(''); k++) solveRack = shuffle(rest, rr);
+    // A+ (Daily): the letter tray - exactly 10 tiles: every missing letter plus decoys (letters not in the word), shuffled
+    if (warpTrayOn()){
+      const decoys = shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(c=> runWord.word.indexOf(c) < 0), rr).slice(0, Math.max(0, 10 - rest.length));
+      solveRack = shuffle(rest.concat(decoys), rr);
+    }
+    applyTrayMode();
     rackUsedFlags = [];
     buildSolveKeyboard();
-    solveEndsAt = Date.now() + RUN_SOLVE_MS + runWarpBonusMs;
+    solveEndsAt = Date.now() + RUN_SOLVE_MS + runWarpBonusMs; solveTotalMs = RUN_SOLVE_MS + runWarpBonusMs;
     // The solve minigame isn't a normal vote-and-reveal round, so the stale
     // voted/votedSinceTime from whichever vote triggered it must be cleared
     // here — otherwise the watchdog thinks the round has been stuck for the
@@ -15246,7 +15253,7 @@
     solveLockedLetters = sv.locked || new Array(RUN_WORD_LENGTH).fill(null);
     solveRack = sv.rack || [];
     solveFreeHints = sv.freeHints || 0; solveBonusNote = sv.note || '';
-    solveEndsAt = sv.endsAt;
+    solveEndsAt = sv.endsAt; solveTotalMs = RUN_SOLVE_MS + runWarpBonusMs; applyTrayMode();
     voted = false; votedSinceTime = null;
     const last = solveGuesses[solveGuesses.length - 1];
     if (last && last.join('') === runWord.word){ endRun(true, sv.solvedAt || Date.now()); return; }
@@ -15264,6 +15271,7 @@
     const totalSec = Math.ceil(remain/1000);
     els.solveTimer.textContent = Math.floor(totalSec/60) + ':' + (totalSec%60<10?'0':'') + (totalSec%60);
     els.solveTimer.classList.toggle('danger', remain <= 20000);
+    { const bar = document.querySelector('#solveBar b'); if (bar) bar.style.transform = 'scaleX(' + Math.min(1, remain / Math.max(1, solveTotalMs || RUN_SOLVE_MS)).toFixed(3) + ')'; }
     if (remain <= 0){ clearInterval(solveInterval); missWarp(); }
   }
   // B5: a missed Word Warp - the word drops into the slots in red, the
@@ -15278,14 +15286,15 @@
     // The answer is revealed the Word Warp way (the tiles slide to the middle and flip), in red; then the trombone.
     const rv = warpReveal(runWord.word, 'miss');
     solveLockedLetters = runWord.word.split(''); solveCurrentGuess = [];
-    setTimeout(()=>{ renderSolveUI(); hostSay('So close! It was ' + runWord.word + '.', 2000); if (sfx.warpMiss) sfx.warpMiss(); else sfx.wrong(); }, rv.ms);
-    setTimeout(()=>{ warpMissing = false; els.solveOverlay.classList.remove('missed'); rv.remove(); if (runActive) endRun(false); }, rv.ms + paced(1500));
+    setTimeout(()=>{ renderSolveUI(); hostSay(warpTray ? 'Nice try, Earthling! It was ' + runWord.word + '!' : 'So close! It was ' + runWord.word + '.', 2000); if (sfx.warpMiss) sfx.warpMiss(); else sfx.wrong(); }, rv.ms);
+    setTimeout(()=>{ warpMissing = false; els.solveOverlay.classList.remove('missed'); rv.remove(); if (runActive) endRun(false); }, rv.ms + (warpTray ? Math.max(paced(1500), REVEAL_HOLD_MS) : paced(1500)));
   }
   function renderSolveUI(){
     els.solveHint.textContent = runHintsRevealed > 0 ? '\uD83D\uDCA1 ' + runWord.hints.slice(0, runHintsRevealed).join(' \u00B7 ') : '';
     els.solveHintBtn.textContent = solveFreeHints > 0 ? '\uD83D\uDCA1 Hint (free)' : '\uD83D\uDCA1 Hint (\u22125s)';
     els.solveHintBtn.classList.toggle('disabled', runHintsRevealed >= runWord.hints.length);
-    els.solveAttempts.textContent = (RUN_MAX_GUESSES - solveGuesses.length) + ' guesses left';
+    if (warpTray){ els.solveAttempts.innerHTML = '<span class="strikes" aria-label="' + (RUN_MAX_GUESSES - solveGuesses.length) + ' strikes left">' + Array.from({ length: RUN_MAX_GUESSES }, (_, k)=> '<i class="' + (k < solveGuesses.length ? 'x' : '') + '"></i>').join('') + '</span>'; }
+    else els.solveAttempts.textContent = (RUN_MAX_GUESSES - solveGuesses.length) + ' guesses left';
     els.solveSlots.innerHTML = '';
     for (let i=0;i<RUN_WORD_LENGTH;i++){
       const filled = solveLockedLetters[i] || solveCurrentGuess[i];
@@ -15302,9 +15311,11 @@
     solveRack.forEach((letter,i)=>{
       const isLocked = solveLockedLetters.indexOf(letter) !== -1;
       const div = document.createElement('div');
-      div.className = 'solve-tile' + ((rackUsedFlags[i] || isLocked) ? ' used' : '');
+      const tried = warpTray && solveGuesses.some(g=> g.length === 1 && g[0] === letter);
+      div.className = 'solve-tile' + ((rackUsedFlags[i] || isLocked) ? ' used' : '') + (tried ? ' tried' : '');
       div.textContent = letter;
-      if (!isLocked) div.onclick = ()=> addToGuess(letter, i);
+      if (warpTray){ if (!isLocked && !tried) div.onclick = ()=> trayPick(letter, div); }
+      else if (!isLocked) div.onclick = ()=> addToGuess(letter, i);
       els.solveRack.appendChild(div);
     });
     // No repeated letters in any target word, so "present" (right letter,
@@ -15317,6 +15328,46 @@
       }).join('') + '</div>'
     ).join('');
   }
+  // ---- A+ the Word Warp letter tray (Daily): 10 tiles, 5 strikes, 30 s. A tile that fits locks into every blank needing it (it flies in, a neon ring
+  // runs round the blank); one that doesn't shakes, dims and costs a strike. Ends on the solve, the 5th strike or the clock.
+  let warpTray = false, solveTotalMs = 0;
+  function warpTrayOn(){ return document.documentElement.classList.contains('mode-daily'); }
+  function applyTrayMode(){ warpTray = warpTrayOn() && solveRack.length === 10; els.solveOverlay.classList.toggle('tray', warpTray); }
+  function winWarp(){
+    clearInterval(solveInterval);
+    const solvedAt = Date.now(); runSolvedAt = solvedAt;
+    runWarpPoints = WARP_SOLVE_POINTS + Math.floor(Math.max(0, solveEndsAt - solvedAt) / 1000 / WARP_SECONDS_PER_POINT);
+    runScore += runWarpPoints;
+    showFlash('win'); hostMood('cheer'); hostSay('You warped it! +' + runWarpPoints, 2200);
+    saveRunSnapshot();
+    els.solveOverlay.classList.add('celebrating');
+    if (window.Juice) Juice.correct(els.solveSlots, { count:24 });
+    wwAbduct(runWord.word.split('').map((_, i)=> i), ()=> celebrateSolve(solvedAt, ()=>{ if (runActive) endRun(true, solvedAt); }));
+  }
+  function trayPick(letter, tileEl){
+    if (!runActive || warpMissing || els.solveOverlay.classList.contains('celebrating') || els.solveOverlay.classList.contains('revealing')) return;
+    const word = runWord.word, spots = []; word.split('').forEach((c, i)=>{ if (c === letter && !solveLockedLetters[i]) spots.push(i); });
+    const from = tileEl && tileEl.getBoundingClientRect();
+    if (spots.length){
+      spots.forEach(i=> solveLockedLetters[i] = letter);
+      renderSolveUI(); sfx.correct(); sfx.chime(Math.min(8, solveLockedLetters.filter(Boolean).length));
+      const still = FX.reduced() || document.documentElement.classList.contains('lite') || !Element.prototype.animate;
+      spots.forEach(i=>{ const sl = els.solveSlots.children[i]; if (!sl) return; sl.classList.add('ring');
+        if (!still && from){ const r = sl.getBoundingClientRect(); sl.animate([{ transform:'translate(' + (from.left + from.width / 2 - r.left - r.width / 2) + 'px,' + (from.top + from.height / 2 - r.top - r.height / 2) + 'px) scale(0.8)', opacity:0.5 }, { transform:'none', opacity:1 }], { duration:360, easing:'cubic-bezier(.3,1.2,.5,1)' }); }
+        setTimeout(()=> sl.classList.remove('ring'), 900); });
+      saveRunSnapshot();
+      if (solveLockedLetters.every(Boolean)) winWarp();
+      return;
+    }
+    solveGuesses.push([letter]); runSolveWrongGuesses++; saveRunSnapshot();
+    sfx.wrong(); hostMood('sad');
+    if (tileEl && tileEl.animate && !FX.reduced() && !document.documentElement.classList.contains('lite')) tileEl.animate([{ transform:'translateX(0)' }, { transform:'translateX(-7px)' }, { transform:'translateX(7px)' }, { transform:'translateX(-4px)' }, { transform:'none' }], { duration:300 });
+    if (solveGuesses.length >= RUN_MAX_GUESSES){ clearInterval(solveInterval); renderSolveUI(); missWarp(); return; }
+    setTimeout(()=>{ if (runPhase === 'solving' && !warpMissing) renderSolveUI(); }, 300);
+    if (tileEl) tileEl.classList.add('tried');
+    renderSolveStrikes();
+  }
+  function renderSolveStrikes(){ if (!warpTray) return; els.solveAttempts.querySelectorAll('.strikes i').forEach((e, k)=> e.classList.toggle('x', k < solveGuesses.length)); }
   function nextOpenSlot(){
     return solveLockedLetters.findIndex((v,i)=> !v && !solveCurrentGuess[i]);
   }
