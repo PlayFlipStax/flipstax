@@ -377,3 +377,15 @@
 .pr-stage{ justify-content:center !important; gap:12px; }
 .pr-body{ flex:0 0 auto; height:min(46dvh, 330px); }
 .pr-card{ justify-content:space-evenly; }
+
+/* ---- Twin Flip jackpot (all pairs found): chasing marquee, a rain of coins and stars, a UFO with a golden beam. Transform and opacity only. ---- */
+.tf-stage{ position:relative; }
+.tf-fx{ position:absolute; inset:0; z-index:8; overflow:hidden; pointer-events:none; }
+.tf-marq{ position:absolute; inset:4px; border-radius:20px; border:6px dotted #fff6c2; opacity:0; } .tf-marq.b{ border-color:#ffd23f; inset:8px; }
+.tf-marq.a{ animation:prChase 0.8s steps(1) infinite; } .tf-marq.b{ animation:prChase 0.8s steps(1) infinite 0.4s; }
+.tf-rain{ position:absolute; top:0; font-style:normal; line-height:1; will-change:transform; }
+.tf-ufo{ position:absolute; left:0; top:4%; width:84px; will-change:transform; }
+.tf-ufo svg{ width:100%; height:auto; display:block; }
+.tf-beamsweep{ position:absolute; left:50%; top:62%; width:150px; height:min(60vh, 420px); margin-left:-75px; background:linear-gradient(180deg, rgba(255,226,110,0.8), rgba(255,226,110,0.05)); clip-path:polygon(42% 0, 58% 0, 100% 100%, 0 100%); }
+.tf-stage.tf-gold .tf-grid{ box-shadow:0 0 0 4px #ffd23f, 0 0 26px 8px rgba(255,210,60,0.8); border-radius:16px; }
+.tf-rain.coin{ width:1em; height:1em; border-radius:50%; background:radial-gradient(circle at 35% 30%, #fffbd0, #ffd23f 50%, #c88a00); border:2px solid #fff3a8; box-sizing:border-box; }
