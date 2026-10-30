@@ -1345,3 +1345,6 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root.lite .mw-glow.a, :root.lite .mw-glow.b, :root.lite .lucky-overlay.mw .mw-btn.pulse, :root.lite .mw-wheel.landed .mw-wedge.win .mw-hl{ animation:none; } :root.lite .mw-wheel.landed .mw-wedge.win .mw-hl{ opacity:0.3; }
 @media (prefers-reduced-motion: reduce){ .mw-glow.a, .mw-glow.b, .lucky-overlay.mw .mw-btn.pulse, .mw-wheel.landed .mw-wedge.win .mw-hl{ animation:none; } .mw-wheel.landed .mw-wedge.win .mw-hl{ opacity:0.3; } .lucky-overlay.mw .mw-pop{ transition:opacity .2s; } }
 .mw-glow circle{ fill:#fff3c0; }
+/* End screen tidy (overnight job 8): no leftover timer pill or floating details button on the main path */
+:root.results-open #runBanner, :root.results-open .status-banner, :root.results-open .run-clock{ visibility:hidden !important; }
+#readoutOverlay.ep.outro-on .outro-details{ display:none !important; }
