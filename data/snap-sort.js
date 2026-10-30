@@ -4,9 +4,8 @@
 // `no` (6 to 10 plausible near-miss decoys, each with a one-line note on why it doesn't belong - the host reads it
 // out on a wrong tap). Clear, well-known facts only; nothing disputed; no logos.
 // Difficulty follows the act: easy in Act 1, medium in Act 2, hard in Act 3.
-// *** The hard tier is NOT CHECKED YET: until SNAP_SORT_REVIEWED is true, Act 3 plays a medium category instead and
-// the hard ones only play from the TEST menu. The plain-text copy for checking is data/snap-sort.txt.
-window.SNAP_SORT_REVIEWED = false;
+// The hard tier was checked (Oct 30) and SNAP_SORT_REVIEWED is true, so Act 3 plays hard categories. The plain-text copy for checking is data/snap-sort.txt.
+window.SNAP_SORT_REVIEWED = true;
 window.FLIPSTAX_SNAP_SORT = [
   // ================================================================ EASY
   { cat:"Fruits", diff:"easy", yes:["Mango", "Kiwi", "Cherry", "Pear", "Plum", "Apricot"],
@@ -104,7 +103,7 @@ window.FLIPSTAX_SNAP_SORT = [
   { cat:"Bones in the human body", diff:"medium", yes:["Femur", "Tibia", "Skull", "Rib", "Kneecap", "Collarbone"],
     no:[["Biceps", "A muscle"], ["Achilles", "A tendon"], ["Aorta", "An artery"], ["Retina", "Part of the eye"], ["Esophagus", "The food pipe"], ["Diaphragm", "A muscle"]] },
   { cat:"US presidents", diff:"medium", yes:["George Washington", "Abraham Lincoln", "Theodore Roosevelt", "John F. Kennedy", "Thomas Jefferson", "Ulysses S. Grant"],
-    no:[["Benjamin Franklin", "Never president"], ["Alexander Hamilton", "The first Treasury Secretary"], ["Paul Revere", "Famous for his midnight ride"], ["Martin Luther King Jr.", "A civil rights leader"], ["Robert E. Lee", "A Confederate general"], ["John Hancock", "Signed the Declaration, never president"], ["Al Gore", "Vice president, never president"]] },
+    no:[["Benjamin Franklin", "Never president"], ["Alexander Hamilton", "The first Treasury Secretary"], ["Paul Revere", "Famous for his midnight ride"], ["Martin Luther King Jr.", "A civil rights leader"], ["Betsy Ross", "Associated with the first flag, never president"], ["John Hancock", "Signed the Declaration, never president"], ["Davy Crockett", "A frontiersman, never president"]] },
   { cat:"Greek gods", diff:"medium", yes:["Zeus", "Athena", "Poseidon", "Apollo", "Hera", "Ares"],
     no:[["Jupiter", "Roman"], ["Mars", "Roman"], ["Odin", "Norse"], ["Thor", "Norse"], ["Ra", "Egyptian"], ["Venus", "Roman"], ["Anubis", "Egyptian"]] },
   { cat:"Reptiles", diff:"medium", yes:["Snake", "Lizard", "Crocodile", "Turtle", "Iguana", "Gecko"],
@@ -126,7 +125,7 @@ window.FLIPSTAX_SNAP_SORT = [
   { cat:"Sitcoms set in New York", diff:"hard", yes:["Friends", "Seinfeld", "How I Met Your Mother", "Brooklyn Nine-Nine", "30 Rock", "Will & Grace"],
     no:[["Cheers", "Set in Boston"], ["The Office", "The US one is set in Scranton"], ["Frasier", "Set in Seattle"], ["The Big Bang Theory", "Set in Pasadena"], ["Parks and Recreation", "Set in Pawnee, Indiana"], ["Modern Family", "Set in Los Angeles"], ["Happy Days", "Set in Milwaukee"]] },
   { cat:"Actors who played James Bond", diff:"hard", yes:["Sean Connery", "Roger Moore", "Pierce Brosnan", "Daniel Craig", "Timothy Dalton", "George Lazenby"],
-    no:[["Michael Caine", "Played the spy Harry Palmer, never Bond"], ["Tom Cruise", "The Mission: Impossible films"], ["Matt Damon", "The Bourne films"], ["Clive Owen", "Often tipped, never cast"], ["Idris Elba", "Often tipped, never cast"], ["Hugh Jackman", "Never played Bond"]] },
+    no:[["Michael Caine", "Played the spy Harry Palmer, never Bond"], ["Tom Cruise", "The Mission: Impossible films"], ["Matt Damon", "The Bourne films"], ["Liam Neeson", "Never played Bond"], ["Jason Statham", "Never played Bond"], ["Hugh Jackman", "Never played Bond"]] },
   { cat:"Members of the Fellowship of the Ring", diff:"hard", yes:["Frodo", "Sam", "Gandalf", "Aragorn", "Legolas", "Gimli"],
     no:[["Bilbo", "Stays behind in Rivendell"], ["Gollum", "Never part of the Fellowship"], ["Saruman", "A villain"], ["Galadriel", "An elf queen who helps them"], ["Elrond", "Forms the Fellowship but doesn't join"], ["Faramir", "Boromir's brother, not a member"]] },
   { cat:"NHL hockey teams", diff:"hard", yes:["Maple Leafs", "Bruins", "Canadiens", "Red Wings", "Blackhawks", "Oilers"],
@@ -151,7 +150,7 @@ window.FLIPSTAX_SNAP_SORT = [
     no:[["Hydrogen", "Very reactive, not noble"], ["Oxygen", "Very reactive"], ["Nitrogen", "Not a noble gas"], ["Chlorine", "A halogen"], ["Fluorine", "A halogen"], ["Carbon dioxide", "A compound, not an element"]] },
   { cat:"Planets with rings", diff:"hard", yes:["Saturn", "Jupiter", "Uranus", "Neptune"],
     no:[["Mars", "No rings"], ["Venus", "No rings"], ["Mercury", "No rings"], ["Earth", "No rings"], ["Pluto", "A dwarf planet, no rings"], ["The Moon", "Earth's moon, no rings"]] },
-  { cat:"Invented in the 1900s", diff:"hard", yes:["Airplane", "Television", "Microwave oven", "Personal computer", "Video game console", "Ballpoint pen"],
+  { cat:"Invented in the 1900s", diff:"hard", yes:["Airplane", "Television", "Microwave oven", "Personal computer", "Video game console", "Jet engine"],
     no:[["Telephone", "Patented in 1876"], ["Light bulb", "Edison's worked in 1879"], ["Printing press", "Around 1440"], ["Steam engine", "Early 1700s"], ["Telescope", "1608"], ["Phonograph", "1877"], ["Bicycle", "The 1800s"]] },
   { cat:"Seven Wonders of the Ancient World", diff:"hard", yes:["Great Pyramid of Giza", "Hanging Gardens of Babylon", "Colossus of Rhodes", "Lighthouse of Alexandria", "Temple of Artemis", "Statue of Zeus"],
     no:[["Stonehenge", "Not on the ancient list"], ["Great Wall of China", "Not on the ancient list"], ["Colosseum", "Not on the ancient list"], ["Parthenon", "Not on the ancient list"], ["Taj Mahal", "Built in the 1600s"], ["Machu Picchu", "Not on the ancient list"], ["Petra", "Not on the ancient list"]] },

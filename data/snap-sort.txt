@@ -1,5 +1,5 @@
 FlipStax - Snap Sort categories (81: 24 easy, 27 medium, 30 hard)
-The hard tier is NOT CHECKED YET (SNAP_SORT_REVIEWED = false in data/snap-sort.js): until it is true, hard categories play only from the TEST menu.
+The hard tier was checked (Oct 30): SNAP_SORT_REVIEWED = true in data/snap-sort.js.
 Format: number. [difficulty] category
    belongs: items
    decoys: item - why it doesn't belong
@@ -455,9 +455,9 @@ Format: number. [difficulty] category
    decoy: Alexander Hamilton - The first Treasury Secretary
    decoy: Paul Revere - Famous for his midnight ride
    decoy: Martin Luther King Jr. - A civil rights leader
-   decoy: Robert E. Lee - A Confederate general
+   decoy: Betsy Ross - Associated with the first flag, never president
    decoy: John Hancock - Signed the Declaration, never president
-   decoy: Al Gore - Vice president, never president
+   decoy: Davy Crockett - A frontiersman, never president
 
 48. [medium] Greek gods
    belongs: Zeus, Athena, Poseidon, Apollo, Hera, Ares
@@ -547,8 +547,8 @@ Format: number. [difficulty] category
    decoy: Michael Caine - Played the spy Harry Palmer, never Bond
    decoy: Tom Cruise - The Mission: Impossible films
    decoy: Matt Damon - The Bourne films
-   decoy: Clive Owen - Often tipped, never cast
-   decoy: Idris Elba - Often tipped, never cast
+   decoy: Liam Neeson - Never played Bond
+   decoy: Jason Statham - Never played Bond
    decoy: Hugh Jackman - Never played Bond
 
 58. [hard] Members of the Fellowship of the Ring
@@ -670,7 +670,7 @@ Format: number. [difficulty] category
    decoy: The Moon - Earth's moon, no rings
 
 70. [hard] Invented in the 1900s
-   belongs: Airplane, Television, Microwave oven, Personal computer, Video game console, Ballpoint pen
+   belongs: Airplane, Television, Microwave oven, Personal computer, Video game console, Jet engine
    decoy: Telephone - Patented in 1876
    decoy: Light bulb - Edison's worked in 1879
    decoy: Printing press - Around 1440
