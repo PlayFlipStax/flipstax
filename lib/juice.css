@@ -1099,3 +1099,16 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .mq-ring .cable.l{ left:12px; } .mq-ring .cable.r{ right:12px; }
 :root.mode-daily #board.deal-first .mq-ring.top .cable{ animation:cableOut 1.2s linear both; }
 @keyframes cableOut{ 0%, 78%{ opacity:1; } 100%{ opacity:0; } }
+
+/* ---- A+ job 2 item 4: Mystery Portal. The clock's hands pivot on the hub (they were hung from a point off to the right and swept out of the doorway),
+   every scene is clipped to its own door opening, and the doors that were not picked go clearly dark (a dark cover fading in - opacity only)
+   instead of looking see-through. ---- */
+.ts-h1{ top:26%; margin:0 0 0 -2.5px; } .ts-h2{ top:33%; margin:0 0 0 -2.5px; }
+.event-tile.mp .mp-door::after{ content:''; position:absolute; inset:0; z-index:4; background:#0a0618; opacity:0; pointer-events:none; transition:opacity 0.3s ease; }
+.event-tile.mp:nth-child(1) .mp-door::after{ clip-path:polygon(50% 1%, 98% 15.5%, 98% 84.5%, 50% 99%, 2% 84.5%, 2% 15.5%); }
+.event-tile.mp:nth-child(2) .mp-door::after{ border-radius:50% 50% 3% 3% / 33% 33% 3% 3%; inset:1% 2%; }
+.event-tile.mp:nth-child(3) .mp-door::after{ border-radius:9% / 4.5%; inset:1% 2%; }
+:root.mode-daily .event-overlay.mdoor .event-tile.mp.dim{ opacity:1; }
+.event-tile.mp.dim .mp-door::after{ opacity:0.86; }
+.event-tile.mp.dim .mp-num{ opacity:0.5; }
+.mp-scene{ contain:paint; }
