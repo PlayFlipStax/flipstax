@@ -1192,7 +1192,6 @@ music | Luke Combs | 🎸 | Jason Aldean | 🎧 | 2010s
 music | Shania Twain | 🎤 | Faith Hill | ⭐ | 90s
 music | George Strait | 🎸 | Alan Jackson | 🎧 | 90s
 music | Beastie Boys | 🎸 | Run-DMC | 🎧 | 80s
-music | Amy Winehouse | 🎤 | Adele | ⭐ | 2000s
 music | Norah Jones | 🎸 | Alicia Keys | 🎧 | 2000s
 music | John Legend | 🎤 | Michael Bublé | ⭐ | 2000s
 music | John Mayer | 🎸 | Dave Matthews Band | 🎧 | 2000s
@@ -1212,7 +1211,6 @@ albums | Taylor Swift - 1989 | 💿 | Lorde - Melodrama | 🎶 | 2010s
 albums | Nirvana - Nevermind | 💿 | Pearl Jam - Ten | 🎧 | 90s
 albums | Pink Floyd - The Dark Side of the Moon | 💿 | Led Zeppelin - IV | 🎶 | timeless
 albums | The Beatles - Abbey Road | 💿 | The Beach Boys - Pet Sounds | 🎵 | timeless
-albums | Amy Winehouse - Back to Black | 💿 | Frank Ocean - channel ORANGE | 🎶 | 2010s
 albums | SZA - SOS | 💿 | Billie Eilish - When We All Fall Asleep, Where Do We Go? | 📻 | now
 albums | Olivia Rodrigo - SOUR | 💿 | Lorde - Pure Heroine | 🎧 | now
 albums | Eminem - The Marshall Mathers LP | 💿 | 50 Cent - Get Rich or Die Tryin' | 📀 | 2000s
@@ -1224,7 +1222,6 @@ albums | Green Day - Dookie | 💿 | Blink-182 - Enema of the State | 📻 | 90s
 albums | My Chemical Romance - The Black Parade | 💿 | Fall Out Boy - From Under the Cork Tree | 🎶 | 2000s
 albums | Metallica - Master of Puppets | 💿 | Iron Maiden - The Number of the Beast | 🎵 | 80s
 albums | Black Sabbath - Paranoid | 💿 | Led Zeppelin - Led Zeppelin II | 📀 | timeless
-albums | Adele - 21 | 💿 | Amy Winehouse - Back to Black | 📻 | 2010s
 albums | Norah Jones - Come Away with Me | 💿 | Alicia Keys - Songs in A Minor | 🎧 | 2000s
 albums | The Clash - London Calling | 💿 | Ramones - Ramones | 🎵 | timeless
 albums | Tom Petty - Wildflowers | 💿 | Bruce Springsteen - Born to Run | 🎧 | 90s

@@ -382,21 +382,6 @@ window.FLIPSTAX_PRICE_PROBE = [
  },
  {
   "a": {
-   "glyph": "🍾",
-   "name": "Champagne",
-   "sub": "French, well-known brand",
-   "price": 55
-  },
-  "b": {
-   "glyph": "🍷",
-   "name": "Wine",
-   "sub": "everyday bottle",
-   "price": 12
-  },
-  "more": 0
- },
- {
-  "a": {
    "glyph": "🔋",
    "name": "Power bank",
    "sub": "10,000 mAh",

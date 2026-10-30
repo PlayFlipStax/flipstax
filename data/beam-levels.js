@@ -5,8 +5,6 @@
 window.FLIPSTAX_BEAM_LEVELS = {
   easy: [
     // history
-    'Who was the U.S. President on September 11, 2001?',
-    'In what year was Barack Obama first elected President?',
     'Who was the British Prime Minister for most of World War II?',
     'Who is famous for developing the theory of relativity?',
     'Who is commonly credited with inventing the practical electric light bulb?',
