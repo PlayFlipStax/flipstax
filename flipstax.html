@@ -12040,7 +12040,7 @@
   // game's backdrop is swapped in underneath, then the bloom fades. About ZOOM_MS in all, one smooth pulse, no flicker.
   // The reverse (zoom out of the play, back to the host on the stage) opens the next round. Faked with transform and
   // opacity only (no live blur); lite mode and reduced motion get a quick crossfade instead.
-  const ZOOM_SCALE = 2.6;
+  const ZOOM_SCALE = 2.6, ZOOM_OUT_FROM = 1.6;   // (the way out starts at 1.6: the marquee text never exceeds the screen)
   const zoomFx = document.createElement('div');
   zoomFx.className = 'zoom-fx hidden'; zoomFx.setAttribute('aria-hidden', 'true');
   zoomFx.innerHTML = '<i class="zf-veil"></i><i class="zf-bloom"></i>';
@@ -12078,7 +12078,7 @@
       glow(dir === 'out');
       try{ if (atPeak) atPeak(); }catch(e){ console.error(e); }
       requestAnimationFrame(()=> requestAnimationFrame(()=>{ if (stage) stage.classList.remove('cut-now'); }));
-      const pushOut = dir === 'out' ? push(ZOOM_SCALE, 1, fall + 120, 'cubic-bezier(.15,.7,.3,1)') : [];
+      const pushOut = dir === 'out' ? push(ZOOM_OUT_FROM, 1, fall + 120, 'cubic-bezier(.15,.7,.3,1)') : [];
       clear(up);
       const down = [veil.animate([{ opacity:1 }, { opacity:0 }], { duration:fall, easing:'cubic-bezier(.25,1,.5,1)', fill:'forwards' })];
       if (!quick) down.push(bloom.animate([{ opacity:1, transform:'translate(-50%, -50%) scale(1.6)' }, { opacity:0, transform:'translate(-50%, -50%) scale(2.2)' }], { duration:fall, easing:'ease-out', fill:'forwards' }));

@@ -992,7 +992,7 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 @media (max-height:700px){ .outro-donate{ min-height:50px !important; } }
 
 /* ---- A+ outro item 5: art on the Round Done card - a celebration scene as the backdrop (opaque), a soft dark gradient behind the text ---- */
-:root.mode-daily .show-card.reward.has-art{ background:linear-gradient(180deg, rgba(20,6,40,0.55) 0%, rgba(20,6,40,0.18) 34%, rgba(20,6,40,0.5) 100%), var(--rw-art) 50% 100% / auto 100% no-repeat, #2a0b4e; align-items:flex-start; padding-top:max(70px, 9vh); }
+:root.mode-daily .show-card.reward.has-art{ background:linear-gradient(180deg, rgba(20,6,40,0.55) 0%, rgba(20,6,40,0.18) 34%, rgba(20,6,40,0.5) 100%), var(--rw-art) 50% 100% / cover no-repeat, #2a0b4e; align-items:flex-start; padding-top:max(70px, 9vh); }
 :root.mode-daily .show-card.reward.has-art .rw-sun{ display:none; }
 
 :root.mode-daily .show-card.reward.has-art .rw-title{ text-shadow:0 5px 0 #b4125f, 0 9px 0 rgba(60,0,60,0.45), 0 0 26px rgba(20,6,40,0.9); }
@@ -1060,3 +1060,12 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .fin-plinko .plinko-board{ margin-top:16px; width:max(200px, min(100%, 420px, calc((100dvh - 305px) * 0.643))); }
 .fin-plinko .pk-line{ font-size:17px; font-weight:900; }
 :root.stage-on .fin-overlay.daily-orbit.stage-backed, .fin-overlay.daily-orbit{ background:linear-gradient(180deg, rgba(8,2,24,0.5), rgba(8,2,24,0.2) 40%, rgba(8,2,24,0.55)), url(../data/orbit/bg.webp) center / cover no-repeat, #12062a !important; }
+
+/* ---- A+ job 2 item 1: Round Done - the slam-in settles to a size that fits (the title never exceeds the screen), the art is full-bleed cover,
+   and the zoom veil is a deep midnight (no cream frame between Round Done and the next scene) ---- */
+.zf-veil{ background:radial-gradient(circle at var(--zx, 50%) var(--zy, 13%), #3a1268 0%, #1a0a38 55%, #0c0620 100%) !important; }
+:root.mode-daily .show-card.reward .rw-title{ max-width:100%; overflow-wrap:anywhere; animation:rwSlam 0.45s var(--ease-pop, cubic-bezier(.3,1.4,.5,1)) both; }
+@keyframes rwSlam{ 0%{ transform:scale(1.25); opacity:0; } 60%{ transform:scale(0.96); opacity:1; } 100%{ transform:none; opacity:1; } }
+:root.lite .rw-title, :root.mode-daily.lite .show-card.reward .rw-title{ animation:rwFadeIn 0.25s ease-out both; }
+@keyframes rwFadeIn{ from{ opacity:0; } to{ opacity:1; } }
+@media (prefers-reduced-motion: reduce){ :root.mode-daily .show-card.reward .rw-title{ animation:rwFadeIn 0.25s ease-out both; } }
