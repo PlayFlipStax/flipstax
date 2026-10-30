@@ -36,6 +36,9 @@
 .stg-sign{ position:absolute; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4%; text-align:center;
   container-type:size; opacity:0; transition:opacity 300ms ease; }
 .stg-sign.on{ opacity:1; }
+.stg-logo{ display:none; max-width:92%; max-height:96%; width:auto; height:auto; object-fit:contain; }
+.stg-sign.logo .stg-logo{ display:block; }
+.stg-sign.logo .stg-sub, .stg-sign.logo .stg-main{ display:none !important; }
 .stg-sign span, .stg-sign b{ display:block; max-width:96%; white-space:nowrap; overflow:hidden; font-family:var(--f-display, 'Big Shoulders Display', 'Arial Narrow', sans-serif); font-weight:900; text-transform:uppercase; line-height:1; }
 .stg-main{ font-size:min(56cqh, 15cqw); letter-spacing:0.04em; color:#fff;
   text-shadow:0 0 0.12em #fff, 0 0 0.35em rgba(255,92,200,0.95), 0 0 0.8em rgba(255,60,172,0.7); }

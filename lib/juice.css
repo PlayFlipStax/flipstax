@@ -1376,3 +1376,7 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .outro-feedback{ display:block; margin:2px auto 0; font:700 13px/1.4 var(--f-body); color:#cfe8ff; text-decoration:underline; text-underline-offset:3px; }
 .outro-feedback[hidden]{ display:none; }
 :root:root .solve-overlay.tray .solve-timer.late{ color:#ff5a6e; }   /* (QA: the red last-8-seconds clock lost to the white rule above) */
+
+/* Play Today: the FlipStax logo sits inside the sign frame (lib/stage.js), so the text logo above it goes. 'Watch intro' sits in the bottom-right corner, clear of Flip's feet. */
+:root.stage-on .split-select-overlay.one-show .split-select-header .logo{ display:none; }
+#modeSelectOverlay .ms-watch-intro{ left:auto !important; right:10px; transform:none !important; }
