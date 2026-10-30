@@ -4908,6 +4908,7 @@
 <script src="data/game-names.js"></script>
 <script src="data/price-probe.js"></script>
 <script src="data/price-sets.js"></script>
+<script src="data/schedule.js"></script>
 <script src="data/oddball-alert.js"></script>
 <script src="data/emoji-decode.js"></script>
 <script src="data/time-warp.js"></script>
@@ -5949,6 +5950,23 @@
     const d = Math.round((Date.parse(date + 'T00:00:00Z') - Date.parse(SHOW_LAUNCH_DATE + 'T00:00:00Z')) / 86400000);
     return Math.max(1, d + 1);
   }
+  // ---- THE FROZEN NO-REPEAT SCHEDULE (A+): the Brain Beam banks, riddles, Emoji Decode, Time Warp, Price Probe sets, Fact or Fib and the Twin Flip
+  // faces are not drawn at random. Each pool has ONE fixed shuffled order, written once into data/schedule.js (window.FLIPSTAX_SCHEDULE[pool] = the
+  // items' keys in order; Fact or Fib's is a list of days of five) and never recomputed at run time. A day's items are the next ones in that
+  // list: item number day * perDay + slot, day = days since SHOW_LAUNCH_DATE, wrapping only after the whole list is used. New items are only ever
+  // added at the END of the list (an item in the pool but not in the file is appended in pool order), never inserted, and an item later removed
+  // is skipped - so past episodes never change. Everyone on the same date gets the same items. VS cards keep their own date-seeded reshuffle. A
+  // test jump with no day (the TEST menu) still draws at random. tools: __debug.buildSchedule() prints a fresh data/schedule.js for new pools.
+  function schedDay(date){ return Math.max(0, showEpisode(date) - 1); }
+  function schedList(key, poolKeys){ const frozen = (window.FLIPSTAX_SCHEDULE || {})[key] || [], have = new Set(frozen); return frozen.concat(poolKeys.filter(k=> !have.has(k))); }
+  function schedPick(key, poolKeys, day, slot, perDay){
+    const list = schedList(key, poolKeys), n = list.length, present = new Set(poolKeys); if (!n) return null;
+    const i = (((day * perDay + (slot || 0)) % n) + n) % n;
+    for (let k = 0; k < n; k++){ const kk = list[(i + k) % n]; if (present.has(kk)) return kk; }
+    return null;
+  }
+  function schedFreeze(key, poolKeys){ return shuffle(poolKeys.slice(), mulberry32(hashStr('flipstax-frozen-' + key))); }
+  window.FLIPSTAX_SCHED = { list: schedList, pick: schedPick, freeze: schedFreeze };
   function showRange(r, rng){ return r[0] + Math.floor(rng() * (r[1] - r[0] + 1)); }
   // One pass through the show: SHOW_ROUNDS rounds. The show REPEATS - cycle 1,
   // 2, ... are further passes, each reshuffled from the date's seed (so it is
@@ -6075,16 +6093,16 @@
     if (SHOW_DATE_OVERRIDE) date = SHOW_DATE_OVERRIDE;
     const rng = mulberry32(hashStr('flipstax-show-' + date));
     const mystery = showMysteryGames(date), doors = showDoorGames(date);
-    const steps = [];
+    const steps = [], day = schedDay(date), beamSlots = {};
     RUNDOWN.acts.forEach((act, ai)=>{
       if (act.ad){ steps.push({ t:'ad', ad: showAd(date) }); return; }
       steps.push({ t:'act', act:ai, title:act.title, sub:act.sub || '', world:act.world || 'vs', finale: act.id === 'finale', round: act.round || 0, announce: act.announce || '' });
       (act.steps || []).forEach(s=>{
         if (s.vs) steps.push({ t:'vs', n:s.vs, act:ai });
-        else if (s.beam) steps.push({ t:'quiz', beam:true, level:s.beam, act:ai, seed:seedOf(rng) });
-        else if (s.game) steps.push(s.game === 'door' ? { t:'game', key:'door', doors: doors.slice(), act:ai, seed:seedOf(rng) } : { t:'game', key:s.game, act:ai, seed:seedOf(rng) });
+        else if (s.beam){ const slot = beamSlots[s.beam] = (beamSlots[s.beam] == null ? 0 : beamSlots[s.beam] + 1); steps.push({ t:'quiz', beam:true, level:s.beam, act:ai, seed:seedOf(rng), day, slot }); }
+        else if (s.game) steps.push(s.game === 'door' ? { t:'game', key:'door', doors: doors.slice(), act:ai, seed:seedOf(rng), day } : { t:'game', key:s.game, act:ai, seed:seedOf(rng), day });
         else if (s.reward) steps.push({ t:'reward', act:ai });
-        else if (s.mystery) steps.push({ t:'mystery', k:s.mystery, game:mystery[s.mystery - 1], act:ai, seed:seedOf(rng) });
+        else if (s.mystery) steps.push({ t:'mystery', k:s.mystery, game:mystery[s.mystery - 1], act:ai, seed:seedOf(rng), day });
         else if (s.portal) steps.push({ t:'portal', act:ai, doors: shuffle(RUN_POWERUPS.map(p=> p.key), rng) });
         else if (s.lucky) steps.push({ t:'lucky', act:ai, seed:seedOf(rng) });
         else if (s.wordWarp) steps.push({ t:'finale', act:ai });
@@ -6130,8 +6148,17 @@
     return out;
   }
   // A Brain Beam at a level, by the seed, never one already asked this episode.
-  function pickBeamQuestion(level, seed, seen){
+  function pickBeamQuestion(level, seed, seen, step){
     const pool = beamPool(level);
+    // the no-repeat schedule: 2 questions a day at each level, walking a fixed shuffle of the level's whole bank (skipping any already asked this episode)
+    if (step && step.day != null && pool.length){
+      for (let k = 0; k < pool.length; k++){
+        const pk = schedPick('beam-' + level, pool.map(p=> p.set.q), step.day, (step.slot || 0) + k, 2), it = pool.find(p=> p.set.q === pk);
+        if (!it || seen(it.set.q)) continue;
+        const opts = shuffle([it.set.correct].concat(it.set.wrongs), mulberry32((seed + k * 7919) >>> 0));
+        return { category: it.subject, question: it.set.q, opts, correctIdx: opts.indexOf(it.set.correct) };
+      }
+    }
     for (let k = 0; k < 80 && pool.length; k++){
       const rng = mulberry32((seed + k * 7919) >>> 0), it = pool[Math.floor(rng() * pool.length)];
       if (seen(it.set.q)) continue;
@@ -6152,14 +6179,14 @@
     return list[(st.round - 1) % list.length];
   }
   // A round's riddle: one of Infinity's multiple-choice riddles, by the date.
-  function showRiddleQuestion(seed){
+  function showRiddleQuestion(seed, step){
     const list = INFINITY_RIDDLES.length ? INFINITY_RIDDLES : null;
     if (!list){
       // Riddle slots must show a riddle; if the data didn't load the caller falls back to a Brain Beam - say why.
       if (!showRiddleQuestion.warned){ showRiddleQuestion.warned = true; console.warn('FlipStax: no Daily riddle - data/infinity-riddles.js ' + (Array.isArray(window.FLIPSTAX_INFINITY_RIDDLES) ? 'loaded but no entry has q, a and exactly 3 wrong answers' : 'did not load (window.FLIPSTAX_INFINITY_RIDDLES is missing)') + '; showing a Brain Beam instead'); }
       return null;
     }
-    const rng = mulberry32(seed), r = list[Math.floor(rng() * list.length)];
+    const rng = mulberry32(seed), r = (step && step.day != null) ? (list.find(x=> x.q === schedPick('riddles', list.map(x=> x.q), step.day, 0, 1)) || list[0]) : list[Math.floor(rng() * list.length)];   // (the no-repeat schedule: one a day)
     const opts = shuffle([r.a].concat(r.wrong), rng);
     return { category:'riddle', riddle:true, question:r.q, opts, correctIdx: opts.indexOf(r.a) };
   }
@@ -11118,7 +11145,7 @@
     const key = st.key;
     if (key === 'riddle'){
       if (!INFINITY_RIDDLES.length) return false;
-      runTriviaQuestion(null, null, { t:'quiz', riddle:true, mystery:true, seed: st.seed });   // (a right answer wins a gold key; it ends through advanceAfterTrivia)
+      runTriviaQuestion(null, null, { t:'quiz', riddle:true, mystery:true, seed: st.seed, day: st.day });   // (a right answer wins a gold key; it ends through advanceAfterTrivia)
       return true;
     }
     if (key === 'lucky') return typeof runLuckyLights === 'function' && runLuckyLights(st, done);
@@ -11199,7 +11226,7 @@
           // A+ pacing: the game behind the portal gets its own title card (its name and icon, GAME_INTRO_MS) before it starts - no cut
           showGameIntro(game, ()=>{
             if (g !== Show.gen) return;
-            const ok = miniGame(game) ? runMiniGame(game, { seed: st.seed, door:true }, done) : runBrainBreak({ game, seed: st.seed }, done);
+            const ok = miniGame(game) ? runMiniGame(game, { seed: st.seed, door:true, day: st.day }, done) : runBrainBreak({ game, seed: st.seed, day: st.day }, done);
             if (!ok) showDone(g, 'door game unavailable');
           });
         }, { lead:700, text: els.eventPrompt.textContent });   // (the swing takes 0.7 s, then the game's name holds for the shared reveal time)
@@ -11331,10 +11358,10 @@
     }
     showMysteryReveal(st.game, ()=>{
       if (!runActive) return;
-      const ok = st.game === 'riddle' ? (runTriviaQuestion(null, null, { t:'quiz', riddle:true, mystery:true, seed: st.seed }), true)
-        : st.game === 'crowdScan' ? (runDailyCrowdScan(st, done) || (hostSay('The crowd\u2019s still voting - Emoji Decode instead!', 2000), runBrainBreak({ game:'emojiDecode', seed: st.seed }, done)))
+      const ok = st.game === 'riddle' ? (runTriviaQuestion(null, null, { t:'quiz', riddle:true, mystery:true, seed: st.seed, day: st.day }), true)
+        : st.game === 'crowdScan' ? (runDailyCrowdScan(st, done) || (hostSay('The crowd\u2019s still voting - Emoji Decode instead!', 2000), runBrainBreak({ game:'emojiDecode', seed: st.seed, day: st.day }, done)))
         : miniGame(st.game) ? runMiniGame(st.game, st, done)
-        : runBrainBreak({ game: st.game, seed: st.seed }, done);
+        : runBrainBreak({ game: st.game, seed: st.seed, day: st.day }, done);
       if (!ok) showDone(Show.gen, 'mystery unavailable');
     });
     return true;
@@ -11623,8 +11650,10 @@
     return order;
   }
   let runBreakSeen = {};   // game -> the item indexes already used this run
-  function pickBreakItem(key, seed){
+  function breakKey(key, x){ return key === 'emojiDecode' ? x.emoji + '|' + x.answer : key === 'timeWarp' ? x.a.event + '|' + x.b.event : key === 'priceProbe' ? x.a.name + '|' + x.b.name : (x.items || []).map(i=> i.name).join('|'); }
+  function pickBreakItem(key, seed, day){
     const list = breakItems(key), used = runBreakSeen[key] || (runBreakSeen[key] = new Set());
+    if (day != null && list.length){ const kk = schedPick('break-' + key, list.map(x=> breakKey(key, x)), day, 0, 1), i = list.findIndex(x=> breakKey(key, x) === kk); if (i >= 0){ used.add(i); return list[i]; } }   // (the no-repeat schedule: one a day)
     let idx = -1;
     for (let k = 0; k < 60 && idx < 0; k++){ const i = Math.floor(mulberry32((seed + k * 7919) >>> 0)() * list.length); if (!used.has(i)) idx = i; }
     if (idx < 0) idx = Math.floor(mulberry32(seed)() * list.length);
@@ -11650,8 +11679,8 @@
   }
   function breakPriceText(p){ return '$' + (p >= 100 ? Math.round(p).toLocaleString() : p % 1 ? p.toFixed(2) : String(p)); }
   // One round: { prompt, kind, tiles:[{glyph,name,sub}], correct, reveal:(tileEl, i)=>..., why }.
-  function buildBreakRound(key, seed){
-    const x = pickBreakItem(key, seed), rng = mulberry32((seed ^ 0x9e3779b9) >>> 0);
+  function buildBreakRound(key, seed, day){
+    const x = pickBreakItem(key, seed, day), rng = mulberry32((seed ^ 0x9e3779b9) >>> 0);
     if (key === 'priceProbe'){
       const sw = rng() < 0.5, t = sw ? [x.b, x.a] : [x.a, x.b], correct = sw ? 1 - x.more : x.more;
       return { prompt:'Which costs more?', tiles:t.map(i=> ({ glyph:i.glyph, name:i.name, sub:i.sub })), correct, revealSub:t.map(i=> breakPriceText(i.price)) };
@@ -11704,7 +11733,7 @@
   function runBrainBreak(st, done){
     const key = st.game, def = BRAIN_BREAKS[key];
     if (!def || breakItems(key).length < 1) return false;
-    const rd = buildBreakRound(key, st.seed), ov = els.eventOverlay, tiles = els.eventTiles, n = rd.tiles.length;
+    const rd = buildBreakRound(key, st.seed, st.day), ov = els.eventOverlay, tiles = els.eventTiles, n = rd.tiles.length;
     runPhase = 'break';
     stopTallyPolling(); clearRoundTimer(); voted = false; votedSinceTime = null;
     ov.classList.remove('hidden', 'powerup', 'quiz-beam', 'quiz-riddle'); ov.classList.add('brainbreak', 'stack', 'bb-' + key); if (n === 2) ov.classList.add('bb-two'); ov.style.setProperty('--bb', def.accent); els.eventPrompt.classList.remove('long');
@@ -12622,9 +12651,9 @@
       // another subject if a subject runs dry.
       const seen = text=> runAskedQuestions.indexOf(text) !== -1;
       // The rundown's Brain Beams come at a level (easy, medium, hard).
-      if (step && step.beam && step.level) q = pickBeamQuestion(step.level, step.seed, seen);
+      if (step && step.beam && step.level) q = pickBeamQuestion(step.level, step.seed, seen, step);
       if (step && step.riddle){
-        for (let k = 0; k < 40 && (!q || seen(q.question)); k++) q = showRiddleQuestion((step.seed + k * 7919) >>> 0);
+        for (let k = 0; k < 40 && (!q || seen(q.question)); k++) q = showRiddleQuestion((step.seed + k * 7919) >>> 0, k === 0 ? step : null);
         if (q && seen(q.question)) q = null;
       }
       if (!q){
@@ -17964,6 +17993,9 @@
       getRamp: () => ({ rampRounds, rampTier, rampDriftRate, audioLayers: !!rampTimer }),
       getTrackTime: () => trackEls.infinity ? trackEls.infinity.currentTime : null,
       seekInfinityTrack: (t) => { if (trackEls.infinity) trackEls.infinity.currentTime = t; },
+      buildSchedule: () => { const S = window.FLIPSTAX_SCHED, out = {}, put = (k, keys)=>{ out[k] = S.freeze(k, keys); };
+        ['easy', 'medium', 'hard'].forEach(l=> put('beam-' + l, beamPool(l).map(p=> p.set.q))); put('riddles', INFINITY_RIDDLES.map(r=> r.q)); ['emojiDecode', 'timeWarp'].forEach(k=> put('break-' + k, breakItems(k).map(x=> breakKey(k, x))));
+        Object.assign(out, (window.MiniGames && MiniGames.schedBuild) ? MiniGames.schedBuild(S) : {}); return 'window.FLIPSTAX_SCHEDULE = ' + JSON.stringify(out, null, 1) + ';\n'; },
       getContentPools: () => ({ cards: CARD_POOLS, cardKey, trivia: { geography: GEOGRAPHY_SETS, english: ENGLISH_SETS, history: HISTORY_SETS, science: SCIENCE_SETS, art: ART_SETS, music: MUSIC_SETS, health: HEALTH_SETS }, gen: generateSubjectTrivia, poolKey: contentPoolKey }),
       getCurrentCard: () => current,
       showCard: (c) => { const d = decks[contentPoolKey()]; d.cards.splice(d.next, 0, c); lastWasEvent = true; loadNext(); clearRoundTimer(); },
