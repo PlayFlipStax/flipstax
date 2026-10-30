@@ -30,7 +30,7 @@ window.FLIPSTAX_NAMES = {
     vault:          'The Mothership Vault',
   },
   host: {
-    brainBeam:      'Get it right for points and a key. Wrong? No harm, no foul!',
+    brainBeam:      'Get it right for points and an orb. Wrong? No harm, no foul!',
     riddleRound:    'Riddle me this! Four answers, one winner. Tick tock!',
     crowdScan:      'Guess how the crowd voted. No peeking, Earthling.',
     cosmicSurprise: 'Could be a prize, could be a pickle. Feeling lucky?',
@@ -72,7 +72,7 @@ window.FLIPSTAX_NAMES = {
   explainers: {
     vs:        { full:'Pick the one YOU prefer. There\u2019s no right or wrong answer! We\u2019re learning from the coolest cats in the Milky Way.', short:'Pick the one YOU prefer!' },
     riddle:    { full:'Read the riddle, then pick the right answer. Think fast, Earthling!', short:'Solve the riddle!' },
-    lucky:     { full:'Spin the wheel, then hit STOP! Three spins for points and keys - or BANK what you have. Beware the GOOP!', short:'SPIN, STOP or BANK!' },
+    lucky:     { full:'Spin the wheel, then hit STOP! Three spins for points and orbs - or BANK what you have. Beware the GOOP!', short:'SPIN, STOP or BANK!' },
     door:      { full:'Pick a portal. Behind it hides a surprise game!', short:'Pick a portal!' },
     zapWords:  { full:'Swipe across letters to spell words before time runs out!', short:'Spell the words!' },
     twinFlip:  { full:'Flip the cards and match every pair before time runs out!', short:'Match the pairs!' },

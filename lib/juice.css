@@ -1304,3 +1304,7 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 /* Word Warp background (overnight job 0): the finale art (incoming-assets/gemini/bg-finale.jpg, 2% cropped) cover-fit and still, the twinkling stars on top. */
 .ww-galaxy i{ left:0; top:0; width:100%; height:100%; margin:0; background:url(../data/wordwarp/bg-finale.webp) center / cover no-repeat; animation:none; will-change:auto; }
 .ww-galaxy::after{ background:rgba(6,2,22,0.3); }
+
+/* the orb icon (overnight job 12) */
+.orb-ic{ display:inline-block; width:1em; height:1em; vertical-align:-0.14em; font-style:normal; line-height:0; }
+.orb-ic svg{ width:100%; height:100%; display:block; overflow:visible; filter:drop-shadow(0 0 2px rgba(125,240,255,0.85)); }

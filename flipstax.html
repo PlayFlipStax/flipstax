@@ -5079,7 +5079,7 @@
     { key:'flips10',  icon:'\u26A1',      label:'+10 Points', color:'#f09d00' },
     { key:'coinflip', icon:'\uD83E\uDE99', label:'Coin Flip',  color:'#17b86b' },
     { key:'wildcard', icon:'\uD83C\uDF81', label:GN.cosmicSurprise, color:'#f23c5a' },
-    { key:'goldkey',  icon:'\uD83D\uDD11', label:'Golden Key', color:'#d99a00' },
+    { key:'goldkey',  icon:'\u25C9', label:'Golden Orb', color:'#d99a00' },
   ];
   const SPELLING_SETS = [
     { correct:'Receive', wrongs:['Recieve','Receeve','Receve'] },
@@ -9150,7 +9150,7 @@
     const chips = Math.max(ORBIT_MIN_CHIPS, Math.min(PLINKO_MAX_CHIPS, infRun.keys)), earned = infKeysEarned(infRun), done = earned >= WORDHUNT_KEYS;
     let dots = ''; for (let i = 0; i < PLINKO_MAX_CHIPS; i++) dots += '<i class="' + (i < chips ? 'on' : '') + '"></i>';
     return '<span class="sp-chips" title="' + GN.orbitDrop + ' chips: ' + chips + '" aria-label="' + chips + ' ' + GN.orbitDrop + ' chips"><em>\uD83E\uDE99</em>' + dots + '</span>' +
-      '<span class="sp-keys' + (done ? ' done' : '') + '" title="Keys earned this run, toward ' + GN.zapWords + '">\uD83D\uDD11<b id="infKeyCount">' + earned + '</b><span class="sp-of">/' + WORDHUNT_KEYS + '</span>' + (done ? '\u26A1' : '') + '</span>';
+      '<span class="sp-keys' + (done ? ' done' : '') + '" title="Orbs earned this run, toward ' + GN.zapWords + '">\u25C9<b id="infKeyCount">' + earned + '</b><span class="sp-of">/' + WORDHUNT_KEYS + '</span>' + (done ? '\u26A1' : '') + '</span>';
   }
   function addInfKey(source){
     if (!infRun || infRun.ended) return false;
@@ -9410,7 +9410,7 @@
     riddle_sage:     { name:'The Riddle Sage', icon:'\uD83E\uDD89', blurb:'Riddles fold before you like paper airplanes.' },
     vault_cracker:   { name:'Vault Cracker', icon:'\uD83D\uDD13', blurb:'Every chip down, bonus chip too. The Mothership Vault never stood a chance.' },
     lone_wolf:       { name:'The Lone Wolf', icon:'\uD83D\uDC3A', blurb:'The herd went one way. You strolled the other.' },
-    key_keeper:      { name:'Key Keeper', icon:'\uD83D\uDDDD\uFE0F', blurb:'Keys, keys and more keys. Your pockets jingle.' },
+    key_keeper:      { name:'Orb Keeper', icon:'\u25C9', blurb:'Orbs, orbs and more orbs. Your pockets glow.' },
   };
   Object.keys(RUN_CARD_META).forEach(k=>{ PERSONALITY_META[k] = Object.assign({ run:true }, RUN_CARD_META[k]); });
   function isRunCard(k){ return RUN_CARD_ORDER.indexOf(k) !== -1; }
@@ -9907,7 +9907,7 @@
       els.runBanner.innerHTML = '<span class="sp-label">Pts</span><b class="sp-num">' + shownScore(runScore) + '</b>' +
         '<span class="sp-sep">\u00B7</span><span class="sp-act" id="dailyClock"></span>' +
         '<span class="sp-sep">\u00B7</span><span class="sp-tray" id="letterTray" aria-label="Word Warp letters: ' + runLetters.length + ' of ' + RUN_WORD_LENGTH + '">' + tray + '</span>' +
-        (runGoldKeys() ? '<span class="sp-sep">·</span><span class="sp-keys" aria-label="' + runGoldKeys() + ' gold keys: Orbit Drop chips">🔑<b>' + runGoldKeys() + '</b></span>' : '') + streakTag +
+        (runGoldKeys() ? '<span class="sp-sep">·</span><span class="sp-keys" aria-label="' + runGoldKeys() + ' orbs for Orbit Drop">◉<b>' + runGoldKeys() + '</b></span>' : '') + streakTag +
         roundTrackHtml();
       renderDailyClock();
     } else {
@@ -10112,7 +10112,7 @@
       return {
         badge: 'INFINITY FLIPS \u00B7 RUN COMPLETE',
         heroText: a.finalScore + ' PTS',
-        statLine: [a.crowdPct !== null && a.crowdPct !== undefined ? 'Matched the crowd ' + a.crowdPct + '%' : null, '\uD83D\uDD11 ' + a.keys + ' key' + (a.keys === 1 ? '' : 's'),
+        statLine: [a.crowdPct !== null && a.crowdPct !== undefined ? 'Matched the crowd ' + a.crowdPct + '%' : null, '\u25C9 ' + a.keys + ' orb' + (a.keys === 1 ? '' : 's'),
           a.ended === 'clock' ? 'Time\u2019s up at 10:00' : 'Finished in ' + formatClock(a.clockMs)].filter(Boolean).join(' \u00B7 '),
         score: a.finalScore,
         boldest: a.boldest || null,
@@ -10526,7 +10526,7 @@
   }
   function runShareStatLine(a){
     return [a.crowdPct !== null && a.crowdPct !== undefined ? 'Matched the crowd ' + a.crowdPct + '%' : null,
-      a.keys + ' key' + (a.keys === 1 ? '' : 's'),
+      a.keys + ' orb' + (a.keys === 1 ? '' : 's'),
       a.ended === 'clock' ? 'Time\u2019s up at 10:00' : 'Finished in ' + formatClock(a.clockMs)].filter(Boolean).join(' \u00B7 ');
   }
   // `opts` lets Daily use the same picture (renderDailyRunShare...): its own
@@ -11354,7 +11354,7 @@
     if (!runActive) return false;
     runKeys++; runActKeys[runActIdx] = (runActKeys[runActIdx] || 0) + 1; renderRunBanner(); saveRunSnapshot();
     if (sfx.key) sfx.key();
-    showToast('🔑 +1 gold key · one more ' + GN.orbitDrop + ' chip');
+    showToast('◉ +1 orb for ' + GN.orbitDrop);
     return true;
   }
   let runActKeys = [], runActLetter = [];   // Run 4A: per round, the gold keys won and the Brain Beam's letter ('got' / 'miss'), for the reward beat
@@ -11391,7 +11391,7 @@
     if (REPLAY){ try{ const s = localStorage.getItem('flipstax_lucky_theme'); if (LUCKY_THEMES[s]) return s; }catch(e){} }
     return '1';
   }
-  function luckyLabel(k){ return k === 'KEY' ? '🔑' : k === 'CHIP' ? '🪙' : k === 'x2' ? '×2' : k; }
+  function luckyLabel(k){ return k === 'KEY' ? '◉' : k === 'CHIP' ? '🪙' : k === 'x2' ? '×2' : k; }
   // A+ tier 2 item 2: Lucky Lights is a spinning prize wheel. Eight bright wedges - points, keys, GOOP and DOUBLE - turn on a
   // stand under the spotlights; the wheel spins 3 to 4 seconds (ease-out) and lands on the outcome the game already chose from
   // the same table and odds as before (LUCKY_SQUARES, picked at random when SPIN is tapped); a pointer flicks at every peg with a
@@ -11399,10 +11399,10 @@
   // Wedge -> outcome (every label is a real outcome of the table, picked at the same odds as before): +20 twice, +50, KEY +1 twice, GOOP twice and
   // DOUBLE (the round's points x2). Landing picks the outcome first, then one of its wedges.
   const LW_WEDGES = [
-    { c:'#a45cff', d:'#5b1fd0', icon:'⭐', t:'+20', kind:'+20' }, { c:'#ff4fc8', d:'#c2158f', icon:'🔑', t:'KEY +1', kind:'KEY' },
+    { c:'#a45cff', d:'#5b1fd0', icon:'⭐', t:'+20', kind:'+20' }, { c:'#ff4fc8', d:'#c2158f', icon:'◉', t:'ORB +1', kind:'KEY'},
     { c:'#2fd9ff', d:'#0a8fc4', icon:'🟢', t:'GOOP', kind:'GOOP' }, { c:'#4be683', d:'#12a04a', icon:'✨', t:'DOUBLE', kind:'x2' },
     { c:'#ffe640', d:'#f0a800', icon:'⭐', t:'+50', kind:'+50' }, { c:'#ffa032', d:'#e0620a', icon:'⭐', t:'+20', kind:'+20' },
-    { c:'#ff5656', d:'#c4152a', icon:'🟢', t:'GOOP', kind:'GOOP' }, { c:'#5a86ff', d:'#1f3fd0', icon:'🔑', t:'KEY +1', kind:'KEY' },
+    { c:'#ff5656', d:'#c4152a', icon:'🟢', t:'GOOP', kind:'GOOP' }, { c:'#5a86ff', d:'#1f3fd0', icon:'◉', t:'ORB +1', kind:'KEY'},
   ];
   // Wedges: a soft flat-to-light gradient from the hub to the rim, thin white dividers. Every label is white with a dark outline, runs
   // outward from the hub and stays inside its wedge; the icon sits at the rim end, a long label (DOUBLE) is set a little smaller.
@@ -11456,7 +11456,7 @@
     const rotEl = luckyOv.querySelector('.lw-rot'), pointer = luckyOv.querySelector('.lw-pointer'), hub = luckyOv.querySelector('.lw-hub'), pop = luckyOv.querySelector('.lw-pop');
     const hubT = luckyOv.querySelector('.ll-hub-t'), hubS = luckyOv.querySelector('.ll-hub-s');
     const bBank = luckyOv.querySelector('.bank'), bAgain = luckyOv.querySelector('.again'), note = luckyOv.querySelector('.ll-note');
-    const renderBank = ()=>{ luckyOv.querySelector('.ll-bank').textContent = 'BANK +' + bank + (dbl ? ' · ×2 ROUND' : '') + (keys ? ' · 🔑' + keys : '') + (chips ? ' · 🪙' + chips : '') + ' · SPIN ' + Math.min(LUCKY_SPINS, spins + (state === 'spinning' ? 1 : 0)) + '/' + LUCKY_SPINS; };
+    const renderBank = ()=>{ luckyOv.querySelector('.ll-bank').textContent = 'BANK +' + bank + (dbl ? ' · ×2 ROUND' : '') + (keys ? ' · ◉' + keys : '') + (chips ? ' · 🪙' + chips : '') + ' · SPIN ' + Math.min(LUCKY_SPINS, spins + (state === 'spinning' ? 1 : 0)) + '/' + LUCKY_SPINS; };
     const show = (btns)=>{ bBank.classList.toggle('hidden', btns.indexOf('bank') < 0); bAgain.classList.toggle('hidden', btns.indexOf('again') < 0); };
     const popShow = (big, small)=>{ pop.querySelector('b').textContent = big; pop.querySelector('small').textContent = small || ''; pop.classList.remove('on'); void pop.offsetWidth; pop.classList.add('on'); };
     const popHide = ()=> pop.classList.remove('on');
@@ -11469,7 +11469,7 @@
         if (total) addRunScore(total, true);
         for (let k = 0; k < keys; k++) addRunKey('lucky');
         if (chips) addRunBonusKey(chips);
-        const sub = [total ? '+' + total + ' points' : '', keys + chips ? '🔑 ' + (keys + chips) + ' gold key' + (keys + chips > 1 ? 's' : '') : ''].filter(Boolean).join(' · ') || 'Nothing ventured!';
+        const sub = [total ? '+' + total + ' points' : '', keys + chips ? '◉ ' + (keys + chips) + ' orb' + (keys + chips > 1 ? 's' : '') : ''].filter(Boolean).join(' · ') || 'Nothing ventured!';
         hubT.textContent = 'BANKED!'; hubS.textContent = ''; popShow('BANKED!', sub);
         if (total || keys || chips){ sfx.cashRegister(); sfx.jackpot(); FX.burstAt(showFx, luckyOv.querySelector('.lw-hub'), { count:18, spread:130, shapes:['star', 'coin'] }); castWin(()=> gen === luckyGen && !luckyOv.classList.contains('hidden')); }
       }
@@ -11492,7 +11492,7 @@
       else if (k === 'KEY') keys++;
       else if (k === 'CHIP') chips++;
       sfx.correct(); FX.pop(pop, 1.1);
-      popShow(k === 'KEY' || k === 'CHIP' ? '🔑 GOLD KEY!' : k === 'x2' ? 'DOUBLE!' : k + ' POINTS!', k === 'x2' ? 'This round’s points doubled: +' + act3 : k === 'KEY' || k === 'CHIP' ? 'One more Orbit Drop chip' : 'into the bank');
+      popShow(k === 'KEY' || k === 'CHIP' ? '◉ ORB!' : k === 'x2' ? 'DOUBLE!' : k + ' POINTS!', k === 'x2' ? 'This round’s points doubled: +' + act3 : k === 'KEY' || k === 'CHIP' ? 'One more Orbit Drop chip' : 'into the bank');
       renderBank();
       // the result holds for the shared reveal time, then the old flow: bank at the 3rd spin, else BANK or SPIN AGAIN
       revealThen(()=>{
@@ -11949,12 +11949,12 @@
     showCard.innerHTML = '<i class="rw-sun" aria-hidden="true"></i><div class="rw-panel"><div class="rw-title"></div><div class="rw-frame"><i class="mq mq-a" aria-hidden="true"></i><i class="mq mq-b" aria-hidden="true"></i><div class="rw-row">' +
       '<span class="rw-chip pts" style="--i:0"><b>+' + pts + '</b><small>points</small></span>' +
       '<span class="rw-chip letter ' + (letter || 'none') + '" style="--i:1"><b>' + (letter === 'got' ? '?' : letter === 'miss' ? '✕' : '–') + '</b><small>' + (letter === 'got' ? 'letter won' : 'no letter') + '</small></span>' +
-      '<span class="rw-chip keys" style="--i:2"><b>🔑 ' + keys + '</b><small>gold key' + (keys === 1 ? '' : 's') + '</small></span></div></div></div>';   // (A+: only points gained, the letter won and keys - no running totals)
+      '<span class="rw-chip keys" style="--i:2"><b>◉ ' + keys + '</b><small>orb' + (keys === 1 ? '' : 's') + '</small></span></div></div></div>';   // (A+: only points gained, the letter won and keys - no running totals)
     showCard.querySelector('.rw-title').textContent = (a.title || 'ROUND') + ' DONE!';
     // A+: nothing earned - a friendly line in place of a bare +0 and a grey "no letter" tile (a round that paid something drops just the empty letter tile)
     if (pts <= 0 && letter !== 'got' && !keys){ showCard.querySelector('.rw-row').innerHTML = '<div class="rw-nothing"><b>Next round' + "'" + 's yours!</b><small>Keep going - the points are coming</small></div>'; showCard.classList.add('rw-empty'); }
     else if (letter !== 'got' && letter !== 'miss'){ const lc = showCard.querySelector('.rw-chip.letter'); if (lc) lc.remove(); }
-    showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', (a.title || 'Round') + ' done: ' + pts + ' points, ' + (letter === 'got' ? 'a letter, ' : '') + keys + ' gold keys. Tap to go on');
+    showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', (a.title || 'Round') + ' done: ' + pts + ' points, ' + (letter === 'got' ? 'a letter, ' : '') + keys + ' orbs. Tap to go on');
     showCard.classList.remove('hidden');
     if (pts > 0) sfx.chime(5);
     // A+ tier 1 item 3: a celebration - a burst of confetti over the title (not in lite mode or with reduced motion)
@@ -13132,7 +13132,7 @@
     document.getElementById('finScore').textContent = Math.max(0, r.score);
     const pct = infCrowdPct(r);
     document.getElementById('finCrowd').textContent = pct === null ? '—' : pct + '%';
-    document.getElementById('finKeys').textContent = '🔑 ' + infKeysEarned(r);
+    document.getElementById('finKeys').textContent = '◉ ' + infKeysEarned(r);
     const bold = document.getElementById('finBold');
     bold.classList.toggle('hidden', !r.boldest);
     if (r.boldest){
@@ -13391,6 +13391,32 @@
     setTimeout(end, 4600);   // (G2: lite mode is the still look - the same length)
     return true;
   }
+
+  // Overnight job 12: keys became orbs. Wherever the marker U+25C9 shows up in visible text, a small glowing orb (an SVG circle with a radial
+  // gradient and a highlight) takes its place; the gradient lives once in a hidden <svg> at the top of the page.
+  (function orbIcons(){
+    const MARK = '◉', SVG = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="url(#orbGrad)"/><ellipse cx="7.2" cy="6.4" rx="3.2" ry="2.2" fill="#fff" opacity="0.75"/></svg>';
+    const defs = document.createElement('div'); defs.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+    defs.innerHTML = '<svg width="0" height="0" aria-hidden="true"><defs><radialGradient id="orbGrad" cx="0.38" cy="0.32" r="0.75"><stop offset="0" stop-color="#ffffff"/><stop offset="0.35" stop-color="#9ff6ff"/><stop offset="0.75" stop-color="#27b8ff"/><stop offset="1" stop-color="#5a2fd0"/></radialGradient></defs></svg>';
+    document.body.appendChild(defs);
+    const swap = (t)=>{
+      const p = t.parentNode; if (!p || p.closest && p.closest('svg, textarea, input, script, style, title')) return;
+      const parts = t.nodeValue.split(MARK); if (parts.length < 2) return;
+      const f = document.createDocumentFragment();
+      parts.forEach((x, k)=>{ if (k){ const i = document.createElement('i'); i.className = 'orb-ic'; i.innerHTML = SVG; f.appendChild(i); } if (x) f.appendChild(document.createTextNode(x)); });
+      p.replaceChild(f, t);
+    };
+    const scan = (n)=>{
+      if (n.nodeType === 3){ if (n.nodeValue.indexOf(MARK) >= 0) swap(n); return; }
+      if (n.nodeType !== 1 || !n.textContent || n.textContent.indexOf(MARK) < 0) return;
+      const w = document.createTreeWalker(n, NodeFilter.SHOW_TEXT), hits = []; let t;
+      while ((t = w.nextNode())) if (t.nodeValue.indexOf(MARK) >= 0) hits.push(t);
+      hits.forEach(swap);
+    };
+    scan(document.body);
+    new MutationObserver((ms)=> ms.forEach(m=>{ if (m.type === 'characterData') scan(m.target); else m.addedNodes.forEach(scan); }))
+      .observe(document.body, { childList:true, subtree:true, characterData:true });
+  })();
   window.__warpWord = (DEBUG_FAST || REPLAY) ? ()=> (runWord && runWord.word) : undefined;
   window.__warpWin = (DEBUG_FAST || REPLAY) ? ()=> winWarp() : undefined;
   window.__discoTest = (DEBUG_FAST || REPLAY) ? ()=>{ discoShownFor = null; discoCelebrate('test'); } : undefined;
@@ -13699,7 +13725,7 @@
     infRun.ufoRewards = (infRun.ufoRewards || 0) + 1;
     const key = Math.random() < 0.5 && infRun.keys < INF_KEY_CAP;
     let label;
-    if (key && addInfKey('ufo')) label = '🔑 +1 key';
+    if (key && addInfKey('ufo')) label = '◉ +1 orb';
     else { addRacePoints(5); label = '+5 points'; }
     saveInfRun();
     sfx.ufoTap();
@@ -13768,7 +13794,7 @@
     // rewards
     document.getElementById('vaultScore').textContent = '0';
     document.getElementById('vaultScoreSub').textContent = a.runScore + ' run' + (a.bonus ? ' + ' + a.bonus + ' ' + GN.orbitDrop + ' bonus' : '');
-    document.getElementById('vaultFlipz').innerHTML = '<span>⚡ +' + a.flipz + ' Flipz this run</span><span>' + Math.max(stats.flips, a.flipz).toLocaleString() + ' lifetime</span><span>🔑 ' + a.keys + (a.stats && a.stats.keysHeld > 0 ? ' earned · ' + a.stats.keysHeld + ' kept' : ' keys') + '</span>';
+    document.getElementById('vaultFlipz').innerHTML = '<span>⚡ +' + a.flipz + ' Flipz this run</span><span>' + Math.max(stats.flips, a.flipz).toLocaleString() + ' lifetime</span><span>◉ ' + a.keys + (a.stats && a.stats.keysHeld > 0 ? ' earned · ' + a.stats.keysHeld + ' kept' : ' orbs') + '</span>';
     const pm = PERSONALITY_META[a.personality] || PERSONALITY_META.fence_sitter;
     // The result with its full card: a run personality's card always (it's
     // earned with the result); one of the 16 only if it's in the collection
@@ -13881,7 +13907,7 @@
     if (!runOrbit || runOrbit.done) runOrbit = { stage:'plinko', chips: drawPlinkoOutcomes(dailyChipsFor(runKeys, runBonusChips, false)), dropped:0, base: runScore, done:false, mid:true };
     runPhase = 'orbit'; runOrbitDone = done; saveRunSnapshot();
     const n = runOrbit.chips.length, k = runGoldKeys();
-    openOrbitBoard(runOrbit, (k ? k + ' gold key' + (k === 1 ? '' : 's') + (n > k ? ' + ' + (n - k) + ' free' : '') : n + ' free') + ' = ' + n + ' chips. Slide to aim, then tap DROP!');
+    openOrbitBoard(runOrbit, (k ? k + ' orb' + (k === 1 ? '' : 's') + ' won' + (n > k ? ' + ' + (n - k) + ' free' : '') : n + ' free') + ' = ' + n + ' orbs. Slide to aim, then tap DROP!');
     return true;
   }
   function openDailyOrbit(r){
@@ -13889,7 +13915,7 @@
     if (!r.orbit) r.orbit = { stage:'plinko', chips: drawPlinkoOutcomes(dailyOrbitChips(r)), dropped:0, base: r.score, done:false };
     if (r.orbit.done){ showRunReadout(); return; }
     saveRunResultToday(r);
-    const from = [(r.keys ? r.keys + ' 🔑' : ''), (r.bonusChips ? r.bonusChips + ' 🔑' : ''), (r.warpChip ? '+1 ' + GN.wordWarp : '')].filter(Boolean).join(', ');
+    const from = [(r.keys ? r.keys + ' ◉' : ''), (r.bonusChips ? r.bonusChips + ' ◉' : ''), (r.warpChip ? '+1 ' + GN.wordWarp : '')].filter(Boolean).join(', ');
     openOrbitBoard(r.orbit, r.orbit.chips.length + ' chips' + (from ? ' (' + from + ')' : '') + '. Slide to aim, then tap DROP!');
   }
   function openOrbitBoard(o, line){
@@ -14246,7 +14272,7 @@
       if (sc.pts){ if (dailyScanDone) addRunScore(sc.pts); else addRacePoints(sc.pts); }
       const key = dailyScanDone ? (sc.win ? addRunKey('mystery') : false) : sc.key ? addInfKey('guess') : false;
       res.querySelector('.gr-verdict').textContent = (off === 0 ? '🎯 Dead on! ' : 'You said ' + guess + '% — ' + off + ' off. ') +
-        (sc.pts ? '+' + sc.pts + ' points' + (key ? ' · 🔑 +1 key' : '') : 'No points this time');
+        (sc.pts ? '+' + sc.pts + ' points' + (key ? ' · ◉ +1 orb' : '') : 'No points this time');
       if (sc.pts >= 15) sfx.correct(); else if (sc.pts) sfx.revealWin(); else sfx.revealLose();
       // C3: the show's reaction - gold flash and a burst on a scoring read, red on a miss.
       if (sc.pts){ showFlash('win'); const pc = els.guessOverlay.querySelector('.guess-result') || els.guessOverlay; FX.burstAt(showFx, pc, { count: sc.pts >= 15 ? 16 : 9, spread:110, shapes:['star', 'coin'] }); }
@@ -14554,7 +14580,7 @@
     els.irOverlay.classList.remove('win', 'lose', 'answered');
     buildRiddleField();
     els.irQ.textContent = infRiddle.q;
-    els.irLen.textContent = 'Right answer: +' + INF_RIDDLE_POINTS + ' points · 🔑 1 key · a miss costs nothing';
+    els.irLen.textContent = 'Right answer: +' + INF_RIDDLE_POINTS + ' points · ◉ 1 orb · a miss costs nothing';
     const opts = shuffle([infRiddle.a].concat(infRiddle.wrong));
     els.irOpts.innerHTML = '';
     opts.forEach((o, i)=>{
@@ -14606,7 +14632,7 @@
     if (result === 'win'){
       if (infRun && !infRun.finale){ infRun.riddlesRight = (infRun.riddlesRight || 0) + 1; if (infRiddle.hard) infRun.riddlesHardRight = (infRun.riddlesHardRight || 0) + 1; saveInfRun(); }
       const key = addInfKey('riddle');
-      els.irVerdictSub.textContent = infRiddle.a + ' · +' + INF_RIDDLE_POINTS + ' points' + (key ? ' · 🔑 +1 key' : '');
+      els.irVerdictSub.textContent = infRiddle.a + ' · +' + INF_RIDDLE_POINTS + ' points' + (key ? ' · ◉ +1 orb' : '');
       els.irField.querySelectorAll('.ir-mark').forEach(m=> m.textContent = '!');
       void els.irOverlay.offsetWidth;
       popLetters(els.irOverlay.querySelector('.ir-verdict-big'), 'GENIUS!', 200);
@@ -17245,7 +17271,7 @@
         if (cv.withCrowd){
           { const ph = side === 'A' ? els.halfA : els.halfB; FX.glowSweep(showFx, ph); FX.burstAt(showFx, ph, { count:8, spread:70, shapes:['star'], colors:['#ffd23f', '#fff3c4', '#ffb21f'] }); }   // C5
           infRun.crowdAgree++; infRun.matchStreak++; infRun.maxMatchStreak = Math.max(infRun.maxMatchStreak || 0, infRun.matchStreak);
-          if (infRun.matchStreak % INF_MATCHES_PER_KEY === 0 && addInfKey('streak')) showToast('\uD83D\uDD11 ' + infRun.matchStreak + ' crowd matches in a row \u2014 +1 key');
+          if (infRun.matchStreak % INF_MATCHES_PER_KEY === 0 && addInfKey('streak')) showToast('\u25C9 ' + infRun.matchStreak + ' crowd matches in a row \u2014 +1 orb');
           if (infRun.matchStreak === ABDUCTION_STREAK) abductStack();
         } else infRun.matchStreak = 0;
         if (!cv.withCrowd && cv.others >= CROWD_DATA_MIN_NOW){
@@ -17334,7 +17360,7 @@
     const trivia = generateSubjectTrivia(subject, contentPoolKey());
     if (DEBUG_FAST) window.__debugLastTriviaQ = trivia;
     els.powerupIcon.classList.add('hidden');
-    els.eventSubtitle.textContent = '\uD83E\uDDE0 ' + GN.brainBeam.toUpperCase() + (inInfinity() ? ' \u00B7 answer right, earn points and a key' : '');
+    els.eventSubtitle.textContent = '\uD83E\uDDE0 ' + GN.brainBeam.toUpperCase() + (inInfinity() ? ' \u00B7 answer right, earn points and an orb' : '');
     els.eventPrompt.textContent = trivia.question; els.eventPrompt.classList.toggle('long', trivia.question.length > 90);
     // The same Brain Beam layout as Daily's (a marquee question panel, tall answer bars filling the screen).
     els.eventOverlay.classList.remove('powerup'); els.eventOverlay.classList.add('stack'); els.eventOverlay.style.setProperty('--bb', '#ffd23f');
@@ -17381,7 +17407,7 @@
       const n = INF_TRIVIA_POINTS; addRacePoints(n);
       const key = addInfKey('trivia');
       els.eventSubtitle.textContent = '';
-      els.eventPrompt.textContent = '\u2705 CORRECT! +' + n + ' POINTS' + (key ? ' \u00B7 \uD83D\uDD11 +1 KEY' : '');
+      els.eventPrompt.textContent = '\u2705 CORRECT! +' + n + ' POINTS' + (key ? ' \u00B7 \u25C9 +1 ORB' : '');
     } else if (wasCorrect === false){
       sfx.wrong();
       els.eventSubtitle.textContent = 'No flip this time';
@@ -17442,7 +17468,7 @@
     } else if (key === 'goldkey'){
       sfx.powerUp();
       const got = addInfKey('golden');
-      els.eventPrompt.textContent = got ? '\uD83D\uDD11 GOLDEN KEY! +1 key' : '\uD83D\uDD11 Your key ring is full (' + INF_KEY_CAP + ' max)';
+      els.eventPrompt.textContent = got ? '\u25C9 GOLDEN ORB! +1 orb' : '\u25C9 Your orb bag is full (' + INF_KEY_CAP + ' max)';
       finishPowerUp();
     } else if (key === 'coinflip'){
       runCoinFlip();
@@ -17506,8 +17532,8 @@
       let text, sub = '';
       if (prize === 'points10'){ cosmicPts(10); text = '+' + (10 * mult) + ' POINTS'; }
       else if (prize === 'points20'){ cosmicPts(20); text = '+' + (20 * mult) + ' POINTS'; }
-      else if (prize === 'key'){ cosmicKey(); text = cosmicDaily ? '🔑 +1 GOLD KEY' : '🔑 +1 KEY'; sub = cosmicDaily ? 'One more ' + GN.orbitDrop + ' chip in Round 6' : 'Keys open the finale'; }
-      else if (cosmicDaily){ addRunBonusKey(1); text = '🔑 +1 GOLD KEY'; sub = 'One more ' + GN.orbitDrop + ' chip in Round 6'; }
+      else if (prize === 'key'){ cosmicKey(); text = cosmicDaily ? '◉ +1 ORB' : '◉ +1 ORB'; sub = cosmicDaily ? 'One more orb for ' + GN.orbitDrop + ' in Round 6' : 'Orbs open the finale'; }
+      else if (cosmicDaily){ addRunBonusKey(1); text = '◉ +1 ORB'; sub = 'One more orb for ' + GN.orbitDrop + ' in Round 6'; }
       else { infRun.bonusChip = true; saveInfRun(); text = '🪙 BONUS CHIP'; sub = 'An extra ' + GN.orbitDrop + ' chip'; }
       label.innerHTML = ''; label.classList.add('won');
       const pill = document.createElement('span'); pill.className = 'cz-pill'; label.appendChild(pill);
@@ -17553,7 +17579,7 @@
     };
     for (let k = 0; k < 10; k++) setTimeout(()=> sfx.spinTick(k), 300 + k * 110);
   }
-  const COSMIC_REEL = { points10:'\u26A1', points20:'\uD83D\uDCA5', key:'\uD83D\uDD11', chip:'\uD83E\uDE99', scramble:'\uD83D\uDD00', clock:'\u23F1\uFE0F', riddle:'\uD83E\uDDE9', freeze:'\u2744\uFE0F' };
+  const COSMIC_REEL = { points10:'\u26A1', points20:'\uD83D\uDCA5', key:'\u25C9', chip:'\uD83E\uDE99', scramble:'\uD83D\uDD00', clock:'\u23F1\uFE0F', riddle:'\uD83E\uDDE9', freeze:'\u2744\uFE0F' };
   // The weird ones play on the power-up screen, in .cosmic-stage.
   function runCosmic(kind){
     const ov = els.eventOverlay, st = document.getElementById('cosmicStage');
@@ -17589,7 +17615,7 @@
         const key = Math.random() < 0.5 && (cosmicDaily || (infRun && infRun.keys < INF_KEY_CAP)) && cosmicKey();
         if (!key) cosmicPts(COSMIC_SCRAMBLE_WIN);
         sfx.correct(); sfx.coins(6);
-        done('✨ ' + word + '! ' + (key ? '🔑 +1 key' : '+' + COSMIC_SCRAMBLE_WIN + ' points'));
+        done('✨ ' + word + '! ' + (key ? '◉ +1 orb' : '+' + COSMIC_SCRAMBLE_WIN + ' points'));
       } else {
         const lost = cosmicPenalty(COSMIC_SCRAMBLE_MISS); sfx.revealLose();
         slots.forEach((s, k)=>{ s.textContent = word[k]; s.classList.add('full'); });
@@ -18306,20 +18332,20 @@
   // INF_SWING_CAP, GUESS_SCORING, INF_RIDDLE_POINTS, the Plinko chips.
   const HOWTO_RUN_INFINITY = { icon:'🏁', lead:'Race to ' + FINISH_POINTS + ' points — you have 10 minutes.',
     lines:['The bar up top fills toward ' + FINISH_POINTS + ', and the clock shows your time left (it only runs while you’re voting).',
-      'Earn 🔑 keys: match the crowd 3 times in a row, or nail a trivia question or a riddle.'],
+      'Earn ◉ orbs: match the crowd 3 times in a row, or nail a trivia question or a riddle.'],
     chipsLabel:'Power-ups — pick one when they drop',
     chips:[ ['⚡ +10 Points', 'Instant points'], ['🪙 Coin Flip', 'Heads or tails: win or lose up to 15'],
-            ['🎁 ' + GN.cosmicSurprise, 'A mystery prize — never a loss'], ['🔑 Golden Key', 'An extra key'] ] };
+            ['🎁 ' + GN.cosmicSurprise, 'A mystery prize — never a loss'], ['◉ Golden Orb', 'An extra orb'] ] };
   const HOWTO_LAST_INFINITY = { icon:'🛸', lead:'New rounds, then ' + GN.vault + '.',
     lines:['📡 ' + GN.crowdScan + ': slide to the % you think picked the left card. The closer, the more points.',
-      '🧩 Riddle rounds: pick the answer. Right = +20 and a key, a miss costs nothing.',
-      '🔐 Finish the run, drop a gold chip for each key in ' + GN.orbitDrop + ', then open ' + GN.vault + ': your score, personality, cards and badges.'] };
+      '🧩 Riddle rounds: pick the answer. Right = +20 and an orb, a miss costs nothing.',
+      '🔐 Finish the run, drop an orb for each one you won in ' + GN.orbitDrop + ', then open ' + GN.vault + ': your score, personality, cards and badges.'] };
   const HOWTO_SCREENS = {
     daily: [
       HOWTO_PICK,
       { icon:'🎬', lead:'One show a day, in six rounds.',
         lines:['Rounds 1 and 2 score normal points, Rounds 3 and 4 points ×2, Rounds 5 and 6 points ×3.',
-          'Each ' + GN.brainBeam + ' you get right wins a Word Warp letter. Win a round-end game for a 🔑 gold key: each one is a chip in ' + GN.orbitDrop + '.'],
+          'Each ' + GN.brainBeam + ' you get right wins a Word Warp letter. Win a round-end game for an ◉ orb: each one is a drop in ' + GN.orbitDrop + '.'],
         chipsLabel:'The round-end games',
         chips:[ ['🧩 ' + GN.riddleRound, 'Round 1'], ['💡 Lucky Lights', 'Round 2'],
                 ['🚪 Mystery Portal', 'Round 3'], ['⚡ ' + GN.zapWords, 'Round 4'], ['🃏 ' + GN.twinFlip, 'Round 5'], ['🛸 ' + GN.orbitDrop, 'Round 6'] ] },
@@ -18666,7 +18692,7 @@
       { mode:'infinity', label:'Riddle', go: ()=> infReplayEnter(INF_MID, ()=> startInfRiddle()) },
       { mode:'infinity', label:'Brain Beam', go: ()=> infReplayEnter(INF_MID, ()=> runWildEvent()) },
       { mode:'infinity', label:'Crowd Scan', go: ()=> infReplayEnter(INF_MID, ()=>{ const c = upcomingCards(1)[0]; tallyCache.set(slugify(c.a), 70); tallyCache.set(slugify(c.b), 30); startGuessRound(c); }) },
-      cosmicJump('+10 points', 'points10'), cosmicJump('+20 points', 'points20'), cosmicJump('a key', 'key'), cosmicJump('bonus chip', 'chip'),
+      cosmicJump('+10 points', 'points10'), cosmicJump('+20 points', 'points20'), cosmicJump('an orb', 'key'), cosmicJump('bonus chip', 'chip'),
       cosmicJump('Scramble', 'scramble'), cosmicJump('Time Warp', 'clock'), cosmicJump('Double or nothing', 'riddle'), cosmicJump('Clock freeze', 'freeze'),
       { mode:'infinity', label:'Restart Infinity', wide:true, cls:'restart', go: ()=> infReplayEnter(null, null) }
     );
