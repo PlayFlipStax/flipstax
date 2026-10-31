@@ -49,8 +49,11 @@
     const W = innerWidth, H = innerHeight;
     document.querySelectorAll('.hidden').forEach(e=>{
       const cs = getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity < 0.05) return;
-      const r = e.getBoundingClientRect(); if (r.width >= W * 0.8 && r.height >= H * 0.8) TT.paintedHidden[(e.id ? '#' + e.id : '') + '.' + String(e.className).split(' ').slice(0, 3).join('.')] = 1;
+      const r = e.getBoundingClientRect(); if (r.width >= W * 0.5 && r.height >= H * 0.5) TT.paintedHidden[(e.id ? '#' + e.id : '') + '.' + String(e.className).split(' ').slice(0, 3).join('.')] = 1;
     });
+    // a frozen copy of a scene (the crossfade ghost) must be gone within its fade (0.4 s): one that lingers is a previous screen still painted
+    const now = performance.now(); TT.ghostSince = TT.ghostSince || new Map();
+    document.querySelectorAll('.scene-ghost').forEach(g=>{ if (!TT.ghostSince.has(g)) TT.ghostSince.set(g, now); else if (now - TT.ghostSince.get(g) > 2500) TT.paintedHidden['stale ghost ' + (g.id ? '#' + g.id : '.' + String(g.className).split(' ').slice(0, 3).join('.'))] = 1; });
   }, 400);
   function step(){
     if (TT.report) return;
