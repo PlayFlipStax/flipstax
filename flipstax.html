@@ -422,7 +422,7 @@
   /* The bottom card's tag sits in its top-left corner, in the band kept clear
      at the top of that card (see layoutBoard) - it used to sit at the bottom
      and could cover the "N people" line. */
-  .half.bottom .cat-chip{ top:8px; bottom:auto; left:10px; transform:none; }
+  .half.bottom .cat-chip{ top:30px; bottom:auto; left:50%; transform:translateX(-50%); }   /* (centred on the card like the top card's tag, below the VS coin that overlaps the card's top edge; it sat at the left edge) */
   /* Narrow phones: a long label would run under the Pause pill, so the
      top chip steps aside - the bottom chip still shows the same label. */
   .cat-chip.squeezed{ visibility:hidden; }
