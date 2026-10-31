@@ -11091,7 +11091,7 @@
         // Run 4A: from the play (a round just ended) the show zooms back out to the host on the stage; the card then
         // zooms in through the marquee to the round's play.
         const card = ()=>{ if (g === Show.gen) showActCard(Object.assign({}, st, { vsExplain: vsNext && !explainerSeen.vs, zoomIn:true }), ()=> showDone(g, 'act card')); };
-        if (st.act > 0) zoomThrough('out', card); else card();
+        card();   // (no zoom-out veil from the Round Done card any more: it was an empty purple frame with the title card fading in out of it; the title card now follows the Round Done card straight away)
         return true;
       }
       if (st.t === 'sponsor'){
