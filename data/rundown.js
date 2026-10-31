@@ -30,6 +30,10 @@ const REWARD_HOLD = 2200;            // Run 4A: the reward beat after a round-en
 // G3 (Oct 16): the commercial break is cut from the show. Its code and the "Brought to you by" sponsor field stay;
 // set this to true to bring it back (it plays after the round named in commercial.after).
 const COMMERCIAL_ENABLED = false;
+// One shared setting: every entrance (a sign slamming in, a board zooming in) starts no larger than this times its final size (lib/entrance-check: tools/entrance-check.py).
+const ENTER_SCALE = 1.15;
+window.FLIPSTAX_ENTER_SCALE = ENTER_SCALE;
+try{ document.documentElement.style.setProperty('--enter-scale', String(ENTER_SCALE)); }catch(e){}
 window.FLIPSTAX_TIMING = { ACT_CARD_HOLD, MYSTERY_REVEAL_HOLD, STAR_WIPE, ROUND_BUMPER_HOLD, COSMIC_SURPRISE_INTRO, CINEMATIC_MIN, SKIP_AFTER, ZOOM_MS, GAME_INTRO_MS, REWARD_HOLD };
 
 // VS cards per round (Oct 23: 8, was 6; Oct 22: 6, was 4) and how long each waits for a pick (5 s, unchanged). The player's tap ends the wait: the card advances as

@@ -1625,7 +1625,7 @@
   @keyframes irRing{ 0%{ transform:scale(0.2); opacity:1; } 100%{ transform:scale(22); opacity:0; border-width:1px; } }
   @keyframes irPanelOut{ 0%{ transform:scale(1); opacity:1; } 40%{ transform:scale(1.08); opacity:1; } 100%{ transform:scale(0.7); opacity:0; } }
   /* No CSS filters on the text: WebKit clips its big glow to a visible box. */
-  @keyframes irSlam{ 0%{ transform:scale(3.2) rotate(-6deg); opacity:0; } 60%{ transform:scale(0.92) rotate(1deg); opacity:1; } 100%{ transform:scale(1) rotate(0); opacity:1; } }
+  @keyframes irSlam{ 0%{ transform:scale(var(--enter-scale, 1.15)) rotate(-6deg); opacity:0; } 60%{ transform:scale(0.92) rotate(1deg); opacity:1; } 100%{ transform:scale(1) rotate(0); opacity:1; } }
   @keyframes irGlow{
     0%{ text-shadow:0 0 20px #fff6a8, 0 0 50px rgba(255,210,60,0.95), 0 0 90px rgba(120,255,120,0.8), 0 6px 0 #0b5d2b; }
     100%{ text-shadow:0 0 28px #fff, 0 0 70px rgba(255,220,80,1), 0 0 120px rgba(140,255,140,0.95), 0 6px 0 #0b5d2b; }
@@ -2765,7 +2765,7 @@
     animation:giSlam 520ms var(--ease-pop) 320ms both; }
   .gi-sign span{ position:relative; z-index:3; display:block; padding:2px 4px; }
   .gi-sign .sign-bulbs i{ animation:bulbChase 0.9s steps(1) 0.8s infinite; animation-delay:calc(0.8s + var(--k, 0) * -0.225s); }
-  @keyframes giSlam{ 0%{ transform:scale(1.15); opacity:0; } 60%{ transform:scale(0.96); opacity:1; } 100%{ transform:none; opacity:1; } }   /* (it started at 2.3x: wider than the screen, so only 'DDLE ROU' showed) */
+  @keyframes giSlam{ 0%{ transform:scale(var(--enter-scale, 1.15)); opacity:0; } 60%{ transform:scale(0.96); opacity:1; } 100%{ transform:none; opacity:1; } }   /* (it started at 2.3x: wider than the screen, so only 'DDLE ROU' showed) */
   :root.lite .gi-spot{ animation:none; opacity:0.5; transform:none; }
   :root.lite .gi-sign{ animation:giFade 300ms linear both; } :root.lite .gi-sign .sign-bulbs i{ animation:none; }
   @keyframes giFade{ from{ opacity:0; } to{ opacity:1; } }
@@ -2949,7 +2949,7 @@
     filter:drop-shadow(0 4px 0 #5a1600) drop-shadow(0 0 14px rgba(255,226,110,0.95)) drop-shadow(0 0 36px rgba(255,150,40,0.75)); opacity:0; transform:scale(0.5); }
   .mw-name.long{ font-size:clamp(38px, 11.5vw, 54px); }
   .mw-name.on{ opacity:1; transform:none; animation:mwSlam .55s cubic-bezier(.2,1.4,.4,1) both; }
-  @keyframes mwSlam{ 0%{ opacity:0; transform:scale(2.7); } 38%{ opacity:1; transform:scale(0.88); } 68%{ transform:scale(1.07); } 100%{ opacity:1; transform:scale(1); } }
+  @keyframes mwSlam{ 0%{ opacity:0; transform:scale(var(--enter-scale, 1.15)); } 38%{ opacity:1; transform:scale(0.88); } 68%{ transform:scale(1.07); } 100%{ opacity:1; transform:scale(1); } }
   @media (prefers-reduced-motion: reduce){ .mw-rim circle{ animation:none !important; } .mw-name.on{ animation:none; } }
   /* Lucky Lights (refs/showcase.jpg): gold and black, two swaying spotlights, a ring of 12 squares. */
   .lucky-overlay{ position:fixed; inset:0; z-index:28; display:flex; align-items:center; justify-content:center; overflow:hidden; color:#fff; text-align:center;
@@ -12140,7 +12140,7 @@
   // game's backdrop is swapped in underneath, then the bloom fades. About ZOOM_MS in all, one smooth pulse, no flicker.
   // The reverse (zoom out of the play, back to the host on the stage) opens the next round. Faked with transform and
   // opacity only (no live blur); lite mode and reduced motion get a quick crossfade instead.
-  const ZOOM_SCALE = 2.6, ZOOM_OUT_FROM = 1.6;   // (the way out starts at 1.6: the marquee text never exceeds the screen)
+  const ZOOM_SCALE = window.FLIPSTAX_ENTER_SCALE || 1.15, ZOOM_OUT_FROM = window.FLIPSTAX_ENTER_SCALE || 1.15;   // (one shared setting: nothing is drawn bigger than 1.15x, so it is never cropped out of frame; was 2.6 / 1.6)
   const zoomFx = document.createElement('div');
   zoomFx.className = 'zoom-fx hidden'; zoomFx.setAttribute('aria-hidden', 'true');
   zoomFx.innerHTML = '<i class="zf-veil"></i><i class="zf-bloom"></i>';
