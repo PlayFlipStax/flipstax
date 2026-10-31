@@ -305,7 +305,7 @@
 
 /* ---- A+ job 2 item 8: Fact or Fib - the statement and the fact fit their box (auto-fit in lib/mini-games.js: down to 14 px, up to 3 lines); the host's pop-up and
    its reaction stay inside the stage (overflow hidden) and are toned down ---- */
-.ff-text, .ff-fact{ display:block; max-width:100%; overflow-wrap:anywhere; hyphens:auto; line-height:1.2; }
+.ff-text, .ff-fact{ display:block; max-width:100%; overflow-wrap:break-word; word-break:normal; hyphens:none; -webkit-hyphens:none; line-height:1.2; }
 .ff-bubble{ overflow:hidden; }
 .ff-stage{ position:relative; overflow:hidden !important; }
 .ff-host{ max-width:100%; }

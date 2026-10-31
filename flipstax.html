@@ -11338,6 +11338,19 @@
       timerT = setTimeout(()=>{ timerT = null; if (!over && timerCb) timerCb(); }, ms);
       scheduleLastTicks(ms, ()=> !over && seq === tickSeq && !!timerT);
     };
+    // The result pill ("+80") sits where it covers no text: the first of a few heights on the stage that overlaps nothing readable (Fact or Fib's reveal line used to be under it).
+    const placeResult = ()=>{
+      try{
+        const host = resEl.offsetParent || resEl.parentElement, hr = host.getBoundingClientRect(), ph = resEl.offsetHeight, pw = resEl.offsetWidth;
+        const items = [...ov.querySelectorAll('.mg-stage *, .mg-rule, .mg-hud *')].filter(e=> e !== resEl && !resEl.contains(e) && !e.contains(resEl) && e.getClientRects().length && (
+          [...e.childNodes].some(n=> n.nodeType === 3 && n.textContent.trim()) || e.tagName === 'CANVAS' || e.tagName === 'BUTTON')).map(e=> e.getBoundingClientRect()).filter(r=> r.width > 2 && r.height > 2);
+        const area = (top)=>{ const l = hr.left + hr.width / 2 - pw / 2, t = hr.top + top, r2 = l + pw, b = t + ph; let a = 0;
+          items.forEach(r=>{ const w = Math.min(r2, r.right) - Math.max(l, r.left), h = Math.min(b, r.bottom) - Math.max(t, r.top); if (w > 0 && h > 0) a += w * h; }); return a; };
+        let best = null;
+        [0.46, 0.3, 0.62, 0.14, 0.78, 0.9].forEach(f=>{ const top = hr.height * f - ph / 2; if (top < 4 || top + ph > hr.height - 4) return; const a = area(top); if (best === null || a < best.a) best = { f, a }; });
+        if (best && best.f !== 0.46) resEl.style.top = (best.f * 100) + '%';
+      }catch(e){}
+    };
     const api = {
       key, stage, overlay: ov, seed: (st && st.seed) || ((Math.random() * 4294967296) >>> 0),
       sfx, FX, fxLayer: showFx, lite: isLite(), reduced: prefersReducedMotion(), mult: runActive ? runActMult() : 1,
@@ -11357,6 +11370,7 @@
         if (pts && runActive) addRunScore(pts);
         if (win && runActive) addRunKey('mystery');
         resEl.className = 'mg-result on ' + (pts ? 'win' : 'miss'); resEl.textContent = pts ? '+' + (pts * api.mult) : 'MISSED';
+        placeResult();
         if (res && res.line) api.say(res.line, readMs(res.line));
         if (pts){ sfx.cashRegister(); api.flash('win'); hostMood('cheer'); } else { hostMood('sad'); }
         if (runActive && win && Show.scene === 'game') castWin(()=> !!document.getElementById('mgOverlay'));   // (Run 4A: a round-end game won)
