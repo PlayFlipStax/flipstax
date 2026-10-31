@@ -1064,6 +1064,8 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 /* ---- A+ job 2 item 1: Round Done - the slam-in settles to a size that fits (the title never exceeds the screen), the art is full-bleed cover,
    and the zoom veil is a deep midnight (no cream frame between Round Done and the next scene) ---- */
 .zf-veil{ background:radial-gradient(circle at var(--zx, 50%) var(--zy, 13%), #3a1268 0%, #1a0a38 55%, #0c0620 100%) !important; }
+/* the cream-white flash between a title card and the game was this bloom (white at full opacity): it is a deep violet glow now, so the zoom passes through dark and never flashes white */
+.zf-bloom{ background:radial-gradient(closest-side, #4a1a82 0%, rgba(58,18,104,0.95) 35%, rgba(26,10,56,0.6) 68%, rgba(12,6,32,0) 100%) !important; }
 :root.mode-daily .show-card.reward .rw-title{ max-width:100%; overflow-wrap:anywhere; animation:rwSlam 0.45s var(--ease-pop, cubic-bezier(.3,1.4,.5,1)) both; }
 @keyframes rwSlam{ 0%{ transform:scale(1.25); opacity:0; } 60%{ transform:scale(0.96); opacity:1; } 100%{ transform:none; opacity:1; } }
 :root.lite .rw-title, :root.mode-daily.lite .show-card.reward .rw-title{ animation:rwFadeIn 0.25s ease-out both; }
