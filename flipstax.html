@@ -12217,12 +12217,14 @@
   function gameIntroColors(key){ const gi = GAME_INTRO[key], mg = miniGame(key); return (gi && gi.c) || (mg && mg.colors) || ['#ffd23f', '#c2275f']; }
   // The intro: about GAME_INTRO_MS, then `then`. Lite mode and reduced motion: the title fades in, no sweep or slam.
   function showGameIntro(key, then){
-    const gi = GAME_INTRO[key], c = gameIntroColors(key), ms = (runActive && DEBUG_FAST) ? dt(TIMING.GAME_INTRO_MS || 2000) : (TIMING.GAME_INTRO_MS || 2000);
+    const gi = GAME_INTRO[key], c = gameIntroColors(key), lineMs = Math.min(3450, Math.max(3000, 1400 + readMs(explainerText(key, false) || ''))), ms = (runActive && DEBUG_FAST) ? dt(lineMs) : lineMs;
     const name = gi ? gi.name() : mysteryName(key);
     showCard.className = 'show-card gintro' + (key === 'door' ? ' gi-portal' : '');
     showCard.style.setProperty('--gi-a', c[0]); showCard.style.setProperty('--gi-b', c[1] || c[0]);
     showCard.innerHTML = '<i class="gi-bg" aria-hidden="true"></i><i class="gi-spot" aria-hidden="true"></i>' +
-      '<div class="gi-icon" aria-hidden="true"></div><div class="gi-sign"><div class="sign-bulbs" aria-hidden="true"></div><span></span></div>';
+      '<div class="gi-icon" aria-hidden="true"></div><div class="gi-sign"><div class="sign-bulbs" aria-hidden="true"></div><span></span></div><p class="gi-line"></p>';
+    // ONE card: the sign with the game's one-line instruction under it (the short explainer; the ? button still replays the full one) - 3 to 3.5 s, no blank frame
+    const line = explainerText(key, false); mergedIntro = line ? key : null; if (line) showCard.querySelector('.gi-line').textContent = line; else showCard.querySelector('.gi-line').remove();
     showCard.querySelector('.gi-icon').textContent = GAME_ICONS[key] || '✨';   // (A+ pacing: the game's icon over its name)
     // Overnight job 7: three spotlight beams from the top sweep round the stage and converge on the title, which then settles; the beams fade.
     showCard.insertAdjacentHTML('afterbegin', [0.12, 0.5, 0.88].map((x, k)=> '<i class="gi-beam b' + k + '" aria-hidden="true" style="left:' + (x * 100) + '%"></i>').join(''));
@@ -12242,7 +12244,7 @@
     let gone = false;
     const go = (e)=>{
       if (gone || (e && performance.now() - shownAt < TAP_AFTER_MS)) return;
-      gone = true; showCard.removeEventListener('click', go);
+      gone = true; showCard.removeEventListener('click', go); if (mergedIntro === key) markExplainerSeen(key);
       showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; showCard.style.removeProperty('--gi-a'); showCard.style.removeProperty('--gi-b');
       then();
     };
@@ -12250,8 +12252,10 @@
     showCard.addEventListener('click', go);
   }
   // The explainer card (or nothing, for a game without one). opts.full: always the full card (the ? button).
+  let mergedIntro = null;   // the game whose title card already carried its one-line instruction
   function showExplainer(key, then, opts){
     opts = opts || {};
+    if (!opts.full && mergedIntro === key){ mergedIntro = null; then(); return; }
     const full = !!opts.full || !explainerSeen[key], text = explainerText(key, full);
     if (!text){ then(); return; }
     const gi = GAME_INTRO[key], c = gameIntroColors(key), wait = lineWords(text) > EXPLAINER_TAP_WORDS;

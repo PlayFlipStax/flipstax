@@ -1441,3 +1441,10 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 @media (max-height:700px){ :root.mode-daily .show-card.reward.art-round::before{ background-position:50% 96%; } .rw-video{ object-position:50% 96%; } }
 /* the end-of-show screen on a short phone (360 x 640): the headline is smaller and the group sits a little lower, so the headline stays on the arch, clear of the faces */
 @media (max-height:700px){ .outro-mid{ top:calc(56px + env(safe-area-inset-top)); } .outro-mid .outro-head{ font-size:28px; } .outro-art{ top:46px; height:calc(100% - 346px); object-position:50% 20%; } }
+
+/* ---- ONE game card: the sign, then its one-line instruction fading in under it (3 to 3.5 s in all) ---- */
+.show-card.gintro .gi-sign{ animation-delay:0.65s; } .show-card.gintro .gi-icon{ animation-delay:0.55s; }
+.gi-line{ position:relative; z-index:2; margin:2px 0 0; max-width:min(86vw, 360px); text-align:center; color:#fff7d6; font:800 clamp(17px, 4.8vw, 21px)/1.3 var(--f-body); text-shadow:0 2px 6px rgba(20,0,40,0.8);
+  animation:giLine 0.5s ease-out 1.25s both; }
+@keyframes giLine{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
+:root.lite .gi-line{ animation:vsFade 0.3s ease-out 0.3s both; } @media (prefers-reduced-motion: reduce){ .gi-line{ animation:vsFade 0.3s ease-out 0.3s both; } }
