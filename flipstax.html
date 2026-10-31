@@ -12241,7 +12241,7 @@
       '<div class="gi-icon" aria-hidden="true"></div><div class="gi-sign"><div class="sign-bulbs" aria-hidden="true"></div><span></span></div><p class="gi-line"></p>';
     // ONE card: the sign with the game's one-line instruction under it (the short explainer; the ? button still replays the full one) - 3 to 3.5 s, no blank frame
     const line = explainerText(key, false); mergedIntro = line ? key : null; if (line) showCard.querySelector('.gi-line').textContent = line; else showCard.querySelector('.gi-line').remove();
-    showCard.querySelector('.gi-icon').textContent = GAME_ICONS[key] || '✨';   // (A+ pacing: the game's icon over its name)
+    { const ic = showCard.querySelector('.gi-icon'); if (key === 'lucky') ic.innerHTML = '<svg class="gi-wheel" viewBox="0 0 100 100" aria-hidden="true"><g class="gw-spin"><path d="M50 50 L50.0 6.0 A44 44 0 0 1 81.1 18.9 Z" fill="#ff4d6d"/><path d="M50 50 L81.1 18.9 A44 44 0 0 1 94.0 50.0 Z" fill="#b45cff"/><path d="M50 50 L94.0 50.0 A44 44 0 0 1 81.1 81.1 Z" fill="#2fd4a0"/><path d="M50 50 L81.1 81.1 A44 44 0 0 1 50.0 94.0 Z" fill="#ff9a3d"/><path d="M50 50 L50.0 94.0 A44 44 0 0 1 18.9 81.1 Z" fill="#ff4d6d"/><path d="M50 50 L18.9 81.1 A44 44 0 0 1 6.0 50.0 Z" fill="#b45cff"/><path d="M50 50 L6.0 50.0 A44 44 0 0 1 18.9 18.9 Z" fill="#2fd4a0"/><path d="M50 50 L18.9 18.9 A44 44 0 0 1 50.0 6.0 Z" fill="#ff9a3d"/><circle cx="50" cy="50" r="44" fill="none" stroke="#fff3c4" stroke-width="4"/><circle cx="50" cy="50" r="9" fill="#fff3c4" stroke="#8a5200" stroke-width="2.5"/></g></svg>'; else ic.textContent = GAME_ICONS[key] || '✨'; }   // (A+ pacing: the game's icon over its name)
     // Overnight job 7: three spotlight beams from the top sweep round the stage and converge on the title, which then settles; the beams fade.
     showCard.insertAdjacentHTML('afterbegin', [0.12, 0.5, 0.88].map((x, k)=> '<i class="gi-beam b' + k + '" aria-hidden="true" style="left:' + (x * 100) + '%"></i>').join(''));
     showCard.querySelector('.gi-sign span').textContent = String(name).toUpperCase();
@@ -12438,7 +12438,7 @@
       '<div class="mr-frame"><div class="sign-bulbs" aria-hidden="true"></div><div class="mr-door" style="--c0:' + c[0] + ';--c1:' + c[1] + '">' +
       '<div class="mr-name" aria-live="polite"></div><i class="mr-curt l"></i><i class="mr-curt r"></i></div></div></div>' +
       '';   // (Run 4A: no host at the door - he appears only in the intro, the round announcements, the outro and failure reactions)
-    showCard.querySelector('.mr-name').textContent = (GAME_ICONS[game] ? GAME_ICONS[game] + ' ' : '') + mysteryName(game).toUpperCase();   // (A+ pacing: name and icon)
+    showCard.querySelector('.mr-name').textContent = (GAME_ICONS[game] && game !== 'lucky' ? GAME_ICONS[game] + ' ' : '') + mysteryName(game).toUpperCase();   // (A+ pacing: name and icon)
     showCard.removeAttribute('role'); showCard.setAttribute('aria-label', 'Mystery game: ' + mysteryName(game));
     showCard.classList.remove('hidden');
     clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');

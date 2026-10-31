@@ -1448,3 +1448,9 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
   animation:giLine 0.5s ease-out 1.25s both; }
 @keyframes giLine{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
 :root.lite .gi-line{ animation:vsFade 0.3s ease-out 0.3s both; } @media (prefers-reduced-motion: reduce){ .gi-line{ animation:vsFade 0.3s ease-out 0.3s both; } }
+
+/* the Mystery Wheel's title-card icon: a plain spinning wheel (SVG, transform only) instead of the Ferris-wheel emoji; still in lite mode and reduced motion */
+.gi-wheel{ display:block; width:clamp(66px, 20vw, 96px); height:clamp(66px, 20vw, 96px); }
+.gi-wheel .gw-spin{ transform-origin:50px 50px; animation:gwSpin 3.2s linear infinite; }
+@keyframes gwSpin{ to{ transform:rotate(360deg); } }
+:root.lite .gi-wheel .gw-spin{ animation:none; } @media (prefers-reduced-motion: reduce){ .gi-wheel .gw-spin{ animation:none; } }
