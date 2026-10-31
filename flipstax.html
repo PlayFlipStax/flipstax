@@ -12349,18 +12349,22 @@
       (SPONSOR_LOGO ? '<div class="cb-by"><span>Brought to you by</span><img class="sp-logo" src="' + SPONSOR_LOGO + '" alt="Our sponsor"></div>' : '') + '</div>';
     showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'Commercial break: a word from our sponsors. Tap to skip');
     showCard.classList.remove('hidden');
-    const prod = showCard.querySelector('.cb-prod'), shownAt = performance.now(); let gone = false, stage = 'intro', timers = [];
+    const prod = showCard.querySelector('.cb-prod'), say = showCard.querySelector('.cb-say'), shownAt = performance.now(); let gone = false, stage = 'intro', timers = [];
+    // (the break's own elements: if another screen has taken showCard over (a TEST jump, a skip, a restart) they are gone - the timers then stop quietly and never touch the new card)
+    const alive = ()=> !gone && !!say && say.isConnected && showCard.contains(say) && !!prod;
     const L = (ms, f)=> timers.push((runActive ? showLater : setTimeout)(f, runActive && DEBUG_FAST ? dt(ms) : ms));
     const clearT = ()=>{ timers.forEach(clearTimeout); timers = []; };
-    const finish = ()=>{ if (gone) return; gone = true; clearT(); showCard.removeEventListener('click', go);
+    const finish = ()=>{ if (gone) return; const mine = alive(); gone = true; clearT(); showCard.removeEventListener('click', go);
+      if (!mine) return;   // (another screen owns showCard now: leave it alone)
       showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; noteOverlayClosed(); done(); };
-    const lastCard = ()=>{ clearT(); stage = 'last'; showCard.classList.remove('has-prod'); showCard.classList.add('last'); showCard.querySelector('.cb-say').textContent = 'Thanks for watching!'; L(CB_COFFEE_MS, finish); };
-    const showProd = (i)=>{ if (gone) return; if (i >= CB_PRODUCTS.length){ lastCard(); return; } stage = 'prod'; const p = CB_PRODUCTS[i];
+    const lastCard = ()=>{ clearT(); if (!alive()){ gone = true; return; } stage = 'last'; showCard.classList.remove('has-prod'); showCard.classList.add('last'); say.textContent = 'Thanks for watching!'; L(CB_COFFEE_MS, finish); L(CB_COFFEE_MS + 3000, finish); };   // (the second timer is a safety net: the break always ends and hands back to the show)
+    const showProd = (i)=>{ if (!alive()){ clearT(); gone = true; return; } if (i >= CB_PRODUCTS.length){ lastCard(); return; } stage = 'prod'; const p = CB_PRODUCTS[i];
       prod.querySelector('.cb-e').textContent = p.e; prod.querySelector('.cb-brand').textContent = p.brand; prod.querySelector('.cb-line').textContent = p.line;
       showCard.classList.add('has-prod'); prod.classList.remove('pop'); void prod.offsetWidth; prod.classList.add('pop'); sfx.chime(2 + i);
       L(CB_PRODUCT_MS, ()=> showProd(i + 1)); };
     L(CB_INTRO_MS, ()=> showProd(0));
-    function go(e){ if (gone) return; if (e && e.target.closest && e.target.closest('a')) return;
+    L(CB_INTRO_MS + CB_PRODUCTS.length * CB_PRODUCT_MS + CB_COFFEE_MS + 6000, finish);   // (a hard stop: whatever happens, the break ends and hands back to the show)
+    function go(e){ if (gone) return; if (!alive()){ clearT(); gone = true; return; } if (e && e.target.closest && e.target.closest('a')) return;
       if (e && performance.now() - shownAt < CB_SKIP_MS) return;
       if (stage === 'last') finish(); else lastCard(); }
     showCard.addEventListener('click', go);
