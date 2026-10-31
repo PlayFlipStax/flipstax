@@ -12089,9 +12089,9 @@
     showCard.querySelector('.fs-title b').textContent = signMain; showCard.querySelector('.fs-title span').textContent = signSub;
     showCard.removeAttribute('role'); showCard.setAttribute('aria-label', signMain + (m > 1 ? ', points times ' + m : '') + '. ' + line);
     showCard.classList.remove('hidden');
-    const say = Math.max(TIMING.ACT_CARD_HOLD + (fin ? 300 : 0), cueLineMs(line) + 500);
-    const vsText = st.vsExplain ? explainerText('vs', true) : '';
-    const ms = cine(say + (vsText ? explainerMs(vsText) + 300 : 0));
+    // the title card moves on by itself after ROUND_CARD_MS (about 3 s with the zoom out), shows ONE line from the host, and a tap skips it;
+    // a first-time VS explainer is a card of its own afterwards (showExplainer), not a second host line on this one
+    const ROUND_CARD_MS = 2200, ms = ROUND_CARD_MS;
     if (window.Stage && !tArt) Stage.cue('close', { over:showCard, cls:'flipstage', push:true, ms, sign:{ sub: signSub, main: signMain } });
     showCard.classList.toggle('staged', !!(window.Stage && Stage.ready) && !tArt);
     clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
@@ -12103,15 +12103,11 @@
     const hide = ()=>{ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; };
     const gen0 = Show.gen;
     // (st.zoomIn: the card leaves through the marquee - the play is swapped in at the zoom's peak)
-    const end = ()=>{ if (ended || window.__previewHold) return; ended = true; if (vsText) markExplainerSeen('vs'); showCard.removeEventListener('click', skipVs);
-      if (st.zoomIn) zoomThrough('in', ()=>{ if (runActive && gen0 !== Show.gen) return; hide(); then(); }); else { hide(); then(); } };
-    // (the host's VS explanation: a cue line of its own after the announcement; a tap skips it - the announcement itself plays out)
-    let vsAt = 0;
-    const skipVs = ()=>{ if (vsAt && performance.now() - vsAt > 350) end(); };
-    if (vsText){
-      later(()=>{ vsAt = performance.now(); cueLineSay(lineEl, vsText); Host.pose(showCard.querySelector('.fs-host'), 'point', { hold:0 }); showCard.setAttribute('aria-label', vsText); }, say);
-      showCard.addEventListener('click', skipVs);
-    }
+    const skipTap = ()=>{ if (performance.now() - shownAt > SKIP_MIN_MS) end(); }, shownAt = performance.now();
+    const after = ()=>{ if (runActive && gen0 !== Show.gen) return; hide(); if (st.vsExplain && !explainerSeen.vs) showExplainer('vs', then); else then(); };
+    const end = ()=>{ if (ended || window.__previewHold) return; ended = true; showCard.removeEventListener('click', skipTap);
+      if (st.zoomIn) zoomThrough('in', after); else after(); };
+    showCard.addEventListener('click', skipTap);
     later(end, ms);
   }
   // Run 4A: the outro - the host waves the show off in one cue line, then the results.
