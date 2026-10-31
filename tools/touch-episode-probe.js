@@ -43,6 +43,15 @@
   const tapEl = (el, why)=>{ const [x, y] = center(el); tap(x, y, why); };
   // The player.
   let next = performance.now() + 800, lastGen = -1, sceneAt = 0;
+  // A full-screen element that carries .hidden but is still painted (a stylesheet rule beating .hidden) covers everything under it: a black screen on a phone.
+  TT.paintedHidden = {};
+  setInterval(()=>{
+    const W = innerWidth, H = innerHeight;
+    document.querySelectorAll('.hidden').forEach(e=>{
+      const cs = getComputedStyle(e); if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity < 0.05) return;
+      const r = e.getBoundingClientRect(); if (r.width >= W * 0.8 && r.height >= H * 0.8) TT.paintedHidden[(e.id ? '#' + e.id : '') + '.' + String(e.className).split(' ').slice(0, 3).join('.')] = 1;
+    });
+  }, 400);
   function step(){
     if (TT.report) return;
     const S = window.__show, now = performance.now();
@@ -125,6 +134,7 @@
     if (!opts.fast) for (let i = 1; i < adv.length; i++) if (adv[i].t - adv[i - 1].t < 400) problems.push('two advances ' + Math.round(adv[i].t - adv[i - 1].t) + ' ms apart (' + adv[i - 1].scene + ' -> ' + adv[i].scene + ')');
     const coldAt = (enters.find(e=> e.scene === 'coldopen') || enters[0] || { t:0 }).t;
     const errs = (window.__qa && window.__qa.errors || []).concat(window.__qa && window.__qa.rejections || []);
+    const ph = Object.keys(TT.paintedHidden); if (ph.length) problems.push('a .hidden element is still painted full-screen: ' + ph.join(', '));
     if (errs.length) problems.push('script errors: ' + errs.slice(0, 3).join(' | '));
     TT.report = { ok: !problems.length, problems, cosmic: cosmicIdx, plan: want.length, minutes: +((performance.now() - coldAt) / 60000).toFixed(2), taps: TT.taps, ghostClicks: TT.ghost,
       vsCards: got.filter(s=> s === 'vs').length, scenes: scenes.map(s=> s.scene + (s.info && s.scene !== 'vs' ? ':' + s.info : '') + ' ' + s.ms + 'ms'), drops: S.stats.drops };
