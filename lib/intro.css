@@ -34,7 +34,7 @@
 #introPlayer video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; background:#05030f; }
 #introPlayer .ip-poster{ display:none; position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 #introPlayer.poster .ip-poster{ display:block; } #introPlayer.poster video{ visibility:hidden; }
-.ip-skip{ position:absolute; right:14px; top:calc(12px + env(safe-area-inset-top)); min-width:64px; min-height:44px; padding:0 16px; border-radius:999px; background:rgba(10,8,30,0.55); border:1.5px solid rgba(255,255,255,0.55); color:#fff; font:400 14px/1 'FS Righteous', sans-serif; letter-spacing:0.12em; cursor:pointer; opacity:0; pointer-events:none; transition:opacity 300ms ease; }
+.ip-skip{ z-index:3; position:absolute; right:14px; top:calc(12px + env(safe-area-inset-top)); min-width:64px; min-height:44px; padding:0 16px; border-radius:999px; background:rgba(10,8,30,0.55); border:1.5px solid rgba(255,255,255,0.55); color:#fff; font:400 14px/1 'FS Righteous', sans-serif; letter-spacing:0.12em; cursor:pointer; opacity:0; pointer-events:none; transition:opacity 300ms ease; }
 .ip-skip.show{ opacity:0.9; pointer-events:auto; }
 /* one soft cyan flash */
 #introFlash{ position:fixed; inset:0; z-index:210; background:radial-gradient(120% 90% at 50% 45%, rgba(190,255,255,0.95), rgba(60,220,255,0.75) 60%, rgba(30,160,230,0.6)); opacity:0; pointer-events:none; }
@@ -83,3 +83,8 @@
 :root.intro-new .home-overlay .home-legal-links{ flex-wrap:nowrap; gap:0; bottom:calc(2px + env(safe-area-inset-bottom)); }
 :root.intro-new .home-overlay .home-legal-link{ min-height:36px; padding:0 5px; font-size:11.5px; font-weight:500; opacity:0.85; white-space:nowrap; }
 :root.intro-new .home-overlay .home-legal-dot{ font-size:11px; }
+
+/* the photon blast: a saturated cyan bar the width of the beam that glows and swells (scaleX) to fill the screen, with the opacity; plain black in lite / reduced motion */
+#introBlast{ position:absolute; inset:0; z-index:2; overflow:hidden; opacity:0; pointer-events:none; }
+#introBlast i{ position:absolute; top:0; bottom:0; left:41%; width:18%; background:linear-gradient(90deg, rgba(10,168,224,0), #18dcff 22%, #1fe6ff 50%, #18dcff 78%, rgba(10,168,224,0)); }
+#introBlast.plain i{ left:0; width:100%; background:#05030f; }
