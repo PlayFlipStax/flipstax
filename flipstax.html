@@ -12083,9 +12083,9 @@
       '<div class="fs-title"><b></b><span></span></div>' +
       (m > 1 || fin ? '<div class="fs-pill ds-pill gold">' + (fin ? 'GRAND PRIZE' : 'POINTS ×' + m) + '</div>' : '') +
       '<div class="fs-line" aria-live="polite"><span></span></div>';
-    // Run 4B: the big line is the round's game (Riddle Round, Lucky Lights ...), ROUND N OF 6 small above it.
-    const gStep = (a.steps || []).find(s=> s.game), gameName = gStep ? roundGameName(gStep.game) : '';
-    const signMain = fin ? 'WORD WARP' : (gameName ? String(gameName).toUpperCase() : (st.title || a.title || '')), signSub = fin ? 'THE GRAND FINALE' : round ? 'ROUND ' + round + ' OF ' + SHOW_ROUND_COUNT : (st.sub || '');
+    // The big line names what the card is followed by: every round opens with the VS cards (pick the one YOU prefer), so it reads CROWD SHOWDOWN, ROUND N OF 6 small above it
+    // (it used to name the round's END game - 'RIDDLE ROUND' - which only comes after the VS cards and the Brain Beam).
+    const signMain = fin ? 'WORD WARP' : (round ? 'CROWD SHOWDOWN' : (st.title || a.title || '')), signSub = fin ? 'THE GRAND FINALE' : round ? 'ROUND ' + round + ' OF ' + SHOW_ROUND_COUNT : (st.sub || '');
     showCard.querySelector('.fs-title b').textContent = signMain; showCard.querySelector('.fs-title span').textContent = signSub;
     showCard.removeAttribute('role'); showCard.setAttribute('aria-label', signMain + (m > 1 ? ', points times ' + m : '') + '. ' + line);
     showCard.classList.remove('hidden');
