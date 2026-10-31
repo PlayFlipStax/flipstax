@@ -18765,6 +18765,7 @@
       // The finale's cue card, then the Word Warp with all six letters in.
       { label:'Grand finale (6 letters)', wide:true, go: atType(s=> s.t === 'act' && s.finale, 0, 210, 6) },
       { label:'Grand finale (3 letters)', wide:true, go: atType(s=> s.t === 'act' && s.finale, 0, 210, 3) },
+      { label:'Word Warp: empty slots', wide:true, go: atType(s=> s.t === 'act' && s.finale, 0, 210, 0) },   // (no Brain Beam letters earned: every slot starts empty, so a wrong and a right tile can both be tried)
       { label:'Orbit Drop', go: roundGame('orbitDrop', 300, 6, ()=>{ runKeys = 3; runBonusChips = 1; }) },
       { label:'Results (sample)', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); runResultToday = replaySampleEpisode(); showRunReadout(); updatePauseBtnVisibility(); }) },
       { label:'Share image', go: ()=> replayEnter(null, ()=>{ replayTap(); replayStop(); runResultToday = replaySampleEpisode(); showRunReadout(); updatePauseBtnVisibility();
