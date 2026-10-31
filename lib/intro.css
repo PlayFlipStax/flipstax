@@ -31,8 +31,8 @@
 #introPlayer.on{ display:block; }
 #introPlayer.fade{ opacity:0; transition:opacity 500ms ease-in-out; }   /* (A+: the black fades away over 0.5 s to the studio) */
 #introPlayer.dip video, #introPlayer.dip .ip-poster, #introPlayer.dip .ip-skip{ opacity:0; transition:opacity 300ms linear; }   /* (A+: the video fades to black over 0.3 s) */
-#introPlayer video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; background:#05030f; }
-#introPlayer .ip-poster{ display:none; position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+#introPlayer video{ position:absolute; inset:0; width:100%; height:100%; min-width:100%; min-height:100%; object-fit:cover; background:transparent; z-index:1; }
+#introPlayer .ip-poster{ display:block; z-index:0; position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 #introPlayer.poster .ip-poster{ display:block; } #introPlayer.poster video{ visibility:hidden; }
 .ip-skip{ z-index:3; position:absolute; right:14px; top:calc(12px + env(safe-area-inset-top)); min-width:64px; min-height:44px; padding:0 16px; border-radius:999px; background:rgba(10,8,30,0.55); border:1.5px solid rgba(255,255,255,0.55); color:#fff; font:400 14px/1 'FS Righteous', sans-serif; letter-spacing:0.12em; cursor:pointer; opacity:0; pointer-events:none; transition:opacity 300ms ease; }
 .ip-skip.show{ opacity:0.9; pointer-events:auto; }
@@ -60,7 +60,7 @@
 .il-shipwrap.on{ display:block; }
 .il-ship{ position:relative; width:100%; height:auto; display:block; filter:drop-shadow(0 0 10px rgba(190,220,255,0.75)); }
 .il-shipglow{ position:absolute; left:-20%; right:-20%; top:-30%; bottom:-50%; border-radius:50%; background:radial-gradient(closest-side, rgba(170,210,255,0.45), rgba(170,210,255,0)); }
-#introPlayer.xin{ opacity:0; } #introPlayer{ transition:opacity .5s ease; }
+#introPlayer.xin{ opacity:0; } #introPlayer{ transition:opacity .35s ease; }
 #introPlayer.fade{ transition:opacity 500ms ease-in-out; }
 
 /* ---- A+ the livelier ENTER screen: three slow gold spotlight beams, a soft glow pulse under the ENTER button, the legal links in one small line.
@@ -87,6 +87,7 @@
 /* the photon blast: a saturated cyan bar the width of the beam that glows and swells (scaleX) to fill the screen, with the opacity; plain black in lite / reduced motion */
 #introBlast{ position:absolute; inset:0; z-index:2; overflow:hidden; opacity:0; pointer-events:none; }
 #introBlast i{ position:absolute; top:0; bottom:0; left:41%; width:18%; background:linear-gradient(90deg, rgba(10,168,224,0), #18dcff 22%, #1fe6ff 50%, #18dcff 78%, rgba(10,168,224,0)); }
+#introBlast.diss i{ left:0; width:100%; background:#18dcff; }
 #introBlast.plain i{ left:0; width:100%; background:#05030f; }
 
 /* ---- The ENTER picture (images/enter-bg.webp): fitted to the screen width, top-anchored, never cropped; the navy below it is a gradient that matches its bottom edge.
@@ -107,3 +108,7 @@
 /* ENTER: the picture (with its own saucer) fades out so the flying ship is the only one on screen */
 .il-pic{ transition:opacity .45s ease; }
 :root.il-leaving .il-pic{ opacity:0; }
+
+/* hides the dark band and horizon edge that the video itself has in its first 3 s (see placeCover in intro.js); transform and opacity only */
+#introCover{ position:absolute; left:0; right:0; top:0; height:100%; z-index:1; pointer-events:none;
+  background:linear-gradient(180deg, #080922 0%, #0a0a2c 93%, rgba(12,11,42,0.8) 96.5%, rgba(16,14,52,0) 100%); }
