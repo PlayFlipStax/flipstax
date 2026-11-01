@@ -1467,3 +1467,11 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .mpc-n{ font:900 clamp(30px, 9vw, 40px)/1 var(--f-display); color:#fff8d6; text-shadow:0 0 8px #ffd23f, 0 0 18px rgba(255,180,40,0.9); }
 .mpc-panel{ position:absolute; left:16%; right:16%; top:46%; bottom:12%; border-radius:6px; box-shadow:inset 0 0 0 3px rgba(255,214,90,0.35); }
 .mpc-knob{ position:absolute; right:12%; top:56%; width:9px; height:9px; border-radius:50%; background:radial-gradient(circle at 35% 35%, #fff6c8, #ffd23f 55%, #9a5a00); box-shadow:0 1px 2px rgba(0,0,0,0.5); }
+
+/* ---- Zap Words: every found word lights its tiles in its own neon colour (--kc, one of ten) and they stay lit with dark letters (readable on the board);
+   the pulse (a scale, then the lock-in glow) is in lib/mini-games.js; static in lite mode and reduced motion ---- */
+.zw-stage .zw-grid.sq .zw-cell.kept svg .hx{ fill:var(--kc); stroke:#ffffff; stroke-width:2.5; }
+.zw-stage .zw-grid.sq .zw-cell.kept svg{ filter:drop-shadow(0 0 7px var(--kc)); }
+.zw-stage .zw-grid.sq .zw-cell.kept > span{ color:#0b0f1a; }
+.zw-stage .zw-grid.sq .zw-cell.kept.on svg .hx{ fill:#fff1d2; stroke:var(--tc); }
+.zw-chip{ border:1.5px solid #ffffff; box-shadow:0 0 8px var(--wc); }
