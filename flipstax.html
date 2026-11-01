@@ -11531,7 +11531,7 @@
     const place = ()=>{
       // (a phone narrower than the art: the art is fitted to the width and sits on the bottom edge, so the whole ring shows; otherwise cover-fit)
       // (and never so big that the ring's top tucks under the title and its counter: then the art shrinks, sitting on the bottom edge)
-      const W = innerWidth, H = innerHeight, narrow = W / H < MW_STAGE.w / MW_STAGE.h, hdr = luckyOv.querySelector('.mw-inner').getBoundingClientRect().bottom;
+      const W = innerWidth, H = innerHeight, narrow = W / H < MW_STAGE.w / MW_STAGE.h, hdr = (()=>{ const hi = luckyOv.querySelector('.mw-inner'); return hi.offsetTop + hi.offsetHeight; })();   // (layout size, not the painted box: the title card is still scaling in when this first runs, which made the ring sit too high and tuck under the title)
       const kBase = narrow ? W / MW_STAGE.w : Math.max(W / MW_STAGE.w, H / MW_STAGE.h), kFit = (H - hdr - 34) / (MW_STAGE.h - MW_STAGE.cy + MW_STAGE.r), k = Math.min(kBase, kFit);
       const ox = (W - MW_STAGE.w * k) / 2, oy = narrow || k < kBase ? H - MW_STAGE.h * k : (H - MW_STAGE.h * k) / 2;
       const bg = luckyOv.querySelector('.mw-bg'); bg.style.cssText = 'left:' + ox.toFixed(1) + 'px;top:' + oy.toFixed(1) + 'px;width:' + (MW_STAGE.w * k).toFixed(1) + 'px;height:' + (MW_STAGE.h * k).toFixed(1) + 'px';
@@ -11539,7 +11539,7 @@
       wheel.style.width = wheel.style.height = D.toFixed(1) + 'px'; wheel.style.left = (x - D / 2).toFixed(1) + 'px'; wheel.style.top = (y - D / 2).toFixed(1) + 'px';
       hub.style.top = Math.min(H - 80, y + MW_STAGE.r * k + 26).toFixed(0) + 'px';
     };
-    place(); const onResize = ()=>{ if (gen === luckyGen) place(); }; addEventListener('resize', onResize);
+    place(); [250, 800].forEach(ms=> setTimeout(()=>{ if (gen === luckyGen) place(); }, ms)); const onResize = ()=>{ if (gen === luckyGen) place(); }; addEventListener('resize', onResize);
     const left = ()=> Math.max(0, MW_SPINS - used - lost);
     const renderBank = ()=>{ luckyOv.querySelector('.ll-bank').textContent = 'SPINS LEFT ' + left() + ' · WON ' + (won >= 0 ? '+' : '') + won; };
     const popShow = (big, small)=>{ pop.querySelector('b').innerHTML = big; pop.querySelector('small').textContent = small || ''; pop.classList.remove('on'); void pop.offsetWidth; pop.classList.add('on'); };
