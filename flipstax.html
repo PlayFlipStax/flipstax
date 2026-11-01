@@ -12373,6 +12373,14 @@
       (SPONSOR_LOGO ? '<div class="cb-by"><span>Brought to you by</span><img class="sp-logo" src="' + SPONSOR_LOGO + '" alt="Our sponsor"></div>' : '') + '</div>';
     showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'Commercial break: a word from our sponsors. Tap to skip');
     showCard.classList.remove('hidden');
+    // the stage art (data/scenes/sponsor.webp, 540 x 1154, cover-fit and anchored at the bottom) has a big hanging TV monitor in it: the ad card is fitted inside that monitor
+    // (its rectangle in the art, scaled the same way as the picture) and clipped to it, so it sits in the frame at every screen shape
+    const tv = showCard.querySelector('.cb-tv');
+    const fitTv = ()=>{ if (!tv.isConnected) return; const r = showCard.getBoundingClientRect(); if (!r.width) return;
+      const s = Math.max(r.width / 540, r.height / 1154), ox = (r.width - 540 * s) / 2, oy = r.width / r.height > 0.5 ? 0 : r.height - 1154 * s;   // (wider than 1 : 2 the art is cropped at the bottom - see the media query in juice.css - so the monitor stays clear of the sign)
+      tv.style.left = (ox + 114 * s).toFixed(1) + 'px'; tv.style.top = (oy + 280 * s).toFixed(1) + 'px'; tv.style.width = (312 * s).toFixed(1) + 'px'; tv.style.height = (206 * s).toFixed(1) + 'px';
+      tv.style.borderRadius = (46 * s).toFixed(1) + 'px'; tv.style.setProperty('--tvh', (206 * s).toFixed(1) + 'px'); };
+    fitTv(); addEventListener('resize', fitTv);
     const prod = showCard.querySelector('.cb-prod'), say = showCard.querySelector('.cb-say'), shownAt = performance.now(); let gone = false, stage = 'intro', timers = [];
     // (the break's own elements: if another screen has taken showCard over (a TEST jump, a skip, a restart) they are gone - the timers then stop quietly and never touch the new card)
     const alive = ()=> !gone && !!say && say.isConnected && showCard.contains(say) && !!prod;

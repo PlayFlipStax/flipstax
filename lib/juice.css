@@ -1475,3 +1475,13 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .zw-stage .zw-grid.sq .zw-cell.kept > span{ color:#0b0f1a; }
 .zw-stage .zw-grid.sq .zw-cell.kept.on svg .hx{ fill:#fff1d2; stroke:var(--tc); }
 .zw-chip{ border:1.5px solid #ffffff; box-shadow:0 0 8px var(--wc); }
+
+/* Commercial break: the ad card is fitted to the TV monitor in the stage art (flipstax.html showSponsor / fitTv sets its box and --tvh) and clipped to it;
+   the type scales with the monitor's height so it never spills out at 360 x 640, 390 x 844 or 412 x 915 */
+.cb-tv{ overflow:hidden; border:0; box-shadow:inset 0 0 0 3px rgba(255,210,63,0.9), inset 0 0 22px rgba(125,249,255,0.25); }
+.cb-prod, .cb-last{ gap:calc(var(--tvh, 160px) * 0.02); padding:calc(var(--tvh, 160px) * 0.05) 12px; }
+.cb-e{ font-size:calc(var(--tvh, 160px) * 0.4); }
+.cb-brand{ font-size:max(15px, calc(var(--tvh, 160px) * 0.125)); line-height:1.05; }
+.cb-line{ font-size:max(13px, calc(var(--tvh, 160px) * 0.085)); line-height:1.15; }
+.cb-last b{ font-size:max(16px, calc(var(--tvh, 160px) * 0.12)); } .cb-last small{ font-size:max(14px, calc(var(--tvh, 160px) * 0.09)); }
+@media (min-aspect-ratio: 1/2){ .show-card.sponsor{ background-position:0 0, 50% 0, 0 0; } }
