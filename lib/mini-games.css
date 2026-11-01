@@ -398,3 +398,29 @@
 
 /* Fact or Fib on short screens (360 x 640): the bubble never shrinks below its text (it was squeezed, clipping the statement at the top and the reveal line at the bottom); a smaller minimum height and padding make room */
 @media (max-height:700px){ .ff-bubble{ min-height:104px; padding:12px 14px 14px; gap:6px; } .ff-btn{ min-height:58px; } .ff-host{ width:min(24vw, 96px); } }
+
+/* ---- Saucer Shuffle restyle (polish 3): a dark starfield with a soft floor glow, the purple saucers on glossy neon pads with a gold rim, dark glossy panels.
+   Everything still moves by transform and opacity only; the shuffle, the lights and the rules are untouched ---- */
+.mg-saucerShuffle .mg-stage{ background:none; }
+.sc-casino{ background:
+  radial-gradient(1.4px 1.4px at 12% 18%, #fff 50%, transparent 52%), radial-gradient(1.2px 1.2px at 30% 8%, #cfe9ff 50%, transparent 52%), radial-gradient(1.6px 1.6px at 47% 22%, #fff 50%, transparent 52%),
+  radial-gradient(1.2px 1.2px at 66% 12%, #ffe9a8 50%, transparent 52%), radial-gradient(1.5px 1.5px at 84% 26%, #fff 50%, transparent 52%), radial-gradient(1.2px 1.2px at 8% 46%, #cfe9ff 50%, transparent 52%),
+  radial-gradient(1.4px 1.4px at 92% 52%, #fff 50%, transparent 52%), radial-gradient(1.2px 1.2px at 22% 70%, #ffe9a8 50%, transparent 52%), radial-gradient(1.5px 1.5px at 74% 74%, #fff 50%, transparent 52%),
+  radial-gradient(1.2px 1.2px at 56% 88%, #cfe9ff 50%, transparent 52%), radial-gradient(1.3px 1.3px at 38% 58%, #fff 50%, transparent 52%), radial-gradient(1.2px 1.2px at 62% 40%, #fff 50%, transparent 52%),
+  radial-gradient(120% 70% at 50% 100%, #2a0f58 0%, #120632 55%, #07021a 100%); }
+.sc-curtain, .sc-spot, .sc-cone{ display:none; }
+.sc-table{ border:0; border-radius:0; background:none; box-shadow:none; overflow:visible; }
+.sc-table::before{ inset:auto; left:-2%; right:-2%; top:34%; bottom:auto; height:36%; border-radius:50%; box-shadow:none; z-index:0;
+  background:radial-gradient(ellipse at 50% 50%, rgba(140,110,255,0.5), rgba(70,200,255,0.22) 48%, rgba(70,200,255,0) 72%); }
+.sc-sign{ background:linear-gradient(180deg, #1c1245, #0c0627 70%, #07031a); border:2px solid #ffd23f; box-shadow:0 0 0 2px #3a2a00, 0 0 18px rgba(120,200,255,0.5), inset 0 1px 0 rgba(255,255,255,0.35); }
+.sc-sign::before{ border:2px solid rgba(120,220,255,0.55); inset:-8px; border-radius:20px; }
+.sc-sign b{ color:#fff3c4; text-shadow:0 0 12px rgba(255,210,63,0.7), 0 2px 0 #2a1a00; font-family:'Big Shoulders Display', var(--f-display); letter-spacing:3px; }
+.sc-sign small{ color:#7df9ff; letter-spacing:3px; }
+.sc-panel{ background:linear-gradient(180deg, #1c1245, #0c0627 70%, #07031a); border:2px solid #ffd23f; border-radius:14px; box-shadow:0 0 0 2px #3a2a00, 0 0 18px rgba(190,120,255,0.5), inset 0 1px 0 rgba(255,255,255,0.3); }
+.sc-panel::before{ border:2px solid rgba(120,220,255,0.5); inset:-8px; border-radius:20px; opacity:1; }
+.sc-msg{ color:#fff; text-shadow:0 0 10px rgba(190,140,255,0.8); }
+.su-saucer::before{ left:-2%; right:-2%; bottom:-20%; height:34%; z-index:-1; border-radius:50%; background:radial-gradient(ellipse at 50% 50%, rgba(10,4,40,0.95) 0 52%, rgba(120,90,255,0.0) 54%);
+  border:3px solid #ffd23f; box-shadow:0 0 14px rgba(125,249,255,0.75), inset 0 0 14px rgba(190,120,255,0.8); opacity:1; }
+.su-saucer::after{ left:-4%; right:-4%; bottom:-14%; height:22%; background:radial-gradient(ellipse at 50% 50%, rgba(125,249,255,0.45), rgba(125,249,255,0) 72%); z-index:-1; }
+.su-saucer .su-img{ filter:drop-shadow(0 0 10px rgba(190,120,255,0.65)); }
+.su-saucer.up::before, .su-saucer.up::after{ opacity:0.9; }
