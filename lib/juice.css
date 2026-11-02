@@ -1604,3 +1604,23 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
   #readoutOverlay.ep.outro-on .outro-end .outro-again{ min-height:26px; font-size:14px; }
 }
 #readoutOverlay.ep.outro-on .outro-badge{ z-index:5; }
+
+/* ---- A+ mega fix 9: Mystery Doors animation. A pick: the closed picture swings (scaleX 1 to 0.85 about its hinge) while it crossfades to the open one,
+   0.35 s; then the world inside the doorway moves for 1.5 s - a copy of the open picture clipped to the opening's rectangle (.md-win), the galaxy turning
+   slowly, the hyperspace tunnel zooming 1 to 1.12, the clockwork turning the other way. Transform and opacity only; lite mode and reduced motion:
+   the plain crossfade and no moving world. ---- */
+.event-tile.md .md-c{ transform-origin:var(--hinge, 50% 100%); transition:opacity 0.35s ease, transform 0.35s ease-out; }
+.event-tile.md.art-open .md-c{ transform:translateX(-50%) scaleX(0.85); }
+.event-tile.md .md-o{ transition:opacity 0.35s ease; }
+.event-tile.md .md-ow{ position:absolute; left:50%; bottom:0; width:calc(var(--dow) * var(--dk)); aspect-ratio:var(--ar); transform:translateX(-50%); pointer-events:none; opacity:0; transition:opacity 0.2s ease 0.3s; }
+.event-tile.md.art-open .md-ow{ opacity:1; }
+.event-tile.md .md-win{ position:absolute; left:var(--wl); top:var(--wt); width:var(--ww); height:var(--wh); overflow:hidden; }
+.event-tile.md .md-wi{ position:absolute; left:var(--wil); top:var(--wit); width:var(--wiw); height:var(--wih); max-width:none; transform:none; transform-origin:var(--wox) var(--woy); }
+.event-tile.md.art-open .md-wi{ animation:var(--wanim) 1.5s linear 0.3s both; }
+@keyframes mdGal{ from{ transform:rotate(0deg); } to{ transform:rotate(30deg); } }
+@keyframes mdClk{ from{ transform:rotate(0deg); } to{ transform:rotate(-30deg); } }
+.event-tile.md[data-w="mdGal"] .md-win, .event-tile.md[data-w="mdClk"] .md-win{ -webkit-mask-image:radial-gradient(circle closest-side, #000 52%, transparent 100%); mask-image:radial-gradient(circle closest-side, #000 52%, transparent 100%); }   /* (a feathered disc round the swirl: the rotating copy never reaches the frame) */
+@keyframes mdHyp{ from{ transform:scale(1); } to{ transform:scale(1.12); } }
+:root.lite .event-tile.md .md-ow, :root.lite .event-tile.md.art-open .md-wi{ display:none; }
+:root.lite .event-tile.md .md-c{ transition:opacity 0.25s ease; } :root.lite .event-tile.md.art-open .md-c{ transform:translateX(-50%); }
+@media (prefers-reduced-motion: reduce){ .event-tile.md .md-ow{ display:none; } .event-tile.md .md-c{ transition:opacity 0.25s ease; } .event-tile.md.art-open .md-c{ transform:translateX(-50%); } }

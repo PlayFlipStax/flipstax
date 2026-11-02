@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.join(REPO, 'screenshots', 'qa', 'tools'))
 from wkh import View, spin, LOCAL, ensure_server
 from PIL import Image
 ensure_server()
-GAMES = ['Riddle Round', 'Mystery Portal', 'Mystery Wheel', 'Price Probe', 'Oddball Alert', 'Emoji Decode', 'Time Warp', 'Peak or Plunge', 'Snap Sort', 'Zap Words', 'Twin Flip', 'Fact or Fib',
+GAMES = ['Riddle Round', 'Mystery Doors', 'Mystery Wheel', 'Price Probe', 'Oddball Alert', 'Emoji Decode', 'Time Warp', 'Peak or Plunge', 'Snap Sort', 'Zap Words', 'Twin Flip', 'Fact or Fib',
          'Saucer Shuffle', 'Grand finale (6 letters)', 'Orbit Drop']
 SIZES = [tuple(int(n) for n in a.split('x')) for a in sys.argv[1:] if 'x' in a] or [(390, 844), (360, 640)]
 LIMIT = 1.15 * 1.05
