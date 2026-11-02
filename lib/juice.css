@@ -1554,3 +1554,13 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root:root .solve-overlay.tray .solve-slot.placed{ background:linear-gradient(180deg, #fff7c4, #ffd23f); color:#2a1a00; border-color:#fff3c4; }
 :root:root .solve-overlay.tray .solve-buttons{ order:6; margin-top:12px; }
 :root:root .solve-overlay.tray .solve-rack{ margin-bottom:0; }
+/* Word Warp win: the UFO drops in from the top, its beam sweeps the word, the tiles lift, then SOLVED! once. Transform and opacity only. */
+.ww-win{ position:fixed; inset:0; z-index:45; pointer-events:none; overflow:hidden; }
+.ww-wufo{ position:absolute; left:50%; width:104px; margin-left:-52px; }
+.ww-wship svg{ width:104px; height:auto; display:block; }
+.ww-wbeam{ position:absolute; left:50%; top:46px; width:min(80vw, 330px); transform:translateX(-50%) scaleY(0.1); transform-origin:50% 0; opacity:0; clip-path:polygon(40% 0, 60% 0, 100% 100%, 0 100%); background:linear-gradient(180deg, rgba(255,255,255,0.95), rgba(125,249,255,0.55) 55%, rgba(125,249,255,0.2)); }
+.ww-solved{ position:absolute; left:0; right:0; text-align:center; display:flex; flex-direction:column; align-items:center; gap:6px; }
+.ww-solved b{ font:900 clamp(44px, 14vw, 64px)/0.95 var(--f-display); letter-spacing:1px; color:#fffbe0; text-shadow:0 4px 0 #7a2e00, 0 0 24px rgba(255,200,40,0.8); }
+.ww-solved span{ font:800 clamp(16px, 4.6vw, 20px)/1 var(--f-display); color:#ffe9a0; letter-spacing:0.5px; text-shadow:0 2px 0 rgba(0,0,0,0.5); }
+.solve-celebrate.nb .sc-banner{ display:none; }
+.solve-overlay.tray.celebrating :is(.solve-header, .solve-bar, .solve-attempts){ visibility:hidden; }   /* (the banner has the room: no ghost of the clock behind SOLVED!) */

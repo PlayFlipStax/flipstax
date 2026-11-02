@@ -15717,26 +15717,35 @@
     saveRunSnapshot();
     els.solveOverlay.classList.add('celebrating');
     if (window.Juice) Juice.correct(els.solveSlots, { count:24 });
-    wwAbduct(runWord.word.split('').map((_, i)=> i), ()=> wwBarnyard(()=> celebrateSolve(solvedAt, ()=>{ if (runActive) endRun(true, solvedAt); })));
+    wwWin(solvedAt, ()=>{ if (runActive) endRun(true, solvedAt); });
   }
-  // The win (Daily tray): after the beam lifts the letters, a cow, then a pig, then a horse bob up from the bottom to mid-screen with a happy wiggle and
-  // settle back off the bottom, under chasing winner lights. (Lite and reduced motion: each one fades in and out in place.)
-  function wwBarnyard(done){
-    const lite = FX.reduced() || isLite() || !Element.prototype.animate, H = innerHeight;
-    const layer = document.createElement('div'); layer.className = 'ww-barn'; layer.setAttribute('aria-hidden', 'true');
-    layer.innerHTML = '<i class="wb-m a"></i><i class="wb-m b"></i>'; els.solveOverlay.appendChild(layer);
+  // The Word Warp win (Daily tray): the UFO flies in from the top, its beam sweeps the solved word and the tiles lift into it for a moment, confetti bursts,
+  // and SOLVED! shows once with the time and points. (Lite and reduced motion: a plain fade and the banner. The farm-animal fly-up is gone.)
+  function wwWin(solvedAt, done){
+    const still = FX.reduced() || isLite() || !Element.prototype.animate, ov = els.solveOverlay;
+    const secs = Math.max(0, Math.round((RUN_SOLVE_MS - Math.max(0, solveEndsAt - solvedAt)) / 1000));
+    const layer = document.createElement('div'); layer.className = 'ww-win'; layer.setAttribute('aria-hidden', 'true'); ov.appendChild(layer);
+    const sl = els.solveSlots.getBoundingClientRect(), slots = Array.from(els.solveSlots.children);
+    const ban = document.createElement('div'); ban.className = 'ww-solved'; ban.style.top = Math.round(sl.bottom + 14) + 'px';
+    ban.innerHTML = '<b>SOLVED!</b><span></span>'; ban.lastChild.textContent = runWord.word + ' \u00B7 ' + Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0') + (runWarpPoints ? ' \u00B7 +' + runWarpPoints + ' pts' : '');
+    layer.appendChild(ban);
+    const fin = (ms)=> setTimeout(()=>{ layer.remove(); ov.classList.remove('celebrating'); done(); }, ms);
     sfx.cheer();
-    const STEP = lite ? 700 : 800, DUR = lite ? 800 : 1500;
-    ['\uD83D\uDC04', '\uD83D\uDC16', '\uD83D\uDC0E'].forEach((em, k)=>{
-      setTimeout(()=>{
-        const a = document.createElement('div'); a.className = 'wb-an' + (lite ? ' still' : ''); a.textContent = em; a.style.left = (22 + k * 28) + '%'; layer.appendChild(a);
-        const up = -(H * 0.55);
-        if (lite) a.animate([{ opacity:0 }, { opacity:1, offset:0.3 }, { opacity:1, offset:0.7 }, { opacity:0 }], { duration:DUR, fill:'both' });
-        else a.animate([{ transform:'translate(-50%,0) rotate(0deg)' }, { transform:'translate(-50%,' + up + 'px) rotate(-9deg)', offset:0.3, easing:'ease-out' },
-          { transform:'translate(-50%,' + (up + 14) + 'px) rotate(9deg)', offset:0.5 }, { transform:'translate(-50%,' + up + 'px) rotate(-9deg)', offset:0.7 }, { transform:'translate(-50%,0) rotate(0deg)' }], { duration:DUR, easing:'ease-in-out', fill:'both' });
-      }, k * STEP);
-    });
-    setTimeout(()=>{ layer.remove(); done(); }, 2 * STEP + DUR + 100);
+    if (still){
+      ban.animate && ban.animate([{ opacity:0 }, { opacity:1 }], { duration:300, fill:'both' }); sfx.solveWin();
+      fin(1700); return;
+    }
+    const ufo = document.createElement('div'); ufo.className = 'ww-wufo'; ufo.innerHTML = '<i class="ww-wbeam"></i><div class="ww-wship">' + FX.ufoSvg() + '</div>';
+    const shipTop = Math.max(8, sl.top - 150); ufo.style.top = shipTop + 'px'; layer.appendChild(ufo);
+    const beam = ufo.firstChild; beam.style.height = Math.max(40, sl.bottom + 10 - shipTop - 60) + 'px';
+    ufo.animate([{ transform:'translateY(' + (-shipTop - 120) + 'px)' }, { transform:'translateY(0)' }], { duration:700, easing:'cubic-bezier(.2,.8,.3,1)', fill:'both' });
+    beam.animate([{ opacity:0, transform:'translateX(-50%) scaleY(0.1)' }, { opacity:0.9, transform:'translateX(-50%) scaleY(1)', offset:0.35 }, { opacity:0.9, transform:'translateX(-50%) scaleY(1)', offset:0.8 }, { opacity:0, transform:'translateX(-50%) scaleY(1)' }], { duration:1500, delay:700, easing:'ease-out', fill:'both' });
+    slots.forEach((c, i)=> c.animate([{ transform:'translateY(0) scale(1)' }, { transform:'translateY(-16px) scale(1.1)', offset:0.45 }, { transform:'translateY(0) scale(1)' }], { duration:700, delay:900 + i * 90, easing:'ease-in-out' }));
+    setTimeout(()=>{ if (window.Juice) Juice.correct(els.solveSlots, { count:30 }); els.solveCelebrate.classList.remove('hidden'); els.solveCelebrate.classList.add('nb'); solveConfettiBurst(); }, 1050);
+    setTimeout(()=>{ sfx.solveWin(); ban.animate([{ opacity:0, transform:'scale(0.6)' }, { opacity:1, transform:'scale(1.08)', offset:0.6 }, { opacity:1, transform:'scale(1)' }], { duration:500, easing:'ease-out', fill:'both' }); }, 1250);
+    setTimeout(()=> ufo.animate([{ transform:'translateY(0)', opacity:1 }, { transform:'translateY(' + (-shipTop - 140) + 'px)', opacity:1 }], { duration:600, easing:'ease-in', fill:'both' }), 2300);
+    setTimeout(()=>{ els.solveCelebrate.classList.add('hidden'); els.solveCelebrate.classList.remove('nb'); }, 3000);
+    fin(3000);
   }
   function trayPick(letter, tileEl){
     if (!runActive || warpBusy || warpMissing || els.solveOverlay.classList.contains('celebrating') || els.solveOverlay.classList.contains('revealing')) return;
