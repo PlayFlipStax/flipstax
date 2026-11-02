@@ -488,3 +488,13 @@
 @media (max-height:700px){ .ss-cart{ width:46px; } }
 :root.lite .ss-cart{ filter:none; }
 @media (max-height:700px){ .tf-perfect{ font-size:clamp(40px,12.5vw,48px); padding:5px 20px 7px; top:calc(clamp(40px,12.5vw,48px) * 0.65 + 8px); border-width:3px; } }   /* (a short phone: the banner stays in the band above the tiles) */
+
+/* ---- Price Probe background: a deep teal to royal blue gradient that sets off the gold cards and yellow pills, with a slow sunburst behind the cards
+   (a conic gradient turning once in 60 s, opacity 0.2, transform only; still in lite mode and reduced motion) ---- */
+:root:root.stage-on .mg-overlay.mg-priceProbe, .mg-overlay.mg-priceProbe{ background:radial-gradient(90% 55% at 50% 42%, rgba(40,200,190,0.45), transparent 72%), linear-gradient(180deg, #0b6f78 0%, #0d4f9a 52%, #14307f 100%) !important; }
+.mg-priceProbe .mg-bg{ background:none !important; }
+.mg-overlay.mg-priceProbe::before{ content:''; position:absolute; left:50%; top:50%; width:170vmax; height:170vmax; margin:-85vmax 0 0 -85vmax; z-index:0; pointer-events:none; opacity:0.2;
+  background:repeating-conic-gradient(from 0deg, #ffffff 0deg 8deg, rgba(255,255,255,0) 8deg 24deg); animation:prBurst 60s linear infinite; }
+@keyframes prBurst{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+:root.lite .mg-overlay.mg-priceProbe::before{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .mg-overlay.mg-priceProbe::before{ animation:none; } }
