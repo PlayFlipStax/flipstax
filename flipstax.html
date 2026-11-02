@@ -11230,6 +11230,51 @@
     if (i === 1){ let r = ''; for (let k = 0; k < 18; k++) r += '<i style="--a:' + (k * 20) + 'deg;--d:' + (-(k % 6) * 0.2).toFixed(1) + 's"></i>'; return '<div class="mp-scene vx">' + r + '<b class="vx-core"></b></div>'; }
     return '<div class="mp-scene ts"><i class="r1"></i><i class="r2"></i><i class="r3"></i><i class="r4"></i><b class="ts-h1"></b><b class="ts-h2"></b><b class="ts-hub"></b></div>';
   }
+  // The light-up floor of the art doors: a 6 x 4 grid of rounded squares laid on the stage picture's floor ring (placed with the same cover-fit maths as
+  // the picture, so it lines up at any size). Idle: a Simon-style sequence - the columns in order, then random groups, then the rows - one step every 0.65 s,
+  // so the whole floor never flashes more than twice a second; only opacity changes. A tap lights the pad under that door's number and the squares round it.
+  // Lite mode and reduced motion: a static glow, nothing animates.
+  const FLOOR_IMG = { w:720, h:1290, y0:880, y1:1205 };
+  let doorFloorT = 0;
+  function doorFloorFit(ov){
+    const fl = ov.querySelector('.md-floor'); if (!fl) return;
+    const W = ov.clientWidth, H = ov.clientHeight, sc = Math.max(W / FLOOR_IMG.w, H / FLOOR_IMG.h), x0 = (W - FLOOR_IMG.w * sc) / 2, y0 = H - FLOOR_IMG.h * sc;
+    fl.style.left = x0 + 'px'; fl.style.top = (y0 + FLOOR_IMG.y0 * sc) + 'px'; fl.style.width = (FLOOR_IMG.w * sc) + 'px'; fl.style.height = ((FLOOR_IMG.y1 - FLOOR_IMG.y0) * sc) + 'px';
+  }
+  function doorFloorStop(){ clearTimeout(doorFloorT); doorFloorT = 0; removeEventListener('resize', doorFloorStop.fit || (()=>{})); }
+  function doorFloorStart(ov, n){
+    doorFloorStop();
+    const fit = ()=> doorFloorFit(ov); doorFloorStop.fit = fit; fit(); addEventListener('resize', fit); setTimeout(fit, 250); setTimeout(fit, 800);
+    const cells = Array.from(ov.querySelectorAll('.md-grid i'));
+    if (!cells.length) return;
+    if (isLite() || prefersReducedMotion()){ cells.forEach(c=> c.classList.add('still')); return; }
+    const col = c=> cells.filter((_, k)=> k % 6 === c), row = r=> cells.slice(r * 6, r * 6 + 6);
+    const rnd = ()=>{ const set = []; const m = 1 + Math.floor(Math.random() * 3); while (set.length < m){ const c = cells[Math.floor(Math.random() * 24)]; if (set.indexOf(c) < 0) set.push(c); } return set; };
+    const plan = ()=>{ const a = []; for (let c = 0; c < 6; c++) a.push(col(c)); for (let k = 0; k < 8; k++) a.push(rnd()); for (let r = 0; r < 4; r++) a.push(row(r)); for (let c = 5; c >= 0; c--) a.push(col(c)); for (let k = 0; k < 6; k++) a.push(rnd()); return a; };
+    let steps = plan(), k = 0;
+    const tick = ()=>{
+      if (!ov.querySelector('.md-grid')) return;
+      if (k >= steps.length){ steps = plan(); k = 0; }
+      const set = steps[k++]; set.forEach(c=> c.classList.add('on'));
+      setTimeout(()=> set.forEach(c=> c.classList.remove('on')), 450);
+      doorFloorT = setTimeout(tick, dt(650));
+    };
+    doorFloorT = setTimeout(tick, 400);
+  }
+  // A tap: stop the sequence and light the pad nearest that door's number badge, brightly for 0.4 s, with the squares around it.
+  function doorFloorPick(i){
+    doorFloorStop();
+    const ov = els.eventOverlay, cells = Array.from(ov.querySelectorAll('.md-grid i')), badge = ov.querySelectorAll('.event-tile.md .md-n')[i];
+    if (!cells.length || !badge) return;
+    cells.forEach(c=> c.classList.remove('on'));
+    const b = badge.getBoundingClientRect(), bx = b.left + b.width / 2, by = b.top + b.height / 2;
+    const info = cells.map(c=>{ const r = c.getBoundingClientRect(); return { c, x:r.left + r.width / 2, y:r.top + r.height / 2, w:r.width }; });
+    info.forEach(o=> o.d = Math.hypot(o.x - bx, (o.y - by) * 1.6));
+    const near = info.slice().sort((a, z)=> a.d - z.d), pad = near[0], reach = pad.w * 1.9;
+    info.forEach(o=>{ if (o === pad || o.d <= reach) o.c.classList.add(o === pad ? 'pad' : 'hot'); });
+    if (isLite() || prefersReducedMotion()){ cells.forEach(c=> c.classList.remove('still')); return; }
+    setTimeout(()=> cells.forEach(c=> c.classList.remove('hot')), 400);
+  }
   function runMysteryDoor(st, done){
     const games = (st.doors || []).filter(g=> mysteryAvailable(g)).slice(0, DOOR_COUNT);
     if (!games.length) return false;
@@ -11246,16 +11291,19 @@
       const old = document.getElementById('mdArt'); if (old) old.remove();
       const art = document.createElement('div'); art.id = 'mdArt'; art.setAttribute('aria-hidden', 'true');
       art.innerHTML = '<div class="md-sign"><img src="data/doors/open-sign.webp" alt=""><span class="md-rib"></span><span class="md-rtxt"></span></div><div class="md-pill">Pick a door!</div>';
+      { let cells = ''; for (let k = 0; k < 24; k++){ const r = Math.floor(k / 6), c = k % 6; cells += '<i style="--c:' + ['#ff3c9d', '#4fe8ff', '#ffd23f', '#4be683'][(r + c) % 4] + '"></i>'; }
+        art.insertAdjacentHTML('afterbegin', '<div class="md-floor"><div class="md-grid">' + cells + '</div></div>'); }
       art.querySelector('.md-rtxt').textContent = 'ROUND ' + ((RUNDOWN.acts[st.act] || {}).round || 3) + ' \u00B7 CHOOSE WISELY';
       ov.insertBefore(art, ov.firstChild);
     }
     if (window.Stage && !DOORS_ART) Stage.cue('close', { over: ov, cls:'mdoor', sign:{ sub:'ROUND ' + ((RUNDOWN.acts[st.act] || {}).round || 3) + ' OF ' + SHOW_ROUND_COUNT, main:'MYSTERY PORTAL' } });
     let picked = false;
     const tiles = els.eventTiles, used = tiles.slice(0, Math.min(DOOR_COUNT, games.length));
-    const reset = ()=>{ ov.classList.add('hidden'); ov.classList.remove('powerup', 'mdoor', 'art'); { const a = document.getElementById('mdArt'); if (a) a.remove(); } { const c = document.getElementById('mpCaption'); if (c) c.remove(); } tiles.forEach(t=>{ t.classList.remove('portal', 'mp', 'md', 'art-open', 'opened', 'dim', 'open', 'other', 'picked-wait'); t.removeAttribute('role'); t.removeAttribute('tabindex'); t.style.removeProperty('--dw'); t.innerHTML = ''; t.onclick = null; t.style.display = ''; }); };
+    const reset = ()=>{ ov.classList.add('hidden'); ov.classList.remove('powerup', 'mdoor', 'art'); doorFloorStop(); { const a = document.getElementById('mdArt'); if (a) a.remove(); } { const c = document.getElementById('mpCaption'); if (c) c.remove(); } tiles.forEach(t=>{ t.classList.remove('portal', 'mp', 'md', 'art-open', 'opened', 'dim', 'open', 'other', 'picked-wait'); t.removeAttribute('role'); t.removeAttribute('tabindex'); t.style.removeProperty('--dw'); t.innerHTML = ''; t.onclick = null; t.style.display = ''; }); };
     const open = (i)=>{
       if (picked || g !== Show.gen) return;
       picked = true; clearTimeout(eventTimeoutId);
+      if (DOORS_ART) doorFloorPick(i);
       tiles.forEach(t=> t.onclick = null);
       const tile = tiles[i], game = games[i % games.length];
       used.forEach((t, k)=>{ if (k !== i) t.classList.add('dim'); });
@@ -11305,6 +11353,7 @@
       tileEl.setAttribute('aria-label', 'Portal ' + (i + 1));
       tileEl.onclick = ()=> open(i);
     });
+    if (DOORS_ART) doorFloorStart(ov, used.length);
     startEventTimerBar(dt(DOOR_PICK_MS), dt(DOOR_PICK_MS));
     clearTimeout(eventTimeoutId);
     eventTimeoutId = setTimeout(()=> open(Math.floor(Math.random() * used.length)), dt(DOOR_PICK_MS));

@@ -1518,3 +1518,13 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 @media (prefers-reduced-motion: reduce){ .event-tile.md .md-glow{ animation:none; opacity:0.3; } .event-tile.md .md-c, .event-tile.md .md-o{ transition-duration:0.25s; } }
 #mdArt.picked .md-pill{ opacity:0; }
 .event-tile.md .md-shadow{ position:absolute; left:50%; bottom:-5%; width:104%; height:11%; transform:translateX(-50%); border-radius:50%; background:radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.55), rgba(0,0,0,0) 70%); pointer-events:none; }
+/* the light-up floor: perspective is a static rotateX on the grid; only each square's opacity changes. The mask keeps it inside the ring ellipse. */
+.md-floor{ position:absolute; perspective:var(--fp, 900px); perspective-origin:50% 0%; -webkit-mask-image:radial-gradient(ellipse 50% 62% at 50% 34%, #000 82%, transparent 84%); mask-image:radial-gradient(ellipse 50% 62% at 50% 34%, #000 82%, transparent 84%); }
+.md-grid{ position:absolute; left:-2%; right:-2%; top:-14%; bottom:-14%; display:grid; grid-template-columns:repeat(6, 1fr); grid-template-rows:repeat(4, 1fr); gap:3.2%; transform:rotateX(42deg); transform-origin:50% 50%; }
+.md-grid i{ border-radius:14%; background:var(--c); box-shadow:0 0 10px 1px var(--c); opacity:0.12; transition:opacity 0.45s ease; }
+.md-grid i.on{ opacity:0.5; transition:opacity 0.2s ease; }
+.md-grid i.still{ opacity:0.28; transition:none; }
+.md-grid i.hot{ opacity:0.9; transition:opacity 0.12s ease; }
+.md-grid i.pad{ opacity:1; transition:opacity 0.12s ease; }
+:root.lite .md-grid i, .md-grid i:where(.rm){ transition:none; }
+@media (prefers-reduced-motion: reduce){ .md-grid i{ transition:none; } }
