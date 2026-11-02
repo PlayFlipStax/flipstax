@@ -1570,3 +1570,37 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .show-card.flipstage.art-title::before{ transform-origin:50% 0; animation:artPush 3s ease-out both; }
 :root.lite .show-card.flipstage.art-title::before{ animation:none; }
 @media (prefers-reduced-motion: reduce){ .show-card.flipstage.art-title::before{ animation:none; } }
+
+/* ---- A+ mega fix 8: the finale end screen is a stack on a solid dark ground, so nothing overlaps: a headline band under the score badge,
+   the group picture in the room left over, and the stats panel (8 tiles, SHARE, the coffee button, 'Play again tomorrow') on top of the art.
+   The end layer fades in as the curtain closes (opacity only; lite and reduced motion: a plain fade). ---- */
+#readoutOverlay.ep.outro-on .outro-end{ position:absolute; inset:0; z-index:4; display:flex; flex-direction:column; background:#0a0624; opacity:0; pointer-events:none; transition:opacity 0.5s ease; }
+#readoutOverlay.ep.outro-on .outro.end .outro-end{ opacity:1; pointer-events:auto; }
+#readoutOverlay.ep.outro-on .outro.instant .outro-end, :root.lite #readoutOverlay.ep.outro-on .outro-end{ transition-duration:0.2s; }
+#readoutOverlay.ep.outro-on .outro-end .outro-mid{ position:relative; inset:auto; top:auto; flex:0 0 auto; z-index:2; padding:calc(64px + env(safe-area-inset-top)) 12px 8px; background:linear-gradient(180deg, #0a0624 70%, rgba(10,6,36,0)); }
+#readoutOverlay.ep.outro-on .outro-end .outro-mid .outro-head{ opacity:1; transition:none; font-size:clamp(30px, 9.4vw, 42px); }
+#readoutOverlay.ep.outro-on .outro-end .outro-artwrap{ position:relative; flex:1 1 0; min-height:0; overflow:hidden; z-index:1; margin-top:-6px; }
+#readoutOverlay.ep.outro-on .outro-end .outro-art{ position:absolute; left:0; top:0; width:100%; height:100%; max-height:none; object-fit:cover; object-position:50% 25%; opacity:1; transition:none;
+  -webkit-mask-image:linear-gradient(180deg, transparent, #000 10%, #000 90%, transparent); mask-image:linear-gradient(180deg, transparent, #000 10%, #000 90%, transparent); }
+#readoutOverlay.ep.outro-on .outro-end .outro-lower{ position:relative; inset:auto; flex:0 0 auto; z-index:3; opacity:1; pointer-events:auto; gap:9px; padding:12px 14px calc(12px + env(safe-area-inset-bottom)); background:#0a0624; border-top:3px solid #ffcb2b; }
+#readoutOverlay.ep.outro-on .outro-end .outro-stats{ opacity:1; transition:none; display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; max-width:380px; }
+#readoutOverlay.ep.outro-on .outro-end .outro-stats .os{ padding:6px 2px 5px; border-radius:12px; border-width:2px; gap:3px; box-shadow:0 3px 0 #7a4a00; }
+#readoutOverlay.ep.outro-on .outro-end .outro-stats .os b{ font-size:22px; }
+#readoutOverlay.ep.outro-on .outro-end .outro-stats .os small{ font-size:10px; letter-spacing:0.3px; }
+#readoutOverlay.ep.outro-on .outro-end .outro-stats .os.ep, #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.flz{ background:linear-gradient(180deg, #d9c8ff, #8f6bff); box-shadow:0 3px 0 #4a2aa8; }
+#readoutOverlay.ep.outro-on .outro-end .outro-stats .os.ok, #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.str{ background:linear-gradient(180deg, #c4ffcf, #2fd36b); box-shadow:0 3px 0 #0f7a38; }
+#readoutOverlay.ep.outro-on .outro-end .outro-share, #readoutOverlay.ep.outro-on .outro-end .outro-donate, #readoutOverlay.ep.outro-on .outro-end .outro-again{ opacity:1; transition:none; animation:none; }
+#readoutOverlay.ep.outro-on .outro-end .outro-share{ min-height:56px !important; }
+#readoutOverlay.ep.outro-on .outro-end .outro-donate{ min-height:46px !important; font-size:17px !important; }
+#readoutOverlay.ep.outro-on .outro-end .outro-again{ opacity:1; color:#fff; font-size:16px; min-height:34px; padding:4px 18px; }
+@media (max-height:700px){
+  #readoutOverlay.ep.outro-on .outro-end .outro-mid{ padding-top:calc(56px + env(safe-area-inset-top)); padding-bottom:4px; }
+  #readoutOverlay.ep.outro-on .outro-end .outro-mid .outro-head{ font-size:28px; }
+  #readoutOverlay.ep.outro-on .outro-end .outro-lower{ gap:6px; padding-top:8px; padding-bottom:calc(8px + env(safe-area-inset-bottom)); }
+  #readoutOverlay.ep.outro-on .outro-end .outro-stats .os b{ font-size:19px; }
+  #readoutOverlay.ep.outro-on .outro-end .outro-share{ min-height:48px !important; }
+  #readoutOverlay.ep.outro-on .outro-end .outro-donate{ min-height:40px !important; font-size:15px !important; }
+  #readoutOverlay.ep.outro-on .outro-end .outro-donate .od-icon{ width:30px; height:30px; }
+  #readoutOverlay.ep.outro-on .outro-end .outro-again{ min-height:26px; font-size:14px; }
+}
+#readoutOverlay.ep.outro-on .outro-badge{ z-index:5; }

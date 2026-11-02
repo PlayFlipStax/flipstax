@@ -4742,18 +4742,20 @@
   <div class="outro" id="outro">
     <video class="outro-video" id="outroVideo" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
     <img class="outro-poster" id="outroPoster" src="data/outro/poster.webp" alt="" decoding="async" draggable="false">
-    <img class="outro-art" id="outroArt" alt="" decoding="async" draggable="false">
     <div class="outro-badge" id="outroBadge" aria-live="polite"><span>FINAL SCORE</span><b id="outroScore">0</b></div>
     <button type="button" class="outro-details" id="outroDetails" aria-expanded="false">details</button>
-    <div class="outro-mid" id="outroMid">
-      <h2 class="outro-head" id="outroHead">CONGRATULATIONS!</h2>
-    </div>
-    <div class="outro-lower">
-      <div class="outro-stats" id="outroStats"></div>
-      <div class="daily-btn primary outro-share" id="outroShare" role="button" tabindex="0">📤 SHARE</div>
-      <a class="outro-donate" id="outroDonate" href="https://ko-fi.com/flipstax" target="_blank" rel="noopener noreferrer"><img class="od-icon" src="images/kofi-logo.webp" width="40" height="40" alt="" decoding="async"><span>Buy Flip a coffee</span></a>
-      <div class="outro-again" id="outroAgain" role="button" tabindex="0">Play again tomorrow</div>
+    <div class="outro-end" id="outroEnd">
+      <div class="outro-mid" id="outroMid">
+        <h2 class="outro-head" id="outroHead">CONGRATULATIONS!</h2>
+      </div>
+      <div class="outro-artwrap"><img class="outro-art" id="outroArt" alt="" decoding="async" draggable="false"></div>
+      <div class="outro-lower">
+        <div class="outro-stats" id="outroStats"></div>
+        <div class="daily-btn primary outro-share" id="outroShare" role="button" tabindex="0">📤 SHARE</div>
+        <a class="outro-donate" id="outroDonate" href="https://ko-fi.com/flipstax" target="_blank" rel="noopener noreferrer"><img class="od-icon" src="images/kofi-logo.webp" width="40" height="40" alt="" decoding="async"><span>Buy Flip a coffee</span></a>
+        <div class="outro-again" id="outroAgain" role="button" tabindex="0">Play again tomorrow</div>
       <a class="outro-feedback" id="outroFeedback" href="#" target="_blank" rel="noopener noreferrer" hidden>Tell us what you think</a>
+      </div>
     </div>
   </div>
   <div class="personality-inner">
@@ -16115,7 +16117,7 @@
     voted = false; votedSinceTime = null;
     playRunEndMusic(!!solved);
     // Run 4A: Orbit Drop was Round 6 (its points are in the score already); the Word Warp finale ends the show: the results.
-    runResultToday.vsMarks = runVsMarks.slice(); runResultToday.letters = runLetters.length;
+    runResultToday.vsMarks = runVsMarks.slice(); runResultToday.letters = runLetters.length; runResultToday.bestStreak = runBestStreak; runResultToday.flipz = runVotesDecided;
     runResultToday.keys = runKeys; runResultToday.bonusChips = runBonusChips; runResultToday.warpChip = false;
     runResultToday.orbitChips = runOrbit ? runOrbit.chips.length : dailyChipsFor(runKeys, runBonusChips, false);
     runResultToday.orbitPoints = runOrbitPts; runResultToday.jackpot = runOrbitJackpot;
@@ -16148,7 +16150,10 @@
     if (r.goopLost > 0) rows.push(['Gooped', -Math.round(r.goopLost), 'goop']);   // (a prize the GOOP took, never in the score)
     rows.push([GN.orbitDrop + (r.jackpot ? ' · THE MOTHERSHIP!' : ''), orbit, 'roll']);
     { const st = document.getElementById('outroStats'), L = r.letters || 0, O = r.orbitChips != null ? r.orbitChips : ((r.orbit && r.orbit.chips) || []).length;
-      if (st) st.innerHTML = '<span class="os pts"><b>+' + orbit + '</b><small>points gained</small></span><span class="os ltr"><b>' + L + '</b><small>letter' + (L === 1 ? '' : 's') + ' won</small></span><span class="os orb"><b>' + O + '</b><small>orb' + (O === 1 ? '' : 's') + '</small></span>'; }
+      const tiles = [['pts', shownScore(r.score).toLocaleString(), 'final score'], ['ep', r.episode != null ? '#' + r.episode : '-', 'episode'],
+        ['ok', (r.triviaCorrect || 0) + '/' + (r.triviaTotal || 0), 'correct'], ['str', String(r.bestStreak || 0), 'best streak'],
+        ['flz', String(r.flipz || 0), 'Flipz earned'], ['pts', '+' + orbit, 'points gained'], ['ltr', String(L), 'letter' + (L === 1 ? '' : 's') + ' won'], ['orb', String(O), 'orb' + (O === 1 ? '' : 's')]];
+      if (st) st.innerHTML = tiles.map(t=> '<span class="os ' + t[0] + '"><b>' + t[1] + '</b><small>' + t[2] + '</small></span>').join(''); }
     const br = document.getElementById('eprBreak'); br.textContent = '';
     rows.forEach(([label, pts, cls])=>{ const s = document.createElement('span'), b = document.createElement('b'); s.textContent = label; b.textContent = pts > 0 ? '+' + pts : pts < 0 ? '\u2212' + Math.abs(pts) : '0'; if (cls){ s.className = cls; b.className = cls; } br.appendChild(s); br.appendChild(b); });
     // The score counts up; straight from the Orbit Drop, the winnings roll in on top.
@@ -16191,15 +16196,15 @@
   // while it plays skips straight to the end. Muted unless the player has sound on. If the video cannot play (error, blocked, stalled,
   // lite mode, reduced motion) the poster shows and the end state follows after 1.5 s. OUTRO_WATCHDOG_MS guarantees the buttons within 12 s.
   // The video never blocks SHARE or the donation button: they are ordinary elements, and everything starts at the end state on a skip.
-  const OUTRO_WATCHDOG_MS = 11000, OUTRO_FALLBACK_MS = 1500, OUTRO_START_MS = 3500;
+  const OUTRO_TAIL_S = 2, OUTRO_WATCHDOG_MS = 11000, OUTRO_FALLBACK_MS = 1500, OUTRO_START_MS = 3500;
   let outroTimers = [], outroState = 'idle';
   function outroLater(ms, fn){ const t = setTimeout(fn, ms); outroTimers.push(t); return t; }
   function outroClear(){ outroTimers.forEach(clearTimeout); outroTimers = []; }
-  function outroEnd(instant){
+  function outroEnd(instant, early){
     const o = document.getElementById('outro'); if (!o || outroState === 'end') return;
     outroState = 'end'; outroClear();
     const v = document.getElementById('outroVideo');
-    if (instant || !v.ended){ try{ v.pause(); }catch(e){} o.classList.add('poster-on'); }   // (a skip or a failure freezes on the poster: the same last frame)
+    if (instant || (!v.ended && !early)){ try{ v.pause(); }catch(e){} o.classList.add('poster-on'); }   // (a skip or a failure freezes on the poster: the same last frame)
     o.classList.toggle('instant', !!instant);
     o.classList.add('end');
   }
@@ -16232,6 +16237,7 @@
     try{
       v.muted = !soundOn; v.src = 'data/outro/outro.mp4'; v.currentTime = 0;
       v.onended = ()=> outroEnd(false); v.onerror = fail;
+      v.ontimeupdate = ()=>{ if (v.duration && v.currentTime >= v.duration - OUTRO_TAIL_S) outroEnd(false, true); };   // (the last 2 s are only the closed curtain: the results come in as the curtain closes)
       let started = false; v.onplaying = ()=>{ started = true; };
       const p = v.play(); if (p && p.catch) p.catch(()=>{ if (!v.muted){ v.muted = true; v.play().catch(fail); } else fail(); });
       outroLater(OUTRO_START_MS, ()=>{ if (!started) fail(); });   // (never stuck on a stalled load)
@@ -18971,7 +18977,7 @@
     function replaySampleEpisode(){
       const r = replaySampleResult();
       return Object.assign(r, { score: 412, actPts: [22, 31, 58, 64, 89, 60], missPts: 10, goopLost: 28, best: { pts: 45, text: 'Read the crowd on Pizza vs Tacos in Round Five' }, episode: showEpisode(todayStr()),
-        orbit: { stage:'done', done:true, chips:[], dropped:0, base: 368 }, orbitPoints: 44, jackpot: true, letters: 5, streak: 7,
+        orbit: { stage:'done', done:true, chips:[], dropped:0, base: 368 }, orbitPoints: 44, jackpot: true, letters: 5, streak: 7, bestStreak: 4, flipz: 38,
         vsMarks: ['ggrggrggg', '', 'grggrgggr', 'ggrgrg'] });
     }
     const JUMPS = [
