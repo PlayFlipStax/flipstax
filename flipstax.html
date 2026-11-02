@@ -5846,6 +5846,7 @@
   // show / hide of that element crossfades. Opacity only; lite and reduced motion get the same simple fade.
   const SCENE_BG_RE = /(^|[\s-])(bg|studio|stage|sun|sky|backdrop|spot|cone|curt|wall|floorplane|pool|tint|slime)(\s|$)/;
   function sceneOut(el, removing){
+    if (window.__noGhost) return;   // (the Round Done to title card change fades through black: no frozen copy may show with the next picture)
     if (!el || !el.parentNode || !Element.prototype.animate || el.classList.contains('hidden')) return;
     let cs; try{ cs = getComputedStyle(el); }catch(e){ return; }
     if (cs.display === 'none' || cs.visibility === 'hidden') return;
@@ -12218,9 +12219,19 @@
     const go = (e)=>{
       if (gone || window.__previewHold || (e && performance.now() - shownAt < SKIP_MIN_MS)) return;   // (__previewHold: screenshots only)
       gone = true; showCard.removeEventListener('click', go);
-      showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden';
-      noteOverlayClosed();
-      then();
+      // never both pictures at once: the Round Done card fades to black over 0.25 s, holds 0.1 s, then the next card's art fades in over 0.3 s (the title art then pushes in)
+      const blk = document.createElement('div'); blk.className = 'rw-black'; document.body.appendChild(blk);
+      const can = !!blk.animate, quietB = FX.reduced() || isLite();
+      const step = (frames, ms, fn)=>{ if (can) blk.animate(frames, { duration:quietB ? Math.round(ms * 0.8) : ms, fill:'forwards', easing:'linear' }); else blk.style.opacity = frames[frames.length - 1].opacity; setTimeout(fn, ms); };
+      step([{ opacity:0 }, { opacity:1 }], 250, ()=>{
+        window.__noGhost = true;
+        showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden';
+        noteOverlayClosed();
+        setTimeout(()=>{
+          then(); setTimeout(()=>{ window.__noGhost = false; }, 80);
+          step([{ opacity:1 }, { opacity:0 }], 300, ()=> blk.remove());
+        }, 100);
+      });
     };
     (runActive ? showLater : setTimeout)(()=> go(), cine(TIMING.REWARD_HOLD || 2200));
     if (runActive) showOn(showCard, 'click', go); else showCard.addEventListener('click', go);

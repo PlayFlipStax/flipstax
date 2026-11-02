@@ -1422,14 +1422,14 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
    Round title cards: a column - the picture takes whatever is left above the points pill, the sign and the host's line, which follow it with small
    fixed gaps (so the bubble can never touch the sign, however many lines it has). Round Done: a grid - the video (or its poster) fills the first row
    and the title and the three tiles sit right under it. */
-.show-card.flipstage.art-title{ display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:12px; padding:0 0 calc(64px + env(safe-area-inset-bottom)); }
+.show-card.flipstage.art-title{ display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:12px; padding:0 0 calc(76px + env(safe-area-inset-bottom)); }   /* (the host's line sits well clear of the foot of the screen, two lines included) */
 .show-card.flipstage.art-title::before{ position:relative; left:auto; right:auto; top:auto; flex:1 1 auto; align-self:stretch; width:100%; height:auto; min-height:0; z-index:0;
   background:var(--rw-art) 50% 18% / cover no-repeat; margin-bottom:-10px; }
 .show-card.flipstage.art-title .fs-pill, .show-card.flipstage.art-title .fs-title, .show-card.flipstage.art-title .fs-line{ position:relative; left:auto; right:auto; top:auto; bottom:auto; margin:0; transform:none; animation:none; flex:0 0 auto; }
 .show-card.flipstage.art-title .fs-line{ width:min(92vw, 420px); transition:opacity 0.25s linear; }
 .show-card.flipstage.art-title .fs-line.on{ transform:none; }
 .show-card.flipstage.art-title .fs-title{ max-width:92vw; }
-@media (max-height:660px){ .show-card.flipstage.art-title{ padding-bottom:calc(16px + env(safe-area-inset-bottom)); gap:8px; } .show-card.flipstage.art-title .fs-title b{ font-size:clamp(22px, 7vw, 30px); } }
+@media (max-height:660px){ .show-card.flipstage.art-title{ padding-bottom:calc(48px + env(safe-area-inset-bottom)); gap:8px; } .show-card.flipstage.art-title .fs-title b{ font-size:clamp(22px, 7vw, 30px); } }
 :root.mode-daily .show-card.reward.has-art.art-round{ display:grid; grid-template-rows:minmax(0, 1fr) auto; grid-template-columns:minmax(0, 1fr); justify-items:center; align-items:end; padding-top:0; }
 :root.mode-daily .show-card.reward.art-round::before{ position:relative; grid-area:1 / 1; align-self:stretch; justify-self:stretch; top:auto; left:auto; right:auto; width:auto; height:auto; min-height:0; margin-bottom:-14px; }
 :root.mode-daily .show-card.reward.art-round .rw-video{ position:relative; grid-area:1 / 1; align-self:stretch; justify-self:stretch; top:auto; left:auto; width:100%; height:100%; min-height:0; margin-bottom:-14px; }
@@ -1564,3 +1564,9 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .ww-solved span{ font:800 clamp(16px, 4.6vw, 20px)/1 var(--f-display); color:#ffe9a0; letter-spacing:0.5px; text-shadow:0 2px 0 rgba(0,0,0,0.5); }
 .solve-celebrate.nb .sc-banner{ display:none; }
 .solve-overlay.tray.celebrating :is(.solve-header, .solve-bar, .solve-attempts){ visibility:hidden; }   /* (the banner has the room: no ghost of the clock behind SOLVED!) */
+/* Round Done to the next card: a black layer for the 0.25 s fade out, 0.1 s hold and 0.3 s fade in (no frame shows both pictures); the title art then pushes in slowly */
+.rw-black{ position:fixed; inset:0; z-index:9000; background:#000; opacity:0; pointer-events:none; }
+@keyframes artPush{ from{ transform:scale(1); } to{ transform:scale(1.06); } }
+.show-card.flipstage.art-title::before{ transform-origin:50% 0; animation:artPush 3s ease-out both; }
+:root.lite .show-card.flipstage.art-title::before{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .show-card.flipstage.art-title::before{ animation:none; } }
