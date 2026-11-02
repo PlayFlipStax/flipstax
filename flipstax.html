@@ -11201,6 +11201,11 @@
   // DOORS_CLASSIC (test flag, on by default; ?doors=new shows the A+ redesign again): the earlier door art - an arched purple door with a gold frame, a
   // panel, a brass knob and a glowing number (commit 939f507, "Mystery Door - four doors on the stage"; the older flat teal tiles are 1586466). Same code behaviour.
   const DOORS_CLASSIC = !/[?&]doors=new\b/.test(location.search);
+  // DOORS_ART (default on; ?doors=old or ?doors=new brings the CSS-drawn doors back): the Mystery Doors screen made of art - the saucer-shuffle floor, a hanging
+  // sign, three closed doors (data/doors/*.webp) that crossfade to their open picture on a tap. The old door code below stays for rollback.
+  const DOORS_ART = !/[?&]doors=(old|new)\b/.test(location.search);
+  const DOOR_ART = [{ w:238, h:404, ow:387 }, { w:206, h:375, ow:337 }, { w:214, h:397, ow:370 }];   // (the files' own sizes: all three doors share one scale)
+  const DOOR_ART_NAMES = ['left', 'mid', 'right'];
   window.FLIPSTAX_DOORS_CLASSIC = DOORS_CLASSIC;
   function portalDoorSvg(i){
     if (DOORS_CLASSIC) return '<div class="mpc-door"><b class="mpc-n">' + (i + 1) + '</b><i class="mpc-panel"></i><i class="mpc-knob"></i></div>';
@@ -11231,23 +11236,30 @@
     const g = Show.gen, ov = els.eventOverlay;
     runPhase = 'break';
     stopTallyPolling(); clearRoundTimer();
-    ov.classList.remove('hidden', 'stack'); ov.classList.add('powerup', 'mdoor'); els.eventPrompt.classList.remove('long');
+    ov.classList.remove('hidden', 'stack'); ov.classList.add('powerup', 'mdoor'); ov.classList.toggle('art', DOORS_ART); els.eventPrompt.classList.remove('long');
     els.powerupIcon.classList.add('hidden');
     fitTopChip();
     els.eventSubtitle.textContent = '🚪 MYSTERY PORTAL';
     els.eventPrompt.textContent = 'Pick a portal — a bonus game waits behind each';
     // the title goes up on the marquee (the close shot of the stage, behind the portals)
-    if (window.Stage) Stage.cue('close', { over: ov, cls:'mdoor', sign:{ sub:'ROUND ' + ((RUNDOWN.acts[st.act] || {}).round || 3) + ' OF ' + SHOW_ROUND_COUNT, main:'MYSTERY PORTAL' } });
+    if (DOORS_ART){
+      const old = document.getElementById('mdArt'); if (old) old.remove();
+      const art = document.createElement('div'); art.id = 'mdArt'; art.setAttribute('aria-hidden', 'true');
+      art.innerHTML = '<div class="md-sign"><img src="data/doors/open-sign.webp" alt=""><span class="md-rib"></span><span class="md-rtxt"></span></div><div class="md-pill">Pick a door!</div>';
+      art.querySelector('.md-rtxt').textContent = 'ROUND ' + ((RUNDOWN.acts[st.act] || {}).round || 3) + ' \u00B7 CHOOSE WISELY';
+      ov.insertBefore(art, ov.firstChild);
+    }
+    if (window.Stage && !DOORS_ART) Stage.cue('close', { over: ov, cls:'mdoor', sign:{ sub:'ROUND ' + ((RUNDOWN.acts[st.act] || {}).round || 3) + ' OF ' + SHOW_ROUND_COUNT, main:'MYSTERY PORTAL' } });
     let picked = false;
     const tiles = els.eventTiles, used = tiles.slice(0, Math.min(DOOR_COUNT, games.length));
-    const reset = ()=>{ ov.classList.add('hidden'); ov.classList.remove('powerup', 'mdoor'); { const c = document.getElementById('mpCaption'); if (c) c.remove(); } tiles.forEach(t=>{ t.classList.remove('portal', 'mp', 'opened', 'dim', 'open', 'other', 'picked-wait'); t.innerHTML = ''; t.onclick = null; t.style.display = ''; }); };
+    const reset = ()=>{ ov.classList.add('hidden'); ov.classList.remove('powerup', 'mdoor', 'art'); { const a = document.getElementById('mdArt'); if (a) a.remove(); } { const c = document.getElementById('mpCaption'); if (c) c.remove(); } tiles.forEach(t=>{ t.classList.remove('portal', 'mp', 'md', 'art-open', 'opened', 'dim', 'open', 'other', 'picked-wait'); t.removeAttribute('role'); t.removeAttribute('tabindex'); t.style.removeProperty('--dw'); t.innerHTML = ''; t.onclick = null; t.style.display = ''; }); };
     const open = (i)=>{
       if (picked || g !== Show.gen) return;
       picked = true; clearTimeout(eventTimeoutId);
       tiles.forEach(t=> t.onclick = null);
       const tile = tiles[i], game = games[i % games.length];
       used.forEach((t, k)=>{ if (k !== i) t.classList.add('dim'); });
-      tile.classList.add('picked-wait'); sfx.drumroll(QUIZ_DRUMROLL_MS);
+      tile.classList.add('picked-wait'); if (DOORS_ART) tile.classList.add('art-open'); sfx.drumroll(QUIZ_DRUMROLL_MS);   // (art doors: the closed picture crossfades to the open one now, 0.4 s, opacity only)
       setTimeout(()=>{
         if (g !== Show.gen) return;
         tile.classList.remove('picked-wait'); tile.classList.add('opened'); if (sfx.slam) sfx.slam();
@@ -11265,8 +11277,8 @@
             const ok = miniGame(game) ? runMiniGame(game, { seed: st.seed, door:true, day: st.day }, done) : runBrainBreak({ game, seed: st.seed, day: st.day }, done);
             if (!ok) showDone(g, 'door game unavailable');
           });
-        }, { lead:700, text: els.eventPrompt.textContent });   // (the swing takes 0.7 s, then the game's name holds for the shared reveal time)
-      }, dt(QUIZ_DRUMROLL_MS));
+        }, { lead: DOORS_ART ? 0 : 700, text: els.eventPrompt.textContent });   // (the swing takes 0.7 s, then the game's name holds for the shared reveal time)
+      }, dt(DOORS_ART ? 600 : QUIZ_DRUMROLL_MS));
     };
     { const oc = document.getElementById('mpCaption'); if (oc) oc.remove(); }
     // A+: every door starts solid, opaque and CLOSED - nothing from an earlier quiz, run or Jump-to visit (dim, opened, a swing, an inline style) carries over
@@ -11274,6 +11286,17 @@
     tiles.forEach((tileEl, i)=>{
       if (i >= used.length){ tileEl.style.display = 'none'; return; }
       const game = games[i % games.length], c = gameIntroColors(game);
+      if (DOORS_ART){
+        const nm = DOOR_ART_NAMES[i % 3];
+        tileEl.innerHTML = '<i class="md-glow"></i><img class="md-c" src="data/doors/closed-' + nm + '.webp" alt=""><img class="md-o" src="data/doors/open-' + nm + '.webp" alt=""><b class="md-n">' + (i + 1) + '</b>';
+        tileEl.style.setProperty('--dw', DOOR_ART[i % 3].w); tileEl.style.setProperty('--dh', DOOR_ART[i % 3].h); tileEl.style.setProperty('--dow', DOOR_ART[i % 3].ow);
+        tileEl.style.setProperty('--gi', i);
+        tileEl.style.backgroundColor = ''; tileEl.dataset.pu = '';
+        tileEl.classList.add('md'); tileEl.classList.remove('portal', 'open', 'other', 'is-right', 'is-wrong');
+        tileEl.setAttribute('role', 'button'); tileEl.setAttribute('tabindex', '0'); tileEl.setAttribute('aria-label', 'Door ' + (i + 1));
+        tileEl.onclick = ()=> open(i);
+        return;
+      }
       tileEl.innerHTML = '<div class="mp-door">' + portalSceneHtml(i) + '<div class="mp-prize" style="background:linear-gradient(180deg, ' + c[0] + ', ' + (c[1] || c[0]) + ')"><span class="pu-icon">' + (DOOR_ICONS[game] || '✨') + '</span><span class="pu-label"></span></div>' +
         '<div class="mp-leaf">' + portalDoorSvg(i) + '</div><b class="mp-num">' + (i + 1) + '</b></div>';
       tileEl.querySelector('.pu-label').textContent = mysteryName(game);

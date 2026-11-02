@@ -1484,3 +1484,35 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .cb-line{ font-size:max(13px, calc(var(--tvh, 160px) * 0.085)); line-height:1.15; }
 .cb-last b{ font-size:max(16px, calc(var(--tvh, 160px) * 0.12)); } .cb-last small{ font-size:max(14px, calc(var(--tvh, 160px) * 0.09)); }
 @media (min-aspect-ratio: 1/2){ .show-card.sponsor{ background-position:0 0, 50% 0, 0 0; } }
+
+/* ---- A+ Mystery Doors made of art (DOORS_ART): the saucer-shuffle floor, a hanging sign with its ribbon re-lettered live, three closed doors that
+   crossfade to their open picture on a tap (0.4 s, opacity only), glowing number badges on the floor and a soft idle glow. The old CSS door boxes stay
+   above for ?doors=old. Lite and reduced motion: a plain fade, no idle glow. ---- */
+.event-overlay.mdoor.art{ --dk:calc(min(30vw, 150px) / 238); justify-content:flex-end; background:#150a2a url(../data/scenes/saucer-shuffle-bg.webp) center bottom / cover no-repeat !important; }
+.event-overlay.mdoor.art > :not(#mdArt):not(.event-timerbar):not(.event-grid):not(#mpCaption){ display:none !important; }
+.event-overlay.mdoor.art .event-timerbar{ position:absolute; left:50%; transform:translateX(-50%); bottom:calc(8px + env(safe-area-inset-bottom)); width:60%; margin:0; z-index:3; }
+#mdArt{ position:absolute; inset:0; z-index:1; pointer-events:none; }
+.md-sign{ position:absolute; left:50%; top:calc(58px + env(safe-area-inset-top)); width:min(70vw, 300px); aspect-ratio:344 / 313; transform:translateX(-50%); }
+.md-sign img{ position:absolute; inset:0; width:100%; height:100%; display:block; clip-path:polygon(0 0, 100% 0, 100% 90%, 78% 90%, 78% 100%, 0 100%); }   /* (the file has a stray olive wedge in its lower right corner) */
+.md-rib{ position:absolute; left:19.2%; width:61.6%; top:70.4%; height:9.4%; border-radius:6px; background:linear-gradient(180deg, #2b2558, #1d1840); box-shadow:inset 0 0 0 1px rgba(150,120,255,0.35); }
+.md-rtxt{ position:absolute; left:19.2%; width:61.6%; top:70.4%; height:9.4%; display:flex; align-items:center; justify-content:center; white-space:nowrap; font:800 clamp(8px, 2.6vw, 11px)/1 var(--f-display, Inter, system-ui, sans-serif); letter-spacing:0.6px; color:#e8e2ff; }
+.md-pill{ position:absolute; left:50%; top:calc(58px + env(safe-area-inset-top) + min(70vw, 300px) * 313 / 344 + 6px); transform:translateX(-50%); padding:6px 16px; border-radius:99px; background:rgba(36,18,74,0.82); border:2px solid #ffd23f; color:#fff8d6; font:900 14px/1 var(--f-display, Inter, system-ui, sans-serif); letter-spacing:0.5px; white-space:nowrap; }
+:root.mode-daily .event-overlay.mdoor.art .event-grid{ position:absolute; left:0; right:0; bottom:calc(92px + env(safe-area-inset-bottom)); margin:0; padding:0; max-width:none; width:auto; display:flex !important; justify-content:center; align-items:flex-end; gap:1.5vw; z-index:2; }
+:root.mode-daily .event-overlay.mdoor.art .event-grid .bb-vs{ display:none; }
+:root.mode-daily .event-overlay.mdoor.art .event-tile.md{ position:relative; flex:0 0 auto; width:calc(var(--dw) * var(--dk)); height:calc(var(--dh) * var(--dk)); min-height:0; padding:0; margin:0; background:none !important; border:0 !important; border-radius:0; box-shadow:none !important; animation:none !important; transform:none; opacity:1; overflow:visible; cursor:pointer; -webkit-tap-highlight-color:transparent; }
+.event-tile.md img{ position:absolute; bottom:0; left:50%; display:block; max-width:none; transform:translateX(-50%); pointer-events:none; }
+.event-tile.md .md-c{ width:100%; height:100%; opacity:1; transition:opacity 0.4s ease; }
+.event-tile.md .md-o{ width:calc(var(--dow) * var(--dk)); height:auto; opacity:0; transition:opacity 0.4s ease; }
+.event-tile.md.art-open{ z-index:3; }
+.event-tile.md.art-open .md-c{ opacity:0; }
+.event-tile.md.art-open .md-o{ opacity:1; }
+:root.mode-daily .event-overlay.mdoor.art .event-tile.md.dim{ opacity:0.4; transition:opacity 0.3s ease; }
+.event-tile.md .md-glow{ position:absolute; left:50%; bottom:2%; width:150%; height:70%; transform:translateX(-50%); border-radius:50%; background:radial-gradient(ellipse at 50% 60%, rgba(255,210,63,0.5), rgba(255,210,63,0) 68%); opacity:0.25; animation:mdGlow 2.6s ease-in-out infinite; animation-delay:calc(var(--gi) * -0.9s); pointer-events:none; }
+.event-tile.md.art-open .md-glow{ animation:none; opacity:0; }
+.event-tile.md .md-n{ position:absolute; left:50%; bottom:calc(-1 * min(11vw, 46px) - 4px); width:min(9vw, 36px); height:min(9vw, 36px); transform:translateX(-50%); border-radius:50%; display:flex; align-items:center; justify-content:center; background:radial-gradient(circle at 35% 30%, #fff6c8, #ffd23f 60%, #b87400); color:#3a1a00; font:900 clamp(16px, 5vw, 22px)/1 var(--f-display, Inter, system-ui, sans-serif); box-shadow:0 0 12px 3px rgba(255,210,63,0.75); }
+.event-tile.md.art-open .md-n{ opacity:0; transition:opacity 0.3s ease; }
+@keyframes mdGlow{ 0%, 100%{ opacity:0.15; } 50%{ opacity:0.55; } }
+:root.lite .event-tile.md .md-glow{ animation:none; opacity:0.3; }
+:root.lite .event-tile.md .md-c, :root.lite .event-tile.md .md-o{ transition-duration:0.25s; }
+@media (prefers-reduced-motion: reduce){ .event-tile.md .md-glow{ animation:none; opacity:0.3; } .event-tile.md .md-c, .event-tile.md .md-o{ transition-duration:0.25s; } }
+@media (max-height:680px){ .md-sign{ top:calc(30px + env(safe-area-inset-top)); width:min(56vw, 300px); } .md-pill{ top:calc(30px + env(safe-area-inset-top) + min(56vw, 300px) * 313 / 344 + 2px); } :root.mode-daily .event-overlay.mdoor.art .event-grid{ bottom:calc(84px + env(safe-area-inset-bottom)); } }
