@@ -114,3 +114,6 @@
   background:linear-gradient(180deg, #080922 0%, #0a0a2c 93%, rgba(12,11,42,0.8) 96.5%, rgba(16,14,52,0) 100%); }
 #introBlast.glow i{ left:0; width:100%; background:radial-gradient(ellipse at 50% 55%, #ffffff 0, #d6fdff 38%, #7aeeff 100%); }
 #introBlast.glow.plain i{ background:#05030f; }
+.ip-edge{ position:absolute; left:0; width:100%; height:100%; z-index:1; pointer-events:none; opacity:0; image-rendering:auto; }
+.ip-edge.top{ top:0; transform-origin:50% 0; -webkit-mask-image:linear-gradient(180deg, #000 90%, transparent); mask-image:linear-gradient(180deg, #000 90%, transparent); }
+.ip-edge.bot{ bottom:0; transform-origin:50% 100%; -webkit-mask-image:linear-gradient(0deg, #000 90%, transparent); mask-image:linear-gradient(0deg, #000 90%, transparent); }
