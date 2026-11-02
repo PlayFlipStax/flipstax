@@ -7001,6 +7001,9 @@
       });
       haptic(8);
     },
+    // mega fix 17: the VS card tap - a soft 40 ms low pop (a short sine drop from 220 to 120 Hz, volume 0.12), through the same master volume and mute as the rest
+    vsTick: ()=>{ withSfxCtx((ctx, t)=>{ const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(220, t); o.frequency.exponentialRampToValueAtTime(120, t + 0.04);
+      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.12, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.04); o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + 0.05); }); haptic(8); },
     revealWin: ()=>{ playTone(660,0,0.09,'sine',0.1); playTone(880,0.08,0.14,'sine',0.1); },
     revealLose: ()=>{ playTone(320,0,0.15,'sine',0.07); },
     combo: ()=>{ playTone(784,0,0.06,'triangle',0.09); playTone(988,0.05,0.08,'triangle',0.09); haptic(12); },
@@ -17734,8 +17737,8 @@
     clearTimeout(celebrateTriviaCorrect._t);
     celebrateTriviaCorrect._t = setTimeout(()=> el.classList.add('hidden'), 1000);
   }
-  els.halfA.addEventListener('click', ()=>{ sfx.tap('top'); playTrack(gameTrackKey()); tapFeedback(els.halfA, els.halfB); vote('A'); });
-  els.halfB.addEventListener('click', ()=>{ sfx.tap('bottom'); playTrack(gameTrackKey()); tapFeedback(els.halfB, els.halfA); vote('B'); });
+  els.halfA.addEventListener('click', ()=>{ sfx.vsTick(); playTrack(gameTrackKey()); tapFeedback(els.halfA, els.halfB); vote('A'); });
+  els.halfB.addEventListener('click', ()=>{ sfx.vsTick(); playTrack(gameTrackKey()); tapFeedback(els.halfB, els.halfA); vote('B'); });
   document.addEventListener('keydown', (e)=>{
     // Typing "1"/"2" into a riddle answer box is not a vote.
     if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
