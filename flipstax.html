@@ -11314,6 +11314,7 @@
     const g = miniGame(key); if (!g) return false;
     if (mgOpen) mgOpen.close(true);
     const c = g.colors || ['#ffd23f', '#c2275f', '#2a0b4e'];
+    if (window.__liteSettle) window.__liteSettle();
     const ov = document.createElement('div'); ov.id = 'mgOverlay'; ov.className = 'mg-overlay mg-' + key; ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', mysteryName(key));
     ov.style.setProperty('--mg-a', c[0]); ov.style.setProperty('--mg-b', c[1]); ov.style.setProperty('--mg-c', c[2] || '#12062a'); ov.style.setProperty('--bulb', g.bulb || c[0]);
     // I2: one template for every mini-game - header plate (name + act), host zone (the rule, or the game's own host),
@@ -12054,7 +12055,7 @@
       '<span class="rw-chip pts" style="--i:0"><b>+' + pts + '</b><small>points</small></span>' +
       '<span class="rw-chip letter ' + (letter || 'none') + '" style="--i:1"><b>' + (letter === 'got' ? '?' : letter === 'miss' ? '✕' : '–') + '</b><small>' + (letter === 'got' ? 'letter won' : 'no letter') + '</small></span>' +
       '<span class="rw-chip keys" style="--i:2"><b>◉ ' + keys + '</b><small>orb' + (keys === 1 ? '' : 's') + '</small></span></div></div></div>';   // (A+: only points gained, the letter won and keys - no running totals)
-    if (!isLite() && !prefersReducedMotion()){
+    if (!prefersReducedMotion()){   // (lite mode keeps the dancers: it only stops the marquee and blur)
       try{
         const vid = document.createElement('video'); vid.className = 'rw-video'; vid.muted = true; vid.loop = true; vid.playsInline = true; vid.preload = 'auto'; vid.setAttribute('aria-hidden', 'true'); vid.setAttribute('disablepictureinpicture', '');
         vid.addEventListener('playing', ()=> vid.classList.add('on'));
@@ -16653,8 +16654,8 @@
   }
   buildMarquee(); addEventListener('resize', buildMarquee);
   // ---------- Lite mode (C8) ----------
-  // On with ?lite=1, or by itself when the page runs below 40fps for 2 seconds (measured with
-  // requestAnimationFrame while the tab is visible, from 3s after load; it then stays on for the
+  // On with ?lite=1 (?lite=0 keeps it off), or by itself when the page averages under 20fps for 3 seconds (measured with
+  // requestAnimationFrame while the tab is visible, never in the 4s after a screen, card or video starts; it then stays on for the
   // session). It drops the heaviest effects: the turning ray backgrounds, the bulb chases, the flying
   // question marks and floaters, backdrop blurs, the 2600px star wipe (a fade instead), and most of the
   // particles and confetti.
@@ -16667,26 +16668,37 @@
   let liteWhy = null;
   const isLite = ()=> document.documentElement.classList.contains('lite');
   (function(){
+    // ?lite=0 forces lite off for testing (the automatic switch never runs, and a saved lite flag is ignored)
+    if (/[?&]lite=0(&|$)/.test(location.search)){ try{ sessionStorage.removeItem('flipstax_lite'); }catch(e){} return; }
     let forced = /[?&]lite=1(&|$)/.test(location.search);
     try{ forced = forced || sessionStorage.getItem('flipstax_lite') === '1'; }catch(e){}
     if (forced){ setLite(true, 'param'); return; }
     if (!window.requestAnimationFrame) return;
-    let frames = [], lowSince = 0;
+    // Automatic switch: only a sustained low rate counts - under 20fps averaged over 3 seconds - and never in the
+    // first 4 seconds after the page, a screen, a card or a video starts (transitions always dip the frame rate).
+    const LITE_FPS = 20, LITE_WINDOW_MS = 3000, LITE_SETTLE_MS = 4000;
+    let settleUntil = 4000, winStart = 0, winFrames = 0;
+    const settle = ()=>{ settleUntil = performance.now() + LITE_SETTLE_MS; winStart = 0; winFrames = 0; };
+    window.__liteSettle = settle;
     const sample = (now)=>{
       if (isLite()) return;
-      if (document.hidden){ frames = []; lowSince = 0; requestAnimationFrame(sample); return; }
-      // (WebKit runs late callbacks back to back when it catches up: those count as one frame)
-      if (frames.length && now - frames[frames.length - 1] < 6){ requestAnimationFrame(sample); return; }
-      frames.push(now); while (frames.length && now - frames[0] > 1000) frames.shift();
-      if (now > 3000 && frames.length > 1 && now - frames[0] >= 900){
-        if (frames.length < 40){ if (!lowSince) lowSince = now; else if (now - lowSince >= 2000){ setLite(true, 'fps'); return; } }
-        else lowSince = 0;
+      if (document.hidden){ settle(); requestAnimationFrame(sample); return; }
+      if (now < settleUntil){ winStart = 0; winFrames = 0; requestAnimationFrame(sample); return; }
+      if (!winStart){ winStart = now; winFrames = 0; requestAnimationFrame(sample); return; }
+      winFrames++;
+      if (now - winStart >= LITE_WINDOW_MS){
+        const fps = winFrames * 1000 / (now - winStart);
+        if (fps < LITE_FPS){ setLite(true, 'fps ' + fps.toFixed(0)); return; }
+        winStart = now; winFrames = 0;
       }
       requestAnimationFrame(sample);
     };
-    document.addEventListener('visibilitychange', ()=>{ frames = []; lowSince = 0; });
+    document.addEventListener('visibilitychange', settle);
+    document.addEventListener('playing', settle, true);
+    document.addEventListener('loadstart', settle, true);
     requestAnimationFrame(sample);
   })();
+  // Screens and cards opening restart the settle time (set up after the overlays exist, below).
   function syncMarquee(){
     const open = el=> el && !el.classList.contains('hidden');
     const html = document.documentElement, daily = html.classList.contains('mode-daily'), inf = html.classList.contains('mode-infinity');
@@ -16729,6 +16741,7 @@
     showBg.classList.toggle('paused', open(els.solveOverlay) || els.readoutOverlay.classList.contains('show') || open(els.finOverlay) || !showCard.classList.contains('hidden'));
   }
   [els.eventOverlay, els.solveOverlay, els.readoutOverlay, els.finOverlay, els.irOverlay, els.guessOverlay, document.getElementById('showCard'), document.documentElement].forEach(ov=> new MutationObserver(syncShowWorld).observe(ov, { attributes:true, attributeFilter:['class'] }));
+  [els.eventOverlay, els.solveOverlay, els.readoutOverlay, els.finOverlay, els.irOverlay, els.guessOverlay, els.pauseOverlay, document.getElementById('showCard'), document.getElementById('mgOverlay')].forEach(ov=> ov && new MutationObserver(()=>{ if (window.__liteSettle) window.__liteSettle(); }).observe(ov, { attributes:true, attributeFilter:['class'] }));
   [els.eventOverlay, els.solveOverlay, els.readoutOverlay, els.finOverlay, els.irOverlay, els.guessOverlay, els.pauseOverlay, document.getElementById('showCard'), document.documentElement].forEach(ov=> new MutationObserver(syncMarquee).observe(ov, { attributes:true, attributeFilter:['class'] }));
   // C1: Infinity's popup world - the power-up pick, a Cosmic Surprise, or
   // the bonus Brain Beam.
