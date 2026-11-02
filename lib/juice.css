@@ -1488,7 +1488,7 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 /* ---- A+ Mystery Doors made of art (DOORS_ART): the saucer-shuffle floor, a hanging sign with its ribbon re-lettered live, three closed doors that
    crossfade to their open picture on a tap (0.4 s, opacity only), glowing number badges on the floor and a soft idle glow. The old CSS door boxes stay
    above for ?doors=old. Lite and reduced motion: a plain fade, no idle glow. ---- */
-.event-overlay.mdoor.art{ --dk:calc(min(30vw, 150px) * 0.88 / 238); justify-content:flex-end; background:#150a2a url(../data/scenes/saucer-shuffle-bg.webp) center bottom / cover no-repeat !important; }
+.event-overlay.mdoor.art{ --dk:calc(min(30vw, 150px) * 0.88 / 238); justify-content:flex-end; background:linear-gradient(rgba(10,4,24,0.45), rgba(10,4,24,0.45)), #150a2a url(../data/scenes/saucer-shuffle-bg.webp) center bottom / cover no-repeat !important;   /* (the dark layer is part of the background only: the sign, doors and badges above it stay at full brightness) */ }
 .event-overlay.mdoor.art > :not(#mdArt):not(.event-timerbar):not(.event-grid):not(#mpCaption){ display:none !important; }
 .event-overlay.mdoor.art .event-timerbar{ position:absolute; left:50%; transform:translateX(-50%); bottom:calc(8px + env(safe-area-inset-bottom)); width:60%; margin:0; z-index:3; }
 #mdArt{ position:absolute; inset:0; z-index:1; pointer-events:none; }
