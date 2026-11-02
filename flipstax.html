@@ -2688,6 +2688,8 @@
     clip-path:polygon(45% 0, 55% 0, 74% calc(42% + 70px), 26% calc(42% + 70px)); }
   .co-spot::after{ background:radial-gradient(ellipse 150px 84px at 50% 42%, rgba(255,244,210,0.4), rgba(255,244,210,0.13) 58%, rgba(255,244,210,0) 100%); }
   .curtain.open .co-spot{ opacity:0; }
+  /* after the intro video: the drapes slide apart from the centre (translateX, 0.6 s); lite and reduced motion fade them out */
+  @keyframes ciL{ from{ transform:translateX(0); } to{ transform:translateX(-101%); } } @keyframes ciR{ from{ transform:translateX(0); } to{ transform:translateX(101%); } } @keyframes ciF{ from{ opacity:1; } to{ opacity:0; } }
   .co-plate{ position:absolute; z-index:8; top:42%; left:50%; transform:translate(-50%, -50%); font:900 22px/1 var(--f-display); letter-spacing:4px; color:#3a1a00; padding:12px 22px;
     border-radius:10px; border:3px solid #fff3c4; background:linear-gradient(180deg, var(--gold-1), var(--gold-2) 50%, var(--gold-3)); box-shadow:0 8px 24px rgba(0,0,0,0.55); transition:opacity .4s, transform .4s; }
   /* A3: the pull - each drape bunches to its side (the folds crowd together) over --pull, then sways as it settles. */
@@ -2695,6 +2697,8 @@
   .curtain .co-drape.l{ transform-origin:0 0; } .curtain .co-drape.r{ transform-origin:100% 0; }
   .curtain.open .co-drape.l{ animation:coPullL var(--pull, 4s) cubic-bezier(.5,0,.3,1) forwards; }
   .curtain.open .co-drape.r{ animation:coPullR var(--pull, 4s) cubic-bezier(.5,0,.3,1) forwards; }
+  .curtain.intro-curt .co-drape{ transform-origin:50% 0; } .curtain.intro-curt.open .co-drape.l{ animation:ciL 0.6s cubic-bezier(.5,0,.3,1) forwards; } .curtain.intro-curt.open .co-drape.r{ animation:ciR 0.6s cubic-bezier(.5,0,.3,1) forwards; }
+  :root.lite .curtain.intro-curt.open .co-drape, :root.rm .curtain.intro-curt.open .co-drape{ animation:ciF 0.4s ease forwards; }
   @keyframes coPullL{ 0%{ transform:none; } 80%{ transform:scaleX(0.22) skewX(0deg); } 87%{ transform:scaleX(0.235) skewX(2.2deg); } 94%{ transform:scaleX(0.218) skewX(-1.2deg); } 100%{ transform:scaleX(0.225) skewX(0deg); } }
   @keyframes coPullR{ 0%{ transform:none; } 80%{ transform:scaleX(0.22) skewX(0deg); } 87%{ transform:scaleX(0.235) skewX(-2.2deg); } 94%{ transform:scaleX(0.218) skewX(1.2deg); } 100%{ transform:scaleX(0.225) skewX(0deg); } }
   .co-studio{ z-index:0; }
@@ -2715,7 +2719,7 @@
   .co-sign.off{ transform:translate(-50%, -30%) scale(0.85); opacity:0; transition-duration:.3s; }
   .co-sign .sign-bulbs i{ --bulb:#fff8d0; box-shadow:0 0 7px #ffd23f, 0 0 0 1.5px rgba(90,40,0,0.6); }
   .co-sign.on .sign-bulbs i{ animation:bulbUnison .36s steps(1) 2, bulbChase .9s steps(1) .8s infinite; animation-delay:0s, calc(.8s + var(--k) * -0.225s); }
-  @media (prefers-reduced-motion: reduce){ .curtain.open .co-drape{ animation:none; transform:scaleX(0.225); } .co-stage-host, .co-follow, .co-sign{ transition:none; } .co-sign.on .sign-bulbs i{ animation:none; } }
+  @media (prefers-reduced-motion: reduce){ .curtain.intro-curt.open .co-drape{ animation:ciF 0.4s ease forwards; transform:none; } .curtain.open .co-drape{ animation:none; transform:scaleX(0.225); } .co-stage-host, .co-follow, .co-sign{ transition:none; } .co-sign.on .sign-bulbs i{ animation:none; } }
   .curtain.open .co-plate{ opacity:0; transform:translate(-50%, -80%) scale(0.8); }
   .show-card.curtain{ background:#1d0636; }
   .curtain .sc-inner{ gap:16px; }
@@ -12093,7 +12097,7 @@
     // A+: 'Greetings, Earthlings!' is the whole welcome now - it advances on its own 3.5 s after the line appears (a tap still skips it)
     const COLD_OPEN_AUTO_MS = 3500;
     const lines = seen && !afterIntro ? [HOST_INTRO_BACK] : HOST_INTRO_LINES.slice(0, 1);
-    const T = afterIntro ? { open:0, pull:0, walk:0, walkMs:0, talk:700 }
+    const T = afterIntro ? { open:0, pull:600, walk:0, walkMs:0, talk:1500 }
             : seen ? { open:0, pull:800, walk:100, walkMs:600, talk:600 }
                    : { open:300, pull:2200, walk:900, walkMs:1400, talk:2500 };
     const starts = []; let at = T.talk;
@@ -12111,7 +12115,14 @@
     if (window.Stage){ Stage.loadWide(); Stage.cue('wide', { over:showCard, cls:'curtain', sign:{ sub:'WELCOME TO', main:'FLIPSTAX' } }); }   // Run 3: the wide shot, then a push in
     const timers = [], later = (ms, f)=> timers.push(setTimeout(f, ms));
     const lineEl = showCard.querySelector('.co-line'), rig = showCard.querySelector('.co-stage-host');
-    if (afterIntro){ showCard.classList.add('open', 'walk'); } else later(T.open, ()=>{ showCard.classList.add('open'); if (sfx.bumper) sfx.bumper(false); });
+    // after the intro: Flip is already on his mark (walk, no travel) behind the CLOSED curtains; the held last frame of the video fades out over 0.6 s while the two
+    // halves slide apart from the centre (lib/intro.js calls __introOpen as that fade starts), the welcome bubble comes after
+    if (afterIntro){
+      // Flip stands exactly as big and where he stood in the video's last frame (a 540 x 960 picture, cover-fitted: head top at 219 and feet at 885 of 1000 of its height)
+      const Wd = innerWidth, Hd = innerHeight, kk = Math.max(Wd / 540, Hd / 960), oyy = (Hd - 960 * kk) / 2, fh = 640 * kk, fw = fh * 0.6743;
+      rig.style.cssText = 'width:' + fw.toFixed(1) + 'px;margin-left:' + (-fw / 2 + 10 * kk).toFixed(1) + 'px;bottom:' + (Hd - (oyy + 850 * kk)).toFixed(1) + 'px;';
+    }
+    if (afterIntro){ showCard.classList.add('walk', 'intro-curt'); window.__introOpen = ()=>{ window.__introOpen = null; showCard.classList.add('open'); }; later(1400, ()=>{ if (window.__introOpen) window.__introOpen(); }); } else later(T.open, ()=>{ showCard.classList.add('open'); if (sfx.bumper) sfx.bumper(false); });
     later(T.walk, ()=>{ showCard.classList.add('walk'); if (window.Stage) Stage.cue('close', { over:showCard, cls:'curtain', push:true, ms: total - T.walk + 600, sign:{ sub:'TONIGHT’S SHOW', main:'EPISODE ' + ep } }); });
     lines.forEach((l, i)=> later(starts[i], ()=>{
       cueLineSay(lineEl, l);
