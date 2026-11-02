@@ -11259,7 +11259,7 @@
       tiles.forEach(t=> t.onclick = null);
       const tile = tiles[i], game = games[i % games.length];
       used.forEach((t, k)=>{ if (k !== i) t.classList.add('dim'); });
-      tile.classList.add('picked-wait'); if (DOORS_ART) tile.classList.add('art-open'); sfx.drumroll(QUIZ_DRUMROLL_MS);   // (art doors: the closed picture crossfades to the open one now, 0.4 s, opacity only)
+      tile.classList.add('picked-wait'); if (DOORS_ART){ tile.classList.add('art-open'); const ma = document.getElementById('mdArt'); if (ma) ma.classList.add('picked'); } sfx.drumroll(QUIZ_DRUMROLL_MS);   // (art doors: the closed picture crossfades to the open one now, 0.4 s, opacity only)
       setTimeout(()=>{
         if (g !== Show.gen) return;
         tile.classList.remove('picked-wait'); tile.classList.add('opened'); if (sfx.slam) sfx.slam();
