@@ -1017,7 +1017,7 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
    dims. Transform and opacity only; static in lite mode and reduced motion. ---- */
 :root.stage-on .solve-overlay.tray, .solve-overlay.tray{ background:linear-gradient(180deg, rgba(8,2,24,0.55) 0%, rgba(8,2,24,0.2) 38%, rgba(8,2,24,0.62) 100%), url(../data/wordwarp/bg.webp) center / cover no-repeat, #12062a !important; }
 .solve-overlay.tray .warp-bg{ display:none; }
-.solve-overlay.tray .solve-keyboard, .solve-overlay.tray .solve-section-label, .solve-overlay.tray .solve-buttons, .solve-overlay.tray .solve-history, .solve-overlay.tray .solve-hint-line{ display:none !important; }
+.solve-overlay.tray .solve-keyboard, .solve-overlay.tray .solve-section-label, .solve-overlay.tray #solveHintBtn, .solve-overlay.tray .solve-history, .solve-overlay.tray .solve-hint-line{ display:none !important; }
 .solve-overlay.tray .solve-inner{ display:flex; flex-direction:column; align-items:center; }
 .solve-overlay.tray .solve-title{ font-size:clamp(30px, 9.5vw, 42px); margin-bottom:2px; }
 .solve-overlay.tray .solve-title small{ display:none; }
@@ -1548,3 +1548,9 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root.lite .md-ring{ animation:none; opacity:0.35; }
 :root.lite .pd-glow{ transition:none; }
 @media (prefers-reduced-motion: reduce){ .md-ring{ animation:none; opacity:0.35; } .pd-glow{ transition:none; } }
+/* Word Warp tray: tap a tile to place its letter, ENTER tests the word, CLEAR returns the letters */
+.solve-overlay.tray .solve-buttons{ display:flex; gap:12px; width:min(100%, 360px); margin:0 auto; }
+.solve-overlay.tray .solve-buttons .daily-btn{ flex:1; min-height:50px; display:flex; align-items:center; justify-content:center; font:900 20px/1 var(--f-display); letter-spacing:1px; }
+:root:root .solve-overlay.tray .solve-slot.placed{ background:linear-gradient(180deg, #fff7c4, #ffd23f); color:#2a1a00; border-color:#fff3c4; }
+:root:root .solve-overlay.tray .solve-buttons{ order:6; margin-top:12px; }
+:root:root .solve-overlay.tray .solve-rack{ margin-bottom:0; }

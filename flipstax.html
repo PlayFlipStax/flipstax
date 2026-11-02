@@ -15657,7 +15657,7 @@
     for (let i=0;i<RUN_WORD_LENGTH;i++){
       const filled = solveLockedLetters[i] || solveCurrentGuess[i];
       const div = document.createElement('div');
-      div.className = 'solve-slot' + (solveLockedLetters[i] ? ' locked' : '');
+      div.className = 'solve-slot' + (solveLockedLetters[i] ? ' locked' : (warpTray && solveCurrentGuess[i] ? ' placed' : ''));
       div.style.setProperty('--i', i);
       if (warpTray && solveLockedLetters[i]){   // the panel flips over like a trilon to a cream panel (a tiny stagger when several flip at once)
         div.innerHTML = '<span class="sl-new"></span>'; div.firstChild.textContent = filled;
@@ -15676,7 +15676,7 @@
       const tried = warpTray && solveGuesses.some(g=> g.length === 1 && g[0] === letter);
       div.className = 'solve-tile' + ((rackUsedFlags[i] || isLocked) ? ' used' : '') + (tried ? ' tried' : '');
       div.textContent = letter;
-      if (warpTray){ if (!isLocked && !tried) div.onclick = ()=> trayPick(letter, div); }
+      if (warpTray){ if (!isLocked && !tried && !rackUsedFlags[i]) div.onclick = ()=> trayPlace(letter, i); }
       else if (!isLocked) div.onclick = ()=> addToGuess(letter, i);
       els.solveRack.appendChild(div);
     });
@@ -15697,7 +15697,17 @@
   const SHUFFLE_ON_WRONG = false;
   let warpTray = false, solveTotalMs = 0, warpBusy = false;
   function warpTrayOn(){ return document.documentElement.classList.contains('mode-daily'); }
-  function applyTrayMode(){ warpTray = warpTrayOn() && solveRack.length === WARP_TRAY; els.solveOverlay.classList.toggle('tray', warpTray); }
+  function applyTrayMode(){
+    warpTray = warpTrayOn() && solveRack.length === WARP_TRAY; els.solveOverlay.classList.toggle('tray', warpTray);
+    els.solveSubmit.textContent = warpTray ? 'ENTER' : 'Submit'; els.solveClearBtn.textContent = warpTray ? 'CLEAR' : 'Clear';
+  }
+  // Tapping a tile moves its letter to the first open slot in the answer row (a placed letter taps back to its tile); ENTER tests the word, CLEAR returns every placed
+  // letter. (The old tap-to-test trayPick below stays for rollback.)
+  function trayPlace(letter, rackIdx){
+    if (!runActive || warpBusy || warpMissing || els.solveOverlay.classList.contains('celebrating') || els.solveOverlay.classList.contains('revealing')) return;
+    if (nextOpenSlot() === -1) return;
+    addToGuess(letter, rackIdx); sfx.tick && sfx.tick();
+  }
   function winWarp(){
     clearInterval(solveInterval);
     const solvedAt = Date.now(); runSolvedAt = solvedAt;
@@ -15860,6 +15870,14 @@
     solveCurrentGuess = [];
     solveCurrentGuessSource = [];
     rackUsedFlags = [];
+    if (warpTray){
+      // the tray: ENTER on the right word locks it and moves on; a wrong word costs a strike and its letters go back to the tiles (nothing locks early)
+      if (allCorrect){ solveLockedLetters = runWord.word.split(''); renderSolveUI(); winWarp(); return; }
+      solveLockedLetters = solveLockedLetters.map((v, i)=> (runLetterPos.indexOf(i) >= 0 ? v : null));
+      runSolveWrongGuesses++; saveRunSnapshot(); sfx.wrong(); FX.shake(els.solveSlots); hostMood('sad');
+      if (solveGuesses.length >= RUN_MAX_GUESSES){ clearInterval(solveInterval); renderSolveUI(); missWarp(); return; }
+      renderSolveUI(); return;
+    }
     if (allCorrect){
       clearInterval(solveInterval);
       const solvedAt = Date.now();
