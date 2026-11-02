@@ -380,9 +380,9 @@
 
 /* ---- Twin Flip jackpot (all pairs found): chasing marquee, a rain of coins and stars, a UFO with a golden beam. Transform and opacity only. ---- */
 .tf-stage{ position:relative; }
-.tf-perfect{ position:absolute; left:50%; top:46%; transform:translate(-50%,-50%); font:inherit; font-family:var(--f-display); font-size:clamp(44px,15vw,72px); letter-spacing:.04em; color:#fff6b0; -webkit-text-stroke:3px #7a3d00; paint-order:stroke fill; text-shadow:0 4px 0 #b05a00, 0 0 18px #ffd23f; white-space:nowrap; z-index:3; }
+.tf-perfect{ position:absolute; left:50%; top:calc(clamp(52px,17vw,84px) * 0.65 + 14px); transform:translate(-50%,-50%); font:inherit; font-family:var(--f-display); font-size:clamp(52px,17vw,84px); line-height:1; letter-spacing:.04em; color:#3a1500; padding:8px 26px 10px; border-radius:20px; background:linear-gradient(180deg, #fff3a8, #ffcb2b 55%, #ff9900); border:4px solid #fff; box-shadow:0 0 0 4px #7a4a00, 0 6px 0 4px #7a4a00, 0 0 28px 8px rgba(255,210,63,0.6); white-space:nowrap; z-index:3; }   /* (mega fix 19: bigger, on a solid plaque above the tiles, so no tile or glow covers it) */
 .tf-stage.tf-gold .tf-perfect{ opacity:0; }
-.tf-fx{ position:absolute; inset:0; z-index:8; overflow:hidden; pointer-events:none; }
+.tf-fx{ position:absolute; inset:0; z-index:30; overflow:hidden; pointer-events:none; }
 .tf-marq{ position:absolute; inset:4px; border-radius:20px; border:6px dotted #fff6c2; opacity:0; } .tf-marq.b{ border-color:#ffd23f; inset:8px; }
 .tf-marq.a{ animation:prChase 0.8s steps(1) infinite; } .tf-marq.b{ animation:prChase 0.8s steps(1) infinite 0.4s; }
 .tf-rain{ position:absolute; top:0; font-style:normal; line-height:1; will-change:transform; }
@@ -487,3 +487,4 @@
 .ss-cart{ display:block; width:60px; height:auto; margin-top:-2px; filter:drop-shadow(0 0 4px rgba(125,249,255,0.5)); } .ss-item.flip .ss-cart{ transform:scaleX(-1); }
 @media (max-height:700px){ .ss-cart{ width:46px; } }
 :root.lite .ss-cart{ filter:none; }
+@media (max-height:700px){ .tf-perfect{ font-size:clamp(40px,12.5vw,48px); padding:5px 20px 7px; top:calc(clamp(40px,12.5vw,48px) * 0.65 + 8px); border-width:3px; } }   /* (a short phone: the banner stays in the band above the tiles) */
