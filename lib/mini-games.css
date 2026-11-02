@@ -460,11 +460,22 @@
 /* ---- Saucer Shuffle art swap: the chrome saucers and the plasma orb (data/saucer/) on the show-set background (data/scenes/saucer-shuffle-bg.webp) - the floor
    ring sits in the bottom half and the saucers stand on it, under the marquee. A soft static ellipse shadow under each saucer; the shuffle is unchanged
    (transform and opacity only). A dark wash at the top and bottom keeps the sign, the prompt panel, the progress bar and the score pill readable. ---- */
-:root:root.stage-on .mg-overlay.mg-saucerShuffle, .mg-overlay.mg-saucerShuffle{ background:linear-gradient(180deg, rgba(6,2,22,0.55) 0%, rgba(6,2,22,0) 22%, rgba(6,2,22,0) 78%, rgba(6,2,22,0.6) 100%), url(../data/scenes/saucer-shuffle-bg.webp) center bottom / cover no-repeat, #07031a !important; }
+:root:root.stage-on .mg-overlay.mg-saucerShuffle, .mg-overlay.mg-saucerShuffle{ background:
+  radial-gradient(2px 2px at 9% 12%, #fff 55%, transparent), radial-gradient(1.5px 1.5px at 24% 31%, #fff 55%, transparent), radial-gradient(2.5px 2.5px at 38% 8%, #fff7c8 55%, transparent), radial-gradient(1.5px 1.5px at 52% 22%, #fff 55%, transparent),
+  radial-gradient(2px 2px at 67% 10%, #fff 55%, transparent), radial-gradient(2.5px 2.5px at 83% 27%, #d9fffb 55%, transparent), radial-gradient(1.5px 1.5px at 93% 8%, #fff 55%, transparent), radial-gradient(2px 2px at 15% 52%, #fff 55%, transparent),
+  radial-gradient(1.5px 1.5px at 88% 55%, #fff 55%, transparent), radial-gradient(2px 2px at 47% 44%, #fff7c8 55%, transparent), radial-gradient(1.5px 1.5px at 6% 78%, #fff 55%, transparent), radial-gradient(2px 2px at 96% 84%, #fff 55%, transparent),
+  radial-gradient(ellipse 75% 40% at 22% 24%, rgba(255,64,200,0.62), transparent 72%), radial-gradient(ellipse 70% 45% at 84% 40%, rgba(36,225,214,0.55), transparent 72%), radial-gradient(ellipse 90% 50% at 50% 100%, rgba(170,70,245,0.7), transparent 74%),
+  linear-gradient(180deg, #4a1b8f 0%, #8a2095 48%, #1f6f8f 100%) !important; }   /* (Saucer Shuffle: a vibrant cosmic scene - a purple, magenta and teal nebula with bright stars; as bright as Zap Words) */
+.mg-overlay.mg-saucerShuffle::before, .mg-overlay.mg-saucerShuffle::after{ content:''; position:absolute; top:-4%; width:46%; height:110%; z-index:0; pointer-events:none; opacity:0.25; background:linear-gradient(180deg, #ffffff, rgba(255,255,255,0) 82%);
+  clip-path:polygon(44% 0, 56% 0, 100% 100%, 0 100%); transform-origin:50% 0; animation:ssBeam 8s ease-in-out infinite alternate; }   /* (two slow spotlight beams: 8 degrees back and forth over 8 s, transform only) */
+.mg-overlay.mg-saucerShuffle::before{ left:-6%; } .mg-overlay.mg-saucerShuffle::after{ right:-6%; animation-direction:alternate-reverse; }
+@keyframes ssBeam{ from{ transform:rotate(-8deg); } to{ transform:rotate(8deg); } }
+:root.lite .mg-overlay.mg-saucerShuffle::before, :root.lite .mg-overlay.mg-saucerShuffle::after{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .mg-overlay.mg-saucerShuffle::before, .mg-overlay.mg-saucerShuffle::after{ animation:none; } }
 .sc-casino{ background:none; }
 .sc-table{ top:54%; bottom:calc(104px + env(safe-area-inset-bottom)); }
 @media (max-height:700px){ .sc-table{ top:43%; bottom:calc(118px + env(safe-area-inset-bottom)); } }
-.sc-table::before{ display:none; }
+.sc-table::before{ content:''; display:block; position:absolute; left:-6%; right:-6%; top:30%; bottom:-14%; z-index:-1; border-radius:50%; box-shadow:none; pointer-events:none; background:radial-gradient(ellipse at 50% 50%, rgba(255,246,190,0.85), rgba(255,150,230,0.4) 50%, rgba(255,150,230,0) 72%); }   /* (the glowing floor ellipse under the saucers) */
 .su-saucer::before, .su-saucer::after{ display:none; }
 .su-saucer .su-img{ filter:none; }
 .su-saucer .su-shadow{ position:absolute; left:6%; right:6%; bottom:-9%; height:22%; z-index:-1; border-radius:50%; background:radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.6), rgba(0,0,0,0) 72%); pointer-events:none; }
