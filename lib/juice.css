@@ -1640,3 +1640,18 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 /* ---- A+ mega fix 18: the commercial break's monitor content waits for the art, then fades in (opacity only) ---- */
 .cb-prod{ transition:opacity 0.25s ease; } .cb-prod.wait{ opacity:0 !important; animation:none; }
 .cb-tv{ transition:opacity 0.3s ease; }
+
+/* ---- A+ Mystery Doors swing: the closed door really swings (perspective 800px, rotateY to 75 degrees about its hinge, 0.7 s ease-out); the open picture and the
+   animated world are already there behind it, then the closed door fades out (0.3 s) and the world keeps moving for 2.5 s in all. Transform and opacity only;
+   lite mode and reduced motion: a plain crossfade, no world. ---- */
+.event-tile.md{ --ry:75deg; } .event-tile.md[data-w="mdGal"]{ --ry:-75deg; }
+.event-tile.md .md-o{ z-index:1; transition:opacity 0.45s ease 0.1s; }
+.event-tile.md .md-ow{ z-index:2; transition:none; }
+.event-tile.md .md-c{ z-index:3; transform-origin:var(--hinge, 100% 100%); transition:opacity 0.3s ease 0.7s, transform 0.7s cubic-bezier(.15,.7,.3,1); }
+.event-tile.md.art-open .md-c{ opacity:0; transform:perspective(800px) translateX(-50%) rotateY(var(--ry)); }
+.event-tile.md.art-open .md-wi{ animation-duration:2.5s; animation-delay:0s; }
+@keyframes mdGal{ from{ transform:rotate(0deg); } to{ transform:rotate(45deg); } }
+@keyframes mdClk{ from{ transform:rotate(0deg); } to{ transform:rotate(-45deg); } }
+@keyframes mdHyp{ from{ transform:scale(1); } to{ transform:scale(1.18); } }
+:root.lite .event-tile.md .md-c, :root.lite .event-tile.md .md-o{ transition:opacity 0.4s ease; } :root.lite .event-tile.md.art-open .md-c{ transform:translateX(-50%); }
+@media (prefers-reduced-motion: reduce){ .event-tile.md .md-c, .event-tile.md .md-o{ transition:opacity 0.4s ease; } .event-tile.md.art-open .md-c{ transform:translateX(-50%); } }
