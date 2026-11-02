@@ -953,7 +953,7 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 /* ---- A+ outro item 2: one screen. The badge, headline, SHARE, donation and 'Play again tomorrow' fit 390 x 844 and 360 x 640 with no scrolling;
    everything else (breakdown, cards, tomorrow) is behind the small 'details' toggle ---- */
 .outro-details{ display:none; }
-#readoutOverlay.ep.outro-on .outro-details{ display:block; position:absolute; right:12px; top:calc(18px + env(safe-area-inset-top)); z-index:7; min-height:44px; min-width:44px; padding:0 14px; border-radius:99px; border:2px solid rgba(255,255,255,0.7);
+#readoutOverlay.ep.outro-on .outro-details{ display:block; position:absolute; right:12px; top:calc(8px + env(safe-area-inset-top)); z-index:7; min-height:44px; min-width:44px; padding:0 14px; border-radius:99px; border:2px solid rgba(255,255,255,0.7);
   background:rgba(6,10,40,0.72); color:#fff; font:800 14px/1 var(--f-body, Inter, sans-serif); letter-spacing:0.5px; cursor:pointer; }
 #readoutOverlay.ep.outro-on.show-details .personality-inner{ display:block; position:absolute; inset:0; z-index:6; max-width:none; width:auto; margin:0; padding:calc(70px + env(safe-area-inset-top)) 14px calc(24px + env(safe-area-inset-bottom)); overflow-y:auto; background:#2a0b4e; }
 #readoutOverlay.ep.outro-on.show-details .contact-footer{ display:block; position:absolute; left:0; right:0; bottom:0; z-index:6; }
@@ -1488,17 +1488,17 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 /* ---- A+ Mystery Doors made of art (DOORS_ART): the saucer-shuffle floor, a hanging sign with its ribbon re-lettered live, three closed doors that
    crossfade to their open picture on a tap (0.4 s, opacity only), glowing number badges on the floor and a soft idle glow. The old CSS door boxes stay
    above for ?doors=old. Lite and reduced motion: a plain fade, no idle glow. ---- */
-.event-overlay.mdoor.art{ --dk:calc(min(30vw, 150px) * 0.88 / 238); justify-content:flex-end; background:linear-gradient(rgba(10,4,24,0.45), rgba(10,4,24,0.45)), #150a2a url(../data/scenes/saucer-shuffle-bg.webp) center bottom / cover no-repeat !important;   /* (the dark layer is part of the background only: the sign, doors and badges above it stay at full brightness) */ }
+.event-overlay.mdoor.art{ --dk:calc(min(30vw, 150px) * 0.88 / 238); justify-content:flex-end; background:linear-gradient(180deg, rgba(10,4,24,0.55) 0, rgba(10,4,24,0.55) calc(var(--fy, 55%) - 24px), rgba(10,4,24,0) var(--fy, 55%)), #150a2a url(../data/scenes/saucer-shuffle-bg.webp) center bottom / cover no-repeat !important;   /* (a 55 percent dark layer over the stage above the floor only, part of the background: the floor, sign, doors and badges stay at full brightness) */ }
 .event-overlay.mdoor.art > :not(#mdArt):not(.event-timerbar):not(.event-grid):not(#mpCaption){ display:none !important; }
 .event-overlay.mdoor.art .event-timerbar{ position:absolute; left:50%; transform:translateX(-50%); bottom:calc(8px + env(safe-area-inset-bottom)); width:60%; margin:0; z-index:3; }
 #mdArt{ position:absolute; inset:0; z-index:1; pointer-events:none; }
-.md-sign{ position:absolute; left:50%; top:calc(18px + env(safe-area-inset-top)); width:min(70vw, 300px, 33svh);   /* (svh, not a height media query: a phone's toolbar sliding must not resize the sign) */
+.md-sign{ position:absolute; left:50%; top:calc(8px + env(safe-area-inset-top)); width:min(70vw, 300px, 31svh);   /* (svh, not a height media query: a phone's toolbar sliding must not resize the sign) */
   aspect-ratio:344 / 313; transform:translateX(-50%); }
 .md-sign img{ position:absolute; inset:0; width:100%; height:100%; display:block; clip-path:polygon(0 0, 100% 0, 100% 90%, 78% 90%, 78% 100%, 0 100%); }   /* (the file has a stray olive wedge in its lower right corner) */
 .md-rib{ position:absolute; left:19.2%; width:61.6%; top:70.4%; height:9.4%; border-radius:6px; background:linear-gradient(180deg, #2b2558, #1d1840); box-shadow:inset 0 0 0 1px rgba(150,120,255,0.35); }
 .md-rtxt{ position:absolute; left:19.2%; width:61.6%; top:70.4%; height:9.4%; display:flex; align-items:center; justify-content:center; white-space:nowrap; font:800 clamp(8px, 2.6vw, 11px)/1 var(--f-display, Inter, system-ui, sans-serif); letter-spacing:0.6px; color:#e8e2ff; }
-.md-pill{ position:absolute; left:50%; top:calc(18px + env(safe-area-inset-top) + min(70vw, 300px, 33svh) * 313 / 344 + 6px); transform:translateX(-50%); transition:opacity 0.3s ease; padding:6px 16px; border-radius:99px; background:rgba(36,18,74,0.82); border:2px solid #ffd23f; color:#fff8d6; font:900 14px/1 var(--f-display, Inter, system-ui, sans-serif); letter-spacing:0.5px; white-space:nowrap; }
-:root.mode-daily .event-overlay.mdoor.art .event-grid{ position:absolute; left:0; right:0; bottom:calc(104px + env(safe-area-inset-bottom)); margin:0; padding:0; max-width:none; width:auto; display:flex !important; justify-content:center; align-items:flex-end; gap:1.5vw; z-index:2; }
+.md-pill{ position:absolute; left:50%; top:calc(8px + env(safe-area-inset-top) + min(70vw, 300px, 31svh) * 313 / 344 + 6px); transform:translateX(-50%); transition:opacity 0.3s ease; padding:6px 16px; border-radius:99px; background:rgba(36,18,74,0.82); border:2px solid #ffd23f; color:#fff8d6; font:900 14px/1 var(--f-display, Inter, system-ui, sans-serif); letter-spacing:0.5px; white-space:nowrap; }
+:root.mode-daily .event-overlay.mdoor.art .event-grid{ position:absolute; left:0; right:0; bottom:calc(134px + env(safe-area-inset-bottom)); margin:0; padding:0; max-width:none; width:auto; display:flex !important; justify-content:center; align-items:flex-end; gap:1.5vw; z-index:2; }
 :root.mode-daily .event-overlay.mdoor.art .event-grid .bb-vs{ display:none; }
 :root.mode-daily .event-overlay.mdoor.art .event-tile.md{ position:relative; flex:0 0 auto; width:calc(var(--dw) * var(--dk)); height:calc(var(--dh) * var(--dk)); min-height:0; padding:0; margin:0; background:none !important; border:0 !important; border-radius:0; box-shadow:none !important; animation:none !important; transform:none; opacity:1; overflow:visible; cursor:pointer; -webkit-tap-highlight-color:transparent; }
 .event-tile.md img{ position:absolute; bottom:0; left:50%; display:block; max-width:none; transform:translateX(-50%); pointer-events:none; }
@@ -1519,12 +1519,13 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 #mdArt.picked .md-pill{ opacity:0; }
 .event-tile.md .md-shadow{ position:absolute; left:50%; bottom:-5%; width:104%; height:11%; transform:translateX(-50%); border-radius:50%; background:radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0.55), rgba(0,0,0,0) 70%); pointer-events:none; }
 /* the light-up floor: perspective is a static rotateX on the grid; only each square's opacity changes. The mask keeps it inside the ring ellipse. */
-.md-floor{ position:absolute; perspective:var(--fp, 900px); perspective-origin:50% 0%; -webkit-mask-image:radial-gradient(ellipse 50% 62% at 50% 34%, #000 82%, transparent 84%); mask-image:radial-gradient(ellipse 50% 62% at 50% 34%, #000 82%, transparent 84%); }
-.md-grid{ position:absolute; left:-2%; right:-2%; top:-14%; bottom:-14%; display:grid; grid-template-columns:repeat(6, 1fr); grid-template-rows:repeat(4, 1fr); gap:3.2%; transform:rotateX(42deg); transform-origin:50% 50%; }
-.md-grid i{ border-radius:14%; background:var(--c); box-shadow:0 0 10px 1px var(--c); opacity:0.12; transition:opacity 0.45s ease; }
-.md-grid i.on{ opacity:0.5; transition:opacity 0.2s ease; }
-.md-grid i.still{ opacity:0.28; transition:none; }
-.md-grid i.hot{ opacity:0.9; transition:opacity 0.12s ease; }
+.md-floor{ position:absolute; perspective:var(--fp, 900px); perspective-origin:50% 0%; -webkit-mask-image:radial-gradient(ellipse 60% var(--mry, 60%) at 50% var(--mcy, 40%), #000 90%, transparent 92%); mask-image:radial-gradient(ellipse 60% var(--mry, 60%) at 50% var(--mcy, 40%), #000 90%, transparent 92%); }
+.md-grid{ position:absolute; left:0; right:0; top:0; bottom:0; display:grid; grid-template-columns:repeat(6, 1fr); grid-template-rows:repeat(4, 1fr); gap:3%; transform:rotateX(28deg); transform-origin:50% 100%; }
+/* solid rounded tiles: a thin bright edge, a subtle inner highlight, no outer blur; only opacity animates */
+.md-grid i{ border-radius:16%; background:linear-gradient(180deg, rgba(255,255,255,0.38), rgba(255,255,255,0) 48%), var(--c); border:2px solid rgba(255,255,255,0.8); box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25), inset 0 -3px 0 rgba(0,0,0,0.18); opacity:0.3; transition:opacity 0.45s ease; }
+.md-grid i.on{ opacity:0.85; transition:opacity 0.3s ease; }
+.md-grid i.still{ opacity:0.6; transition:none; }
+.md-grid i.hot{ opacity:1; transition:opacity 0.12s ease; }
 .md-grid i.pad{ opacity:1; transition:opacity 0.12s ease; }
 :root.lite .md-grid i, .md-grid i:where(.rm){ transition:none; }
 @media (prefers-reduced-motion: reduce){ .md-grid i{ transition:none; } }
