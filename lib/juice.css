@@ -1636,3 +1636,7 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 @keyframes bbBanner{ from{ opacity:0; transform:scale(0.6); } to{ opacity:1; transform:scale(1); } }
 :root.lite .bb-pop, :root.lite .bb-banner{ animation:vsFade 0.3s ease-out both; }
 @media (prefers-reduced-motion: reduce){ .bb-pop, .bb-banner{ animation:vsFade 0.3s ease-out both; } }
+
+/* ---- A+ mega fix 18: the commercial break's monitor content waits for the art, then fades in (opacity only) ---- */
+.cb-prod{ transition:opacity 0.25s ease; } .cb-prod.wait{ opacity:0 !important; animation:none; }
+.cb-tv{ transition:opacity 0.3s ease; }

@@ -12553,6 +12553,11 @@
     { e:'✨', brand:'Saucer-Wax Deluxe', line:'So shiny, pilots need sunglasses!' },
   ];
   const CB_PRODUCT_MS = 2000, CB_INTRO_MS = 1500, CB_SKIP_MS = 2000, CB_COFFEE_MS = 4500;
+  let cbReadyP = null;
+  function cbArtReady(){
+    return cbReadyP || (cbReadyP = Promise.race([ Promise.all([ new Promise(res=>{ const im = new Image(); im.onload = im.onerror = res; im.src = 'data/scenes/sponsor.webp'; }), document.fonts && document.fonts.ready ]),
+      new Promise(res=> setTimeout(res, 1500)) ]));   // (never waits more than 1.5 s)
+  }
   function showSponsor(done){
     showCard.className = 'show-card sponsor';
     showCard.innerHTML = '<div class="cb-say">A word from our sponsors!</div><div class="cb-tv"><div class="cb-prod"><span class="cb-e"></span><b class="cb-brand"></b><small class="cb-line"></small></div>' +
@@ -12580,7 +12585,11 @@
     const lastCard = ()=>{ clearT(); if (!alive()){ gone = true; return; } stage = 'last'; showCard.classList.remove('has-prod'); showCard.classList.add('last'); say.textContent = 'Thanks for watching!'; L(CB_COFFEE_MS, finish); L(CB_COFFEE_MS + 3000, finish); };   // (the second timer is a safety net: the break always ends and hands back to the show)
     const showProd = (i)=>{ if (!alive()){ clearT(); gone = true; return; } if (i >= CB_PRODUCTS.length){ lastCard(); return; } stage = 'prod'; const p = CB_PRODUCTS[i];
       prod.querySelector('.cb-e').textContent = p.e; prod.querySelector('.cb-brand').textContent = p.brand; prod.querySelector('.cb-line').textContent = p.line;
-      showCard.classList.add('has-prod'); prod.classList.remove('pop'); void prod.offsetWidth; prod.classList.add('pop'); sfx.chime(2 + i);
+      // mega fix 18: the monitor's content stays hidden until the art has loaded (the scene picture and the fonts), then fades in - the first frame of an ad no longer shows a blank white blob
+      prod.classList.add('wait'); prod.classList.remove('pop');
+      cbArtReady().then(()=>{ if (!alive() || stage !== 'prod') return; showCard.classList.add('has-prod');
+        requestAnimationFrame(()=> requestAnimationFrame(()=>{ if (!alive() || stage !== 'prod') return; prod.classList.remove('wait'); void prod.offsetWidth; prod.classList.add('pop'); })); });
+      sfx.chime(2 + i);
       L(CB_PRODUCT_MS, ()=> showProd(i + 1)); };
     L(CB_INTRO_MS, ()=> showProd(0));
     L(CB_INTRO_MS + CB_PRODUCTS.length * CB_PRODUCT_MS + CB_COFFEE_MS + 6000, finish);   // (a hard stop: whatever happens, the break ends and hands back to the show)
