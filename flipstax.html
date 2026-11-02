@@ -11204,6 +11204,8 @@
   // DOORS_ART (default on; ?doors=old or ?doors=new brings the CSS-drawn doors back): the Mystery Doors screen made of art - the saucer-shuffle floor, a hanging
   // sign, three closed doors (data/doors/*.webp) that crossfade to their open picture on a tap. The old door code below stays for rollback.
   const DOORS_ART = !/[?&]doors=(old|new)\b/.test(location.search);
+  // DOORS_TILES (?floor=tiles): the 6 x 4 grid of coloured floor tiles; by default the floor has three glowing pads under the doors and a slow ring of light (doorFloor* below).
+  const DOORS_TILES = /[?&]floor=tiles\b/.test(location.search);
   const DOOR_ART = [{ w:238, h:404, ow:387 }, { w:206, h:375, ow:337 }, { w:214, h:397, ow:370 }];   // (the files' own sizes: all three doors share one scale)
   const DOOR_ART_NAMES = ['left', 'mid', 'right'];
   window.FLIPSTAX_DOORS_CLASSIC = DOORS_CLASSIC;
@@ -11237,15 +11239,27 @@
   const FLOOR_IMG = { w:720, h:1290, y0:880, y1:1205 };
   let doorFloorT = 0;
   function doorFloorFit(ov){
-    const fl = ov.querySelector('.md-floor'); if (!fl) return;
     const W = ov.clientWidth, H = ov.clientHeight, sc = Math.max(W / FLOOR_IMG.w, H / FLOOR_IMG.h), x0 = (W - FLOOR_IMG.w * sc) / 2, y0 = H - FLOOR_IMG.h * sc;
+    ov.style.setProperty('--fy', (y0 + 775 * sc).toFixed(0) + 'px');   // (the dim layer ends where the floor begins)
+    if (W >= 600) ov.style.setProperty('--gb', Math.max(90, H - (y0 + 1085 * sc)).toFixed(0) + 'px'); else ov.style.removeProperty('--gb');   // (tall or wide screens: the doors stand on the floor ring itself)
+    const ring = ov.querySelector('.md-ring');
+    if (ring){
+      ring.style.left = (x0 + 14 * sc) + 'px'; ring.style.top = (y0 + 790 * sc) + 'px'; ring.style.width = ((FLOOR_IMG.w - 28) * sc) + 'px'; ring.style.height = (400 * sc) + 'px';
+      const ovr2 = ov.getBoundingClientRect(), pads = ov.querySelectorAll('.md-pad');
+      ov.querySelectorAll('.event-tile.md').forEach((t, k)=>{
+        const pd = pads[k]; if (!pd) return;
+        const tr = t.getBoundingClientRect(), bd = t.querySelector('.md-n').getBoundingClientRect(), w = 190 * sc, h = w * 0.4;
+        pd.style.width = w + 'px'; pd.style.height = h + 'px'; pd.style.left = (tr.left + tr.width / 2 - ovr2.left - w / 2) + 'px'; pd.style.top = (bd.top + bd.height / 2 - ovr2.top - h / 2) + 'px';
+      });
+      return;
+    }
+    const fl = ov.querySelector('.md-floor'); if (!fl) return;
     // two full rows of tiles lie between the doors' feet and the ring's front rim; the other two rows run back behind the doors
     const ovr = ov.getBoundingClientRect(), tiles = Array.from(ov.querySelectorAll('.event-tile.md'));
     const base = tiles.length ? Math.max.apply(null, tiles.map(t=> t.getBoundingClientRect().bottom)) - ovr.top : y0 + 1000 * sc, front = y0 + 1190 * sc;
     const A = Math.max(70, front - base), top = base - A * 0.95, h = front - top;
     fl.style.left = x0 + 'px'; fl.style.top = top + 'px'; fl.style.width = (FLOOR_IMG.w * sc) + 'px'; fl.style.height = h + 'px';
     fl.style.setProperty('--mcy', ((990 * sc + y0 - top) / h * 100).toFixed(1) + '%'); fl.style.setProperty('--mry', (235 * sc / h * 100).toFixed(1) + '%');
-    ov.style.setProperty('--fy', (y0 + 775 * sc).toFixed(0) + 'px');   // (the dim layer ends where the floor begins)
     // each number badge sits on the front-row tile nearest its door
     const cells = Array.from(ov.querySelectorAll('.md-grid i')).slice(18);
     ov.querySelectorAll('.event-tile.md .md-n').forEach(b=>{
@@ -11258,6 +11272,20 @@
   function doorFloorStart(ov, n){
     doorFloorStop();
     const fit = ()=> doorFloorFit(ov); doorFloorStop.fit = fit; fit(); addEventListener('resize', fit); setTimeout(fit, 250); setTimeout(fit, 800);
+    const pads = Array.from(ov.querySelectorAll('.md-pad'));
+    if (pads.length){
+      const ring = ov.querySelector('.md-ring');
+      if (isLite() || prefersReducedMotion()){ pads.forEach(p=> p.classList.add('on', 'soft')); if (ring) ring.classList.add('still'); return; }
+      // idle: pads 1, 2, 3 in order (0.8 s each), then all three softly together, then again - opacity only
+      let k = 0;
+      const tickP = ()=>{
+        if (!ov.querySelector('.md-pads')) return;
+        pads.forEach(p=> p.classList.remove('on', 'soft'));
+        if (k < 3) pads[k].classList.add('on'); else pads.forEach(p=> p.classList.add('on', 'soft'));
+        k = (k + 1) % 4; doorFloorT = setTimeout(tickP, dt(k === 0 ? 1200 : 800));
+      };
+      tickP(); return;
+    }
     const cells = Array.from(ov.querySelectorAll('.md-grid i'));
     if (!cells.length) return;
     if (isLite() || prefersReducedMotion()){ cells.forEach(c=> c.classList.add('still')); return; }
@@ -11277,7 +11305,15 @@
   // A tap: stop the sequence and light the pad nearest that door's number badge, brightly for 0.4 s, with the squares around it.
   function doorFloorPick(i){
     doorFloorStop();
-    const ov = els.eventOverlay, cells = Array.from(ov.querySelectorAll('.md-grid i')), badge = ov.querySelectorAll('.event-tile.md .md-n')[i];
+    const ov = els.eventOverlay, padsEl = Array.from(ov.querySelectorAll('.md-pad'));
+    if (padsEl.length){   // the tapped door's pad flashes bright for 0.4 s, the other two dim to 30 percent
+      padsEl.forEach((p, k)=>{ p.classList.remove('on', 'soft', 'flash'); p.classList.toggle('dimmed', k !== i); });
+      const mine = padsEl[i]; if (!mine) return;
+      mine.classList.add('on', 'flash');
+      if (!(isLite() || prefersReducedMotion())) setTimeout(()=> mine.classList.remove('flash'), 400);
+      return;
+    }
+    const cells = Array.from(ov.querySelectorAll('.md-grid i')), badge = ov.querySelectorAll('.event-tile.md .md-n')[i];
     if (!cells.length || !badge) return;
     cells.forEach(c=> c.classList.remove('on'));
     const b = badge.getBoundingClientRect(), bx = b.left + b.width / 2, by = b.top + b.height / 2;
@@ -11304,8 +11340,12 @@
       const old = document.getElementById('mdArt'); if (old) old.remove();
       const art = document.createElement('div'); art.id = 'mdArt'; art.setAttribute('aria-hidden', 'true');
       art.innerHTML = '<div class="md-sign"><img src="data/doors/open-sign.webp" alt=""><span class="md-rib"></span><span class="md-rtxt"></span></div><div class="md-pill">Pick a door!</div>';
-      { let cells = ''; for (let k = 0; k < 24; k++){ const r = Math.floor(k / 6), c = k % 6; cells += '<i style="--c:' + ['#ff3c9d', '#4fe8ff', '#ffd23f', '#4be683'][(r + c) % 4] + '"></i>'; }
+      if (DOORS_TILES){
+        { let cells = ''; for (let k = 0; k < 24; k++){ const r = Math.floor(k / 6), c = k % 6; cells += '<i style="--c:' + ['#ff3c9d', '#4fe8ff', '#ffd23f', '#4be683'][(r + c) % 4] + '"></i>'; }
         art.insertAdjacentHTML('afterbegin', '<div class="md-floor"><div class="md-grid">' + cells + '</div></div>'); }
+      } else {
+        art.insertAdjacentHTML('afterbegin', '<i class="md-ring"></i><div class="md-pads">' + ['#ff3c9d', '#4fe8ff', '#ffd23f'].map((c, k)=> '<div class="md-pad" style="--c:' + c + '"><i class="pd-base"></i><i class="pd-glow"></i><i class="pd-rim"></i></div>').join('') + '</div>');
+      }
       art.querySelector('.md-rtxt').textContent = 'ROUND ' + ((RUNDOWN.acts[st.act] || {}).round || 3) + ' \u00B7 CHOOSE WISELY';
       ov.insertBefore(art, ov.firstChild);
     }
