@@ -2946,7 +2946,7 @@
   @keyframes mwChase{ 0%{ opacity:1; } 50%{ opacity:0.3; } }
   .landed .mw-rim circle[class]{ animation:mwFlash 0.36s steps(1) 3; fill:#fff; }
   @keyframes mwFlash{ 50%{ opacity:0.2; } }
-  .mw-pointer{ position:absolute; left:50%; top:-6px; width:30px; height:38px; margin-left:-15px; z-index:3;
+  i.mw-pointer{ position:absolute; left:50%; top:-6px; width:30px; height:38px; margin-left:-15px; z-index:3;
     background:linear-gradient(180deg, #fff, #ff7ad9 40%, #c2187a); clip-path:polygon(0 0, 100% 0, 50% 100%); filter:drop-shadow(0 3px 2px rgba(0,0,0,0.5)); }
   /* C15: the landed game's name slams in, big, in glowing gold (it was faint cream text). */
   .mw-name{ min-height:44px; padding:4px 10px 8px; font:900 clamp(46px, 14.5vw, 66px)/1 var(--f-display); letter-spacing:1px; white-space:nowrap; color:#ffe45c;
@@ -11662,7 +11662,7 @@
       '<div class="ll-bank" aria-live="polite"></div></div>' +
       '<div class="mw-wheel"><div class="mw-rot"><img class="mw-face" src="' + MW_FACE.src + '" alt="" draggable="false">' + mwOverlaySvg() + '</div><i class="mw-cap" aria-hidden="true"></i>' +
       '<svg class="mw-pointer" viewBox="0 0 40 56" aria-hidden="true"><defs><linearGradient id="mwPtr" x1="0" x2="1"><stop offset="0" stop-color="#8a90a8"/><stop offset="0.45" stop-color="#ffffff"/><stop offset="0.6" stop-color="#d8dcea"/><stop offset="1" stop-color="#6a7088"/></linearGradient></defs>' +
-      '<path d="M4 4 Q20 -2 36 4 L22 52 Q20 56 18 52 Z" fill="url(#mwPtr)" stroke="#3a3f55" stroke-width="2" stroke-linejoin="round"/><circle cx="20" cy="12" r="5" fill="#ffd23f" stroke="#7a4a00" stroke-width="1.5"/></svg></div>' +
+      '<path d="M5 5 L35 5 L20 51 Z" fill="url(#mwPtr)" stroke="#ffd23f" stroke-width="4" stroke-linejoin="round"/><path d="M5 5 L35 5 L20 51 Z" fill="none" stroke="#7a4a00" stroke-width="1" stroke-linejoin="round" opacity="0.6"/></svg></div>' +
       '<button type="button" class="lw-hub mw-btn pulse" aria-label="Spin the wheel"><b class="ll-hub-t">SPIN</b></button>' +
       '<div class="lw-pop mw-pop" aria-live="polite"><b></b><small></small></div><div class="ll-slime" aria-hidden="true">' + GOOP_SVG + '</div>';
     { const tb = luckyOv.querySelector('.ll-title .sign-bulbs'); if (tb) requestAnimationFrame(()=> ringBulbs(tb, 18, 6)); }
