@@ -11288,7 +11288,7 @@
       const game = games[i % games.length], c = gameIntroColors(game);
       if (DOORS_ART){
         const nm = DOOR_ART_NAMES[i % 3];
-        tileEl.innerHTML = '<i class="md-glow"></i><img class="md-c" src="data/doors/closed-' + nm + '.webp" alt=""><img class="md-o" src="data/doors/open-' + nm + '.webp" alt=""><b class="md-n">' + (i + 1) + '</b>';
+        tileEl.innerHTML = '<i class="md-shadow"></i><i class="md-glow"></i><img class="md-c" src="data/doors/closed-' + nm + '.webp" alt=""><img class="md-o" src="data/doors/open-' + nm + '.webp" alt=""><b class="md-n">' + (i + 1) + '</b>';
         tileEl.style.setProperty('--dw', DOOR_ART[i % 3].w); tileEl.style.setProperty('--dh', DOOR_ART[i % 3].h); tileEl.style.setProperty('--dow', DOOR_ART[i % 3].ow);
         tileEl.style.setProperty('--gi', i);
         tileEl.style.backgroundColor = ''; tileEl.dataset.pu = '';
