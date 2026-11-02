@@ -112,3 +112,5 @@
 /* hides the dark band and horizon edge that the video itself has in its first 3 s (see placeCover in intro.js); transform and opacity only */
 #introCover{ position:absolute; left:0; right:0; top:0; height:100%; z-index:1; pointer-events:none;
   background:linear-gradient(180deg, #080922 0%, #0a0a2c 93%, rgba(12,11,42,0.8) 96.5%, rgba(16,14,52,0) 100%); }
+#introBlast.glow i{ left:0; width:100%; background:radial-gradient(ellipse at 50% 55%, #ffffff 0, #d6fdff 38%, #7aeeff 100%); }
+#introBlast.glow.plain i{ background:#05030f; }
