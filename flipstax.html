@@ -11841,9 +11841,9 @@
   }
   let runBreakSeen = {};   // game -> the item indexes already used this run
   function breakKey(key, x){ return key === 'emojiDecode' ? x.emoji + '|' + x.answer : key === 'timeWarp' ? x.a.event + '|' + x.b.event : key === 'priceProbe' ? x.a.name + '|' + x.b.name : (x.items || []).map(i=> i.name).join('|'); }
-  function pickBreakItem(key, seed, day){
+  function pickBreakItem(key, seed, day, slot, perDay){
     const list = breakItems(key), used = runBreakSeen[key] || (runBreakSeen[key] = new Set());
-    if (day != null && list.length){ const kk = schedPick('break-' + key, list.map(x=> breakKey(key, x)), day, 0, 1), i = list.findIndex(x=> breakKey(key, x) === kk); if (i >= 0){ used.add(i); return list[i]; } }   // (the no-repeat schedule: one a day)
+    if (day != null && list.length){ const kk = schedPick('break-' + key, list.map(x=> breakKey(key, x)), day, slot || 0, perDay || 1), i = list.findIndex(x=> breakKey(key, x) === kk); if (i >= 0){ used.add(i); return list[i]; } }   // (the no-repeat schedule: one a day)
     let idx = -1;
     for (let k = 0; k < 60 && idx < 0; k++){ const i = Math.floor(mulberry32((seed + k * 7919) >>> 0)() * list.length); if (!used.has(i)) idx = i; }
     if (idx < 0) idx = Math.floor(mulberry32(seed)() * list.length);
@@ -11869,8 +11869,8 @@
   }
   function breakPriceText(p){ return '$' + (p >= 100 ? Math.round(p).toLocaleString() : p % 1 ? p.toFixed(2) : String(p)); }
   // One round: { prompt, kind, tiles:[{glyph,name,sub}], correct, reveal:(tileEl, i)=>..., why }.
-  function buildBreakRound(key, seed, day){
-    const x = pickBreakItem(key, seed, day), rng = mulberry32((seed ^ 0x9e3779b9) >>> 0);
+  function buildBreakRound(key, seed, day, slot, perDay){
+    const x = pickBreakItem(key, seed, day, slot, perDay), rng = mulberry32((seed ^ 0x9e3779b9) >>> 0);
     if (key === 'priceProbe'){
       const sw = rng() < 0.5, t = sw ? [x.b, x.a] : [x.a, x.b], correct = sw ? 1 - x.more : x.more;
       return { prompt:'Which costs more?', tiles:t.map(i=> ({ glyph:i.glyph, name:i.name, sub:i.sub })), correct, revealSub:t.map(i=> breakPriceText(i.price)) };
@@ -11920,16 +11920,41 @@
   }
   // Plays one Brain Break in the Brain Beam screen's frame. done() runs when it
   // has finished; returns false (and plays nothing) if the game's data is unusable.
+  // Emoji Decode plays 3 puzzles and Time Warp 2, one after another in the same card, from the next unused items of the frozen schedule
+  // (each show takes the next 3 / 2 and wraps round); a banner and a burst follow when every one is right.
+  const BREAK_PARTS = { emojiDecode:3, timeWarp:2 };
+  function breakBanner(ov, text, ms, big){
+    const b = document.createElement('div'); b.className = 'bb-banner' + (big ? ' big' : ''); b.textContent = text; ov.appendChild(b);
+    setTimeout(()=> b.remove(), dt(ms) + 200); return b;
+  }
   function runBrainBreak(st, done){
+    const N = BREAK_PARTS[st.game] || 1;
+    if (N < 2 || st.part != null) return runBrainBreakOne(st, done);
+    let right = 0, k = 0;
+    const play = ()=> runBrainBreakOne(Object.assign({}, st, { part:k, parts:N, keep:true, seed: st.seed + k * 131, onResult:(ok)=>{ if (ok) right++; } }), (cleanup)=>{
+      if (k < N - 1){ cleanup(); k++; if (!play()) done(); return; }
+      const ov = els.eventOverlay, perfect = right === N;
+      if (perfect){
+        breakBanner(ov, st.game === 'emojiDecode' ? 'PERFECT DECODE!' : 'PERFECT WARP!', 1500, true);
+        try{ FX.confettiBurst(showFx); FX.burstAt(showFx, ov.querySelector('.bb-banner'), { count:16, spread:120, shapes:['star', 'coin'] }); }catch(e){}
+        sfx.cheer(); setTimeout(()=>{ cleanup(); done(); }, dt(1500));
+      } else if (st.game === 'emojiDecode'){
+        breakBanner(ov, right + ' of ' + N + ' decoded', 1200, false);
+        setTimeout(()=>{ cleanup(); done(); }, dt(1200));
+      } else { cleanup(); done(); }
+    });
+    return play();
+  }
+  function runBrainBreakOne(st, done){
     const key = st.game, def = BRAIN_BREAKS[key];
     if (!def || breakItems(key).length < 1) return false;
-    const rd = buildBreakRound(key, st.seed, st.day), ov = els.eventOverlay, tiles = els.eventTiles, n = rd.tiles.length;
+    const rd = buildBreakRound(key, st.seed, st.day, st.part || 0, st.parts || 1), ov = els.eventOverlay, tiles = els.eventTiles, n = rd.tiles.length;
     runPhase = 'break';
     stopTallyPolling(); clearRoundTimer(); voted = false; votedSinceTime = null;
     ov.classList.remove('hidden', 'powerup', 'quiz-beam', 'quiz-riddle'); ov.classList.add('brainbreak', 'stack', 'bb-' + key); if (n === 2) ov.classList.add('bb-two'); ov.style.setProperty('--bb', def.accent); els.eventPrompt.classList.remove('long');
     els.powerupIcon.classList.add('hidden');
     fitTopChip();
-    els.eventSubtitle.textContent = '🎲 BRAIN BREAK · ' + def.name().toUpperCase() + (rd.kind ? ' · ' + rd.kind.toUpperCase() : '');
+    els.eventSubtitle.textContent = '🎲 BRAIN BREAK · ' + def.name().toUpperCase() + (rd.kind ? ' · ' + rd.kind.toUpperCase() : '') + (st.parts ? ' · ' + (st.part + 1) + ' OF ' + st.parts : '');
     els.eventPrompt.textContent = rd.prompt;
     tiles.forEach((tileEl, i)=>{
       tileEl.classList.remove('portal', 'open', 'is-right', 'is-wrong', 'picked-wait', 'bb-press');
@@ -11942,15 +11967,17 @@
     const tl = ov.querySelector('.bb-timeline');
     if (tl){ tl.classList.remove('on'); tl.querySelectorAll('.tl-m b').forEach(b=> b.textContent = '?'); tl.querySelector('.tl-gap').textContent = ''; }
     let settled = false;
-    const finish = ()=>{
-      ov.classList.add('hidden'); ov.classList.remove('brainbreak', 'stack', 'bb-two', 'flash-win', 'bb-' + key); els.eventSubtitle.classList.remove('res-win', 'res-miss'); ov.style.removeProperty('--bb');
+    const cleanup = ()=>{
+      ov.classList.add('hidden'); ov.classList.remove('brainbreak', 'stack', 'bb-two', 'flash-win', 'bb-revealed', 'bb-' + key); els.eventSubtitle.classList.remove('res-win', 'res-miss'); ov.style.removeProperty('--bb');
+      ov.querySelectorAll('.bb-banner, .bb-pop').forEach(e=> e.remove());
       tiles.forEach(t=>{ t.style.display = ''; t.classList.remove('is-right', 'is-wrong'); t.onclick = null; });
-      if (runActive) done();
     };
+    const finish = ()=>{ if (st.keep && runActive){ done(cleanup); return; } cleanup(); if (runActive) done(); };   // (a part of a series hands the clean-up to the series)
     const resolve = (pick)=>{
       if (settled || !runActive) return; settled = true;
       clearTimeout(eventTimeoutId); tiles.forEach(t=> t.onclick = null);
       const right = tiles[rd.correct], ok = pick === rd.correct;
+      if (st.onResult) st.onResult(ok);
       if (key === 'timeWarp' && tl && rd.revealSub){   // the timeline: the earlier year slides to the left end, the later to the right
         const ys = rd.revealSub.map(Number), lo = Math.min.apply(null, ys), hi = Math.max.apply(null, ys);
         tl.querySelector('.tl-m.e b').textContent = lo; tl.querySelector('.tl-m.l b').textContent = hi;
@@ -11973,6 +12000,7 @@
         if (rd.why) els.eventPrompt.textContent = rd.why;
         showFlash('win'); hostMood('cheer'); hostSay(hostLine('right')); sfx.combo(); if (key === 'priceProbe') sfx.cashRegister(); else sfx.cheer(); ov.classList.add('flash-win');
         if (right){ FX.burstAt(showFx, right, { count:12, spread:100, shapes:['star', 'coin'] }); FX.pop(right, 1.25); }
+        if (st.parts){ const pp = document.createElement('div'); pp.className = 'bb-pop'; pp.textContent = '+' + (runActive ? BRAIN_BREAK_POINTS * runActMult() : BRAIN_BREAK_POINTS); ov.appendChild(pp); setTimeout(()=> pp.remove(), 900); }   // (a points pop-up, 0.8 s)
       } else {
         if (pick != null && tiles[pick]) tiles[pick].classList.add('is-wrong');
         els.eventSubtitle.textContent = pick == null ? 'MISSED · OUT OF TIME' : 'MISSED'; els.eventSubtitle.classList.add('res-miss');   // a red MISSED (not a 0 POINTS pill)
