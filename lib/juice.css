@@ -1713,3 +1713,13 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .event-overlay.bb-timeWarp .bb-tag.flipped .tf{ opacity:0; }
 :root.lite .event-overlay.bb-timeWarp .bb-tag :is(.tb, .tf){ transition-delay:0s; }
 @media (prefers-reduced-motion: reduce){ .event-overlay.bb-timeWarp .bb-tag :is(.tb, .tf){ transition-delay:0s; } }
+/* mega 3 item 12: Emoji Decode's background moves - a big soft gradient turns slowly behind the puzzle (rotate only) and ten emoji drift up through it (transform and opacity only).
+   Lite mode and reduced motion: the still background. */
+.ed-fx{ display:none; position:absolute; inset:0; z-index:-1; overflow:hidden; pointer-events:none; }
+.event-overlay.bb-emojiDecode .ed-fx{ display:block; }
+.ed-fx .ed-grad{ position:absolute; left:50%; top:50%; width:170vmax; height:170vmax; margin:-85vmax 0 0 -85vmax; opacity:0.5; will-change:transform;
+  background:conic-gradient(from 0deg, rgba(255,226,122,0.55), rgba(255,61,148,0.5), rgba(138,63,252,0.55), rgba(34,211,200,0.4), rgba(255,226,122,0.55)); animation:pkSpin 90s linear infinite; }
+.ed-fx i{ position:absolute; top:100%; font-style:normal; font-size:clamp(30px, 9vw, 46px); line-height:1; opacity:0; will-change:transform, opacity; animation:edFloat var(--t, 16s) linear var(--d, 0s) infinite; }
+@keyframes edFloat{ 0%{ transform:translateY(0) rotate(-8deg); opacity:0; } 12%{ opacity:0.55; } 88%{ opacity:0.55; } 100%{ transform:translateY(-115vh) rotate(10deg); opacity:0; } }
+:root.lite .ed-fx .ed-grad, :root.lite .ed-fx i{ animation:none; } :root.lite .ed-fx i{ display:none; }
+@media (prefers-reduced-motion: reduce){ .ed-fx .ed-grad, .ed-fx i{ animation:none !important; } .ed-fx i{ display:none; } }
