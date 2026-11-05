@@ -1655,3 +1655,4 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 @keyframes mdHyp{ from{ transform:scale(1); } to{ transform:scale(1.18); } }
 :root.lite .event-tile.md .md-c, :root.lite .event-tile.md .md-o{ transition:opacity 0.4s ease; } :root.lite .event-tile.md.art-open .md-c{ transform:translateX(-50%); }
 @media (prefers-reduced-motion: reduce){ .event-tile.md .md-c, .event-tile.md .md-o{ transition:opacity 0.4s ease; } .event-tile.md.art-open .md-c{ transform:translateX(-50%); } }
+.cb-prod.gone{ opacity:0 !important; transition:none; animation:none !important; }

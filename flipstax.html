@@ -12582,7 +12582,7 @@
     const finish = ()=>{ if (gone) return; const mine = alive(); gone = true; clearT(); showCard.removeEventListener('click', go);
       if (!mine) return;   // (another screen owns showCard now: leave it alone)
       showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; noteOverlayClosed(); done(); };
-    const lastCard = ()=>{ clearT(); if (!alive()){ gone = true; return; } stage = 'last'; showCard.classList.remove('has-prod'); showCard.classList.add('last'); say.textContent = 'Thanks for watching!'; L(CB_COFFEE_MS, finish); L(CB_COFFEE_MS + 3000, finish); };   // (the second timer is a safety net: the break always ends and hands back to the show)
+    const lastCard = ()=>{ clearT(); if (!alive()){ gone = true; return; } stage = 'last'; prod.classList.add('gone'); showCard.classList.remove('has-prod'); L(350, ()=>{ if (!alive()) return; showCard.classList.add('last'); say.textContent = 'Thanks for watching!'; }); L(350 + CB_COFFEE_MS, finish); L(350 + CB_COFFEE_MS + 3000, finish); };   // (the ad is fully gone, 0.35 s, before the donate text appears; the second timer is a safety net: the break always ends and hands back to the show)
     const showProd = (i)=>{ if (!alive()){ clearT(); gone = true; return; } if (i >= CB_PRODUCTS.length){ lastCard(); return; } stage = 'prod'; const p = CB_PRODUCTS[i];
       prod.querySelector('.cb-e').textContent = p.e; prod.querySelector('.cb-brand').textContent = p.brand; prod.querySelector('.cb-line').textContent = p.line;
       // mega fix 18: the monitor's content stays hidden until the art has loaded (the scene picture and the fonts), then fades in - the first frame of an ad no longer shows a blank white blob
