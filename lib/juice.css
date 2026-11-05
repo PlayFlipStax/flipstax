@@ -1691,3 +1691,14 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 @keyframes mwBreathe{ from{ opacity:0.04; } to{ opacity:0.22; } }
 :root.lite .lucky-overlay.mw .mw-bg::before, :root.lite .lucky-overlay.mw .mw-bg::after, :root.lite .lucky-overlay.mw::after{ animation:none; }
 @media (prefers-reduced-motion: reduce){ .lucky-overlay.mw .mw-bg::before, .lucky-overlay.mw .mw-bg::after, .lucky-overlay.mw::after{ animation:none !important; } }
+/* mega 3 item 10: Mystery Doors polish. The closed leaf swings less far and from a more distant camera (perspective 1500px, 65 degrees) so it no longer balloons over the
+   next door, and it fades sooner; the moving world sits on its own layer (smoother on the right door) and never stalls: the turn / zoom is slower and longer
+   (3.4 s) so it is still moving when the show moves on at 2.5 s, the hyperspace included. Transform and opacity only. */
+.event-tile.md{ --ry:65deg; } .event-tile.md[data-w="mdGal"]{ --ry:-65deg; }
+.event-tile.md .md-c{ transition:opacity 0.3s ease 0.5s, transform 0.7s cubic-bezier(.25,.6,.3,1); }
+.event-tile.md.art-open .md-c{ transform:perspective(1500px) translateX(-50%) rotateY(var(--ry)); }
+.event-tile.md .md-win{ will-change:transform; transform:translateZ(0); }
+.event-tile.md.art-open .md-wi{ animation-duration:3.4s; animation-timing-function:linear; will-change:transform; backface-visibility:hidden; }
+@keyframes mdGal{ from{ transform:rotate(0deg); } to{ transform:rotate(61deg); } }
+@keyframes mdClk{ from{ transform:rotate(0deg); } to{ transform:rotate(-61deg); } }
+@keyframes mdHyp{ from{ transform:scale(1); } to{ transform:scale(1.25); } }
