@@ -1818,3 +1818,41 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
    the hinge and the bottom), and so does the moving world inside the doorway; the closed leaf still swings open about its hinge over it. ---- */
 .event-tile.md .md-o{ left:0; right:auto; bottom:0; width:100%; height:100%; transform:none; object-fit:cover; object-position:var(--hinge, 50% 100%); }
 .event-tile.md .md-ow{ left:0; right:0; top:0; bottom:0; width:auto; height:auto; aspect-ratio:auto; transform:none; overflow:hidden; }
+
+/* ---- fix 5: the curtain-closing finish and a results card that looks like part of the show. Red velvet curtains sweep shut over the goodbye video (transform only),
+   Flip's 'That's our show' line on the closed curtain, then the results card in a gold frame with marquee bulbs: the headline, Flip with the dancers, the 8 stats, the
+   old cards (best moment, today's personality, streak, new collectible cards, the Secret Riddler badge) with Flip's personality line, SHARE. Lite and reduced motion: fades. ---- */
+.outro-curtain{ position:absolute; inset:0; z-index:3; pointer-events:none; overflow:hidden; }
+.outro-drape{ position:absolute; top:0; bottom:0; width:52%; transform:scaleX(0); transition:transform 1.5s cubic-bezier(.45,.05,.3,1);
+  background:linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0) 26%, rgba(0,0,0,0.3)), repeating-linear-gradient(90deg, #7a0f1c 0 13px, #c22a3a 13px 25px, #93162a 25px 36px); box-shadow:inset 0 0 30px rgba(0,0,0,0.45); }
+.outro-drape.l{ left:0; transform-origin:0 50%; } .outro-drape.r{ right:0; transform-origin:100% 50%; }
+.outro-valance{ position:absolute; left:0; right:0; top:0; height:9%; transform:translateY(-100%); transition:transform 0.7s ease-out;
+  background:repeating-linear-gradient(90deg, #a51a2c 0 22px, #d23a4a 22px 30px, #a51a2c 30px 44px); border-bottom:5px solid #ffd23f; border-radius:0 0 50% 50% / 0 0 30% 30%; }
+.outro.closing .outro-drape{ transform:scaleX(1); } .outro.closing .outro-valance{ transform:none; }
+.outro-say{ position:absolute; left:50%; top:46%; width:min(86vw, 420px); transform:translate(-50%, 10px); opacity:0; transition:opacity 0.4s ease 0.9s, transform 0.4s ease 0.9s; text-align:center; padding:16px 18px; border-radius:20px;
+  background:linear-gradient(180deg, #fff8e0, #ffe9a8); border:3px solid #ffd23f; box-shadow:0 0 0 3px #7a3d00, 0 10px 26px rgba(0,0,0,0.5); color:#3a1500; font:900 clamp(20px, 6vw, 28px)/1.15 var(--f-display); letter-spacing:0.5px; }
+.outro.closing .outro-say{ opacity:1; transform:translate(-50%, 0); }
+:root.lite .outro-drape, :root.lite .outro-valance{ transform:none; opacity:0; transition:opacity 0.5s ease; } :root.lite .outro.closing .outro-drape, :root.lite .outro.closing .outro-valance{ opacity:1; }
+@media (prefers-reduced-motion: reduce){ .outro-drape, .outro-valance{ transform:none; opacity:0; transition:opacity 0.5s ease; } .outro.closing .outro-drape, .outro.closing .outro-valance{ opacity:1; } }
+/* the card: a gold frame with marquee bulbs round the whole screen, the content scrolls inside it */
+#readoutOverlay.ep.outro-on .outro-end{ overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; background:radial-gradient(120% 60% at 50% 0%, #2a0b58 0%, #12052c 60%, #0a0320 100%); padding:10px 10px calc(10px + env(safe-area-inset-bottom)); }
+.outro-frame{ position:absolute; inset:6px; z-index:6; pointer-events:none; border-radius:22px; border:4px solid #ffd23f; box-shadow:0 0 0 2px #7a3d00, inset 0 0 0 2px #7a3d00, 0 0 18px rgba(255,210,63,0.5); opacity:0; transition:opacity 0.5s ease; }
+.outro-frame::after{ content:''; position:absolute; inset:4px; border-radius:18px; border:4px dotted #fff3b0; opacity:0.85; animation:outroBulbs 1.2s steps(2) infinite; }
+@keyframes outroBulbs{ 0%{ opacity:0.95; } 50%{ opacity:0.55; } }
+.outro.end .outro-frame{ opacity:1; }
+:root.lite .outro-frame::after{ animation:none; } @media (prefers-reduced-motion: reduce){ .outro-frame::after{ animation:none; } }
+#readoutOverlay.ep.outro-on .outro-end .outro-mid{ padding-top:calc(56px + env(safe-area-inset-top)); }
+#readoutOverlay.ep.outro-on .outro-end .outro-artwrap{ flex:0 0 auto; height:min(40vh, 340px); border-radius:16px; margin:0 6px; }
+#readoutOverlay.ep.outro-on .outro-end .outro-lower{ background:none; padding:10px 6px 8px; }
+.outro-extras{ width:100%; max-width:380px; display:flex; flex-direction:column; gap:8px; }
+.ox-flip{ display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:16px; background:linear-gradient(180deg, #fff8e0, #ffe9a8); border:2px solid #ffd23f; box-shadow:0 0 0 2px #7a3d00; }
+.ox-flip:has(.ox-line:empty){ display:none; }
+.ox-face{ flex:0 0 auto; width:46px; height:46px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 2px #7a3d00; object-fit:cover; }
+.ox-line{ margin:0; font:800 14px/1.3 var(--f-body, Inter, sans-serif); color:#3a1500; text-align:left; }
+.outro-extras .epr-cards{ margin:0; }
+.outro-extras .readout-unlocks, .outro-extras .readout-riddler{ margin:0; }
+.outro-extras .readout-unlocks.hidden, .outro-extras .readout-riddler.hidden{ display:none; }
+@media (max-height:700px){ #readoutOverlay.ep.outro-on .outro-end .outro-artwrap{ height:30vh; } }
+.ox-face{ display:block; overflow:hidden; background:radial-gradient(circle at 50% 40%, #6a2bd8, #2a0b58); }
+.ox-face .host-rig{ width:100%; height:auto; }
+.outro.end .outro-badge{ opacity:0; pointer-events:none; transition:opacity 0.3s ease; }
