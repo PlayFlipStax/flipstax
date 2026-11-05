@@ -17799,6 +17799,7 @@
     showFlash(wasCorrect === true ? 'win' : 'lose');
     if (wasCorrect === true) els.eventOverlay.classList.add('flash-win');   // the marquee bulbs flash
     if (wasCorrect === true && els.eventTiles[correctIdx]) FX.burstAt(showFx, els.eventTiles[correctIdx], { count:12, spread:100, shapes:['star', 'coin'] });
+    if (wasCorrect === true && els.eventTiles[correctIdx] && /quiz-(beam|riddle)/.test(els.eventOverlay.className) && !isLite() && !FX.reduced()){ FX.glowSweep(showFx, els.eventTiles[correctIdx]); setTimeout(()=> FX.burstAt(showFx, els.eventTiles[correctIdx], { count:10, spread:70, shapes:['star'], colors:['#ffd23f', '#fff3c4', '#ffffff'] }), 260); }   // mega 3 item 8: a sparkle sweep and a second small burst on the right answer
     if (inInfinity()){
       infBlock.trivia++; if (wasCorrect === true) infBlock.triviaCorrect++; saveInfBlock();
       progress.triviaN++; if (wasCorrect === true) progress.triviaCorrect++; saveProgress();
