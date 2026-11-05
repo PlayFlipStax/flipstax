@@ -621,3 +621,36 @@
 @keyframes scFade{ 0%, 100%{ opacity:0; } 40%{ opacity:0.85; } }
 .su-saucer{ min-height:0; }
 .sc-blaze.floor{ height:34%; background:radial-gradient(80% 60% at 50% 60%, rgba(255,230,140,0.55), transparent 72%), radial-gradient(circle, rgba(255,246,200,0.9) 0 2.5px, rgba(255,246,200,0) 3.5px) 0 0 / 24px 18px; -webkit-mask-image:linear-gradient(180deg, transparent, #000 35%); mask-image:linear-gradient(180deg, transparent, #000 35%); }
+
+/* ---- fix 4: Snap Sort as a spiral galaxy. The whole vortex centred in the field with a bright core and a slowly turning copy; a segmented glowing ring round it is the
+   timer; dark-glass pills with a bright cyan rim spiral in from the edges with a light trail. Transform and opacity only; still in lite mode and reduced motion. ---- */
+:root:root.stage-on .mg-overlay.mg-snapSort, .mg-overlay.mg-snapSort{ background:radial-gradient(70% 50% at 50% 55%, rgba(30,90,140,0.55), transparent 75%), linear-gradient(180deg, #030a1e 0%, #06132e 50%, #030a1e 100%) !important; }
+.mg-overlay.mg-snapSort::before{ display:none; }
+.mg-snapSort .mg-timer{ display:none; }
+.ss-galaxy .ss-field{ overflow:hidden; }
+.ss-vortex{ position:absolute; left:50%; top:50%; width:min(96vw, 64vh, 760px); aspect-ratio:1; transform:translate(-50%, -50%); pointer-events:none; z-index:0; }
+.ss-vimg, .ss-vspin{ position:absolute; inset:-14%; border-radius:50%; background:url(../data/scenes/snap-sort-vortex.webp) 47% 48.2% / 178% auto no-repeat;
+  -webkit-mask-image:radial-gradient(circle closest-side, #000 58%, transparent 100%); mask-image:radial-gradient(circle closest-side, #000 58%, transparent 100%); }
+.ss-vspin{ opacity:0.3; animation:ssVortex 90s linear infinite; }
+.ss-core{ position:absolute; left:50%; top:50%; width:22%; aspect-ratio:1; margin:-11% 0 0 -11%; border-radius:50%; background:radial-gradient(circle, #ffffff 0%, rgba(200,255,255,0.95) 18%, rgba(95,244,255,0.55) 42%, rgba(95,244,255,0) 70%); animation:ssCoreIdle 2.6s ease-in-out infinite alternate; }
+@keyframes ssCoreIdle{ from{ transform:scale(0.9); opacity:0.85; } to{ transform:scale(1.06); opacity:1; } }
+.ss-core.pulse{ animation:ssCorePulse 0.5s ease-out 1; }
+@keyframes ssCorePulse{ 0%{ transform:scale(1); opacity:1; } 35%{ transform:scale(1.7); opacity:1; } 100%{ transform:scale(1); opacity:0.9; } }
+.ss-ring{ position:absolute; inset:2%; width:96%; height:96%; overflow:visible; }
+.ss-ring .seg{ fill:none; stroke:#7df9ff; stroke-width:5; stroke-linecap:round; opacity:1; transition:opacity 0.3s ease; filter:drop-shadow(0 0 3px rgba(125,249,255,0.9)); }
+.ss-ring .seg.off{ opacity:0.14; }
+.ss-late .ss-ring .seg{ stroke:#ff8a4a; filter:drop-shadow(0 0 3px rgba(255,138,74,0.9)); }
+.ss-lane{ z-index:3; }
+.ss-item.spiral{ position:absolute; left:0; top:0; will-change:transform, opacity; }
+.ss-galaxy .ss-word{ min-height:38px; padding:6px 13px; border-radius:999px; font:900 clamp(15px, 4.5vw, 19px)/1.05 var(--f-display); letter-spacing:0.6px; color:#ffffff; text-transform:uppercase;
+  background:linear-gradient(180deg, rgba(40,70,120,0.72) 0%, rgba(6,16,40,0.88) 55%, rgba(14,30,66,0.85) 100%); border:2px solid #7df9ff; box-shadow:0 0 12px rgba(125,249,255,0.6), inset 0 1px 0 rgba(255,255,255,0.35); text-shadow:0 0 6px rgba(125,249,255,0.6); }
+.ss-galaxy .ss-word.fits{ border-color:#7df9ff; }
+.ss-trail{ position:absolute; left:0; top:0; width:10px; height:10px; border-radius:50%; pointer-events:none; background:radial-gradient(circle, #ffffff, rgba(125,249,255,0.8) 45%, rgba(125,249,255,0) 72%); }
+.ss-trail.t1{ width:8px; height:8px; } .ss-trail.t2{ width:6px; height:6px; }
+.ss-galaxy .ss-fly.right{ color:#02303d; border-color:#fff; background:linear-gradient(180deg, #e6ffff, #5ff4ff 52%, #14b6dc); box-shadow:0 0 22px rgba(95,244,255,1); }
+.ss-galaxy .ss-fly.wrong{ color:#fff; border-color:#ffd0d0; background:linear-gradient(180deg, #ff9a8a, #ff3a3a 52%, #b8101e); box-shadow:0 0 22px rgba(255,58,58,1); }
+:root.lite .ss-vspin, :root.lite .ss-core{ animation:none; } @media (prefers-reduced-motion: reduce){ .ss-vspin, .ss-core{ animation:none; } }
+:root.lite .ss-core.pulse{ animation:ssCoreFade 0.4s ease-out 1; } @media (prefers-reduced-motion: reduce){ .ss-core.pulse{ animation:ssCoreFade 0.4s ease-out 1; } }
+@keyframes ssCoreFade{ 0%{ opacity:1; } 40%{ opacity:0.5; } 100%{ opacity:1; } }
+@media (min-width:600px){ .ss-galaxy .ss-word{ font-size:clamp(20px, 3vw, 30px); padding:9px 20px; min-height:52px; } .ss-ring .seg{ stroke-width:4; } }
+.ss-vortex{ width:auto; height:94%; max-width:96%; max-height:94%; }
