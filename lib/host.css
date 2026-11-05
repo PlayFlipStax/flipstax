@@ -83,3 +83,12 @@
 :root.host-img .show-host .host-rig.hr-head.has-img .hr-img{ left:-30%; width:160%; }
 /* (the games with their own stage host had no bottom strip for the corner host; they have it now that he is not on the stage) */
 :root.host-img .mg-overlay .mg-inner{ padding-bottom:calc(50px + env(safe-area-inset-bottom)) !important; }
+
+/* ---- fix 5: Flip stands still. No jumping, bobbing, bouncing, swaying or popping anywhere - on the stage, in the intro, between games and in the finale. He just
+   stands in his pose; a pose change is a plain crossfade of the pictures, and where he appears he simply fades in. (Blinks stay: they are not movement of Flip.) ---- */
+.host-rig, .host-rig.hr-pop, .host-rig .hr-img, .host-rig .hr-img.on, .host-rig .hr-svg, .host-rig .ha-arm-wave, .host-full svg, .host-full .ha-arm-wave,
+.ir-host-art, .host-art, .alien, .alien.cheer, .alien.sad, .disco.on .dc-alien, .disco.on .dc-alien svg, .disco.on .dc-alien .ha-arm-wave, .vault-alien.pop{ animation:none !important; }
+.host-rig .hr-img{ transform:none !important; transition:opacity 0.3s ease !important; }
+.fs-host, .ir-overlay:not(.intro) .ir-host, .cue-fig{ animation:hostStillIn 0.35s ease both !important; }
+.vault-alien.pop{ animation:hostStillIn 0.4s ease both !important; }
+@keyframes hostStillIn{ from{ opacity:0; } to{ opacity:1; } }
