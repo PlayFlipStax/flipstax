@@ -11708,9 +11708,13 @@
     const danceParty = (then)=>{
       const v = document.createElement('div'); v.className = 'mw-dance'; v.innerHTML = '<video src="data/wheel/dance-party.mp4" playsinline autoplay preload="auto"></video><div class="mw-dance-skip">TAP TO SKIP</div>';
       document.body.appendChild(v); const vid = v.querySelector('video'), t0 = performance.now(); vid.muted = !sfxOn; vid.volume = Math.max(0, Math.min(1, masterVol));
-      let over = false; const end = ()=>{ if (over) return; over = true; clearTimeout(cap); v.classList.add('out'); setTimeout(()=> v.remove(), 300); then(); };
+      let over = false;
+      // mega 3 item 9: the party fades out smoothly (the picture over 0.9 s and the sound with it) instead of cutting off; the wheel is already behind it
+      const end = ()=>{ if (over) return; over = true; clearTimeout(cap); const still = isLite() || FX.reduced(), ms = still ? 300 : 900; v.style.transition = 'opacity ' + ms + 'ms ease-in-out'; void v.offsetWidth; v.classList.add('out');
+        const v0 = vid.volume, t1 = performance.now(), fade = setInterval(()=>{ const f = Math.min(1, (performance.now() - t1) / ms); try{ vid.volume = Math.max(0, v0 * (1 - f)); }catch(e){} if (f >= 1) clearInterval(fade); }, 50);
+        setTimeout(()=>{ clearInterval(fade); v.remove(); }, ms + 60); then(); };
       const cap = setTimeout(end, 12000);   // (a safety net)
-      vid.addEventListener('ended', end); v.addEventListener('click', ()=>{ if (performance.now() - t0 > 1000) end(); });
+      vid.addEventListener('timeupdate', ()=>{ if (!over && vid.duration && vid.duration - vid.currentTime < 0.9) end(); }); vid.addEventListener('ended', end); v.addEventListener('click', ()=>{ if (performance.now() - t0 > 1000) end(); });
       vid.addEventListener('error', ()=>{ if (over) return; over = true; clearTimeout(cap); v.remove(); discoShownFor = null; if (!discoCelebrate('wheel', then)) setTimeout(then, 4000); });
       const pr = vid.play(); if (pr && pr.catch) pr.catch(()=>{ vid.muted = true; vid.play().catch(()=>{}); });
       if (!isLite() && !FX.reduced()){ FX.confettiBurst(showFx); setTimeout(()=>{ if (!over) FX.confettiBurst(showFx); }, 2500); }
