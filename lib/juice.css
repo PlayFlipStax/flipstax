@@ -1658,3 +1658,13 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .cb-prod.gone{ opacity:0 !important; transition:none; animation:none !important; }
 /* mega 3 item 4: card text scales down with its length (--tk set per card) */
 :root.mode-daily .take, :root.mode-infinity .take{ font-size:calc(clamp(26px, 7.8vw, 42px) * var(--tk, 1)); overflow-wrap:anywhere; }
+/* mega 3 item 7: Word Warp grand finale - a slow purple/cyan swirl turns over the still art (rotate only), a bigger UFO and SOLVED!, a gold ring swells out of the word */
+.ww-galaxy::before{ content:''; position:absolute; left:50%; top:50%; width:170vmax; height:170vmax; margin:-85vmax 0 0 -85vmax; z-index:1; opacity:0.55; will-change:transform;
+  background:repeating-conic-gradient(from 0deg, rgba(120,70,255,0) 0 14deg, rgba(125,249,255,0.16) 14deg 22deg, rgba(190,80,255,0.2) 22deg 30deg);
+  -webkit-mask-image:radial-gradient(circle, transparent 4%, #000 30%, #000 70%, transparent 95%); mask-image:radial-gradient(circle, transparent 4%, #000 30%, #000 70%, transparent 95%); animation:pkSpin 70s linear infinite; }
+:root.lite .ww-galaxy::before{ animation:none; display:none; }
+@media (prefers-reduced-motion: reduce){ .ww-galaxy::before{ animation:none !important; } }
+.ww-wufo{ width:140px; margin-left:-70px; }
+.ww-wship svg{ width:140px; }
+.ww-solved b{ font-size:clamp(54px, 17vw, 80px); }
+.ww-ring{ position:absolute; left:50%; width:90px; height:90px; border-radius:50%; border:6px solid #ffd23f; box-sizing:border-box; pointer-events:none; }

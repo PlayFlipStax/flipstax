@@ -15811,12 +15811,13 @@
     const beam = ufo.firstChild; beam.style.height = Math.max(40, sl.bottom + 10 - shipTop - 60) + 'px';
     ufo.animate([{ transform:'translateY(' + (-shipTop - 120) + 'px)' }, { transform:'translateY(0)' }], { duration:700, easing:'cubic-bezier(.2,.8,.3,1)', fill:'both' });
     beam.animate([{ opacity:0, transform:'translateX(-50%) scaleY(0.1)' }, { opacity:0.9, transform:'translateX(-50%) scaleY(1)', offset:0.35 }, { opacity:0.9, transform:'translateX(-50%) scaleY(1)', offset:0.8 }, { opacity:0, transform:'translateX(-50%) scaleY(1)' }], { duration:1500, delay:700, easing:'ease-out', fill:'both' });
-    slots.forEach((c, i)=> c.animate([{ transform:'translateY(0) scale(1)' }, { transform:'translateY(-16px) scale(1.1)', offset:0.45 }, { transform:'translateY(0) scale(1)' }], { duration:700, delay:900 + i * 90, easing:'ease-in-out' }));
-    setTimeout(()=>{ if (window.Juice) Juice.correct(els.solveSlots, { count:30 }); els.solveCelebrate.classList.remove('hidden'); els.solveCelebrate.classList.add('nb'); solveConfettiBurst(); }, 1050);
-    setTimeout(()=>{ sfx.solveWin(); ban.animate([{ opacity:0, transform:'scale(0.6)' }, { opacity:1, transform:'scale(1.08)', offset:0.6 }, { opacity:1, transform:'scale(1)' }], { duration:500, easing:'ease-out', fill:'both' }); }, 1250);
-    setTimeout(()=> ufo.animate([{ transform:'translateY(0)', opacity:1 }, { transform:'translateY(' + (-shipTop - 140) + 'px)', opacity:1 }], { duration:600, easing:'ease-in', fill:'both' }), 2300);
-    setTimeout(()=>{ els.solveCelebrate.classList.add('hidden'); els.solveCelebrate.classList.remove('nb'); }, 3000);
-    fin(3000);
+    slots.forEach((c, i)=> c.animate([{ transform:'translateY(0) scale(1)' }, { transform:'translateY(-26px) scale(1.28)', offset:0.45 }, { transform:'translateY(0) scale(1)' }], { duration:800, delay:900 + i * 110, easing:'ease-in-out' }));
+    setTimeout(()=>{ if (window.Juice) Juice.correct(els.solveSlots, { count:30 }); els.solveCelebrate.classList.remove('hidden'); els.solveCelebrate.classList.add('nb'); solveConfettiBurst(); const ring = document.createElement('i'); ring.className = 'ww-ring'; ring.style.top = Math.round(sl.top + sl.height / 2) + 'px'; layer.appendChild(ring); ring.animate([{ transform:'translate(-50%,-50%) scale(0.2)', opacity:0.9 }, { transform:'translate(-50%,-50%) scale(7)', opacity:0 }], { duration:1100, easing:'ease-out', fill:'both' }); }, 1050);
+    setTimeout(()=>{ if (window.Juice) Juice.correct(els.solveSlots, { count:30 }); solveConfettiBurst(); }, 1900);   // (mega 3 item 7: a second confetti burst; a gold ring swells out of the word)
+    setTimeout(()=>{ sfx.solveWin(); ban.animate([{ opacity:0, transform:'scale(0.4)' }, { opacity:1, transform:'scale(1.22)', offset:0.6 }, { opacity:1, transform:'scale(1)' }], { duration:650, easing:'ease-out', fill:'both' }); }, 1250);
+    setTimeout(()=> ufo.animate([{ transform:'translateY(0)', opacity:1 }, { transform:'translateY(' + (-shipTop - 140) + 'px)', opacity:1 }], { duration:600, easing:'ease-in', fill:'both' }), 3000);
+    setTimeout(()=>{ els.solveCelebrate.classList.add('hidden'); els.solveCelebrate.classList.remove('nb'); }, 3700);
+    fin(3700);
   }
   function trayPick(letter, tileEl){
     if (!runActive || warpBusy || warpMissing || els.solveOverlay.classList.contains('celebrating') || els.solveOverlay.classList.contains('revealing')) return;
