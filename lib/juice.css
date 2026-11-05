@@ -1778,3 +1778,38 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 /* Mystery Doors: the moving world has its layer ready before the tap (a hitch on the first frames showed most on the right door) */
 .event-tile.md .md-wi{ will-change:transform; }
 :root.lite .event-tile.md .md-wi{ will-change:auto; }
+
+/* ---- fix 4: the Time Warp timeline and idle motion. A glowing track with era ticks, the events dropping onto it at their years with a glowing link, the tubes
+   rolling up; before the answer the clock rings turn, the cards float and the tubes tick softly. Transform and opacity only; lite and reduced motion: plain fades. ---- */
+.tw-track{ position:relative; z-index:3; flex:0 0 auto; height:64px; margin:4px 2px 2px; }
+.tw-line{ position:absolute; left:10px; right:10px; top:30px; height:4px; border-radius:2px; background:linear-gradient(90deg, rgba(125,249,255,0.2), #7df9ff 12%, #b48cff 88%, rgba(180,140,255,0.2)); box-shadow:0 0 10px rgba(125,249,255,0.8); }
+.tw-tick{ position:absolute; left:0; top:22px; width:0; transition:transform 0.7s cubic-bezier(.3,.8,.3,1), opacity 0.4s ease; }
+.tw-tick i{ position:absolute; left:-1.5px; top:0; width:3px; height:20px; border-radius:2px; background:#dff8ff; box-shadow:0 0 6px rgba(125,249,255,0.9); }
+.tw-tick b{ position:absolute; left:0; top:24px; transform:translateX(-50%); font:900 13px/1 var(--f-display); letter-spacing:1px; color:#bff4ff; white-space:nowrap; text-shadow:0 0 6px rgba(125,249,255,0.7); }
+.tw-tick.minor i{ height:12px; top:4px; opacity:0.7; } .tw-tick.minor b{ font-size:11px; opacity:0.8; }
+.tw-tick.minor{ opacity:0; } .tw-track.zoom .tw-tick.minor{ opacity:1; transition-delay:0s, 0.3s; }
+.tw-tick.out{ opacity:0 !important; }
+.tw-link{ position:absolute; top:28px; height:8px; border-radius:4px; background:linear-gradient(90deg, #ffe066, #ffffff, #ffe066); box-shadow:0 0 14px rgba(255,224,102,1); transform:scaleX(0); transform-origin:0 50%; opacity:0; transition:transform 0.5s ease-out 0.25s, opacity 0.2s ease 0.2s; }
+.tw-track.pins .tw-link{ transform:scaleX(1); opacity:1; }
+.tw-pin{ position:absolute; top:4px; width:0; opacity:0; transform:translateY(-26px); transition:transform 0.45s cubic-bezier(.3,1.5,.5,1), opacity 0.25s ease; }
+.tw-pin.b{ transition-delay:0.12s; }
+.tw-track.pins .tw-pin{ opacity:1; transform:none; }
+.tw-pin b{ position:absolute; left:-14px; top:12px; width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font:900 16px/1 var(--f-display); color:#fff; border:2px solid #fff; }
+.tw-pin.a b{ background:radial-gradient(circle at 38% 30%, #bff0ff, #27c8ff 50%, #1566e6); box-shadow:0 0 12px rgba(39,200,255,1); }
+.tw-pin.b b{ background:radial-gradient(circle at 38% 30%, #ffd0f2, #ff4fc4 50%, #7a2be6); box-shadow:0 0 12px rgba(255,79,196,1); }
+.tw-pin em{ position:absolute; left:0; top:-8px; transform:translateX(-50%); font:900 15px/1 var(--f-display); font-style:normal; color:#ffe9a0; text-shadow:0 0 8px rgba(255,190,70,1); white-space:nowrap; }
+.tw-track.pins .tw-tick.era b, .tw-track.pins .tw-tick.minor b{ opacity:0.55; }
+@media (min-width:600px){ .tw-track{ height:96px; } .tw-line{ top:44px; height:6px; } .tw-tick{ top:34px; } .tw-tick i{ height:28px; } .tw-tick b{ top:34px; font-size:20px; } .tw-link{ top:42px; height:10px; } .tw-pin b{ width:40px; height:40px; left:-20px; top:22px; font-size:22px; } .tw-pin em{ font-size:22px; top:-4px; } }
+@media (max-height:700px){ .tw-track{ height:52px; } .tw-line{ top:24px; } .tw-tick{ top:17px; } .tw-tick i{ height:16px; } .tw-tick b{ top:19px; font-size:11px; } .tw-link{ top:22px; } .tw-pin{ top:0; } .tw-pin b{ top:10px; } }
+:root.lite .tw-tick, :root.lite .tw-pin, :root.lite .tw-link{ transition:opacity 0.3s ease !important; } :root.lite .tw-pin{ transform:none; } :root.lite .tw-link{ transform:scaleX(1); }
+@media (prefers-reduced-motion: reduce){ .tw-tick, .tw-pin, .tw-link{ transition:opacity 0.3s ease !important; } .tw-pin{ transform:none; } .tw-link{ transform:scaleX(1); } }
+/* idle motion before the answer */
+.event-overlay.bb-timeWarp .ev-bg::after{ animation:twRingsTurn 60s linear infinite; opacity:0.32; }
+@keyframes twRingsTurn{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+:root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-timeWarp:not(.bb-revealed) .event-tile{ animation:twFloat 4.6s ease-in-out infinite alternate; }
+:root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-timeWarp:not(.bb-revealed) .event-tile:nth-child(2){ animation-delay:-2.3s; }
+@keyframes twFloat{ from{ transform:translateY(-3px); } to{ transform:translateY(3px); } }
+.event-overlay.bb-timeWarp:not(.bb-revealed) .bb-tag .tf{ animation:twTick 2s steps(1) infinite; }
+@keyframes twTick{ 0%{ transform:rotate(-2.5deg); } 50%{ transform:rotate(2.5deg); } }
+:root.lite .event-overlay.bb-timeWarp .event-tile, :root.lite .event-overlay.bb-timeWarp .bb-tag .tf, :root.lite .event-overlay.bb-timeWarp .ev-bg::after{ animation:none !important; }
+@media (prefers-reduced-motion: reduce){ .event-overlay.bb-timeWarp .event-tile, .event-overlay.bb-timeWarp .bb-tag .tf, .event-overlay.bb-timeWarp .ev-bg::after{ animation:none !important; } }

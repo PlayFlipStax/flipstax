@@ -11933,6 +11933,37 @@
   // Emoji Decode plays 3 puzzles and Time Warp 2, one after another in the same card, from the next unused items of the frozen schedule
   // (each show takes the next 3 / 2 and wraps round); a banner and a burst follow when every one is right.
   const BREAK_PARTS = { emojiDecode:3, timeWarp:2 };
+  // fix 4: the Time Warp timeline (see runBrainBreakOne). Positions are transforms only; lite mode and reduced motion get plain fades and no roll.
+  const TW_D0 = [-260, 2060], TW_TICKS = [[-130, 'BC'], [1000, '1000'], [1500, '1500'], [1800, '1800'], [2000, '2000']];
+  function twX(track, dom, y){ const W = track.clientWidth, P = 18; return P + (y - dom[0]) / (dom[1] - dom[0]) * (W - 2 * P); }
+  function twPlace(track, dom){
+    const W = track.clientWidth;
+    track.querySelectorAll('.tw-tick').forEach(t=>{ const x = twX(track, dom, +t.dataset.y); t.style.transform = 'translateX(' + x.toFixed(1) + 'px)'; t.classList.toggle('out', x < 4 || x > W - 4); });
+  }
+  function twReveal(track, ys, tiles){
+    const quiet = isLite() || prefersReducedMotion(), lo = Math.min(ys[0], ys[1]), hi = Math.max(ys[0], ys[1]), pad = Math.max(6, (hi - lo) * 0.45), dom = [lo - pad, hi + pad];
+    // a few plain ticks at a round step inside the zoomed span
+    const span = dom[1] - dom[0], step = [5, 10, 20, 25, 50, 100, 200, 250, 500].find(s=> span / s <= 5) || 1000;
+    for (let y = Math.ceil(dom[0] / step) * step; y <= dom[1]; y += step){
+      if (TW_TICKS.some(t=> t[0] === y)) continue;
+      const m = document.createElement('span'); m.className = 'tw-tick minor'; m.dataset.y = y; m.innerHTML = '<i></i><b>' + (y < 0 ? -y + ' BC' : y) + '</b>';
+      m.style.transform = 'translateX(' + twX(track, TW_D0, y).toFixed(1) + 'px)'; track.insertBefore(m, track.querySelector('.tw-link'));
+    }
+    requestAnimationFrame(()=>{ track.classList.add('zoom'); twPlace(track, dom); });
+    const xa = twX(track, dom, ys[0]), xb = twX(track, dom, ys[1]), pa = track.querySelector('.tw-pin.a'), pb = track.querySelector('.tw-pin.b'), link = track.querySelector('.tw-link');
+    pa.querySelector('em').textContent = ys[0]; pb.querySelector('em').textContent = ys[1];
+    pa.style.left = xa.toFixed(1) + 'px'; pb.style.left = xb.toFixed(1) + 'px';
+    link.style.left = Math.min(xa, xb).toFixed(1) + 'px'; link.style.width = Math.max(2, Math.abs(xb - xa)).toFixed(1) + 'px';
+    setTimeout(()=> track.classList.add('pins'), quiet ? 0 : 700);
+    // the year tubes roll up to their numbers over about a second, as each tube turns over
+    tiles.forEach((t, i)=>{
+      const tb = t.querySelector('.bb-tag .tb'); if (!tb || ys[i] == null || isNaN(ys[i])) return;
+      const to = ys[i], from = Math.max(0, to - 240); if (quiet){ tb.textContent = to; return; }
+      tb.textContent = from; const t0 = performance.now() + i * 350 + 380;
+      const roll = (now)=>{ if (!tb.isConnected) return; const p = Math.max(0, Math.min(1, (now - t0) / 1000)); tb.textContent = Math.round(from + (to - from) * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(roll); };
+      requestAnimationFrame(roll);
+    });
+  }
   function breakBanner(ov, text, ms, big){
     const b = document.createElement('div'); b.className = 'bb-banner' + (big ? ' big' : ''); b.textContent = text; ov.appendChild(b);
     setTimeout(()=> b.remove(), dt(ms) + 200); return b;
@@ -11979,12 +12010,22 @@
     const paintLeds = ()=>{ if (leds) Array.from(leds.children).forEach((d, i)=>{ const r = st.results && st.results[i]; d.className = r === true ? 'ok' : r === false ? 'no' : i === st.part ? 'now' : ''; }); };
     ov.querySelectorAll('.tw-leds').forEach(e=> e.remove());
     if (key === 'timeWarp' && st.parts){ leds = document.createElement('div'); leds.className = 'tw-leds'; leds.setAttribute('aria-hidden', 'true'); leds.innerHTML = '<i></i>'.repeat(st.parts); els.eventSubtitle.after(leds); paintLeds(); }
+    // fix 4: Time Warp's timeline - a glowing track with era ticks (BC, 1000, 1500, 1800, 2000) spaced by the actual years. It shows the whole span before
+    // the answer (so it gives nothing away); on the answer it zooms to the two years, the events drop onto it at their years and a glowing link joins them.
+    let track = null;
+    ov.querySelectorAll('.tw-track').forEach(e=> e.remove());
+    if (key === 'timeWarp'){
+      track = document.createElement('div'); track.className = 'tw-track'; track.setAttribute('aria-hidden', 'true');
+      track.innerHTML = '<i class="tw-line"></i>' + TW_TICKS.map(t=> '<span class="tw-tick era" data-y="' + t[0] + '"><i></i><b>' + t[1] + '</b></span>').join('') +
+        '<i class="tw-link"></i><span class="tw-pin a"><b>1</b><em></em></span><span class="tw-pin b"><b>2</b><em></em></span>';
+      els.eventTimerBar.after(track); requestAnimationFrame(()=> twPlace(track, TW_D0));
+    }
     const tl = ov.querySelector('.bb-timeline');
     if (tl){ tl.classList.remove('on'); tl.querySelectorAll('.tl-m b').forEach(b=> b.textContent = '?'); tl.querySelector('.tl-gap').textContent = ''; }
     let settled = false;
     const cleanup = ()=>{
       ov.classList.add('hidden'); ov.classList.remove('brainbreak', 'stack', 'bb-two', 'flash-win', 'bb-revealed', 'bb-' + key); els.eventSubtitle.classList.remove('res-win', 'res-miss'); ov.style.removeProperty('--bb');
-      ov.querySelectorAll('.bb-banner, .bb-pop, .tw-leds').forEach(e=> e.remove());
+      ov.querySelectorAll('.bb-banner, .bb-pop, .tw-leds, .tw-track').forEach(e=> e.remove());
       tiles.forEach(t=>{ t.style.display = ''; t.classList.remove('is-right', 'is-wrong'); t.onclick = null; });
     };
     const finish = ()=>{ if (st.keep && runActive){ done(cleanup); return; } cleanup(); if (runActive) done(); };   // (a part of a series hands the clean-up to the series)
@@ -11994,6 +12035,7 @@
       const right = tiles[rd.correct], ok = pick === rd.correct;
       if (st.onResult) st.onResult(ok);
       paintLeds();
+      if (track && rd.revealSub) twReveal(track, rd.revealSub.map(Number), tiles);
       if (key === 'timeWarp' && tl && rd.revealSub){   // the timeline: the earlier year slides to the left end, the later to the right
         const ys = rd.revealSub.map(Number), lo = Math.min.apply(null, ys), hi = Math.max.apply(null, ys);
         tl.querySelector('.tl-m.e b').textContent = lo; tl.querySelector('.tl-m.l b').textContent = hi;
