@@ -1723,3 +1723,55 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 @keyframes edFloat{ 0%{ transform:translateY(0) rotate(-8deg); opacity:0; } 12%{ opacity:0.55; } 88%{ opacity:0.55; } 100%{ transform:translateY(-115vh) rotate(10deg); opacity:0; } }
 :root.lite .ed-fx .ed-grad, :root.lite .ed-fx i{ animation:none; } :root.lite .ed-fx i{ display:none; }
 @media (prefers-reduced-motion: reduce){ .ed-fx .ed-grad, .ed-fx i{ animation:none !important; } .ed-fx i{ display:none; } }
+
+/* ---- A+ Time Warp in a time tunnel: a deep blue-violet tunnel (a slowly turning conic sunburst, a centre glow, faint clock rings drifting out), glossy rounded event cards
+   (cyan-blue and magenta-violet) with a bright rim and a glowing round VS disc, dark-glass number tubes for the year reveal, round LEDs for progress, one dark-glass
+   'Tap the earlier event' banner. Right glows green with a pulse, wrong glows red with a short shake. Transform and opacity only; still in lite mode and reduced motion. ---- */
+:root:root.stage-on .event-overlay.bb-timeWarp, .event-overlay.bb-timeWarp{ background:#070326 !important; }
+:root:root.stage-on .event-overlay.bb-timeWarp .ev-bg, .event-overlay.bb-timeWarp .ev-bg{ position:absolute; inset:0; overflow:hidden; opacity:1; background:radial-gradient(45% 30% at 50% 52%, rgba(150,190,255,0.75), rgba(90,60,230,0.35) 55%, rgba(90,60,230,0) 100%), radial-gradient(110% 80% at 50% 52%, #2a1a9a 0%, #150a62 50%, #070326 100%) !important; }
+.event-overlay.bb-timeWarp .ev-bg :is(.rays, .glow){ display:none; }
+.event-overlay.bb-timeWarp .ev-bg::before, .event-overlay.bb-timeWarp .ev-bg::after{ content:''; display:block; position:absolute; left:50%; top:52%; pointer-events:none; border:0; border-radius:0; transform-origin:50% 50%; }
+.event-overlay.bb-timeWarp .ev-bg::before{ width:190vmax; height:190vmax; margin:-95vmax 0 0 -95vmax; opacity:0.4; background:repeating-conic-gradient(from 0deg, rgba(120,170,255,0.55) 0deg 7deg, rgba(120,170,255,0) 7deg 20deg); animation:twTurn 80s linear infinite; }
+.event-overlay.bb-timeWarp .ev-bg::after{ width:120vmin; height:120vmin; margin:-60vmin 0 0 -60vmin; border-radius:50%; opacity:0.3; background:repeating-radial-gradient(circle, rgba(190,220,255,0) 0 13%, rgba(190,220,255,0.55) 13% 13.7%, rgba(190,220,255,0) 13.7% 14%), repeating-conic-gradient(rgba(190,220,255,0.5) 0deg 1deg, rgba(190,220,255,0) 1deg 30deg); animation:twRings 16s ease-in-out infinite alternate; }
+@keyframes twTurn{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+@keyframes twRings{ from{ transform:scale(0.92) rotate(-6deg); opacity:0.2; } to{ transform:scale(1.14) rotate(6deg); opacity:0.38; } }
+:root.lite .event-overlay.bb-timeWarp .ev-bg::before, :root.lite .event-overlay.bb-timeWarp .ev-bg::after{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .event-overlay.bb-timeWarp .ev-bg::before, .event-overlay.bb-timeWarp .ev-bg::after{ animation:none; } }
+.event-overlay.bb-timeWarp :is(.bb-marquee, .bb-timeline, .ov-tint, .event-sky, .coin-rays){ display:none !important; }
+:root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-timeWarp .event-prompt{ background:linear-gradient(180deg, rgba(14,10,60,0.86), rgba(5,3,30,0.92)) !important; border:2px solid #7df9ff !important; border-radius:16px; box-shadow:0 0 16px rgba(125,249,255,0.5), inset 0 1px 0 rgba(255,255,255,0.28) !important; color:#fff; text-shadow:0 0 10px rgba(125,249,255,0.7); min-height:0; padding:12px 14px; }
+:root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-timeWarp .event-prompt::before, :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-timeWarp .event-prompt::after{ display:none; }
+:root:is(.mode-daily, .mode-infinity) .event-overlay.bb-timeWarp .event-subtitle:not(.res-win):not(.res-miss){ background:rgba(5,3,30,0.85) !important; border:1.5px solid #7df9ff !important; color:#bff9ff !important; box-shadow:0 0 10px rgba(125,249,255,0.45) !important; }
+.tw-leds{ position:relative; z-index:3; display:flex; justify-content:center; gap:12px; margin:6px 0 2px; flex:0 0 auto; }
+.tw-leds i{ width:18px; height:18px; border-radius:50%; background:radial-gradient(circle at 40% 35%, #3a3a70, #14143a 70%); box-shadow:inset 0 0 0 2px rgba(190,220,255,0.45); }
+.tw-leds i.now{ background:radial-gradient(circle at 40% 35%, #ffffff, #7df9ff 55%, #14b6dc); box-shadow:inset 0 0 0 2px #eaffff, 0 0 12px rgba(125,249,255,1); }
+.tw-leds i.ok{ background:radial-gradient(circle at 40% 35%, #ffffff, #5dff9a 55%, #17b85a); box-shadow:inset 0 0 0 2px #e6fff0, 0 0 12px rgba(93,255,154,1); }
+.tw-leds i.no{ background:radial-gradient(circle at 40% 35%, #ffd0d0, #ff4d5e 55%, #c4122f); box-shadow:inset 0 0 0 2px #ffe0e0, 0 0 12px rgba(255,77,94,1); }
+:root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-timeWarp .event-tile{ border-radius:26px !important; border:3px solid rgba(255,255,255,0.92) !important; overflow:visible; }
+:root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-timeWarp .event-tile:nth-child(1){ background:linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.04) 42%, rgba(0,0,0,0.1) 100%), linear-gradient(180deg, #27c8ff, #1566e6) !important; box-shadow:0 0 0 2px #0a3a9a, 0 0 22px rgba(39,200,255,0.65) !important; }
+:root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-timeWarp .event-tile:nth-child(2){ background:linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.04) 42%, rgba(0,0,0,0.1) 100%), linear-gradient(180deg, #ff4fc4, #7a2be6) !important; box-shadow:0 0 0 2px #4a0f9a, 0 0 22px rgba(255,79,196,0.65) !important; }
+:root:is(.mode-daily, .mode-infinity) .event-overlay.stack.brainbreak.bb-timeWarp .event-tile::after, :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-timeWarp .event-tile::before{ display:none; }
+:root.mode-daily .event-overlay.bb-two.bb-timeWarp .bb-vs{ border-radius:50%; color:#fff; border:3px solid #fff; background:radial-gradient(circle at 38% 30%, #ffffff 0%, #a07dff 32%, #4a22d8 72%, #24107e 100%); box-shadow:0 0 0 3px rgba(20,8,90,0.9), 0 0 24px rgba(160,125,255,1), 0 0 44px rgba(125,249,255,0.55); text-shadow:0 2px 0 rgba(20,8,90,0.8); }
+.event-overlay.bb-timeWarp .bb-num.tw-num{ color:#eaffff; border:2px solid #7df9ff; background:rgba(5,3,30,0.82); box-shadow:0 0 10px rgba(125,249,255,0.7); }
+/* the number tubes: dark glass with a glowing year */
+.event-overlay.bb-timeWarp .bb-tag{ width:138px; height:58px; filter:none; }
+.event-overlay.bb-timeWarp .bb-tag b, .event-overlay.bb-timeWarp .bb-tag .tb{ padding:0; border-radius:16px; clip-path:none; border:2px solid rgba(255,255,255,0.75); color:#ffe9a0; font:900 32px/1 var(--f-display); letter-spacing:4px; text-shadow:0 0 10px rgba(255,190,70,1), 0 0 2px #fff;
+  background:repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0 1px, rgba(255,255,255,0) 1px 30px), linear-gradient(180deg, rgba(40,34,90,0.95), rgba(5,3,30,0.97) 55%, rgba(24,20,70,0.95)); box-shadow:inset 0 1px 0 rgba(255,255,255,0.35), 0 0 12px rgba(5,3,30,0.7); }
+@media (max-height:700px){ .event-overlay.bb-timeWarp .bb-tag{ width:112px; height:44px; } .event-overlay.bb-timeWarp .bb-tag b, .event-overlay.bb-timeWarp .bb-tag .tb{ font-size:25px; letter-spacing:3px; } }
+/* right and wrong */
+:root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-timeWarp .event-tile.is-right{ border-color:#caffdd !important; background:linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.04) 42%, rgba(0,0,0,0.1) 100%), linear-gradient(180deg, #38e88a, #0e9a56) !important; box-shadow:0 0 0 2px #066a3a, 0 0 34px rgba(93,255,154,1) !important; animation:twRight 0.5s ease-in-out 2; opacity:1; }
+:root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-timeWarp .event-tile.is-wrong{ border-color:#ffd6d6 !important; background:linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.03) 42%, rgba(0,0,0,0.12) 100%), linear-gradient(180deg, #ff5a68, #c4122f) !important; box-shadow:0 0 0 2px #7a0618, 0 0 30px rgba(255,77,94,1) !important; animation:twWrong 0.38s ease-in-out 1; opacity:1; }
+@keyframes twRight{ 0%, 100%{ transform:scale(1); } 50%{ transform:scale(1.03); } }
+@keyframes twWrong{ 0%, 100%{ transform:translateX(0); } 20%{ transform:translateX(-8px); } 45%{ transform:translateX(7px); } 70%{ transform:translateX(-4px); } 88%{ transform:translateX(2px); } }
+:root.lite .event-overlay.stack.bb-timeWarp .event-tile:is(.is-right, .is-wrong){ animation:none !important; }
+@media (prefers-reduced-motion: reduce){ .event-overlay.stack.bb-timeWarp .event-tile:is(.is-right, .is-wrong){ animation:none !important; } }
+@media (min-width:600px){ :root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-timeWarp .event-prompt{ font-size:clamp(30px, 5vw, 48px); } .event-overlay.bb-timeWarp .bb-tag{ width:200px; height:84px; } .event-overlay.bb-timeWarp .bb-tag b, .event-overlay.bb-timeWarp .bb-tag .tb{ font-size:48px; } .tw-leds i{ width:26px; height:26px; } }
+:root:root .event-overlay.bb-timeWarp{ isolation:isolate; }
+:root:root.mode-daily .event-overlay.bb-timeWarp .ev-bg, :root:root.mode-infinity .event-overlay.bb-timeWarp .ev-bg{ display:block !important; z-index:-1; }
+:root:root .event-overlay.bb-timeWarp .bb-tag{ width:138px; height:56px; margin-top:4px; filter:none; }
+:root:root .event-overlay.bb-timeWarp .bb-tag b, :root:root .event-overlay.bb-timeWarp .bb-tag .tb{ padding:0; border-radius:16px; clip-path:none; border:2px solid rgba(255,255,255,0.75); color:#ffe9a0; font:900 32px/1 var(--f-display); letter-spacing:4px; text-shadow:0 0 10px rgba(255,190,70,1), 0 0 2px #fff;
+  background:repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0 1px, rgba(255,255,255,0) 1px 30px), linear-gradient(180deg, rgba(40,34,90,0.96), rgba(5,3,30,0.98) 55%, rgba(24,20,70,0.96)); box-shadow:inset 0 1px 0 rgba(255,255,255,0.35), 0 0 12px rgba(5,3,30,0.7); }
+@media (max-height:700px){ :root:root .event-overlay.bb-timeWarp .bb-tag{ width:112px; height:42px; } :root:root .event-overlay.bb-timeWarp .bb-tag b, :root:root .event-overlay.bb-timeWarp .bb-tag .tb{ font-size:25px; letter-spacing:3px; } }
+@media (min-width:600px){ :root:root .event-overlay.bb-timeWarp .bb-tag{ width:220px; height:88px; } :root:root .event-overlay.bb-timeWarp .bb-tag b, :root:root .event-overlay.bb-timeWarp .bb-tag .tb{ font-size:52px; border-radius:22px; }
+  :root:root .event-overlay.stack.bb-timeWarp .bb-glyph{ font-size:clamp(120px, 13vh, 220px); } :root:root .event-overlay.stack.bb-timeWarp .bb-name{ font-size:clamp(32px, 5.4vw, 52px); }
+  :root:root .event-overlay.bb-timeWarp .bb-num.tw-num{ width:60px; height:60px; font-size:36px; } :root:root.mode-daily .event-overlay.bb-two.bb-timeWarp .bb-vs{ transform-origin:50% 50%; scale:1.5; } }
+@media (min-width:600px){ :root:root .event-overlay.stack.bb-timeWarp .bb-glyph{ zoom:2; } }

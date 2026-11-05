@@ -11939,8 +11939,8 @@
   function runBrainBreak(st, done){
     const N = BREAK_PARTS[st.game] || 1;
     if (N < 2 || st.part != null) return runBrainBreakOne(st, done);
-    let right = 0, k = 0;
-    const play = ()=> runBrainBreakOne(Object.assign({}, st, { part:k, parts:N, keep:true, seed: st.seed + k * 131, onResult:(ok)=>{ if (ok) right++; } }), (cleanup)=>{
+    let right = 0, k = 0; const results = [];
+    const play = ()=> runBrainBreakOne(Object.assign({}, st, { part:k, parts:N, keep:true, results, seed: st.seed + k * 131, onResult:(ok)=>{ if (ok) right++; results[k] = ok; } }), (cleanup)=>{
       if (k < N - 1){ cleanup(); k++; if (!play()) done(); return; }
       const ov = els.eventOverlay, perfect = right === N;
       if (perfect){
@@ -11972,13 +11972,18 @@
       tileEl.style.backgroundColor = TILE_COLORS[i];
       fillBreakTile(tileEl, rd.tiles[i], undefined, false, key, key === 'oddballAlert' ? i + 1 : rd.revealSub && rd.revealSub[i]);
     });
-    hostSay(HOST_LINES[key] || def.rule, 2600);
+    if (key !== 'timeWarp') hostSay(HOST_LINES[key] || def.rule, 2600);   // (Time Warp says 'Tap the earlier event' once, in its banner)
+    // Time Warp's progress: one glowing round LED per puzzle (lit for this one; green or red once answered)
+    let leds = null;
+    const paintLeds = ()=>{ if (leds) Array.from(leds.children).forEach((d, i)=>{ const r = st.results && st.results[i]; d.className = r === true ? 'ok' : r === false ? 'no' : i === st.part ? 'now' : ''; }); };
+    ov.querySelectorAll('.tw-leds').forEach(e=> e.remove());
+    if (key === 'timeWarp' && st.parts){ leds = document.createElement('div'); leds.className = 'tw-leds'; leds.setAttribute('aria-hidden', 'true'); leds.innerHTML = '<i></i>'.repeat(st.parts); els.eventSubtitle.after(leds); paintLeds(); }
     const tl = ov.querySelector('.bb-timeline');
     if (tl){ tl.classList.remove('on'); tl.querySelectorAll('.tl-m b').forEach(b=> b.textContent = '?'); tl.querySelector('.tl-gap').textContent = ''; }
     let settled = false;
     const cleanup = ()=>{
       ov.classList.add('hidden'); ov.classList.remove('brainbreak', 'stack', 'bb-two', 'flash-win', 'bb-revealed', 'bb-' + key); els.eventSubtitle.classList.remove('res-win', 'res-miss'); ov.style.removeProperty('--bb');
-      ov.querySelectorAll('.bb-banner, .bb-pop').forEach(e=> e.remove());
+      ov.querySelectorAll('.bb-banner, .bb-pop, .tw-leds').forEach(e=> e.remove());
       tiles.forEach(t=>{ t.style.display = ''; t.classList.remove('is-right', 'is-wrong'); t.onclick = null; });
     };
     const finish = ()=>{ if (st.keep && runActive){ done(cleanup); return; } cleanup(); if (runActive) done(); };   // (a part of a series hands the clean-up to the series)
@@ -11987,6 +11992,7 @@
       clearTimeout(eventTimeoutId); tiles.forEach(t=> t.onclick = null);
       const right = tiles[rd.correct], ok = pick === rd.correct;
       if (st.onResult) st.onResult(ok);
+      paintLeds();
       if (key === 'timeWarp' && tl && rd.revealSub){   // the timeline: the earlier year slides to the left end, the later to the right
         const ys = rd.revealSub.map(Number), lo = Math.min.apply(null, ys), hi = Math.max.apply(null, ys);
         tl.querySelector('.tl-m.e b').textContent = lo; tl.querySelector('.tl-m.l b').textContent = hi;
