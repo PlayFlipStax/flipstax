@@ -11407,7 +11407,11 @@
         tileEl.querySelectorAll('img').forEach(im=>{ if (im.decode) im.decode().catch(()=>{}); });   // (decoded before the tap, so a picked door has no first-frame hitch)
         { const D = DOOR_ART[i % 3], w = D.win, pc = (v, t)=> (v / t * 100) + '%';   // the animated copy of the open picture, clipped to the opening (see .md-win in lib/juice.css)
           tileEl.style.setProperty('--ar', D.ow + ' / ' + D.oh); tileEl.style.setProperty('--hinge', D.hinge);
-          tileEl.style.setProperty('--wl', pc(w[0], D.ow)); tileEl.style.setProperty('--wt', pc(w[1], D.oh)); tileEl.style.setProperty('--ww', pc(w[2] - w[0], D.ow)); tileEl.style.setProperty('--wh', pc(w[3] - w[1], D.oh));
+          // fix 4: the open picture fills exactly the closed door's box (object-fit: cover, anchored at the hinge edge and the floor), so nothing jumps or shifts;
+          // the moving world inside the doorway is placed in that same box (k: the cover scale, ox / oy: where the picture's corner lands in the box)
+          const k = Math.max(D.w / D.ow, D.h / D.oh), hx = parseFloat(D.hinge) / 100, ox = (D.w - D.ow * k) * hx, oy = D.h - D.oh * k;
+          tileEl.style.setProperty('--wl', ((ox + w[0] * k) / D.w * 100) + '%'); tileEl.style.setProperty('--wt', ((oy + w[1] * k) / D.h * 100) + '%');
+          tileEl.style.setProperty('--ww', ((w[2] - w[0]) * k / D.w * 100) + '%'); tileEl.style.setProperty('--wh', ((w[3] - w[1]) * k / D.h * 100) + '%');
           tileEl.style.setProperty('--wil', pc(-w[0], w[2] - w[0])); tileEl.style.setProperty('--wit', pc(-w[1], w[3] - w[1])); tileEl.style.setProperty('--wiw', pc(D.ow, w[2] - w[0])); tileEl.style.setProperty('--wih', pc(D.oh, w[3] - w[1]));
           tileEl.style.setProperty('--wox', pc(D.ctr[0], D.ow)); tileEl.style.setProperty('--woy', pc(D.ctr[1], D.oh)); tileEl.style.setProperty('--wanim', D.anim); tileEl.dataset.w = D.anim; }
         tileEl.style.setProperty('--gi', i);

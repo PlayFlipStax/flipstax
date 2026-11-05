@@ -1813,3 +1813,8 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 @keyframes twTick{ 0%{ transform:rotate(-2.5deg); } 50%{ transform:rotate(2.5deg); } }
 :root.lite .event-overlay.bb-timeWarp .event-tile, :root.lite .event-overlay.bb-timeWarp .bb-tag .tf, :root.lite .event-overlay.bb-timeWarp .ev-bg::after{ animation:none !important; }
 @media (prefers-reduced-motion: reduce){ .event-overlay.bb-timeWarp .event-tile, .event-overlay.bb-timeWarp .bb-tag .tf, .event-overlay.bb-timeWarp .ev-bg::after{ animation:none !important; } }
+
+/* ---- fix 4: Mystery Doors - the open picture sits in exactly the closed door's box (same width, height, floor line and hinge edge: object-fit cover anchored at
+   the hinge and the bottom), and so does the moving world inside the doorway; the closed leaf still swings open about its hinge over it. ---- */
+.event-tile.md .md-o{ left:0; right:auto; bottom:0; width:100%; height:100%; transform:none; object-fit:cover; object-position:var(--hinge, 50% 100%); }
+.event-tile.md .md-ow{ left:0; right:0; top:0; bottom:0; width:auto; height:auto; aspect-ratio:auto; transform:none; overflow:hidden; }
