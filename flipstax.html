@@ -17516,9 +17516,9 @@
   // of just snapping the text in.
   function animateCount(el, target){
     const startTime = performance.now();
-    const duration = 550;
+    const duration = (prefersReducedMotion() || document.documentElement.classList.contains("lite")) ? 0 : 1500;   // mega 3: about 1.5 s, ease-out
     function tick(now){
-      const t = Math.min(1, (now - startTime) / duration);
+      const t = duration ? Math.min(1, (now - startTime) / duration) : 1;
       const eased = 1 - Math.pow(1 - t, 3);
       el.textContent = Math.round(target * eased) + '%';
       if (t < 1) requestAnimationFrame(tick);
