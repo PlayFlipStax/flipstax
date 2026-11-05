@@ -601,3 +601,23 @@
 .ss-beam{ background:linear-gradient(180deg, rgba(150,255,255,0.75), rgba(150,255,255,0)); }
 .mg-snapSort .mg-inner{ max-width:none; width:100%; }
 @media (min-width:600px){ .ss-cat, .ss-combo, .mg-snapSort .mg-foot{ width:min(84%, 680px); margin-left:auto; margin-right:auto; } .ss-word{ font-size:clamp(24px, 3.6vw, 34px); padding:12px 24px; } .ss-ufo{ width:170px; } .ss-cat{ font-size:clamp(30px, 5vw, 48px); } }
+
+/* ---- fix 4: Saucer Shuffle's stage reacts. A right pick: the neon wall panels and the floor lights blaze (two opacity pulses, 2.5 a second at most) while a bright band
+   sweeps across the stage (transform only), then it settles. A wrong pick: the stage dims for a moment. Lite mode and reduced motion: one plain fade. ---- */
+.sc-blaze, .sc-dimmer{ position:absolute; left:0; right:0; pointer-events:none; opacity:0; z-index:1; }
+.sc-blaze.wall{ top:8%; height:42%; background:radial-gradient(60% 70% at 22% 50%, rgba(255,120,240,0.55), transparent 70%), radial-gradient(60% 70% at 78% 50%, rgba(110,240,255,0.55), transparent 70%), radial-gradient(40% 70% at 50% 50%, rgba(255,240,170,0.45), transparent 70%); mix-blend-mode:screen; }
+.sc-blaze.floor{ top:auto; bottom:0; height:40%; background:radial-gradient(80% 60% at 50% 70%, rgba(255,230,140,0.6), transparent 70%), repeating-linear-gradient(90deg, rgba(255,240,180,0.55) 0 6px, rgba(255,240,180,0) 6px 26px); mix-blend-mode:screen; }
+.sc-blaze.sweep{ top:0; bottom:0; left:-40%; right:auto; width:40%; background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,240,200,0.42), rgba(255,255,255,0)); mix-blend-mode:screen; }
+.sc-dimmer{ top:0; bottom:0; z-index:5; background:rgba(4,2,20,0.55); }
+.sc-casino.blaze .sc-blaze.wall, .sc-casino.blaze .sc-blaze.floor{ animation:scBlaze 2s ease-out 1 both; }
+.sc-casino.blaze .sc-blaze.floor{ animation-delay:0.15s; }
+.sc-casino.blaze .sc-blaze.sweep{ animation:scSweep 1.1s ease-in-out 2 both; }
+.sc-casino.dim .sc-dimmer{ animation:scDim 1s ease-in-out 1 both; }
+@keyframes scBlaze{ 0%{ opacity:0; } 12%{ opacity:1; } 30%{ opacity:0.45; } 46%{ opacity:1; } 100%{ opacity:0; } }
+@keyframes scSweep{ 0%{ transform:translateX(0); opacity:0; } 15%{ opacity:1; } 85%{ opacity:1; } 100%{ transform:translateX(350%); opacity:0; } }
+@keyframes scDim{ 0%{ opacity:0; } 25%{ opacity:1; } 70%{ opacity:1; } 100%{ opacity:0; } }
+:root.lite .sc-casino.blaze .sc-blaze.wall, :root.lite .sc-casino.blaze .sc-blaze.floor{ animation:scFade 1.4s ease-in-out 1 both; } :root.lite .sc-casino.blaze .sc-blaze.sweep{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .sc-casino.blaze .sc-blaze.wall, .sc-casino.blaze .sc-blaze.floor{ animation:scFade 1.4s ease-in-out 1 both; } .sc-casino.blaze .sc-blaze.sweep{ animation:none; } }
+@keyframes scFade{ 0%, 100%{ opacity:0; } 40%{ opacity:0.85; } }
+.su-saucer{ min-height:0; }
+.sc-blaze.floor{ height:34%; background:radial-gradient(80% 60% at 50% 60%, rgba(255,230,140,0.55), transparent 72%), radial-gradient(circle, rgba(255,246,200,0.9) 0 2.5px, rgba(255,246,200,0) 3.5px) 0 0 / 24px 18px; -webkit-mask-image:linear-gradient(180deg, transparent, #000 35%); mask-image:linear-gradient(180deg, transparent, #000 35%); }
