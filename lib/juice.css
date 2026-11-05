@@ -1702,3 +1702,14 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 @keyframes mdGal{ from{ transform:rotate(0deg); } to{ transform:rotate(61deg); } }
 @keyframes mdClk{ from{ transform:rotate(0deg); } to{ transform:rotate(-61deg); } }
 @keyframes mdHyp{ from{ transform:scale(1); } to{ transform:scale(1.25); } }
+/* mega 3 item 11: Time Warp - the two cards carry a gold numbered circle (1, 2), like Brain Beam's answers */
+.event-overlay.bb-timeWarp .bb-num.tw-num{ left:10px; top:10px; width:36px; height:36px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:50%; font:900 22px/1 var(--f-display); color:#4a2600; letter-spacing:0;
+  border:3px solid #fff1b0; background:radial-gradient(circle at 35% 30%, #fff6c8, #ffd23f 55%, #d99100); box-shadow:0 0 0 2px #7a4a00, 0 3px 6px rgba(0,0,0,0.4); z-index:3; }
+/* mega 3 item 11: the year on a Time Warp plate must stay hidden until the answer. Some WebKit builds draw the back face of a 3D flip through its front, so the back is
+   also faded in only once the flip has turned past halfway (and the front out), whatever the engine does with backface-visibility. */
+.event-overlay.bb-timeWarp .bb-tag .tb{ opacity:0; transition:opacity 0s linear calc(var(--fd, 0s) + 0.38s); }
+.event-overlay.bb-timeWarp .bb-tag.flipped .tb{ opacity:1; }
+.event-overlay.bb-timeWarp .bb-tag .tf{ opacity:1; transition:opacity 0s linear calc(var(--fd, 0s) + 0.38s); }
+.event-overlay.bb-timeWarp .bb-tag.flipped .tf{ opacity:0; }
+:root.lite .event-overlay.bb-timeWarp .bb-tag :is(.tb, .tf){ transition-delay:0s; }
+@media (prefers-reduced-motion: reduce){ .event-overlay.bb-timeWarp .bb-tag :is(.tb, .tf){ transition-delay:0s; } }

@@ -11829,7 +11829,7 @@
       valid: x=> x && Array.isArray(x.items) && x.items.length === 4 && x.items.every(i=> i && i.name) && x.odd >= 0 && x.odd < 4 },
     emojiDecode:  { name:()=> GN.emojiDecode,  accent:'#7df9ff', rule:'What do these emojis spell out? Tap it!',    list:()=> window.FLIPSTAX_EMOJI_DECODE,
       valid: x=> x && x.emoji && x.answer && Array.isArray(x.decoys) && x.decoys.length === 3 },
-    timeWarp:     { name:()=> GN.timeWarp,     accent:'#c8ff3d', rule:'Which came first? Tap the earlier one!',     list:()=> window.FLIPSTAX_TIME_WARP,
+    timeWarp:     { name:()=> GN.timeWarp,     accent:'#c8ff3d', rule:'Tap the earlier event.',     list:()=> window.FLIPSTAX_TIME_WARP,
       valid: x=> x && x.a && x.b && x.a.event && x.b.event && (x.first === 0 || x.first === 1) },
   };
   function breakItems(key){ const d = BRAIN_BREAKS[key], l = d.list(); return Array.isArray(l) ? l.filter(d.valid) : []; }
@@ -11891,7 +11891,7 @@
       return { prompt:x.emoji, kind:x.kind || '', tiles:opts.map(o=> ({ name:o })), correct:opts.indexOf(x.answer) };
     }
     const sw = rng() < 0.5, t = sw ? [x.b, x.a] : [x.a, x.b], correct = sw ? 1 - x.first : x.first;
-    return { prompt:'Which came first?', tiles:t.map(i=> ({ glyph:i.glyph, name:i.event })), correct, revealSub:t.map(i=> String(i.year)) };
+    return { prompt:'Tap the earlier event', tiles:t.map(i=> ({ glyph:i.glyph, name:i.event })), correct, revealSub:t.map(i=> String(i.year)) };
   }
   // `sub` replaces the tile's small line (the price / the year revealed after the
   // answer); `flip` plays the flip-in on it.
@@ -11912,6 +11912,7 @@
       tag.innerHTML = '<span class="pt-in"><span class="pc ps">$</span><span class="pc">?</span><span class="pc">?</span><span class="pc">?</span></span>';
       tileEl.appendChild(tag);
     } else if (key === 'timeWarp'){
+      { const num = document.createElement('span'); num.className = 'bb-num tw-num'; num.textContent = String(Math.max(0, els.eventTiles.indexOf(tileEl)) + 1); tileEl.insertBefore(num, tileEl.firstChild); }   // mega 3 item 11: the two cards are numbered 1 and 2
       const tag = document.createElement('span'); tag.className = 'bb-tag';
       tag.innerHTML = '<span class="tag-in"><b class="tf">' + (key === 'priceProbe' ? '$ ?' : '\uD83D\uDD70\uFE0F ?') + '</b><b class="tb"></b></span>';
       tag.querySelector('.tb').textContent = back || ''; tileEl.appendChild(tag);
