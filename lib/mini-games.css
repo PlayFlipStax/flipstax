@@ -498,3 +498,17 @@
 @keyframes prBurst{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
 :root.lite .mg-overlay.mg-priceProbe::before{ animation:none; }
 @media (prefers-reduced-motion: reduce){ .mg-overlay.mg-priceProbe::before{ animation:none; } }
+
+/* ---- Mega 3 item 1: Saucer Shuffle look - a slowly rotating purple sunburst (rotate only) and a dark vignette; a soft reflection under each saucer; the orb is a glowing
+   sphere (its little base cropped away) that always draws in front of the saucers ---- */
+:root:root.stage-on .mg-overlay.mg-saucerShuffle, .mg-overlay.mg-saucerShuffle{ background:radial-gradient(ellipse at 50% 45%, #4b1c8c 0%, #2a0d58 55%, #12052c 100%) !important; }
+.mg-overlay.mg-saucerShuffle::before{ content:''; position:absolute; left:50%; top:50%; width:170vmax; height:170vmax; margin:-85vmax 0 0 -85vmax; right:auto; clip-path:none; z-index:0; pointer-events:none; opacity:0.55;
+  background:repeating-conic-gradient(from 0deg, rgba(190,120,255,0.55) 0deg 9deg, rgba(190,120,255,0) 9deg 24deg); animation:suBurst 120s linear infinite; }
+.mg-overlay.mg-saucerShuffle::after{ content:''; position:absolute; inset:0; left:0; right:0; top:0; width:auto; height:auto; clip-path:none; z-index:0; pointer-events:none; opacity:1; animation:none; transform:none;
+  background:radial-gradient(ellipse at 50% 48%, rgba(8,2,24,0) 38%, rgba(8,2,24,0.82) 100%); }
+@keyframes suBurst{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+.su-saucer .su-refl{ position:absolute; left:4%; right:4%; top:80%; height:62%; z-index:-1; pointer-events:none; background:url(../data/saucer/saucer-chrome.webp) 50% 100% / 100% auto no-repeat; transform:scaleY(-1); opacity:0.3;
+  -webkit-mask-image:linear-gradient(180deg, transparent 10%, #000 100%); mask-image:linear-gradient(180deg, transparent 10%, #000 100%); }
+.su-star{ z-index:6 !important; width:68px; margin-left:-34px; } .su-star img{ clip-path:ellipse(50% 45% at 50% 45%); }
+:root.lite .mg-overlay.mg-saucerShuffle::before{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .mg-overlay.mg-saucerShuffle::before{ animation:none; } }
