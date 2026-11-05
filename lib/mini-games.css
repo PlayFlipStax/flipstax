@@ -568,3 +568,36 @@
 .mg-saucerShuffle .mg-inner{ max-width:none; width:100%; }
 .mg-saucerShuffle .mg-foot{ width:min(100%, 640px); margin-left:auto; margin-right:auto; }
 @media (min-width:600px){ .sc-sign{ width:min(62%, 560px); margin-top:3vh; } .sc-sign b{ font-size:clamp(34px, 6.4vw, 60px); } .sc-sign small{ font-size:clamp(14px, 2.4vw, 22px); } .sc-panel{ width:min(70%, 620px); min-height:70px; } .sc-msg{ font-size:clamp(22px, 4vw, 36px); } }
+
+/* ---- Snap Sort in the vortex (data/scenes/snap-sort-vortex.webp, with a duplicate layer turning once in 90 s at low opacity; still in lite mode and reduced motion).
+   Glossy pills with a bright rim drift in from different directions, dark-glass banners with a neon cyan edge, a bigger combo and score. On a tap: a right word glows
+   cyan, sparkles and flies into the vortex centre; a wrong one glows red-orange and shakes. Transform and opacity only. ---- */
+:root:root.stage-on .mg-overlay.mg-snapSort, .mg-overlay.mg-snapSort{ background:url(../data/scenes/snap-sort-vortex.webp) 30% 50% / cover no-repeat, #06122e !important; }
+.mg-overlay.mg-snapSort::before{ left:50%; top:48%; width:170vmax; height:170vmax; margin:-85vmax 0 0 -85vmax; opacity:0.24; background:url(../data/scenes/snap-sort-vortex.webp) 50% 45.7% / cover no-repeat; animation:ssVortex 90s linear infinite; }
+@keyframes ssVortex{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+.mg-snapSort{ overflow:hidden; }
+.ss-bin, .ss-belt, .ss-road, .ss-host, .ss-lights, .ss-cart, .ss-mini, .ss-car{ display:none !important; }
+.ss-item.ground .ss-word::after{ display:none; }
+.mg-snapSort .mg-sign, .ss-cat, .mg-snapSort .mg-rule{ background:linear-gradient(180deg, rgba(10,24,60,0.82), rgba(4,10,34,0.9)) !important; border:2px solid #5ff4ff !important; box-shadow:0 0 16px rgba(95,244,255,0.5), inset 0 1px 0 rgba(255,255,255,0.28) !important; color:#eaffff; }
+.mg-snapSort .mg-sign{ border-radius:14px; } .mg-snapSort .mg-sign .sign-bulbs{ display:none; } .mg-snapSort .mg-sign span{ color:#fff; text-shadow:0 0 12px rgba(95,244,255,0.9); }
+.mg-snapSort .mg-rule{ padding:6px 12px; border-radius:12px; text-shadow:none; }
+.mg-snapSort .mg-act{ background:rgba(4,10,34,0.85); border:1.5px solid #5ff4ff; color:#bff9ff; box-shadow:0 0 8px rgba(95,244,255,0.4); }
+.ss-cat{ border-radius:16px; color:#fff; text-shadow:0 0 12px rgba(95,244,255,0.75); }
+.ss-cat::before{ display:none; }
+.ss-cat small{ color:#7df9ff; }
+.ss-combo{ min-height:46px; padding:4px 14px; border-radius:99px; align-self:center; background:rgba(4,10,34,0.72); box-shadow:inset 0 0 0 1.5px rgba(95,244,255,0.6); font-size:24px; }
+.ss-pips{ gap:6px; } .ss-pips i{ width:22px; height:22px; border-radius:50%; background:rgba(95,244,255,0.12); box-shadow:inset 0 0 0 2px rgba(95,244,255,0.7); }
+.ss-pips i.on{ background:radial-gradient(circle at 40% 35%, #ffffff, #5ff4ff 55%, #0fa8d8); box-shadow:inset 0 0 0 2px #eaffff, 0 0 10px rgba(95,244,255,0.95); }
+.ss-combo.hot .ss-cl{ color:#ffb15c; }
+.ss-tally{ font-size:18px; min-width:0; color:#eaffff; }
+.mg-snapSort .mg-score{ font-size:32px; min-width:84px; padding:6px 18px; }
+.ss-word{ color:#061a3d; border:3px solid #ffffff; background:linear-gradient(180deg, #ffffff 0%, #e6f6ff 46%, #a9dcff 54%, #d9f1ff 100%); box-shadow:0 0 0 2px rgba(6,26,61,0.85), 0 4px 0 rgba(6,26,61,0.85), 0 0 12px rgba(255,255,255,0.55); }
+.ss-word.fits{ border-color:#ffffff; }
+.ss-fly.right{ color:#02303d; border-color:#fff; background:linear-gradient(180deg, #e6ffff, #5ff4ff 52%, #14b6dc); box-shadow:0 0 0 2px #0a6f8f, 0 0 26px rgba(95,244,255,1); }
+.ss-fly.wrong{ color:#fff; border-color:#ffe0c8; background:linear-gradient(180deg, #ffb48a, #ff5a2e 52%, #d42410); box-shadow:0 0 0 2px #7a1606, 0 0 24px rgba(255,90,46,1); }
+.ss-spark{ background:#7df9ff; width:16px; height:16px; } .ss-spark.bad{ background:#ff7a45; }
+.ss-glow.win{ background:radial-gradient(60% 45% at 50% 48%, rgba(95,244,255,0.5), rgba(95,244,255,0.08) 70%, transparent); }
+.ss-glow.lose{ background:radial-gradient(90% 80% at 50% 50%, rgba(255,70,30,0.26), rgba(60,10,0,0.3)); }
+.ss-beam{ background:linear-gradient(180deg, rgba(150,255,255,0.75), rgba(150,255,255,0)); }
+.mg-snapSort .mg-inner{ max-width:none; width:100%; }
+@media (min-width:600px){ .ss-cat, .ss-combo, .mg-snapSort .mg-foot{ width:min(84%, 680px); margin-left:auto; margin-right:auto; } .ss-word{ font-size:clamp(24px, 3.6vw, 34px); padding:12px 24px; } .ss-ufo{ width:170px; } .ss-cat{ font-size:clamp(30px, 5vw, 48px); } }
