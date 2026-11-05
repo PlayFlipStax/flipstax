@@ -11404,6 +11404,7 @@
         const nm = DOOR_ART_NAMES[i % 3];
         tileEl.innerHTML = '<i class="md-shadow"></i><i class="md-glow"></i><img class="md-c" src="data/doors/closed-' + nm + '.webp" alt=""><img class="md-o" src="data/doors/open-' + nm + '.webp" alt=""><div class="md-ow"><div class="md-win"><img class="md-wi" src="data/doors/open-' + nm + '.webp" alt=""></div></div><b class="md-n">' + (i + 1) + '</b>';
         tileEl.style.setProperty('--dw', DOOR_ART[i % 3].w); tileEl.style.setProperty('--dh', DOOR_ART[i % 3].h); tileEl.style.setProperty('--dow', DOOR_ART[i % 3].ow);
+        tileEl.querySelectorAll('img').forEach(im=>{ if (im.decode) im.decode().catch(()=>{}); });   // (decoded before the tap, so a picked door has no first-frame hitch)
         { const D = DOOR_ART[i % 3], w = D.win, pc = (v, t)=> (v / t * 100) + '%';   // the animated copy of the open picture, clipped to the opening (see .md-win in lib/juice.css)
           tileEl.style.setProperty('--ar', D.ow + ' / ' + D.oh); tileEl.style.setProperty('--hinge', D.hinge);
           tileEl.style.setProperty('--wl', pc(w[0], D.ow)); tileEl.style.setProperty('--wt', pc(w[1], D.oh)); tileEl.style.setProperty('--ww', pc(w[2] - w[0], D.ow)); tileEl.style.setProperty('--wh', pc(w[3] - w[1], D.oh));
