@@ -17232,6 +17232,8 @@
       setScene(els.sceneA, current.glyphA); setScene(els.sceneB, current.glyphB);
     }
     els.takeA.textContent = current.a; els.takeB.textContent = current.b;
+    // mega 3 item 4: long card text shrinks to fit (a step per length) so a whole title always shows inside its half
+    [[els.takeA, current.a], [els.takeB, current.b]].forEach(([el, t])=>{ const n = String(t).length; el.style.setProperty('--tk', n > 52 ? '0.58' : n > 42 ? '0.66' : n > 32 ? '0.76' : n > 24 ? '0.88' : '1'); });
     // A+ item 2: the round's first card - the top one drops in from above, the bottom one rises from below (about 0.9 s,
     // a small bounce); the other cards slide in quickly (0.25 s). Transform and opacity; lite / reduced motion: a fade.
     { const first = runActive && vsRoundFirst; vsRoundFirst = false;
