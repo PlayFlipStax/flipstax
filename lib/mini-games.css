@@ -512,3 +512,33 @@
 .su-star{ z-index:6 !important; width:68px; margin-left:-34px; } .su-star img{ clip-path:ellipse(50% 45% at 50% 45%); }
 :root.lite .mg-overlay.mg-saucerShuffle::before{ animation:none; }
 @media (prefers-reduced-motion: reduce){ .mg-overlay.mg-saucerShuffle::before{ animation:none; } }
+
+/* ---- Mega 3 item 2: Snap Sort in an arcade look - a deep blue stage with a slow rotating sunburst, glossy rounded word tiles with a bright rim, large glossy bin
+   panels with bold labels; a correct drop lights its bin green with a quick pulse and a sparkle burst, a wrong one lights it red with a short shake; a bigger
+   combo and score and a host saucer in the corner. The mechanic is untouched. Transform and opacity only. ---- */
+:root:root.stage-on .mg-overlay.mg-snapSort, .mg-overlay.mg-snapSort{ background:radial-gradient(ellipse at 50% 40%, #1c3fae 0%, #0d1f6b 55%, #060b32 100%) !important; }
+.mg-snapSort .mg-bg{ background:none !important; }
+.mg-overlay.mg-snapSort::before{ content:''; position:absolute; left:50%; top:50%; width:170vmax; height:170vmax; margin:-85vmax 0 0 -85vmax; z-index:0; pointer-events:none; opacity:0.35;
+  background:repeating-conic-gradient(from 0deg, rgba(120,190,255,0.6) 0deg 8deg, rgba(120,190,255,0) 8deg 22deg); animation:suBurst 90s linear infinite; }
+:root.lite .mg-overlay.mg-snapSort::before{ animation:none; } @media (prefers-reduced-motion: reduce){ .mg-overlay.mg-snapSort::before{ animation:none; } }
+.ss-word{ border-radius:999px; color:#0b1f66; border:3px solid #7df9ff; background:linear-gradient(180deg, #ffffff 0%, #d9ecff 48%, #9cc8ff 52%, #cfe6ff 100%); box-shadow:0 0 0 2px #0b2a8a, 0 4px 0 #0b2a8a, 0 0 14px rgba(125,249,255,0.7); letter-spacing:0.5px; }
+.ss-word.fits{ border-color:#7df9ff; }
+.ss-fly.right{ background:linear-gradient(180deg, #eaffd8, #5fe05a 52%, #2fb83a); border-color:#fff; color:#0b3a10; }
+.ss-fly.wrong{ background:linear-gradient(180deg, #ffd0d6, #ff4560 52%, #c4122f); border-color:#fff; color:#fff; }
+.ss-bin{ width:clamp(96px, 28%, 132px); height:clamp(78px, 31%, 124px); border-top:0; border-radius:18px; clip-path:none; border:4px solid #fff; overflow:hidden; box-shadow:0 0 0 3px #0b2a8a, 0 6px 0 3px #0b2a8a, 0 0 20px rgba(125,249,255,0.55); }
+.ss-bin::before{ content:''; position:absolute; left:6%; right:6%; top:4%; height:38%; border-radius:12px 12px 40% 40%; background:linear-gradient(180deg, rgba(255,255,255,0.65), rgba(255,255,255,0)); pointer-events:none; }
+.ss-bin.red{ background:linear-gradient(180deg, #ff6b7d, #d6182b 55%, #8f0c1f); } .ss-bin.blue{ background:linear-gradient(180deg, #6fd3ff, #1b86e0 55%, #0e4a9a); }
+.ss-bin b, .ss-bin.red b, .ss-bin.blue b{ font-size:36px; position:relative; } .ss-bin em{ font-size:24px; letter-spacing:2px; position:relative; }
+.ss-bin.hit-ok{ background:linear-gradient(180deg, #8dff8d, #25c63a 55%, #0f7a24); animation:ssHitOk 0.5s ease-out; }
+.ss-bin.hit-bad{ background:linear-gradient(180deg, #ff6b7d, #ff1f3d 55%, #a00c20); animation:ssHitBad 0.45s ease-out; }
+@keyframes ssHitOk{ 0%{ transform:scale(1); } 35%{ transform:scale(1.16); } 100%{ transform:scale(1); } }
+@keyframes ssHitBad{ 0%,100%{ transform:translateX(0); } 20%{ transform:translateX(-8px); } 45%{ transform:translateX(7px); } 70%{ transform:translateX(-4px); } }
+:root.lite .ss-bin.hit-ok, :root.lite .ss-bin.hit-bad{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .ss-bin.hit-ok, .ss-bin.hit-bad{ animation:none; } }
+.ss-belt-top{ background:#16237a; border-top-color:#7df9ff; border-bottom-color:#050b3a; } .ss-belt-bot{ background:#0e1858; border-bottom-color:#7df9ff; }
+.ss-road{ background:linear-gradient(180deg, #14216e, #080f45); border-top-color:#7df9ff; box-shadow:none; } .ss-leg{ background:linear-gradient(90deg, #3a52c8, #1a2a80); }
+.ss-combo{ min-height:40px; font-size:24px; letter-spacing:2px; } .ss-pips i{ width:24px; height:16px; } .ss-tally{ font-size:20px; font-weight:900; min-width:90px; color:#fff; }
+.ss-ufo{ width:104px; } .ss-ufo img{ filter:none; }
+.ss-host{ position:absolute; z-index:1; right:6px; top:2%; width:92px; height:auto; pointer-events:none; opacity:0.95; animation:ssHostBob 3.4s ease-in-out infinite alternate; }
+@keyframes ssHostBob{ from{ transform:translateY(0); } to{ transform:translateY(8px); } }
+:root.lite .ss-host{ animation:none; } @media (prefers-reduced-motion: reduce){ .ss-host{ animation:none; } }
