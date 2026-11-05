@@ -11310,6 +11310,15 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     { w:206, h:375, ow:337, oh:445, win:[40, 76, 180, 410], ctr:[110, 242], anim:'mdHyp', hinge:'100% 100%' },
     { w:214, h:397, ow:370, oh:480, win:[43, 187, 199, 343], ctr:[121, 265], anim:'mdClk', hinge:'100% 100%' }];   // (the files' own sizes: all three doors share one scale)
   const DOOR_ART_NAMES = ['left', 'mid', 'right'];
+  // fix 5: measured in the open pictures (their own pixels): the doorframe's hinge-side x, its bottom y and its height. s = closed height / frame height;
+  // ox / oy put the frame's bottom hinge corner on the closed door's (closed-picture pixels: ox from the box's left, oy below the floor line, negative = below).
+  // ml / mr: the room each door keeps free beside it (closed-picture pixels at the shared scale), so an open door never touches its neighbours and the
+  // middle door stays centred (left side 130 + 238 + 106 = right side 120 + 214 + 140).
+  const DOOR_FIT = [
+    { hx:150, fb:480, fh:467, w:238, h:404, oh:484, hingeRight:false, ml:130, mr:0 },
+    { hx:214, fb:430, fh:420, w:206, h:375, oh:445, hingeRight:true,  ml:106, mr:120 },
+    { hx:220, fb:450, fh:424, w:214, h:397, oh:480, hingeRight:true,  ml:0,   mr:140 }].map(f=>{
+      const s = f.h / f.fh; return Object.assign(f, { s, ox: (f.hingeRight ? f.w : 0) - f.hx * s, oy: -(f.oh - f.fb) * s }); });
   window.FLIPSTAX_DOORS_CLASSIC = DOORS_CLASSIC;
   function portalDoorSvg(i){
     if (DOORS_CLASSIC) return '<div class="mpc-door"><b class="mpc-n">' + (i + 1) + '</b><i class="mpc-panel"></i><i class="mpc-knob"></i></div>';
@@ -11496,11 +11505,12 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
         tileEl.querySelectorAll('img').forEach(im=>{ if (im.decode) im.decode().catch(()=>{}); });   // (decoded before the tap, so a picked door has no first-frame hitch)
         { const D = DOOR_ART[i % 3], w = D.win, pc = (v, t)=> (v / t * 100) + '%';   // the animated copy of the open picture, clipped to the opening (see .md-win in lib/juice.css)
           tileEl.style.setProperty('--ar', D.ow + ' / ' + D.oh); tileEl.style.setProperty('--hinge', D.hinge);
-          // fix 4: the open picture fills exactly the closed door's box (object-fit: cover, anchored at the hinge edge and the floor), so nothing jumps or shifts;
-          // the moving world inside the doorway is placed in that same box (k: the cover scale, ox / oy: where the picture's corner lands in the box)
-          const k = Math.max(D.w / D.ow, D.h / D.oh), hx = parseFloat(D.hinge) / 100, ox = (D.w - D.ow * k) * hx, oy = D.h - D.oh * k;
-          tileEl.style.setProperty('--wl', ((ox + w[0] * k) / D.w * 100) + '%'); tileEl.style.setProperty('--wt', ((oy + w[1] * k) / D.h * 100) + '%');
-          tileEl.style.setProperty('--ww', ((w[2] - w[0]) * k / D.w * 100) + '%'); tileEl.style.setProperty('--wh', ((w[3] - w[1]) * k / D.h * 100) + '%');
+          // fix 5: the open picture is NOT squeezed into the closed box. Both pictures share the door's scale: the open one is scaled so its doorframe is exactly as
+          // tall as the closed door (DOOR_FIT.s, from the measured frame in the open picture), and placed so the frame's bottom hinge corner sits on the closed door's
+          // bottom hinge corner (ox, oy, in closed-picture pixels). It may stick out past the closed door's width; nothing round it clips it.
+          const F = DOOR_FIT[i % 3];
+          tileEl.style.setProperty('--os', F.s); tileEl.style.setProperty('--ox', F.ox); tileEl.style.setProperty('--oy', F.oy); tileEl.style.setProperty('--ml', F.ml); tileEl.style.setProperty('--mr', F.mr);
+          tileEl.style.setProperty('--wl', pc(w[0], D.ow)); tileEl.style.setProperty('--wt', pc(w[1], D.oh)); tileEl.style.setProperty('--ww', pc(w[2] - w[0], D.ow)); tileEl.style.setProperty('--wh', pc(w[3] - w[1], D.oh));
           tileEl.style.setProperty('--wil', pc(-w[0], w[2] - w[0])); tileEl.style.setProperty('--wit', pc(-w[1], w[3] - w[1])); tileEl.style.setProperty('--wiw', pc(D.ow, w[2] - w[0])); tileEl.style.setProperty('--wih', pc(D.oh, w[3] - w[1]));
           tileEl.style.setProperty('--wox', pc(D.ctr[0], D.ow)); tileEl.style.setProperty('--woy', pc(D.ctr[1], D.oh)); tileEl.style.setProperty('--wanim', D.anim); tileEl.dataset.w = D.anim; }
         tileEl.style.setProperty('--gi', i);

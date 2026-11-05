@@ -1856,3 +1856,12 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .ox-face{ display:block; overflow:hidden; background:radial-gradient(circle at 50% 40%, #6a2bd8, #2a0b58); }
 .ox-face .host-rig{ width:100%; height:auto; }
 .outro.end .outro-badge{ opacity:0; pointer-events:none; transition:opacity 0.3s ease; }
+
+/* ---- fix 5: Mystery Doors - one scale for each door's closed and open picture (the open frame as tall as the closed door), the open picture anchored at the
+   bottom hinge corner and free to stick out past the door's width; nothing clips it; the doors are spaced so an open one never touches its neighbours and the
+   middle one stays centred. ---- */
+.event-overlay.mdoor.art{ --dk:min(calc(30vw * 0.88 / 238), calc((100vw - 18px) / 1154)); overflow:visible; }
+:root.mode-daily .event-overlay.mdoor.art .event-grid{ gap:0; overflow:visible; }
+:root.mode-daily .event-overlay.mdoor.art .event-tile.md{ overflow:visible; margin-left:calc(var(--ml, 0) * var(--dk)); margin-right:calc(var(--mr, 0) * var(--dk)); }
+.event-tile.md .md-o{ left:calc(var(--ox) * var(--dk)); right:auto; bottom:calc(var(--oy) * var(--dk)); width:calc(var(--dow) * var(--os) * var(--dk)); height:auto; transform:none; object-fit:fill; object-position:50% 50%; }
+.event-tile.md .md-ow{ left:calc(var(--ox) * var(--dk)); right:auto; top:auto; bottom:calc(var(--oy) * var(--dk)); width:calc(var(--dow) * var(--os) * var(--dk)); height:auto; aspect-ratio:var(--ar); transform:none; overflow:visible; }
