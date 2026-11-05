@@ -16308,7 +16308,7 @@
        evResultsSent = true; trackEvent('reached_results'); flushEvents(); }
     const r = runResultToday;
     preloadShareArt(r);
-    const ep = !!(r.actPts || r.orbit);   // an episode result (the rundown show): the new results screen
+    const ep = true;   // mega 3 item 14: EVERY path shows the new results layout with all 8 stats (a saved older result, a test result and the TEST menu's too), never the old one
     els.readoutOverlay.classList.toggle('ep', ep);
     if (ep) fillEpisodeResults(r, !!fromOrbit);
     els.readoutScore.textContent = shownScore(r.score) + ' pts';
@@ -18337,7 +18337,7 @@
   if (DEBUG_FAST){
     window.__debug = {
       // (screenshots only: shows one round's title card or Round Done card by act index, with nothing after it)
-      previewCard: (kind, act, extra) => { const a = RUNDOWN.acts[act] || {}; if (kind === 'outro'){ startOutro({ score: 1234 }); outroEnd(true); return; } if (kind === 'title') showActCard({ title:a.title, sub:a.sub, world:a.world, act, announce:a.announce, finale: a.id === 'finale' }, ()=>{}); else { runActPts[act] = (extra && extra.pts) || 120; runActKeys[act] = 1; runActLetter[act] = 'got'; showRewardBeat({ act }, ()=>{}); } },
+      previewCard: (kind, act, extra) => { const a = RUNDOWN.acts[act] || {}; if (kind === 'outro'){ const o = { score: 1234 }; fillEpisodeResults(o, false); startOutro(o); outroEnd(true); return; } if (kind === 'title') showActCard({ title:a.title, sub:a.sub, world:a.world, act, announce:a.announce, finale: a.id === 'finale' }, ()=>{}); else { runActPts[act] = (extra && extra.pts) || 120; runActKeys[act] = 1; runActLetter[act] = 'got'; showRewardBeat({ act }, ()=>{}); } },
       getRunWord: () => runWord,
       getRunLetters: () => runLetters,
       getStats: () => stats,
