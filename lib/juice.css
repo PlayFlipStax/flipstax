@@ -2026,3 +2026,9 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
   .sign-bulbs i, .wb-m, .pr-marq, .tf-marq, .jc-bulb, .zs-wall i, .sl-tl{ opacity:0.9 !important; }
   .fin-vault.open .vault-rays::after{ opacity:0.35; transform:none; }
 }
+
+/* makeover job 2: the Zap Words logo - a bigger still SVG (chunky glossy letters with a zap through them); it replaces the neon text title.
+   It never animates, so lite and reduced motion need nothing extra. */
+.zw-stage .zw-title.zw-logo{ width:min(96%, 520px); height:auto; margin:2px auto 0; font-size:0; line-height:0; letter-spacing:0; text-shadow:none; }
+.zw-logo .zl-svg{ display:block; width:100%; height:auto; max-height:clamp(84px, 15svh, 200px); overflow:visible; }
+@media (max-height:700px){ .zw-stage .zw-title.zw-logo{ margin:0 auto; } .zw-logo .zl-svg{ max-height:48px; } .zw-stage .zw-grid.sq{ width:min(100%, 372px, calc((100dvh - 318px) * 0.8333)); } }   /* (the grid gives back the logo's extra height on short screens, so the hint clears the clock bar) */
