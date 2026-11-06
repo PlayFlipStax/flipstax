@@ -1882,3 +1882,27 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .solve-overlay.tray.ww-done :is(.solve-rack, .solve-buttons, .solve-attempts, .solve-hint-line){ opacity:0; pointer-events:none; }
 :root.lite .solve-overlay.tray .solve-slot.ww-gold::after{ animation:none; opacity:0.35; }
 @media (prefers-reduced-motion: reduce){ .solve-overlay.tray .solve-slot.ww-gold::after{ animation:none; opacity:0.35; } }
+
+/* ---- mega 4 item 1: back to the blue curtain. The goodbye video plays to its end (its own CGI curtain closes on the neon FLIPSTAX sign) and the
+   results lie over that last frame, as in 1d39dd0: the FINAL SCORE pill under the sign, CONGRATULATIONS!, the stat tiles, SHARE, the coffee button and
+   'Play again tomorrow'; Flip's personality line, the badges and the collectible cards scroll below. No red curtains, no gold frame. Opacity fades only. ---- */
+.outro.blue .outro-curtain, .outro.blue .outro-frame{ display:none !important; }
+.outro.blue .outro-badge{ top:calc(16.5vh + env(safe-area-inset-top)); }
+.outro.blue.end .outro-badge{ opacity:1; pointer-events:none; }
+#readoutOverlay.ep.outro-on .outro.blue .outro-end{ display:block; top:calc(16.5vh + 58px + env(safe-area-inset-top)); background:none; padding:6px 12px calc(18px + env(safe-area-inset-bottom));
+  overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; -webkit-mask-image:linear-gradient(180deg, transparent 0, #000 14px); mask-image:linear-gradient(180deg, transparent 0, #000 14px); }
+#readoutOverlay.ep.outro-on .outro.blue .outro-end .outro-artwrap{ display:none; }
+#readoutOverlay.ep.outro-on .outro.blue .outro-end .outro-mid{ position:relative; top:auto; padding:6px 0 8px; background:none; }
+#readoutOverlay.ep.outro-on .outro.blue .outro-end .outro-mid .outro-head{ font-size:clamp(32px, 10vw, 44px); }
+#readoutOverlay.ep.outro-on .outro.blue .outro-end .outro-lower{ position:relative; background:none; border-top:0; padding:4px 4px 8px; gap:12px; }
+#readoutOverlay.ep.outro-on .outro.blue .outro-end .outro-stats .os b{ font-size:24px; }
+#readoutOverlay.ep.outro-on .outro.blue .outro-end .outro-stats .os small{ font-size:10.5px; }
+#readoutOverlay.ep.outro-on .outro.blue .outro-end .outro-again{ color:#fff; text-shadow:0 1px 4px rgba(0,0,30,0.9); }
+.outro.blue .outro-extras{ margin-top:10px; padding-top:14px; border-top:2px solid rgba(255,214,90,0.45); }
+@media (max-height:700px){
+  #readoutOverlay.ep.outro-on .outro.blue .outro-end{ top:calc(16.5vh + 48px + env(safe-area-inset-top)); }
+  #readoutOverlay.ep.outro-on .outro.blue .outro-end .outro-mid{ padding:2px 0 4px; }
+  #readoutOverlay.ep.outro-on .outro.blue .outro-end .outro-mid .outro-head{ font-size:28px; }
+  #readoutOverlay.ep.outro-on .outro.blue .outro-end .outro-lower{ gap:7px; }
+  #readoutOverlay.ep.outro-on .outro.blue .outro-end .outro-stats .os b{ font-size:19px; }
+}

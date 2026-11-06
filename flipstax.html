@@ -16435,26 +16435,21 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // while it plays skips straight to the end. Muted unless the player has sound on. If the video cannot play (error, blocked, stalled,
   // lite mode, reduced motion) the poster shows and the end state follows after 1.5 s. OUTRO_WATCHDOG_MS guarantees the buttons within 12 s.
   // The video never blocks SHARE or the donation button: they are ordinary elements, and everything starts at the end state on a skip.
-  // fix 5: the curtain-closing finish is back. The goodbye video plays to its end; over its last moments red curtains sweep shut over the stage and Flip says
-  // 'That's our show, Earthlings! See you tomorrow!'; then the results card comes in - the 8 stats and SHARE, and again the old cards: the best moment, today's
-  // personality (with Flip's personality line), the streak, any new collectible cards and the Secret Riddler badge (restored from 432c262, the last ending before
-  // the outro rebuild). OUTRO_CLOSE_S: how long before the video's end the curtains start to close; OUTRO_HOLD_MS: the closed curtain and line before the card.
-  const OUTRO_TAIL_S = 2, OUTRO_WATCHDOG_MS = 15000, OUTRO_FALLBACK_MS = 1500, OUTRO_START_MS = 3500, OUTRO_CLOSE_S = 2.6, OUTRO_HOLD_MS = 1300;
+  // mega 4 item 1: back to the blue curtain. The goodbye video plays to its end - its own CGI curtain closes on the neon FLIPSTAX sign - and the results come in over
+  // that last frame (the 1d39dd0 screen: the FINAL SCORE pill, CONGRATULATIONS!, the 8 stat tiles, SHARE, the coffee button, 'Play again tomorrow'); Flip's personality
+  // line, the badges and the old cards (best moment, today's personality, streak, new collectible cards, the Secret Riddler) scroll below. No red curtains.
+  const OUTRO_WATCHDOG_MS = 15000, OUTRO_FALLBACK_MS = 1500, OUTRO_START_MS = 3500;
   function outroMount(){
-    const o = document.getElementById('outro'); if (!o || o.querySelector('.outro-drape')) return;
-    const d = document.createElement('div'); d.className = 'outro-curtain'; d.setAttribute('aria-hidden', 'true');
-    d.innerHTML = '<i class="outro-drape l"></i><i class="outro-drape r"></i><i class="outro-valance"></i><div class="outro-say"><span></span></div>';
-    d.querySelector('.outro-say span').textContent = HOST_OUTRO_LINE;
-    o.insertBefore(d, document.getElementById('outroBadge'));
-    const f = document.createElement('i'); f.className = 'outro-frame'; f.setAttribute('aria-hidden', 'true'); o.appendChild(f);
-    // the old cards and badges, moved onto the results card (the same elements, so the code that fills them is unchanged)
-    const lower = o.querySelector('.outro-lower'), share = document.getElementById('outroShare'), x = document.createElement('div'); x.className = 'outro-extras';
+    const o = document.getElementById('outro'); if (!o || o.querySelector('.outro-extras')) return;
+    // mega 4 item 1: no red curtains and no 'That's our show' card - the video's own blue curtain closes on the neon FLIPSTAX sign, and the results lie over
+    // that last frame (the 1d39dd0 screen). The old cards and badges scroll below the buttons (the same elements, so the code that fills them is unchanged).
+    o.classList.add('blue');
+    const lower = o.querySelector('.outro-lower'), x = document.createElement('div'); x.className = 'outro-extras';
     x.innerHTML = '<div class="ox-flip"><span class="ox-face">' + Host.html({ pose:'wave', kind:'head' }) + '</span><p class="ox-line" id="outroFlipLine"></p></div>';
     const cards = document.querySelector('#epResults .epr-cards'), unl = document.getElementById('readoutUnlocks'), rid = document.getElementById('readoutRiddler');
-    [cards, rid, unl].forEach(n=>{ if (n) x.appendChild(n); });
-    lower.insertBefore(x, share);
+    [rid, unl, cards].forEach(n=>{ if (n) x.appendChild(n); });
+    lower.appendChild(x);
   }
-  function outroClose(){ const o = document.getElementById('outro'); if (o) o.classList.add('closing'); }
   let outroTimers = [], outroState = 'idle';
   function outroLater(ms, fn){ const t = setTimeout(fn, ms); outroTimers.push(t); return t; }
   function outroClear(){ outroTimers.forEach(clearTimeout); outroTimers = []; }
@@ -16465,7 +16460,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     if (instant || (!v.ended && !early)){ try{ v.pause(); }catch(e){} o.classList.add('poster-on'); }   // (a skip or a failure freezes on the poster: the same last frame)
     o.classList.toggle('instant', !!instant);
     { const ln = document.getElementById('outroFlipLine'); if (ln) ln.textContent = els.readoutTypeBlurb.textContent || ''; }
-    o.classList.add('end', 'closing');
+    o.classList.add('end');
   }
   function stopOutro(){
     outroClear(); outroState = 'idle';
@@ -16491,12 +16486,12 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     outroState = 'playing';
     outroLater(OUTRO_WATCHDOG_MS, ()=> outroEnd(true));   // (the watchdog: whatever happens, the buttons are there within 12 s)
     const quiet = isLite() || prefersReducedMotion() || (DEBUG_FAST && !REALTIME);   // (test runs and quiet modes: the poster, then the end state)
-    if (quiet){ o.classList.add('poster-on'); outroClose(); outroLater(DEBUG_FAST && !REALTIME ? 300 : OUTRO_FALLBACK_MS + OUTRO_HOLD_MS, ()=> outroEnd(false)); return; }
-    const fail = ()=>{ if (outroState !== 'playing') return; o.classList.add('poster-on'); outroClose(); outroClear(); outroLater(OUTRO_FALLBACK_MS + OUTRO_HOLD_MS, ()=> outroEnd(false)); outroLater(OUTRO_WATCHDOG_MS, ()=> outroEnd(true)); };
+    if (quiet){ o.classList.add('poster-on'); outroLater(DEBUG_FAST && !REALTIME ? 300 : OUTRO_FALLBACK_MS, ()=> outroEnd(false)); return; }
+    const fail = ()=>{ if (outroState !== 'playing') return; o.classList.add('poster-on'); outroClear(); outroLater(OUTRO_FALLBACK_MS, ()=> outroEnd(false)); outroLater(OUTRO_WATCHDOG_MS, ()=> outroEnd(true)); };
     try{
       v.muted = !soundOn; v.src = 'data/outro/outro.mp4'; v.currentTime = 0;
-      v.onended = ()=>{ outroClose(); outroLater(OUTRO_HOLD_MS, ()=> outroEnd(false, true)); }; v.onerror = fail;
-      v.ontimeupdate = ()=>{ if (v.duration && v.currentTime >= v.duration - OUTRO_CLOSE_S) outroClose(); };   // (the red curtains sweep shut over the video's last moments)
+      v.onended = ()=> outroEnd(false, true); v.onerror = fail;   // (mega 4: the video plays to its end - its own blue curtain closes on the sign - then the results fade in over that last frame)
+      v.ontimeupdate = null;
       let started = false; v.onplaying = ()=>{ started = true; };
       const p = v.play(); if (p && p.catch) p.catch(()=>{ if (!v.muted){ v.muted = true; v.play().catch(fail); } else fail(); });
       outroLater(OUTRO_START_MS, ()=>{ if (!started) fail(); });   // (never stuck on a stalled load)
