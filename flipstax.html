@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<script>
+  // Launch safety: the production hosts, in one place (read by the main script's PRODUCTION_HOSTS and by the lib/ games). A TEST HOST is localhost
+  // or any other *.vercel.app preview; only there do the test parameters (?replay, ?debug, ?test, ?doors, ?floor, ?luckytheme, ?intro, ?oldintro ...)
+  // and the test hooks exist. On a production host they are ignored completely.
+  window.FLIPSTAX_PRODUCTION_HOSTS = ['flipstax-one.vercel.app', 'playflipstax.com', 'www.playflipstax.com'];
+  window.FLIPSTAX_TEST_HOST = window.FLIPSTAX_PRODUCTION_HOSTS.indexOf(location.hostname) === -1 &&
+    (/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || /\.vercel\.app$/.test(location.hostname));
+</script>
 <title>FlipStax - Flip, Vote, Jumble & Solve</title>
 <meta name="description" content="FlipStax: Daily Stax: one run, once a day. Infinity Flips: race to the finish line - vote, scan the crowd, crack riddles, drop chips, open the vault.">
 
@@ -5804,7 +5812,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   //                A preview starts in this mode by default, in case it
   //                shares the production vote database; ?test=0 turns real
   //                votes back on. (Localhost has no vote API at all.)
-  const PRODUCTION_HOSTS = ['flipstax-one.vercel.app', 'playflipstax.com', 'www.playflipstax.com'];
+  const PRODUCTION_HOSTS = window.FLIPSTAX_PRODUCTION_HOSTS || ['flipstax-one.vercel.app', 'playflipstax.com', 'www.playflipstax.com'];   // (set in the page's head)
   const IS_PREVIEW_HOST = /\.vercel\.app$/.test(location.hostname) && PRODUCTION_HOSTS.indexOf(location.hostname) === -1;
   const TEST_HOST = IS_LOCAL_HOST || IS_PREVIEW_HOST;
   // ?replay=1 (localhost and preview URLs only, never the production domain): today's
@@ -11106,7 +11114,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // cache, the build and the rundown loaded. A Copy log button on the results screen; an elapsed-time badge.
   // It stays in memory on the phone - nothing is sent anywhere.
   const BUILD_ID = 'J-2026-10-16';
-  const FR = { on: new URLSearchParams(location.search).get('debug') === '1' || DEBUG_FAST, t0: performance.now(), showAt: null, lines: [], lastInput: null, lastAdvance: 0, flags: 0 };
+  const FR = { on: (TEST_HOST && new URLSearchParams(location.search).get('debug') === '1') || DEBUG_FAST,   /* (launch safety: ?debug=1 only on a test host) */ t0: performance.now(), showAt: null, lines: [], lastInput: null, lastAdvance: 0, flags: 0 };
   const frTime = ()=> ((performance.now() - FR.t0) / 1000).toFixed(2);
   function frLog(kind, detail){ if (!FR.on) return; FR.lines.push(frTime() + 's ' + kind + (detail ? ' ' + detail : '')); if (FR.lines.length > 3000) FR.lines.splice(0, 500); }
   const frTarget = (el)=>{ if (!el || !el.closest) return '?'; const t = el.closest('[id], button, .event-tile, .half, .show-card, .mg-overlay') || el;
@@ -11232,7 +11240,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     return showDone(Show.gen, why);
   }
   // ?debug=1: the step, the card, the transition state and the last 20 transitions.
-  const SHOW_DEBUG = new URLSearchParams(location.search).get('debug') === '1';
+  const SHOW_DEBUG = TEST_HOST && new URLSearchParams(location.search).get('debug') === '1';   // (launch safety: a test host only)
   if (SHOW_DEBUG || DEBUG_FAST) window.__show = Show;
   if (DEBUG_FAST || SHOW_DEBUG){ window.__frLines = FR.lines; window.__showPlan = ()=> runPlan; window.__timing = TIMING; }   // (the automated checks read the flight recorder, the plan and the timings)   // (for the automated flow and pacing checks)
   let showDebugEl = null;
@@ -11374,12 +11382,12 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // plays. The other two portals dim. Lite mode and reduced motion: a crossfade, no swing.
   // DOORS_CLASSIC (test flag, on by default; ?doors=new shows the A+ redesign again): the earlier door art - an arched purple door with a gold frame, a
   // panel, a brass knob and a glowing number (commit 939f507, "Mystery Door - four doors on the stage"; the older flat teal tiles are 1586466). Same code behaviour.
-  const DOORS_CLASSIC = !/[?&]doors=new\b/.test(location.search);
+  const DOORS_CLASSIC = !(TEST_HOST && /[?&]doors=new\b/.test(location.search));   // (launch safety: the ?doors / ?floor switches work on a test host only)
   // DOORS_ART (default on; ?doors=old or ?doors=new brings the CSS-drawn doors back): the Mystery Doors screen made of art - the saucer-shuffle floor, a hanging
   // sign, three closed doors (data/doors/*.webp) that crossfade to their open picture on a tap. The old door code below stays for rollback.
-  const DOORS_ART = !/[?&]doors=(old|new)\b/.test(location.search);
+  const DOORS_ART = !(TEST_HOST && /[?&]doors=(old|new)\b/.test(location.search));
   // DOORS_TILES (?floor=tiles): the 6 x 4 grid of coloured floor tiles; by default the floor has three glowing pads under the doors and a slow ring of light (doorFloor* below).
-  const DOORS_TILES = /[?&]floor=tiles\b/.test(location.search);
+  const DOORS_TILES = TEST_HOST && /[?&]floor=tiles\b/.test(location.search);
   const DOOR_ART = [{ w:238, h:404, ow:387, oh:484, win:[173, 133, 337, 297], ctr:[255, 215], anim:'mdGal', hinge:'0% 100%' },    // (win: the opening's rectangle inside the open picture, ctr: the swirl's centre; px of the file)
     { w:206, h:375, ow:337, oh:445, win:[40, 76, 180, 410], ctr:[110, 242], anim:'mdHyp', hinge:'100% 100%' },
     { w:214, h:397, ow:370, oh:480, win:[43, 187, 199, 343], ctr:[121, 265], anim:'mdClk', hinge:'100% 100%' }];   // (the files' own sizes: all three doors share one scale)
@@ -11814,7 +11822,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // or 3 picks one; in replay mode the TEST menu's "Lucky palette" jumps remember the pick. Palette 1 until Rick picks.
   const LUCKY_THEMES = { 1:'burgundy velvet, warm gold bulbs', 2:'midnight indigo, white and yellow bulbs, hot pink', 3:'near-black, rainbow bulbs, white tiles' };
   function luckyTheme(){
-    const q = new URLSearchParams(location.search).get('luckytheme');
+    const q = TEST_HOST ? new URLSearchParams(location.search).get('luckytheme') : null;   // (launch safety: a test host only)
     if (LUCKY_THEMES[q]) return q;
     if (REPLAY){ try{ const s = localStorage.getItem('flipstax_lucky_theme'); if (LUCKY_THEMES[s]) return s; }catch(e){} }
     return '1';
