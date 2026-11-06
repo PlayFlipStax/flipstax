@@ -1931,3 +1931,23 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root:is(.mode-daily, .mode-infinity) .event-overlay.bb-timeWarp .event-subtitle:not(.res-win):not(.res-miss){ background:rgba(1,26,12,0.86) !important; border-color:#8dffb0 !important; color:#d8ffe4 !important; box-shadow:0 0 10px rgba(141,255,176,0.45) !important; }
 :root.mode-daily .event-overlay.bb-two.bb-timeWarp .bb-vs{ background:radial-gradient(circle at 38% 30%, #ffffff 0%, #9dffb8 30%, #17b85a 70%, #06602c 100%); box-shadow:0 0 0 3px rgba(2,40,18,0.9), 0 0 24px rgba(141,255,176,1), 0 0 44px rgba(255,214,90,0.5); text-shadow:0 2px 0 rgba(2,50,20,0.8); }
 .event-overlay.bb-timeWarp .bb-num.tw-num{ border-color:#ffe27a; background:rgba(1,26,12,0.85); box-shadow:0 0 10px rgba(255,226,122,0.7); color:#fff6d0; }
+
+/* ---- mega 4 item 7: the commercial break uses the real screen. No sponsor scene with its TV monitor: the ad fills the game screen inside the gold frame -
+   a bright ad backdrop with slow rays, Flip's line in its pill at the top, the product (big emoji, brand, tagline) filling the middle, then 'Thanks for
+   watching!' and the 'Want to support the show?' card full screen with the coffee button below - stacked, so nothing overlaps. Rotate / opacity only. ---- */
+.show-card.sponsor.full{ background:radial-gradient(60% 40% at 50% 46%, rgba(255,240,180,0.55), rgba(255,240,180,0) 70%), linear-gradient(165deg, #ff4fb8 0%, #b02be0 45%, #3a0f8a 78%, #160640 100%) !important; overflow:hidden; }
+.show-card.sponsor.full::before{ content:''; position:absolute; left:50%; top:46%; width:190vmax; height:190vmax; margin:-95vmax 0 0 -95vmax; pointer-events:none; opacity:0.28;
+  background:repeating-conic-gradient(from 0deg, rgba(255,255,255,0.7) 0deg 6deg, rgba(255,255,255,0) 6deg 18deg); animation:cbRays 60s linear infinite; }
+@keyframes cbRays{ to{ transform:rotate(360deg); } }
+:root.lite .show-card.sponsor.full::before{ animation:none; } @media (prefers-reduced-motion: reduce){ .show-card.sponsor.full::before{ animation:none; } }
+.show-card.sponsor.full .cb-say{ z-index:2; }
+.show-card.sponsor.full .cb-tv{ left:16px !important; right:16px; width:auto !important; top:calc(max(46px, 6vh) + env(safe-area-inset-top) + 64px) !important; bottom:calc(96px + env(safe-area-inset-bottom)); height:auto !important;
+  border-radius:26px !important; z-index:1; background:linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.05) 40%, rgba(20,4,60,0.25)); box-shadow:inset 0 0 0 3px rgba(255,226,122,0.95), 0 0 24px rgba(255,226,122,0.35) !important; }
+.show-card.sponsor.full .cb-prod, .show-card.sponsor.full .cb-last{ padding:16px 18px; gap:calc(var(--tvh, 260px) * 0.05); }
+.show-card.sponsor.full .cb-e{ font-size:min(calc(var(--tvh, 260px) * 0.6), 220px); line-height:1; filter:drop-shadow(0 8px 6px rgba(30,0,60,0.4)); }
+.show-card.sponsor.full .cb-brand{ font-size:clamp(28px, 9vw, 52px); color:#fff6d0; text-shadow:0 3px 0 #5a0a3a, 0 0 16px rgba(255,214,90,0.6); text-align:center; }
+.show-card.sponsor.full .cb-line{ font-size:clamp(18px, 5.4vw, 30px); color:#ffffff; text-shadow:0 2px 6px rgba(30,0,60,0.7); text-align:center; max-width:16em; }
+.show-card.sponsor.full .cb-last b{ font-size:clamp(30px, 9.4vw, 54px); color:#ffe27a; text-shadow:0 3px 0 #5a0a3a, 0 0 16px rgba(255,214,90,0.6); text-align:center; }
+.show-card.sponsor.full .cb-last small{ font-size:clamp(20px, 6vw, 32px); color:#fff; text-align:center; }
+.show-card.sponsor.full .cb-low{ z-index:2; }
+@media (max-height:700px){ .show-card.sponsor.full .cb-tv{ top:calc(max(46px, 6vh) + env(safe-area-inset-top) + 54px) !important; bottom:calc(84px + env(safe-area-inset-bottom)); } }

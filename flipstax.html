@@ -12787,6 +12787,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     { e:'✨', brand:'Saucer-Wax Deluxe', line:'So shiny, pilots need sunglasses!' },
   ];
   const CB_PRODUCT_MS = 2000, CB_INTRO_MS = 1500, CB_SKIP_MS = 2000, CB_COFFEE_MS = 4500;
+  const CB_TV_PROP = false;   // (mega 4: false = the ads fill the real screen; true = the old TV monitor in the sponsor scene)
   let cbReadyP = null;
   function cbArtReady(){
     return cbReadyP || (cbReadyP = Promise.race([ Promise.all([ new Promise(res=>{ const im = new Image(); im.onload = im.onerror = res; im.src = 'data/scenes/sponsor.webp'; }), document.fonts && document.fonts.ready ]),
@@ -12807,7 +12808,11 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       const s = Math.max(r.width / 540, r.height / 1154), ox = (r.width - 540 * s) / 2, oy = r.width / r.height > 0.5 ? 0 : r.height - 1154 * s;   // (wider than 1 : 2 the art is cropped at the bottom - see the media query in juice.css - so the monitor stays clear of the sign)
       tv.style.left = (ox + 114 * s).toFixed(1) + 'px'; tv.style.top = (oy + 280 * s).toFixed(1) + 'px'; tv.style.width = (312 * s).toFixed(1) + 'px'; tv.style.height = (206 * s).toFixed(1) + 'px';
       tv.style.borderRadius = (46 * s).toFixed(1) + 'px'; tv.style.setProperty('--tvh', (206 * s).toFixed(1) + 'px'); };
-    fitTv(); addEventListener('resize', fitTv);
+    // mega 4 item 7: the break uses the real screen - no TV monitor prop: the ads, 'Thanks for watching!' and the donate card fill the game screen inside
+    // the gold frame (lib/juice.css .show-card.sponsor.full); the monitor fit above is kept for CB_TV_PROP = true
+    if (CB_TV_PROP){ fitTv(); addEventListener('resize', fitTv); }
+    else { showCard.classList.add('full'); const fitFull = ()=>{ if (!tv.isConnected) return; tv.style.setProperty('--tvh', Math.min(tv.clientHeight * 0.62, tv.clientWidth * 0.62).toFixed(1) + 'px'); };
+      requestAnimationFrame(fitFull); addEventListener('resize', fitFull); }
     const prod = showCard.querySelector('.cb-prod'), say = showCard.querySelector('.cb-say'), shownAt = performance.now(); let gone = false, stage = 'intro', timers = [];
     // (the break's own elements: if another screen has taken showCard over (a TEST jump, a skip, a restart) they are gone - the timers then stop quietly and never touch the new card)
     const alive = ()=> !gone && !!say && say.isConnected && showCard.contains(say) && !!prod;
