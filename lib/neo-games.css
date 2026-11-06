@@ -351,3 +351,7 @@
 .nx-sl.sl-voyaging .nx-panel, .nx-sl.sl-voyaging .sl-go{ visibility:hidden; }
 :root.lite .sl-voyage *, :root.lite .sl-voyage{ animation:none !important; transition:opacity 0.3s ease !important; }
 @media (prefers-reduced-motion: reduce){ .sl-voyage *, .sl-voyage{ animation:none !important; transition:opacity 0.3s ease !important; } }
+/* mega 5 item 10: ZiG Zap ZaBam! - while a question is up the status pill is hidden and can't take a tap (a class set by the game, so it works
+   without :has() too), and the question card sits above it, so all four answers are always visible and tappable */
+.nx-zz.zz-asking .nx-panel{ opacity:0; visibility:hidden; pointer-events:none; }
+.nx-zz.zz-asking .nx-play{ position:relative; z-index:8; }
