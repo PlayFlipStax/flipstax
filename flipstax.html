@@ -11680,6 +11680,9 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       hostSvg: ()=> Host.html({ pose:'idle' }),
       // fix 6: ZiG Zap ZaBam! asks Brain Beam questions - from the Brain Beam banks (medium, then easy, then hard), never one already asked in this show
       beamPts: EXTRA_BEAM_POINTS,
+      // mega 4 item 6: the shared celebrations - bigWin on a PERFECT or top result (the game goes on to then() once it has settled, about 4 s), smallWin on a right answer
+      bigWin: (word, then, o)=>{ if (over || !window.Celebrate){ if (then) then(); return; } Celebrate.win(Object.assign({ word, sfx, done: ()=>{ if (then) then(); } }, o || {})); },
+      smallWin: (el)=>{ if (window.Celebrate && Celebrate.small) Celebrate.small(el); },
       quiz: (k)=>{ const asked = api._asked = api._asked || [], seen = (t)=> asked.indexOf(t) >= 0 || runAskedQuestions.indexOf(t) >= 0;
         let q = null; for (const lv of ['medium', 'easy', 'hard']){ q = pickBeamQuestion(lv, ((api.seed ^ hashStr('zz-' + (k || 0) + lv)) >>> 0), seen); if (q && !seen(q.question)) break; }
         if (q){ asked.push(q.question); if (runActive) runAskedQuestions.push(q.question); }
@@ -12147,9 +12150,10 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       if (k < N - 1){ cleanup(); k++; if (!play()) done(); return; }
       const ov = els.eventOverlay, perfect = right === N;
       if (perfect){
-        breakBanner(ov, st.game === 'emojiDecode' ? 'PERFECT DECODE!' : 'PERFECT WARP!', 1500, true);
-        try{ FX.confettiBurst(showFx); FX.burstAt(showFx, ov.querySelector('.bb-banner'), { count:16, spread:120, shapes:['star', 'coin'] }); }catch(e){}
-        sfx.cheer(); setTimeout(()=>{ cleanup(); done(); }, dt(1500));
+        // mega 4 item 6: the shared BIG WIN CELEBRATION (lib/celebrate.js) - the banner word slams in, confetti, lasers, spotlights, the bulb chase - then on
+        const word = st.game === 'emojiDecode' ? 'PERFECT DECODE!' : 'PERFECT WARP!';
+        if (window.Celebrate && !DEBUG_FAST) Celebrate.win({ word, sfx, done: ()=>{ cleanup(); done(); } });
+        else { breakBanner(ov, word, 1500, true); sfx.cheer(); setTimeout(()=>{ cleanup(); done(); }, dt(1500)); }
       } else if (st.game === 'emojiDecode'){
         breakBanner(ov, right + ' of ' + N + ' decoded', 1200, false);
         setTimeout(()=>{ cleanup(); done(); }, dt(1200));
@@ -12193,7 +12197,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     }
     const tl = ov.querySelector('.bb-timeline');
     if (tl){ tl.classList.remove('on'); tl.querySelectorAll('.tl-m b').forEach(b=> b.textContent = '?'); tl.querySelector('.tl-gap').textContent = ''; }
-    let settled = false;
+    let settled = false, bigBreak = false;
     const cleanup = ()=>{
       ov.classList.add('hidden'); ov.classList.remove('brainbreak', 'stack', 'bb-two', 'flash-win', 'bb-revealed', 'bb-' + key); els.eventSubtitle.classList.remove('res-win', 'res-miss'); ov.style.removeProperty('--bb');
       ov.querySelectorAll('.bb-banner, .bb-pop, .tw-leds, .tw-track').forEach(e=> e.remove());
@@ -12229,6 +12233,9 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
         if (rd.why) els.eventPrompt.textContent = rd.why;
         showFlash('win'); hostMood('cheer'); hostSay(hostLine('right')); sfx.combo(); if (key === 'priceProbe') sfx.cashRegister(); else sfx.cheer(); ov.classList.add('flash-win');
         if (right){ FX.burstAt(showFx, right, { count:12, spread:100, shapes:['star', 'coin'] }); FX.pop(right, 1.25); }
+        // mega 4 item 6: a single Price Probe's right answer is its top result - the big celebration; a right answer in a series is the small one
+        bigBreak = key === 'priceProbe' && !st.parts && !!window.Celebrate && !DEBUG_FAST;
+        if (bigBreak) Celebrate.win({ word:'PRICE IS RIGHT!', wordTop:'30%' }); else if (window.Celebrate) Celebrate.small(right);
         if (st.parts){ const pp = document.createElement('div'); pp.className = 'bb-pop'; pp.textContent = '+' + (runActive ? BRAIN_BREAK_POINTS * runActMult() : BRAIN_BREAK_POINTS); ov.appendChild(pp); setTimeout(()=> pp.remove(), 900); }   // (a points pop-up, 0.8 s)
       } else {
         if (pick != null && tiles[pick]) tiles[pick].classList.add('is-wrong');
@@ -12238,8 +12245,9 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
         playTone(150, 0, 0.16, 'triangle', 0.05); playTone(120, 0.14, 0.2, 'triangle', 0.05);   // a gentle buzz
       }
       saveRunSnapshot();
-      revealThen(finish, { lead:300, min: key === 'priceProbe' ? 2200 : 0, text: els.eventPrompt.textContent });   // (Price Probe: long enough for both tags to roll; A+: every result at least REVEAL_HOLD_MS)
+      revealThen(finish, { lead:300, min: bigBreak ? 4200 : key === 'priceProbe' ? 2200 : 0, text: els.eventPrompt.textContent });   // (the big celebration settles before the next screen)   // (Price Probe: long enough for both tags to roll; A+: every result at least REVEAL_HOLD_MS)
     };
+    if (REPLAY || DEBUG_FAST) window.__bbRight = rd.correct;   // (tests only)
     tiles.forEach((tileEl, i)=>{ if (i < n) tileEl.onclick = ()=>{ tileEl.classList.add('bb-press'); resolve(i); }; });
     startEventTimerBar(dt(BRAIN_BREAK_MS), dt(BRAIN_BREAK_MS));
     clearTimeout(eventTimeoutId);
@@ -13271,6 +13279,13 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
         quizScore(PERFECT_RUN_BONUS); renderRunBanner();
         bannerParts.push('\ud83c\udfc6 PERFECT RUN +' + PERFECT_RUN_BONUS + ' pts');
       }
+      // mega 4 item 6: the top results get the shared BIG WIN CELEBRATION - a perfect run (the first six Brain Beams all right) or a solved Riddle Round;
+      // any other right answer gets the small one from the answer
+      if (window.Celebrate && !DEBUG_FAST){
+        if (runPerfect && runTriviaAttempted === RUN_WORD_LENGTH) Celebrate.win({ word:'PERFECT RUN!', wordTop:'28%' });
+        else if (runQuizMystery) Celebrate.win({ word:'RIDDLE SOLVED!', wordTop:'28%' });
+        else Celebrate.small(els.eventTiles[runPendingQCorrectIdx]);
+      }
       els.eventSubtitle.textContent = bannerParts.join(' \u00b7 ');
       els.eventPrompt.textContent = letterLeft ? '✅ Correct! A Word Warp letter is yours' : '✅ Correct! +' + EXTRA_BEAM_POINTS + ' points';
       celebrateTriviaCorrect();
@@ -14050,7 +14065,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       if (c.kind === 'jackpot') FX.coinShower(showFx, 3); }
     if (c.kind === 'jackpot') pkJackpotShow(c);
     if (c.kind === 'jackpot' && dailyOrbit){ sfx.jackpot(); showToast('🛸 THE MOTHERSHIP! +' + c.pts); document.getElementById('finPlinko').classList.add('jackpot'); }
-    else if (c.kind === 'jackpot'){ sfx.jackpot(); showToast('🛸 MOTHERSHIP JACKPOT! +100' + (f.chips.slice(0, f.dropped).filter(x=> x.kind === 'jackpot').length === 1 ? ' and a bonus card' : '')); document.getElementById('finPlinko').classList.add('jackpot'); }
+    else if (c.kind === 'jackpot'){ if (window.Celebrate) Celebrate.win({ word:'THE MOTHERSHIP!', wordTop:'30%' }); sfx.jackpot(); showToast('🛸 MOTHERSHIP JACKPOT! +100' + (f.chips.slice(0, f.dropped).filter(x=> x.kind === 'jackpot').length === 1 ? ' and a bonus card' : '')); document.getElementById('finPlinko').classList.add('jackpot'); }
     if (pkLanded.length >= f.chips.length) pkAuto = false;
     if (pkResizePending && !pkFalling.size){ pkResizePending = false; setAim(pkAim); renderPlinko(); return; }
     renderPlinkoTally();
@@ -15207,6 +15222,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       els.irField.querySelectorAll('.ir-mark').forEach(m=> m.textContent = '!');
       void els.irOverlay.offsetWidth;
       popLetters(els.irOverlay.querySelector('.ir-verdict-big'), 'GENIUS!', 200);
+      if (window.Celebrate && !reduced) Celebrate.win({ noWord:true });   // (mega 4 item 6: the shared celebration around the riddle's own GENIUS!)
       els.irOverlay.classList.add('win');
       sfx.riddleWin();
       showFlash('win'); const rb = els.irOpts.querySelector('.ir-opt.right'); if (rb) FX.beamHit(showFx, [rb]);   // C2
