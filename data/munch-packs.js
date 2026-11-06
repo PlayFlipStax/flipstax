@@ -65,7 +65,39 @@
     return { text, right: pool.filter(ok).map(e=> e.sym), wrong: pool.filter(e=> !ok(e)).map(e=> e.sym) }; } });
   // Counts in the table: gases 11 (H He N O F Ne Cl Ar Kr Xe Rn), solids 28, metals 23, nonmetals 10 (H C N O F P S Cl Br I), noble gases 6 (He Ne Ar Kr Xe Rn),
   // old Latin / German symbols 10 (Na K Fe Cu Ag Sn W Au Hg Pb). Liquids (Br, Hg: 2) and metalloids (B, Si: 2) have fewer than 5, so they are not rules.
-  const SCIENCE = { label:'SCIENCE', rules:[
+  // ---------------------------------------------------------------- SCIENCE (the default: easy packs in plain words; one is picked at random each play)
+  // Every list is checked by hand: the right words are clearly right, the wrong ones clearly wrong for that rule (no trick words such as spider for
+  // insects, penguin for flying, Pluto for planets or smoke for gases). Every tile is under 10 letters.
+  const SCI = {
+    planets: { text:'Eat the planets', right:['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune'],
+      wrong:['Moon', 'Sun', 'Comet', 'Rocket', 'Meteor', 'Galaxy', 'Ocean', 'Mountain', 'Cloud', 'Apple', 'Tree', 'Pencil', 'Chair', 'River', 'Shoe', 'Castle'] },
+    mammals: { text:'Eat the mammals', right:['dog', 'cat', 'whale', 'bat', 'horse', 'cow', 'lion', 'dolphin', 'mouse', 'elephant', 'rabbit', 'bear'],
+      wrong:['shark', 'eagle', 'snake', 'frog', 'trout', 'parrot', 'ant', 'lizard', 'bee', 'turtle', 'goldfish', 'owl', 'beetle', 'crow', 'salmon', 'toad'] },
+    flyers: { text:'Eat the animals that can fly', right:['eagle', 'owl', 'bat', 'bee', 'butterfly', 'parrot', 'moth', 'fly', 'dragonfly', 'duck', 'robin', 'crow'],
+      wrong:['dog', 'cat', 'snake', 'cow', 'horse', 'frog', 'whale', 'worm', 'turtle', 'pig', 'shark', 'snail', 'goat', 'mouse', 'lizard', 'rabbit'] },
+    space: { text:'Eat the things you find in space', right:['star', 'planet', 'comet', 'moon', 'asteroid', 'galaxy', 'meteor', 'nebula', 'satellite', 'sun'],
+      wrong:['tree', 'river', 'house', 'car', 'fish', 'dog', 'desk', 'apple', 'shoe', 'mountain', 'lake', 'flower', 'pencil', 'bread', 'chair', 'bicycle'] },
+    liquids: { text:'Eat the liquids', right:['water', 'milk', 'juice', 'oil', 'vinegar', 'syrup', 'soda', 'tea', 'honey', 'lemonade'],
+      wrong:['rock', 'ice', 'wood', 'steam', 'air', 'oxygen', 'iron', 'brick', 'coin', 'chalk', 'helium', 'pencil', 'spoon', 'glass', 'stone', 'apple'] },
+    solids: { text:'Eat the solids', right:['rock', 'ice', 'wood', 'iron', 'brick', 'coin', 'chalk', 'stone', 'spoon', 'pencil', 'apple'],
+      wrong:['water', 'milk', 'juice', 'oil', 'steam', 'air', 'oxygen', 'helium', 'vinegar', 'syrup', 'soda', 'tea', 'lemonade', 'neon', 'hydrogen', 'nitrogen'] },
+    gases: { text:'Eat the gases', right:['air', 'steam', 'oxygen', 'helium', 'hydrogen', 'nitrogen', 'neon', 'vapor'],
+      wrong:['water', 'milk', 'juice', 'oil', 'rock', 'ice', 'wood', 'iron', 'brick', 'coin', 'honey', 'syrup', 'stone', 'chalk', 'tea', 'soda'] },
+    body: { text:'Eat the body parts', right:['heart', 'lungs', 'brain', 'liver', 'stomach', 'kidney', 'skin', 'bone', 'muscle', 'elbow', 'knee', 'tongue'],
+      wrong:['wheel', 'rock', 'leaf', 'cloud', 'chair', 'spoon', 'shoe', 'door', 'window', 'apple', 'river', 'star', 'pencil', 'book', 'lamp', 'brick'] },
+    insects: { text:'Eat the insects', right:['ant', 'bee', 'beetle', 'butterfly', 'fly', 'moth', 'ladybug', 'wasp', 'cricket', 'mosquito', 'dragonfly'],
+      wrong:['worm', 'snail', 'mouse', 'frog', 'bird', 'fish', 'cat', 'dog', 'snake', 'cow', 'horse', 'lizard', 'rabbit', 'owl', 'turtle', 'whale'] },
+    living: { text:'Eat the living things', right:['tree', 'dog', 'mushroom', 'flower', 'grass', 'fish', 'bird', 'frog', 'moss', 'bee', 'whale', 'cactus'],
+      wrong:['rock', 'car', 'chair', 'cloud', 'water', 'sand', 'robot', 'phone', 'coin', 'glass', 'brick', 'spoon', 'shoe', 'pencil', 'lamp', 'kite'] },
+    metals: { text:'Eat the metals', right:['gold', 'iron', 'copper', 'silver', 'tin', 'zinc', 'nickel', 'aluminum', 'platinum', 'steel'],
+      wrong:['wood', 'glass', 'plastic', 'paper', 'rubber', 'cotton', 'wool', 'stone', 'clay', 'water', 'leather', 'sand', 'bread', 'cloth', 'chalk', 'ice'] },
+  };
+  // (solids, liquids and gases are one family: a show never has two of them)
+  const SCIENCE = { label:'SCIENCE', rules: Object.keys(SCI).map(k=>{ const p = SCI[k]; return { id:'sci-' + k, family: ['liquids', 'solids', 'gases'].indexOf(k) >= 0 ? 'sci-states' : 'sci-' + k,
+    make(){ return { text:p.text, right:p.right.slice(), wrong:p.wrong.slice() }; } }; }) };
+  // ---------------------------------------------------------------- SCIENCE (hard: the periodic-table symbols) - kept, out of the default rounds; to switch it on as a
+  // 'hard' mode, use 'scienceHard' in FLIPSTAX_MUNCH_ROUNDS below
+  const SCIENCE_HARD = { label:'SCIENCE', rules:[
     el('gas', 'state-gas', 'Eat the gases at room temperature', e=> e.state === 'gas', null, false),
     el('solid', 'state-solid', 'Eat the solids at room temperature', e=> e.state === 'solid', null, false),
     el('metal', 'metals', 'Eat the metals', e=> e.kind === 'metal', e=> e.kind === 'metalloid', false),
@@ -117,7 +149,7 @@
   ] };
 
   const MIN_RIGHT = 5;   // (a rule needs at least this many right tiles)
-  const packs = { math: MATH, science: SCIENCE, english: ENGLISH };
+  const packs = { math: MATH, science: SCIENCE, scienceHard: SCIENCE_HARD, english: ENGLISH };
   Object.keys(packs).forEach(k=>{ packs[k].rules = packs[k].rules.filter(r=>{ try{ return r.make(()=> 0.5).right.length >= MIN_RIGHT; }catch(e){ return false; } }); });
   window.FLIPSTAX_MUNCH_PACKS = packs;
   window.FLIPSTAX_MUNCH_ELEMENTS = ELEMENTS;
