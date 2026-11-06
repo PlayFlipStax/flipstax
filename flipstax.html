@@ -46,6 +46,7 @@
 <link rel="stylesheet" href="lib/celebrate.css">
 <link rel="stylesheet" href="lib/neo-games.css">
 <link rel="stylesheet" href="lib/munch-mix.css">
+<link rel="stylesheet" href="lib/spotlights.css">
 <link rel="preload" as="image" href="data/stage/stage-close.webp" type="image/webp">
 <style>
   /* fix 7: no double-tap zoom anywhere: touch-action manipulation on the page itself (lib/juice.css also sets it on every game screen and tappable) */
@@ -4938,6 +4939,7 @@
 <script src="lib/neo-games.js"></script>
 <script src="data/munch-packs.js"></script>
 <script src="lib/munch-mix.js"></script>
+<script src="lib/spotlights.js"></script>
 <script src="lib/orbit-physics.js"></script>
 <script src="lib/host-alien.js"></script>
 <script src="data/host/manifest.js"></script>
@@ -11851,6 +11853,8 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       '<button type="button" class="lw-hub mw-btn pulse" aria-label="Spin the wheel"><b class="ll-hub-t">SPIN</b></button>' +
       '<div class="lw-pop mw-pop" aria-live="polite"><b></b><small></small></div><div class="ll-slime" aria-hidden="true">' + GOOP_SVG + '</div>';
     { const tb = luckyOv.querySelector('.ll-title .sign-bulbs'); if (tb) requestAnimationFrame(()=> ringBulbs(tb, 18, 6)); }
+    // (mega 5: four soft white and warm-gold beams sweep behind the wheel, with about 20 slow shimmer sparkles - lib/spotlights.js)
+    if (window.Spotlights) Spotlights.mount(luckyOv, { colors:['#ffffff', '#ffd88a'], beams:4, sparkles:20, opacity:0.16, before: luckyOv.querySelector('.ll-inner') });
     const wheel = luckyOv.querySelector('.mw-wheel'), rotEl = luckyOv.querySelector('.mw-rot'), pointer = luckyOv.querySelector('.mw-pointer'), hub = luckyOv.querySelector('.mw-btn'), hubT = hub.querySelector('b'), pop = luckyOv.querySelector('.mw-pop');
     // the wheel sits exactly on the ring of the cover-fit stage art (recomputed on resize)
     const place = ()=>{
