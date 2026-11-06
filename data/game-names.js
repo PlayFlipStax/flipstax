@@ -21,6 +21,9 @@ window.FLIPSTAX_NAMES = {
     twinFlip:       'Twin Flip',             // memory match
     factOrFib:      'Fact or Fib',           // true or false
     saucerShuffle:  'Saucer Shuffle',        // follow the star under the saucers
+    zigZap:         'ZiG Zap ZaBam!',        // tic-tac-toe with trivia (keep these exact capitals; plays in Snap Sort's slots while Snap Sort is on hold)
+    alienBlast:     'Alien Blast',           // tap the green aliens
+    spaceLaunch:    'Space Launch',          // stop the marker in the green zone
     priceProbe:     'Price Probe',
     oddballAlert:   'Oddball Alert',
     emojiDecode:    'Emoji Decode',
@@ -78,6 +81,9 @@ window.FLIPSTAX_NAMES = {
     twinFlip:  { full:'Flip the cards and match every pair before time runs out!', short:'Match the pairs!' },
     orbitDrop: { full:'Drop your chips from the UFO. Land in the Mothership slot for the jackpot!', short:'Drop your chips!' },
     wordWarp:  { full:'Unscramble the six letters you earned. Beat the clock to win big!', short:'Unscramble the word!' },
+    zigZap:    { full:'Tap a square and answer right to claim it. Three in a row beats Flip!', short:'Tap a square. Answer right to claim it!' },
+    alienBlast:{ full:'Tap the green aliens as they pop up. Avoid the red ones and the bombs!', short:'Tap the green aliens!' },
+    spaceLaunch:{ full:'Tap LAUNCH to stop the marker in the green zone. Dead centre is PERFECT!', short:'Stop it in the green zone!' },
   },
   roundTitles: {
     opener:  'THE OPENER',

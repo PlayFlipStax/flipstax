@@ -44,6 +44,7 @@
 <link rel="stylesheet" href="lib/juice.css">
 <link rel="stylesheet" href="lib/intro.css">
 <link rel="stylesheet" href="lib/celebrate.css">
+<link rel="stylesheet" href="lib/neo-games.css">
 <link rel="preload" as="image" href="data/stage/stage-close.webp" type="image/webp">
 <style>
   :root{
@@ -4930,6 +4931,7 @@
 <script src="data/vs-cards-new.js"></script>
 <script src="data/vs/vs-emoji.js"></script>
 <script src="lib/mini-games.js"></script>
+<script src="lib/neo-games.js"></script>
 <script src="lib/orbit-physics.js"></script>
 <script src="lib/host-alien.js"></script>
 <script src="data/host/manifest.js"></script>
@@ -4949,7 +4951,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // Player-facing game names and the alien host's lines live in
   // data/game-names.js (the defaults here are only a fallback if it fails).
   const GN = Object.assign({ orbitDrop:'Orbit Drop', cosmicSurprise:'Cosmic Surprise', crowdScan:'Crowd Scan', brainBeam:'Brain Beam', riddleRound:'Riddle Round',
-    zapWords:'Zap Words', peakOrPlunge:'Peak or Plunge', snapSort:'Snap Sort', twinFlip:'Twin Flip', factOrFib:'Fact or Fib', saucerShuffle:'Saucer Shuffle', priceProbe:'Price Probe', oddballAlert:'Oddball Alert', emojiDecode:'Emoji Decode', timeWarp:'Time Warp', portalPick:'Portal Pick',
+    zapWords:'Zap Words', peakOrPlunge:'Peak or Plunge', snapSort:'Snap Sort', twinFlip:'Twin Flip', factOrFib:'Fact or Fib', saucerShuffle:'Saucer Shuffle', zigZap:'ZiG Zap ZaBam!', alienBlast:'Alien Blast', spaceLaunch:'Space Launch', priceProbe:'Price Probe', oddballAlert:'Oddball Alert', emojiDecode:'Emoji Decode', timeWarp:'Time Warp', portalPick:'Portal Pick',
     wordWarp:'Word Warp', vault:'The Mothership Vault' }, (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.names) || {});
   const HOST_LINES = (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.host) || {};
   const HOST_QUIPS = (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.quip) || {};
@@ -6084,6 +6086,12 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // every pair of days. A game whose data didn't load is left out of the pool.
   const MYSTERY_POOL = (RUNDOWN.mystery && Array.isArray(RUNDOWN.mystery.pool)) ? RUNDOWN.mystery.pool : [];
   const SHOW_OFF = Array.isArray(RUNDOWN.off) ? RUNDOWN.off : [];   // games switched off in the show (Peak or Plunge)
+  // fix 6: Snap Sort is ON HOLD. Wherever the show would play Snap Sort - a Mystery Portal door (RUNDOWN.door.pool), the Mystery Wheel's SNAP wedge, the
+  // old two-a-day mystery pool (the results' tease) - it plays ZiG Zap ZaBam! instead. The swap happens at runtime, after the date's pick, so every day's
+  // draw (and data/schedule.js, data/rundown.js) is unchanged; Snap Sort's code and data stay, and the TEST menu's 'Snap Sort: easy/medium/hard' still
+  // play Snap Sort itself (a forced pick is never swapped). TO SWITCH BACK: make this {} (or delete the snapSort entry).
+  const SHOW_GAME_SWAP = { snapSort:'zigZap' };
+  function showSwap(g){ const t = g && SHOW_GAME_SWAP[g]; return t && miniGame(t) ? t : g; }
   function mysteryAvailable(g){
     if (SHOW_OFF.indexOf(g) >= 0) return false;
     if (miniGame(g)) return !miniGame(g).available || !!miniGame(g).available();   // the Part E games (lib/mini-games.js)
@@ -6118,14 +6126,14 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       d = dayAfter(d);
     }
     const out = mysteryCache[date] || prev;
-    return [out[0] || null, out[1] || out[0] || null];
+    return [out[0] || null, out[1] || out[0] || null].map(g=> g && showSwap(g));   // (fix 6: Snap Sort on hold)
   }
   // Run 4A, the Mystery Door (Round 3): four different bonus games behind four doors, by the date (the same for
   // everyone that day), from RUNDOWN.door.pool - only games whose data loaded, and none twice in the episode.
   const DOOR_COUNT = 3;   // (A+: the Mystery Portal has exactly three doors)
   function showDoorGames(date){
     const pool = ((RUNDOWN.door && RUNDOWN.door.pool) || []).filter(g=> mysteryAvailable(g));
-    return shuffle(pool.slice(), mulberry32(hashStr('flipstax-door-' + date))).slice(0, DOOR_COUNT);
+    return shuffle(pool.slice(), mulberry32(hashStr('flipstax-door-' + date))).slice(0, DOOR_COUNT).map(showSwap);   // (fix 6: Snap Sort on hold - see SHOW_GAME_SWAP)
   }
   function showAd(date){
     const ads = (RUNDOWN.commercial && RUNDOWN.commercial.ads) || [];
@@ -11292,7 +11300,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // the other three open too so the player sees what else was there, and the picked game plays. The old Portal Pick's
   // power-ups are not offered here (their code stays).
   const DOOR_PICK_MS = 8000;
-  const DOOR_ICONS = { emojiDecode:'😀', timeWarp:'⌛', snapSort:'📸', saucerShuffle:'🛸', factOrFib:'❓', priceProbe:'🏷️' };
+  const DOOR_ICONS = { emojiDecode:'😀', timeWarp:'⌛', snapSort:'📸', saucerShuffle:'🛸', factOrFib:'❓', priceProbe:'🏷️', zigZap:'⚡', alienBlast:'👽', spaceLaunch:'🚀' };
   // A+ pacing: every game's icon, for its title card
   const GAME_ICONS = Object.assign({ riddle:'🧩', lucky:'🎡', door:'🚪', zapWords:'⚡', twinFlip:'🃏', orbitDrop:'🛸', wordWarp:'🌀', peakOrPlunge:'⛰️', oddballAlert:'🔍', crowdScan:'👥', vs:'🆚' }, DOOR_ICONS);
   // A+ tier 2 item 3: the Mystery Portal (was the Mystery Door) - exactly three doors drawn in code (CSS + SVG): a copper door with an
@@ -11619,6 +11627,12 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       flash: (kind)=>{ if (kind === 'win'){ marquee.classList.remove('unison', 'miss'); void marquee.offsetWidth; marquee.classList.add('unison'); setTimeout(()=> marquee.classList.remove('unison'), 700); showFlash('win'); }
         else { marquee.classList.remove('unison', 'miss'); void marquee.offsetWidth; marquee.classList.add('miss'); setTimeout(()=> marquee.classList.remove('miss'), 800); } },
       hostSvg: ()=> Host.html({ pose:'idle' }),
+      // fix 6: ZiG Zap ZaBam! asks Brain Beam questions - from the Brain Beam banks (medium, then easy, then hard), never one already asked in this show
+      beamPts: EXTRA_BEAM_POINTS,
+      quiz: (k)=>{ const asked = api._asked = api._asked || [], seen = (t)=> asked.indexOf(t) >= 0 || runAskedQuestions.indexOf(t) >= 0;
+        let q = null; for (const lv of ['medium', 'easy', 'hard']){ q = pickBeamQuestion(lv, ((api.seed ^ hashStr('zz-' + (k || 0) + lv)) >>> 0), seen); if (q && !seen(q.question)) break; }
+        if (q){ asked.push(q.question); if (runActive) runAskedQuestions.push(q.question); }
+        return q; },
       finish: (res)=>{
         if (over) return; over = true; stopTimer();
         const pts = Math.max(0, Math.round((res && res.pts) || 0)), win = !!(res && res.win);
@@ -11842,7 +11856,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
         popShow('GOOPED!', took ? '-' + took + ' points' : 'Nothing to lose - phew!');
       }
       else if (w.kind === 'LOSE'){ const had = left(); if (had > 0) lost++; sfx.wrong(); popShow('LOSE A SPIN!', had > 0 ? 'One spin gone' : 'No spins left to lose'); }
-      else if (w.kind === 'SAUCER' || w.kind === 'SNAP'){ const key = w.kind === 'SAUCER' ? 'saucerShuffle' : 'snapSort'; sfx.correct(); popShow('MYSTERY GAME!', mysteryName(key) + ' - a bonus round'); after = (go)=> bonusGame(key, go); }
+      else if (w.kind === 'SAUCER' || w.kind === 'SNAP'){ const key = w.kind === 'SAUCER' ? 'saucerShuffle' : showSwap('snapSort');   /* (fix 6: Snap Sort on hold - the SNAP wedge plays ZiG Zap ZaBam!) */ sfx.correct(); popShow('MYSTERY GAME!', mysteryName(key) + ' - a bonus round'); after = (go)=> bonusGame(key, go); }
       else if (w.kind === 'DANCE'){ points(10); sfx.cheer(); popShow('DANCE PARTY!', '+10 points - get down!'); after = (go)=> danceParty(go); }
       renderBank(); FX.pop(pop, 1.1);
       revealThen(()=>{ if (gen !== luckyGen) return; popHide(); if (after) after(next); else next(); }, { text: pop.textContent });   // (the result holds REVEAL_HOLD_MS)
@@ -12597,7 +12611,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     { const ic = showCard.querySelector('.gi-icon'); if (key === 'lucky') ic.innerHTML = '<svg class="gi-wheel" viewBox="0 0 100 100" aria-hidden="true"><g class="gw-spin"><path d="M50 50 L50.0 6.0 A44 44 0 0 1 81.1 18.9 Z" fill="#ff4d6d"/><path d="M50 50 L81.1 18.9 A44 44 0 0 1 94.0 50.0 Z" fill="#b45cff"/><path d="M50 50 L94.0 50.0 A44 44 0 0 1 81.1 81.1 Z" fill="#2fd4a0"/><path d="M50 50 L81.1 81.1 A44 44 0 0 1 50.0 94.0 Z" fill="#ff9a3d"/><path d="M50 50 L50.0 94.0 A44 44 0 0 1 18.9 81.1 Z" fill="#ff4d6d"/><path d="M50 50 L18.9 81.1 A44 44 0 0 1 6.0 50.0 Z" fill="#b45cff"/><path d="M50 50 L6.0 50.0 A44 44 0 0 1 18.9 18.9 Z" fill="#2fd4a0"/><path d="M50 50 L18.9 18.9 A44 44 0 0 1 50.0 6.0 Z" fill="#ff9a3d"/><circle cx="50" cy="50" r="44" fill="none" stroke="#fff3c4" stroke-width="4"/><circle cx="50" cy="50" r="9" fill="#fff3c4" stroke="#8a5200" stroke-width="2.5"/></g></svg>'; else ic.textContent = GAME_ICONS[key] || '✨'; }   // (A+ pacing: the game's icon over its name)
     // Overnight job 7: three spotlight beams from the top sweep round the stage and converge on the title, which then settles; the beams fade.
     showCard.insertAdjacentHTML('afterbegin', [0.12, 0.5, 0.88].map((x, k)=> '<i class="gi-beam b' + k + '" aria-hidden="true" style="left:' + (x * 100) + '%"></i>').join(''));
-    showCard.querySelector('.gi-sign span').textContent = String(name).toUpperCase();
+    showCard.querySelector('.gi-sign span').textContent = key === 'zigZap' ? String(name) : String(name).toUpperCase();   // (fix 6: ZiG Zap ZaBam! keeps its own capitals)
     if (key === 'door'){   // the Mystery Doors's title card: a shine sweep across the sign and six sparkles around it (lib/juice.css)
       const sg = showCard.querySelector('.gi-sign'); sg.insertAdjacentHTML('beforeend', '<i class="gi-shine" aria-hidden="true"></i>' + [[-5, -16], [48, -26], [103, -12], [-7, 112], [50, 126], [105, 110]].map((q, k)=> '<i class="gi-spk" aria-hidden="true" style="left:' + q[0] + '%;top:' + q[1] + '%;animation-delay:' + (-(k * 0.37)).toFixed(2) + 's"></i>').join(''));
     }
@@ -19254,6 +19268,9 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       { label:'Twin Flip', go: roundGame('twinFlip', 220, 5) },
       { label:'Fact or Fib', go: mysteryAs('factOrFib') },
       { label:'Saucer Shuffle', go: mysteryAs('saucerShuffle') },
+      { label:'ZiG Zap ZaBam!', go: mysteryAs('zigZap') },
+      { label:'Alien Blast', go: mysteryAs('alienBlast') },
+      { label:'Space Launch', go: mysteryAs('spaceLaunch') },
       // The finale's cue card, then the Word Warp with all six letters in.
       { label:'Grand finale (6 letters)', wide:true, go: atType(s=> s.t === 'act' && s.finale, 0, 210, 6) },
       { label:'Grand finale (3 letters)', wide:true, go: atType(s=> s.t === 'act' && s.finale, 0, 210, 3) },
