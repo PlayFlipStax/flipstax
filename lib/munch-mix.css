@@ -157,3 +157,12 @@
 .gc-set .gc-hole{ margin:-23vmin 0 0 -23vmin; z-index:2; }
 /* the English galaxy is bright behind the board: a subtle dark backing keeps every tile and word clear of it */
 .gc-slab[data-pack="ENGLISH"]{ background:linear-gradient(180deg, rgba(14,8,40,0.5), rgba(10,6,30,0.42) 50%, rgba(14,8,40,0.55)); }
+/* ---- mega 5 item 7: the win polish. Warp streaks thicker (4 px) and brighter (a white core); comets with a bigger head (20 px) and a longer trail
+   (160 px); VICTORY! bigger, in gold lettering on the navy title plate with the neon cyan outline (the GALACTIC CHOMPER sign's look). Static shadows only. ---- */
+.gc-set .gc-warp{ height:4px; margin-top:-2px; border-radius:4px; background:linear-gradient(90deg, rgba(255,255,255,0), color-mix(in srgb, var(--sc, #fff) 85%, transparent) 45%, var(--sc, #fff) 70%, #ffffff 92%); }
+.gc-set .gc-comet{ width:160px; height:5px; margin-top:-2.5px; border-radius:5px; background:linear-gradient(90deg, rgba(255,255,255,0), color-mix(in srgb, var(--sc, #fff) 55%, transparent) 45%, var(--sc, #fff) 80%, #ffffff); }
+.gc-set .gc-comet::after{ right:-10px; width:20px; height:20px; margin-top:-10px; box-shadow:0 0 14px 6px var(--sc, #fff); }
+.nx-slam.gcvictory{ z-index:9; padding:10px 26px 14px; border-radius:20px; border:3px solid #7df9ff; letter-spacing:4px;
+  font:900 clamp(64px, 20vw, 132px)/1 'Big Shoulders Display', var(--f-display);
+  background:linear-gradient(180deg, rgba(20,10,60,0.94), rgba(8,4,34,0.96)); box-shadow:0 0 22px rgba(125,249,255,0.6), inset 0 1px 0 rgba(255,255,255,0.3);
+  color:#ffe45c; text-shadow:0 0 18px rgba(255,210,63,0.85), 0 4px 0 #7a4a00; }
