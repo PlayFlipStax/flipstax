@@ -2079,3 +2079,59 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root:root.mode-daily .event-overlay.has-plate.bb-emojiDecode .qz-plate b{ color:#ffe86b; text-shadow:0 3px 0 #0a1f66; font-size:clamp(28px, 9vw, 40px); }
 :root:root.mode-daily .event-overlay.has-plate.bb-emojiDecode .qz-plate small{ color:#dfe6f5; }
 @media (min-width:600px){ :root:root.mode-daily .event-overlay.has-plate.bb-emojiDecode .qz-plate b{ font-size:clamp(40px, 7vw, 64px); } }
+
+/* makeover job 5: Time Warp - (a) a larger timeline on a dark panel with the year labels on two rows below the line, (b) a clock tunnel on deep indigo,
+   (c) a blast of clocks and gears on a right answer (see runBrainBreakOne). Transform and opacity only; lite and reduced motion: a still tunnel, no blast. */
+:root:root.stage-on .event-overlay.bb-timeWarp, :root:root .event-overlay.bb-timeWarp{ background:radial-gradient(ellipse 90% 70% at 50% 46%, #2a1680 0%, #160a52 45%, #0a0430 80%, #05021c 100%) !important; }
+:root:root:root:root:root .event-overlay.bb-timeWarp .ev-bg{ display:none !important; }
+.tw-tunnel{ display:none; position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:-1; }
+.event-overlay.bb-timeWarp .tw-tunnel{ display:block; }
+.tw-tunnel > i{ position:absolute; left:50%; top:46%; display:block; }
+.tt-streaks{ width:180vmax; height:180vmax; margin:-90vmax 0 0 -90vmax; opacity:0.22; background:repeating-conic-gradient(from 3deg, rgba(255,255,255,0.9) 0deg 0.6deg, rgba(255,255,255,0) 0.6deg 11deg); -webkit-mask-image:radial-gradient(circle, transparent 0 4%, #000 14%); mask-image:radial-gradient(circle, transparent 0 4%, #000 14%); }
+.tt-ring{ width:96vmin; height:96vmin; margin:-48vmin 0 0 -48vmin; border-radius:50%; border:0.9vmin solid var(--rc); box-sizing:border-box; opacity:0; transform:scale(0.06);
+  animation:ttRush 7s linear calc(var(--k) * -1s) infinite; will-change:transform, opacity; }
+.tt-ring::before{ content:''; position:absolute; inset:5%; border-radius:50%; border:1.6vmin dotted var(--rc); opacity:0.75; }
+.tt-ring::after{ content:''; position:absolute; inset:-3%; border-radius:50%; border:0.3vmin solid var(--rc); opacity:0.5; }
+.tt-ring.c0{ --rc:#3fe4ff; } .tt-ring.c1{ --rc:#ff4fc4; } .tt-ring.c2{ --rc:#ffcf3f; }
+@keyframes ttRush{ 0%{ transform:scale(0.06); opacity:0; } 12%{ opacity:0.75; } 80%{ opacity:0.55; } 100%{ transform:scale(1.9); opacity:0; } }
+.tt-streak{ width:0.5vmin; height:20vmin; margin-left:-0.25vmin; border-radius:1vmin; background:linear-gradient(180deg, rgba(255,255,255,0), #ffffff); transform-origin:50% 0; opacity:0;
+  transform:rotate(var(--a)) translateY(6vmin); animation:ttStreak var(--du) linear var(--dl) infinite; will-change:transform, opacity; }
+@keyframes ttStreak{ 0%{ transform:rotate(var(--a)) translateY(4vmin) scaleY(0.3); opacity:0; } 20%{ opacity:0.85; } 100%{ transform:rotate(var(--a)) translateY(72vmin) scaleY(1.6); opacity:0; } }
+.tt-core{ width:30vmin; height:30vmin; margin:-15vmin 0 0 -15vmin; border-radius:50%; background:radial-gradient(circle, #ffffff 0%, #e6fbff 18%, rgba(125,249,255,0.75) 36%, rgba(120,90,255,0.3) 60%, rgba(120,90,255,0) 72%); }
+:root.lite .tt-ring, :root.lite .tt-streak{ animation:none; }
+:root.lite .tt-ring{ opacity:0.55; transform:scale(calc(0.18 + var(--k) * 0.24)); } :root.lite .tt-streak{ display:none; } :root.lite .tt-streaks{ opacity:0.32; }
+@media (prefers-reduced-motion: reduce){ .tt-ring, .tt-streak{ animation:none; } .tt-ring{ opacity:0.55; transform:scale(calc(0.18 + var(--k) * 0.24)); } .tt-streak{ display:none; } .tt-streaks{ opacity:0.32; } }
+.paused .tw-tunnel i, :root.tab-hidden .tw-tunnel i{ animation-play-state:paused !important; }
+.tw-blast{ position:absolute; left:50%; top:46%; width:0; height:0; z-index:5; pointer-events:none; }
+.tw-tunnel .tw-blast{ z-index:1; }
+.tw-blast i{ position:absolute; left:0; top:0; font-size:clamp(28px, 8vw, 64px); line-height:1; font-style:normal; transform:translate(-50%, -50%) scale(0.2); will-change:transform, opacity; }
+/* the blast plays above the cards: put it in the overlay itself (z 5) rather than the tunnel */
+/* dim the tunnel behind the reading parts */
+:root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-timeWarp .event-prompt{ background:linear-gradient(180deg, rgba(10,6,48,0.92), rgba(5,3,30,0.95)) !important; border-color:#7df9ff !important; }
+:root:is(.mode-daily, .mode-infinity) .event-overlay.bb-timeWarp .event-subtitle:not(.res-win):not(.res-miss){ background:rgba(5,3,30,0.9) !important; border-color:#7df9ff !important; color:#d8fbff !important; }
+.event-overlay.bb-timeWarp .bb-num.tw-num{ border-color:#7df9ff; background:rgba(5,3,30,0.88); color:#eaffff; }
+:root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-timeWarp .event-tile:nth-child(1){ box-shadow:0 0 0 4px rgba(5,3,30,0.75), 0 8px 0 2px rgba(5,3,30,0.6); }
+:root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-timeWarp .event-tile:nth-child(2){ box-shadow:0 0 0 4px rgba(5,3,30,0.75), 0 8px 0 2px rgba(5,3,30,0.6); }
+/* the larger timeline: a dark rounded panel, the line through its middle, pins 36 px, labels 15 px; zoomed labels on two rows below */
+.event-overlay.bb-timeWarp .tw-track{ height:96px; margin:6px 0 10px; border-radius:18px; background:rgba(5,3,30,0.78); box-shadow:0 0 0 2px rgba(125,249,255,0.35); }
+.event-overlay.bb-timeWarp .tw-line{ top:46px; height:5px; }
+.event-overlay.bb-timeWarp .tw-tick{ top:38px; }
+.event-overlay.bb-timeWarp .tw-tick i{ height:20px; }
+.event-overlay.bb-timeWarp .tw-tick b{ top:25px; font-size:15px; }
+.event-overlay.bb-timeWarp .tw-tick.minor b{ font-size:13px; }
+.event-overlay.bb-timeWarp .tw-tick.up b{ top:-21px; }
+.event-overlay.bb-timeWarp .tw-tick.low2 b{ top:40px; }
+.event-overlay.bb-timeWarp .tw-link{ top:44px; height:9px; }
+.event-overlay.bb-timeWarp .tw-pin{ top:28px; }
+.event-overlay.bb-timeWarp .tw-pin b{ left:-18px; top:0; width:36px; height:36px; font-size:20px; }
+.event-overlay.bb-timeWarp .tw-pin em{ top:-24px; font-size:19px; }
+@media (max-height:700px){ .event-overlay.bb-timeWarp .tw-track{ height:78px; margin:4px 0 6px; } .event-overlay.bb-timeWarp .tw-line{ top:36px; } .event-overlay.bb-timeWarp .tw-tick{ top:29px; } .event-overlay.bb-timeWarp .tw-tick i{ height:18px; }
+  .event-overlay.bb-timeWarp .tw-tick b{ top:21px; font-size:12px; } .event-overlay.bb-timeWarp .tw-tick.minor b{ font-size:11px; } .event-overlay.bb-timeWarp .tw-tick.up b{ top:-17px; } .event-overlay.bb-timeWarp .tw-tick.low2 b{ top:33px; }
+  .event-overlay.bb-timeWarp .tw-link{ top:34px; } .event-overlay.bb-timeWarp .tw-pin{ top:22px; } .event-overlay.bb-timeWarp .tw-pin b{ left:-15px; width:30px; height:30px; font-size:17px; } .event-overlay.bb-timeWarp .tw-pin em{ top:-20px; font-size:16px; } }
+@media (min-width:600px){ .event-overlay.bb-timeWarp .tw-track{ height:150px; margin:10px 0 16px; border-radius:24px; } .event-overlay.bb-timeWarp .tw-line{ top:70px; height:8px; } .event-overlay.bb-timeWarp .tw-tick{ top:58px; } .event-overlay.bb-timeWarp .tw-tick i{ height:32px; }
+  .event-overlay.bb-timeWarp .tw-tick b{ top:40px; font-size:24px; } .event-overlay.bb-timeWarp .tw-tick.minor b{ font-size:20px; } .event-overlay.bb-timeWarp .tw-tick.up b{ top:-34px; } .event-overlay.bb-timeWarp .tw-tick.low2 b{ top:66px; }
+  .event-overlay.bb-timeWarp .tw-link{ top:67px; height:14px; } .event-overlay.bb-timeWarp .tw-pin{ top:46px; } .event-overlay.bb-timeWarp .tw-pin b{ left:-28px; width:56px; height:56px; font-size:30px; } .event-overlay.bb-timeWarp .tw-pin em{ top:-40px; font-size:32px; } }
+/* (job 5) the VS badge moves to the right end of the seam so it no longer covers the centred year tags; cyan on indigo to match the tunnel */
+:root.mode-daily .event-overlay.bb-two.bb-timeWarp .bb-vs{ left:auto; right:6%; margin-left:0; background:radial-gradient(circle at 38% 30%, #ffffff 0%, #9ff3ff 30%, #2a7be0 68%, #160a52 100%); box-shadow:0 0 0 3px rgba(5,3,30,0.9), 0 0 20px rgba(125,249,255,0.9); }
+/* (job 5) on phones the event's picture is capped to the card so it no longer rises out of the card's top into the timeline */
+@media (max-width:599px){ :root:root:root:root .event-overlay.stack.bb-two.bb-timeWarp .bb-glyph{ font-size:clamp(40px, 6.6svh, 100px); line-height:1; } }

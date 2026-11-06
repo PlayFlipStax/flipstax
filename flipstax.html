@@ -12176,6 +12176,13 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       v.t.classList.toggle('up', !zoomed && k % 2 === 1);
       if (zoomed){ if (v.x - last < 36 && v.t.classList.contains('minor')) v.t.classList.add('out'); else last = v.x; }
     });
+    // makeover job 5: zoomed in, the year labels take turns on two rows below the line (so none runs into its neighbour or sits under a card edge), and a
+    // plain tick right under an event's pin drops its label (the pin shows that year above the line)
+    if (zoomed){
+      const pins = [...track.querySelectorAll('.tw-pin')].map(p=> parseFloat(p.style.left)).filter(x=> !isNaN(x));
+      let row = 0;
+      vis.forEach(v=>{ if (v.t.classList.contains('out')) return; if (v.t.classList.contains('minor') && pins.some(px=> Math.abs(px - v.x) < 30)){ v.t.classList.add('out'); return; } v.t.classList.toggle('low2', row++ % 2 === 1); });
+    }
   }
   function twReveal(track, ys, tiles){
     const quiet = isLite() || prefersReducedMotion(), lo = Math.min(ys[0], ys[1]), hi = Math.max(ys[0], ys[1]), pad = Math.max(6, (hi - lo) * 0.45), dom = [lo - pad, hi + pad];
@@ -12255,6 +12262,14 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     if (key === 'timeWarp' && st.parts){ leds = document.createElement('div'); leds.className = 'tw-leds'; leds.setAttribute('aria-hidden', 'true'); leds.innerHTML = '<i></i>'.repeat(st.parts); els.eventSubtitle.after(leds); paintLeds(); }
     // fix 4: Time Warp's timeline - a glowing track with era ticks (BC, 1000, 1500, 1800, 2000) spaced by the actual years. It shows the whole span before
     // the answer (so it gives nothing away); on the answer it zooms to the two years, the events drop onto it at their years and a glowing link joins them.
+    // makeover job 5: Time Warp's clock tunnel - concentric clock rings (cyan, pink, gold) rushing toward the viewer and white speed streaks from a bright
+    // centre on deep indigo (transform and opacity only; built once, shown only with .bb-timeWarp; lite and reduced motion: a still tunnel)
+    if (key === 'timeWarp' && !document.getElementById('twTunnel')){
+      let h = '<div id="twTunnel" class="tw-tunnel" aria-hidden="true"><i class="tt-streaks"></i>';
+      for (let k = 0; k < 7; k++) h += '<i class="tt-ring c' + (k % 3) + '" style="--k:' + k + '"></i>';
+      for (let k = 0; k < 18; k++) h += '<i class="tt-streak" style="--a:' + (k * 20 + (k * 7) % 11) + 'deg;--dl:-' + ((k * 0.37) % 1.8).toFixed(2) + 's;--du:' + (1.5 + (k * 0.13) % 0.8).toFixed(2) + 's"></i>';
+      ov.insertAdjacentHTML('afterbegin', h + '<i class="tt-core"></i></div>');
+    }
     let track = null;
     ov.querySelectorAll('.tw-track').forEach(e=> e.remove());
     if (key === 'timeWarp'){
@@ -12301,6 +12316,18 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
         if (rd.why) els.eventPrompt.textContent = rd.why;
         showFlash('win'); hostMood('cheer'); hostSay(hostLine('right')); sfx.combo(); if (key === 'priceProbe') sfx.cashRegister(); else sfx.cheer(); ov.classList.add('flash-win');
         if (right){ FX.burstAt(showFx, right, { count:12, spread:100, shapes:['star', 'coin'] }); FX.pop(right, 1.25); }
+        if (key === 'timeWarp' && !isLite() && !prefersReducedMotion() && Element.prototype.animate){   // makeover job 5: 12 clocks and gears blast out of the tunnel's centre and fade (1.2 s)
+          const b = document.createElement('div'); b.className = 'tw-blast'; b.setAttribute('aria-hidden', 'true');
+          const G = ['\u23F0', '\u2699\uFE0F', '\uD83D\uDD70\uFE0F', '\u231A', '\u2699\uFE0F', '\u23F1\uFE0F'], W = ov.clientWidth, H = ov.clientHeight;
+          ov.appendChild(b);
+          for (let k = 0; k < 12; k++){
+            const e = document.createElement('i'); e.textContent = G[k % G.length]; b.appendChild(e);
+            const a = (k / 12) * Math.PI * 2 + Math.random() * 0.4, d = Math.min(W, H) * (0.36 + Math.random() * 0.2), sc = 0.8 + Math.random() * 0.7, rot = (Math.random() < 0.5 ? -1 : 1) * (180 + Math.random() * 240);
+            e.animate([{ transform:'translate(-50%, -50%) scale(0.2) rotate(0deg)', opacity:1 }, { transform:'translate(calc(-50% + ' + (Math.cos(a) * d * 0.55).toFixed(0) + 'px), calc(-50% + ' + (Math.sin(a) * d * 0.55).toFixed(0) + 'px)) scale(' + sc.toFixed(2) + ') rotate(' + (rot * 0.5).toFixed(0) + 'deg)', opacity:1, offset:0.45 },
+              { transform:'translate(calc(-50% + ' + (Math.cos(a) * d).toFixed(0) + 'px), calc(-50% + ' + (Math.sin(a) * d).toFixed(0) + 'px)) scale(' + (sc * 1.15).toFixed(2) + ') rotate(' + rot.toFixed(0) + 'deg)', opacity:0 }], { duration:1200, easing:'cubic-bezier(.2,.7,.3,1)', fill:'forwards' });
+          }
+          setTimeout(()=> b.remove(), 1300);
+        }
         // mega 4 item 6: a single Price Probe's right answer is its top result - the big celebration; a right answer in a series is the small one
         bigBreak = key === 'priceProbe' && !st.parts && !!window.Celebrate && !DEBUG_FAST;
         if (bigBreak) Celebrate.win({ word:'PRICE IS RIGHT!', wordTop:'30%' }); else if (window.Celebrate) Celebrate.small(right);
