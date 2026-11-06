@@ -148,4 +148,10 @@
   box-shadow:0 0 16px var(--lc, #2fb4ff), inset 0 0 0 2px #ffffff; }
 .gc-lit.white{ background:radial-gradient(circle, #ffffff 0%, #ffffff 55%, rgba(255,255,255,0.75) 100%); }
 @media (min-width:600px){ .gc-lit{ border-radius:20px; } } @media (max-height:700px){ .gc-lit{ border-radius:11px; } }
+/* the hyperspace jump's pieces, out from the centre: warp streaks, comets, laser bolts (transform and opacity only) */
+.gc-set .gc-warp, .gc-set .gc-comet, .gc-set .gc-bolt{ position:absolute; transform-origin:0 50%; pointer-events:none; z-index:3; }
+.gc-set .gc-warp{ height:2px; margin-top:-1px; border-radius:2px; background:linear-gradient(90deg, rgba(255,255,255,0), var(--sc, #fff) 60%, #ffffff); }
+.gc-set .gc-comet{ width:90px; height:3px; margin-top:-1.5px; border-radius:3px; background:linear-gradient(90deg, rgba(255,255,255,0), color-mix(in srgb, var(--sc, #fff) 80%, transparent) 70%, #ffffff); }
+.gc-set .gc-comet::after{ content:''; position:absolute; right:-6px; top:50%; width:12px; height:12px; margin-top:-6px; border-radius:50%; background:#ffffff; box-shadow:0 0 10px 4px var(--sc, #fff); }
+.gc-set .gc-bolt{ width:70px; height:4px; margin-top:-2px; border-radius:4px; background:linear-gradient(90deg, #ffffff, var(--sc, #fff)); box-shadow:0 0 10px var(--sc, #fff); }
 .gc-set .gc-hole{ margin:-23vmin 0 0 -23vmin; z-index:2; }
