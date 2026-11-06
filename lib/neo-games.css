@@ -276,3 +276,78 @@
 .ab-actor.armor.cracked .ab-crack{ opacity:1; } .ab-actor .ab-crack{ opacity:0; } .ab-actor.armor.cracked .ab-shield{ opacity:0.75; }
 @media (max-height:700px){ .ab-sky{ height:40px; } .ab-ufo{ width:66px; height:34px; } }
 .nx-ab .ab-field{ --ab:min(104px, 26vw, calc((100dvh - 412px) / 3.3)); } @media (min-width:600px){ .nx-ab .ab-field{ --ab:min(170px, 20vw, calc((100dvh - 520px) / 3.3)); } }
+
+/* ---- mega 4 item 11: Space Launch at a launch site. The set: a twilight sky, a horizon glow, dark hills and two sweeping searchlights. The rocket view: the sky in
+   layers (far stars, mid clouds, the near ground with the tower, the pad and its flame light) that scroll with parallax as the rocket rises; cloud streaks and
+   stage-separation pieces; the rocket and the pad about 30% larger. The PERFECT LAUNCH voyage to the moon (.sl-voyage). Transform / opacity only. ---- */
+.sl-set .ls-sky{ inset:0; background:linear-gradient(180deg, #0a0a34 0%, #24125e 34%, #5a2a7a 58%, #c0507a 76%, #ff9a5a 88%, #2a1640 100%); }
+.sl-set .ls-glow{ left:-10%; right:-10%; bottom:8%; height:30%; background:radial-gradient(60% 60% at 50% 100%, rgba(255,170,90,0.6), rgba(255,120,90,0) 70%); }
+.sl-set .ls-hills{ left:0; right:0; bottom:0; height:14%; background:radial-gradient(40% 90% at 20% 100%, #1a0c2e 60%, transparent 61%), radial-gradient(50% 100% at 80% 100%, #140824 60%, transparent 61%), linear-gradient(0deg, #0e061c 40%, transparent 41%); }
+.sl-set .ls-beam{ bottom:-6%; width:38%; height:110%; opacity:0.2; transform-origin:50% 100%; clip-path:polygon(46% 100%, 54% 100%, 100% 0, 0 0); background:linear-gradient(0deg, rgba(255,250,220,0.85), rgba(255,240,200,0.2) 60%, rgba(255,240,200,0)); animation:lsBeam 8s ease-in-out infinite alternate; }
+.sl-set .ls-beam.l{ left:2%; } .sl-set .ls-beam.r{ right:2%; animation-delay:-4s; animation-direction:alternate-reverse; }
+@keyframes lsBeam{ from{ transform:rotate(-28deg); } to{ transform:rotate(20deg); } }
+:root.lite .sl-set *{ animation:none !important; } @media (prefers-reduced-motion: reduce){ .sl-set *{ animation:none !important; } }
+.nx-sl .sl-scene{ background:none !important; }
+.sl-sky{ position:absolute; inset:0; z-index:0; background:linear-gradient(180deg, #070726 0%, #1c1258 40%, #6a2c7e 72%, #e0707a 90%, #ffb070 100%); }
+.sl-par{ position:absolute; inset:0; z-index:0; pointer-events:none; will-change:transform; }
+.sl-par.far .sl-stars{ position:absolute; left:0; right:0; top:-120%; bottom:30%; }
+.sl-cloud{ position:absolute; height:22px; border-radius:50%; background:radial-gradient(ellipse at 50% 60%, rgba(255,220,240,0.75), rgba(255,200,230,0.25) 55%, rgba(255,200,230,0) 72%); }
+.sl-cloud.c1{ left:-8%; width:60%; top:30%; } .sl-cloud.c2{ right:-10%; width:70%; top:8%; opacity:0.8; } .sl-cloud.c3{ left:10%; width:50%; top:-22%; opacity:0.7; }
+.sl-hglow{ position:absolute; left:-10%; right:-10%; bottom:6%; height:26%; background:radial-gradient(60% 60% at 50% 100%, rgba(255,180,110,0.7), rgba(255,140,110,0) 70%); }
+.sl-land{ position:absolute; left:0; right:0; bottom:0; height:9%; background:linear-gradient(180deg, #2a1838, #120a1c); }
+.sl-tower{ position:absolute; left:9%; bottom:8%; width:15%; height:58%; z-index:1;
+  background:repeating-linear-gradient(45deg, rgba(160,150,190,0.85) 0 2px, transparent 2px 12px), repeating-linear-gradient(-45deg, rgba(160,150,190,0.85) 0 2px, transparent 2px 12px), linear-gradient(90deg, #4a4060 0 10%, transparent 10% 90%, #4a4060 90%); border-top:4px solid #6a6088; }
+.sl-tl{ position:absolute; right:-3px; width:7px; height:7px; border-radius:50%; background:#ff3a3a; box-shadow:0 0 8px #ff3a3a; animation:slBlink 1.6s steps(1) infinite; }
+.sl-tl.a{ top:-6px; } .sl-tl.b{ top:35%; animation-delay:-0.5s; } .sl-tl.c{ top:70%; animation-delay:-1.1s; }
+@keyframes slBlink{ 0%{ opacity:1; } 50%{ opacity:0.15; } }
+.nx-sl .sl-pad{ left:15%; right:15%; bottom:7%; height:10.4%; }
+.sl-padlight{ position:absolute; left:20%; right:20%; bottom:10%; height:34%; z-index:1; opacity:0; transition:opacity 0.3s ease; background:radial-gradient(50% 60% at 50% 100%, rgba(255,200,110,0.85), rgba(255,140,60,0) 70%); }
+.sl-scene:has(.sl-flame.on) .sl-padlight{ opacity:1; }
+.sl-scene.count .sl-bulbs{ animation-duration:0.5s !important; }
+.sl-streaks{ position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
+.sl-cstreak{ position:absolute; top:0; width:34%; height:70px; border-radius:50%; background:radial-gradient(ellipse, rgba(255,240,250,0.85), rgba(255,240,250,0) 70%); }
+.nx-sl .sl-heights{ z-index:2; }
+.nx-sl .sl-rocket{ width:clamp(57px, 15.6vw, 91px); margin-left:calc(clamp(57px, 15.6vw, 91px) / -2); bottom:14%; z-index:3; }
+.nx-sl .sl-smoke{ z-index:4; }
+.sl-sep{ position:absolute; left:50%; top:78%; z-index:0; width:34%; height:14%; border-radius:3px; background:linear-gradient(90deg, #6a6f86, #e8eaf4 45%, #8a8fa6); }
+.sl-sep:nth-child(odd){ background:linear-gradient(90deg, #7a0612, #ff5a5a 45%, #8a0c18); }
+@media (min-width:600px){ .nx-sl .sl-rocket{ width:156px; margin-left:-78px; } .nx-sl .sl-pad{ left:24%; right:24%; height:6.5%; } }
+:root.lite .sl-tl{ animation:none; } @media (prefers-reduced-motion: reduce){ .sl-tl{ animation:none; } }
+/* the PERFECT LAUNCH voyage */
+.sl-voyage{ position:absolute; inset:0; z-index:9; overflow:hidden; border-radius:18px; cursor:pointer; background:linear-gradient(180deg, #120a40 0%, #3a1a6e 50%, #b0507a 100%); transition:opacity 0.4s ease; }
+.sl-voyage.out{ opacity:0; }
+.sl-voyage > i, .sl-voyage > div{ position:absolute; pointer-events:none; }
+.sv-space{ inset:0; opacity:0; background:radial-gradient(120% 80% at 50% 30%, #0a0626 0%, #020110 70%); transition:opacity 2s ease-in; }
+.sl-voyage.rise .sv-space{ opacity:1; }
+.sv-stars{ inset:0; } .sv-stars i{ position:absolute; top:0; width:2px; height:10px; border-radius:2px; background:#ffffff; }
+.sv-earth{ left:10%; top:9%; width:22%; aspect-ratio:1; border-radius:50%; opacity:0; transform:scale(0.6); transition:opacity 1s ease, transform 1.4s ease-out;
+  background:radial-gradient(circle at 35% 30%, #e8fbff 0%, #4ab8ff 25%, #1a7a4a 45%, #2a6ae0 60%, #0a2a6a 100%); box-shadow:0 0 22px 6px rgba(80,170,255,0.55); }
+.sl-voyage.moon .sv-earth{ opacity:1; transform:scale(1); }
+.sv-moon{ left:-20%; right:-20%; bottom:0; height:34%; border-radius:50% 50% 0 0 / 30% 30% 0 0; transform:translateY(105%); transition:transform 1.4s cubic-bezier(.2,.7,.3,1);
+  background:radial-gradient(70% 60% at 50% 0%, #f2f2f8 0%, #c8c8d6 40%, #8a8aa0 80%, #5a5a70 100%); }
+.sl-voyage.moon .sv-moon{ transform:none; }
+.sv-cr{ position:absolute; border-radius:50%; background:radial-gradient(ellipse at 50% 40%, #6a6a82 0%, #9a9ab0 60%, rgba(154,154,176,0) 72%); box-shadow:inset 0 3px 4px rgba(40,40,60,0.45); }
+.sv-cr.a{ left:24%; top:22%; width:13%; height:16%; } .sv-cr.b{ left:62%; top:34%; width:9%; height:11%; } .sv-cr.c{ left:40%; top:58%; width:16%; height:18%; } .sv-cr.d{ left:76%; top:16%; width:6%; height:8%; }
+.sv-rocket{ left:50%; bottom:29%; width:clamp(57px, 15.6vw, 91px); margin-left:calc(clamp(57px, 15.6vw, 91px) / -2); z-index:3; transform:translateY(-55%); transition:transform 0.5s ease-in; }
+.sv-rocket svg{ display:block; width:100%; height:auto; position:relative; z-index:1; }
+.sl-voyage.rise .sv-rocket{ animation:svShake 0.12s linear infinite; }
+.sl-voyage.moon .sv-rocket{ transform:translateY(-420%); animation:none; }
+.sl-voyage.descend .sv-rocket{ transform:translateY(0); transition:transform 2s cubic-bezier(.15,.6,.35,1); }
+@keyframes svShake{ 0%{ margin-top:0; } 50%{ margin-top:1px; } }
+.sv-thrust{ position:absolute; left:50%; top:74%; width:44%; height:70%; margin-left:-22%; transform-origin:50% 0; clip-path:polygon(50% 100%, 0 0, 100% 0); z-index:0;
+  background:linear-gradient(180deg, #fffbe0, #ffd23f 30%, #ff6a1a 65%, rgba(255,60,20,0)); animation:slFlicker 0.12s ease-in-out infinite alternate; }
+.sl-voyage.rise .sv-thrust{ height:150%; } .sl-voyage.descend .sv-thrust{ height:55%; } .sl-voyage.landed .sv-thrust{ opacity:0; transition:opacity 0.3s ease; }
+.sv-flag{ left:66%; bottom:30%; width:44px; height:64px; z-index:2; }
+.sv-pole{ position:absolute; left:0; bottom:0; width:3px; height:100%; background:#e8eaf4; transform:scaleY(0); transform-origin:50% 100%; transition:transform 0.4s ease-out; }
+.sv-cloth{ position:absolute; left:3px; top:0; width:40px; height:26px; opacity:0; transform:scaleX(0.2); transform-origin:0 50%; transition:transform 0.4s ease-out 0.3s, opacity 0.2s ease 0.3s;
+  background:linear-gradient(180deg, #ff3fb5 0 33%, #ffe27a 33% 66%, #27e6ff 66%); border-radius:0 4px 4px 0; }
+.sl-voyage.flag .sv-pole{ transform:scaleY(1); } .sl-voyage.flag .sv-cloth{ opacity:1; transform:none; }
+.sv-beam{ bottom:-4%; width:46%; height:100%; opacity:0; transform-origin:50% 100%; clip-path:polygon(46% 100%, 54% 100%, 100% 0, 0 0); background:linear-gradient(0deg, rgba(255,250,220,0.8), rgba(255,240,200,0) 80%); transition:opacity 0.5s ease; }
+.sv-beam.l{ left:-6%; } .sv-beam.r{ right:-6%; }
+.sl-voyage.flag .sv-beam{ opacity:0.45; animation:lsBeam 1.8s ease-in-out infinite alternate; } .sl-voyage.flag .sv-beam.r{ animation-direction:alternate-reverse; }
+.sv-fw{ inset:0; z-index:4; } .sv-pop{ position:absolute; width:4px; height:4px; }
+.sv-skip{ left:0; right:0; bottom:6px; z-index:5; text-align:center; font:800 12px/1 var(--f-body, Inter, sans-serif); letter-spacing:1px; color:rgba(255,255,255,0.75); }
+.nx-slam.moon{ z-index:6; font-size:clamp(34px, 10.5vw, 60px); color:#fff4d6; text-shadow:0 4px 0 #3a1a6e, 0 0 20px rgba(125,249,255,0.8); }
+.nx-sl.sl-voyaging .nx-panel, .nx-sl.sl-voyaging .sl-go{ visibility:hidden; }
+:root.lite .sl-voyage *, :root.lite .sl-voyage{ animation:none !important; transition:opacity 0.3s ease !important; }
+@media (prefers-reduced-motion: reduce){ .sl-voyage *, .sl-voyage{ animation:none !important; transition:opacity 0.3s ease !important; } }
