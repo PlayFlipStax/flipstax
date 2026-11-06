@@ -16011,7 +16011,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       const decoys = shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(c=> runWord.word.indexOf(c) < 0), rr).slice(0, Math.max(0, WARP_TRAY - rest.length));
       solveRack = shuffle(rest.concat(decoys), rr);
     }
-    applyTrayMode();
+    applyTrayMode(); wwLogoEnsure();
     rackUsedFlags = [];
     buildSolveKeyboard();
     solveEndsAt = Date.now() + RUN_SOLVE_MS + runWarpBonusMs; solveTotalMs = RUN_SOLVE_MS + runWarpBonusMs;
@@ -16043,7 +16043,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     solveLockedLetters = sv.locked || new Array(RUN_WORD_LENGTH).fill(null);
     solveRack = sv.rack || [];
     solveFreeHints = sv.freeHints || 0; solveBonusNote = sv.note || '';
-    solveEndsAt = sv.endsAt; solveTotalMs = RUN_SOLVE_MS + runWarpBonusMs; applyTrayMode();
+    solveEndsAt = sv.endsAt; solveTotalMs = RUN_SOLVE_MS + runWarpBonusMs; applyTrayMode(); wwLogoEnsure();
     voted = false; votedSinceTime = null;
     const last = solveGuesses[solveGuesses.length - 1];
     if (last && last.join('') === runWord.word){ endRun(true, sv.solvedAt || Date.now()); return; }
@@ -16145,6 +16145,50 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     if (nextOpenSlot() === -1) return;
     addToGuess(letter, rackIdx); sfx.tick && sfx.tick();
   }
+  // makeover job 7: the Word Warp logo (Daily tray). WORD is four white tiles with navy letters on a gentle upward arc; WARP starts as the same tiles, then
+  // each one stretches, skews and tilts more than the one before it, with two faint trail copies behind it, spiralling toward a swirl of cyan and pink
+  // arms at the lower right. HTML tiles in a box sized by its own width (container units), so it always fits; the swirl turns the opposite way to the galaxy.
+  const WW_LOGO_TILES = [ ['W', 8, 60, -12, 0, 1], ['O', 19.5, 48, -7, 0, 1], ['R', 31, 41, -2, 0, 1], ['D', 42.5, 38, 3, 0, 1],
+    ['W', 54.5, 36, 10, -5, 1.06], ['A', 67.5, 30, 24, -10, 1.16], ['R', 81, 34, 46, -15, 1.28], ['P', 91, 56, 72, -21, 1.4] ];
+  function wwLogoHtml(){
+    const tile = (t, cls, op)=> '<span class="wl-t' + (cls || '') + '" style="left:' + t[1] + '%;top:' + t[2] + '%;--r:' + t[3] + 'deg;--sk:' + t[4] + 'deg;--sx:' + t[5] + (op != null ? ';opacity:' + op : '') + '"><b>' + t[0] + '</b></span>';
+    const lerp = (a, b, f)=> [b[0], a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f, a[3] + (b[3] - a[3]) * f, a[4] + (b[4] - a[4]) * f, a[5] + (b[5] - a[5]) * f];
+    let h = '';
+    for (let k = 4; k < 8; k++){ h += tile(lerp(WW_LOGO_TILES[k - 1], WW_LOGO_TILES[k], 0.45), ' tr', 0.14) + tile(lerp(WW_LOGO_TILES[k - 1], WW_LOGO_TILES[k], 0.72), ' tr', 0.3); }
+    // the swirl: four spiral arms (two cyan, two pink), as round-capped strokes
+    const arm = (a0, col)=>{ let d = ''; for (let i = 0; i <= 28; i++){ const t = i / 28, a = a0 + t * 4.2, r = 6 + t * 40; d += (i ? 'L' : 'M') + (Math.cos(a) * r).toFixed(1) + ' ' + (Math.sin(a) * r).toFixed(1); } return '<path d="' + d + '" stroke="' + col + '"/>'; };
+    const sw = '<span class="wl-swirl"><svg viewBox="-50 -50 100 100"><circle r="47" fill="rgba(125,249,255,0.12)"/><g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">' +
+      arm(0, '#5ff4ff') + arm(Math.PI / 2, '#ff6ac8') + arm(Math.PI, '#5ff4ff') + arm(Math.PI * 1.5, '#ff6ac8') + '</g><circle r="6" fill="#ffffff"/></svg></span>';
+    return '<div class="wl-box">' + sw + h + WW_LOGO_TILES.map((t, k)=> tile(t, k < 4 ? ' wd' : ' wp')).join('') + '</div>';
+  }
+  // the galaxy behind the Word Warp: a spiral of pink, cyan and peach arms round a bright core over a field of stars (an inline SVG drawn once, on the
+  // .ww-galaxy layer that turns; the soft arms are a still blur filter - nothing about the blur animates)
+  function wwGalaxySvg(){
+    const rr = mulberry32(20261106); let arms = '', stars = '';
+    const COL = ['#ff6ac8', '#5ff4ff', '#ffb38a', '#b98cff'];
+    for (let k = 0; k < 4; k++){
+      let d = ''; for (let i = 0; i <= 60; i++){ const r = 26 * Math.pow(18.5, i / 60), a = k * Math.PI / 2 + Math.log(r / 26) * 1.55; d += (i ? 'L' : 'M') + (Math.cos(a) * r).toFixed(1) + ' ' + (Math.sin(a) * r).toFixed(1); }
+      arms += '<path d="' + d + '" stroke="' + COL[k] + '" stroke-width="90" opacity="0.32"/><path d="' + d + '" stroke="' + COL[k] + '" stroke-width="34" opacity="0.5"/><path d="' + d + '" stroke="#ffffff" stroke-width="8" opacity="0.35"/>';
+    }
+    for (let i = 0; i < 260; i++){ const x = (rr() * 1000 - 500).toFixed(0), y = (rr() * 1000 - 500).toFixed(0), r = (0.6 + rr() * 1.9).toFixed(1); stars += '<circle cx="' + x + '" cy="' + y + '" r="' + r + '" opacity="' + (0.45 + rr() * 0.55).toFixed(2) + '"/>'; }
+    return '<svg viewBox="-500 -500 1000 1000" preserveAspectRatio="xMidYMid slice"><defs><radialGradient id="wgBg"><stop offset="0" stop-color="#2a1260"/><stop offset="0.55" stop-color="#120836"/><stop offset="1" stop-color="#05021a"/></radialGradient>' +
+      '<radialGradient id="wgCore"><stop offset="0" stop-color="#ffffff"/><stop offset="0.25" stop-color="#ffe6f6"/><stop offset="0.55" stop-color="#ff9ad8" stop-opacity="0.6"/><stop offset="1" stop-color="#7a4cff" stop-opacity="0"/></radialGradient>' +
+      '<filter id="wgSoft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="16"/></filter></defs>' +
+      '<rect x="-500" y="-500" width="1000" height="1000" fill="url(#wgBg)"/><g fill="none" stroke-linecap="round" filter="url(#wgSoft)">' + arms + '</g>' +
+      '<circle r="150" fill="url(#wgCore)"/><g fill="#ffffff">' + stars + '</g></svg>';
+  }
+  function wwLogoEnsure(){
+    { const inner = els.solveOverlay.querySelector('.solve-inner'); if (inner) inner.style.opacity = ''; }
+    { const gi = document.querySelector('.ww-galaxy i'); if (gi && !gi.querySelector('svg')) gi.innerHTML = wwGalaxySvg(); }
+    if (document.getElementById('wwLogo')) return;
+    const inner = els.solveOverlay.querySelector('.solve-inner'); if (!inner) return;
+    const d = document.createElement('div'); d.className = 'ww-logo'; d.id = 'wwLogo'; d.setAttribute('role', 'img'); d.setAttribute('aria-label', 'Word Warp'); d.innerHTML = wwLogoHtml();
+    inner.insertBefore(d, inner.firstChild);
+  }
+  // the galaxy's turn (and the logo swirl's) at a given speed: 1 = normal (one turn in about 90 s), 4 = the win's spin-up
+  function wwSpinRate(rate){
+    document.querySelectorAll('.ww-galaxy i, .ww-logo .wl-swirl svg').forEach(e=>{ if (e.getAnimations) e.getAnimations().forEach(a=>{ try{ a.updatePlaybackRate ? a.updatePlaybackRate(rate) : (a.playbackRate = rate); }catch(err){ a.playbackRate = rate; } }); });
+  }
   function winWarp(){
     clearInterval(solveInterval);
     const solvedAt = Date.now(); runSolvedAt = solvedAt;
@@ -16158,7 +16202,69 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   }
   // The Word Warp win (Daily tray): the UFO flies in from the top, its beam sweeps the solved word and the tiles lift into it for a moment, confetti bursts,
   // and SOLVED! shows once with the time and points. (Lite and reduced motion: a plain fade and the banner. The farm-animal fly-up is gone.)
+  // makeover job 7 item 4: the massive Word Warp win (set WW_SPIRAL_WIN false for the fix 6 version below). Under about 3 s in all:
+  //   0 - 1.5 s  every tile (the answer, the tray, the logo letters) spirals into the galaxy's centre while the galaxy (and the logo swirl) spin 4x faster;
+  //   1.5 s      a burst from the centre: 50 stars and comets fly out and fade (1.1 s), WARPED IT! scales in with a bounce, the win sound plays and the
+  //              score pill counts up with the +N;
+  //   ~2.9 s     done() - the results flow continues. Transform and opacity only.
+  // Lite and reduced motion: the galaxy and logo stay still; the board fades, WARPED IT! shows (no scaling) with the points, then done().
+  const WW_SPIRAL_WIN = true;
+  function wwSpiralWin(solvedAt, done){
+    const still = FX.reduced() || isLite() || !Element.prototype.animate, ov = els.solveOverlay;
+    const W = innerWidth, H = innerHeight, cx = W / 2, cy = H / 2;
+    const layer = document.createElement('div'); layer.className = 'ww-win ww-mega'; layer.setAttribute('aria-hidden', 'true'); ov.appendChild(layer);
+    const scoreEl = els.runBanner && els.runBanner.querySelector('.sp-num'), to = shownScore(runScore), from = shownScore(runScore - (runWarpPoints || 0));
+    const word = document.createElement('div'); word.className = 'ww-mega-word'; word.textContent = 'WARPED IT!'; word.style.opacity = '0'; layer.appendChild(word);
+    const pts = document.createElement('div'); pts.className = 'ww-mega-pts'; pts.textContent = runWarpPoints ? '+' + runWarpPoints + ' pts' : ''; pts.style.opacity = '0'; layer.appendChild(pts);
+    const countUp = (ms)=>{ if (!scoreEl) return; if (still || !ms){ scoreEl.textContent = to.toLocaleString(); return; } const t0 = performance.now();
+      (function f(now){ const t = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - t, 3); scoreEl.textContent = Math.round(from + (to - from) * e).toLocaleString(); if (t < 1) requestAnimationFrame(f); })(t0); };
+    if (scoreEl) scoreEl.textContent = from;
+    const pieces = [].concat(Array.from(els.solveSlots.children), Array.from(els.solveRack.children), Array.from(ov.querySelectorAll('.ww-logo .wl-t, .ww-logo .wl-swirl, .solve-buttons .daily-btn, .solve-attempts, .solve-header, .solve-bar')));
+    const anims = [];
+    // (the board stays hidden through the crossfade to the results - its animations are only dropped once it is out of sight; wwLogoEnsure shows it again)
+    const fin = ()=>{ const inner = ov.querySelector('.solve-inner'); if (inner) inner.style.opacity = '0'; anims.forEach(a=>{ try{ a.cancel(); }catch(e){} }); wwSpinRate(1); layer.remove(); ov.classList.remove('celebrating', 'ww-done'); done(); };
+    sfx.cheer();
+    if (still){
+      ov.classList.add('ww-done');
+      const inner = ov.querySelector('.solve-inner');
+      [inner, els.solveSlots, els.solveRack].forEach(e=>{ if (e && e.animate) anims.push(e.animate([{ opacity:1 }, { opacity:0 }], { duration:400, fill:'forwards' })); });
+      word.style.opacity = '1'; pts.style.opacity = '1'; sfx.solveWin(); countUp(0);
+      setTimeout(fin, 1800); return;
+    }
+    // 1. the spiral in, the galaxy spun up
+    wwSpinRate(4);
+    pieces.forEach((e, k)=>{
+      const r = e.getBoundingClientRect(); if (!r.width) return;
+      const dx = cx - (r.left + r.width / 2), dy = cy - (r.top + r.height / 2), dir = dx >= 0 ? 1 : -1, d = (k * 37) % 300;
+      // a curved path: out to the side first, then wound in (a quarter turn about the centre)
+      const mx = dx * 0.45 - dy * 0.35 * dir, my = dy * 0.45 + dx * 0.35 * dir;
+      anims.push(e.animate([{ transform:'translate(0,0) rotate(0deg) scale(1)', opacity:1 },
+        { transform:'translate(' + mx.toFixed(0) + 'px,' + my.toFixed(0) + 'px) rotate(' + (260 * dir) + 'deg) scale(0.7)', opacity:1, offset:0.5 },
+        { transform:'translate(' + dx.toFixed(0) + 'px,' + dy.toFixed(0) + 'px) rotate(' + (620 * dir) + 'deg) scale(0.05)', opacity:0 }], { duration:1200, delay:d, easing:'cubic-bezier(.45,0,.75,.9)', fill:'forwards' }));
+    });
+    [els.solveSlots, els.solveRack].forEach(e=> anims.push(e.animate([{ opacity:1 }, { opacity:0 }], { duration:700, delay:500, easing:'ease-in', fill:'forwards' })));   // (the board's frame and the tray's panel fade as their tiles leave)
+    setTimeout(()=> ov.classList.add('ww-done'), 1300);
+    setTimeout(()=> wwSpinRate(1), 1500);
+    // 2. the burst, the word, the sound and the count-up
+    setTimeout(()=>{
+      const COL = ['#5ff4ff', '#ff6ac8', '#ffffff', '#b98cff', '#7dff9a', '#ffe27a'];
+      for (let k = 0; k < 50; k++){
+        const comet = k % 3 === 0, p = document.createElement('i'); p.className = comet ? 'ww-comet' : 'ww-star'; p.style.setProperty('--c', COL[k % COL.length]); p.style.left = cx + 'px'; p.style.top = cy + 'px'; layer.appendChild(p);
+        const a = (k / 50) * Math.PI * 2 + Math.random() * 0.25, dist = Math.min(W, H) * (0.3 + Math.random() * 0.4), deg = a * 180 / Math.PI, sc = 0.7 + Math.random() * 0.8;
+        p.animate(comet ? [{ transform:'translate(-50%,-50%) rotate(' + deg + 'deg) translateX(0) scaleX(0.3)', opacity:1 }, { transform:'translate(-50%,-50%) rotate(' + deg + 'deg) translateX(' + dist.toFixed(0) + 'px) scaleX(1.2)', opacity:0 }]
+          : [{ transform:'translate(-50%,-50%) translate(0,0) scale(0.2) rotate(0deg)', opacity:1 }, { transform:'translate(-50%,-50%) translate(' + (Math.cos(a) * dist).toFixed(0) + 'px,' + (Math.sin(a) * dist).toFixed(0) + 'px) scale(' + sc.toFixed(2) + ') rotate(' + (Math.random() * 360).toFixed(0) + 'deg)', opacity:0 }],
+          { duration:1000 + Math.random() * 300, delay:Math.random() * 120, easing:'cubic-bezier(.15,.7,.3,1)', fill:'both' });
+      }
+      word.style.opacity = '';
+      word.animate([{ transform:'translate(-50%,-50%) scale(0.2)', opacity:0 }, { transform:'translate(-50%,-50%) scale(1.22)', opacity:1, offset:0.55 }, { transform:'translate(-50%,-50%) scale(0.92)', opacity:1, offset:0.78 }, { transform:'translate(-50%,-50%) scale(1)', opacity:1 }], { duration:620, easing:'ease-out', fill:'both' });
+      pts.style.opacity = '';
+      pts.animate([{ transform:'translate(-50%,0) translateY(16px)', opacity:0 }, { transform:'translate(-50%,0) translateY(0)', opacity:1 }], { duration:400, delay:250, easing:'ease-out', fill:'both' });
+      sfx.solveWin(); countUp(900);
+    }, 1500);
+    setTimeout(fin, 2950);
+  }
   function wwWin(solvedAt, done){
+    if (WW_SPIRAL_WIN) return wwSpiralWin(solvedAt, done);
     // fix 6 item 2b: the SOLVED moment, in order - the tiles lock and flash gold, the tray fades out, the UFO beam comes down over the word, the letters bounce
     // one after another, SOLVED! slams in below the word (the tray's room, never over the tiles), then the BIG WIN CELEBRATION (lib/celebrate.js) with the
     // points counting up on the score pill. Transform and opacity only; lite mode and reduced motion: plain fades.

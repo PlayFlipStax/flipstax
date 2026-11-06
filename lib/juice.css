@@ -2148,3 +2148,58 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 @media (min-width:600px){ .tf-stage.tf-stage .tf-title span{ font-size:clamp(34px, 6vw, 60px); } .tf-stage.tf-stage .tf-pairs{ font-size:24px; padding:5px 20px; } }
 @media (min-width:600px){ .mg-twinFlip .mg-inner{ max-width:min(92vw, 900px); } }
 @media (max-height:700px){ .mg-twinFlip .mg-rule{ display:none; } .tf-stage.tf-stage.tf-stage .tf-grid{ width:min(100%, 900px, calc((100dvh - 250px) * 0.77)); } }
+
+/* ---- makeover job 7: Word Warp (Daily tray) ----
+   (1) the logo (wwLogoHtml): WORD in white tiles with navy letters on an upward arc, WARP tiles stretching, skewing and tilting more each, with faint trail
+   copies, spiralling to a cyan-and-pink swirl at the lower right. No gold letters. The box is sized from its own width (cqw), capped by the screen height.
+   (2) much larger answer letters, and the tray (the keyboard) lower on the screen with big keys. (3) the galaxy turns once every 90 s on a layer larger than
+   the screen; the logo swirl turns the other way. (4) the win pieces (wwSpiralWin). Lite and reduced motion: a still galaxy and logo. */
+.ww-logo{ display:none; }
+.solve-overlay.tray .solve-title{ display:none !important; }
+.solve-overlay.tray .ww-logo{ display:block; order:0; flex:none; width:min(100%, 600px, calc(22svh * 2.1)); margin:0 auto 0; }
+.ww-logo .wl-box{ position:relative; width:100%; aspect-ratio:400 / 190; container-type:inline-size; }
+.ww-logo .wl-t{ position:absolute; width:10.6%; aspect-ratio:44 / 50; display:flex; align-items:center; justify-content:center; border-radius:16%;
+  background:linear-gradient(180deg, #ffffff 0%, #eef3ff 55%, #d5e0ff 100%); border:0.5cqw solid #ffffff; box-shadow:0 0.9cqw 0 #6f86d6, 0 1.4cqw 0 rgba(10,20,70,0.35);
+  transform:translate(-50%, -50%) rotate(var(--r)) skewX(var(--sk)) scaleX(var(--sx)); transform-origin:50% 50%; }
+.ww-logo .wl-t b{ font:900 8.4cqw/1 var(--f-display, 'Big Shoulders Display', sans-serif); color:#14286e; letter-spacing:0; }
+.ww-logo .wl-t.wp{ background:linear-gradient(180deg, #ffffff 0%, #ffeefa 55%, #ffd2ef 100%); box-shadow:0 0.9cqw 0 #c86aa8, 0 1.4cqw 0 rgba(10,20,70,0.35); }
+.ww-logo .wl-t.tr{ box-shadow:none; }
+.ww-logo .wl-swirl{ position:absolute; left:71%; top:74%; width:28%; aspect-ratio:1; transform:translate(-50%, -50%); }
+.ww-logo .wl-swirl svg{ display:block; width:100%; height:100%; overflow:visible; animation:wwSwirlBack 30s linear infinite; will-change:transform; }
+@keyframes wwSwirlBack{ from{ transform:rotate(0deg); } to{ transform:rotate(-360deg); } }
+@keyframes wwGalTurn{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+/* the galaxy: a square layer 170vmax across (larger than the screen in every direction), turning once every 90 s */
+:root:root .solve-overlay.tray .ww-galaxy i{ left:50%; top:50%; width:118vmax; height:118vmax; margin:-59vmax 0 0 -59vmax; background:#05021a; animation:wwGalTurn 90s linear infinite; will-change:transform; }
+.ww-galaxy i svg{ display:block; width:100%; height:100%; }
+:root:root .solve-overlay.tray .ww-galaxy::before{ display:none; }
+:root:root .solve-overlay.tray .ww-galaxy::after{ background:rgba(6,2,22,0.18); }
+:root.lite .solve-overlay.tray .ww-galaxy i, :root.lite .ww-logo .wl-swirl svg{ animation:none !important; }
+@media (prefers-reduced-motion: reduce){ :root:root .solve-overlay.tray .ww-galaxy i, .ww-logo .wl-swirl svg{ animation:none !important; } }
+.paused .ww-galaxy i, :root.tab-hidden .ww-galaxy i, .paused .ww-logo .wl-swirl svg{ animation-play-state:paused; }
+/* the layout: the column fills the screen, the tray and its buttons sit at the bottom */
+:root:root .solve-overlay.tray{ align-items:stretch; padding-top:max(18px, env(safe-area-inset-top)); }
+:root:root .solve-overlay.tray .solve-inner{ height:100%; max-width:min(100%, 640px); margin:0 auto; justify-content:flex-start; }
+:root:root .solve-overlay.tray .solve-rack{ margin-top:auto; }
+/* (2) the answer letters: six big panels across the width */
+:root:root:root .solve-overlay.tray .solve-slots{ gap:clamp(4px, 1.2vw, 10px); padding:clamp(7px, 2vw, 14px); margin:8px 0 6px; }
+:root:root:root .solve-overlay.tray .solve-slot{ width:clamp(42px, calc((min(100vw, 640px) - 92px) / 6), 92px); height:clamp(62px, calc((min(100vw, 640px) - 92px) / 6 * 1.55), 140px); font-size:clamp(40px, calc((min(100vw, 640px) - 92px) / 6 * 1.0), 92px); border-radius:10px; }
+/* the keyboard: 4 rows of 5 big keys at the bottom */
+:root:root:root .solve-overlay.tray .solve-rack{ width:min(100%, 600px); gap:clamp(6px, 2vw, 14px); padding:clamp(8px, 2.4vw, 16px); margin-bottom:10px; }
+:root:root:root .solve-overlay.tray .solve-tile{ max-width:none; width:100%; height:clamp(54px, 15.4vw, 104px); font-size:clamp(30px, 9.6vw, 62px); touch-action:manipulation; }
+:root:root .solve-overlay.tray .solve-buttons{ width:min(100%, 600px); margin-top:0; }
+:root:root .solve-overlay.tray .solve-buttons .daily-btn{ min-height:clamp(50px, 7svh, 76px); font-size:clamp(20px, 5.4vw, 32px); touch-action:manipulation; }
+.solve-overlay.tray .solve-slot{ touch-action:manipulation; }
+@media (max-height:700px){
+  .solve-overlay.tray .ww-logo{ width:min(100%, calc(15svh * 2.1)); }
+  :root:root:root .solve-overlay.tray .solve-slot{ height:clamp(52px, 8.8svh, 70px); font-size:clamp(30px, 5.4svh, 40px); }
+  :root:root:root .solve-overlay.tray .solve-tile{ height:clamp(44px, 7.6svh, 60px); font-size:clamp(26px, 4.8svh, 34px); }
+  :root:root:root .solve-overlay.tray .solve-rack{ gap:6px; padding:7px; margin-bottom:6px; }
+  :root:root .solve-overlay.tray .solve-buttons .daily-btn{ min-height:44px; font-size:19px; }
+}
+/* (4) the win */
+.ww-mega{ position:fixed; inset:0; z-index:40; pointer-events:none; }
+.ww-mega-word{ position:absolute; left:50%; top:46%; transform:translate(-50%, -50%); white-space:nowrap; font:900 clamp(56px, 17vw, 150px)/1 var(--f-display, sans-serif); letter-spacing:2px; color:#ffffff;
+  -webkit-text-stroke:3px #14286e; paint-order:stroke fill; text-shadow:0 6px 0 #ff4fb4, 0 12px 0 rgba(10,4,40,0.55); }
+.ww-mega-pts{ position:absolute; left:50%; top:calc(46% + clamp(44px, 11vw, 100px)); transform:translate(-50%, 0); white-space:nowrap; font:900 clamp(26px, 7vw, 56px)/1 var(--f-display, sans-serif); color:#7df9ff; -webkit-text-stroke:2px #14286e; paint-order:stroke fill; }
+.ww-star{ position:absolute; width:clamp(14px, 3.6vw, 28px); aspect-ratio:1; background:var(--c); clip-path:polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); will-change:transform, opacity; }
+.ww-comet{ position:absolute; width:clamp(40px, 11vw, 90px); height:4px; border-radius:2px; background:linear-gradient(90deg, rgba(255,255,255,0), var(--c) 70%, #ffffff); transform-origin:0 50%; will-change:transform, opacity; }
