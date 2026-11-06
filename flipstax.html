@@ -4420,6 +4420,7 @@
       <div class="riddle-ufo event-ufo" aria-hidden="true"><span>🛸</span><i></i></div>
       <div class="powerup-icon hidden" id="powerupIcon">🎁</div>
       <div class="bb-marquee" aria-hidden="true"></div>
+      <div class="qz-plate" id="qzPlate" aria-hidden="true"><b></b><small></small></div>
       <div class="event-subtitle" id="eventSubtitle"></div>
       <div class="event-prompt" id="eventPrompt"></div>
       <div class="event-timerbar" id="eventTimerBar"><div class="event-timerbar-fill" id="eventTimerFill"></div></div>
@@ -12189,6 +12190,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     els.powerupIcon.classList.add('hidden');
     fitTopChip();
     els.eventSubtitle.textContent = '🎲 BRAIN BREAK · ' + def.name().toUpperCase() + (rd.kind ? ' · ' + rd.kind.toUpperCase() : '') + (st.parts ? ' · ' + (st.part + 1) + ' OF ' + st.parts : '');
+    if (setQuizPlate(def.name().toUpperCase(), [rd.kind ? rd.kind.toUpperCase() : '', st.parts ? (st.part + 1) + ' OF ' + st.parts : ''].filter(Boolean).join(' · '))) els.eventSubtitle.textContent = '';   // (mega 5: the title plate)
     els.eventPrompt.textContent = rd.prompt;
     tiles.forEach((tileEl, i)=>{
       tileEl.classList.remove('portal', 'open', 'is-right', 'is-wrong', 'picked-wait', 'bb-press');
@@ -13163,6 +13165,15 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // Daily's Brain Beam and Riddle Round: the A+ look (sunburst, marquee card, candy answers, light-strip clock, the
   // Family Feud flip, chime / buzzer).
   function aplusQuiz(){ const ov = els.eventOverlay; return document.documentElement.classList.contains('mode-daily') && (ov.classList.contains('quiz-beam') || ov.classList.contains('quiz-riddle')); }
+  // mega 5 item 5: a title plate in the Galactic Chomper style (navy plate, neon outline, gold lettering) over the Brain Beam, the Riddle Round and
+  // the Brain Breaks (Emoji Decode and the rest) in the daily show; it takes the bulb strip's place. Off (returns false) outside the daily show.
+  // The overlay observer takes it off when the overlay hides or turns into anything else.
+  function setQuizPlate(title, sub){
+    const p = document.getElementById('qzPlate'), ov = els.eventOverlay, on = !!(p && title) && document.documentElement.classList.contains('mode-daily');
+    ov.classList.toggle('has-plate', on);
+    if (on){ p.querySelector('b').textContent = title; p.querySelector('small').textContent = sub || ''; }
+    return on;
+  }
   function setBeamLook(on, question, riddle){
     els.eventOverlay.classList.toggle('quiz-beam', on && !riddle);
     els.eventOverlay.classList.toggle('quiz-riddle', on && !!riddle);   // D2: the riddle show's own look (split-flap answers)
@@ -13231,6 +13242,9 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       };
     });
     setBeamLook(beamLook, q.question, !!q.riddle);
+    // (mega 5: the Chomper-style title plate names the game; the info line moves onto the plate)
+    if (setQuizPlate(q.riddle ? GN.riddleRound.toUpperCase() : GN.brainBeam.toUpperCase(),
+      second ? 'SECOND CHANCE · RECOVER A LETTER' : q.riddle ? 'SOLVE THE RIDDLE' : [step && step.level ? step.level.toUpperCase() : '', runQuizBeam ? 'WIN A PRIZE-TRACK TILE' : ''].filter(Boolean).join(' · '))) els.eventSubtitle.textContent = '';
     // The clock starts once the bars are open (a refresh mid-question resumes it at once).
     const myQ = runPendingQ;
     const startClock = ()=>{
@@ -17289,7 +17303,8 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // C1: Infinity's popup world - the power-up pick, a Cosmic Surprise, or
   // the bonus Brain Beam.
   const evBg = document.getElementById('evBg');
-  new MutationObserver(()=>{ const ov = els.eventOverlay; if (ov.classList.contains('hidden')) els.eventSubtitle.classList.remove('res-win', 'res-miss'); if ((ov.classList.contains('quiz-beam') || ov.classList.contains('quiz-riddle')) && (ov.classList.contains('hidden') || ov.classList.contains('powerup') || ov.classList.contains('cosmic-mode') || ov.classList.contains('gift-mode'))) ov.classList.remove('quiz-beam', 'quiz-riddle'); })
+  new MutationObserver(()=>{ const ov = els.eventOverlay; if (ov.classList.contains('hidden')) els.eventSubtitle.classList.remove('res-win', 'res-miss'); if ((ov.classList.contains('quiz-beam') || ov.classList.contains('quiz-riddle')) && (ov.classList.contains('hidden') || ov.classList.contains('powerup') || ov.classList.contains('cosmic-mode') || ov.classList.contains('gift-mode'))) ov.classList.remove('quiz-beam', 'quiz-riddle');
+    if (ov.classList.contains('has-plate') && (ov.classList.contains('hidden') || !(ov.classList.contains('quiz-beam') || ov.classList.contains('quiz-riddle') || ov.classList.contains('brainbreak')))) ov.classList.remove('has-plate'); })   // (mega 5: the title plate)
     .observe(els.eventOverlay, { attributes:true, attributeFilter:['class'] });
   new MutationObserver(()=>{
     const ov = els.eventOverlay, w = ov.classList.contains('cosmic-mode') && document.getElementById('cosmicStage').classList.contains('riddle') ? 'w-riddle' : ov.classList.contains('gift-mode') || ov.classList.contains('cosmic-mode') ? 'w-odd' : ov.classList.contains('powerup') ? 'w-powerup' : 'w-trivia';

@@ -1967,3 +1967,17 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :where(#board, #board *, .mg-overlay, .mg-overlay *, .event-overlay, .event-overlay *, .lucky-overlay, .lucky-overlay *, .solve-overlay, .solve-overlay *,
   .fin-overlay, .fin-overlay *, .guess-overlay, .guess-overlay *, .ir-overlay, .ir-overlay *, .riddle-overlay, .riddle-overlay *, #showCard, #showCard *,
   .personality-overlay, .personality-overlay *, .home-overlay, .home-overlay *, .split-select-overlay, .split-select-overlay *, button, [role="button"], .daily-btn){ touch-action:manipulation; }
+/* mega 5 item 5: the title plate in the Galactic Chomper style (navy glass plate, neon cyan outline, gold lettering, a cyan info line) over the
+   Brain Beam, the Riddle Round and the Brain Breaks (Emoji Decode and the rest) in the daily show; it takes the bulb strip's place and sits above the
+   question, never over it. Still (no animation). */
+.qz-plate{ display:none; }
+:root:root.mode-daily .event-overlay.has-plate .bb-marquee{ display:none !important; }
+:root:root.mode-daily .event-overlay.has-plate .qz-plate{ display:block; position:relative; z-index:2; flex:none; align-self:center; box-sizing:border-box; width:min(90%, 340px); margin:0 auto 10px; padding:6px 14px 7px;
+  border-radius:14px; text-align:center; background:linear-gradient(180deg, rgba(20,10,60,0.94), rgba(8,4,34,0.96)); border:2px solid #7df9ff;
+  box-shadow:0 0 16px rgba(125,249,255,0.55), inset 0 1px 0 rgba(255,255,255,0.3); }
+:root:root.mode-daily .event-overlay.has-plate .qz-plate b{ display:block; white-space:nowrap; font:900 clamp(22px, 7vw, 30px)/1 'Big Shoulders Display', var(--f-display); letter-spacing:3px; color:#fff3c4;
+  text-shadow:0 0 12px rgba(255,210,63,0.7), 0 2px 0 #2a1a00; }
+:root:root.mode-daily .event-overlay.has-plate .qz-plate small{ display:block; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font:900 11px/1.15 var(--f-body, Inter, sans-serif); letter-spacing:2px; color:#7df9ff; }
+:root:root.mode-daily .event-overlay.has-plate .qz-plate small:empty{ display:none; }
+@media (max-height:700px){ :root:root.mode-daily .event-overlay.has-plate .qz-plate{ padding:4px 12px 5px; margin-bottom:6px; } :root:root.mode-daily .event-overlay.has-plate .qz-plate b{ font-size:clamp(19px, 6vw, 24px); } :root:root.mode-daily .event-overlay.has-plate .qz-plate small{ font-size:10px; margin-top:2px; } }
+@media (min-width:600px){ :root:root.mode-daily .event-overlay.has-plate .qz-plate{ width:min(62%, 560px); padding:10px 20px 11px; } :root:root.mode-daily .event-overlay.has-plate .qz-plate b{ font-size:clamp(34px, 6vw, 56px); } :root:root.mode-daily .event-overlay.has-plate .qz-plate small{ font-size:clamp(14px, 2.2vw, 20px); } }
