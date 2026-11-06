@@ -25,6 +25,7 @@ window.FLIPSTAX_NAMES = {
     alienBlast:     'Alien Blast',           // tap the green aliens
     spaceLaunch:    'Space Launch',          // stop the marker in the green zone
     munchMix:       'Galactic Chomper',      // chomp the tiles that fit the rule (registry id munchMix)
+    starSequence:   'Star Sequence',         // repeat the saucer's growing light-and-sound pattern (a spare Mystery Game)
     priceProbe:     'Price Probe',
     oddballAlert:   'Oddball Alert',
     emojiDecode:    'Emoji Decode',
@@ -86,6 +87,7 @@ window.FLIPSTAX_NAMES = {
     alienBlast:{ full:'Tap the green aliens as they pop up. Avoid the red ones and the bombs!', short:'Tap the green aliens!' },
     spaceLaunch:{ full:'Tap LAUNCH to stop the marker in the green zone. Dead centre is PERFECT!', short:'Stop it in the green zone!' },
     munchMix:  { full:'Tap the tiles that fit the rule to chomp them. Clear all three boards in 75 seconds!', short:'Tap a tile to chomp it. Beat the clock!' },
+    starSequence:{ full:'Watch the lights. Copy the pattern!', short:'Watch the lights. Copy the pattern!' },
   },
   roundTitles: {
     opener:  'THE OPENER',

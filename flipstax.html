@@ -47,6 +47,7 @@
 <link rel="stylesheet" href="lib/neo-games.css">
 <link rel="stylesheet" href="lib/munch-mix.css">
 <link rel="stylesheet" href="lib/spotlights.css">
+<link rel="stylesheet" href="lib/star-sequence.css">
 <link rel="preload" as="image" href="data/stage/stage-close.webp" type="image/webp">
 <style>
   /* fix 7: no double-tap zoom anywhere: touch-action manipulation on the page itself (lib/juice.css also sets it on every game screen and tappable) */
@@ -4941,6 +4942,7 @@
 <script src="data/munch-packs.js"></script>
 <script src="lib/munch-mix.js"></script>
 <script src="lib/spotlights.js"></script>
+<script src="lib/star-sequence.js"></script>
 <script src="lib/orbit-physics.js"></script>
 <script src="lib/host-alien.js"></script>
 <script src="data/host/manifest.js"></script>
@@ -4960,7 +4962,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // Player-facing game names and the alien host's lines live in
   // data/game-names.js (the defaults here are only a fallback if it fails).
   const GN = Object.assign({ orbitDrop:'Orbit Drop', cosmicSurprise:'Cosmic Surprise', crowdScan:'Crowd Scan', brainBeam:'Brain Beam', riddleRound:'Riddle Round',
-    zapWords:'Zap Words', peakOrPlunge:'Peak or Plunge', snapSort:'Snap Sort', twinFlip:'Twin Flip', factOrFib:'Fact or Fib', saucerShuffle:'Saucer Shuffle', zigZap:'ZiG Zap ZaBam!', alienBlast:'Alien Blast', spaceLaunch:'Space Launch', munchMix:'Galactic Chomper', priceProbe:'Price Probe', oddballAlert:'Oddball Alert', emojiDecode:'Emoji Decode', timeWarp:'Time Warp', portalPick:'Portal Pick',
+    zapWords:'Zap Words', peakOrPlunge:'Peak or Plunge', snapSort:'Snap Sort', twinFlip:'Twin Flip', factOrFib:'Fact or Fib', saucerShuffle:'Saucer Shuffle', zigZap:'ZiG Zap ZaBam!', alienBlast:'Alien Blast', spaceLaunch:'Space Launch', munchMix:'Galactic Chomper', starSequence:'Star Sequence', priceProbe:'Price Probe', oddballAlert:'Oddball Alert', emojiDecode:'Emoji Decode', timeWarp:'Time Warp', portalPick:'Portal Pick',
     wordWarp:'Word Warp', vault:'The Mothership Vault' }, (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.names) || {});
   const HOST_LINES = (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.host) || {};
   const HOST_QUIPS = (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.quip) || {};
@@ -7052,6 +7054,9 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     }),
     correct: ()=>{ playTone(660,0,0.09,'sine',0.11); playTone(990,0.09,0.2,'sine',0.11); haptic([10,30,10]); },
     wrong: ()=>{ playTone(220,0,0.22,'sawtooth',0.06); },
+    // Star Sequence (lib/star-sequence.js): beam i's own note - a C major pentatonic, blue C5, pink E5, orange G5, green A5, gold C6 (Web Audio; the audio
+    // context is unlocked by the game's START tap)
+    starNote: (i)=>{ const f = [523.25, 659.25, 783.99, 880, 1046.5][Math.max(0, Math.min(4, i | 0))]; playTone(f, 0, 0.42, 'triangle', 0.11); playTone(f * 2, 0, 0.24, 'sine', 0.025); },
     powerUp: ()=>{ playTone(440,0,0.07,'square',0.09); playTone(660,0.06,0.09,'square',0.09); playTone(880,0.13,0.18,'square',0.1); haptic([10,20,10]); },
     spinTick: (i)=>{ playTone(280 + i*35, 0, 0.05, 'square', 0.05); },
     // A+ tier 2: the prize wheel's peg tick - a soft short click, higher and snappier while the wheel is fast, lower as it slows (muted with the sound setting)
@@ -11359,7 +11364,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // the other three open too so the player sees what else was there, and the picked game plays. The old Portal Pick's
   // power-ups are not offered here (their code stays).
   const DOOR_PICK_MS = 8000;
-  const DOOR_ICONS = { riddle:'🧩', emojiDecode:'😀', timeWarp:'⌛', snapSort:'📸', saucerShuffle:'🛸', factOrFib:'❓', priceProbe:'🏷️', zigZap:'⚡', alienBlast:'👽', spaceLaunch:'🚀', munchMix:'🍴' };
+  const DOOR_ICONS = { riddle:'🧩', emojiDecode:'😀', timeWarp:'⌛', snapSort:'📸', saucerShuffle:'🛸', factOrFib:'❓', priceProbe:'🏷️', zigZap:'⚡', alienBlast:'👽', spaceLaunch:'🚀', munchMix:'🍴', starSequence:'⭐' };
   // A+ pacing: every game's icon, for its title card
   const GAME_ICONS = Object.assign({ riddle:'🧩', lucky:'🎡', door:'🚪', zapWords:'⚡', twinFlip:'🃏', orbitDrop:'🛸', wordWarp:'🌀', peakOrPlunge:'⛰️', oddballAlert:'🔍', crowdScan:'👥', vs:'🆚' }, DOOR_ICONS);
   // A+ tier 2 item 3: the Mystery Portal (was the Mystery Door) - exactly three doors drawn in code (CSS + SVG): a copper door with an
@@ -19416,6 +19421,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       { label:'ZiG Zap ZaBam!', go: mysteryAs('zigZap') },
       { label:'Alien Blast', go: mysteryAs('alienBlast') },
       { label:'Galactic Chomper', go: mysteryAs('munchMix') },   // (internal id munchMix; also Round 1's game)
+      { label:'Star Sequence', go: mysteryAs('starSequence') },   // (a spare Mystery Game: the end of the Mystery Portal pool)
       { label:'Space Launch', go: mysteryAs('spaceLaunch') },
       // The finale's cue card, then the Word Warp with all six letters in.
       { label:'Grand finale (6 letters)', wide:true, go: atType(s=> s.t === 'act' && s.finale, 0, 210, 6) },

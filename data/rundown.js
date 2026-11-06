@@ -71,7 +71,7 @@ window.FLIPSTAX_RUNDOWN = {
   // everyone that day; no game twice in an episode). Out of the pool: Peak or Plunge (off), Oddball Alert,
   // Crowd Scan, and Twin Flip (Round 5's game). A game whose data didn't load is left out.
   door: {
-    pool: [ 'emojiDecode', 'timeWarp', 'snapSort', 'saucerShuffle', 'factOrFib', 'priceProbe', 'alienBlast', 'spaceLaunch', 'riddle' ],   // (fix 8: Riddle Round appended)   // (fix 6: Alien Blast and Space Launch appended; Snap Sort's door plays ZiG Zap ZaBam! while Snap Sort is on hold - SHOW_GAME_SWAP in flipstax.html)
+    pool: [ 'emojiDecode', 'timeWarp', 'snapSort', 'saucerShuffle', 'factOrFib', 'priceProbe', 'alienBlast', 'spaceLaunch', 'riddle', 'starSequence' ],   // (Star Sequence appended; not on the Wheel)   // (fix 8: Riddle Round appended)   // (fix 6: Alien Blast and Space Launch appended; Snap Sort's door plays ZiG Zap ZaBam! while Snap Sort is on hold - SHOW_GAME_SWAP in flipstax.html)
   },
   // (Older builds drew two Mystery Games a day from here; the results' "Tomorrow" tease still reads it.)
   mystery: {
