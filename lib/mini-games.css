@@ -654,3 +654,20 @@
 @keyframes ssCoreFade{ 0%{ opacity:1; } 40%{ opacity:0.5; } 100%{ opacity:1; } }
 @media (min-width:600px){ .ss-galaxy .ss-word{ font-size:clamp(20px, 3vw, 30px); padding:9px 20px; min-height:52px; } .ss-ring .seg{ stroke-width:4; } }
 .ss-vortex{ width:auto; height:94%; max-width:96%; max-height:94%; }
+
+/* ---- fix 6 item 1: Saucer Shuffle's stage lights up. The lit stage art (data/scenes/saucer-shuffle-stage-lit.webp) lies exactly over the normal background (the same
+   wash, size and anchor) and cross-fades in a chase on a right pick: lit, normal, lit, normal, lit, a beat lit, then back (opacity only, under 2 flashes a second).
+   The old light overlays are gone. Small bulbs on the front rail chase along it all the time. Lite mode and reduced motion: one plain fade, still bulbs. ---- */
+.sc-blaze.wall, .sc-blaze.floor, .sc-blaze.sweep{ display:none !important; }
+.mg-overlay .sc-litbg{ position:absolute; inset:0; z-index:0; pointer-events:none; opacity:0; will-change:opacity;
+  background:linear-gradient(180deg, rgba(10,4,30,0.42) 0%, rgba(10,4,30,0.14) 40%, rgba(10,4,30,0) 62%), url(../data/scenes/saucer-shuffle-stage-lit.webp) 50% 100% / cover no-repeat; }
+.mg-overlay.su-lit .sc-litbg{ animation:suLitChase 3.2s linear 1 both; }
+@keyframes suLitChase{ 0%{ opacity:0; } 6%{ opacity:1; } 15%{ opacity:1; } 23%{ opacity:0; } 31%{ opacity:1; } 40%{ opacity:1; } 48%{ opacity:0; } 56%{ opacity:1; } 80%{ opacity:1; } 100%{ opacity:0; } }
+.mg-overlay .sc-rail{ position:absolute; z-index:0; height:0; display:flex; justify-content:space-around; pointer-events:none; }
+.mg-overlay .sc-rail i{ display:block; width:7px; height:7px; margin-top:-3.5px; border-radius:50%; background:radial-gradient(circle at 40% 35%, #ffffff, #ffe27a 55%, #f5b83a); box-shadow:0 0 6px 2px rgba(255,226,122,0.75);
+  opacity:0.25; animation:suRail 1.6s linear infinite; animation-delay:calc(var(--i) * -0.1s); }
+@keyframes suRail{ 0%{ opacity:0.25; } 10%{ opacity:1; } 30%{ opacity:0.25; } 100%{ opacity:0.25; } }
+.mg-overlay.su-lit .sc-rail i{ animation-duration:0.8s; }
+:root.lite .mg-overlay.su-lit .sc-litbg{ animation:suLitFade 1.6s ease-in-out 1 both; } :root.lite .mg-overlay .sc-rail i{ animation:none; opacity:0.7; }
+@media (prefers-reduced-motion: reduce){ .mg-overlay.su-lit .sc-litbg{ animation:suLitFade 1.6s ease-in-out 1 both; } .mg-overlay .sc-rail i{ animation:none; opacity:0.7; } }
+@keyframes suLitFade{ 0%, 100%{ opacity:0; } 40%, 70%{ opacity:1; } }
