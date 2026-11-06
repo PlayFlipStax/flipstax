@@ -47,7 +47,7 @@ window.FLIPSTAX_RUNDOWN = {
   acts: [
     { id:'r1', round:1, title:'ROUND ONE',   sub:'ROUND 1', mult:1, vsTimerMs:VS_TIMER_MS, world:'vs',
       announce:'Round One! Let’s warm up those Earth brains!',
-      steps:[ { vs:VS_PER_ROUND }, { beam:'easy' },   { game:'riddle' },    { reward:true } ] },
+      steps:[ { vs:VS_PER_ROUND }, { beam:'easy' },   { game:'munchMix' },  { reward:true } ] },   // (fix 8: Galactic Chomps; Riddle Round moved to the Mystery Portal and the Wheel)
     { id:'r2', round:2, title:'ROUND TWO',   sub:'ROUND 2', mult:1, vsTimerMs:VS_TIMER_MS, world:'vs',
       announce:'Round Two! Things are heating up!',
       steps:[ { vs:VS_PER_ROUND }, { beam:'easy' },   { game:'lucky' },     { reward:true } ] },
@@ -71,7 +71,7 @@ window.FLIPSTAX_RUNDOWN = {
   // everyone that day; no game twice in an episode). Out of the pool: Peak or Plunge (off), Oddball Alert,
   // Crowd Scan, and Twin Flip (Round 5's game). A game whose data didn't load is left out.
   door: {
-    pool: [ 'emojiDecode', 'timeWarp', 'snapSort', 'saucerShuffle', 'factOrFib', 'priceProbe', 'alienBlast', 'spaceLaunch' ],   // (fix 6: Alien Blast and Space Launch appended; Snap Sort's door plays ZiG Zap ZaBam! while Snap Sort is on hold - SHOW_GAME_SWAP in flipstax.html)
+    pool: [ 'emojiDecode', 'timeWarp', 'snapSort', 'saucerShuffle', 'factOrFib', 'priceProbe', 'alienBlast', 'spaceLaunch', 'riddle' ],   // (fix 8: Riddle Round appended)   // (fix 6: Alien Blast and Space Launch appended; Snap Sort's door plays ZiG Zap ZaBam! while Snap Sort is on hold - SHOW_GAME_SWAP in flipstax.html)
   },
   // (Older builds drew two Mystery Games a day from here; the results' "Tomorrow" tease still reads it.)
   mystery: {

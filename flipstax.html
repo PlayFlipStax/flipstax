@@ -11356,7 +11356,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // the other three open too so the player sees what else was there, and the picked game plays. The old Portal Pick's
   // power-ups are not offered here (their code stays).
   const DOOR_PICK_MS = 8000;
-  const DOOR_ICONS = { emojiDecode:'😀', timeWarp:'⌛', snapSort:'📸', saucerShuffle:'🛸', factOrFib:'❓', priceProbe:'🏷️', zigZap:'⚡', alienBlast:'👽', spaceLaunch:'🚀', munchMix:'🍴' };
+  const DOOR_ICONS = { riddle:'🧩', emojiDecode:'😀', timeWarp:'⌛', snapSort:'📸', saucerShuffle:'🛸', factOrFib:'❓', priceProbe:'🏷️', zigZap:'⚡', alienBlast:'👽', spaceLaunch:'🚀', munchMix:'🍴' };
   // A+ pacing: every game's icon, for its title card
   const GAME_ICONS = Object.assign({ riddle:'🧩', lucky:'🎡', door:'🚪', zapWords:'⚡', twinFlip:'🃏', orbitDrop:'🛸', wordWarp:'🌀', peakOrPlunge:'⛰️', oddballAlert:'🔍', crowdScan:'👥', vs:'🆚' }, DOOR_ICONS);
   // A+ tier 2 item 3: the Mystery Portal (was the Mystery Door) - exactly three doors drawn in code (CSS + SVG): a copper door with an
@@ -11552,7 +11552,9 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
           // A+ pacing: the game behind the portal gets its own title card (its name and icon, GAME_INTRO_MS) before it starts - no cut
           showGameIntro(game, ()=>{
             if (g !== Show.gen) return;
-            const ok = miniGame(game) ? runMiniGame(game, { seed: st.seed, door:true, day: st.day }, done) : runBrainBreak({ game, seed: st.seed, day: st.day }, done);
+            // (Riddle Round behind a door: the riddle plays and ends the round's game itself, through advanceAfterTrivia, as a Mystery riddle always has)
+            const ok = game === 'riddle' ? (runTriviaQuestion(null, null, { t:'quiz', riddle:true, mystery:true, seed: st.seed, day: st.day }), true)
+              : miniGame(game) ? runMiniGame(game, { seed: st.seed, door:true, day: st.day }, done) : runBrainBreak({ game, seed: st.seed, day: st.day }, done);
             if (!ok) showDone(g, 'door game unavailable');
           });
         }, { lead: DOORS_ART ? 0 : 700, text: els.eventPrompt.textContent, min: DOORS_ART && !(isLite() || prefersReducedMotion()) ? 1800 : 0 });   // (art doors: the world inside animates for 2.5 s in all, from the pick, before the game moves on)   // (the swing takes 0.7 s, then the game's name holds for the shared reveal time)
@@ -11814,7 +11816,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     { kind:'GOOP50',  t:'GOOP',    s:'-50',  icon:'🟢', ink:'#ffffff', out:'#0a1a5a' },
     { kind:'ORB',     t:'ORB',     s:'+1',   icon:'ORB', ink:'#ffffff', out:'#3a0a6a' },
     { kind:'LOSE',    t:'LOSE A',  s:'SPIN', icon:'💨', ink:'#ffffff', out:'#6a0010' },
-    { kind:'SNAP',    t:'MYSTERY', s:'GAME', icon:'📸', ink:'#04323a', out:'#e0fffb' },
+    { kind:'RIDDLE',  t:'RIDDLE',  s:'ROUND', icon:'🧩', ink:'#04323a', out:'#e0fffb' },   // (fix 8: Riddle Round moved here from Round 1 - it was the SNAP mystery wedge, which played ZiG Zap ZaBam!)
     { kind:'DANCE',   t:'DANCE',   s:'PARTY', icon:'🪩', ink:'#5a0a3a', out:'#fff0fa' },
   ];
   const MW_N = MW_WEDGES.length, MW_W = 360 / MW_N, MW_SPINS = 3;
@@ -11899,6 +11901,12 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       const pr = vid.play(); if (pr && pr.catch) pr.catch(()=>{ vid.muted = true; vid.play().catch(()=>{}); });
       if (!isLite() && !FX.reduced()){ FX.confettiBurst(showFx); setTimeout(()=>{ if (!over) FX.confettiBurst(showFx); }, 2500); }
     };
+    // fix 8: the RIDDLE wedge - one Riddle Round question on the show's riddle screen; when it is answered the wheel comes back (triviaOnDone)
+    const bonusRiddle = (then)=>{
+      luckyOv.classList.add('hidden');
+      triviaOnDone = ()=>{ if (gen !== luckyGen) return; luckyOv.classList.remove('hidden'); place(); then(); };
+      runTriviaQuestion(null, null, { t:'quiz', riddle:true, mystery:true, seed: ((st.seed || 1) ^ hashStr('mw-riddle')) >>> 0, day: st.day });
+    };
     const bonusGame = (key, then)=>{
       luckyOv.classList.add('hidden');
       const ok = typeof runMiniGame === 'function' && miniGame(key) && runMiniGame(key, { seed: (st.seed || 1) ^ hashStr('mw-' + key), door:true }, ()=>{ if (gen !== luckyGen) return; luckyOv.classList.remove('hidden'); place(); then(); });
@@ -11916,6 +11924,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       }
       else if (w.kind === 'LOSE'){ const had = left(); if (had > 0) lost++; sfx.wrong(); popShow('LOSE A SPIN!', had > 0 ? 'One spin gone' : 'No spins left to lose'); }
       else if (w.kind === 'SAUCER' || w.kind === 'SNAP'){ const key = w.kind === 'SAUCER' ? 'saucerShuffle' : showSwap('snapSort');   /* (fix 6: Snap Sort on hold - the SNAP wedge plays ZiG Zap ZaBam!) */ sfx.correct(); popShow('MYSTERY GAME!', mysteryName(key) + ' - a bonus round'); after = (go)=> bonusGame(key, go); }
+      else if (w.kind === 'RIDDLE'){ sfx.correct(); popShow('RIDDLE ROUND!', 'One riddle - a bonus round'); after = (go)=> bonusRiddle(go); }
       else if (w.kind === 'DANCE'){ points(10); sfx.cheer(); popShow('DANCE PARTY!', '+10 points - get down!'); after = (go)=> danceParty(go); }
       renderBank(); FX.pop(pop, 1.1);
       revealThen(()=>{ if (gen !== luckyGen) return; popHide(); if (after) after(next); else next(); }, { text: pop.textContent });   // (the result holds REVEAL_HOLD_MS)
@@ -13330,7 +13339,9 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // player who missed at least one first gets a single Second Chance
   // question. This deliberately keys off "all six attempted", not the clock,
   // so everyone who reaches the end of trivia gets it.
+  let triviaOnDone = null;   // (fix 8: a riddle played from the Wheel hands back to the Wheel instead of ending the round's game)
   function advanceAfterTrivia(){
+    if (triviaOnDone){ const f = triviaOnDone; triviaOnDone = null; f(); return; }
     // B2: the show plan decides what's next (Second Chance is retired - the
     // Portal Pick's hint is the help now).
     if (runClockExpired()){ goToFinale(); return; }
@@ -19339,7 +19350,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       { label:'Round 1 card', go: roundCard(1) },
       { label:'VS card', go: atType(s=> s.t === 'vs', 0, 12, 0) },
       { label:'Brain Beam', go: atType(s=> s.t === 'quiz', 0, 24, 0) },
-      { label:'Riddle Round', go: roundGame('riddle', 30, 1) },
+      { label:'Riddle Round', go: mysteryAs('riddle') },   // (fix 8: no longer a round's own game: it plays as a Mystery Game)
       { label:'Reward beat', go: atType(s=> s.t === 'reward', 0, 40, 1) },
       { label:'Crowd Scan', go: mysteryAs('crowdScan') },
       { label:'Cosmic Surprise', go: atType(s=> s.t === 'vs', 0, 30, 1, (i)=>{ runPlan.splice(i, 0, { t:'cosmic', act:0, seed:7 }); }) },
@@ -19349,7 +19360,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       { label:'Portal Pick (old)', go: atType(doorStep, 0, 96, 3, (i)=>{ runPlan.splice(i, 0, { t:'portal', act:runPlan[i].act, doors: RUN_POWERUPS.map(p=> p.key) }); }) },
       { label:'Round 5 card', go: roundCard(5) },
       { label:'Mystery Wheel', go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = null; }) },
-      ...['JACKPOT +100', 'ORB +1', 'GOOP -25', 'Mystery: Saucer Shuffle', '+25', 'GOOP -50', 'ORB +1 (2)', 'LOSE A SPIN', 'Mystery: Snap Sort', 'DANCE PARTY'].map((t, i)=> ({ label:'Wheel: ' + t, go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = i; }) })),
+      ...['JACKPOT +100', 'ORB +1', 'GOOP -25', 'Mystery: Saucer Shuffle', '+25', 'GOOP -50', 'ORB +1 (2)', 'LOSE A SPIN', 'Riddle Round', 'DANCE PARTY'].map((t, i)=> ({ label:'Wheel: ' + t, go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = i; }) })),
       { label:'Price Probe', go: mysteryAs('priceProbe') },
       { label:'Oddball Alert', go: mysteryAs('oddballAlert') },
       { label:'Emoji Decode', go: mysteryAs('emojiDecode') },
