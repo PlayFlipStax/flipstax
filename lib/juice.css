@@ -2032,3 +2032,14 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .zw-stage .zw-title.zw-logo{ width:min(96%, 520px); height:auto; margin:2px auto 0; font-size:0; line-height:0; letter-spacing:0; text-shadow:none; }
 .zw-logo .zl-svg{ display:block; width:100%; height:auto; max-height:clamp(84px, 15svh, 200px); overflow:visible; }
 @media (max-height:700px){ .zw-stage .zw-title.zw-logo{ margin:0 auto; } .zw-logo .zl-svg{ max-height:48px; } .zw-stage .zw-grid.sq{ width:min(100%, 372px, calc((100dvh - 318px) * 0.8333)); } }   /* (the grid gives back the logo's extra height on short screens, so the hint clears the clock bar) */
+
+/* makeover job 3: the Riddle Round sky (Daily) - a lighter green behind the existing plate, machine and answers, with question marks
+   drifting slowly (transform only: a small sideways sway and rise, 16-28 s a loop). Lite and reduced motion: the same marks, still. */
+:root:root.mode-daily .event-overlay.stack.quiz-riddle{ background:radial-gradient(ellipse 120% 80% at 50% 35%, #9df08a 0%, #5ccb5f 45%, #2f9a44 80%, #1d7a35 100%) !important; animation:none !important; isolation:isolate; }
+.rd-sky{ display:none; position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:-1; }
+:root.mode-daily .event-overlay.stack.quiz-riddle .rd-sky{ display:block; }
+.rd-sky i{ position:absolute; font:900 var(--s)/1 var(--f-display, 'Big Shoulders Display', sans-serif); font-style:normal; color:rgba(255,255,255,0.6); text-shadow:0 4px 0 rgba(20,90,30,0.4);
+  transform:translate(0,0) rotate(var(--r)); animation:rdDrift var(--d) ease-in-out var(--dl) infinite alternate; will-change:transform; }
+@keyframes rdDrift{ from{ transform:translate(0, 0) rotate(var(--r)); } to{ transform:translate(var(--dx), -38px) rotate(calc(var(--r) * -1)); } }
+:root.lite .rd-sky i, .paused .rd-sky i, :root.tab-hidden .rd-sky i{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .rd-sky i{ animation:none; } }

@@ -13213,6 +13213,12 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   function setBeamLook(on, question, riddle){
     els.eventOverlay.classList.toggle('quiz-beam', on && !riddle);
     els.eventOverlay.classList.toggle('quiz-riddle', on && !!riddle);   // D2: the riddle show's own look (split-flap answers)
+    // makeover job 3: the riddle's lighter green sky with question marks drifting slowly behind the machine (built once, shown only with .quiz-riddle)
+    if (on && riddle && !document.getElementById('rdSky')){
+      let h = '<div id="rdSky" class="rd-sky" aria-hidden="true">';
+      for (let k = 0; k < 12; k++) h += '<i style="left:' + ((k * 37 + 6) % 92) + '%;top:' + ((k * 23 + 4) % 90) + '%;--s:' + (54 + (k * 29) % 80) + 'px;--d:' + (16 + (k * 7) % 12) + 's;--dl:-' + ((k * 4.3) % 16).toFixed(1) + 's;--dx:' + (((k % 2) ? 1 : -1) * (18 + (k * 11) % 26)) + 'px;--r:' + (((k % 3) - 1) * 12) + 'deg">?</i>';
+      els.eventOverlay.insertAdjacentHTML('afterbegin', h + '</div>');
+    }
     if (on){ els.eventPrompt.innerHTML = '<span>' + keyWordsHtml(question) + '</span>'; els.eventTiles.forEach((t, i)=>{ const k = t.querySelector('.tkey'); if (k) k.textContent = String(i + 1); }); }
   }
   function runTriviaQuestion(resumeQ, resumeEndsAt, step){
