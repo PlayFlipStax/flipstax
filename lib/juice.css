@@ -1865,3 +1865,20 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root.mode-daily .event-overlay.mdoor.art .event-tile.md{ overflow:visible; margin-left:calc(var(--ml, 0) * var(--dk)); margin-right:calc(var(--mr, 0) * var(--dk)); }
 .event-tile.md .md-o{ left:calc(var(--ox) * var(--dk)); right:auto; bottom:calc(var(--oy) * var(--dk)); width:calc(var(--dow) * var(--os) * var(--dk)); height:auto; transform:none; object-fit:fill; object-position:50% 50%; }
 .event-tile.md .md-ow{ left:calc(var(--ox) * var(--dk)); right:auto; top:auto; bottom:calc(var(--oy) * var(--dk)); width:calc(var(--dow) * var(--os) * var(--dk)); height:auto; aspect-ratio:var(--ar); transform:none; overflow:visible; }
+/* fix 6 item 2a: the Word Warp tray has a fourth layer - 20 coin tiles in 4 rows of 5, the rows staggered a little left and right (position only; taps, ENTER and CLEAR unchanged) */
+.solve-overlay.tray .solve-rack{ row-gap:clamp(5px, 1.6vw, 9px); }
+.solve-overlay.tray .solve-tile{ position:relative; }
+.solve-overlay.tray .solve-tile:nth-child(10n+1), .solve-overlay.tray .solve-tile:nth-child(10n+2), .solve-overlay.tray .solve-tile:nth-child(10n+3), .solve-overlay.tray .solve-tile:nth-child(10n+4), .solve-overlay.tray .solve-tile:nth-child(10n+5){ left:-3.5%; }
+.solve-overlay.tray .solve-tile:nth-child(10n+6), .solve-overlay.tray .solve-tile:nth-child(10n+7), .solve-overlay.tray .solve-tile:nth-child(10n+8), .solve-overlay.tray .solve-tile:nth-child(10n+9), .solve-overlay.tray .solve-tile:nth-child(10n+10){ left:3.5%; }
+:root:root .solve-overlay.tray .solve-tile{ max-width:54px; }
+@media (max-height:700px){ :root:root .solve-overlay.tray .solve-tile{ max-width:42px; } .solve-overlay.tray .solve-rack{ gap:5px; row-gap:4px; padding:7px 8px 9px; } }
+/* fix 6 item 2b: the Word Warp SOLVED moment - the tiles lock and flash gold twice (a gold face fading in and out over each tile: opacity only), then the tray and
+   its buttons fade out (the room below the word is for SOLVED!) */
+.solve-overlay.tray .solve-slot.ww-gold::after{ content:''; position:absolute; inset:-2px; border-radius:inherit; pointer-events:none; z-index:2; opacity:0;
+  background:linear-gradient(180deg, rgba(255,251,230,0.95), rgba(255,226,122,0.9) 45%, rgba(245,184,58,0.85)); animation:wwGoldFlash 0.7s ease-in-out 1 both; }
+@keyframes wwGoldFlash{ 0%{ opacity:0; } 22%{ opacity:0.9; } 45%{ opacity:0.15; } 68%{ opacity:0.9; } 100%{ opacity:0.35; } }
+.solve-overlay.tray .solve-slot.ww-gold{ border-color:#ffe27a; }
+.solve-overlay.tray :is(.solve-rack, .solve-buttons, .solve-attempts, .solve-hint-line){ transition:opacity 0.35s ease; }
+.solve-overlay.tray.ww-done :is(.solve-rack, .solve-buttons, .solve-attempts, .solve-hint-line){ opacity:0; pointer-events:none; }
+:root.lite .solve-overlay.tray .solve-slot.ww-gold::after{ animation:none; opacity:0.35; }
+@media (prefers-reduced-motion: reduce){ .solve-overlay.tray .solve-slot.ww-gold::after{ animation:none; opacity:0.35; } }

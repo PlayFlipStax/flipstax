@@ -43,6 +43,7 @@
 <link rel="stylesheet" href="lib/cast.css">
 <link rel="stylesheet" href="lib/juice.css">
 <link rel="stylesheet" href="lib/intro.css">
+<link rel="stylesheet" href="lib/celebrate.css">
 <link rel="preload" as="image" href="data/stage/stage-close.webp" type="image/webp">
 <style>
   :root{
@@ -4934,6 +4935,7 @@
 <script src="data/host/manifest.js"></script>
 <script src="lib/host.js"></script>
 <script src="lib/show-fx.js"></script>
+<script src="lib/celebrate.js"></script>
 <script src="lib/stage.js"></script>
 <script src="data/cast/manifest.js"></script>
 <script src="lib/cast.js"></script>
@@ -15801,7 +15803,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     const rr = mulberry32(hashStr('flipstax-warp-' + (runStartDate || todayStr())));
     solveRack = shuffle(rest, rr);
     for (let k = 0; k < 6 && rest.length > 1 && solveRack.join('') === rest.join(''); k++) solveRack = shuffle(rest, rr);
-    // A+ (Daily): the letter tray - exactly WARP_TRAY tiles (15, in 3 rows of 5): every missing letter plus decoys (letters not in the word), shuffled
+    // A+ (Daily): the letter tray - exactly WARP_TRAY tiles (20, in 4 rows of 5, each row staggered): every missing letter plus decoys (letters not in the word), shuffled
     if (warpTrayOn()){
       const decoys = shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').filter(c=> runWord.word.indexOf(c) < 0), rr).slice(0, Math.max(0, WARP_TRAY - rest.length));
       solveRack = shuffle(rest.concat(decoys), rr);
@@ -15921,13 +15923,13 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   }
   // ---- A+ the Word Warp letter tray (Daily): 10 tiles, 5 strikes, 30 s. A tile that fits locks into every blank needing it (it flies in, a neon ring
   // runs round the blank); one that doesn't shakes, dims and costs a strike. Ends on the solve, the 5th strike or the clock.
-  const WARP_TRAY = 15;
+  const WARP_TRAY = 20;   // fix 6: 20 tiles in 4 rows of 5 (was 15 in 3 rows)
   // When true, after a wrong tile is replaced all the tiles shuffle with a 0.9 s whoosh (taps locked, the clock paused while it plays).
   const SHUFFLE_ON_WRONG = false;
   let warpTray = false, solveTotalMs = 0, warpBusy = false;
   function warpTrayOn(){ return document.documentElement.classList.contains('mode-daily'); }
   function applyTrayMode(){
-    warpTray = warpTrayOn() && solveRack.length === WARP_TRAY; els.solveOverlay.classList.toggle('tray', warpTray);
+    warpTray = warpTrayOn() && (solveRack.length === WARP_TRAY || solveRack.length === 15); els.solveOverlay.classList.toggle('tray', warpTray);   // (15: a tray saved before fix 6, mid-solve)
     els.solveSubmit.textContent = warpTray ? 'ENTER' : 'Submit'; els.solveClearBtn.textContent = warpTray ? 'CLEAR' : 'Clear';
   }
   // Tapping a tile moves its letter to the first open slot in the answer row (a placed letter taps back to its tile); ENTER tests the word, CLEAR returns every placed
@@ -15951,31 +15953,48 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // The Word Warp win (Daily tray): the UFO flies in from the top, its beam sweeps the solved word and the tiles lift into it for a moment, confetti bursts,
   // and SOLVED! shows once with the time and points. (Lite and reduced motion: a plain fade and the banner. The farm-animal fly-up is gone.)
   function wwWin(solvedAt, done){
+    // fix 6 item 2b: the SOLVED moment, in order - the tiles lock and flash gold, the tray fades out, the UFO beam comes down over the word, the letters bounce
+    // one after another, SOLVED! slams in below the word (the tray's room, never over the tiles), then the BIG WIN CELEBRATION (lib/celebrate.js) with the
+    // points counting up on the score pill. Transform and opacity only; lite mode and reduced motion: plain fades.
     const still = FX.reduced() || isLite() || !Element.prototype.animate, ov = els.solveOverlay;
     const secs = Math.max(0, Math.round((RUN_SOLVE_MS - Math.max(0, solveEndsAt - solvedAt)) / 1000));
     const layer = document.createElement('div'); layer.className = 'ww-win'; layer.setAttribute('aria-hidden', 'true'); ov.appendChild(layer);
     const sl = els.solveSlots.getBoundingClientRect(), slots = Array.from(els.solveSlots.children);
-    const ban = document.createElement('div'); ban.className = 'ww-solved'; ban.style.top = Math.round(sl.bottom + 14) + 'px';
-    ban.innerHTML = '<b>SOLVED!</b><span></span>'; ban.lastChild.textContent = runWord.word + ' \u00B7 ' + Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0') + (runWarpPoints ? ' \u00B7 +' + runWarpPoints + ' pts' : '');
+    const ban = document.createElement('div'); ban.className = 'ww-solved'; ban.style.top = Math.round(sl.bottom + 18) + 'px'; ban.style.opacity = '0';
+    ban.innerHTML = '<b>SOLVED!</b><span></span>'; ban.lastChild.textContent = runWord.word + ' · ' + Math.floor(secs / 60) + ':' + String(secs % 60).padStart(2, '0') + (runWarpPoints ? ' · +' + runWarpPoints + ' pts' : '');
     layer.appendChild(ban);
-    const fin = (ms)=> setTimeout(()=>{ layer.remove(); ov.classList.remove('celebrating'); done(); }, ms);
+    const scoreEl = els.runBanner && els.runBanner.querySelector('.sp-num'), to = shownScore(runScore), from = shownScore(runScore - (runWarpPoints || 0));
+    if (scoreEl) scoreEl.textContent = from;
+    const celebrate = ()=>{
+      const fin = ()=>{ layer.remove(); ov.classList.remove('celebrating', 'ww-done'); slots.forEach(c=> c.classList.remove('ww-gold')); done(); };
+      if (window.Celebrate) Celebrate.win({ word:'WARPED!', wordTop:'66%', scoreEl, from, to, plus: runWarpPoints || 0, sfx, done: fin });
+      else { if (scoreEl) scoreEl.textContent = to; setTimeout(fin, 1500); }
+    };
+    slots.forEach(c=> c.classList.add('ww-gold'));   // 1. lock and flash gold
     sfx.cheer();
     if (still){
-      ban.animate && ban.animate([{ opacity:0 }, { opacity:1 }], { duration:300, fill:'both' }); sfx.solveWin();
-      fin(1700); return;
+      ov.classList.add('ww-done'); ban.style.opacity = '1'; sfx.solveWin();
+      setTimeout(celebrate, 900); return;
     }
+    setTimeout(()=> ov.classList.add('ww-done'), 600);   // 2. the tray (and its buttons) fade out
     const ufo = document.createElement('div'); ufo.className = 'ww-wufo'; ufo.innerHTML = '<i class="ww-wbeam"></i><div class="ww-wship">' + FX.ufoSvg() + '</div>';
-    const shipTop = Math.max(8, sl.top - 150); ufo.style.top = shipTop + 'px'; layer.appendChild(ufo);
+    const shipTop = Math.max(8, sl.top - 150); ufo.style.top = shipTop + 'px'; ufo.style.opacity = '0'; layer.appendChild(ufo);
     const beam = ufo.firstChild; beam.style.height = Math.max(40, sl.bottom + 10 - shipTop - 60) + 'px';
-    ufo.animate([{ transform:'translateY(' + (-shipTop - 120) + 'px)' }, { transform:'translateY(0)' }], { duration:700, easing:'cubic-bezier(.2,.8,.3,1)', fill:'both' });
-    beam.animate([{ opacity:0, transform:'translateX(-50%) scaleY(0.1)' }, { opacity:0.9, transform:'translateX(-50%) scaleY(1)', offset:0.35 }, { opacity:0.9, transform:'translateX(-50%) scaleY(1)', offset:0.8 }, { opacity:0, transform:'translateX(-50%) scaleY(1)' }], { duration:1500, delay:700, easing:'ease-out', fill:'both' });
-    slots.forEach((c, i)=> c.animate([{ transform:'translateY(0) scale(1)' }, { transform:'translateY(-26px) scale(1.28)', offset:0.45 }, { transform:'translateY(0) scale(1)' }], { duration:800, delay:900 + i * 110, easing:'ease-in-out' }));
-    setTimeout(()=>{ if (window.Juice) Juice.correct(els.solveSlots, { count:30 }); els.solveCelebrate.classList.remove('hidden'); els.solveCelebrate.classList.add('nb'); solveConfettiBurst(); const ring = document.createElement('i'); ring.className = 'ww-ring'; ring.style.top = Math.round(sl.top + sl.height / 2) + 'px'; layer.appendChild(ring); ring.animate([{ transform:'translate(-50%,-50%) scale(0.2)', opacity:0.9 }, { transform:'translate(-50%,-50%) scale(7)', opacity:0 }], { duration:1100, easing:'ease-out', fill:'both' }); }, 1050);
-    setTimeout(()=>{ if (window.Juice) Juice.correct(els.solveSlots, { count:30 }); solveConfettiBurst(); }, 1900);   // (mega 3 item 7: a second confetti burst; a gold ring swells out of the word)
-    setTimeout(()=>{ sfx.solveWin(); ban.animate([{ opacity:0, transform:'scale(0.4)' }, { opacity:1, transform:'scale(1.22)', offset:0.6 }, { opacity:1, transform:'scale(1)' }], { duration:650, easing:'ease-out', fill:'both' }); }, 1250);
-    setTimeout(()=> ufo.animate([{ transform:'translateY(0)', opacity:1 }, { transform:'translateY(' + (-shipTop - 140) + 'px)', opacity:1 }], { duration:600, easing:'ease-in', fill:'both' }), 3000);
-    setTimeout(()=>{ els.solveCelebrate.classList.add('hidden'); els.solveCelebrate.classList.remove('nb'); }, 3700);
-    fin(3700);
+    setTimeout(()=>{   // 3. the UFO drops in and its beam comes down over the word
+      ufo.style.opacity = '';
+      ufo.animate([{ transform:'translateY(' + (-shipTop - 120) + 'px)' }, { transform:'translateY(0)' }], { duration:600, easing:'cubic-bezier(.2,.8,.3,1)', fill:'both' });
+      beam.animate([{ opacity:0, transform:'translateX(-50%) scaleY(0.1)' }, { opacity:0.9, transform:'translateX(-50%) scaleY(1)', offset:0.3 }, { opacity:0.9, transform:'translateX(-50%) scaleY(1)', offset:0.85 }, { opacity:0, transform:'translateX(-50%) scaleY(1)' }],
+        { duration:1900, delay:450, easing:'ease-out', fill:'both' });
+      if (sfx.beam) sfx.beam();
+    }, 900);
+    // 4. the letters bounce one after another
+    slots.forEach((c, i)=> c.animate([{ transform:'translateY(0) scale(1)' }, { transform:'translateY(-22px) scale(1.18)', offset:0.4 }, { transform:'translateY(4px) scale(0.97)', offset:0.75 }, { transform:'translateY(0) scale(1)' }], { duration:560, delay:1700 + i * 110, easing:'ease-in-out' }));
+    // 5. SOLVED! slams in below the word
+    setTimeout(()=>{ sfx.solveWin(); ban.style.opacity = '';
+      ban.animate([{ opacity:0, transform:'scale(2.2)' }, { opacity:1, transform:'scale(0.92)', offset:0.6 }, { opacity:1, transform:'scale(1)' }], { duration:420, easing:'cubic-bezier(.3,1.3,.5,1)', fill:'both' });
+      if (window.Juice) Juice.correct(els.solveSlots, { count:24 }); }, 1700 + slots.length * 110 + 300);
+    setTimeout(()=> ufo.animate([{ transform:'translateY(0)', opacity:1 }, { transform:'translateY(' + (-shipTop - 140) + 'px)', opacity:1 }], { duration:600, easing:'ease-in', fill:'both' }), 3300);
+    setTimeout(celebrate, 3500);   // 6. the BIG WIN CELEBRATION
   }
   function trayPick(letter, tileEl){
     if (!runActive || warpBusy || warpMissing || els.solveOverlay.classList.contains('celebrating') || els.solveOverlay.classList.contains('revealing')) return;
