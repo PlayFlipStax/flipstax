@@ -4957,7 +4957,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // Player-facing game names and the alien host's lines live in
   // data/game-names.js (the defaults here are only a fallback if it fails).
   const GN = Object.assign({ orbitDrop:'Orbit Drop', cosmicSurprise:'Cosmic Surprise', crowdScan:'Crowd Scan', brainBeam:'Brain Beam', riddleRound:'Riddle Round',
-    zapWords:'Zap Words', peakOrPlunge:'Peak or Plunge', snapSort:'Snap Sort', twinFlip:'Twin Flip', factOrFib:'Fact or Fib', saucerShuffle:'Saucer Shuffle', zigZap:'ZiG Zap ZaBam!', alienBlast:'Alien Blast', spaceLaunch:'Space Launch', munchMix:'Galactic Chomps', priceProbe:'Price Probe', oddballAlert:'Oddball Alert', emojiDecode:'Emoji Decode', timeWarp:'Time Warp', portalPick:'Portal Pick',
+    zapWords:'Zap Words', peakOrPlunge:'Peak or Plunge', snapSort:'Snap Sort', twinFlip:'Twin Flip', factOrFib:'Fact or Fib', saucerShuffle:'Saucer Shuffle', zigZap:'ZiG Zap ZaBam!', alienBlast:'Alien Blast', spaceLaunch:'Space Launch', munchMix:'Galactic Chomper', priceProbe:'Price Probe', oddballAlert:'Oddball Alert', emojiDecode:'Emoji Decode', timeWarp:'Time Warp', portalPick:'Portal Pick',
     wordWarp:'Word Warp', vault:'The Mothership Vault' }, (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.names) || {});
   const HOST_LINES = (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.host) || {};
   const HOST_QUIPS = (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.quip) || {};
@@ -19373,7 +19373,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       { label:'Saucer Shuffle', go: mysteryAs('saucerShuffle') },
       { label:'ZiG Zap ZaBam!', go: mysteryAs('zigZap') },
       { label:'Alien Blast', go: mysteryAs('alienBlast') },
-      { label:'Munch Mix', go: mysteryAs('munchMix') },   // (a spare: in no show pool yet)
+      { label:'Galactic Chomper', go: mysteryAs('munchMix') },   // (internal id munchMix; also Round 1's game)
       { label:'Space Launch', go: mysteryAs('spaceLaunch') },
       // The finale's cue card, then the Word Warp with all six letters in.
       { label:'Grand finale (6 letters)', wide:true, go: atType(s=> s.t === 'act' && s.finale, 0, 210, 6) },

@@ -47,7 +47,7 @@ window.FLIPSTAX_RUNDOWN = {
   acts: [
     { id:'r1', round:1, title:'ROUND ONE',   sub:'ROUND 1', mult:1, vsTimerMs:VS_TIMER_MS, world:'vs',
       announce:'Round One! Let’s warm up those Earth brains!',
-      steps:[ { vs:VS_PER_ROUND }, { beam:'easy' },   { game:'munchMix' },  { reward:true } ] },   // (fix 8: Galactic Chomps; Riddle Round moved to the Mystery Portal and the Wheel)
+      steps:[ { vs:VS_PER_ROUND }, { beam:'easy' },   { game:'munchMix' },  { reward:true } ] },   // (fix 8: Galactic Chomper; Riddle Round moved to the Mystery Portal and the Wheel)
     { id:'r2', round:2, title:'ROUND TWO',   sub:'ROUND 2', mult:1, vsTimerMs:VS_TIMER_MS, world:'vs',
       announce:'Round Two! Things are heating up!',
       steps:[ { vs:VS_PER_ROUND }, { beam:'easy' },   { game:'lucky' },     { reward:true } ] },

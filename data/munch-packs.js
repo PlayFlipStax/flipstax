@@ -1,4 +1,4 @@
-// FlipStax - GALACTIC CHOMPS rule packs (lib/munch-mix.js, registry id munchMix). Easy to extend: add a pack to FLIPSTAX_MUNCH_PACKS with the same shape,
+// FlipStax - GALACTIC CHOMPER rule packs (lib/munch-mix.js, registry id munchMix). Easy to extend: add a pack to FLIPSTAX_MUNCH_PACKS with the same shape,
 // and list it in FLIPSTAX_MUNCH_ROUNDS.
 //   pack: { label, rules:[ rule ] }
 //   rule: { id, family, hard?, make(rng) -> { text, right:[tile], wrong:[tile] } }   (tile: the string shown on the floor tile, cream text, no emoji)
@@ -153,6 +153,6 @@
   Object.keys(packs).forEach(k=>{ packs[k].rules = packs[k].rules.filter(r=>{ try{ return r.make(()=> 0.5).right.length >= MIN_RIGHT; }catch(e){ return false; } }); });
   window.FLIPSTAX_MUNCH_PACKS = packs;
   window.FLIPSTAX_MUNCH_ELEMENTS = ELEMENTS;
-  // GALACTIC CHOMPS: round 1 MATH, round 2 SCIENCE, round 3 ENGLISH - each round draws one rule from its own subject
+  // GALACTIC CHOMPER: round 1 MATH, round 2 SCIENCE, round 3 ENGLISH - each round draws one rule from its own subject
   window.FLIPSTAX_MUNCH_ROUNDS = [ { packs:['math'] }, { packs:['science'] }, { packs:['english'] } ];
 })();

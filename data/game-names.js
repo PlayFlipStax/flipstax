@@ -24,7 +24,7 @@ window.FLIPSTAX_NAMES = {
     zigZap:         'ZiG Zap ZaBam!',        // tic-tac-toe with trivia (keep these exact capitals; plays in Snap Sort's slots while Snap Sort is on hold)
     alienBlast:     'Alien Blast',           // tap the green aliens
     spaceLaunch:    'Space Launch',          // stop the marker in the green zone
-    munchMix:       'Galactic Chomps',       // chomp the tiles that fit the rule (registry id munchMix; a spare: in no show pool yet)
+    munchMix:       'Galactic Chomper',      // chomp the tiles that fit the rule (registry id munchMix)
     priceProbe:     'Price Probe',
     oddballAlert:   'Oddball Alert',
     emojiDecode:    'Emoji Decode',
