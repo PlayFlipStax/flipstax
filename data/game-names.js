@@ -24,7 +24,7 @@ window.FLIPSTAX_NAMES = {
     zigZap:         'ZiG Zap ZaBam!',        // tic-tac-toe with trivia (keep these exact capitals; plays in Snap Sort's slots while Snap Sort is on hold)
     alienBlast:     'Alien Blast',           // tap the green aliens
     spaceLaunch:    'Space Launch',          // stop the marker in the green zone
-    munchMix:       'Munch Mix',             // eat the tiles that fit the rule (a spare: in no show pool yet)
+    munchMix:       'Galactic Chomps',       // chomp the tiles that fit the rule (registry id munchMix; a spare: in no show pool yet)
     priceProbe:     'Price Probe',
     oddballAlert:   'Oddball Alert',
     emojiDecode:    'Emoji Decode',
@@ -85,7 +85,7 @@ window.FLIPSTAX_NAMES = {
     zigZap:    { full:'Tap a square and answer right to claim it. Three in a row beats Flip!', short:'Tap a square. Answer right to claim it!' },
     alienBlast:{ full:'Tap the green aliens as they pop up. Avoid the red ones and the bombs!', short:'Tap the green aliens!' },
     spaceLaunch:{ full:'Tap LAUNCH to stop the marker in the green zone. Dead centre is PERFECT!', short:'Stop it in the green zone!' },
-    munchMix:  { full:'Tap the tiles that fit the rule to munch them. Dodge the red Glitches!', short:'Munch the tiles that fit the rule!' },
+    munchMix:  { full:'Tap a tile to hop there, then CHOMP the ones that fit the rule. Dodge the snake!', short:'Chomp the tiles that fit the rule!' },
   },
   roundTitles: {
     opener:  'THE OPENER',

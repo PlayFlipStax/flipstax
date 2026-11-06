@@ -1,4 +1,4 @@
-// FlipStax - MUNCH MIX rule packs (lib/munch-mix.js). Easy to extend: add a pack to FLIPSTAX_MUNCH_PACKS (for example `english`) with the same shape,
+// FlipStax - GALACTIC CHOMPS rule packs (lib/munch-mix.js, registry id munchMix). Easy to extend: add a pack to FLIPSTAX_MUNCH_PACKS with the same shape,
 // and list it in FLIPSTAX_MUNCH_ROUNDS.
 //   pack: { label, rules:[ rule ] }
 //   rule: { id, family, hard?, make(rng) -> { text, right:[tile], wrong:[tile] } }   (tile: the string shown on the floor tile, cream text, no emoji)
@@ -74,11 +74,53 @@
     el('latin', 'latin', 'Eat the symbols from old Latin or German names', e=> !!e.old, null, true),
   ] };
 
+  // ---------------------------------------------------------------- ENGLISH (tiles are words; checked by hand, every word is under 10 letters)
+  // Parts of speech: only common words with ONE clear part of speech in everyday use - no words like run, light, play, jump, cold or kind that are
+  // also another part of speech. Each list has more than 30 words; a word is in one list only.
+  const NOUNS = ['apple', 'banana', 'kitten', 'puppy', 'mountain', 'river', 'teacher', 'planet', 'pizza', 'giraffe', 'elephant', 'library', 'kitchen', 'umbrella',
+    'butterfly', 'camera', 'castle', 'guitar', 'island', 'forest', 'dragon', 'carrot', 'tomato', 'wizard', 'robot', 'volcano', 'octopus', 'penguin', 'cookie',
+    'pumpkin', 'piano', 'zebra', 'tiger', 'onion', 'lemon', 'hospital', 'airport', 'museum'];
+  const VERBS = ['think', 'bring', 'choose', 'forget', 'explain', 'arrive', 'believe', 'become', 'borrow', 'breathe', 'decide', 'describe', 'destroy', 'discover',
+    'enjoy', 'imagine', 'invite', 'listen', 'pretend', 'remember', 'teach', 'agree', 'allow', 'appear', 'begin', 'behave', 'belong', 'deliver', 'explore',
+    'forgive', 'ignore', 'invent', 'prepare', 'protect', 'receive', 'speak', 'write', 'sing'];
+  const ADJECTIVES = ['happy', 'angry', 'brave', 'careful', 'gentle', 'hungry', 'lazy', 'noisy', 'polite', 'proud', 'shiny', 'sleepy', 'tiny', 'huge', 'loud',
+    'bright', 'famous', 'curious', 'fluffy', 'friendly', 'gigantic', 'grumpy', 'honest', 'jealous', 'lucky', 'nervous', 'silly', 'sticky', 'strong', 'tall',
+    'thirsty', 'wise', 'delicious', 'terrible', 'wonderful', 'enormous', 'fierce', 'cheerful', 'dizzy', 'greedy', 'helpful', 'clever'];
+  // Plurals and singulars: no words that are the same in both (sheep, fish, deer) and no words that end in s but are singular only as a trick beyond 'bus'.
+  const PLURALS = ['cats', 'dogs', 'boxes', 'mice', 'children', 'teeth', 'feet', 'geese', 'apples', 'buses', 'babies', 'wolves', 'knives', 'puppies', 'pianos',
+    'tomatoes', 'heroes', 'women', 'people', 'cherries', 'ladies', 'foxes', 'dishes', 'berries', 'monkeys', 'stories', 'toys', 'shoes', 'trees', 'birds',
+    'horses', 'ducks'];
+  const SINGULARS = ['cat', 'dog', 'box', 'mouse', 'child', 'tooth', 'foot', 'goose', 'apple', 'bus', 'baby', 'wolf', 'knife', 'puppy', 'piano', 'tomato',
+    'hero', 'woman', 'person', 'cherry', 'lady', 'fox', 'dish', 'berry', 'monkey', 'story', 'toy', 'shoe', 'tree', 'bird', 'horse', 'duck', 'glass'];
+  // Rhymes (one syllable endings, said the everyday way). The wrong ones look close (same first letter or vowel) but do not rhyme.
+  const RHYMES = {
+    CAT: { right:['hat', 'bat', 'mat', 'rat', 'sat', 'flat', 'chat', 'splat', 'that', 'pat', 'fat'], wrong:['cut', 'cot', 'cap', 'kit', 'coat', 'bet', 'hit', 'hot', 'cute', 'cab', 'mad', 'can', 'what'] },
+    DAY: { right:['say', 'may', 'way', 'ray', 'hay', 'tray', 'gray', 'stay', 'clay', 'spray', 'away', 'bay'], wrong:['dry', 'dot', 'deep', 'dad', 'toy', 'cow', 'sea', 'boy', 'dig', 'key', 'sky', 'two', 'die'] },
+    LIGHT: { right:['night', 'kite', 'white', 'bite', 'fight', 'height', 'might', 'sight', 'tight', 'write', 'quite', 'flight'], wrong:['lit', 'late', 'left', 'list', 'lot', 'wait', 'weight', 'lift', 'loud', 'let', 'foot', 'gate', 'eight'] },
+  };
+  // Spelling: each pair is a common word and its usual misspelling (the board shows both of a pair); every right word is spelled as in US English.
+  const SPELL = [['receive', 'recieve'], ['believe', 'beleive'], ['friend', 'freind'], ['because', 'becuase'], ['tomorrow', 'tommorow'], ['separate', 'seperate'],
+    ['necessary', 'neccesary'], ['weird', 'wierd'], ['piece', 'peice'], ['calendar', 'calender'], ['address', 'adress'], ['library', 'libary'], ['February', 'Febuary'],
+    ['Wednesday', 'Wensday'], ['surprise', 'suprise'], ['beginning', 'begining'], ['different', 'diffrent'], ['until', 'untill'], ['truly', 'truely'],
+    ['argument', 'arguement'], ['grammar', 'grammer'], ['rhythm', 'rythm'], ['knowledge', 'knowlege'], ['chocolate', 'choclate'], ['writing', 'writting'],
+    ['really', 'realy'], ['which', 'wich'], ['school', 'skool'], ['people', 'peeple'], ['island', 'iland']];
+  const words = (id, family, text, right, wrong)=> ({ id, family, make(){ return { text, right: right.slice(), wrong: wrong.slice() }; } });
+  const ENGLISH = { label:'ENGLISH', rules:[
+    words('nouns', 'pos-noun', 'Eat the nouns', NOUNS, VERBS.concat(ADJECTIVES)),
+    words('verbs', 'pos-verb', 'Eat the verbs', VERBS, NOUNS.concat(ADJECTIVES)),
+    words('adjectives', 'pos-adj', 'Eat the adjectives', ADJECTIVES, NOUNS.concat(VERBS)),
+    words('plurals', 'plural', 'Eat the plural words', PLURALS, SINGULARS),
+    words('rhyme-cat', 'rhyme', 'Eat the words that rhyme with CAT', RHYMES.CAT.right, RHYMES.CAT.wrong),
+    words('rhyme-day', 'rhyme', 'Eat the words that rhyme with DAY', RHYMES.DAY.right, RHYMES.DAY.wrong),
+    words('rhyme-light', 'rhyme', 'Eat the words that rhyme with LIGHT', RHYMES.LIGHT.right, RHYMES.LIGHT.wrong),
+    Object.assign(words('spelling', 'spelling', 'Eat the correctly spelled words', SPELL.map(p=> p[0]), SPELL.map(p=> p[1])), { pairs: SPELL }),
+  ] };
+
   const MIN_RIGHT = 5;   // (a rule needs at least this many right tiles)
-  const packs = { math: MATH, science: SCIENCE };
+  const packs = { math: MATH, science: SCIENCE, english: ENGLISH };
   Object.keys(packs).forEach(k=>{ packs[k].rules = packs[k].rules.filter(r=>{ try{ return r.make(()=> 0.5).right.length >= MIN_RIGHT; }catch(e){ return false; } }); });
   window.FLIPSTAX_MUNCH_PACKS = packs;
   window.FLIPSTAX_MUNCH_ELEMENTS = ELEMENTS;
-  // round 1 MATH, round 2 SCIENCE, round 3 a harder mix of both (only rules marked hard)
-  window.FLIPSTAX_MUNCH_ROUNDS = [ { packs:['math'] }, { packs:['science'] }, { packs:['math', 'science'], hard:true } ];
+  // GALACTIC CHOMPS: round 1 MATH, round 2 SCIENCE, round 3 ENGLISH - each round draws one rule from its own subject
+  window.FLIPSTAX_MUNCH_ROUNDS = [ { packs:['math'] }, { packs:['science'] }, { packs:['english'] } ];
 })();
