@@ -7401,6 +7401,11 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // End of a Daily run: the Daily theme stops and the results screen gets its
   // own track - Victory Lap Results if the word was solved, Better Luck Next
   // Time if not - looping until the player taps Done.
+  // mega 4 item 2: the ending music is back in every case. Since the goodbye video came in (649d32a) it played with its own sound, and on iPhone an unmuted
+  // video stops the music element, so the results were silent; a word that ran out of time also started the music with no tap at all, which a browser may
+  // block. Now: the goodbye video is always muted (the win or lose track is the ending's music); both tracks are unlocked by a tap during the Word Warp
+  // (unlockRunEndMusic); a blocked start retries on the next tap; and the results screen starts the right track if it is not already playing (a saved
+  // result, a refresh, a test entry).
   function playRunEndMusic(solved){
     pauseAllTracks();
     const key = solved ? 'win' : 'lose';
@@ -7409,7 +7414,19 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     const el = getTrackEl(key);
     el.muted = false;
     try{ el.currentTime = 0; }catch(e){}
-    el.play().catch(()=>{});
+    el.play().catch(()=>{ const retry = ()=>{ if (musicOn && currentTrackKey === key && el.paused){ el.muted = false; el.play().catch(()=>{}); } }; document.addEventListener('pointerdown', retry, { once:true, capture:true }); });
+  }
+  let runEndUnlocked = false;
+  function unlockRunEndMusic(){
+    if (runEndUnlocked || !musicOn) return; runEndUnlocked = true;
+    ['win', 'lose'].forEach(k=>{ if (!TRACK_SRC[k] || currentTrackKey === k) return; const el = getTrackEl(k); if (!el.paused) return;
+      el.muted = true; const p = el.play(); if (p && p.then) p.then(()=>{ if (currentTrackKey !== k) try{ el.pause(); }catch(e){} el.muted = false; }, ()=>{ el.muted = false; runEndUnlocked = false; }); });
+  }
+  function ensureRunEndMusic(r){
+    if (!musicOn || !r) return;
+    const key = r.solved ? 'win' : 'lose', el = trackEls[key];
+    if ((currentTrackKey === 'win' || currentTrackKey === 'lose') && el && !el.paused) return;
+    playRunEndMusic(!!r.solved);
   }
   // Browsers block audio.play() before any user gesture on the page, but
   // muted autoplay is universally allowed - so whichever track should be
@@ -16489,7 +16506,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     if (quiet){ o.classList.add('poster-on'); outroLater(DEBUG_FAST && !REALTIME ? 300 : OUTRO_FALLBACK_MS, ()=> outroEnd(false)); return; }
     const fail = ()=>{ if (outroState !== 'playing') return; o.classList.add('poster-on'); outroClear(); outroLater(OUTRO_FALLBACK_MS, ()=> outroEnd(false)); outroLater(OUTRO_WATCHDOG_MS, ()=> outroEnd(true)); };
     try{
-      v.muted = !soundOn; v.src = 'data/outro/outro.mp4'; v.currentTime = 0;
+      v.muted = true; v.src = 'data/outro/outro.mp4'; v.currentTime = 0;   // (mega 4: always muted - the win or lose track plays under the ending)
       v.onended = ()=> outroEnd(false, true); v.onerror = fail;   // (mega 4: the video plays to its end - its own blue curtain closes on the sign - then the results fade in over that last frame)
       v.ontimeupdate = null;
       let started = false; v.onplaying = ()=>{ started = true; };
@@ -16498,6 +16515,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     }catch(e){ fail(); }
   }
   if (DEBUG_FAST || REPLAY) window.__shareImage = ()=> prebuildDailyShare(runResultToday).promise.then(p=> p.canvas ? p.canvas.toDataURL('image/png') : null);   // (tests: the picture the share sheet would send)
+  els.solveOverlay.addEventListener('pointerdown', ()=>{ if (runActive) unlockRunEndMusic(); }, true);   // (a Word Warp tap unlocks the ending's music for later)
   document.getElementById('outro').addEventListener('click', (e)=>{
     if (outroState === 'playing' && !e.target.closest('a, .daily-btn')) outroEnd(true);   // a tap anywhere while it plays: straight to the end state
   });
@@ -16545,6 +16563,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     if (!ep && !(pre.done && asImage(pre))) pre.promise.then(p=>{ if (performance.now() - shownAt < 4000 && els.readoutOverlay.classList.contains('show')) asImage(p); });
     els.readoutOverlay.classList.add('show');
     if (ep) startOutro(r); else stopOutro();
+    ensureRunEndMusic(r);   // (mega 4 item 2: music under the ending in every case)
     // (Run 4A: the presenter's bow is gone from the results - the host's outro plays just before them)   // (was: tablets and up only: the phone's results panel fills the whole width, no room
     updatePauseBtnVisibility();
     sfx.personality();
