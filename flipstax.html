@@ -10043,7 +10043,10 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     showToast(ok ? '📋 Copied! Paste it anywhere.' : 'Couldn’t copy - try the Share button');
   }
   function buildRunShareText(r){
-    if (r.actPts || r.orbit) return episodeShareText(r, false);   // (the share sheet adds the link)
+    if (r.actPts || r.orbit){   // mega 4 item 3: a short hook with today's personality (the share sheet adds the link; the Copy button keeps the squares)
+      const n = shareNumbers(r);
+      return 'I’m today’s ' + n.pers.replace(/^The\s+/i, '') + ' on FlipStax: ' + n.score.toLocaleString() + '! Can you beat it?';
+    }
     const p = PERSONALITY_META[r.personalityType];
     return 'FlipStax Daily Stax\n' + shownScore(r.score) + ' pts \u00B7 ' + (p ? p.icon + ' ' + p.name + ' \u00B7 ' : '') + r.triviaCorrect + '/' + r.triviaTotal + ' trivia \u00B7 ' +
       (r.solved ? ('solved in ' + formatRaceTime(r.solveMs)) : 'word not solved') +
@@ -10471,27 +10474,37 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   }
   // the numbers on the card, exactly as the results screen shows them (fillEpisodeResults uses the same expressions)
   function shareNumbers(r){
-    const pills = [];
-    (r.unlocked || []).filter(k=> PERSONALITY_META[k]).forEach(k=> pills.push('✨ ' + PERSONALITY_META[k].name));
-    if (r.perfect) pills.push('🏆 Perfect Run'); if (r.secretRiddle) pills.push('🪐 Secret Riddler'); if (r.jackpot) pills.push('🛸 The Mothership!');
-    if (dailyRunStreak > 1) pills.push('🔥 ' + dailyRunStreak + '-day streak');
-    const meta = PERSONALITY_META[r.personalityType] || PERSONALITY_META.fence_sitter;
+    const badges = [];
+    if (r.perfect) badges.push('🏆 Perfect Run'); if (r.secretRiddle) badges.push('🪐 Secret Riddler'); if (r.jackpot) badges.push('🛸 The Mothership!');
+    if (dailyRunStreak > 1) badges.push('🔥 ' + dailyRunStreak + '-day streak');
+    const type = PERSONALITY_META[r.personalityType] ? r.personalityType : 'fence_sitter', meta = PERSONALITY_META[type];
+    const fresh = (r.unlocked || []).filter(k=> PERSONALITY_META[k]);
     return { score: shownScore(r.score), episode: r.episode != null ? r.episode : showEpisode(r.date || todayStr()), correct: (r.triviaCorrect || 0) + '/' + (r.triviaTotal || 0),
-      streak: String(r.bestStreak || 0), time: r.solved && r.solveMs ? formatRaceTime(r.solveMs) : '—', pers: meta.name, pills };
+      streak: String(r.bestStreak || 0), time: r.solved && r.solveMs ? formatRaceTime(r.solveMs) : '—', type, pers: meta.name,
+      best: r.best ? r.best.text : 'Showing up! Every episode counts.', newCard: fresh.find(k=> k !== type) || null, heroNew: fresh.indexOf(type) >= 0, badges,
+      pills: fresh.map(k=> '✨ ' + PERSONALITY_META[k].name).concat(badges) };
   }
-  function shareKey(r){ const n = shareNumbers(r); return [n.score, n.episode, n.correct, n.streak, n.time, n.pers, n.pills.join(',')].join('|'); }
+  function shareKey(r){ const n = shareNumbers(r); return [n.score, n.episode, n.correct, n.streak, n.time, n.pers, n.best, n.newCard, n.pills.join(',')].join('|'); }
   function renderEpisodeShare(r){
     try{ return renderEpisodeShare45(r); }catch(e){ console.warn('FlipStax: share card failed, drawing the plain one', e); return renderEpisodeSharePlain(r); }
   }
   function shareTextFit(ctx, text, font, size, maxW){ let s = size; ctx.font = font.replace('#', s); while (s > 18 && ctx.measureText(text).width > maxW){ s -= 2; ctx.font = font.replace('#', s); } return s; }
+  function shareEllipsis(ctx, text, maxW){ if (ctx.measureText(text).width <= maxW) return text; let t = text; while (t.length > 4 && ctx.measureText(t + '…').width > maxW) t = t.slice(0, -1); return t.replace(/[\s,.;:]+$/, '') + '…'; }
+  // mega 4 item 3: the personality is the hero. 1080 x 1350: the show title and episode at the top, the final score big, today's personality card large in
+  // the middle with its name under it, Flip small beside it (and a 'New card unlocked' mini card on the other side when one was earned), the best moment
+  // in one sentence, the key stats and the earned badges as chips, and 'Can you beat N?' at the foot. The same final data as the results screen (shareNumbers).
   function renderEpisodeShare45(r){
     const W = SHARE45_W, H = SHARE45_H, c = document.createElement('canvas'); c.width = W; c.height = H;
     const ctx = c.getContext('2d'), D = SHARE_FONT_D, T = SHARE_FONT_T, n = shareNumbers(r), cx = W / 2;
+    c.__nums = n;   // (tests: what was drawn)
     // the neon stage, darkened, with a purple wash
     ctx.fillStyle = '#12052c'; ctx.fillRect(0, 0, W, H);
-    if (shareStageImg){ const s = Math.max(W / shareStageImg.naturalWidth, H / shareStageImg.naturalHeight), dw = shareStageImg.naturalWidth * s, dh = shareStageImg.naturalHeight * s; ctx.globalAlpha = 0.85; ctx.drawImage(shareStageImg, (W - dw) / 2, (H - dh) * 0.35, dw, dh); ctx.globalAlpha = 1; }
-    const wash = ctx.createLinearGradient(0, 0, 0, H); wash.addColorStop(0, 'rgba(18,5,44,0.55)'); wash.addColorStop(0.45, 'rgba(18,5,44,0.15)'); wash.addColorStop(0.62, 'rgba(18,5,44,0.6)'); wash.addColorStop(1, 'rgba(10,3,28,0.96)');
+    if (shareStageImg){ const s = Math.max(W / shareStageImg.naturalWidth, H / shareStageImg.naturalHeight), dw = shareStageImg.naturalWidth * s, dh = shareStageImg.naturalHeight * s; ctx.globalAlpha = 0.8; ctx.drawImage(shareStageImg, (W - dw) / 2, (H - dh) * 0.35, dw, dh); ctx.globalAlpha = 1; }
+    const wash = ctx.createLinearGradient(0, 0, 0, H); wash.addColorStop(0, 'rgba(18,5,44,0.6)'); wash.addColorStop(0.3, 'rgba(18,5,44,0.3)'); wash.addColorStop(0.7, 'rgba(18,5,44,0.7)'); wash.addColorStop(1, 'rgba(10,3,28,0.97)');
     ctx.fillStyle = wash; ctx.fillRect(0, 0, W, H);
+    // a soft spotlight behind the hero card
+    const spot = ctx.createRadialGradient(cx, 650, 40, cx, 650, 460); spot.addColorStop(0, 'rgba(255,226,122,0.42)'); spot.addColorStop(0.5, 'rgba(255,63,181,0.16)'); spot.addColorStop(1, 'rgba(255,63,181,0)');
+    ctx.fillStyle = spot; ctx.fillRect(0, 180, W, 940);
     // the gold frame with marquee bulbs
     roundRectPath(ctx, 22, 22, W - 44, H - 44, 46); ctx.lineWidth = 14; ctx.strokeStyle = '#ffd23f'; ctx.stroke(); ctx.lineWidth = 4; ctx.strokeStyle = '#7a3d00'; roundRectPath(ctx, 14, 14, W - 28, H - 28, 52); ctx.stroke();
     ctx.fillStyle = '#fff6c2'; const per = 2 * (W + H - 140), step = 46;
@@ -10500,27 +10513,41 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       ctx.beginPath(); ctx.arc(x, y, 6, 0, Math.PI * 2); ctx.fill(); }
     const center = (text, y, font, fill, stroke, sw)=>{ ctx.font = font; ctx.textAlign = 'center'; if (stroke){ ctx.lineWidth = sw || 8; ctx.strokeStyle = stroke; ctx.lineJoin = 'round'; ctx.strokeText(text, cx, y); } ctx.fillStyle = fill; ctx.fillText(text, cx, y); };
     const gold = (y0, y1)=>{ const g = ctx.createLinearGradient(0, y0, 0, y1); g.addColorStop(0, '#fff3a8'); g.addColorStop(0.55, '#ffcb2b'); g.addColorStop(1, '#ff9900'); return g; };
-    // the title plate
-    roundRectPath(ctx, 160, 70, W - 320, 150, 28); ctx.fillStyle = 'rgba(8,4,34,0.86)'; ctx.fill(); ctx.lineWidth = 5; ctx.strokeStyle = '#7df9ff'; ctx.stroke();
-    center('FLIPSTAX', 160, '900 92px ' + D, '#ffffff', '#3a0a6a', 10);
-    center('GALACTIC GAME NIGHT · EPISODE ' + n.episode, 202, '800 30px ' + T, '#bff9ff');
-    // Flip, standing on the left, and the big score beside him
-    if (shareFlipImg){ const fh = 560, fw = fh * shareFlipImg.naturalWidth / shareFlipImg.naturalHeight; ctx.drawImage(shareFlipImg, 70, 250 + (600 - fh), fw, fh); }
-    const sx = shareFlipImg ? 690 : cx;
-    ctx.textAlign = 'center'; ctx.font = '900 40px ' + T; ctx.fillStyle = '#ffe9a0'; ctx.fillText('FINAL SCORE', sx, 420);
-    const ss = shareTextFit(ctx, n.score.toLocaleString(), '900 #px ' + D, 230, shareFlipImg ? 560 : 900);
-    ctx.lineWidth = 16; ctx.strokeStyle = '#5a2a00'; ctx.lineJoin = 'round'; ctx.strokeText(n.score.toLocaleString(), sx, 420 + ss * 0.92); ctx.fillStyle = gold(440, 440 + ss); ctx.fillText(n.score.toLocaleString(), sx, 420 + ss * 0.92);
-    ctx.font = '800 36px ' + T; ctx.fillStyle = '#ffffff'; ctx.fillText(n.pers, sx, 420 + ss * 0.92 + 64);
-    // the three key stats
-    const stats = [[n.correct, 'CORRECT', '#3de07a'], [n.streak, 'BEST STREAK', '#7df9ff'], [n.time, 'WORD WARP TIME', '#ff8ad4']], tw = 300, gap = 30, x0 = (W - (3 * tw + 2 * gap)) / 2, ty = 890;
-    stats.forEach(([v, l, col], i)=>{ const x = x0 + i * (tw + gap); roundRectPath(ctx, x, ty, tw, 170, 26); ctx.fillStyle = 'rgba(8,4,34,0.88)'; ctx.fill(); ctx.lineWidth = 5; ctx.strokeStyle = col; ctx.stroke();
-      ctx.textAlign = 'center'; const vs = shareTextFit(ctx, v, '900 #px ' + D, 86, tw - 30); ctx.fillStyle = '#ffffff'; ctx.fillText(v, x + tw / 2, ty + 98); ctx.font = '800 26px ' + T; ctx.fillStyle = col; ctx.fillText(l, x + tw / 2, ty + 145); });
-    // the earned badges, as pills (up to two rows)
-    let py = 1110; ctx.font = '800 30px ' + T; const rows = [[]]; let rw = 0;
-    n.pills.slice(0, 6).forEach(p=>{ const w = ctx.measureText(p).width + 50; if (rw + w > W - 160 && rows[rows.length - 1].length){ rows.push([]); rw = 0; } rows[rows.length - 1].push([p, w]); rw += w + 16; });
-    rows.slice(0, 2).forEach(row=>{ if (!row.length) return; const total = row.reduce((s, q)=> s + q[1], 0) + 16 * (row.length - 1); let x = (W - total) / 2;
-      row.forEach(([p, w])=>{ roundRectPath(ctx, x, py - 40, w, 56, 28); ctx.fillStyle = gold(py - 40, py + 16); ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = '#7a3d00'; ctx.stroke(); ctx.fillStyle = '#3a1500'; ctx.textAlign = 'center'; ctx.fillText(p, x + w / 2, py - 1); x += w + 16; });
-      py += 70; });
+    // the show title and the episode
+    roundRectPath(ctx, 170, 62, W - 340, 132, 28); ctx.fillStyle = 'rgba(8,4,34,0.86)'; ctx.fill(); ctx.lineWidth = 5; ctx.strokeStyle = '#7df9ff'; ctx.stroke();
+    center('FLIPSTAX', 142, '900 84px ' + D, '#ffffff', '#3a0a6a', 10);
+    center('GALACTIC GAME NIGHT · EPISODE ' + n.episode, 180, '800 28px ' + T, '#bff9ff');
+    // the final score, big
+    center('FINAL SCORE', 246, '900 32px ' + T, '#ffe9a0');
+    { const t = n.score.toLocaleString(), ss = shareTextFit(ctx, t, '900 #px ' + D, 132, 700); ctx.textAlign = 'center'; ctx.lineWidth = 14; ctx.strokeStyle = '#5a2a00'; ctx.lineJoin = 'round';
+      ctx.strokeText(t, cx, 250 + ss * 0.9); ctx.fillStyle = gold(260, 260 + ss); ctx.fillText(t, cx, 250 + ss * 0.9); }
+    // the hero: today's personality card, large in the centre
+    const hw = 372, hx = cx - hw / 2, hy = 432;
+    center('TODAY’S PERSONALITY', hy - 26, '900 26px ' + T, '#ff9ee0');
+    const hh = drawShareCollectionCard(ctx, n.type, hx, hy, hw, n.heroNew);   // (a new card that IS today's personality: the NEW! tag on the hero)
+    { const ny = hy + hh + 62, ns = shareTextFit(ctx, n.pers.toUpperCase(), '900 #px ' + D, 64, W - 200); ctx.textAlign = 'center'; ctx.lineWidth = 9; ctx.strokeStyle = '#5a2a00'; ctx.lineJoin = 'round';
+      ctx.strokeText(n.pers.toUpperCase(), cx, ny); ctx.fillStyle = gold(ny - ns, ny); ctx.fillText(n.pers.toUpperCase(), cx, ny); }
+    // Flip, small, beside it
+    if (shareFlipImg){ const fh = 330, fw = fh * shareFlipImg.naturalWidth / shareFlipImg.naturalHeight; ctx.drawImage(shareFlipImg, Math.max(52, hx - fw - 18), hy + hh - fh + 10, fw, fh); }
+    // a new card, as a mini card on the other side
+    if (n.newCard){ const mw = 172, mx = hx + hw + 34, my = hy + 120;
+      ctx.save(); ctx.translate(mx + mw / 2, my + 120); ctx.rotate(0.08); ctx.translate(-(mx + mw / 2), -(my + 120));
+      const mh = drawShareCollectionCard(ctx, n.newCard, mx, my, mw, true); ctx.restore();
+      ctx.textAlign = 'center'; ctx.font = '900 24px ' + T; ctx.fillStyle = '#ffe066'; ctx.fillText('NEW CARD', mx + mw / 2, my + mh + 46); ctx.fillText('UNLOCKED', mx + mw / 2, my + mh + 76); }
+    // the best moment, one sentence
+    const by = hy + hh + 118;
+    ctx.font = '800 32px ' + T; ctx.textAlign = 'center'; ctx.fillStyle = '#ffffff';
+    ctx.fillText(shareEllipsis(ctx, '⭐ ' + n.best, W - 170), cx, by);
+    // the key stats and the earned badges, as chips (up to two rows)
+    const chips = [['✅ ' + n.correct + ' correct', '#3de07a'], ['⚡ ' + n.streak + ' best streak', '#7df9ff']].concat(n.badges.map(b=> [b, null]));
+    let py = by + 66; ctx.font = '800 30px ' + T; const rows = [[]]; let rw = 0;
+    chips.slice(0, 6).forEach(q=>{ const w = ctx.measureText(q[0]).width + 50; if (rw + w > W - 150 && rows[rows.length - 1].length){ rows.push([]); rw = 0; } rows[rows.length - 1].push([q[0], q[1], w]); rw += w + 16; });
+    rows.slice(0, 2).forEach(row=>{ if (!row.length) return; const total = row.reduce((s, q)=> s + q[2], 0) + 16 * (row.length - 1); let x = (W - total) / 2;
+      row.forEach(([p, col, w])=>{ roundRectPath(ctx, x, py - 40, w, 56, 28);
+        if (col){ ctx.fillStyle = 'rgba(8,4,34,0.9)'; ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = col; ctx.stroke(); ctx.fillStyle = '#ffffff'; }
+        else { ctx.fillStyle = gold(py - 40, py + 16); ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = '#7a3d00'; ctx.stroke(); ctx.fillStyle = '#3a1500'; }
+        ctx.textAlign = 'center'; ctx.fillText(p, x + w / 2, py - 1); x += w + 16; });
+      py += 68; });
     // the invitation and the address
     center('Can you beat ' + n.score.toLocaleString() + '?', 1262, '900 60px ' + D, gold(1210, 1270), '#5a2a00', 7);
     center(GAME_URL.replace(/^https?:\/\//, ''), 1306, '800 30px ' + T, '#ffffff');
@@ -10534,9 +10561,11 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     ctx.lineWidth = 12; ctx.strokeStyle = '#ffd23f'; ctx.strokeRect(24, 24, W - 48, H - 48);
     const line = (t, y, size, col)=>{ ctx.font = 'bold ' + size + 'px ' + F; ctx.textAlign = 'center'; ctx.fillStyle = col; ctx.fillText(t, W / 2, y); };
     line('FLIPSTAX', 170, 96, '#ffffff'); line('Galactic Game Night · Episode ' + n.episode, 236, 36, '#bff9ff');
-    line('FINAL SCORE', 420, 44, '#ffe9a0'); line(n.score.toLocaleString(), 620, 200, '#ffd23f'); line(n.pers, 700, 40, '#ffffff');
-    line('Correct ' + n.correct + '   ·   Best streak ' + n.streak + '   ·   Time ' + n.time, 830, 38, '#ffffff');
-    n.pills.slice(0, 4).forEach((p, i)=> line(p, 930 + i * 56, 34, '#ffe066'));
+    line('FINAL SCORE', 380, 44, '#ffe9a0'); line(n.score.toLocaleString(), 570, 190, '#ffd23f');
+    line('Today’s personality', 680, 34, '#ff9ee0'); line(n.pers, 744, 56, '#ffffff');
+    ctx.font = 'bold 32px ' + F; line(shareEllipsis(ctx, '⭐ ' + n.best, W - 160), 830, 32, '#ffffff');
+    line('Correct ' + n.correct + '   ·   Best streak ' + n.streak, 900, 38, '#ffffff');
+    (n.newCard || n.heroNew ? ['✨ New card unlocked: ' + PERSONALITY_META[n.newCard || n.type].name] : []).concat(n.badges).slice(0, 4).forEach((p, i)=> line(p, 980 + i * 52, 32, '#ffe066'));
     line('Can you beat ' + n.score.toLocaleString() + '?', 1200, 60, '#ffd23f'); line(GAME_URL.replace(/^https?:\/\//, ''), 1270, 34, '#ffffff');
     return c;
   }
@@ -10649,7 +10678,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     if (dailySharePre && dailySharePre.r === r && (!dailySharePre.key || dailySharePre.key === shareKey(r))) return dailySharePre;
     if (r.actPts || r.orbit){   // an episode: the results screen's own picture
       const p = { r, done:false, canvas:null, blob:null, promise:null, key: shareKey(r) };
-      p.promise = shareAssetsReady().then(()=>{
+      p.promise = Promise.all([shareAssetsReady(), waitRunShareAssets({ personality: PERSONALITY_META[r.personalityType] ? r.personalityType : 'fence_sitter', cards: (r.unlocked || []).filter(k=> PERSONALITY_META[k]) }, 3000)]).then(()=>{
         let canvas = null; try{ canvas = renderEpisodeShare(r); }catch(e){ console.warn('FlipStax: episode share image failed', e); }
         if (!canvas){ try{ canvas = renderEpisodeSharePlain(r); }catch(e){} }
         try{ if (canvas){ p.blob = dataUrlToBlob(canvas.toDataURL('image/png')); p.canvas = canvas; } }catch(e){ console.warn('FlipStax: episode share image failed', e); }
@@ -16514,6 +16543,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       outroLater(OUTRO_START_MS, ()=>{ if (!started) fail(); });   // (never stuck on a stalled load)
     }catch(e){ fail(); }
   }
+  if (DEBUG_FAST || REPLAY) window.__shareNums = ()=>{ const p = prebuildDailyShare(runResultToday); return p.promise.then(q=> ({ drawn: q.canvas && q.canvas.__nums, now: shareNumbers(runResultToday), text: buildRunShareText(runResultToday) })); };
   if (DEBUG_FAST || REPLAY) window.__shareImage = ()=> prebuildDailyShare(runResultToday).promise.then(p=> p.canvas ? p.canvas.toDataURL('image/png') : null);   // (tests: the picture the share sheet would send)
   els.solveOverlay.addEventListener('pointerdown', ()=>{ if (runActive) unlockRunEndMusic(); }, true);   // (a Word Warp tap unlocks the ending's music for later)
   document.getElementById('outro').addEventListener('click', (e)=>{
