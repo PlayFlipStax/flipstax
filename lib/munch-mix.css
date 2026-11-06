@@ -129,3 +129,5 @@
 .gc-set .gc-shoot::after{ content:''; position:absolute; right:-4px; top:50%; width:8px; height:8px; margin-top:-4px; border-radius:50%; background:#ffffff; box-shadow:0 0 8px 3px var(--sc, #fff); }
 .gc-set .gc-streaks{ z-index:1; } .gc-set .gc-hole{ z-index:2; }
 :root.lite .gc-set .gc-shoot{ display:none; } @media (prefers-reduced-motion: reduce){ .gc-set .gc-shoot{ display:none; } }
+/* fix: the tile the chomper stands on keeps its own glass colour on every board (even once eaten - its dark socket shows when he hops off); his body covers its word */
+.gc-tile.blank.under .gc-glass{ opacity:1; } .gc-tile.blank.under .gc-sock{ opacity:0; }
