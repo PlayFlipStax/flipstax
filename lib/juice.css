@@ -2043,3 +2043,39 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 @keyframes rdDrift{ from{ transform:translate(0, 0) rotate(var(--r)); } to{ transform:translate(var(--dx), -38px) rotate(calc(var(--r) * -1)); } }
 :root.lite .rd-sky i, .paused .rd-sky i, :root.tab-hidden .rd-sky i{ animation:none; }
 @media (prefers-reduced-motion: reduce){ .rd-sky i{ animation:none; } }
+
+/* makeover job 4: Emoji Decode as a game-show answer board (Daily). Blue panels with a chrome rim and white capitals; each starts under a numbered
+   cover and flips over (rotateX, 0.5 s, 0.22 s apart) to show its answer. Right: a green ring and a green check badge. Wrong: the panel goes red with a
+   red X badge, and one big red X scales in over the board and fades (transform and opacity only, once). Lite and reduced motion: no flip, no scale. */
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile{ position:relative; background-image:linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.04) 48%, rgba(0,0,0,0) 52%, rgba(0,0,0,0.18) 100%) !important; background-color:#1f56d8 !important;
+  border:4px solid #dfe6f5; border-radius:14px; box-shadow:0 0 0 3px #0a1f66, 0 6px 0 3px #0a1f66; touch-action:manipulation; transform-origin:50% 50%; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(n){ color:#ffffff; text-shadow:0 2px 0 rgba(0,10,60,0.7); text-transform:uppercase; letter-spacing:1px; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.is-right{ background-color:#1f56d8 !important; border-color:#7dff9a; box-shadow:0 0 0 4px #1fae4e, 0 0 18px 4px rgba(93,255,138,0.75), 0 6px 0 3px #0e5a26; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.is-wrong{ background-color:#c41a2e !important; border-color:#ffd0d6; box-shadow:0 0 0 3px #5a0414, 0 6px 0 3px #5a0414; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.is-wrong:nth-child(n){ color:#ffffff; opacity:1 !important; filter:none !important; }
+.ed-cover, .ed-mark{ display:none; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .ed-cover{ display:flex; position:absolute; inset:-4px; z-index:3; align-items:center; justify-content:center; border-radius:14px; pointer-events:none;
+  background:linear-gradient(180deg, #2a5fe0 0%, #123a9e 55%, #0b2a7c 100%); border:4px solid #dfe6f5; box-sizing:border-box; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .ed-cover b{ display:flex; align-items:center; justify-content:center; min-width:2.6em; height:1.6em; padding:0 0.3em; border-radius:50%; background:linear-gradient(180deg, #0d1f5c, #1b3b9a); border:3px solid #dfe6f5; color:#ffffff; font:900 clamp(22px, 6.6vw, 32px)/1 var(--f-display); text-shadow:0 2px 0 rgba(0,0,0,0.5); }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.ed-open .ed-cover{ display:none; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.ed-flip{ animation:edFlip 0.5s ease-in-out var(--ed-d, 0s) both; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.ed-flip .ed-cover{ animation:edCoverOff 0.5s linear var(--ed-d, 0s) both; }
+@keyframes edFlip{ 0%{ transform:perspective(700px) rotateX(0deg); } 50%{ transform:perspective(700px) rotateX(90deg); } 100%{ transform:perspective(700px) rotateX(0deg); } }
+@keyframes edCoverOff{ 0%, 49.9%{ opacity:1; } 50%, 100%{ opacity:0; } }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .ed-mark{ position:absolute; right:12px; top:50%; z-index:4; width:44px; height:44px; margin-top:-22px; border-radius:50%; border:3px solid #ffffff; box-shadow:0 3px 0 rgba(0,0,0,0.35); align-items:center; justify-content:center; pointer-events:none; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .ed-mark svg{ width:70%; height:70%; display:block; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .ed-mark.ok{ background:#1fae4e; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .ed-mark.no{ background:#e0182f; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.is-right .ed-mark.ok, :root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.is-wrong .ed-mark.no{ display:flex; animation:edPop 0.32s cubic-bezier(.3,1.6,.5,1) both; }
+@keyframes edPop{ from{ transform:scale(0); } to{ transform:scale(1); } }
+.ed-bigx{ position:absolute; left:50%; top:50%; z-index:30; width:min(70vw, 62vh, 460px); aspect-ratio:1; margin:calc(min(70vw, 62vh, 460px) / -2) 0 0 calc(min(70vw, 62vh, 460px) / -2); pointer-events:none; animation:edBigX 1.2s ease-out both; }
+.ed-bigx svg{ width:100%; height:100%; display:block; }
+@keyframes edBigX{ 0%{ transform:scale(0.3); opacity:0; } 18%{ transform:scale(1.08); opacity:1; } 28%{ transform:scale(1); } 75%{ opacity:1; transform:scale(1); } 100%{ opacity:0; transform:scale(1); } }
+:root.lite .ed-bigx, :root.lite.mode-daily .event-overlay.stack.bb-emojiDecode .ed-mark{ animation:none !important; }
+:root.lite .ed-bigx{ opacity:0.95; }
+@media (prefers-reduced-motion: reduce){ .ed-bigx, :root.mode-daily .event-overlay.stack.bb-emojiDecode .ed-mark, :root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.ed-flip, :root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.ed-flip .ed-cover{ animation:none !important; } :root.mode-daily .event-overlay.stack.bb-emojiDecode .ed-cover{ display:none; } }
+/* the title plate: a bold board sign - gold rim, deep blue, EMOJI DECODE in big bright capitals */
+:root:root.mode-daily .event-overlay.has-plate.bb-emojiDecode .qz-plate{ background:linear-gradient(180deg, #2a5fe0, #0b2a7c); border:4px solid #ffd23f; box-shadow:0 0 0 3px #6a4300, 0 6px 0 3px #6a4300; border-radius:16px; }
+:root:root.mode-daily .event-overlay.has-plate.bb-emojiDecode .qz-plate b{ color:#ffe86b; text-shadow:0 3px 0 #0a1f66; font-size:clamp(28px, 9vw, 40px); }
+:root:root.mode-daily .event-overlay.has-plate.bb-emojiDecode .qz-plate small{ color:#dfe6f5; }
+@media (min-width:600px){ :root:root.mode-daily .event-overlay.has-plate.bb-emojiDecode .qz-plate b{ font-size:clamp(40px, 7vw, 64px); } }

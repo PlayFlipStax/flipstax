@@ -12127,6 +12127,14 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     }
     // Price Probe: a price tag ("$ ?") that flips over to the price; Time Warp: a clock plate that flips to the year.
     // C3: Price Probe's tag is a gold-framed flip-digit board ("$ ? ? ?") whose digit wheels roll to the price.
+    // makeover job 4: Emoji Decode's answer blocks are game-board panels - a numbered cover that flips away to show the answer, and a green check
+    // (right) or a big red X (wrong) that shows on the result
+    if (key === 'emojiDecode'){
+      const n = Math.max(0, els.eventTiles.indexOf(tileEl)) + 1;
+      tileEl.insertAdjacentHTML('beforeend', '<span class="ed-cover" aria-hidden="true"><b>' + n + '</b></span>' +
+        '<span class="ed-mark ok" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M9 21 L17 29 L32 12" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' +
+        '<span class="ed-mark no" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M11 11 L29 29 M29 11 L11 29" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg></span>');
+    }
     if (key === 'priceProbe'){
       const tag = document.createElement('span'); tag.className = 'bb-tag price-tag'; tag.dataset.price = back || '';
       tag.innerHTML = '<span class="pt-in"><span class="pc ps">$</span><span class="pc">?</span><span class="pc">?</span><span class="pc">?</span></span>';
@@ -12235,6 +12243,10 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       tileEl.style.backgroundColor = TILE_COLORS[i];
       fillBreakTile(tileEl, rd.tiles[i], undefined, false, key, key === 'oddballAlert' ? i + 1 : rd.revealSub && rd.revealSub[i]);
     });
+    if (key === 'emojiDecode'){   // makeover job 4: the panels flip over one after another (0.22 s apart); lite and reduced motion: already open
+      const still = isLite() || prefersReducedMotion();
+      tiles.forEach((t, i)=>{ t.classList.remove('ed-flip', 'ed-open'); if (i >= n) return; if (still){ t.classList.add('ed-open'); return; } t.style.setProperty('--ed-d', (0.15 + i * 0.22).toFixed(2) + 's'); void t.offsetWidth; t.classList.add('ed-flip'); });
+    }
     if (key !== 'timeWarp') hostSay(HOST_LINES[key] || def.rule, 2600);   // (Time Warp says 'Tap the earlier event' once, in its banner)
     // Time Warp's progress: one glowing round LED per puzzle (lit for this one; green or red once answered)
     let leds = null;
@@ -12256,7 +12268,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     let settled = false, bigBreak = false;
     const cleanup = ()=>{
       ov.classList.add('hidden'); ov.classList.remove('brainbreak', 'stack', 'bb-two', 'flash-win', 'bb-revealed', 'bb-' + key); els.eventSubtitle.classList.remove('res-win', 'res-miss'); ov.style.removeProperty('--bb');
-      ov.querySelectorAll('.bb-banner, .bb-pop, .tw-leds, .tw-track').forEach(e=> e.remove());
+      ov.querySelectorAll('.bb-banner, .bb-pop, .tw-leds, .tw-track, .ed-bigx').forEach(e=> e.remove());
       tiles.forEach(t=>{ t.style.display = ''; t.classList.remove('is-right', 'is-wrong'); t.onclick = null; });
     };
     const finish = ()=>{ if (st.keep && runActive){ done(cleanup); return; } cleanup(); if (runActive) done(); };   // (a part of a series hands the clean-up to the series)
@@ -12295,6 +12307,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
         if (st.parts){ const pp = document.createElement('div'); pp.className = 'bb-pop'; pp.textContent = '+' + (runActive ? BRAIN_BREAK_POINTS * runActMult() : BRAIN_BREAK_POINTS); ov.appendChild(pp); setTimeout(()=> pp.remove(), 900); }   // (a points pop-up, 0.8 s)
       } else {
         if (pick != null && tiles[pick]) tiles[pick].classList.add('is-wrong');
+        if (key === 'emojiDecode'){ const bx = document.createElement('div'); bx.className = 'ed-bigx'; bx.setAttribute('aria-hidden', 'true'); bx.innerHTML = '<svg viewBox="0 0 100 100"><path d="M18 18 L82 82 M82 18 L18 82" fill="none" stroke="#7a0010" stroke-width="26" stroke-linecap="round"/><path d="M18 18 L82 82 M82 18 L18 82" fill="none" stroke="#ff2a3d" stroke-width="17" stroke-linecap="round"/><path d="M18 18 L82 82 M82 18 L18 82" fill="none" stroke="#ff8a95" stroke-width="5" stroke-linecap="round" opacity="0.8"/></svg>'; ov.appendChild(bx); setTimeout(()=> bx.remove(), 1300); }   // (makeover job 4: a big red X, once)
         els.eventSubtitle.textContent = pick == null ? 'MISSED · OUT OF TIME' : 'MISSED'; els.eventSubtitle.classList.add('res-miss');   // a red MISSED (not a 0 POINTS pill)
         if (rd.why) els.eventPrompt.textContent = rd.why;
         hostMood('sad'); hostSay(hostLine(pick == null ? 'slow' : 'wrong'));
