@@ -92,8 +92,13 @@
 .gc-ring.bite{ border-color:#ff3a3a; }
 .gc-bit{ position:absolute; z-index:7; width:8px; height:8px; margin:-4px 0 0 -4px; border-radius:50%; pointer-events:none; }
 .gc-fly{ position:absolute; z-index:6; border-radius:14px; pointer-events:none; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-.gc-slab.combo{ animation:gcCombo 0.6s ease-out 1; }
-@keyframes gcCombo{ 0%, 100%{ box-shadow:0 0 0 1.5px var(--edge), 0 0 22px var(--edge), 0 18px 40px rgba(0,0,0,0.55); } 40%{ box-shadow:0 0 0 4px #fff, 0 0 46px var(--edge), 0 18px 40px rgba(0,0,0,0.55); } }
 @media (min-width:600px){ .gc-grid{ gap:12px; } .gc-glass, .gc-flash, .gc-sock{ border-radius:20px; } .nx-gc .gc-chomp{ min-height:84px; font-size:44px; } .gc-strikes i{ width:18px; height:18px; } }
 @media (max-height:700px){ .gc-grid{ gap:5px; } .gc-glass, .gc-flash, .gc-sock{ border-radius:11px; } .nx-gc .gc-chomp{ min-height:48px; margin-top:6px; font-size:26px; } }
 .nx-gc .gc-wrap{ width:92vw; max-width:none; align-self:center; flex-shrink:0; flex-grow:1; }
+/* the effects' pieces: the rim flash (the combo and a cleared board), the socket's fading glow ring, the eaten piece */
+.gc-rimflash{ position:absolute; inset:-4px; border-radius:25px; border:3px solid #ffffff; box-shadow:0 0 18px var(--edge, #3FA9FF), inset 0 0 14px var(--edge, #3FA9FF); opacity:0; pointer-events:none; z-index:8; }
+.gc-sockring{ position:absolute; inset:6%; border-radius:12px; border:2px solid color-mix(in srgb, var(--grey, #B8C2D6) 80%, #fff); box-shadow:0 0 12px color-mix(in srgb, var(--grey, #B8C2D6) 80%, transparent); opacity:0; pointer-events:none; z-index:2; }
+.gc-fly b{ font:900 clamp(14px, 6vw, 30px)/1 var(--f-display); color:#fff; text-shadow:0 2px 0 rgba(0,0,0,0.35); white-space:nowrap; }
+.gc-fly{ border:2px solid #fff; box-shadow:0 0 16px rgba(255,255,255,0.8); }
+.nx-slam.gcpop.bite{ color:#ff3a3a; text-shadow:0 3px 0 #4a0000, 0 0 14px rgba(255,58,58,0.9); }
+.gc-board .nx-slam.gcpop{ font-size:clamp(24px, 7vw, 36px); }
