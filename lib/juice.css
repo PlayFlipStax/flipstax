@@ -1997,3 +1997,30 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root.lite .mw-dim, :root.lite .lucky-overlay.mw .mw-pop{ transition:none !important; }
 :root.lite .lw-pop.on{ animation:none; opacity:1; transform:translate(-50%, -50%); }
 @media (prefers-reduced-motion: reduce){ .mw-dim, .lucky-overlay.mw .mw-pop{ transition:none !important; } }
+/* ---- launch safety 3: in lite mode and reduced motion every flashing, blinking or chasing light is STILL - steady and lit, no blinking or flashing.
+   (Normal mode is unchanged.) The list: the show's marquee bulbs (the chase and the miss / win / strobe / blink states - reduced motion missed the
+   state classes, lite missed all but the chase), the show frame's win / miss flash, the Vault's ray burst, its dial lasers and its tally hint, the
+   showcase white flash, the sign bulbs (intro cards, the Wheel's title), the old Wheel rim chase and landing flash, the Lucky Wheel rim chase, the
+   Brain Beam / Riddle prompt blink on a win, Emoji Decode's neon flicker, the Price Probe / Twin Flip / Word Warp marquees, the Juice chase bulbs, the
+   Saucer Shuffle lights-up chase, the ZiG Zap party wall, Space Launch's tower lights and flames, Word Warp's gold sweep, the Orbit Drop jackpot glow,
+   the riddle and Vault UFO beams, the riddle "..." dots, the old portal doors' shimmer and the tiles' sheen. */
+:root.lite .show-marquee .mq-g, :root.lite .show-marquee i, :root.lite .show-marquee:is(.blink, .unison, .miss, .strobe, .disco) i{ animation:none !important; }
+:root.lite .show-marquee i{ opacity:0.9 !important; }
+:root.lite .show-flash::after, :root.lite .frame::after, :root.lite .sc-flash, :root.lite .fin-vault .vault-rays::after, :root.lite .fin-vault .vault-laser,
+:root.lite .sign-bulbs i, :root.lite .mw-rim circle, :root.lite .lw-rimsvg circle, :root.lite .event-overlay.stack.flash-win .event-prompt::before, :root.lite .event-overlay.stack.flash-win .event-prompt::after,
+:root.lite .event-overlay.bb-emojiDecode .event-prompt, :root.lite .wb-m, :root.lite .pr-marq, :root.lite .tf-marq, :root.lite .jc-bulb, :root.lite .sc-litbg, :root.lite .zs-wall i,
+:root.lite .sl-tl, :root.lite .sl-flame, :root.lite .sv-thrust, :root.lite .solve-slot.ww-gold::after, :root.lite .pk-jglow, :root.lite .riddle-ufo i, :root.lite .vault-ufo i,
+:root.lite .irt-text b, :root.lite .vault-tally em, :root.lite .pu-door, :root.lite .event-tile::before{ animation:none !important; }
+:root.lite .sign-bulbs i, :root.lite .wb-m, :root.lite .pr-marq, :root.lite .tf-marq, :root.lite .jc-bulb, :root.lite .zs-wall i, :root.lite .sl-tl{ opacity:0.9 !important; }
+:root.lite .fin-vault.open .vault-rays::after{ opacity:0.35; transform:none; }
+@media (prefers-reduced-motion: reduce){
+  .show-marquee .mq-g, .show-marquee i, .show-marquee:is(.blink, .unison, .miss, .strobe, .disco) i{ animation:none !important; }
+  .show-marquee i{ opacity:0.9 !important; }
+  .show-flash::after, .frame::after, .sc-flash, .fin-vault .vault-rays::after, .fin-vault .vault-laser,
+  .sign-bulbs i, .mw-rim circle, .lw-rimsvg circle, .event-overlay.stack.flash-win .event-prompt::before, .event-overlay.stack.flash-win .event-prompt::after,
+  .event-overlay.bb-emojiDecode .event-prompt, .wb-m, .pr-marq, .tf-marq, .jc-bulb, .sc-litbg, .zs-wall i,
+  .sl-tl, .sl-flame, .sv-thrust, .solve-slot.ww-gold::after, .pk-jglow, .riddle-ufo i, .vault-ufo i,
+  .irt-text b, .vault-tally em, .pu-door, .event-tile::before{ animation:none !important; }
+  .sign-bulbs i, .wb-m, .pr-marq, .tf-marq, .jc-bulb, .zs-wall i, .sl-tl{ opacity:0.9 !important; }
+  .fin-vault.open .vault-rays::after{ opacity:0.35; transform:none; }
+}
