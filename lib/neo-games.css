@@ -224,3 +224,55 @@
 /* while a question card is up the card is the message: the status pill steps aside (it covered answer D at 360 x 640); Flip's header is compact on short screens */
 .nx-zz .nx-panel{ transition:opacity 0.2s ease; } .nx-zz:has(.zz-q) .nx-panel{ opacity:0; }
 @media (max-height:700px){ .zz-fhead{ margin-bottom:3px; font-size:13px; } .zz-face{ width:32px; height:32px; } }
+
+/* ---- mega 4 item 10: Alien Blast on an alien planet at night - a deep teal-to-violet sky with stars, a huge ringed planet, a green aurora that waves slowly,
+   rocky ground with glowing crystals and mushrooms pulsing, drifting fireflies, the portals as craters, two sweeping searchlights. Hit effects below. ---- */
+.ab-set .as-sky{ inset:0; background:linear-gradient(180deg, #06243a 0%, #0b3b52 22%, #2a1460 58%, #170733 80%, #0a0418 100%); }
+.ab-set .as-star{ width:3px; height:3px; border-radius:50%; background:#e8fbff; opacity:0.6; animation:asTw 3.6s ease-in-out var(--d) infinite alternate; }
+@keyframes asTw{ from{ opacity:0.25; } to{ opacity:0.95; } }
+.ab-set .as-planet{ right:-18%; top:9%; width:62vmin; height:62vmin; max-width:420px; max-height:420px; border-radius:50%;
+  background:radial-gradient(circle at 34% 30%, #ffe0b0 0%, #f08a5a 30%, #a8306a 62%, #3a0c3e 100%); box-shadow:inset -22px -16px 40px rgba(10,0,30,0.7); opacity:0.9; }
+.ab-set .as-ring{ left:-26%; top:40%; width:152%; height:22%; border-radius:50%; border:6px solid rgba(255,214,170,0.75); border-top-color:rgba(255,214,170,0.15); transform:rotate(-14deg); }
+.ab-set .as-aurora{ left:-20%; right:-20%; height:30%; border-radius:50%; opacity:0.45; transform-origin:50% 100%;
+  background:linear-gradient(180deg, rgba(120,255,170,0) 0%, rgba(120,255,170,0.55) 45%, rgba(60,220,200,0.2) 70%, rgba(60,220,200,0) 100%); animation:asWave 9s ease-in-out infinite alternate; }
+.ab-set .as-aurora.a{ top:6%; } .ab-set .as-aurora.b{ top:16%; opacity:0.3; animation-duration:12s; animation-delay:-4s; }
+@keyframes asWave{ from{ transform:translateX(-6%) skewX(-12deg) scaleY(0.9); } to{ transform:translateX(6%) skewX(12deg) scaleY(1.15); } }
+.ab-set .as-beam{ bottom:-6%; width:40%; height:110%; opacity:0.22; transform-origin:50% 100%; clip-path:polygon(46% 100%, 54% 100%, 100% 0, 0 0);
+  background:linear-gradient(0deg, rgba(200,255,230,0.85), rgba(150,255,210,0.2) 60%, rgba(150,255,210,0)); animation:asBeam 7s ease-in-out infinite alternate; }
+.ab-set .as-beam.l{ left:0; } .ab-set .as-beam.r{ right:0; animation-delay:-3.5s; animation-direction:alternate-reverse; }
+@keyframes asBeam{ from{ transform:rotate(-30deg); } to{ transform:rotate(22deg); } }
+.ab-set .as-ground{ left:-5%; right:-5%; bottom:0; height:34%; border-radius:50% 50% 0 0 / 18% 18% 0 0;
+  background:radial-gradient(30% 20% at 20% 30%, rgba(90,60,120,0.6), rgba(0,0,0,0) 70%), radial-gradient(26% 18% at 75% 50%, rgba(80,50,110,0.6), rgba(0,0,0,0) 70%), linear-gradient(180deg, #3a2650 0%, #24163a 40%, #120a22 100%); }
+.ab-set .as-cry{ bottom:6%; width:16px; height:34px; clip-path:polygon(50% 0, 100% 35%, 80% 100%, 20% 100%, 0 35%); background:linear-gradient(180deg, #e8fff4, #35f0c0 50%, #0a8a78); opacity:0.5; animation:asPulse 2.8s ease-in-out var(--d) infinite alternate; }
+.ab-set .as-cry.mush{ width:28px; height:22px; clip-path:none; border-radius:50% 50% 20% 20% / 70% 70% 30% 30%; background:radial-gradient(circle at 50% 30%, #ffe0ff, #ff6ad5 50%, #8a1a7a); }
+@keyframes asPulse{ from{ opacity:0.35; } to{ opacity:1; } }
+.ab-set .as-fly{ width:5px; height:5px; border-radius:50%; background:#f4ff9a; box-shadow:0 0 8px 2px rgba(240,255,140,0.7); opacity:0.8; animation:asFly 6s ease-in-out var(--d) infinite alternate; }
+@keyframes asFly{ from{ transform:translate(0,0); opacity:0.2; } 50%{ opacity:1; } to{ transform:translate(var(--dx), -26px); opacity:0.3; } }
+.ab-set .as-vig{ inset:0; opacity:0; z-index:5; background:radial-gradient(ellipse at 50% 50%, rgba(255,40,40,0) 45%, rgba(255,30,30,0.85) 100%); }
+:root.lite .ab-set *{ animation:none !important; } @media (prefers-reduced-motion: reduce){ .ab-set *{ animation:none !important; } }
+/* the portals as craters on rocky ground */
+.nx-ab .ab-hole{ background:radial-gradient(ellipse at 50% 38%, #000 0%, #120820 50%, #3a2650 78%, #5a4070 90%) !important; box-shadow:inset 0 6px 10px rgba(0,0,0,0.8); }
+.nx-ab .ab-rim{ border:4px solid #6a5084 !important; border-top-color:#2a1a3e !important; border-bottom-color:#9a80b8 !important; box-shadow:0 3px 0 #24163a; }
+/* the UFO lane across the top of the field */
+.ab-sky{ position:relative; width:100%; height:52px; flex:none; margin-bottom:4px; }
+.ab-ufo{ position:absolute; left:0; top:0; width:84px; height:44px; padding:0; border:0; background:none; cursor:pointer; z-index:4; }
+.ab-ufo svg{ width:100%; height:100%; display:block; filter:drop-shadow(0 0 8px rgba(39,230,255,0.8)); }
+/* the hits */
+.ab-ring.cyan{ border-color:#27e6ff; } .ab-ring.gold{ border-color:#ffd23f; } .ab-ring.red{ border-color:#ff3a2a; }
+.ab-flash, .ab-shock, .ab-smoke, .ab-debris, .ab-steam, .ab-trail{ position:absolute; z-index:7; pointer-events:none; }
+.ab-flash{ width:150px; height:150px; border-radius:50%; background:radial-gradient(circle, #fffbe0 0%, #ffd23f 30%, #ff6a1a 60%, rgba(255,60,20,0) 72%); }
+.ab-shock{ width:70px; height:70px; border-radius:50%; border:5px solid rgba(255,230,180,0.9); box-sizing:border-box; }
+.ab-smoke{ width:46px; height:46px; border-radius:50%; background:radial-gradient(circle at 40% 35%, rgba(200,190,210,0.95), rgba(110,100,130,0.75) 60%, rgba(80,70,100,0) 72%); }
+.ab-debris{ width:10px; height:8px; border-radius:2px; background:linear-gradient(135deg, #8a8aa8, #2a2a3a); }
+.ab-debris:nth-child(odd){ background:linear-gradient(135deg, #ffb02e, #a8340a); width:7px; height:7px; }
+.ab-steam{ width:26px; height:26px; border-radius:50%; background:radial-gradient(circle, rgba(255,255,255,0.95), rgba(255,255,255,0) 70%); }
+.ab-trail{ width:12px; height:12px; background:#fff4b0; clip-path:polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%); }
+.ab-crackle{ position:absolute; left:50%; top:62%; z-index:6; width:110%; height:30%; pointer-events:none; }
+.ab-crackle svg{ width:100%; height:100%; display:block; }
+.nx-slam.boom{ font-size:clamp(46px, 14vw, 76px); color:#ffe27a; text-shadow:0 4px 0 #8a1a00, 0 0 18px rgba(255,90,30,0.9); z-index:8; }
+.nx-slam.grr{ font-size:clamp(34px, 10vw, 54px); color:#ff6a4a; text-shadow:0 3px 0 #4a0400, 0 0 14px rgba(255,60,40,0.8); z-index:8; }
+.nx-slam.wave{ font-size:clamp(46px, 14vw, 78px); color:#b8ffd8; text-shadow:0 4px 0 #04402a, 0 0 18px rgba(53,240,138,0.8); }
+.nx-float.white{ color:#e8f0ff; font-size:18px; }
+.ab-actor.armor.cracked .ab-crack{ opacity:1; } .ab-actor .ab-crack{ opacity:0; } .ab-actor.armor.cracked .ab-shield{ opacity:0.75; }
+@media (max-height:700px){ .ab-sky{ height:40px; } .ab-ufo{ width:66px; height:34px; } }
+.nx-ab .ab-field{ --ab:min(104px, 26vw, calc((100dvh - 412px) / 3.3)); } @media (min-width:600px){ .nx-ab .ab-field{ --ab:min(170px, 20vw, calc((100dvh - 520px) / 3.3)); } }
