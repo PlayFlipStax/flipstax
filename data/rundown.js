@@ -46,17 +46,17 @@ window.FLIPSTAX_RUNDOWN = {
   coldOpen: { firstMs: 12000, returningMs: 3000 },
   acts: [
     { id:'r1', round:1, title:'ROUND ONE',   sub:'ROUND 1', mult:1, vsTimerMs:VS_TIMER_MS, world:'vs',
-      announce:'Round One! Let’s warm up those Earth brains!',
-      steps:[ { vs:VS_PER_ROUND }, { beam:'easy' },   { game:'munchMix' },  { reward:true } ] },   // (fix 8: Galactic Chomper; Riddle Round moved to the Mystery Portal and the Wheel)
+      announce:'Round One! Doors, my friends. Doors!',
+      steps:[ { vs:VS_PER_ROUND }, { beam:'easy' },   { game:'door' },      { reward:true } ] },   // (mega 5: the show order is Portal, Wheel, Zap Words, Galactic Chomper, Twin Flip, Orbit Drop)
     { id:'r2', round:2, title:'ROUND TWO',   sub:'ROUND 2', mult:1, vsTimerMs:VS_TIMER_MS, world:'vs',
       announce:'Round Two! Things are heating up!',
       steps:[ { vs:VS_PER_ROUND }, { beam:'easy' },   { game:'lucky' },     { reward:true } ] },
     { id:'r3', round:3, title:'ROUND THREE', sub:'ROUND 3 · POINTS x2', mult:2, vsTimerMs:VS_TIMER_MS, world:'powerup',
-      announce:'Round Three! Doors, my friends. Doors!',
-      steps:[ { vs:VS_PER_ROUND }, { beam:'medium' }, { game:'door' },      { reward:true } ] },
-    { id:'r4', round:4, title:'ROUND FOUR',  sub:'ROUND 4 · POINTS x2', mult:2, vsTimerMs:VS_TIMER_MS, world:'powerup',
-      announce:'Round Four! Time to hunt some words!',
+      announce:'Round Three! Time to hunt some words!',
       steps:[ { vs:VS_PER_ROUND }, { beam:'medium' }, { game:'zapWords' },  { reward:true } ] },
+    { id:'r4', round:4, title:'ROUND FOUR',  sub:'ROUND 4 · POINTS x2', mult:2, vsTimerMs:VS_TIMER_MS, world:'powerup',
+      announce:'Round Four! Chomp time, Earthlings!',
+      steps:[ { vs:VS_PER_ROUND }, { beam:'medium' }, { game:'munchMix' },  { reward:true } ] },
     { id:'r5', round:5, title:'ROUND FIVE',  sub:'ROUND 5 · POINTS x3', mult:3, vsTimerMs:VS_TIMER_MS, world:'jumble',
       announce:'Round Five! Keep your eyes sharp!',
       steps:[ { vs:VS_PER_ROUND }, { beam:'hard' },   { game:'twinFlip' },  { reward:true } ] },
