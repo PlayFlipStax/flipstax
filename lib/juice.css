@@ -1951,3 +1951,10 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .show-card.sponsor.full .cb-last small{ font-size:clamp(20px, 6vw, 32px); color:#fff; text-align:center; }
 .show-card.sponsor.full .cb-low{ z-index:2; }
 @media (max-height:700px){ .show-card.sponsor.full .cb-tv{ top:calc(max(46px, 6vh) + env(safe-area-inset-top) + 54px) !important; bottom:calc(84px + env(safe-area-inset-bottom)); } }
+
+/* ---- mega 4 item 8: the pink Word Warp (no tray) matches the finale: 20 letters in 4 rows of 5, and the saucer parks ABOVE the title (never over the
+   title, its subtitle, the timer or the word slots); nothing overlaps at 390 x 844, 360 x 640 and 824 x 1830. Taps, ENTER and CLEAR unchanged. ---- */
+.solve-overlay.r20:not(.tray) .solve-rack{ display:grid; grid-template-columns:repeat(5, max-content); justify-content:center; gap:8px; }
+.solve-overlay:not(.tray) .solve-inner{ padding-top:calc(var(--ww-ufo-h, 58px) + 6px); }
+.solve-overlay:not(.tray) .ww-ufo:not(.beaming){ top:0; width:76px; margin-left:-38px; }
+@media (max-height:700px){ .solve-overlay:not(.tray) .solve-inner{ padding-top:48px; } .solve-overlay:not(.tray) .ww-ufo:not(.beaming){ width:60px; margin-left:-30px; } .solve-overlay.r20:not(.tray) .solve-rack{ gap:6px; } }

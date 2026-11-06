@@ -16016,7 +16016,10 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   let warpTray = false, solveTotalMs = 0, warpBusy = false;
   function warpTrayOn(){ return document.documentElement.classList.contains('mode-daily'); }
   function applyTrayMode(){
-    warpTray = warpTrayOn() && (solveRack.length === WARP_TRAY || solveRack.length === 15); els.solveOverlay.classList.toggle('tray', warpTray);   // (15: a tray saved before fix 6, mid-solve)
+    // mega 4 item 8: a 20-tile rack is always the tray (it used to need the mode-daily class, so a Word Warp restored before that class was set showed the
+    // pink layout in 3 uneven rows with the saucer over the title); the pink layout itself also lays 20 letters out in 4 rows of 5 (.r20)
+    warpTray = (solveRack.length === WARP_TRAY || solveRack.length === 15) && (warpTrayOn() || runActive || solveRack.length === WARP_TRAY); els.solveOverlay.classList.toggle('tray', warpTray);   // (15: a tray saved before fix 6, mid-solve)
+    els.solveOverlay.classList.toggle('r20', solveRack.length >= 16);
     els.solveSubmit.textContent = warpTray ? 'ENTER' : 'Submit'; els.solveClearBtn.textContent = warpTray ? 'CLEAR' : 'Clear';
   }
   // Tapping a tile moves its letter to the first open slot in the answer row (a placed letter taps back to its tile); ENTER tests the word, CLEAR returns every placed
