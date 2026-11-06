@@ -1,0 +1,87 @@
+/* FlipStax - MUNCH MIX (lib/munch-mix.js). The board is the stage floor: a 4 x 5 grid of glossy Simon-coloured tiles (red, green, blue, gold) in a gentle
+   perspective tilt, each with a bright rim, a top highlight and a glowing underlight; a dark stage with two sweeping spotlight cones and a glowing floor
+   reflection. Transform and opacity only; at most 3 flashes a second; lite mode and reduced motion: plain fades, a still floor. */
+.mm-set{ background:radial-gradient(80% 55% at 50% 30%, #241052 0%, #12062e 55%, #06020f 100%); }
+.mm-set .ms-floor{ left:-10%; right:-10%; bottom:0; height:46%; background:radial-gradient(60% 70% at 50% 30%, rgba(255,63,181,0.28), rgba(39,230,255,0.12) 45%, rgba(0,0,0,0) 75%); }
+.mm-set .ms-refl{ left:10%; right:10%; bottom:4%; height:16%; border-radius:50%; background:radial-gradient(ellipse, rgba(255,226,122,0.28), rgba(255,226,122,0) 70%); }
+.mm-set .ms-cone{ top:-6%; width:58%; height:96%; opacity:0.24; transform-origin:50% 0; clip-path:polygon(45% 0, 55% 0, 100% 100%, 0 100%);
+  background:linear-gradient(180deg, rgba(255,244,214,0.9), rgba(255,226,122,0.25) 60%, rgba(255,226,122,0)); animation:msCone 7s ease-in-out infinite alternate; }
+.mm-set .ms-cone.l{ left:-14%; } .mm-set .ms-cone.r{ right:-14%; animation-delay:-3.5s; animation-direction:alternate-reverse; }
+@keyframes msCone{ from{ transform:rotate(-24deg); } to{ transform:rotate(22deg); } }
+.nx-mm .nx-rule{ font-size:clamp(16px, 4.8vw, 22px); }
+/* the floor */
+.mm-wrap{ position:relative; flex:1 1 auto; width:100%; min-height:0; display:flex; align-items:center; justify-content:center; perspective:1100px; padding-bottom:4px; }
+.mm-board{ position:relative; height:100%; max-height:100%; aspect-ratio:4 / 5; max-width:100%; display:grid; grid-template-columns:repeat(4, 1fr); grid-template-rows:repeat(5, 1fr); gap:8px;
+  transform:rotateX(14deg); transform-origin:50% 100%; }
+.mm-tile{ position:relative; border:0; padding:0; margin:0; background:none; cursor:pointer; container-type:inline-size; -webkit-tap-highlight-color:transparent; --tc:255,60,80; }
+.mm-tile.c-r{ --tc:255,60,80; } .mm-tile.c-g{ --tc:60,240,110; } .mm-tile.c-b{ --tc:60,150,255; } .mm-tile.c-y{ --tc:255,205,60; }
+.mm-under{ position:absolute; left:-10%; right:-10%; top:-8%; bottom:-14%; border-radius:30%; pointer-events:none; background:radial-gradient(ellipse at 50% 60%, rgba(var(--tc),0.55), rgba(var(--tc),0) 70%); opacity:0.75; }
+.mm-face{ position:absolute; inset:0; border-radius:14px; overflow:hidden; display:flex; align-items:center; justify-content:center; border:3px solid rgba(255,255,255,0.85);
+  box-shadow:inset 0 -6px 0 rgba(0,0,0,0.28), 0 0 0 2px rgba(var(--tc),0.9), 0 0 14px rgba(var(--tc),0.6); }
+.c-r .mm-face{ background:linear-gradient(180deg, #ff8a96 0%, #f0283c 45%, #8a0016 100%); }
+.c-g .mm-face{ background:linear-gradient(180deg, #9dffab 0%, #1fc24a 45%, #06561c 100%); }
+.c-b .mm-face{ background:linear-gradient(180deg, #8ac8ff 0%, #1f6ef0 45%, #0a2a7a 100%); }
+.c-y .mm-face{ background:linear-gradient(180deg, #fff0a0 0%, #f5b000 45%, #7a4a00 100%); }
+.mm-hi{ position:absolute; left:8%; right:8%; top:5%; height:34%; border-radius:12px 12px 40% 40%; background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0)); pointer-events:none; }
+.mm-neon, .mm-red{ position:absolute; inset:0; opacity:0; pointer-events:none; }
+.mm-tile.p .mm-neon{ background:linear-gradient(180deg, #ffc4ec 0%, #ff3fb5 50%, #a0106a 100%); }
+.mm-tile.b .mm-neon{ background:linear-gradient(180deg, #c8fbff 0%, #27e6ff 50%, #0a6a9a 100%); }
+.mm-red{ background:linear-gradient(180deg, #ff9a8a, #ff1a1a 60%, #7a0000); }
+.mm-t{ position:relative; z-index:1; color:#fff4d6; font:900 clamp(16px, 34cqw, 46px)/1 var(--f-display); letter-spacing:0.5px; white-space:nowrap; text-shadow:0 2px 0 rgba(30,0,20,0.6), 0 0 8px rgba(0,0,0,0.35); }
+.mm-tile.l .mm-t{ font-size:clamp(14px, 26cqw, 38px); } .mm-tile.xl .mm-t{ font-size:clamp(12px, 19cqw, 30px); }
+.mm-face::after{ content:''; position:absolute; inset:0; background:#ffffff; opacity:0; pointer-events:none; animation:mmShim 5s ease-in-out var(--d) infinite; }
+@keyframes mmShim{ 0%, 100%{ opacity:0; } 50%{ opacity:0.14; } }
+.mm-warn{ position:absolute; inset:-5px; border-radius:17px; border:3px solid #ff3a4a; opacity:0; pointer-events:none; box-shadow:0 0 12px rgba(255,58,74,0.9); }
+.mm-tile.warn .mm-warn{ animation:mmWarn 0.5s ease-in both; }
+@keyframes mmWarn{ 0%{ opacity:0; } 40%{ opacity:0.95; } 60%{ opacity:0.45; } 100%{ opacity:1; } }
+/* round start: a snake of light; round clear: a full chase; PERFECT: a wave */
+.mm-tile.lit .mm-face::after{ animation:none; opacity:0.55; }
+.mm-board.chase .mm-face::after{ animation:mmChase 0.5s linear calc(var(--k) * 35ms) 3; }
+.mm-board.wave .mm-face::after{ animation:mmChase 0.7s ease-in-out calc(var(--w) * 90ms) 5; }
+@keyframes mmChase{ 0%, 100%{ opacity:0; } 35%{ opacity:0.7; } }
+/* a right chomp: the tile flips to neon pink or blue, pulses twice, then flips back to a new value */
+.mm-tile.eaten .mm-face{ animation:mmFlip 0.9s ease-in-out both; }
+.mm-tile.eaten .mm-neon{ animation:mmNeon 0.9s linear both; }
+@keyframes mmFlip{ 0%{ transform:rotateY(0deg); } 22%{ transform:rotateY(90deg); } 44%{ transform:rotateY(0deg) scale(1); } 58%{ transform:scale(1.1); } 70%{ transform:scale(1); } 84%{ transform:scale(1.1); } 100%{ transform:scale(1); } }
+@keyframes mmNeon{ 0%, 21%{ opacity:0; } 22%, 100%{ opacity:1; } }
+.mm-tile.back .mm-face{ animation:mmBack 0.5s ease-in-out both; }
+@keyframes mmBack{ 0%{ transform:rotateY(0deg); } 50%{ transform:rotateY(90deg); } 100%{ transform:rotateY(0deg); } }
+.mm-tile.eaten.back .mm-neon{ animation:none; opacity:1; }
+/* a wrong chomp: a red flash and a shake */
+.mm-tile.nope .mm-face{ animation:mmShake 0.4s ease-in-out; } .mm-tile.nope .mm-red{ animation:mmRed 0.55s ease-out; }
+@keyframes mmShake{ 0%, 100%{ transform:translateX(0); } 25%{ transform:translateX(-7px); } 50%{ transform:translateX(6px); } 75%{ transform:translateX(-3px); } }
+@keyframes mmRed{ 0%{ opacity:0; } 20%{ opacity:0.9; } 100%{ opacity:0; } }
+/* the muncher and the Glitches: each a tile-sized box, moved by transform to a tile's centre */
+.mm-muncher, .mm-glitch{ position:absolute; left:-12.5%; top:-10%; width:25%; height:20%; pointer-events:none; }
+.mm-muncher{ z-index:4; } .mm-glitch{ z-index:3; }
+.mm-msvg, .mm-gsvg{ position:absolute; left:12%; bottom:20%; width:76%; height:auto; overflow:visible; }
+.mm-msvg{ filter:drop-shadow(0 4px 4px rgba(0,0,0,0.45)); }
+.mm-gsvg{ left:16%; width:68%; filter:drop-shadow(0 0 8px rgba(255,58,74,0.7)); animation:mmWob 1.6s ease-in-out infinite alternate; }
+@keyframes mmWob{ from{ transform:rotate(-5deg); } to{ transform:rotate(5deg); } }
+.mm-lids{ transform-box:fill-box; transform-origin:50% 0; transform:scaleY(0); animation:mmBlink 4.2s ease-in-out infinite; }
+@keyframes mmBlink{ 0%, 91%, 100%{ transform:scaleY(0); } 94%{ transform:scaleY(1); } }
+.mm-mouth{ transform-box:fill-box; transform-origin:50% 0; }
+.mm-muncher.chomp .mm-mouth{ animation:mmChomp 0.32s ease-in-out; }
+@keyframes mmChomp{ 0%{ transform:scaleY(1); } 35%{ transform:scaleY(1.45); } 65%{ transform:scaleY(0.25); } 100%{ transform:scaleY(1); } }
+.mm-muncher.chomp .mm-msvg{ animation:mmSquash 0.32s ease-in-out; }
+@keyframes mmSquash{ 0%, 100%{ transform:scale(1); } 60%{ transform:scale(1.12, 0.88); } }
+.mm-ring{ position:absolute; z-index:5; width:22%; aspect-ratio:1; border-radius:50%; border:5px solid #ff3a4a; box-sizing:border-box; pointer-events:none; }
+/* the status pill: three life lights on the right */
+.nx-mm .nx-panel{ padding-right:64px !important; }
+.mm-lives{ position:absolute; right:12px; top:50%; z-index:2; display:flex; gap:6px; transform:translateY(-50%); }
+.mm-lives i{ width:13px; height:13px; border-radius:50%; background:radial-gradient(circle at 40% 35%, #ffffff, #5dff9a 55%, #17b85a); box-shadow:0 0 8px rgba(93,255,154,0.9); transition:opacity 0.25s ease; }
+.mm-lives i.off{ background:radial-gradient(circle at 40% 35%, #8a8aa0, #3a3a50 70%); box-shadow:none; opacity:0.7; }
+.nx-slam.mmclear{ font-size:clamp(34px, 10vw, 56px); color:#fff4d6; text-shadow:0 4px 0 #7a4a00, 0 0 18px rgba(245,184,58,0.8); }
+@media (min-width:600px){ .mm-board{ gap:14px; } .mm-face{ border-radius:20px; } }
+@media (max-height:700px){ .mm-board{ gap:6px; } .mm-face{ border-radius:11px; border-width:2px; } }
+:root.lite .mm-set *, :root.lite .nx-mm .mm-board *{ animation:none !important; }
+:root.lite .mm-tile.eaten .mm-neon, :root.lite .mm-tile.eaten.back .mm-neon{ opacity:1; }
+@media (prefers-reduced-motion: reduce){ .mm-set *, .nx-mm .mm-board *{ animation:none !important; } .mm-tile.eaten .mm-neon{ opacity:1; } }
+/* the value stays readable under the muncher or a Glitch: the text sits in the upper part of the tile and they stand low on its front edge */
+.mm-face{ align-items:flex-start; padding-top:16%; box-sizing:border-box; }
+.mm-msvg{ left:22%; width:56%; bottom:-14%; } .mm-gsvg{ left:24%; width:52%; bottom:-12%; }
+/* room under the floor, so the muncher on the bottom row never reaches the status pill */
+.mm-wrap{ padding-bottom:clamp(18px, 4.2vh, 56px); box-sizing:border-box; }
+/* the floor keeps its 4 : 5 shape at every screen size: as big as fits the play area's width and height */
+.mm-wrap{ container-type:size; }
+.mm-board{ height:auto; max-height:none; width:min(100cqw, 80cqh); aspect-ratio:4 / 5; }

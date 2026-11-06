@@ -45,6 +45,7 @@
 <link rel="stylesheet" href="lib/intro.css">
 <link rel="stylesheet" href="lib/celebrate.css">
 <link rel="stylesheet" href="lib/neo-games.css">
+<link rel="stylesheet" href="lib/munch-mix.css">
 <link rel="preload" as="image" href="data/stage/stage-close.webp" type="image/webp">
 <style>
   :root{
@@ -4933,6 +4934,8 @@
 <script src="data/vs/vs-emoji.js"></script>
 <script src="lib/mini-games.js"></script>
 <script src="lib/neo-games.js"></script>
+<script src="data/munch-packs.js"></script>
+<script src="lib/munch-mix.js"></script>
 <script src="lib/orbit-physics.js"></script>
 <script src="lib/host-alien.js"></script>
 <script src="data/host/manifest.js"></script>
@@ -4952,7 +4955,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // Player-facing game names and the alien host's lines live in
   // data/game-names.js (the defaults here are only a fallback if it fails).
   const GN = Object.assign({ orbitDrop:'Orbit Drop', cosmicSurprise:'Cosmic Surprise', crowdScan:'Crowd Scan', brainBeam:'Brain Beam', riddleRound:'Riddle Round',
-    zapWords:'Zap Words', peakOrPlunge:'Peak or Plunge', snapSort:'Snap Sort', twinFlip:'Twin Flip', factOrFib:'Fact or Fib', saucerShuffle:'Saucer Shuffle', zigZap:'ZiG Zap ZaBam!', alienBlast:'Alien Blast', spaceLaunch:'Space Launch', priceProbe:'Price Probe', oddballAlert:'Oddball Alert', emojiDecode:'Emoji Decode', timeWarp:'Time Warp', portalPick:'Portal Pick',
+    zapWords:'Zap Words', peakOrPlunge:'Peak or Plunge', snapSort:'Snap Sort', twinFlip:'Twin Flip', factOrFib:'Fact or Fib', saucerShuffle:'Saucer Shuffle', zigZap:'ZiG Zap ZaBam!', alienBlast:'Alien Blast', spaceLaunch:'Space Launch', munchMix:'Munch Mix', priceProbe:'Price Probe', oddballAlert:'Oddball Alert', emojiDecode:'Emoji Decode', timeWarp:'Time Warp', portalPick:'Portal Pick',
     wordWarp:'Word Warp', vault:'The Mothership Vault' }, (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.names) || {});
   const HOST_LINES = (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.host) || {};
   const HOST_QUIPS = (window.FLIPSTAX_NAMES && window.FLIPSTAX_NAMES.quip) || {};
@@ -11351,7 +11354,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // the other three open too so the player sees what else was there, and the picked game plays. The old Portal Pick's
   // power-ups are not offered here (their code stays).
   const DOOR_PICK_MS = 8000;
-  const DOOR_ICONS = { emojiDecode:'😀', timeWarp:'⌛', snapSort:'📸', saucerShuffle:'🛸', factOrFib:'❓', priceProbe:'🏷️', zigZap:'⚡', alienBlast:'👽', spaceLaunch:'🚀' };
+  const DOOR_ICONS = { emojiDecode:'😀', timeWarp:'⌛', snapSort:'📸', saucerShuffle:'🛸', factOrFib:'❓', priceProbe:'🏷️', zigZap:'⚡', alienBlast:'👽', spaceLaunch:'🚀', munchMix:'🍴' };
   // A+ pacing: every game's icon, for its title card
   const GAME_ICONS = Object.assign({ riddle:'🧩', lucky:'🎡', door:'🚪', zapWords:'⚡', twinFlip:'🃏', orbitDrop:'🛸', wordWarp:'🌀', peakOrPlunge:'⛰️', oddballAlert:'🔍', crowdScan:'👥', vs:'🆚' }, DOOR_ICONS);
   // A+ tier 2 item 3: the Mystery Portal (was the Mystery Door) - exactly three doors drawn in code (CSS + SVG): a copper door with an
@@ -19357,6 +19360,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       { label:'Saucer Shuffle', go: mysteryAs('saucerShuffle') },
       { label:'ZiG Zap ZaBam!', go: mysteryAs('zigZap') },
       { label:'Alien Blast', go: mysteryAs('alienBlast') },
+      { label:'Munch Mix', go: mysteryAs('munchMix') },   // (a spare: in no show pool yet)
       { label:'Space Launch', go: mysteryAs('spaceLaunch') },
       // The finale's cue card, then the Word Warp with all six letters in.
       { label:'Grand finale (6 letters)', wide:true, go: atType(s=> s.t === 'act' && s.finale, 0, 210, 6) },
