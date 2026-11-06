@@ -1,87 +1,99 @@
-/* FlipStax - MUNCH MIX (lib/munch-mix.js). The board is the stage floor: a 4 x 5 grid of glossy Simon-coloured tiles (red, green, blue, gold) in a gentle
-   perspective tilt, each with a bright rim, a top highlight and a glowing underlight; a dark stage with two sweeping spotlight cones and a glowing floor
-   reflection. Transform and opacity only; at most 3 flashes a second; lite mode and reduced motion: plain fades, a still floor. */
-.mm-set{ background:radial-gradient(80% 55% at 50% 30%, #241052 0%, #12062e 55%, #06020f 100%); }
-.mm-set .ms-floor{ left:-10%; right:-10%; bottom:0; height:46%; background:radial-gradient(60% 70% at 50% 30%, rgba(255,63,181,0.28), rgba(39,230,255,0.12) 45%, rgba(0,0,0,0) 75%); }
-.mm-set .ms-refl{ left:10%; right:10%; bottom:4%; height:16%; border-radius:50%; background:radial-gradient(ellipse, rgba(255,226,122,0.28), rgba(255,226,122,0) 70%); }
-.mm-set .ms-cone{ top:-6%; width:58%; height:96%; opacity:0.24; transform-origin:50% 0; clip-path:polygon(45% 0, 55% 0, 100% 100%, 0 100%);
-  background:linear-gradient(180deg, rgba(255,244,214,0.9), rgba(255,226,122,0.25) 60%, rgba(255,226,122,0)); animation:msCone 7s ease-in-out infinite alternate; }
-.mm-set .ms-cone.l{ left:-14%; } .mm-set .ms-cone.r{ right:-14%; animation-delay:-3.5s; animation-direction:alternate-reverse; }
-@keyframes msCone{ from{ transform:rotate(-24deg); } to{ transform:rotate(22deg); } }
-.nx-mm .nx-rule{ font-size:clamp(16px, 4.8vw, 22px); }
-/* the floor */
-.mm-wrap{ position:relative; flex:1 1 auto; width:100%; min-height:0; display:flex; align-items:center; justify-content:center; perspective:1100px; padding-bottom:4px; }
-.mm-board{ position:relative; height:100%; max-height:100%; aspect-ratio:4 / 5; max-width:100%; display:grid; grid-template-columns:repeat(4, 1fr); grid-template-rows:repeat(5, 1fr); gap:8px;
-  transform:rotateX(14deg); transform-origin:50% 100%; }
-.mm-tile{ position:relative; border:0; padding:0; margin:0; background:none; cursor:pointer; container-type:inline-size; -webkit-tap-highlight-color:transparent; --tc:255,60,80; }
-.mm-tile.c-r{ --tc:255,60,80; } .mm-tile.c-g{ --tc:60,240,110; } .mm-tile.c-b{ --tc:60,150,255; } .mm-tile.c-y{ --tc:255,205,60; }
-.mm-under{ position:absolute; left:-10%; right:-10%; top:-8%; bottom:-14%; border-radius:30%; pointer-events:none; background:radial-gradient(ellipse at 50% 60%, rgba(var(--tc),0.55), rgba(var(--tc),0) 70%); opacity:0.75; }
-.mm-face{ position:absolute; inset:0; border-radius:14px; overflow:hidden; display:flex; align-items:center; justify-content:center; border:3px solid rgba(255,255,255,0.85);
-  box-shadow:inset 0 -6px 0 rgba(0,0,0,0.28), 0 0 0 2px rgba(var(--tc),0.9), 0 0 14px rgba(var(--tc),0.6); }
-.c-r .mm-face{ background:linear-gradient(180deg, #ff8a96 0%, #f0283c 45%, #8a0016 100%); }
-.c-g .mm-face{ background:linear-gradient(180deg, #9dffab 0%, #1fc24a 45%, #06561c 100%); }
-.c-b .mm-face{ background:linear-gradient(180deg, #8ac8ff 0%, #1f6ef0 45%, #0a2a7a 100%); }
-.c-y .mm-face{ background:linear-gradient(180deg, #fff0a0 0%, #f5b000 45%, #7a4a00 100%); }
-.mm-hi{ position:absolute; left:8%; right:8%; top:5%; height:34%; border-radius:12px 12px 40% 40%; background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0)); pointer-events:none; }
-.mm-neon, .mm-red{ position:absolute; inset:0; opacity:0; pointer-events:none; }
-.mm-tile.p .mm-neon{ background:linear-gradient(180deg, #ffc4ec 0%, #ff3fb5 50%, #a0106a 100%); }
-.mm-tile.b .mm-neon{ background:linear-gradient(180deg, #c8fbff 0%, #27e6ff 50%, #0a6a9a 100%); }
-.mm-red{ background:linear-gradient(180deg, #ff9a8a, #ff1a1a 60%, #7a0000); }
-.mm-t{ position:relative; z-index:1; color:#fff4d6; font:900 clamp(16px, 34cqw, 46px)/1 var(--f-display); letter-spacing:0.5px; white-space:nowrap; text-shadow:0 2px 0 rgba(30,0,20,0.6), 0 0 8px rgba(0,0,0,0.35); }
-.mm-tile.l .mm-t{ font-size:clamp(14px, 26cqw, 38px); } .mm-tile.xl .mm-t{ font-size:clamp(12px, 19cqw, 30px); }
-.mm-face::after{ content:''; position:absolute; inset:0; background:#ffffff; opacity:0; pointer-events:none; animation:mmShim 5s ease-in-out var(--d) infinite; }
-@keyframes mmShim{ 0%, 100%{ opacity:0; } 50%{ opacity:0.14; } }
-.mm-warn{ position:absolute; inset:-5px; border-radius:17px; border:3px solid #ff3a4a; opacity:0; pointer-events:none; box-shadow:0 0 12px rgba(255,58,74,0.9); }
-.mm-tile.warn .mm-warn{ animation:mmWarn 0.5s ease-in both; }
-@keyframes mmWarn{ 0%{ opacity:0; } 40%{ opacity:0.95; } 60%{ opacity:0.45; } 100%{ opacity:1; } }
-/* round start: a snake of light; round clear: a full chase; PERFECT: a wave */
-.mm-tile.lit .mm-face::after{ animation:none; opacity:0.55; }
-.mm-board.chase .mm-face::after{ animation:mmChase 0.5s linear calc(var(--k) * 35ms) 3; }
-.mm-board.wave .mm-face::after{ animation:mmChase 0.7s ease-in-out calc(var(--w) * 90ms) 5; }
-@keyframes mmChase{ 0%, 100%{ opacity:0; } 35%{ opacity:0.7; } }
-/* a right chomp: the tile flips to neon pink or blue, pulses twice, then flips back to a new value */
-.mm-tile.eaten .mm-face{ animation:mmFlip 0.9s ease-in-out both; }
-.mm-tile.eaten .mm-neon{ animation:mmNeon 0.9s linear both; }
-@keyframes mmFlip{ 0%{ transform:rotateY(0deg); } 22%{ transform:rotateY(90deg); } 44%{ transform:rotateY(0deg) scale(1); } 58%{ transform:scale(1.1); } 70%{ transform:scale(1); } 84%{ transform:scale(1.1); } 100%{ transform:scale(1); } }
-@keyframes mmNeon{ 0%, 21%{ opacity:0; } 22%, 100%{ opacity:1; } }
-.mm-tile.back .mm-face{ animation:mmBack 0.5s ease-in-out both; }
-@keyframes mmBack{ 0%{ transform:rotateY(0deg); } 50%{ transform:rotateY(90deg); } 100%{ transform:rotateY(0deg); } }
-.mm-tile.eaten.back .mm-neon{ animation:none; opacity:1; }
-/* a wrong chomp: a red flash and a shake */
-.mm-tile.nope .mm-face{ animation:mmShake 0.4s ease-in-out; } .mm-tile.nope .mm-red{ animation:mmRed 0.55s ease-out; }
-@keyframes mmShake{ 0%, 100%{ transform:translateX(0); } 25%{ transform:translateX(-7px); } 50%{ transform:translateX(6px); } 75%{ transform:translateX(-3px); } }
-@keyframes mmRed{ 0%{ opacity:0; } 20%{ opacity:0.9; } 100%{ opacity:0; } }
-/* the muncher and the Glitches: each a tile-sized box, moved by transform to a tile's centre */
-.mm-muncher, .mm-glitch{ position:absolute; left:-12.5%; top:-10%; width:25%; height:20%; pointer-events:none; }
-.mm-muncher{ z-index:4; } .mm-glitch{ z-index:3; }
-.mm-msvg, .mm-gsvg{ position:absolute; left:12%; bottom:20%; width:76%; height:auto; overflow:visible; }
-.mm-msvg{ filter:drop-shadow(0 4px 4px rgba(0,0,0,0.45)); }
-.mm-gsvg{ left:16%; width:68%; filter:drop-shadow(0 0 8px rgba(255,58,74,0.7)); animation:mmWob 1.6s ease-in-out infinite alternate; }
-@keyframes mmWob{ from{ transform:rotate(-5deg); } to{ transform:rotate(5deg); } }
-.mm-lids{ transform-box:fill-box; transform-origin:50% 0; transform:scaleY(0); animation:mmBlink 4.2s ease-in-out infinite; }
-@keyframes mmBlink{ 0%, 91%, 100%{ transform:scaleY(0); } 94%{ transform:scaleY(1); } }
-.mm-mouth{ transform-box:fill-box; transform-origin:50% 0; }
-.mm-muncher.chomp .mm-mouth{ animation:mmChomp 0.32s ease-in-out; }
-@keyframes mmChomp{ 0%{ transform:scaleY(1); } 35%{ transform:scaleY(1.45); } 65%{ transform:scaleY(0.25); } 100%{ transform:scaleY(1); } }
-.mm-muncher.chomp .mm-msvg{ animation:mmSquash 0.32s ease-in-out; }
-@keyframes mmSquash{ 0%, 100%{ transform:scale(1); } 60%{ transform:scale(1.12, 0.88); } }
-.mm-ring{ position:absolute; z-index:5; width:22%; aspect-ratio:1; border-radius:50%; border:5px solid #ff3a4a; box-sizing:border-box; pointer-events:none; }
-/* the status pill: three life lights on the right */
-.nx-mm .nx-panel{ padding-right:64px !important; }
-.mm-lives{ position:absolute; right:12px; top:50%; z-index:2; display:flex; gap:6px; transform:translateY(-50%); }
-.mm-lives i{ width:13px; height:13px; border-radius:50%; background:radial-gradient(circle at 40% 35%, #ffffff, #5dff9a 55%, #17b85a); box-shadow:0 0 8px rgba(93,255,154,0.9); transition:opacity 0.25s ease; }
-.mm-lives i.off{ background:radial-gradient(circle at 40% 35%, #8a8aa0, #3a3a50 70%); box-shadow:none; opacity:0.7; }
-.nx-slam.mmclear{ font-size:clamp(34px, 10vw, 56px); color:#fff4d6; text-shadow:0 4px 0 #7a4a00, 0 0 18px rgba(245,184,58,0.8); }
-@media (min-width:600px){ .mm-board{ gap:14px; } .mm-face{ border-radius:20px; } }
-@media (max-height:700px){ .mm-board{ gap:6px; } .mm-face{ border-radius:11px; border-width:2px; } }
-:root.lite .mm-set *, :root.lite .nx-mm .mm-board *{ animation:none !important; }
-:root.lite .mm-tile.eaten .mm-neon, :root.lite .mm-tile.eaten.back .mm-neon{ opacity:1; }
-@media (prefers-reduced-motion: reduce){ .mm-set *, .nx-mm .mm-board *{ animation:none !important; } .mm-tile.eaten .mm-neon{ opacity:1; } }
-/* the value stays readable under the muncher or a Glitch: the text sits in the upper part of the tile and they stand low on its front edge */
-.mm-face{ align-items:flex-start; padding-top:16%; box-sizing:border-box; }
-.mm-msvg{ left:22%; width:56%; bottom:-14%; } .mm-gsvg{ left:24%; width:52%; bottom:-12%; }
-/* room under the floor, so the muncher on the bottom row never reaches the status pill */
-.mm-wrap{ padding-bottom:clamp(18px, 4.2vh, 56px); box-sizing:border-box; }
-/* the floor keeps its 4 : 5 shape at every screen size: as big as fits the play area's width and height */
-.mm-wrap{ container-type:size; }
-.mm-board{ height:auto; max-height:none; width:min(100cqw, 80cqh); aspect-ratio:4 / 5; }
+/* FlipStax - GALACTIC CHOMPS (lib/munch-mix.js, registry id munchMix). The category's galaxy fills the screen and turns slowly (rotate only, 120 s a turn, full
+   brightness, no overlay); a large frosted-glass slab floats over it with a thin glowing edge in the category's colour; the tiles are coloured glass with a bright
+   rim; the snake and the chomper move UNDER the tile text so every word stays readable. Transform and opacity only; at most 3 flashes a second; lite mode and
+   reduced motion: plain fades and a still galaxy. */
+.nx-gc, .nx-gc .nx-stage, .nx-gc button, .nx-gc .gc-tile, .nx-gc .gc-chomp{ touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+.nx-gc .nx-host{ display:none !important; }   /* (no Flip in this game) */
+/* the galaxy: two layers crossfade when the category changes */
+.gc-set{ background:#05020f; }
+.gc-set .gc-galaxy{ left:50%; top:50%; width:150vmax; height:150vmax; margin:-75vmax 0 0 -75vmax; background:#05020f center / cover no-repeat; opacity:0; transition:opacity 0.8s ease; animation:gcTurn 120s linear infinite; }
+.gc-set .gc-galaxy.on{ opacity:1; }
+@keyframes gcTurn{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+.gc-set .gc-streaks{ left:50%; top:50%; width:160vmax; height:160vmax; margin:-80vmax 0 0 -80vmax; opacity:0; border-radius:50%;
+  background:repeating-conic-gradient(from 0deg, rgba(255,255,255,0.95) 0deg 0.5deg, rgba(255,255,255,0) 0.5deg 6deg);
+  -webkit-mask-image:radial-gradient(circle, transparent 6%, #000 22%, #000 60%, transparent 72%); mask-image:radial-gradient(circle, transparent 6%, #000 22%, #000 60%, transparent 72%); }
+.gc-set .gc-hole{ left:50%; top:46%; width:46vmin; height:46vmin; margin:-23vmin 0 0 -23vmin; border-radius:50%; opacity:0; transform:scale(0);
+  background:radial-gradient(circle, #000 0 34%, rgba(0,0,0,0.92) 40%, rgba(255,140,60,0.75) 46%, rgba(255,63,181,0.45) 54%, rgba(120,60,255,0.2) 64%, rgba(0,0,0,0) 72%); }
+:root.lite .gc-set .gc-galaxy{ animation:none; } @media (prefers-reduced-motion: reduce){ .gc-set .gc-galaxy{ animation:none; } }
+/* the play area: the slab is about 92% of the width; only the sign, the banner, the CHOMP button and the status pill are outside it */
+.nx-gc .nx-play{ margin-top:6px; justify-content:flex-start; }
+.nx-gc .nx-rule{ font-size:clamp(16px, 4.8vw, 22px); }
+.gc-wrap{ position:relative; flex:1 1 auto; width:100%; min-height:0; display:flex; align-items:center; justify-content:center; container-type:size; }
+.gc-slab{ position:relative; width:min(100cqw, calc(100cqh * 4 / 4.5)); aspect-ratio:4 / 4.5; padding:2.4%; box-sizing:border-box; border-radius:22px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.07) 40%, rgba(20,16,60,0.28)); border:1.5px solid rgba(255,255,255,0.55);
+  box-shadow:0 0 0 1.5px var(--edge, #3FA9FF), 0 0 22px var(--edge, #3FA9FF), 0 18px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.55);
+  animation:gcFloat 6s ease-in-out infinite alternate; }
+@keyframes gcFloat{ from{ transform:translateY(-3px); } to{ transform:translateY(3px); } }
+:root.lite .gc-slab{ animation:none; } @media (prefers-reduced-motion: reduce){ .gc-slab{ animation:none; } }
+.gc-board{ position:relative; width:100%; height:100%; }
+.gc-slab{ --edge:#3FA9FF; }
+.gc-grid{ position:absolute; inset:0; display:grid; grid-template-columns:repeat(4, 1fr); grid-template-rows:repeat(5, 1fr); gap:7px; }
+.gc-labels{ z-index:5; pointer-events:none; }
+.gc-snake{ position:absolute; inset:0; z-index:3; pointer-events:none; }
+/* the tiles: coloured glass, a bright 2 px rim and a soft glow */
+.gc-tile{ position:relative; border:0; padding:0; margin:0; background:none; cursor:pointer; z-index:1; --tc:#3FA9FF; }
+.gc-glass{ position:absolute; inset:0; border-radius:14px; border:2px solid rgba(255,255,255,0.92);
+  background:linear-gradient(180deg, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0.08) 46%, rgba(0,0,0,0.12) 100%), var(--tc);
+  box-shadow:0 0 12px color-mix(in srgb, var(--tc) 70%, transparent), inset 0 -5px 0 rgba(0,0,0,0.16); transition:opacity 0.25s ease; }
+.gc-flash, .gc-warn, .gc-sock{ position:absolute; inset:0; border-radius:14px; pointer-events:none; opacity:0; }
+.gc-flash{ background:linear-gradient(180deg, #ffd0f0, #ff3fb5 55%, #b0127a); }
+.gc-tile.b .gc-flash{ background:linear-gradient(180deg, #d0fbff, #27e6ff 55%, #0a7aa8); }
+.gc-tile.nope .gc-flash{ background:linear-gradient(180deg, #ffb0a0, #ff2a2a 55%, #8a0000); }
+.gc-warn{ inset:-4px; border-radius:17px; border:3px solid #ff3fb5; box-shadow:0 0 12px rgba(255,63,181,0.9); }
+.gc-tile.warn .gc-warn{ animation:gcWarn 0.5s ease-in both; }
+@keyframes gcWarn{ from{ opacity:0; } to{ opacity:1; } }
+/* a blank socket: dark, with a faint ring in the palette's grey */
+.gc-sock{ background:radial-gradient(circle at 50% 45%, rgba(10,8,30,0.96), rgba(4,3,14,0.98) 70%); box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--grey, #B8C2D6) 45%, transparent), inset 0 4px 10px rgba(0,0,0,0.6); }
+.gc-tile.blank .gc-glass{ opacity:0; } .gc-tile.blank .gc-sock{ opacity:1; }
+.gc-board{ --grey:#B8C2D6; }
+/* the labels: large bold text in the colour that reads best on its tile */
+.gc-lab{ position:relative; display:flex; align-items:center; justify-content:center; container-type:inline-size; --ink:#0b1230; }
+.gc-lab b{ font:900 clamp(16px, 30cqw, 44px)/1 var(--f-display); letter-spacing:0.3px; color:var(--ink); white-space:nowrap; text-align:center; max-width:94%;
+  text-shadow:0 0 3px color-mix(in srgb, var(--ink) 0%, transparent); paint-order:stroke fill; -webkit-text-stroke:0; }
+.gc-lab.l b{ font-size:clamp(14px, 24cqw, 36px); } .gc-lab.xl b{ font-size:clamp(12px, 19cqw, 30px); } .gc-lab.xxl b{ font-size:clamp(11px, 15.5cqw, 26px); }
+.gc-lab.gone b{ opacity:0; }
+/* where the chomper or the snake passes behind a word, a soft halo keeps it readable */
+.gc-lab b{ text-shadow:0 0 6px rgba(255,255,255,0.55); }
+.gc-lab[style*="fff4d6"] b{ text-shadow:0 0 6px rgba(0,0,0,0.75), 0 1px 0 rgba(0,0,0,0.5); }
+/* the chomper: about 20% taller than a tile, its feet on the tile's lower edge, under the text */
+.gc-chomper{ position:absolute; left:0; top:0; z-index:4; width:0; height:0; pointer-events:none; --th:80px; }
+.gc-cb{ position:absolute; left:0; bottom:0; width:calc(var(--th) * 1.2 * 0.523); height:calc(var(--th) * 1.2); margin-left:calc(var(--th) * -0.314); transform-origin:50% 100%; animation:gcBreathe 3.6s ease-in-out infinite alternate; }
+@keyframes gcBreathe{ from{ transform:scale(1); } to{ transform:scale(1.025); } }
+.gc-cb img{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:50% 100%; filter:drop-shadow(0 4px 5px rgba(0,0,0,0.5)); }
+.gc-cb .gc-o{ opacity:0; } .gc-chomper.open .gc-o{ opacity:1; } .gc-chomper.open .gc-c{ opacity:0; }
+.gc-chomper.woozy .gc-c{ filter:drop-shadow(0 4px 5px rgba(0,0,0,0.5)) hue-rotate(40deg) saturate(0.75); }
+.gc-stars{ position:absolute; left:50%; top:4%; width:0; height:0; opacity:0; }
+.gc-stars b{ position:absolute; left:-9px; top:-9px; font-size:18px; line-height:1; color:#ffe27a; }
+.gc-chomper.woozy .gc-stars{ opacity:1; animation:gcStars 0.9s linear infinite; }
+.gc-stars b:nth-child(1){ transform:translate(-22px, 0); } .gc-stars b:nth-child(2){ transform:translate(20px, -6px); } .gc-stars b:nth-child(3){ transform:translate(0, -18px); }
+@keyframes gcStars{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+:root.lite .gc-cb, :root.lite .gc-chomper.woozy .gc-stars{ animation:none; } @media (prefers-reduced-motion: reduce){ .gc-cb, .gc-chomper.woozy .gc-stars{ animation:none; } }
+/* the snake: slim round segments (about 55% of a tile), magenta to orange with a yellow belly stripe and a soft glow, under the tile text */
+.gc-seg, .gc-head{ position:absolute; left:0; top:0; width:0; height:0; }
+.gc-seg::before{ content:''; position:absolute; width:calc(var(--tw, 80px) * 0.55 * var(--sz, 1)); aspect-ratio:1; border-radius:50%; transform:translate(-50%, -50%);
+  background:linear-gradient(90deg, transparent 38%, rgba(255,226,90,0.95) 40%, rgba(255,226,90,0.95) 60%, transparent 62%), radial-gradient(circle at 38% 32%, #ffc0e6, var(--sc, #e0287c) 52%, color-mix(in srgb, var(--sc, #e0287c) 70%, #000) 100%);
+  box-shadow:0 0 10px color-mix(in srgb, var(--sc, #e0287c) 80%, transparent); }
+.gc-head img{ position:absolute; width:calc(var(--tw, 80px) * 0.78); height:auto; transform:translate(-50%, -50%) rotate(var(--rot, 0deg)); filter:drop-shadow(0 0 6px rgba(255,63,181,0.7)); }
+/* the CHOMP button: the shared gold button, big and centred at the bottom */
+.nx-gc .gc-chomp{ margin:8px auto 0; font:900 clamp(26px, 8vw, 34px)/1 var(--f-display); letter-spacing:2px; }
+/* the status pill: three strike lights on the right */
+.nx-gc .nx-panel{ padding-right:64px !important; }
+.gc-strikes{ position:absolute; right:12px; top:50%; z-index:2; display:flex; gap:6px; transform:translateY(-50%); }
+.gc-strikes i{ width:13px; height:13px; border-radius:50%; background:radial-gradient(circle at 40% 35%, #ffffff, #5dff9a 55%, #17b85a); box-shadow:0 0 8px rgba(93,255,154,0.9); transition:opacity 0.25s ease; }
+.gc-strikes i.off{ background:radial-gradient(circle at 40% 35%, #ffb0b0, #ff3a3a 55%, #8a0a0a); box-shadow:0 0 8px rgba(255,58,58,0.85); }
+/* the crack, the slams */
+.gc-crack{ position:absolute; inset:0; z-index:6; width:100%; height:100%; opacity:0; pointer-events:none; overflow:visible; }
+.gc-crack path{ fill:none; stroke:#ffffff; stroke-width:1.4; stroke-linejoin:round; stroke-linecap:round; vector-effect:non-scaling-stroke; filter:drop-shadow(0 0 3px rgba(150,220,255,0.95)); }
+.nx-slam.gcclear{ font-size:clamp(30px, 9vw, 52px); color:#fff4d6; text-shadow:0 4px 0 #7a4a00, 0 0 18px rgba(245,184,58,0.8); }
+.nx-slam.gcsplash{ font-size:clamp(40px, 12vw, 66px); color:#ffffff; text-shadow:0 4px 0 rgba(10,10,40,0.7), 0 0 22px var(--edge, #3FA9FF); }
+.nx-slam.gcvictory{ font-size:clamp(52px, 16vw, 92px); color:#fff4d6; text-shadow:0 5px 0 #7a4a00, 0 0 26px rgba(255,226,122,0.95); }
+.nx-slam.gcpop{ font-size:clamp(30px, 9vw, 44px); color:#ff3fb5; text-shadow:0 3px 0 #4a0030, 0 0 14px rgba(255,63,181,0.9); }
+.gc-ring{ position:absolute; z-index:6; width:20px; height:20px; margin:-10px 0 0 -10px; border-radius:50%; border:4px solid #fff; box-sizing:border-box; pointer-events:none; }
+.gc-ring.bite{ border-color:#ff3a3a; }
+.gc-bit{ position:absolute; z-index:7; width:8px; height:8px; margin:-4px 0 0 -4px; border-radius:50%; pointer-events:none; }
+.gc-fly{ position:absolute; z-index:6; border-radius:14px; pointer-events:none; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.gc-slab.combo{ animation:gcCombo 0.6s ease-out 1; }
+@keyframes gcCombo{ 0%, 100%{ box-shadow:0 0 0 1.5px var(--edge), 0 0 22px var(--edge), 0 18px 40px rgba(0,0,0,0.55); } 40%{ box-shadow:0 0 0 4px #fff, 0 0 46px var(--edge), 0 18px 40px rgba(0,0,0,0.55); } }
+@media (min-width:600px){ .gc-grid{ gap:12px; } .gc-glass, .gc-flash, .gc-sock{ border-radius:20px; } .nx-gc .gc-chomp{ min-height:84px; font-size:44px; } .gc-strikes i{ width:18px; height:18px; } }
+@media (max-height:700px){ .gc-grid{ gap:5px; } .gc-glass, .gc-flash, .gc-sock{ border-radius:11px; } .nx-gc .gc-chomp{ min-height:48px; margin-top:6px; font-size:26px; } }
+.nx-gc .gc-wrap{ width:92vw; max-width:none; align-self:center; flex-shrink:0; flex-grow:1; }
