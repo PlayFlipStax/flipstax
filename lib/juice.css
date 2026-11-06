@@ -1981,3 +1981,11 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root:root.mode-daily .event-overlay.has-plate .qz-plate small:empty{ display:none; }
 @media (max-height:700px){ :root:root.mode-daily .event-overlay.has-plate .qz-plate{ padding:4px 12px 5px; margin-bottom:6px; } :root:root.mode-daily .event-overlay.has-plate .qz-plate b{ font-size:clamp(19px, 6vw, 24px); } :root:root.mode-daily .event-overlay.has-plate .qz-plate small{ font-size:10px; margin-top:2px; } }
 @media (min-width:600px){ :root:root.mode-daily .event-overlay.has-plate .qz-plate{ width:min(62%, 560px); padding:10px 20px 11px; } :root:root.mode-daily .event-overlay.has-plate .qz-plate b{ font-size:clamp(34px, 6vw, 56px); } :root:root.mode-daily .event-overlay.has-plate .qz-plate small{ font-size:clamp(14px, 2.2vw, 20px); } }
+/* mega 5 item 6: bigger Mystery Doors, all three side by side and the same height. Each door is drawn 404 px of art tall (--dn per door, set in
+   flipstax.html); the closed row (238 + 222 + 218 px of art and two 30 px gaps = 738) fills the width, capped at 30 percent of the screen's height.
+   The open picture keeps the door's own scale (so the swing and the open door match the closed one); it may overlap a dimmed neighbour, and an outer
+   door's row slides just enough to keep it on screen (doorPan in flipstax.html). */
+.event-overlay.mdoor.art{ --dkb:min(calc((100vw - 18px) / 738), calc(30svh / 404), calc((100svh - 300px - 0.934 * min(70vw, 31svh)) / 404), 1.1px); }   /* (the third cap keeps the doors under the Pick a door! pill on short phones) */
+:root:root.mode-daily .event-overlay.mdoor.art .event-tile.md{ --dk:calc(var(--dkb) * var(--dn, 1)); margin-left:0; margin-right:0; }
+:root:root.mode-daily .event-overlay.mdoor.art .event-grid{ gap:calc(30 * var(--dkb)); }
+:root:root.mode-daily .event-overlay.mdoor.art .event-tile.md.art-open{ z-index:4; }
