@@ -1992,3 +1992,8 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 /* mega 5 item 9: the Time Warp year labels take turns above and below the line on the full timeline (twPlace in flipstax.html sets .up), so none run together */
 .tw-tick.up b{ top:-17px; }
 @media (max-height:700px){ .tw-tick.up b{ top:-15px; } }
+/* mega 5 item 11: lite mode and reduced motion - the Mystery Wheel's landing is still: the other wedges dim at once and the result card (RIDDLE ROUND! and
+   the rest) is simply there (it popped in with a 0.35 s bounce in lite, a 0.2 s fade in reduced motion). The spotlights are already still (lib/spotlights.css). */
+:root.lite .mw-dim, :root.lite .lucky-overlay.mw .mw-pop{ transition:none !important; }
+:root.lite .lw-pop.on{ animation:none; opacity:1; transform:translate(-50%, -50%); }
+@media (prefers-reduced-motion: reduce){ .mw-dim, .lucky-overlay.mw .mw-pop{ transition:none !important; } }

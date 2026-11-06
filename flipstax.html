@@ -11944,7 +11944,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       else if (w.kind === 'SAUCER' || w.kind === 'SNAP'){ const key = w.kind === 'SAUCER' ? 'saucerShuffle' : showSwap('snapSort');   /* (fix 6: Snap Sort on hold - the SNAP wedge plays ZiG Zap ZaBam!) */ sfx.correct(); popShow('MYSTERY GAME!', mysteryName(key) + ' - a bonus round'); after = (go)=> bonusGame(key, go); }
       else if (w.kind === 'RIDDLE'){ sfx.correct(); popShow('RIDDLE ROUND!', 'One riddle - a bonus round'); after = (go)=> bonusRiddle(go); }
       else if (w.kind === 'DANCE'){ points(10); sfx.cheer(); popShow('DANCE PARTY!', '+10 points - get down!'); after = (go)=> danceParty(go); }
-      renderBank(); FX.pop(pop, 1.1);
+      renderBank(); if (!isLite()) FX.pop(pop, 1.1);   // (mega 5 item 11: no bump in lite mode; FX.pop already skips reduced motion)
       revealThen(()=>{ if (gen !== luckyGen) return; popHide(); if (after) after(next); else next(); }, { text: pop.textContent });   // (the result holds REVEAL_HOLD_MS)
     };
     const wedgeAt = (a)=> Math.floor((((-a) % 360) + 360) % 360 / MW_W) % MW_N;   // the wedge under the top pointer at rotation a

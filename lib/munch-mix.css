@@ -176,3 +176,6 @@
   :root .nx-gc .nx-ptimer{ right:112px; }
   :root .nx-gc .gc-strikes i{ width:13px; height:13px; }
 }
+/* mega 5 item 11: lite mode and reduced motion - a still Galactic Chomper: no fades between galaxies, on the tiles, the strike dots or the black hole */
+:root.lite .gc-set .gc-galaxy, :root.lite .gc-glass, :root.lite .gc-sock, :root.lite .gc-strikes i, :root.lite .gc-set .gc-hole{ transition:none !important; }
+@media (prefers-reduced-motion: reduce){ .gc-set .gc-galaxy, .gc-glass, .gc-sock, .gc-strikes i, .gc-set .gc-hole{ transition:none !important; } }

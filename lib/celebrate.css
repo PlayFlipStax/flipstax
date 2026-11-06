@@ -29,3 +29,6 @@
 @keyframes bwChase{ 0%{ opacity:0.2; } 8%{ opacity:1; } 30%{ opacity:0.2; } 100%{ opacity:0.2; } }
 :root.lite .show-marquee.bw-chase i{ animation:none; }
 @media (prefers-reduced-motion: reduce){ .show-marquee.bw-chase i{ animation:none; } }
+/* mega 5 item 11: lite mode and reduced motion - the Big Win's PERFECT banner is simply there (it borrowed the Brain Break banner's 0.3 s fade) */
+:root.lite .bw-perfect{ animation:none !important; }
+@media (prefers-reduced-motion: reduce){ .bw-perfect{ animation:none !important; } }
