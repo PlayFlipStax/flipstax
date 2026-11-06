@@ -85,7 +85,7 @@ window.FLIPSTAX_NAMES = {
     zigZap:    { full:'Tap a square and answer right to claim it. Three in a row beats Flip!', short:'Tap a square. Answer right to claim it!' },
     alienBlast:{ full:'Tap the green aliens as they pop up. Avoid the red ones and the bombs!', short:'Tap the green aliens!' },
     spaceLaunch:{ full:'Tap LAUNCH to stop the marker in the green zone. Dead centre is PERFECT!', short:'Stop it in the green zone!' },
-    munchMix:  { full:'Tap a tile to hop there, then CHOMP the ones that fit the rule. Dodge the snake!', short:'Chomp the tiles that fit the rule!' },
+    munchMix:  { full:'Tap the tiles that fit the rule to chomp them. Clear all three boards in 75 seconds!', short:'Tap a tile to chomp it. Beat the clock!' },
   },
   roundTitles: {
     opener:  'THE OPENER',
