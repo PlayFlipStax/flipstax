@@ -1958,3 +1958,12 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .solve-overlay:not(.tray) .solve-inner{ padding-top:calc(var(--ww-ufo-h, 58px) + 6px); }
 .solve-overlay:not(.tray) .ww-ufo:not(.beaming){ top:0; width:76px; margin-left:-38px; }
 @media (max-height:700px){ .solve-overlay:not(.tray) .solve-inner{ padding-top:48px; } .solve-overlay:not(.tray) .ww-ufo:not(.beaming){ width:60px; margin-left:-30px; } .solve-overlay.r20:not(.tray) .solve-rack{ gap:6px; } }
+
+/* ---- fix 7: no double-tap zoom in any game. touch-action: manipulation on every game screen container and everything tappable inside: the VS cards,
+   Brain Beam and the riddles, the Mystery Doors, the Wheel, every mini-game (Saucer Shuffle, Snap Sort, Price Probe, Fact or Fib, Twin Flip, ZiG Zap ZaBam!,
+   Alien Blast, Space Launch, Zap Words, Galactic Chomps), Time Warp and Emoji Decode, the Word Warp tiles, Orbit Drop and the Vault, Crowd Scan, the show's cards.
+   :where() keeps it at zero specificity, so the few elements that set none or pan-y for real dragging or scrolling (the Orbit Drop board and slider, the Zap
+   Words grid, the Crowd Scan slider) keep theirs. ---- */
+:where(#board, #board *, .mg-overlay, .mg-overlay *, .event-overlay, .event-overlay *, .lucky-overlay, .lucky-overlay *, .solve-overlay, .solve-overlay *,
+  .fin-overlay, .fin-overlay *, .guess-overlay, .guess-overlay *, .ir-overlay, .ir-overlay *, .riddle-overlay, .riddle-overlay *, #showCard, #showCard *,
+  .personality-overlay, .personality-overlay *, .home-overlay, .home-overlay *, .split-select-overlay, .split-select-overlay *, button, [role="button"], .daily-btn){ touch-action:manipulation; }

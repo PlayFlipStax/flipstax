@@ -48,6 +48,8 @@
 <link rel="stylesheet" href="lib/munch-mix.css">
 <link rel="preload" as="image" href="data/stage/stage-close.webp" type="image/webp">
 <style>
+  /* fix 7: no double-tap zoom anywhere: touch-action manipulation on the page itself (lib/juice.css also sets it on every game screen and tappable) */
+  html, body{ touch-action:manipulation; }
   :root{
     --bg: #1a1442; --panel: #241b5c;
     --a: #ffb833; --b: #2dd4c4;
