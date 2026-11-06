@@ -1906,3 +1906,28 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
   #readoutOverlay.ep.outro-on .outro.blue .outro-end .outro-lower{ gap:7px; }
   #readoutOverlay.ep.outro-on .outro.blue .outro-end .outro-stats .os b{ font-size:19px; }
 }
+
+/* ---- mega 4 item 5: Time Warp on green - the original Riddle game's look: deep emerald with green spotlight beams and the slow rotating sunburst in green tones.
+   The glossy cards in a warm gold-orange and a hot magenta (they read on green); the glowing timeline and the year tubes are kept. Rotate / opacity only;
+   lite mode and reduced motion: a still background. ---- */
+:root:root.stage-on .event-overlay.bb-timeWarp, .event-overlay.bb-timeWarp{ background:#01200f !important; }
+:root:root.stage-on .event-overlay.bb-timeWarp .ev-bg, .event-overlay.bb-timeWarp .ev-bg{ background:radial-gradient(42% 28% at 50% 52%, rgba(190,255,170,0.7), rgba(40,200,90,0.32) 55%, rgba(40,200,90,0) 100%), radial-gradient(115% 85% at 50% 52%, #12904a 0%, #075a2c 46%, #023418 78%, #011a0c 100%) !important; }
+.event-overlay.bb-timeWarp .ev-bg::before{ opacity:0.42; background:repeating-conic-gradient(from 0deg, rgba(170,255,140,0.6) 0deg 7deg, rgba(170,255,140,0) 7deg 20deg); animation:twTurn 80s linear infinite; }
+.event-overlay.bb-timeWarp .ev-bg::after{ background:repeating-radial-gradient(circle, rgba(200,255,190,0) 0 13%, rgba(200,255,190,0.55) 13% 13.7%, rgba(200,255,190,0) 13.7% 14%), repeating-conic-gradient(rgba(200,255,190,0.45) 0deg 1deg, rgba(200,255,190,0) 1deg 30deg); }
+/* the two green spotlight beams (the background's .rays and .glow layers, as cones swinging from the top corners) */
+.event-overlay.bb-timeWarp .ev-bg :is(.rays, .glow){ display:block !important; position:absolute; top:-6%; width:70%; height:96%; inset:auto; opacity:0.5; pointer-events:none; transform-origin:50% 0;
+  clip-path:polygon(45% 0, 55% 0, 100% 100%, 0 100%); background:linear-gradient(180deg, rgba(220,255,200,0.75), rgba(120,255,150,0.28) 55%, rgba(120,255,150,0)) !important; animation:twBeam 7s ease-in-out infinite alternate; }
+.event-overlay.bb-timeWarp .ev-bg .rays{ left:-22%; }
+.event-overlay.bb-timeWarp .ev-bg .glow{ right:-22%; left:auto; animation-delay:-3.5s; animation-direction:alternate-reverse; }
+@keyframes twBeam{ from{ transform:rotate(-24deg); } to{ transform:rotate(18deg); } }
+:root.lite .event-overlay.bb-timeWarp .ev-bg :is(.rays, .glow){ animation:none; transform:rotate(-8deg); }
+@media (prefers-reduced-motion: reduce){ .event-overlay.bb-timeWarp .ev-bg :is(.rays, .glow){ animation:none; transform:rotate(-8deg); } }
+/* the cards: gold-orange and hot magenta, glossy */
+:root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-timeWarp .event-tile:nth-child(1){ background:linear-gradient(180deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.05) 42%, rgba(0,0,0,0.1) 100%), linear-gradient(180deg, #ffc93c, #ff7a14) !important; box-shadow:0 0 0 2px #8a3a00, 0 0 22px rgba(255,170,40,0.7) !important; }
+:root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-timeWarp .event-tile:nth-child(2){ background:linear-gradient(180deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.04) 42%, rgba(0,0,0,0.1) 100%), linear-gradient(180deg, #ff5cc8, #d9127e) !important; box-shadow:0 0 0 2px #7a0a46, 0 0 22px rgba(255,79,196,0.7) !important; }
+:root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-timeWarp .event-tile .bb-name{ text-shadow:0 2px 0 rgba(80,20,0,0.55), 0 0 10px rgba(0,0,0,0.35); }
+/* the banner, the pill and the VS disc in the green set's colours */
+:root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-timeWarp .event-prompt{ background:linear-gradient(180deg, rgba(3,40,20,0.88), rgba(1,22,11,0.94)) !important; border-color:#8dffb0 !important; box-shadow:0 0 16px rgba(141,255,176,0.5), inset 0 1px 0 rgba(255,255,255,0.28) !important; text-shadow:0 0 10px rgba(141,255,176,0.7); }
+:root:is(.mode-daily, .mode-infinity) .event-overlay.bb-timeWarp .event-subtitle:not(.res-win):not(.res-miss){ background:rgba(1,26,12,0.86) !important; border-color:#8dffb0 !important; color:#d8ffe4 !important; box-shadow:0 0 10px rgba(141,255,176,0.45) !important; }
+:root.mode-daily .event-overlay.bb-two.bb-timeWarp .bb-vs{ background:radial-gradient(circle at 38% 30%, #ffffff 0%, #9dffb8 30%, #17b85a 70%, #06602c 100%); box-shadow:0 0 0 3px rgba(2,40,18,0.9), 0 0 24px rgba(141,255,176,1), 0 0 44px rgba(255,214,90,0.5); text-shadow:0 2px 0 rgba(2,50,20,0.8); }
+.event-overlay.bb-timeWarp .bb-num.tw-num{ border-color:#ffe27a; background:rgba(1,26,12,0.85); box-shadow:0 0 10px rgba(255,226,122,0.7); color:#fff6d0; }

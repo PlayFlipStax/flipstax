@@ -12100,9 +12100,10 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   }
   // Plays one Brain Break in the Brain Beam screen's frame. done() runs when it
   // has finished; returns false (and plays nothing) if the game's data is unusable.
-  // Emoji Decode plays 3 puzzles and Time Warp 2, one after another in the same card, from the next unused items of the frozen schedule
-  // (each show takes the next 3 / 2 and wraps round); a banner and a burst follow when every one is right.
-  const BREAK_PARTS = { emojiDecode:3, timeWarp:2 };
+  // Emoji Decode and Time Warp each play 3, one after another in the same card, from the next unused items of the frozen schedule
+  // (each show takes the next 3 and wraps round); a banner and a burst follow when every one is right. (mega 4 item 5: Time Warp was 2 pairs; each right
+  // pair is still BRAIN_BREAK_POINTS (10) times the round's multiplier, as Emoji Decode's puzzles are - so 30 for a PERFECT WARP, all 3 right.)
+  const BREAK_PARTS = { emojiDecode:3, timeWarp:3 };
   // fix 4: the Time Warp timeline (see runBrainBreakOne). Positions are transforms only; lite mode and reduced motion get plain fades and no roll.
   const TW_D0 = [-260, 2060], TW_TICKS = [[-130, 'BC'], [1000, '1000'], [1500, '1500'], [1800, '1800'], [2000, '2000']];
   function twX(track, dom, y){ const W = track.clientWidth, P = 18; return P + (y - dom[0]) / (dom[1] - dom[0]) * (W - 2 * P); }
