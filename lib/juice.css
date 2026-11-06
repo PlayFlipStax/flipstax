@@ -1989,3 +1989,6 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root:root.mode-daily .event-overlay.mdoor.art .event-tile.md{ --dk:calc(var(--dkb) * var(--dn, 1)); margin-left:0; margin-right:0; }
 :root:root.mode-daily .event-overlay.mdoor.art .event-grid{ gap:calc(30 * var(--dkb)); }
 :root:root.mode-daily .event-overlay.mdoor.art .event-tile.md.art-open{ z-index:4; }
+/* mega 5 item 9: the Time Warp year labels take turns above and below the line on the full timeline (twPlace in flipstax.html sets .up), so none run together */
+.tw-tick.up b{ top:-17px; }
+@media (max-height:700px){ .tw-tick.up b{ top:-15px; } }

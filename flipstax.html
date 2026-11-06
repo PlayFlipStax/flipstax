@@ -12144,7 +12144,17 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   function twX(track, dom, y){ const W = track.clientWidth, P = 18; return P + (y - dom[0]) / (dom[1] - dom[0]) * (W - 2 * P); }
   function twPlace(track, dom){
     const W = track.clientWidth;
-    track.querySelectorAll('.tw-tick').forEach(t=>{ const x = twX(track, dom, +t.dataset.y); t.style.transform = 'translateX(' + x.toFixed(1) + 'px)'; t.classList.toggle('out', x < 4 || x > W - 4); });
+    const vis = [];
+    track.querySelectorAll('.tw-tick').forEach(t=>{ const x = twX(track, dom, +t.dataset.y); t.style.transform = 'translateX(' + x.toFixed(1) + 'px)'; t.classList.toggle('out', x < 4 || x > W - 4); if (x >= 4 && x <= W - 4) vis.push({ t, x }); });
+    // mega 5 item 9: no two year labels run together (it read '18002000'). On the full timeline they take turns above and below the line; zoomed in (the
+    // events' own years then sit above it) they all go below, and a plain tick too close to the one before it is hidden.
+    vis.sort((a, b)=> a.x - b.x);
+    const zoomed = track.classList.contains('zoom');
+    let last = -1e9;
+    vis.forEach((v, k)=>{
+      v.t.classList.toggle('up', !zoomed && k % 2 === 1);
+      if (zoomed){ if (v.x - last < 36 && v.t.classList.contains('minor')) v.t.classList.add('out'); else last = v.x; }
+    });
   }
   function twReveal(track, ys, tiles){
     const quiet = isLite() || prefersReducedMotion(), lo = Math.min(ys[0], ys[1]), hi = Math.max(ys[0], ys[1]), pad = Math.max(6, (hi - lo) * 0.45), dom = [lo - pad, hi + pad];
