@@ -358,7 +358,7 @@
   /* Not enough room for picture + text (long names, results showing, short
      phones): the picture shrinks, then steps aside - the text never does. */
   .half.has-glyph.fit-tight .scene .glyph{ font-size:min(7vh,44px); }
-  .half.has-glyph.fit-none .scene{ display:none; }
+  .half.has-glyph.fit-none .scene .glyph{ font-size:min(4.6vh,30px); }   /* (mega 4: the icon shrinks, never hides) */
   /* Mirrored only - no colour shift: a hue-rotated emoji reads as broken
      (a blue burger), and the two halves' backgrounds already tell them apart. */
   .half.has-glyph .scene .glyph.vs-twin{ display:inline-block; transform:scaleX(-1); }
@@ -4101,6 +4101,7 @@
       repeating-linear-gradient(135deg, rgba(255,255,255,0.055) 0 7px, rgba(255,255,255,0) 7px 14px); }
   :root:is(.mode-daily, .mode-infinity) .half.has-glyph .scene .glyph{ font-size:clamp(80px, 14dvh, 124px); opacity:1; filter:drop-shadow(0 6px 5px rgba(0,0,0,0.35)) drop-shadow(0 0 16px rgba(255,255,255,0.4)); }
   :root:is(.mode-daily, .mode-infinity) .half.has-glyph.fit-tight .scene .glyph{ font-size:80px; }
+  :root:is(.mode-daily, .mode-infinity) .half.has-glyph.fit-none .scene .glyph{ font-size:clamp(28px, 5dvh, 40px); }
 
   /* Double or Nothing's four answers: one colour each (red, blue, green, orange), not all yellow. */
   .cz-opts .cz-opt{ color:#fff; text-shadow:0 2px 0 rgba(0,0,0,0.28); border-color:rgba(255,255,255,0.85); box-shadow:0 4px 0 rgba(20,10,60,0.45), inset 0 2px 0 rgba(255,255,255,0.4); }
@@ -8894,17 +8895,21 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     // Oct 2026 master batch
     'The Shining':'🪓', 'It':'🎈', 'The Wheel of Time':'🛞', 'Gillian Flynn':'🔪', 'Gone Girl':'💔', 'The Girl on the Train':'🚆', 'Dune':'🏜️', 'Foundation':'🌌', 'Taylor Jenkins Reid':'✍️', 'Brandon Sanderson':'⚔️', 'George R.R. Martin':'🐺', 'Fourth Wing':'🐲', 'A Court of Thorns and Roses':'🌹', 'Pride and Prejudice':'🎩', 'Jane Eyre':'🕯️', 'Reading at the Beach':'🏖️', 'Rereading a Favorite':'🔁', 'Always Something New':'🆕', 'Johnny Depp':'🏴‍☠️', 'Fight Club':'🧼', 'Se7en':'📦', 'Shutter Island':'🏝️', 'Steven Spielberg':'🦖', 'George Lucas':'🌌', 'Pulp Fiction':'💼', 'Reservoir Dogs':'🕶️', 'Greta Gerwig':'🎀', 'Sofia Coppola':'🗾', 'Jordan Peele':'🫖', 'M. Night Shyamalan':'👻', 'Barbie':'🎀', 'Oppenheimer':'💣', 'La La Land':'🎹', 'Whiplash':'🥁', 'Avengers: Endgame':'🛡️', 'Avengers: Infinity War':'💎', 'Interstellar':'🪐', 'The Martian':'🥔', 'Parasite':'🪨', 'Everything Everywhere All at Once':'🥯', 'Dave Chappelle':'🎤', 'Shane Gillis':'🎤', 'Mark Normand':'🎤', 'Joe List':'🎤', 'George Carlin':'🎤', 'Richard Pryor':'🎤', 'Bill Burr':'🎤', 'Jim Gaffigan':'🎤', 'Kevin Hart':'🎤', 'Chris Rock':'🎤', 'Nikki Glaser':'🎤', 'Taylor Tomlinson':'🎤', 'Sebastian Maniscalco':'🎤', 'Jim Jefferies':'🎤', 'Tom Segura':'🎤', 'Theo Von':'🎤', 'Hasan Minhaj':'🎤', 'Trevor Noah':'🎤', 'John Mulaney':'🎤', 'Nate Bargatze':'🎤', 'Amy Schumer':'🎤', 'Ali Wong':'🎤', 'Eddie Murphy':'🎤', 'Robin Williams':'🎤', 'Stand-Up Specials':'🎤', 'Comedy Movies':'🍿', 'Dark Humor':'🖤', 'Clean Comedy':'😇', 'The Joe Rogan Experience':'🎙️', 'WTF with Marc Maron':'🎸', 'Crime Junkie':'🔍', 'Morbid':'💀', 'Call Her Daddy':'💋', 'SmartLess':'🤓', 'The Daily':'📰', 'Pod Save America':'🗳️', 'Dateline NBC':'🕵️', 'MrBallen Podcast':'🔦', 'Rotten Mango':'🥭', 'Good Hang with Amy Poehler':'🛋️', 'The Herd with Colin Cowherd':'🐄', 'Sports Talk Radio':'📻', 'The Megyn Kelly Show':'🎙️', 'The Ben Shapiro Show':'🎙️', 'Comedy Podcasts':'😂', 'Video Podcasts':'📹', 'Audio-Only Podcasts':'🎧', 'Solo Hosts':'🙋', 'Co-Host Duos':'👯', 'Listening at 1x Speed':'🐢', 'Listening at 1.5x or 2x':'⏩', 'Podcasts While Driving':'🚗', 'Podcasts While Working Out':'🏋️', 'New Episode Day':'📅', 'Binging the Back Catalog':'📚', 'MrBeast':'💰', 'Kai Cenat':'📺', 'IShowSpeed':'⚡', 'Logan Paul':'🥤', 'Jake Paul':'🥊', 'PewDiePie':'👊', 'Khaby Lame':'🤷', 'Charli D’Amelio':'💃', 'Addison Rae':'💄', 'Bella Poarch':'🎶', 'Livestreams':'🔴', 'Edited Videos':'✂️', 'Reaction Content':'😮', 'Original Content':'💡', 'Gaming Streamers':'🎮', 'Just Chatting Streamers':'💬', 'Long-Form YouTube':'🎬', 'Short-Form Videos':'📱', 'Collab Videos':'🤝', 'Solo Videos':'🙋', 'Subscribing':'🔔', 'Just Watching':'👀', 'Creator Drama':'🍿', 'Creator Philanthropy':'💝', 'Lasagna':'🍝', 'Chicken Parm':'🍗', 'Boneless Wings':'🍗', 'Bone-In Wings':'🍖', 'Reuben':'🥪', 'Turkey Club':'🦃', 'Cookie Dough Ice Cream':'🍪', 'Chocolate Ice Cream':'🍫', 'Deep Dish Pizza':'🥧', 'Thin Crust Pizza':'🍕', 'Buffalo Wings':'🌶️', 'BBQ Wings':'🍖', 'Caesar Salad':'🥗', 'Greek Salad':'🫒', 'Pad Thai':'🍜', 'Lo Mein':'🥡', 'Poke Bowls':'🐟', 'Chili':'🌶️', 'Chowder':'🥣', 'Apple Pie':'🍎', 'Pumpkin Pie':'🎃', 'Tiramisu':'☕', 'Spaghetti and Meatballs':'🍝', 'Fettuccine Alfredo':'🧈', 'Loaded Fries':'🍟', 'Egg Rolls':'🌯', 'Dumplings':'🥟', 'Blue Cheese':'🧀', 'Overhead Press':'🙌', 'Romanian Deadlifts':'🏋️', 'Strength Training':'💪', 'Swimming Laps':'🏊', 'Cycling':'🚴', 'Squats':'🦵', 'Lunges':'🚶', 'Running Outside':'🌳', 'The Treadmill':'🏃', 'HIIT':'⏱️', 'Steady-State Cardio':'❤️', 'Deadlifts':'🏋️', 'Bench Press':'🏋️', 'Push-Ups':'💪', 'Pull-Ups':'💪', 'Lat Pulldowns':'⬇️', 'Active Recovery':'🚶', 'Working Out Alone':'🎧', 'Working Out with a Partner':'👯', 'Marathon Training':'🏃', 'Sprint Training':'⚡', 'Rock Climbing':'🧗', 'Hiking':'🥾', 'Martial Arts':'🥋', 'Lakers':'💜', 'Celtics':'☘️', 'Warriors':'🌉', 'Knicks':'🗽', 'Nets':'🏀', 'Patriots':'🏈', 'Chiefs':'🏹', 'Cowboys':'🤠', 'Eagles':'🦅', 'Packers':'🧀', 'Bears':'🐻', 'Bills':'🦬', 'Steelers':'🏈', 'Ravens':'🏈', 'Red Sox':'🧦', 'Yankees':'⚾', 'Dodgers':'⚾', 'Giants':'⚾', 'Mets':'🍎', 'Cubs':'🧸', 'Cardinals':'🐦', 'Bruins':'🏒', 'Canadiens':'🍁', 'Penguins':'🐧', 'Capitals':'🏛️', 'Rangers':'🏒', 'Islanders':'🏝️', 'Real Madrid':'👑', 'Barcelona':'⚽', 'Manchester United':'😈', 'Liverpool':'🔴', 'Arsenal':'💥', 'Tottenham':'🐓', 'Duke':'🔵', 'UNC':'🐏', 'Michigan':'〽️', 'Ohio State':'🌰', 'Alabama':'🐘', 'Auburn':'🐯', 'Jayson Tatum':'☘️', 'Magic Johnson':'🏀', 'Larry Bird':'☘️', 'Josh Allen':'🏈', 'Jerry Rice':'🏈', 'Randy Moss':'🏈', 'Lawrence Taylor':'🏈', 'J.J. Watt':'🏈', 'Aaron Judge':'⚾', 'Shohei Ohtani':'⚾', 'Derek Jeter':'⚾', 'Alex Rodriguez':'⚾', 'Mike Trout':'⚾', 'Ronald Acuña Jr.':'⚾', 'Connor McDavid':'🏒', 'Mario Lemieux':'🏒', 'Alexander Ovechkin':'🏒', 'Kylian Mbappé':'⚽', 'Erling Haaland':'⚽', 'Diego Maradona':'⚽', 'Football Sundays':'🏈', 'March Madness':'🏀', 'Fantasy Football':'📋', 'Fantasy Baseball':'⚾', 'Home Jerseys':'🏠', 'Away Jerseys':'✈️',
     // Celebrity add-on (Oct 2026)
-    'Travis Kelce':'🏈', 'Kylie Jenner':'💄', 'Blake Lively':'👱‍♀️', 'Gwyneth Paltrow':'🌿', 'Celebrity Feuds':'😤', 'Celebrity Friendships':'🤝', 'Paparazzi Photos':'📸', 'Posted Selfies':'🤳', 'The Met Gala':'👑', 'The Oscars Red Carpet':'🏆', 'Celebrity Breakup Drama':'💔', 'Celebrity Weddings':'💒', 'Tabloid Headlines':'📰', 'Verified Statements':'✅', 'Old Hollywood Glamour':'🎞️', 'Modern Influencer Fame':'📱'
+    'Travis Kelce':'🏈', 'Kylie Jenner':'💄', 'Blake Lively':'👱‍♀️', 'Gwyneth Paltrow':'🌿', 'Celebrity Feuds':'😤', 'Celebrity Friendships':'🤝', 'Paparazzi Photos':'📸', 'Posted Selfies':'🤳', 'The Met Gala':'👑', 'The Oscars Red Carpet':'🏆', 'Celebrity Breakup Drama':'💔', 'Celebrity Weddings':'💒', 'Tabloid Headlines':'📰', 'Verified Statements':'✅', 'Old Hollywood Glamour':'🎞️', 'Modern Influencer Fame':'📱',
+    // mega 4 item 4: a fitting emoji of its own for every card side that only had its category's generic one (people keep theirs from data/vs/vs-emoji.js)
+    'Beyoncé - Lemonade':'🍋', 'Billie Eilish - Happier Than Ever':'💛', 'Black Sabbath - Paranoid':'🦇', 'Charli XCX - Brat':'💚', 'Dr. Dre - 2001':'🎧', 'Eagles - Hotel California':'🏨', 'Eminem - The Marshall Mathers LP':'🎤', 'Green Day - Dookie':'💣', 'Joni Mitchell - Blue':'💙', 'Metallica - Master of Puppets':'🎭', 'My Chemical Romance - The Black Parade':'🖤', 'Nas - Illmatic':'🗽', 'Nirvana - Nevermind':'🏊', 'Noah Kahan - Stick Season':'🍂', 'Norah Jones - Come Away with Me':'🎹', 'Olivia Rodrigo - SOUR':'🍬', 'Pink Floyd - The Dark Side of the Moon':'🌈', 'Reneé Rapp - Snow Angel':'❄️', 'SZA - SOS':'🛟', 'Sabrina Carpenter - Short n\' Sweet':'🍒', 'Taylor Swift - 1989':'📸', 'The Beatles - Abbey Road':'🚶', 'The Clash - London Calling':'🎸', 'The Strokes - Is This It':'🎸', 'Tom Petty - Wildflowers':'🌼', 'Keeping Books Pristine':'📖', 'Series':'📚', 'UPS':'📦', 'Under Armour':'👟', 'Toyota Corolla':'🚗', 'Milkshakes':'🥛', 'Root Beer':'🍺', 'Soda':'🥤', 'A gym membership you actually use':'🏋️', 'Arm Day':'💪', 'Extra Workout Day':'📅', 'Lifting weights':'🏋️', 'Push Day':'🏋️', 'A big, indulgent dinner':'🍖', 'A buffet, all you can eat':'🍱', 'A restaurant holiday meal, zero cleanup':'🦃', 'Eating out for every meal':'🍴', 'Console':'🕹️', 'Console Games':'🕹️', 'Home Consoles':'🕹️', 'Modern Games':'👾', 'Video Games':'👾', 'Africa':'🌍', 'Ancient Rome':'🏟️', 'Exploring ancient Rome':'🗺️', 'The fall of the Roman Empire':'⚔️', 'Talent':'🌟', 'Social media':'📲', 'Social Media':'📲', 'A guaranteed $50k a year forever':'💰', 'A steady paycheck':'💼', '80s':'🕺', 'Blockbuster':'📼', 'Mixtapes':'📼', 'Olympics':'🥇', 'A brand-new outfit every day, never repeated':'👚', 'A closet full of statement pieces':'🧥', 'A summer dress':'👗', 'Disney+':'🏰', 'Tablet':'💻', 'Teddy bear':'🧸', 'Flying':'🛫', 'Attack on Titan':'⚔️', 'Bob\'s Burgers':'🍔', 'Breaking Bad':'⚗️', 'Buffy the Vampire Slayer':'🧛', 'Community':'🏫', 'Curb Your Enthusiasm':'😬', 'Dexter':'🔪', 'Everybody Loves Raymond':'🛋️', 'Fallout':'☢️', 'Family Guy':'🐶', 'Game of Thrones':'🐉', 'Gossip Girl':'💋', 'Great British Baking Show':'🧁', 'Hannibal':'🍷', 'House of the Dragon':'🐲', 'How I Met Your Mother':'🍻', 'Keeping Up with the Kardashians':'💄', 'King of the Hill':'🔥', 'Loki':'🐍', 'Love Is Blind':'🙈', 'Malcolm in the Middle':'👦', 'Naruto':'🍥', 'One Tree Hill':'🏀', 'Ozark':'💵', 'Parks and Recreation':'🌳', 'Pretty Little Liars':'🤫', 'Reacher':'👊', 'South Park':'⛰️', 'Stranger Things':'🔦', 'Succession':'💼', 'Supernatural':'👻', 'Ted Lasso':'⚽', 'Teen Wolf':'🐺', 'The Good Place':'😇', 'The Last of Us':'🧟', 'The Mandalorian':'🪖', 'The Sopranos':'🍝', 'Top Chef':'👨‍🍳', 'Two and a Half Men':'🍹', 'Vampire Diaries':'🧛', 'Yellowjackets':'🐝', 'Burping Sparkles':'🫧', 'Flip a coin: $50,000 or nothing, decided in 10 seconds':'🪙', 'Sneezing Glitter':'🤧', '50 Cent - Get Rich or Die Tryin\'':'💰', 'Alicia Keys - Songs in A Minor':'🎹', 'Arctic Monkeys - AM':'🌊', 'Billie Eilish - When We All Fall Asleep, Where Do We Go?':'🛏️', 'Blink-182 - Enema of the State':'🩺', 'Bruce Springsteen - Born to Run':'🏍️', 'Carole King - Tapestry':'🧶', 'Chappell Roan - The Rise and Fall of a Midwest Princess':'👸', 'Dua Lipa - Future Nostalgia':'🪩', 'Fall Out Boy - From Under the Cork Tree':'🌳', 'Fleetwood Mac - Rumours':'🗣️', 'Gracie Abrams - The Secret of Us':'🤫', 'Iron Maiden - The Number of the Beast':'😈', 'Led Zeppelin - IV':'👴', 'Led Zeppelin - Led Zeppelin II':'✈️', 'Lorde - Melodrama':'🎭', 'Lorde - Pure Heroine':'👑', 'Olivia Rodrigo - GUTS':'💜', 'Pearl Jam - Ten':'🔟', 'Ramones - Ramones':'🧥', 'Rihanna - Anti':'☂️', 'Snoop Dogg - Doggystyle':'🐶', 'The Beach Boys - Pet Sounds':'🐐', 'The Notorious B.I.G. - Ready to Die':'👶', 'Zach Bryan - Zach Bryan':'🤠', 'UPS':'🚚', 'Under Armour':'🛡️', 'Toyota Corolla':'🚙', 'Soda':'🫧', 'Arm Day':'🦾', 'Pull-Ups':'🧗', 'Push-Ups':'🙌', 'Strength Training':'🏋️', 'Applebee’s':'🍎', 'In-N-Out':'🌴', 'Pepperoni Pizza':'🍕', 'Whataburger':'🍔', 'PlayStation 5':'🕹️', 'Africa':'🦁', 'Blockbuster':'🎟️', 'Mixtapes':'📻', 'A summer dress':'☀️', 'Tablet':'💻', 'Teddy bear':'🐻', 'Abbott Elementary':'🍎', 'American Dad!':'👽', 'Andor':'🚀', 'Arrested Development':'🍌', 'Better Call Saul':'⚖️', 'Bleach':'🗡️', 'Brooklyn Nine-Nine':'🚓', 'Charmed':'🔮', 'Chopped':'🔪', 'Dawson\'s Creek':'🛶', 'Demon Slayer':'⚔️', 'Everybody Hates Chris':'🏠', 'Grimm':'🐺', 'It\'s Always Sunny in Philadelphia':'🌞', 'Jack Ryan':'🕵️', 'King of Queens':'🚚', 'Lost':'🏝️', 'Rick and Morty':'🧪', 'Riverdale':'🍔', 'Schitt\'s Creek':'🏨', 'The Big Bang Theory':'⚛️', 'The O.C.':'🏄', 'The Real Housewives':'🍸', 'The Rings of Power':'💍', 'The Vampire Diaries':'🧛', 'The Walking Dead':'🧟', 'The Wire':'📞', 'Too Hot to Handle':'🔥', 'True Blood':'🩸', 'WandaVision':'📺', 'Wednesday':'🕷️', 'White Lotus':'🌺', 'You':'📖'
   };
   function cardGlyph(name, cat){ return ITEM_GLYPHS[name] || window.FLIPSTAX_VS_EMOJI.fallback[cat] || '\uD83C\uDFB2'; }   // (Oct 24: a name with no emoji of its own gets its category's fallback - data/vs/vs-emoji.js)
   function matchCards(raw, p){
     return raw.map(([cat,a,b],i)=>({ id:p+'m-'+i, mode:'match', category:cat, a, b, glyphA:cardGlyph(a, cat), glyphB:cardGlyph(b, cat) }));
   }
+  // mega 4 item 4: a side whose emoji is only its category's generic one (or empty) takes the name's own from ITEM_GLYPHS when there is one
+  function ownGlyph(g, name, cat){ const fb = window.FLIPSTAX_VS_EMOJI.fallback[cat], E = window.FLIPSTAX_VS_EMOJI; return (E.missing(g) || g === fb) && ITEM_GLYPHS[name] ? ITEM_GLYPHS[name] : g; }
   function sceneCards(raw, p){
     return raw.map((row,i)=>({
       id:p+'s-'+i, mode:'scenario', category:row[0],
-      a:row[1], glyphA:row[2], gradA:row[3],
-      b:row[4], glyphB:row[5], gradB:row[6],
+      a:row[1], glyphA:ownGlyph(row[2], row[1], row[0]), gradA:row[3],
+      b:row[4], glyphB:ownGlyph(row[5], row[4], row[0]), gradB:row[6],
     }));
   }
   function pairCards(raw, p){
@@ -8927,7 +8932,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     const eras = window.FLIPSTAX_VS_ERAS || {};
     all.forEach(c=>{ c.era = eras[vsPairKey(c.a, c.b)] || ''; });
     (window.FLIPSTAX_VS_NEW || []).forEach((r, i)=>{
-      const c = { id:'n-' + i, mode:'match', pick:true, category:r[0], a:r[1], glyphA:r[2], b:r[3], glyphB:r[4], era:r[5] };
+      const c = { id:'n-' + i, mode:'match', pick:true, category:r[0], a:r[1], glyphA:ownGlyph(r[2], r[1], r[0]), b:r[3], glyphB:ownGlyph(r[4], r[3], r[0]), era:r[5] };
       const k = cardKey(c); if (keys.has(k)) return; keys.add(k); all.push(c);
     });
     // Oct 24: every card shows an emoji on both sides and the two never match (data/vs/vs-emoji.js): an empty side (or the old
@@ -14789,8 +14794,8 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     const ov = els.guessOverlay;
     const L = ov.querySelector('.gc-left'), R = ov.querySelector('.gc-right'), grads = pairGradients(card.a, card.b);
     L.style.background = card.mode === 'match' ? grads[0] : boostGradient(card.gradA); R.style.background = card.mode === 'match' ? grads[1] : boostGradient(card.gradB);
-    L.querySelector('.gc-glyph').textContent = card.glyphA || ''; L.querySelector('.gc-name').textContent = card.a;
-    R.querySelector('.gc-glyph').textContent = card.glyphB || ''; R.querySelector('.gc-name').textContent = card.b;
+    L.querySelector('.gc-glyph').textContent = cardIcon(card, 'A'); L.querySelector('.gc-name').textContent = card.a;
+    R.querySelector('.gc-glyph').textContent = cardIcon(card, 'B'); R.querySelector('.gc-name').textContent = card.b;
     const slider = ov.querySelector('.guess-slider'); slider.value = 50; slider.disabled = false; setGuessDial(50);
     ov.querySelector('.guess-result').classList.add('hidden');
     ov.querySelector('.guess-lock-row').classList.remove('hidden');
@@ -16790,7 +16795,15 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     return Math.round(18 + shaped * 64);
   }
   function resetDeck(p){ p = p || contentPoolKey(); decks[p].cards = smartShuffle(CARD_POOLS[p], p === 'daily' && runActive ? mulberry32(hashStr('flipstax-deck-' + (runStartDate || todayStr()))) : null); decks[p].next = 0; }
+  // mega 4 item 4: a card can never show without an icon - its own emoji, else its category's (data/vs/vs-emoji.js), else a generic one
+  const CARD_ICON_GENERIC = '\uD83C\uDFB2';
+  function cardIcon(card, side){
+    const g = card && card['glyph' + side], E = window.FLIPSTAX_VS_EMOJI;
+    if (g && String(g).trim() && !(E && E.missing(g))) return g;
+    return (card && E && E.fallback[card.category]) || CARD_ICON_GENERIC;
+  }
   function setScene(el, glyph){
+    if (!glyph || !String(glyph).trim()) glyph = cardIcon(current, el === els.sceneB ? 'B' : 'A');
     el.innerHTML = glyph ? '<span class="glyph">'+glyph+'</span>' : '';
     // Same icon on both sides (🏀 vs 🏀, 🎸 vs 🎸): the bottom one faces the
     // other way, so it still reads as a matchup.
@@ -16899,7 +16912,9 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     const need = ()=> [...h.children].filter(c=> c.classList.contains('scene') || c.classList.contains('content')).reduce((a, c)=> a + c.offsetHeight, 0) + 2;
     if (need() <= room) return;
     h.classList.add('fit-tight');
-    if (need() > room){ h.classList.remove('fit-tight'); h.classList.add('fit-none'); }
+    if (need() > room){ h.classList.remove('fit-tight'); h.classList.add('fit-none'); }   // (mega 4: 'fit-none' keeps a small icon now - it never hides it)
+    const tk = h.querySelector('.take');   // and if even that is too tall, the text steps down instead of the icon going
+    for (let i = 0; tk && i < 4 && need() > room; i++) tk.style.setProperty('--tk', String(Math.max(0.42, parseFloat(getComputedStyle(tk).getPropertyValue('--tk')) * 0.88 || 0.8)));
   }
   let layoutBoardRaf = 0;
   function queueLayoutBoard(){ cancelAnimationFrame(layoutBoardRaf); layoutBoardRaf = requestAnimationFrame(layoutBoard); }
@@ -18602,6 +18617,9 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
         Object.assign(out, (window.MiniGames && MiniGames.schedBuild) ? MiniGames.schedBuild(S) : {}); return 'window.FLIPSTAX_SCHEDULE = ' + JSON.stringify(out, null, 1) + ';\n'; },
       getContentPools: () => ({ cards: CARD_POOLS, cardKey, trivia: { geography: GEOGRAPHY_SETS, english: ENGLISH_SETS, history: HISTORY_SETS, science: SCIENCE_SETS, art: ART_SETS, music: MUSIC_SETS, health: HEALTH_SETS }, gen: generateSubjectTrivia, poolKey: contentPoolKey }),
       getCurrentCard: () => current,
+      // (mega 4 item 4, tests only: the board's own icon and text code - setScene, the shrink-to-fit and the fit layout - on one card, without dealing it)
+      renderCardIcons: (c) => { current = c; setScene(els.sceneA, c.glyphA); setScene(els.sceneB, c.glyphB); els.takeA.textContent = c.a; els.takeB.textContent = c.b;
+        [[els.takeA, c.a], [els.takeB, c.b]].forEach(([el, t])=>{ const n = String(t).length; el.style.setProperty('--tk', n > 52 ? '0.58' : n > 42 ? '0.66' : n > 32 ? '0.76' : n > 24 ? '0.88' : '1'); }); layoutBoard(); },
       showCard: (c) => { const d = decks[contentPoolKey()]; d.cards.splice(d.next, 0, c); lastWasEvent = true; loadNext(); clearRoundTimer(); },
       getCollection: () => collection,
       getInfBlock: () => infBlock,
