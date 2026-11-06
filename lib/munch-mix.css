@@ -148,3 +148,4 @@
   box-shadow:0 0 16px var(--lc, #2fb4ff), inset 0 0 0 2px #ffffff; }
 .gc-lit.white{ background:radial-gradient(circle, #ffffff 0%, #ffffff 55%, rgba(255,255,255,0.75) 100%); }
 @media (min-width:600px){ .gc-lit{ border-radius:20px; } } @media (max-height:700px){ .gc-lit{ border-radius:11px; } }
+.gc-set .gc-hole{ margin:-23vmin 0 0 -23vmin; z-index:2; }
