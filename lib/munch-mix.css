@@ -155,3 +155,5 @@
 .gc-set .gc-comet::after{ content:''; position:absolute; right:-6px; top:50%; width:12px; height:12px; margin-top:-6px; border-radius:50%; background:#ffffff; box-shadow:0 0 10px 4px var(--sc, #fff); }
 .gc-set .gc-bolt{ width:70px; height:4px; margin-top:-2px; border-radius:4px; background:linear-gradient(90deg, #ffffff, var(--sc, #fff)); box-shadow:0 0 10px var(--sc, #fff); }
 .gc-set .gc-hole{ margin:-23vmin 0 0 -23vmin; z-index:2; }
+/* the English galaxy is bright behind the board: a subtle dark backing keeps every tile and word clear of it */
+.gc-slab[data-pack="ENGLISH"]{ background:linear-gradient(180deg, rgba(14,8,40,0.5), rgba(10,6,30,0.42) 50%, rgba(14,8,40,0.55)); }
