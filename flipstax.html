@@ -11595,9 +11595,8 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       // spotlight comes on over the opened door (opacity only; both are removed with the doors)
       if (DOORS_ART){ const grid = tile.parentNode; if (grid){ grid.querySelectorAll('.md-house, .md-spot').forEach(e=> e.remove());
         const house = document.createElement('i'); house.className = 'md-house'; house.setAttribute('aria-hidden', 'true'); grid.appendChild(house);
-        const spot = document.createElement('i'); spot.className = 'md-spot'; spot.setAttribute('aria-hidden', 'true');
-        spot.style.left = (tile.offsetLeft + tile.offsetWidth / 2) + 'px'; spot.style.setProperty('--sw', Math.round(tile.offsetWidth * 2.2) + 'px'); spot.style.setProperty('--sb', Math.round(tile.offsetTop + tile.offsetHeight) + 'px'); grid.appendChild(spot);
-        requestAnimationFrame(()=>{ house.classList.add('on'); spot.classList.add('on'); }); } }
+        // (Part A job 3: no spotlight over the opened door any more - only the house lights go down over the stage and the other doors)
+        requestAnimationFrame(()=>{ house.classList.add('on'); }); } }
       tile.classList.add('picked-wait'); if (DOORS_ART){ tile.classList.add('art-open'); const ma = document.getElementById('mdArt'); if (ma) ma.classList.add('picked'); doorPan(tile); } sfx.drumroll(QUIZ_DRUMROLL_MS);   // (art doors: the closed picture crossfades to the open one now, 0.4 s, opacity only)
       setTimeout(()=>{
         if (g !== Show.gen) return;
