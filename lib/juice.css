@@ -2203,3 +2203,72 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .ww-mega-pts{ position:absolute; left:50%; top:calc(46% + clamp(44px, 11vw, 100px)); transform:translate(-50%, 0); white-space:nowrap; font:900 clamp(26px, 7vw, 56px)/1 var(--f-display, sans-serif); color:#7df9ff; -webkit-text-stroke:2px #14286e; paint-order:stroke fill; }
 .ww-star{ position:absolute; width:clamp(14px, 3.6vw, 28px); aspect-ratio:1; background:var(--c); clip-path:polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); will-change:transform, opacity; }
 .ww-comet{ position:absolute; width:clamp(40px, 11vw, 90px); height:4px; border-radius:2px; background:linear-gradient(90deg, rgba(255,255,255,0), var(--c) 70%, #ffffff); transform-origin:0 50%; will-change:transform, opacity; }
+
+/* ---- makeover job 8: the retro TV commercial break (showSponsorRetro). The whole screen is a TV: a dark bezel, a rounded glass screen with static
+   scanlines and a vignette, a channel bug and a COMMERCIAL BREAK tag. Colour bars and WE'LL BE RIGHT BACK; three invented ads (each its own colours and a
+   slowly turning sunburst); then TIP ME and ADVERTISE HERE cards. Transform and opacity only; lite and reduced motion: the sunburst is still. ---- */
+:root:root .show-card.sponsor.cbr{ background:#0b0612 !important; padding:0 !important; display:block; overflow:hidden; }
+.show-card.sponsor.cbr::before, .show-card.sponsor.cbr::after{ display:none !important; }
+.cbr-tv{ position:absolute; inset:calc(10px + env(safe-area-inset-top)) 10px calc(84px + env(safe-area-inset-bottom)) 10px; border-radius:28px; padding:12px;
+  background:linear-gradient(180deg, #4a3326, #2a1a12); box-shadow:inset 0 0 0 3px #6e5038, inset 0 0 0 7px #1a0e08, 0 10px 0 #120a06; }
+.cbr-screen{ position:relative; width:100%; height:100%; border-radius:22px / 26px; overflow:hidden; background:#120a2a; isolation:isolate; }
+.cbr-scan{ position:absolute; inset:0; z-index:5; pointer-events:none; border-radius:inherit;
+  background:repeating-linear-gradient(180deg, rgba(0,0,0,0.16) 0 2px, rgba(0,0,0,0) 2px 4px), radial-gradient(ellipse 85% 75% at 50% 50%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.55) 100%);
+  box-shadow:inset 0 0 40px rgba(0,0,0,0.6); }
+.cbr-bug{ position:absolute; right:14px; top:12px; z-index:6; font:900 12px/1 var(--f-display, sans-serif); letter-spacing:2px; color:rgba(255,255,255,0.7); }
+.cbr-tag{ position:absolute; left:14px; top:12px; z-index:6; padding:4px 8px; border-radius:4px; background:#ffd23f; color:#2a1400; font:900 12px/1 var(--f-display, sans-serif); letter-spacing:1.5px; }
+/* the leader: colour bars (generic test bars) and WE'LL BE RIGHT BACK */
+.cbr-bars{ position:absolute; inset:0; display:flex; z-index:1; }
+.cbr-bars i{ flex:1; }
+.cbr-bars i:nth-child(1){ background:#c0c0c0; } .cbr-bars i:nth-child(2){ background:#c0c000; } .cbr-bars i:nth-child(3){ background:#00c0c0; } .cbr-bars i:nth-child(4){ background:#00c000; }
+.cbr-bars i:nth-child(5){ background:#c000c0; } .cbr-bars i:nth-child(6){ background:#c00000; } .cbr-bars i:nth-child(7){ background:#0000c0; }
+.cbr-bars b{ position:absolute; left:6%; right:6%; top:38%; transform:translateY(-50%); padding:14px 10px; border-radius:10px; background:rgba(10,4,30,0.88); border:3px solid #ffffff; text-align:center;
+  font:900 clamp(30px, 9vw, 72px)/1.05 var(--f-display, sans-serif); color:#ffffff; letter-spacing:2px; }
+.show-card.sponsor.cbr .cbr-say{ position:absolute; left:6%; right:6%; top:58%; padding:10px; border-radius:10px; background:rgba(10,4,30,0.88); text-align:center; font:900 clamp(18px, 5.4vw, 36px)/1.1 var(--f-display, sans-serif); color:#ffe27a; }
+.show-card.cbr:not(.intro) .cbr-bars{ display:none; }
+/* an ad */
+.cbr-ad{ position:absolute; inset:0; z-index:2; display:none; flex-direction:column; align-items:center; justify-content:center; gap:clamp(6px, 1.6svh, 18px); padding:52px 16px 26px; text-align:center; overflow:hidden; }
+.show-card.cbr.ad-on .cbr-ad{ display:flex; }
+.cbr-ad.food{ background:radial-gradient(circle at 50% 42%, #fff36b 0%, #ffb21e 40%, #e8341c 100%); --ink:#5a0a00; --deal:#ffffff; --dealbg:#e8341c; }
+.cbr-ad.soda{ background:radial-gradient(circle at 50% 42%, #c9fbff 0%, #39d6f0 40%, #c42ad8 100%); --ink:#2a0050; --deal:#2a0050; --dealbg:#ffe27a; }
+.cbr-ad.car{ background:linear-gradient(180deg, #2a0a5a 0%, #a0208c 48%, #ff7a3a 72%, #ffd23f 100%); --ink:#ffffff; --deal:#2a0a00; --dealbg:#5ff4ff; }
+.cbr-burst{ position:absolute; left:50%; top:42%; width:180vmax; height:180vmax; margin:-90vmax 0 0 -90vmax; z-index:-1; opacity:0.28; pointer-events:none;
+  background:repeating-conic-gradient(from 0deg, #ffffff 0deg 9deg, rgba(255,255,255,0) 9deg 22deg); animation:cbrTurn 40s linear infinite; will-change:transform; }
+.cbr-ad.car .cbr-burst{ opacity:0.12; }
+@keyframes cbrTurn{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+.cbr-art{ width:min(78%, 44svh, 520px); flex:none; }
+.cbr-art svg{ display:block; width:100%; height:auto; overflow:visible; filter:drop-shadow(0 8px 0 rgba(0,0,0,0.18)); }
+.cbr-ad.soda .cbr-art{ width:min(52%, 34svh, 360px); }
+.cbr-brand{ font:900 clamp(34px, 11vw, 96px)/0.95 var(--f-display, sans-serif); letter-spacing:1px; color:#ffffff; -webkit-text-stroke:2px var(--ink); paint-order:stroke fill; text-shadow:0 5px 0 var(--ink); }
+.cbr-ad.car .cbr-brand{ font-size:clamp(28px, 8.6vw, 76px); }
+.cbr-line{ font:800 clamp(17px, 5vw, 38px)/1.15 var(--f-body, Inter, sans-serif); color:var(--ink); max-width:18em; }
+.cbr-ad.car .cbr-line{ color:#ffffff; text-shadow:0 2px 0 rgba(42,10,90,0.7); }
+.cbr-deal{ position:absolute; right:5%; top:16%; z-index:3; display:flex; align-items:center; justify-content:center; width:clamp(92px, 27vw, 200px); aspect-ratio:1; padding:8px; box-sizing:border-box; text-align:center;
+  font:900 clamp(15px, 4.4vw, 32px)/1 var(--f-display, sans-serif); font-style:normal; color:var(--deal); background:var(--dealbg); transform:rotate(-12deg);
+  clip-path:polygon(50% 0, 61% 14%, 79% 7%, 82% 25%, 100% 28%, 91% 45%, 100% 62%, 82% 66%, 79% 86%, 61% 80%, 50% 96%, 39% 80%, 21% 86%, 18% 66%, 0 62%, 9% 45%, 0 28%, 18% 25%, 21% 7%, 39% 14%); }
+.cbr-fine{ position:absolute; left:0; right:0; bottom:12px; font:600 clamp(10px, 2.8vw, 18px)/1 var(--f-body, Inter, sans-serif); color:var(--ink); opacity:0.75; }
+.cbr-ad.car .cbr-fine{ color:#2a0a00; }
+/* the last card: TIP ME and ADVERTISE HERE */
+.cbr-last{ position:absolute; inset:0; z-index:2; display:none; flex-direction:column; align-items:center; justify-content:center; gap:clamp(12px, 3svh, 30px); padding:48px 16px 24px;
+  background:radial-gradient(circle at 50% 40%, #3a1a80 0%, #1a0a44 70%, #0c0624 100%); }
+.show-card.cbr.last .cbr-last{ display:flex; }
+.cbr-thanks{ font:900 clamp(30px, 9.4vw, 76px)/1 var(--f-display, sans-serif); color:#ffe27a; text-shadow:0 4px 0 #5a0a3a; text-align:center; }
+.cbr-cards{ display:flex; flex-direction:column; gap:clamp(10px, 2.2svh, 22px); width:min(100%, 520px); }
+.cbr-card{ display:grid; grid-template-columns:auto 1fr; grid-template-rows:auto auto; align-items:center; column-gap:14px; padding:clamp(12px, 2svh, 22px) 18px; border-radius:18px; text-decoration:none; touch-action:manipulation;
+  border:3px solid #ffffff; box-shadow:0 6px 0 rgba(0,0,0,0.35); }
+.cbr-card.tip{ background:linear-gradient(180deg, #ff6ac8, #c42a8c); }
+.cbr-card.adv{ background:linear-gradient(180deg, #5ff4ff, #1c8ad8); }
+.cbr-card img, .cbr-card .cbr-big{ grid-row:1 / span 2; grid-column:1; width:clamp(48px, 13vw, 84px); height:auto; font-size:clamp(40px, 11vw, 70px); line-height:1; border-radius:50%; }
+.cbr-ct{ grid-column:2; font:900 clamp(26px, 7.6vw, 52px)/1 var(--f-display, sans-serif); letter-spacing:1px; color:#ffffff; text-shadow:0 3px 0 rgba(0,0,0,0.3); }
+.cbr-cs{ grid-column:2; font:800 clamp(14px, 4.2vw, 26px)/1.2 var(--f-body, Inter, sans-serif); color:#ffffff; word-break:break-all; }
+/* the skip / continue button */
+.cbr-skip{ position:absolute; right:16px; bottom:calc(20px + env(safe-area-inset-bottom)); z-index:8; min-height:48px; padding:0 22px; border-radius:99px; border:3px solid #ffffff; background:#ff3fb5; color:#ffffff;
+  font:900 clamp(18px, 5vw, 28px)/1 var(--f-display, sans-serif); letter-spacing:1px; box-shadow:0 5px 0 #8a1050; opacity:0; transform:translateY(10px); pointer-events:none; transition:opacity 0.3s ease, transform 0.3s ease; touch-action:manipulation; cursor:pointer; }
+.show-card.cbr.can-skip .cbr-skip, .show-card.cbr.last .cbr-skip{ opacity:1; transform:none; pointer-events:auto; }
+:root.lite .cbr-burst{ animation:none; } :root.lite .cbr-skip{ transition:opacity 0.3s ease; transform:none; }
+@media (prefers-reduced-motion: reduce){ .cbr-burst{ animation:none; } .cbr-skip{ transform:none; } }
+@media (max-height:700px){ .cbr-tv{ bottom:calc(74px + env(safe-area-inset-bottom)); padding:8px; } .cbr-ad{ padding-top:40px; } .cbr-cards{ gap:8px; } .cbr-last{ gap:10px; } }
+:root:root .show-card.sponsor.cbr .cbr-say{ position:absolute; left:6%; right:6%; top:58%; width:auto; transform:none; margin:0; padding:10px; border-radius:10px; border:0; background:rgba(10,4,30,0.88); box-shadow:none; text-align:center;
+  font:900 clamp(18px, 5.4vw, 36px)/1.1 var(--f-display, sans-serif); color:#ffe27a; animation:none; opacity:1; }
+:root:root .show-card.cbr .cbr-skip{ right:auto; left:50%; margin-left:calc(clamp(120px, 32vw, 220px) / -2); width:clamp(120px, 32vw, 220px); padding:0; }
+:root:root .show-card.cbr.can-skip .cbr-skip, :root:root .show-card.cbr.last .cbr-skip{ transform:none; }
