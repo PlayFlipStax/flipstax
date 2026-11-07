@@ -2958,3 +2958,6 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 @keyframes zzWordPulse{ 0%, 50%, 100%{ transform:translate(-50%, -50%) scale(1); } 25%, 75%{ transform:translate(-50%, -50%) scale(1.12); } }
 :root.lite .zz-bigword, :root:root .zz-bigword.still{ animation:none; opacity:1; }
 @media (prefers-reduced-motion: reduce){ :root:root .zz-bigword{ animation:none; } }
+
+/* ---- fix pass 3, fix 6: Zap Words - ZAP-TASTIC! sits in the band under the logo, above the letter board (placed and sized by the game), not over the letters ---- */
+:root:root .zw-bigword.band{ line-height:1; -webkit-text-stroke-width:2px; text-shadow:0 3px 0 #ff3fb5; }
