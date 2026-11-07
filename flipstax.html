@@ -19469,9 +19469,11 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // Screen 3 differs: the secret riddle lives in Daily Stax only, and Infinity
   // has no results screen - there the payoff is the personality (every
   // INF_AWARD_VOTES votes), its collectible card (16 in all) and the badges.
-  const HOWTO_LAST_DAILY = { icon:'🛸', lead:'The Grand Finale.',
-    lines:['Your tiles turn into letters: unscramble the ' + GN.wordWarp + '.', 'Then drop your chips in ' + GN.orbitDrop + ' for the grand prize. Aim for THE MOTHERSHIP!',
-      'Your picks reveal your personality card. And somewhere in there... can you find the Super Secret Riddle?'] };
+  // (Part A job 1: the finale is Word Warp alone - Orbit Drop is Round 6's game; the word is typed on a full keyboard, RUN_MAX_GUESSES tries;
+  // each Brain Beam answered right still locks one of its letters in place.)
+  const HOWTO_LAST_DAILY = { icon:'🌀', lead:'The Grand Finale: ' + GN.wordWarp + '.',
+    lines:['Each ' + GN.brainBeam + ' you got right locks in one letter of the secret word.', 'Type the rest on the keyboard. You get ' + RUN_MAX_GUESSES + ' tries.',
+      'Your picks reveal your personality card. Can you find the Super Secret Riddle?'] };
   // Infinity's screens 2-3 (v3): the run's finish line, keys and power-ups,
   // then the new round types and the Vault finale. Numbers from the code:
   // FINISH_POINTS / INF_RUN_CLOCK_MS, INF_MATCHES_PER_KEY, POWERUPS,
@@ -19489,12 +19491,13 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   const HOWTO_SCREENS = {
     daily: [
       HOWTO_PICK,
+      // (Part A job 1: read from data/rundown.js - the six round-end games in order, the points x1 x1 x2 x2 x3 x3, orbs from a won round-end game)
       { icon:'🎬', lead:'One show a day, in six rounds.',
-        lines:['Rounds 1 and 2 score normal points, Rounds 3 and 4 points ×2, Rounds 5 and 6 points ×3.',
-          'Each ' + GN.brainBeam + ' you get right wins a Word Warp letter. Win a round-end game for an ◉ orb: each one is a drop in ' + GN.orbitDrop + '.'],
-        chipsLabel:'The round-end games',
-        chips:[ ['🧩 ' + GN.riddleRound, 'Round 1'], ['🎡 Mystery Wheel', 'Round 2'],
-                ['🚪 Mystery Doors', 'Round 3'], ['⚡ ' + GN.zapWords, 'Round 4'], ['🃏 ' + GN.twinFlip, 'Round 5'], ['🛸 ' + GN.orbitDrop, 'Round 6'] ] },
+        lines:['Rounds 1–2 score normal points, Rounds 3–4 ×2, Rounds 5–6 ×3.',
+          'Win a round’s game for an ◉ orb. Each orb is one drop in ' + GN.orbitDrop + '.'],
+        chipsLabel:'Each round ends with',
+        chips:[ ['🚪 Mystery Portal', 'Round 1'], ['🎡 Mystery Wheel', 'Round 2'],
+                ['⚡ ' + GN.zapWords, 'Round 3'], ['👾 ' + GN.munchMix, 'Round 4'], ['🃏 ' + GN.twinFlip, 'Round 5'], ['🛸 ' + GN.orbitDrop, 'Round 6'] ] },
       HOWTO_LAST_DAILY,
     ],
     infinity: [
