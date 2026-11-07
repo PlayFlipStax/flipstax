@@ -2945,3 +2945,10 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 .mg-overlay.pr-celebrating .mg-act, .mg-overlay.pr-celebrating .mg-host-zone{ opacity:0; transition:opacity 0.25s ease; }
 :root.lite .pr-tint{ animation:none; } :root.lite .mg-overlay.pr-celebrating .mg-act, :root.lite .mg-overlay.pr-celebrating .mg-host-zone{ transition:none; }
 @media (prefers-reduced-motion: reduce){ .pr-tint{ animation:none; } .mg-overlay.pr-celebrating .mg-act, .mg-overlay.pr-celebrating .mg-host-zone{ transition:none; } }
+
+/* ---- fix pass 3, fix 3: Time Warp on phones - the event picture fits inside its card (390x844: 35 px, was 47 - the picture, the name and the year tag
+   were taller than the card, so the picture poked above it into the timeline) ---- */
+@media (max-width:599px) and (min-height:701px){ :root:root:root:root:root:root .event-overlay.stack.bb-two.bb-timeWarp .bb-glyph{ font-size:clamp(30px, 4.2svh, 44px); line-height:1; }
+  /* (the cards' 38 px of padding toward the VS badge, which sits at the right edge, is evened to 8 px, and the year tag is 48 px tall, was 56, so all three fit) */
+  :root:root:root:root:root:root .event-overlay.stack.bb-two.bb-timeWarp .event-tile{ padding-top:8px; padding-bottom:8px; }
+  :root:root:root:root:root:root .event-overlay.bb-timeWarp .bb-tag{ height:48px; } }
