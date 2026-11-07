@@ -2709,3 +2709,8 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 @media (prefers-reduced-motion: reduce){ .gal-pic{ animation:none !important; } }
 :root:root:root .solve-overlay.tray .ww-galaxy::before{ display:none !important; animation:none !important; }
 @media (max-height:700px){ :root:root:root .event-overlay.bb-timeWarp .bb-tag{ width:100px; height:34px; margin-top:2px; } :root:root:root .event-overlay.bb-timeWarp .bb-tag b, :root:root:root .event-overlay.bb-timeWarp .bb-tag .tb{ font-size:22px; } }   /* (run 2: room for the neon sign on short screens) */
+
+/* run 2 job 3: the electric dash that runs round a right answer's border (Juice.edgeRun) */
+.ne-edge{ position:fixed; z-index:60; pointer-events:none; }
+.ne-edge i{ position:absolute; left:-2px; top:-3px; width:34px; height:6px; border-radius:3px; transform-origin:0 50%;
+  background:linear-gradient(90deg, rgba(255,255,255,0), #bff8ff 40%, #ffffff 80%, #fffbe0); box-shadow:0 0 8px 2px rgba(125,249,255,0.9); }

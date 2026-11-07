@@ -15000,10 +15000,10 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     const el = document.createElement('div'); el.className = 'beam-banner'; el.setAttribute('aria-hidden', 'true'); el.innerHTML = '<b>\uD83E\uDDE0 BRAIN BEAM</b>';
     document.body.appendChild(el);
     const quiet = document.documentElement.classList.contains('lite') || prefersReducedMotion();
-    const kf = quiet ? [{ opacity:0 }, { opacity:1, offset:0.25 }, { opacity:1, offset:0.75 }, { opacity:0 }]
-      : [{ transform:'translateX(-105%)', opacity:0 }, { transform:'translateX(0)', opacity:1, offset:0.28, easing:'ease-out' }, { transform:'translateX(0)', opacity:1, offset:0.72 }, { transform:'translateX(105%)', opacity:0 }];
-    const a = el.animate ? el.animate(kf, { duration:800, easing:'ease-in-out', fill:'both' }) : null;
-    setTimeout(()=> el.remove(), 900);
+    const kf = quiet ? [{ opacity:0 }, { opacity:1, offset:0.12 }, { opacity:1, offset:0.88 }, { opacity:0 }]
+      : [{ transform:'translateX(-105%)', opacity:0 }, { transform:'translateX(0)', opacity:1, offset:0.13, easing:'ease-out' }, { transform:'translateX(0)', opacity:1, offset:0.87 }, { transform:'translateX(105%)', opacity:0 }];
+    const a = el.animate ? el.animate(kf, { duration:2700, easing:'ease-in-out', fill:'both' }) : null;   // (run 2 job 3: was 0.8 s - now in over 0.35 s, held clearly for 2 s, out over 0.35 s)
+    setTimeout(()=> el.remove(), 2800);
     if (!a) el.style.opacity = '1';
   }
   function hostIntro(key, then){
@@ -17760,7 +17760,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     const end = ()=>{
       if (correct){
         hostMood('cheer'); hostSay(hostLine('right'));
-        if (J) J.winSeq(right, { onStrike:(i)=>{ sfx.crackle(); if (i === 2 || still) sfx.chime(); } });
+        if (J) J.winSeq(right, { sidesOnly:true, edgeRun:true, onStrike:(i)=>{ sfx.crackle(); if (i === 2 || still) sfx.chime(); } });   // (run 2 job 3: an electric dash round the right answer; no strike over the question)
       } else {
         hostMood('sad'); hostSay(hostLine(pickIdx == null ? 'slow' : 'wrong'));
         const lit = ()=>{ if (right) right.classList.add('is-right', 'lit'); };
