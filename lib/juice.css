@@ -2930,3 +2930,18 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 .mr-name.neon{ padding:0 4%; }
 .mr-name.neon .nl{ width:100%; margin:0; }
 :root.zz-nohost .co-stage-host, :root.zz-nohost .fs-host, :root.zz-nohost .show-card .host-full{ visibility:hidden !important; }
+
+/* ---- fix pass 3, fix 2: Price Probe's win - the coins behind the cards, the board dimmed, the word and the points in the band between the title and the
+   question (sized by the game to fit it: --wf, --pf), never over the cards ---- */
+:root:root .pr-winfx{ z-index:0; }
+.pr-winfx::before{ opacity:0.6; }
+:root:root .pr-winbox{ top:30%; gap:2px; }
+:root:root .pr-winword{ font-size:var(--wf, 40px); -webkit-text-stroke-width:2px; text-shadow:0 3px 0 #c98a00, 0 6px 12px rgba(0,0,0,0.45); }
+:root:root .pr-winpts{ font-size:var(--pf, 30px); padding:2px 16px; }
+/* (the board dims with a dark tint on each solid card - the cards stay opaque, so the coins are hidden behind them) */
+.pr-tint{ position:absolute; inset:0; z-index:3; border-radius:inherit; background:rgba(4,18,40,0.55); pointer-events:none; animation:prTint 0.35s ease both; }
+@keyframes prTint{ from{ opacity:0; } to{ opacity:1; } }
+.mg-overlay.pr-celebrating .pr-dots, .mg-overlay.pr-celebrating .pr-meter{ opacity:0.45; transition:opacity 0.35s ease; }
+.mg-overlay.pr-celebrating .mg-act, .mg-overlay.pr-celebrating .mg-host-zone{ opacity:0; transition:opacity 0.25s ease; }
+:root.lite .pr-tint{ animation:none; } :root.lite .mg-overlay.pr-celebrating .mg-act, :root.lite .mg-overlay.pr-celebrating .mg-host-zone{ transition:none; }
+@media (prefers-reduced-motion: reduce){ .pr-tint{ animation:none; } .mg-overlay.pr-celebrating .mg-act, .mg-overlay.pr-celebrating .mg-host-zone{ transition:none; } }
