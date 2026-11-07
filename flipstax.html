@@ -16374,17 +16374,15 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       '<circle r="150" fill="url(#wgCore)"/><g fill="#ffffff">' + stars + '</g></svg>';
   }
   // fix pass 2A job 2: the deep-space sky in front of the turning galaxy - nebula glows, a ringed planet, twinkling stars, a shooting star every 9 s, bright
-  // constellation lines that pulse slowly, and a hidden big star the constellations join into on a win (transform and opacity only)
+  // constellation lines that pulse slowly (transform and opacity only; Part A job 10: no big star on a win any more)
   function wwSkyEnsure(){
     if (document.getElementById('wwSky')) return;
     let tw = ''; for (let k = 0; k < 26; k++) tw += '<i class="wk-tw" style="left:' + ((k * 37 + 7) % 96) + '%;top:' + ((k * 53 + 11) % 92) + '%;--d:' + (2.4 + (k % 5) * 0.6).toFixed(1) + 's;--dl:-' + ((k * 0.7) % 3).toFixed(1) + 's"></i>';
     const C = [[[8,18],[16,12],[24,16],[30,8]], [[70,6],[78,14],[88,10],[93,20]], [[6,62],[12,70],[20,66],[26,76]], [[80,58],[86,66],[94,62]]];
     let lines = ''; C.forEach((c, k)=>{ lines += '<polyline class="wk-cl" style="--dl:-' + (k * 0.8).toFixed(1) + 's" points="' + c.map(p=> p.join(',')).join(' ') + '"/>' + c.map(p=> '<circle class="wk-cn" cx="' + p[0] + '" cy="' + p[1] + '" r="0.9"/>').join(''); });
-    const star = []; for (let k = 0; k < 5; k++){ const a = -Math.PI / 2 + k * Math.PI * 4 / 5; star.push([(50 + Math.cos(a) * 40).toFixed(1), (50 + Math.sin(a) * 40).toFixed(1)]); }
-    let big = ''; for (let k = 0; k < 5; k++){ const p = star[k], q = star[(k + 1) % 5]; big += '<line class="wk-bs" style="--k:' + k + '" x1="' + p[0] + '" y1="' + p[1] + '" x2="' + q[0] + '" y2="' + q[1] + '"/>'; } big += star.map(p=> '<circle class="wk-bn" cx="' + p[0] + '" cy="' + p[1] + '" r="1.6"/>').join('');
     const d = document.createElement('div'); d.id = 'wwSky'; d.className = 'ww-sky'; d.setAttribute('aria-hidden', 'true');
     d.innerHTML = '<i class="wk-neb a"></i><i class="wk-neb b"></i><i class="wk-neb c"></i>' + tw + '<svg class="wk-const" viewBox="0 0 100 100" preserveAspectRatio="none">' + lines + '</svg>' +
-      '<svg class="wk-big" viewBox="0 0 100 100">' + big + '</svg><i class="wk-planet"><i class="wk-pring"></i></i><i class="wk-shoot"></i>';
+      '<i class="wk-planet"><i class="wk-pring"></i></i><i class="wk-shoot"></i>';
     const inner = els.solveOverlay.querySelector('.solve-inner'); els.solveOverlay.insertBefore(d, inner);
   }
   // run 2 job 1: the galaxy as a picture. The inline SVG (blurred arms, 260 stars) on a layer 118vmax across made a texture of about 38 MB on a 3x phone,
@@ -16450,11 +16448,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       (function f(now){ const t = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - t, 3); scoreEl.textContent = Math.round(from + (to - from) * e).toLocaleString(); if (t < 1) requestAnimationFrame(f); })(t0); };
     if (scoreEl) scoreEl.textContent = from;
     const pieces = [].concat(Array.from(els.solveSlots.children), Array.from(els.solveRack.children), Array.from(ov.querySelectorAll('.ww-logo .wl-t, .ww-logo .wl-swirl, .solve-buttons .daily-btn, .solve-attempts, .solve-header, .solve-bar, .solve-keyboard .solve-kb-key')).filter(e=> e.getBoundingClientRect().width));
-    // fix pass 2A: the constellation lines join into one big star behind WARPED IT! (each of its five lines fades in after the one before; opacity and transform)
-    const sky = document.getElementById('wwSky'), bigStar = sky && sky.querySelector('.wk-big');
-    if (sky){ sky.classList.add('ww-won'); setTimeout(()=> sky.classList.remove('ww-won'), 3600); }
-    if (bigStar && !still){ bigStar.animate([{ transform:'translate(-50%,-50%) scale(0.5) rotate(-20deg)', opacity:0 }, { transform:'translate(-50%,-50%) scale(1) rotate(0deg)', opacity:1 }], { duration:900, delay:900, easing:'cubic-bezier(.2,.8,.3,1)', fill:'backwards' });
-      bigStar.querySelectorAll('.wk-bs, .wk-bn').forEach((l, k)=> l.animate([{ opacity:0 }, { opacity:1 }], { duration:240, delay:900 + Math.min(k, 4) * 150, fill:'backwards' })); }
+    // (Part A job 10: the constellation-to-star effect on a win is gone - the constellations stay as they are and no big star is drawn; Part B replaces the win)
     const anims = [];
     // (the board stays hidden through the crossfade to the results - its animations are only dropped once it is out of sight; wwLogoEnsure shows it again)
     const fin = ()=>{ const inner = ov.querySelector('.solve-inner'); if (inner) inner.style.opacity = '0'; anims.forEach(a=>{ try{ a.cancel(); }catch(e){} }); wwSpinRate(1); layer.remove(); ov.classList.remove('celebrating', 'ww-done'); done(); };

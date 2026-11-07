@@ -2443,7 +2443,7 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root:root:root .ff-stage.ff-lie .ff-stamp{ top:6px; right:8px; font-size:clamp(16px, 4.6vw, 26px); padding:3px 10px; }   /* (on the INCOMING line, clear of the statement) */
 
 /* ---- fix pass 2A job 2: Word Warp in deep space. The sky (.ww-sky, over the turning galaxy, under the board): three nebula glows, a ringed planet,
-   twinkling stars, a shooting star every 9 s, bright constellation lines pulsing slowly, and the big star they join into on a win. Cream letter blocks
+   twinkling stars, a shooting star every 9 s, bright constellation lines pulsing slowly (Part A job 10: no big star on a win). Cream letter blocks
    and keys with navy letters in a glowing ring, and a full QWERTY keyboard low on the screen (BACK left, ENTER right). Transform and opacity only;
    lite and reduced motion: everything still (no twinkle, no shooting star, steady lines). ---- */
 .ww-sky{ display:none; position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
@@ -2460,9 +2460,6 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .wk-cl{ fill:none; stroke:#bff8ff; stroke-width:0.35; vector-effect:non-scaling-stroke; stroke-width:1.6px; opacity:0.55; animation:wkPulse 3.2s ease-in-out var(--dl) infinite alternate; }
 .wk-cn{ fill:#ffffff; }
 @keyframes wkPulse{ from{ opacity:0.35; } to{ opacity:0.95; } }
-.wk-big{ left:50%; top:42%; width:min(92vw, 70vh); height:min(92vw, 70vh); transform:translate(-50%, -50%); opacity:0; z-index:3; overflow:visible; }
-.wk-bs{ stroke:#fff6c2; stroke-width:1.4; stroke-linecap:round; } .wk-bn{ fill:#ffffff; }
-.ww-sky.ww-won .wk-big{ opacity:1; } .ww-sky.ww-won .wk-const{ opacity:0; transition:opacity 0.5s ease; }
 .wk-planet{ right:6%; top:47%; width:clamp(70px, 22vw, 180px); aspect-ratio:1; border-radius:50%; background:radial-gradient(circle at 35% 30%, #ffd8a8 0%, #f08a4a 45%, #8a3a1a 100%); }
 .wk-pring{ position:absolute; left:-32%; right:-32%; top:38%; height:24%; border-radius:50%; border:3px solid rgba(255,214,170,0.85); border-top-color:rgba(255,214,170,0.25); transform:rotate(-14deg); }
 .wk-shoot{ left:8%; top:30%; width:120px; height:2px; border-radius:2px; background:linear-gradient(90deg, rgba(255,255,255,0), #ffffff); opacity:0; transform:rotate(24deg); animation:wkShoot 9s ease-in 2s infinite; }
