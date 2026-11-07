@@ -17535,7 +17535,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // particles and confetti.
   function setLite(on, why){
     document.documentElement.classList.toggle('lite', on); FX.MAX_PARTICLES = on ? 30 : 90;
-    if (on){ try{ sessionStorage.setItem('flipstax_lite', '1'); }catch(e){} }
+    if (on && why === 'param'){ try{ sessionStorage.setItem('flipstax_lite', 'p'); }catch(e){} }   // (run 1 job 1: only ?lite=1 is remembered for the session - the automatic switch is not saved)
     if (DEBUG_FAST) window.__liteWhy = on ? why : null;
     liteWhy = on ? (why || 'on') : null; if (typeof frLog === 'function') frLog('lite', on ? 'ON (' + liteWhy + ')' : 'off');
   }
@@ -17545,12 +17545,15 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     // ?lite=0 forces lite off for testing (the automatic switch never runs, and a saved lite flag is ignored)
     if (/[?&]lite=0(&|$)/.test(location.search)){ try{ sessionStorage.removeItem('flipstax_lite'); }catch(e){} return; }
     let forced = /[?&]lite=1(&|$)/.test(location.search);
-    try{ forced = forced || sessionStorage.getItem('flipstax_lite') === '1'; }catch(e){}
+    try{ forced = forced || sessionStorage.getItem('flipstax_lite') === 'p'; }catch(e){}
+    try{ if (sessionStorage.getItem('flipstax_lite') === '1') sessionStorage.removeItem('flipstax_lite'); }catch(e){}   // (a flag saved by the old automatic switch no longer stills the game)
     if (forced){ setLite(true, 'param'); return; }
     if (!window.requestAnimationFrame) return;
     // Automatic switch: only a sustained low rate counts - under 20fps averaged over 3 seconds - and never in the
     // first 4 seconds after the page, a screen, a card or a video starts (transitions always dip the frame rate).
-    const LITE_FPS = 20, LITE_WINDOW_MS = 3000, LITE_SETTLE_MS = 4000;
+    // run 1 job 1: was under 20 fps for 3 s, saved for the whole session - a single heavy moment on a phone (a video, a big celebration, a hot phone)
+    // stilled every game for the rest of the visit. Now: under 12 fps averaged over 6 s, for this page load only.
+    const LITE_FPS = 12, LITE_WINDOW_MS = 6000, LITE_SETTLE_MS = 4000;
     let settleUntil = 4000, winStart = 0, winFrames = 0;
     const settle = ()=>{ settleUntil = performance.now() + LITE_SETTLE_MS; winStart = 0; winFrames = 0; };
     window.__liteSettle = settle;
