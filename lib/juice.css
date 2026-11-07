@@ -2916,3 +2916,12 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 @keyframes suWordIn{ from{ transform:translate(-50%, -50%) scale(0.3); opacity:0; } to{ transform:translate(-50%, -50%) scale(1); opacity:1; } }
 :root.lite .su-winword{ animation:none; } @media (prefers-reduced-motion: reduce){ .su-winword{ animation:none; } }
 .su-saucer{ touch-action:manipulation; }
+
+/* ---- run 2 job 13b: Time Warp on tablets (600 px wide and up) - the two cards keep a phone's proportions (about 2.1 : 1, so 796 x 379 at 824 x 1830,
+   were 796 x 568), the pair is centred in the space under the timeline, and the picture and the words are larger. Phones unchanged. ---- */
+@media (min-width:600px){
+  :root:root:root:root:root .event-overlay.stack.bb-two.bb-timeWarp .event-grid{ justify-content:center; }
+  :root:root:root:root:root .event-overlay.stack.bb-two.bb-timeWarp .event-tile{ flex:0 0 auto; height:auto; aspect-ratio:2.1; max-height:47%; min-height:0; overflow:visible; }
+  :root:root:root:root:root .event-overlay.stack.bb-two.bb-timeWarp .bb-glyph{ font-size:clamp(72px, 12vw, 104px); line-height:1; }
+  :root:root:root:root:root .event-overlay.stack.bb-two.bb-timeWarp .bb-name{ font-size:clamp(40px, 6.6vw, 60px); }
+}
