@@ -85,7 +85,7 @@ window.FLIPSTAX_RUNDOWN = {
     ],
   },
   // Games switched off in the show (their code and data stay; the TEST menu still plays them).
-  off: [ 'peakOrPlunge' ],
+  off: [ 'peakOrPlunge', 'oddballAlert' ],   // (run 1 job 2: both cut from the show - no pool, door, wheel or Mystery Game can draw them; the TEST menu still plays them)
   // About one episode in three, one random VS card is replaced by a Cosmic Surprise twist.
   cosmicSurpriseChance: 1 / 3,
   // The commercial break: a 3-second fake 70s ad for a fictional product (one a day, by
