@@ -2657,3 +2657,31 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 .tf-stage.tf-stage.tf-stage.tf-stage .tf-grid{ width:min(100%, 900px, calc((100dvh - 200px) * 0.77)); }
 @media (max-height:700px){ .tf-stage.tf-stage.tf-stage.tf-stage .tf-grid{ width:min(100%, 900px, calc((100dvh - 214px) * 0.77)); } }
 @media (min-width:600px){ :root:root:root .tf-stage .tf-title span{ font-size:clamp(44px, 7vw, 72px); } }
+
+/* ---- run 1 job 20: Time Warp - timeline numbers about 40% larger and brighter (on a taller panel, so the two label rows still sit inside it, above the
+   cards), larger bolder card text, a smaller 'Tap the earlier event' bar, and bigger blast pieces ---- */
+:root:root .event-overlay.bb-timeWarp .tw-track{ height:118px; }
+:root:root .event-overlay.bb-timeWarp .tw-line{ top:54px; }
+:root:root .event-overlay.bb-timeWarp .tw-tick{ top:46px; }
+:root:root .event-overlay.bb-timeWarp .tw-tick b{ top:25px; font-size:21px; color:#ffffff; text-shadow:0 0 6px rgba(125,249,255,0.95), 0 0 14px rgba(125,249,255,0.6); }
+:root:root .event-overlay.bb-timeWarp .tw-tick.minor b{ font-size:18px; opacity:1; }
+:root:root .event-overlay.bb-timeWarp .tw-track.pins .tw-tick b{ opacity:0.85; }
+:root:root .event-overlay.bb-timeWarp .tw-tick.up b{ top:-27px; }
+:root:root .event-overlay.bb-timeWarp .tw-tick.low2 b{ top:46px; }
+:root:root .event-overlay.bb-timeWarp .tw-link{ top:52px; }
+:root:root .event-overlay.bb-timeWarp .tw-pin{ top:36px; }
+:root:root .event-overlay.bb-timeWarp .tw-pin em{ top:-32px; font-size:26px; color:#fff3b0; }
+@media (max-height:700px){ :root:root .event-overlay.bb-timeWarp .tw-track{ height:96px; } :root:root .event-overlay.bb-timeWarp .tw-line{ top:44px; } :root:root .event-overlay.bb-timeWarp .tw-tick{ top:37px; }
+  :root:root .event-overlay.bb-timeWarp .tw-tick b{ top:21px; font-size:17px; } :root:root .event-overlay.bb-timeWarp .tw-tick.minor b{ font-size:15px; } :root:root .event-overlay.bb-timeWarp .tw-tick.up b{ top:-22px; }
+  :root:root .event-overlay.bb-timeWarp .tw-tick.low2 b{ top:38px; } :root:root .event-overlay.bb-timeWarp .tw-link{ top:42px; } :root:root .event-overlay.bb-timeWarp .tw-pin{ top:29px; } :root:root .event-overlay.bb-timeWarp .tw-pin em{ top:-26px; font-size:21px; } }
+@media (min-width:600px){ :root:root .event-overlay.bb-timeWarp .tw-track{ height:180px; } :root:root .event-overlay.bb-timeWarp .tw-line{ top:84px; } :root:root .event-overlay.bb-timeWarp .tw-tick{ top:72px; } :root:root .event-overlay.bb-timeWarp .tw-tick b{ top:40px; font-size:34px; }
+  :root:root .event-overlay.bb-timeWarp .tw-tick.minor b{ font-size:28px; } :root:root .event-overlay.bb-timeWarp .tw-tick.up b{ top:-44px; } :root:root .event-overlay.bb-timeWarp .tw-tick.low2 b{ top:76px; } :root:root .event-overlay.bb-timeWarp .tw-link{ top:81px; }
+  :root:root .event-overlay.bb-timeWarp .tw-pin{ top:56px; } :root:root .event-overlay.bb-timeWarp .tw-pin em{ top:-50px; font-size:40px; } }
+:root:root:root .event-overlay.stack.bb-timeWarp .bb-name{ font-weight:900; font-size:clamp(26px, 7.6vw, 40px); }
+@media (max-height:700px){ :root:root:root .event-overlay.stack.bb-timeWarp .bb-name{ font-size:clamp(22px, 6.4vw, 28px); } }
+:root:root:root:is(.mode-daily, .mode-infinity) .event-overlay.stack.bb-timeWarp .event-prompt{ font-size:clamp(18px, 5vw, 24px); padding:6px 14px; min-height:0; }
+.tw-blast i{ font-size:clamp(34px, 9.5vw, 72px); }
+:root:root:root:root .event-overlay.stack.bb-timeWarp .bb-name{ font-size:clamp(24px, 6.6vw, 40px); line-height:1.05; }
+@media (max-width:599px){ :root:root:root:root:root .event-overlay.stack.bb-two.bb-timeWarp .bb-glyph{ font-size:clamp(36px, 5.6svh, 80px); } }
+@media (max-height:700px){ :root:root:root:root .event-overlay.stack.bb-timeWarp .bb-name{ font-size:clamp(20px, 6vw, 24px); } }
+@media (max-height:700px){ :root:root:root:root:root .event-overlay.stack.bb-timeWarp .bb-name{ font-size:clamp(18px, 5.4vw, 22px); } }
