@@ -13115,6 +13115,8 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       requestAnimationFrame(()=>{ const door = showCard.querySelector('.mr-door'); if (!door || !sp.isConnected) return; const max = door.clientWidth * 0.84; let fs = parseFloat(getComputedStyle(nm).fontSize) || 36;
         const widest = ()=> Math.max(0, ...Array.from(sp.getClientRects()).map(r=> r.width));
         for (let k = 0; k < 30 && widest() > max && fs > 16; k++){ fs -= 1.5; nm.style.fontSize = fs + 'px'; } }); }
+    // fix pass 3: ZiG Zap ZaBam! shows its neon sign on the reveal, not the plain title
+    if (game === 'zigZap' && window.NeonLogo && NeonLogo.has('zigZap')){ const nm = showCard.querySelector('.mr-name'); nm.classList.add('neon'); nm.innerHTML = NeonLogo.html('zigZap'); }
     showCard.removeAttribute('role'); showCard.setAttribute('aria-label', 'Mystery game: ' + mysteryName(game));
     showCard.classList.remove('hidden');
     clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
@@ -19700,7 +19702,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     }
     // Daily from the top (the cold open is up); `tweak` runs on the fresh run's state.
     function replayEnter(tweak, then){
-      replayTeardown();
+      replayTeardown(); zzNoHostOff();
       els.homeOverlay.classList.add('hidden');
       els.modeDailyBtn.click();
       if (!runActive) return;
@@ -19744,6 +19746,13 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     const actCard = (a)=> atType(s=> s.t === 'act' && s.act === a);
     // (Run 4A: a forced game plays in the Mystery Door's slot, through the old Mystery Game reveal)
     const doorStep = s=> s.t === 'game' && s.key === 'door';
+    // fix pass 3: ZiG Zap ZaBam! is played without Flip on screen - from its TEST entry the cold open and the round card hide him too, until the game closes
+    let zzNoHostIv = 0;
+    function zzNoHostOff(){ clearInterval(zzNoHostIv); zzNoHostIv = 0; document.documentElement.classList.remove('zz-nohost'); }
+    function zzNoHost(){
+      zzNoHostOff(); document.documentElement.classList.add('zz-nohost'); let seen = false;
+      zzNoHostIv = setInterval(()=>{ const on = !!document.querySelector('.mg-overlay.mg-zigZap'); if (on) seen = true; else if (seen || !runActive) zzNoHostOff(); }, 500);
+    }
     const mysteryAs = (game)=> atType(doorStep, 0, 60, 2, (i)=>{ runPlan[i] = Object.assign({}, runPlan[i], { t:'mystery', game, seed:20261013, forced:true }); });
     const roundGame = (key, score, letters, tweak)=> atType(s=> s.t === 'game' && s.key === key, 0, score, letters, tweak);
     const roundCard = (n)=> actCard(RUNDOWN.acts.findIndex(a=> a.round === n));
@@ -19779,7 +19788,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       { label:'Twin Flip', go: roundGame('twinFlip', 220, 5) },
       { label:'Fact or Fib', go: mysteryAs('factOrFib') },
       { label:'Saucer Shuffle', go: mysteryAs('saucerShuffle') },
-      { label:'ZiG Zap ZaBam!', go: mysteryAs('zigZap') },
+      { label:'ZiG Zap ZaBam!', go: ()=>{ mysteryAs('zigZap')(); zzNoHost(); } },   // (fix pass 3: no Flip on the way in to ZiG Zap ZaBam!)
       { label:'Alien Blast', go: mysteryAs('alienBlast') },
       { label:'Galactic Chomper', go: mysteryAs('munchMix') },   // (internal id munchMix; also Round 1's game)
       { label:'Star Sequence', go: mysteryAs('starSequence') },   // (a spare Mystery Game: the end of the Mystery Portal pool)

@@ -2925,3 +2925,8 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
   :root:root:root:root:root .event-overlay.stack.bb-two.bb-timeWarp .bb-glyph{ font-size:clamp(72px, 12vw, 104px); line-height:1; }
   :root:root:root:root:root .event-overlay.stack.bb-two.bb-timeWarp .bb-name{ font-size:clamp(40px, 6.6vw, 60px); }
 }
+
+/* ---- fix pass 3, fix 1: ZiG Zap ZaBam! - its neon sign on the Mystery Game reveal (no plain title), and no Flip on the way in from its TEST entry ---- */
+.mr-name.neon{ padding:0 4%; }
+.mr-name.neon .nl{ width:100%; margin:0; }
+:root.zz-nohost .co-stage-host, :root.zz-nohost .fs-host, :root.zz-nohost .show-card .host-full{ visibility:hidden !important; }
