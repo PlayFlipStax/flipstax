@@ -179,3 +179,7 @@
 /* mega 5 item 11: lite mode and reduced motion - a still Galactic Chomper: no fades between galaxies, on the tiles, the strike dots or the black hole */
 :root.lite .gc-set .gc-galaxy, :root.lite .gc-glass, :root.lite .gc-sock, :root.lite .gc-strikes i, :root.lite .gc-set .gc-hole{ transition:none !important; }
 @media (prefers-reduced-motion: reduce){ .gc-set .gc-galaxy, .gc-glass, .gc-sock, .gc-strikes i, .gc-set .gc-hole{ transition:none !important; } }
+
+/* run 1 job 19: the board's category word (MATH, SCIENCE...) sits ABOVE the board - over the rule line, on its own dark pill - never over the tiles,
+   and goes after 0.7 s (set in lib/munch-mix.js) */
+:root:root .nx-slam.gcsplash{ top:-28px; z-index:9; padding:4px 20px 6px; border-radius:16px; background:rgba(8,6,34,0.92); box-shadow:0 0 0 2px var(--edge, #3FA9FF); font-size:clamp(28px, 8.4vw, 46px); }
