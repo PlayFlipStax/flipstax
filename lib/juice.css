@@ -2370,3 +2370,9 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root:root:root .mg-priceProbe .mg-sign{ padding-left:72px; padding-right:52px; }
 :root:root:root .mg-priceProbe .mg-sign span{ font-size:clamp(26px, 7.6vw, 60px) !important; }
 @media (min-width:600px){ :root:root:root .mg-priceProbe .mg-sign{ padding-left:86px; } }
+
+/* ---- makeover job 16: every game's intro explainer card opens with a clear title plate - the game's name in big capitals on a bar in the game's own
+   colours with a gold rim, the ? badge on it (the mystery reveal and the round intro signs already carry the name). ---- */
+:root:root .ex-card .ex-head{ margin:calc(var(--sp-5, 20px) * -1) calc(var(--sp-5, 20px) * -1) var(--sp-4, 16px); padding:12px 16px; background:linear-gradient(180deg, var(--gi-a), var(--gi-b)); border-bottom:4px solid #ffd23f; }
+:root:root .ex-card .ex-head b{ flex:1; font-size:clamp(28px, 8.6vw, 40px); letter-spacing:1.5px; color:#ffffff; text-shadow:0 3px 0 rgba(0,0,0,0.35); }
+:root:root .ex-card .ex-q{ background:#ffffff; color:var(--gi-b); }
