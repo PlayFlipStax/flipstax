@@ -71,7 +71,8 @@
         next = now + rnd(150, 400);
       } else if (fin && vis(fin)){
         const all = document.getElementById('plinkoAll'), go = document.getElementById('plinkoDrop');
-        if (go && vis(go)) tapEl(go, 'results'); else if (all && vis(all)) tapEl(all, 'auto-drop');
+        const drop = document.getElementById('pkGo');   // (makeover job 9: no Auto-drop any more - the player drops each orb with DROP)
+        if (go && vis(go)) tapEl(go, 'results'); else if (all && vis(all)) tapEl(all, 'auto-drop'); else if (drop && vis(drop) && !drop.disabled) tapEl(drop, 'drop');
         next = now + rnd(800, 1500);
       } else if (solve && vis(solve)){
         const tiles = [...solve.querySelectorAll('#solveRack .solve-tile:not(.used), .solve-key')].filter(vis);
