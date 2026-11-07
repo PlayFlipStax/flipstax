@@ -2441,3 +2441,54 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .mg-factOrFib:has(.ff-lie) .mg-act{ margin-top:4px; }
 @media (max-height:700px){ .ff-lie .ff-gauge{ width:min(100%, calc(19svh * 1.5625)); } :root:root .ff-stage.ff-lie .ff-btn{ width:clamp(80px, 13svh, 120px); } .mg-factOrFib:has(.ff-lie) .mg-act{ display:none; } }
 :root:root:root .ff-stage.ff-lie .ff-stamp{ top:6px; right:8px; font-size:clamp(16px, 4.6vw, 26px); padding:3px 10px; }   /* (on the INCOMING line, clear of the statement) */
+
+/* ---- fix pass 2A job 2: Word Warp in deep space. The sky (.ww-sky, over the turning galaxy, under the board): three nebula glows, a ringed planet,
+   twinkling stars, a shooting star every 9 s, bright constellation lines pulsing slowly, and the big star they join into on a win. Cream letter blocks
+   and keys with navy letters in a glowing ring, and a full QWERTY keyboard low on the screen (BACK left, ENTER right). Transform and opacity only;
+   lite and reduced motion: everything still (no twinkle, no shooting star, steady lines). ---- */
+.ww-sky{ display:none; position:fixed; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
+.solve-overlay.tray .ww-sky{ display:block; }
+.ww-sky > i, .ww-sky > svg{ position:absolute; display:block; }
+.wk-neb{ border-radius:50%; }
+.wk-neb.a{ left:-20%; top:8%; width:80vmin; height:60vmin; background:radial-gradient(ellipse, rgba(255,90,200,0.32), rgba(255,90,200,0) 70%); }
+.wk-neb.b{ right:-25%; top:38%; width:90vmin; height:70vmin; background:radial-gradient(ellipse, rgba(80,200,255,0.26), rgba(80,200,255,0) 70%); }
+.wk-neb.c{ left:10%; bottom:-10%; width:80vmin; height:50vmin; background:radial-gradient(ellipse, rgba(160,110,255,0.3), rgba(160,110,255,0) 70%); }
+.wk-tw{ width:3px; height:3px; margin:-1.5px; border-radius:50%; background:#ffffff; opacity:0.3; animation:wkTw var(--d) ease-in-out var(--dl) infinite alternate; }
+.wk-tw:nth-child(3n){ width:4px; height:4px; background:#d8f4ff; }
+@keyframes wkTw{ from{ opacity:0.2; transform:scale(0.7); } to{ opacity:1; transform:scale(1.2); } }
+.wk-const{ inset:0; width:100%; height:100%; }
+.wk-cl{ fill:none; stroke:#bff8ff; stroke-width:0.35; vector-effect:non-scaling-stroke; stroke-width:1.6px; opacity:0.55; animation:wkPulse 3.2s ease-in-out var(--dl) infinite alternate; }
+.wk-cn{ fill:#ffffff; }
+@keyframes wkPulse{ from{ opacity:0.35; } to{ opacity:0.95; } }
+.wk-big{ left:50%; top:42%; width:min(92vw, 70vh); height:min(92vw, 70vh); transform:translate(-50%, -50%); opacity:0; z-index:3; overflow:visible; }
+.wk-bs{ stroke:#fff6c2; stroke-width:1.4; stroke-linecap:round; } .wk-bn{ fill:#ffffff; }
+.ww-sky.ww-won .wk-big{ opacity:1; } .ww-sky.ww-won .wk-const{ opacity:0; transition:opacity 0.5s ease; }
+.wk-planet{ right:6%; top:47%; width:clamp(70px, 22vw, 180px); aspect-ratio:1; border-radius:50%; background:radial-gradient(circle at 35% 30%, #ffd8a8 0%, #f08a4a 45%, #8a3a1a 100%); }
+.wk-pring{ position:absolute; left:-32%; right:-32%; top:38%; height:24%; border-radius:50%; border:3px solid rgba(255,214,170,0.85); border-top-color:rgba(255,214,170,0.25); transform:rotate(-14deg); }
+.wk-shoot{ left:8%; top:30%; width:120px; height:2px; border-radius:2px; background:linear-gradient(90deg, rgba(255,255,255,0), #ffffff); opacity:0; transform:rotate(24deg); animation:wkShoot 9s ease-in 2s infinite; }
+@keyframes wkShoot{ 0%, 88%{ opacity:0; transform:rotate(24deg) translateX(0); } 90%{ opacity:1; } 100%{ opacity:0; transform:rotate(24deg) translateX(60vw); } }
+:root.lite .ww-sky *, :root.lite .ww-sky{ animation:none !important; } :root.lite .wk-shoot{ display:none; }
+@media (prefers-reduced-motion: reduce){ .ww-sky *{ animation:none !important; } .wk-shoot{ display:none !important; } }
+.paused .ww-sky *, :root.tab-hidden .ww-sky *{ animation-play-state:paused !important; }
+/* the six letter blocks: cream with navy letters, in a glowing ring (no gold frame) */
+:root:root:root:root .solve-overlay.tray.ww-qwerty .solve-slots{ background:none; border:0; box-shadow:none; padding:clamp(14px, 3svh, 26px) 8px; }
+.solve-overlay.tray.ww-qwerty .solve-slots::before{ inset:-4px -14px; border:2px solid rgba(95,244,255,0.85); border-radius:50%; box-shadow:0 0 14px rgba(95,244,255,0.6), inset 0 0 14px rgba(95,244,255,0.35); opacity:1; transform:rotate(-4deg); }
+:root:root:root:root .solve-overlay.tray.ww-qwerty .solve-slot{ background:linear-gradient(180deg, #172a78, #0c1850); border:3px solid #5ff4ff; color:#14286e; border-radius:10px; box-shadow:0 4px 0 rgba(10,8,40,0.6); }
+:root:root:root:root .solve-overlay.tray.ww-qwerty .solve-slot.placed{ background:linear-gradient(180deg, #fff8e6, #f6e6c0); border-color:#fff8e6; color:#14286e; }
+:root:root:root:root .solve-overlay.tray.ww-qwerty .solve-slot.locked{ background:none; border-color:#fff8e6; }
+.solve-overlay.tray.ww-qwerty .sl-new{ background:linear-gradient(180deg, #fff8e6, #f6e6c0); color:#14286e; }
+/* the keyboard: three rows of cream keys low on the screen; the tray, its label and the CLEAR / ENTER buttons are hidden in this mode */
+.solve-overlay.tray.ww-qwerty #solveRack, .solve-overlay.tray.ww-qwerty #solveRackLabel, .solve-overlay.tray.ww-qwerty .solve-buttons{ display:none !important; }
+:root:root:root .solve-overlay.tray.ww-qwerty .solve-keyboard{ display:flex !important; order:5; margin:auto 0 8px; width:100%; gap:clamp(6px, 1.2svh, 12px); }
+.solve-overlay.tray.ww-qwerty .solve-kb-row{ gap:clamp(4px, 1.2vw, 8px); width:100%; }
+:root:root .solve-overlay.tray.ww-qwerty .solve-kb-key{ flex:0 0 auto; width:calc((min(100vw, 640px) - 36px - 9 * clamp(4px, 1.2vw, 8px)) / 10); height:clamp(46px, 7.4svh, 84px); padding:0; border-radius:10px; border:0;
+  background:linear-gradient(180deg, #fff8e6, #f2e0b6); color:#14286e; font:900 clamp(20px, 6vw, 40px)/1 var(--f-display, sans-serif); box-shadow:0 4px 0 #8a7a5a, 0 6px 8px rgba(0,0,0,0.35); touch-action:manipulation; transition:transform 0.1s ease; }
+:root:root .solve-overlay.tray.ww-qwerty .solve-kb-key.wide{ width:calc((min(100vw, 640px) - 36px - 9 * clamp(4px, 1.2vw, 8px)) / 10 * 1.62); font-size:clamp(12px, 3.4vw, 24px); letter-spacing:0.5px; color:#ffffff; }
+:root:root .solve-overlay.tray.ww-qwerty .solve-kb-key.back{ background:linear-gradient(180deg, #8a5cff, #4a22c8); box-shadow:0 4px 0 #2a0e78, 0 6px 8px rgba(0,0,0,0.35); }
+:root:root .solve-overlay.tray.ww-qwerty .solve-kb-key.enter{ background:linear-gradient(180deg, #ff6ac8, #d81e8a); box-shadow:0 4px 0 #7a0a4a, 0 6px 8px rgba(0,0,0,0.35); }
+.solve-overlay.tray.ww-qwerty .solve-kb-key::after{ content:''; position:absolute; inset:-3px; border-radius:12px; background:radial-gradient(circle, rgba(95,244,255,0.75), rgba(95,244,255,0) 70%); opacity:0; pointer-events:none; }
+.solve-overlay.tray.ww-qwerty .solve-kb-key{ position:relative; }
+.solve-overlay.tray.ww-qwerty .solve-kb-key.hit{ transform:translateY(3px) scale(0.95); }
+.solve-overlay.tray.ww-qwerty .solve-kb-key.hit::after{ opacity:1; }
+.solve-overlay.tray.ww-qwerty .solve-kb-key:active{ transform:translateY(3px) scale(0.95); }
+@media (max-height:700px){ :root:root .solve-overlay.tray.ww-qwerty .solve-kb-key{ height:clamp(38px, 7svh, 48px); } }
