@@ -54,6 +54,7 @@
 <link rel="stylesheet" href="lib/celebrate.css">
 <link rel="stylesheet" href="lib/neo-games.css">
 <link rel="stylesheet" href="lib/munch-mix.css">
+<link rel="stylesheet" href="lib/neon-logos.css">
 <link rel="stylesheet" href="lib/spotlights.css">
 <link rel="stylesheet" href="lib/star-sequence.css">
 <link rel="preload" as="image" href="data/stage/stage-close.webp" type="image/webp">
@@ -4946,6 +4947,7 @@
 <script src="data/vs-cards-new.js"></script>
 <script src="data/vs/vs-emoji.js"></script>
 <script src="lib/mini-games.js"></script>
+<script src="lib/neon-logos.js"></script>
 <script src="lib/neo-games.js"></script>
 <script src="data/munch-packs.js"></script>
 <script src="lib/munch-mix.js"></script>
@@ -11897,7 +11899,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     runCurrentGame = 'Mystery Wheel';
     const gen = ++luckyGen;
     let won = 0, used = 0, lost = 0, rot = 0, autoT = null, state = 'idle', raf = 0, stopNow = null, lastTick = 0;
-    luckyOv.innerHTML = '<div class="mw-bg" aria-hidden="true"></div><div class="ll-inner mw-inner"><div class="ll-title"><div class="sign-bulbs" aria-hidden="true"></div><span>MYSTERY WHEEL</span></div>' +
+    luckyOv.innerHTML = '<div class="mw-bg" aria-hidden="true"></div><div class="ll-inner mw-inner">' + (window.NeonLogo && NeonLogo.has('lucky') ? NeonLogo.html('lucky') : '<div class="ll-title"><div class="sign-bulbs" aria-hidden="true"></div><span>MYSTERY WHEEL</span></div>') +
       '<div class="ll-bank" aria-live="polite"></div></div>' +
       '<div class="mw-wheel"><div class="mw-rot"><img class="mw-face" src="' + MW_FACE.src + '" alt="" draggable="false">' + mwOverlaySvg() + '</div><i class="mw-cap" aria-hidden="true"></i>' +
       '<svg class="mw-pointer" viewBox="0 0 40 56" aria-hidden="true"><defs><linearGradient id="mwPtr" x1="0" x2="1"><stop offset="0" stop-color="#8a90a8"/><stop offset="0.45" stop-color="#ffffff"/><stop offset="0.6" stop-color="#d8dcea"/><stop offset="1" stop-color="#6a7088"/></linearGradient></defs>' +
