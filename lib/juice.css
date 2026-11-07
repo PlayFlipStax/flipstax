@@ -2982,3 +2982,7 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root:root:root .pr-winfx{ z-index:60; }
 :root:root:root .pr-winbox{ z-index:62; }
 :root:root .pr-winfx::before{ opacity:0.85; }
+
+/* ---- Part A job 7: Time Warp - long event names fit inside their cards (flipstax.html twFitName: at most two lines, the font steps down until the picture,
+   name and year tag fit). On short phones the year tag is a little smaller (28 px, was 34) so names keep a readable size. ---- */
+@media (max-width:599px) and (max-height:700px){ :root:root:root:root .event-overlay.bb-timeWarp .bb-tag{ height:28px; margin-top:1px; } :root:root:root:root .event-overlay.stack.bb-two.bb-timeWarp .bb-name{ line-height:1.02; } }

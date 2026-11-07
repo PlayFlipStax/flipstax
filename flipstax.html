@@ -12167,12 +12167,25 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     const sw = rng() < 0.5, t = sw ? [x.b, x.a] : [x.a, x.b], correct = sw ? 1 - x.first : x.first;
     return { prompt:'Tap the earlier event', tiles:t.map(i=> ({ glyph:i.glyph, name:i.event })), correct, revealSub:t.map(i=> String(i.year)) };
   }
+  // Part A job 7: Time Warp - an event name fits inside its card: at most two lines, and the picture, the name and the year tag together inside the card's
+  // box; the name's font steps down (to 60% of its size at most) until both hold. Measured after layout, again after the fonts load.
+  function twFitName(tileEl){
+    const nm = tileEl && tileEl.querySelector('.bb-name'); if (!nm || !tileEl.isConnected || !tileEl.offsetHeight) return;
+    nm.style.fontSize = ''; const base = parseFloat(getComputedStyle(nm).fontSize) || 24; let fs = base;
+    const fits = ()=>{ const tr = tileEl.getBoundingClientRect(), lh = parseFloat(getComputedStyle(nm).lineHeight) || fs * 1.1, nr = nm.getBoundingClientRect();
+      if (nr.height > lh * 2 + 2) return false;
+      return [...tileEl.children].filter(c=> c.matches('.bb-glyph, .bb-name, .bb-tag, .bb-sub')).every(c=>{ const r = c.getBoundingClientRect(); return !r.height || (r.top >= tr.top + 1 && r.bottom <= tr.bottom - 1); }); };
+    for (let k = 0; k < 24 && !fits() && fs > base * 0.6; k++){ fs -= Math.max(1, base * 0.04); nm.style.fontSize = fs.toFixed(1) + 'px'; }
+    if (document.fonts && document.fonts.status !== 'loaded' && !tileEl._twFitWait){ tileEl._twFitWait = true; document.fonts.ready.then(()=>{ tileEl._twFitWait = false; twFitName(tileEl); }); }
+  }
+  if (window.FLIPSTAX_TEST_HOST === true && /[?&](replay|debug)=/.test(location.search)) window.__twFit = (el)=> twFitName(el);   // (tests only)
   // `sub` replaces the tile's small line (the price / the year revealed after the
   // answer); `flip` plays the flip-in on it.
   function fillBreakTile(tileEl, t, sub, flip, key, back){
     tileEl.textContent = '';
     const add = (cls, text)=>{ if (!text) return null; const s = document.createElement('span'); s.className = cls; s.textContent = text; tileEl.appendChild(s); return s; };
     add('bb-glyph', t.glyph); add('bb-name', t.name);
+    if (key === 'timeWarp') requestAnimationFrame(()=> twFitName(tileEl));   // (Part A job 7: a long event name always fits inside its card)
     const s = add('bb-sub', sub != null ? sub : t.sub); if (s && flip) s.classList.add('flip');
     // Oddball Alert: a numbered lineup card with a spotlight that lights up on the reveal.
     if (key === 'oddballAlert'){
