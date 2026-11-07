@@ -13083,6 +13083,11 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       '<div class="mr-name" aria-live="polite"></div><i class="mr-curt l"></i><i class="mr-curt r"></i></div></div></div>' +
       '';   // (Run 4A: no host at the door - he appears only in the intro, the round announcements, the outro and failure reactions)
     showCard.querySelector('.mr-name').textContent = (GAME_ICONS[game] && game !== 'lucky' ? GAME_ICONS[game] + ' ' : '') + mysteryName(game).toUpperCase();   // (A+ pacing: name and icon)
+    // run 1 job 4: the name always fits the panel with a margin (each line at most 84% of the door's width): it shrinks a step at a time until it does
+    { const nm = showCard.querySelector('.mr-name'), txt = nm.textContent; nm.innerHTML = '<span class="mr-fit"></span>'; const sp = nm.firstChild; sp.textContent = txt;
+      requestAnimationFrame(()=>{ const door = showCard.querySelector('.mr-door'); if (!door || !sp.isConnected) return; const max = door.clientWidth * 0.84; let fs = parseFloat(getComputedStyle(nm).fontSize) || 36;
+        const widest = ()=> Math.max(0, ...Array.from(sp.getClientRects()).map(r=> r.width));
+        for (let k = 0; k < 30 && widest() > max && fs > 16; k++){ fs -= 1.5; nm.style.fontSize = fs + 'px'; } }); }
     showCard.removeAttribute('role'); showCard.setAttribute('aria-label', 'Mystery game: ' + mysteryName(game));
     showCard.classList.remove('hidden');
     clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
