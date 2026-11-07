@@ -88,3 +88,4 @@
 :root:root:root.mode-daily .event-overlay.has-plate .qz-plate.neon > .nl{ width:100%; }
 :root:root:root.mode-daily .event-overlay.has-plate .qz-plate.neon > small{ margin-top:2px; }
 :root:root:root.mode-daily .event-overlay.has-plate .qz-plate.neon > small{ margin-top:8px; }
+@media (max-height:700px){ :root:root:root.mode-daily .event-overlay.has-plate .qz-plate.neon{ width:min(72%, 290px); margin-bottom:2px; } }

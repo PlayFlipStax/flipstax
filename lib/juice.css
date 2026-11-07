@@ -2708,3 +2708,4 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root.lite .gal-pic, :root.lite :root .gal-pic{ animation:none !important; }
 @media (prefers-reduced-motion: reduce){ .gal-pic{ animation:none !important; } }
 :root:root:root .solve-overlay.tray .ww-galaxy::before{ display:none !important; animation:none !important; }
+@media (max-height:700px){ :root:root:root .event-overlay.bb-timeWarp .bb-tag{ width:100px; height:34px; margin-top:2px; } :root:root:root .event-overlay.bb-timeWarp .bb-tag b, :root:root:root .event-overlay.bb-timeWarp .bb-tag .tb{ font-size:22px; } }   /* (run 2: room for the neon sign on short screens) */
