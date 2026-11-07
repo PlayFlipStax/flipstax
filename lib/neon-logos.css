@@ -82,3 +82,9 @@
 .lucky-overlay.mw .mw-inner > .nl{ width:min(92%, 400px); margin-top:0; }
 .nl-l{ color:var(--c); -webkit-text-stroke:0; text-shadow:0 0 0.5cqw rgba(255,255,255,0.55), 0 0 1.8cqw var(--c), 0 0 3.8cqw var(--c); }
 .nl-l{ text-shadow:0 0 0.5cqw rgba(255,255,255,0.6), 0 0 1.6cqw var(--c), 0 0 3.4cqw var(--c), 0 0 6cqw var(--c); }
+/* the quiz title plate (Riddle Round, Time Warp): the neon sign in place of the plain title, the small line under it */
+:root:root:root.mode-daily .event-overlay.has-plate .qz-plate.neon{ background:none !important; border:0 !important; box-shadow:none !important; padding:0; width:min(94%, 470px); }
+:root:root:root.mode-daily .event-overlay.has-plate .qz-plate.neon > b{ display:none; }
+:root:root:root.mode-daily .event-overlay.has-plate .qz-plate.neon > .nl{ width:100%; }
+:root:root:root.mode-daily .event-overlay.has-plate .qz-plate.neon > small{ margin-top:2px; }
+:root:root:root.mode-daily .event-overlay.has-plate .qz-plate.neon > small{ margin-top:8px; }
