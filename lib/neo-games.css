@@ -355,3 +355,10 @@
    without :has() too), and the question card sits above it, so all four answers are always visible and tappable */
 .nx-zz.zz-asking .nx-panel{ opacity:0; visibility:hidden; pointer-events:none; }
 .nx-zz.zz-asking .nx-play{ position:relative; z-index:8; }
+
+/* makeover job 10: ZiG Zap ZaBam! - Flip is off the screen (the corner host and the face on his question card are hidden; his turns, lines and
+   scoring are unchanged) and the squares are larger (390x844: 112 px, were 92; tablets up to 220 px). */
+.mg-zigZap .nx-host, .mg-zigZap .zz-face{ display:none !important; }
+:root:root .mg-zigZap .zz-grid{ --zc:min(112px, 29vw, calc((100dvh - 300px) / 3.3)); gap:10px; }
+@media (min-width:600px){ :root:root .mg-zigZap .zz-grid{ --zc:min(220px, 24vw, calc((100dvh - 420px) / 3.3)); gap:16px; } }
+.mg-zigZap .zz-cell{ touch-action:manipulation; }
