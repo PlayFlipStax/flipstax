@@ -15008,8 +15008,13 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // The 0.8 s BRAIN BEAM announce banner: slides across over the first question (transform and opacity only; a plain fade in lite mode / reduced motion).
   function showBeamBanner(){ setTimeout(beamBannerNow, 450); }   // (after the question's own entrance has started, so it slides over the question)
   function beamBannerNow(){
+    // fix pass 3: it never covers the question - once the quiz's own title plate (BRAIN BEAM, EASY ...) is up it is not needed and is skipped; with no
+    // title plate it sits wholly above the question's board, or is skipped if there is no room there
+    if (document.querySelector('.event-overlay.has-plate .qz-plate')) return;
     const el = document.createElement('div'); el.className = 'beam-banner'; el.setAttribute('aria-hidden', 'true'); el.innerHTML = '<b>\uD83E\uDDE0 BRAIN BEAM</b>';
     document.body.appendChild(el);
+    { const pr = document.querySelector('.event-overlay:not(.hidden) .event-prompt'), bh = el.offsetHeight || 64;
+      if (pr){ const top = pr.getBoundingClientRect().top - bh - 8; if (top < 40){ el.remove(); return; } el.style.top = Math.round(top) + 'px'; } }
     const quiet = document.documentElement.classList.contains('lite') || prefersReducedMotion();
     const kf = quiet ? [{ opacity:0 }, { opacity:1, offset:0.12 }, { opacity:1, offset:0.88 }, { opacity:0 }]
       : [{ transform:'translateX(-105%)', opacity:0 }, { transform:'translateX(0)', opacity:1, offset:0.13, easing:'ease-out' }, { transform:'translateX(0)', opacity:1, offset:0.87 }, { transform:'translateX(105%)', opacity:0 }];
