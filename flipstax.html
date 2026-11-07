@@ -11567,7 +11567,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       panEls().forEach(e=>{ e.style.transition = still ? 'none' : 'transform 0.35s ease-out'; e.style.transform = 'translateX(' + dx.toFixed(0) + 'px)'; });
     };
     const unpan = ()=> panEls().forEach(e=>{ e.style.transition = ''; e.style.transform = ''; });
-    const reset = ()=>{ unpan(); ov.classList.add('hidden'); ov.classList.remove('powerup', 'mdoor', 'art'); doorFloorStop(); { const a = document.getElementById('mdArt'); if (a) a.remove(); } { const c = document.getElementById('mpCaption'); if (c) c.remove(); } tiles.forEach(t=>{ t.classList.remove('portal', 'mp', 'md', 'art-open', 'opened', 'dim', 'open', 'other', 'picked-wait'); t.removeAttribute('role'); t.removeAttribute('tabindex'); t.style.removeProperty('--dw'); t.innerHTML = ''; t.onclick = null; t.style.display = ''; }); };
+    const reset = ()=>{ unpan(); ov.querySelectorAll('.md-house, .md-spot').forEach(e=> e.remove()); ov.classList.add('hidden'); ov.classList.remove('powerup', 'mdoor', 'art'); doorFloorStop(); { const a = document.getElementById('mdArt'); if (a) a.remove(); } { const c = document.getElementById('mpCaption'); if (c) c.remove(); } tiles.forEach(t=>{ t.classList.remove('portal', 'mp', 'md', 'art-open', 'opened', 'dim', 'open', 'other', 'picked-wait'); t.removeAttribute('role'); t.removeAttribute('tabindex'); t.style.removeProperty('--dw'); t.innerHTML = ''; t.onclick = null; t.style.display = ''; }); };
     const open = (i)=>{
       if (picked || g !== Show.gen) return;
       picked = true; clearTimeout(eventTimeoutId);
@@ -11575,6 +11575,13 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       tiles.forEach(t=> t.onclick = null);
       const tile = tiles[i], game = games[i % games.length];
       used.forEach((t, k)=>{ if (k !== i) t.classList.add('dim'); });
+      // run 2 job 4: the house lights go down - a dark wash over the stage and the other doors (they sit under it, the opened door above it) - and a
+      // spotlight comes on over the opened door (opacity only; both are removed with the doors)
+      if (DOORS_ART){ const grid = tile.parentNode; if (grid){ grid.querySelectorAll('.md-house, .md-spot').forEach(e=> e.remove());
+        const house = document.createElement('i'); house.className = 'md-house'; house.setAttribute('aria-hidden', 'true'); grid.appendChild(house);
+        const spot = document.createElement('i'); spot.className = 'md-spot'; spot.setAttribute('aria-hidden', 'true');
+        spot.style.left = (tile.offsetLeft + tile.offsetWidth / 2) + 'px'; spot.style.setProperty('--sw', Math.round(tile.offsetWidth * 2.2) + 'px'); spot.style.setProperty('--sb', Math.round(tile.offsetTop + tile.offsetHeight) + 'px'); grid.appendChild(spot);
+        requestAnimationFrame(()=>{ house.classList.add('on'); spot.classList.add('on'); }); } }
       tile.classList.add('picked-wait'); if (DOORS_ART){ tile.classList.add('art-open'); const ma = document.getElementById('mdArt'); if (ma) ma.classList.add('picked'); doorPan(tile); } sfx.drumroll(QUIZ_DRUMROLL_MS);   // (art doors: the closed picture crossfades to the open one now, 0.4 s, opacity only)
       setTimeout(()=>{
         if (g !== Show.gen) return;
@@ -11595,7 +11602,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
               : miniGame(game) ? runMiniGame(game, { seed: st.seed, door:true, day: st.day }, done) : runBrainBreak({ game, seed: st.seed, day: st.day }, done);
             if (!ok) showDone(g, 'door game unavailable');
           });
-        }, { lead: DOORS_ART ? 0 : 700, text: els.eventPrompt.textContent, min: DOORS_ART && !(isLite() || prefersReducedMotion()) ? 1800 : 0 });   // (art doors: the world inside animates for 2.5 s in all, from the pick, before the game moves on)   // (the swing takes 0.7 s, then the game's name holds for the shared reveal time)
+        }, { lead: DOORS_ART ? 0 : 700, text: els.eventPrompt.textContent, min: DOORS_ART && !(isLite() || prefersReducedMotion()) ? 3300 : 0 });   // (run 2 job 4: the world inside moves for 3 s and the reveal holds longer - was 1.8 s)   // (art doors: the world inside animates for 2.5 s in all, from the pick, before the game moves on)   // (the swing takes 0.7 s, then the game's name holds for the shared reveal time)
       }, dt(DOORS_ART ? (isLite() || prefersReducedMotion() ? 800 : 700) : QUIZ_DRUMROLL_MS));   // (art doors: the swing takes 0.7 s, then the name; lite and reduced motion: a 0.8 s wait)
     };
     { const oc = document.getElementById('mpCaption'); if (oc) oc.remove(); }

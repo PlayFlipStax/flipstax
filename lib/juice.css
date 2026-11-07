@@ -2714,3 +2714,23 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 .ne-edge{ position:fixed; z-index:60; pointer-events:none; }
 .ne-edge i{ position:absolute; left:-2px; top:-3px; width:34px; height:6px; border-radius:3px; transform-origin:0 50%;
   background:linear-gradient(90deg, rgba(255,255,255,0), #bff8ff 40%, #ffffff 80%, #fffbe0); box-shadow:0 0 8px 2px rgba(125,249,255,0.9); }
+
+/* ---- run 2 job 4: Mystery Doors - smooth: the moving layers are promoted (will-change) and isolated, so the swing, the crossfade, the pan and the world
+   inside the doorway are compositor-only work (transform and opacity); the world moves for 3 s (was 1.5 s) and the reveal holds longer. When a door
+   opens the house lights go down - a dark wash over the stage and the other doors - and a spotlight comes on over the opened door. ---- */
+.event-tile.md .md-c, .event-tile.md .md-o, .event-tile.md .md-ow, .event-tile.md .md-wi{ will-change:transform, opacity; backface-visibility:hidden; }
+.event-tile.md .md-win{ transform:translateZ(0); isolation:isolate; }
+.event-grid > .event-tile.md{ will-change:opacity; }
+:root:root .event-tile.md.art-open .md-wi{ animation-duration:3s; animation-fill-mode:both; }
+.md-house{ position:absolute; left:-50vw; right:-50vw; top:-100vh; bottom:-50vh; z-index:2; pointer-events:none; background:rgba(4,2,14,0.62); opacity:0; transition:opacity 0.7s ease; }
+.md-house.on{ opacity:1; }
+.md-spot{ position:absolute; z-index:2; bottom:calc(100% - var(--sb) - 6px); width:var(--sw); height:150vh; transform:translateX(-50%); pointer-events:none; opacity:0; transition:opacity 0.6s ease 0.15s;
+  background:linear-gradient(180deg, rgba(255,248,214,0) 0%, rgba(255,248,214,0.18) 55%, rgba(255,248,214,0.42) 100%); clip-path:polygon(42% 0, 58% 0, 100% 100%, 0 100%); }
+.md-spot::after{ content:''; position:absolute; left:8%; right:8%; bottom:-6px; height:42px; border-radius:50%; background:radial-gradient(ellipse, rgba(255,246,200,0.75), rgba(255,246,200,0) 70%); }
+.md-spot.on{ opacity:1; }
+:root:root .event-grid > .event-tile.md.art-open{ z-index:3; }
+:root:root:root.mode-daily .event-overlay.mdoor.art .event-tile.md.dim{ opacity:1; }   /* (the other doors are put in shadow by the dark wash, not see-through) */
+:root.lite .md-house, :root.lite .md-spot{ transition:opacity 0.3s ease; }
+@media (prefers-reduced-motion: reduce){ .md-house, .md-spot{ transition:opacity 0.3s ease; } }
+:root:root:root .event-grid > .event-tile.md.art-open{ z-index:4; }
+.md-spot{ z-index:3; background:linear-gradient(180deg, rgba(255,248,214,0) 0%, rgba(255,248,214,0.12) 55%, rgba(255,248,214,0.26) 100%); }
