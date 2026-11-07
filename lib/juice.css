@@ -2986,3 +2986,13 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 /* ---- Part A job 7: Time Warp - long event names fit inside their cards (flipstax.html twFitName: at most two lines, the font steps down until the picture,
    name and year tag fit). On short phones the year tag is a little smaller (28 px, was 34) so names keep a readable size. ---- */
 @media (max-width:599px) and (max-height:700px){ :root:root:root:root .event-overlay.bb-timeWarp .bb-tag{ height:28px; margin-top:1px; } :root:root:root:root .event-overlay.stack.bb-two.bb-timeWarp .bb-name{ line-height:1.02; } }
+
+/* ---- Part A job 8: Fact or Fib's gauge on the reveal - the FACT arc stays green and the FIB arc stays red (the FIB arc used to turn green on a right FIB);
+   the true side's arc brightens, the other side softens and the yellow middle arc fades out (opacity only). ---- */
+.ff-lie .fg-fact, .ff-lie .fg-mid, .ff-lie .fg-fib{ transition:opacity 0.35s ease; }
+:root:root .ff-lie .ff-gauge.lit-done .fg-fact{ stroke:#2ee57a; } :root:root .ff-lie .ff-gauge.lit-done .fg-fib{ stroke:#ff4060; }
+:root:root .ff-lie .ff-gauge.lit-done .fg-mid{ opacity:0; }
+:root:root .ff-lie .ff-gauge.lit-done.lit-fact .fg-fact, :root:root .ff-lie .ff-gauge.lit-done.lit-fib .fg-fib{ opacity:1; }
+:root:root .ff-lie .ff-gauge.lit-done.lit-fact .fg-fib, :root:root .ff-lie .ff-gauge.lit-done.lit-fib .fg-fact{ opacity:0.5; }
+:root.lite .ff-lie .fg-fact, :root.lite .ff-lie .fg-mid, :root.lite .ff-lie .fg-fib{ transition:none; }
+@media (prefers-reduced-motion: reduce){ .ff-lie .fg-fact, .ff-lie .fg-mid, .ff-lie .fg-fib{ transition:none; } }
