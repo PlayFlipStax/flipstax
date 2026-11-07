@@ -2636,3 +2636,14 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 @media (min-width:600px){ :root:root:root .plinko-board{ width:max(200px, min(100%, 760px, calc((100dvh - 430px) * 0.643))); } }
 body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); }
 @media (max-height:600px){ :root:root #finOverlay.daily-orbit .fin-plinko{ padding-bottom:calc(62px + env(safe-area-inset-bottom)); } }
+
+/* ---- run 1 job 14: Zap Words on tablets - a wider column, a bigger board, logo and HINT, and the hint row always clear of the clock bar ---- */
+@media (min-width:600px){
+  .mg-zapWords .mg-inner{ max-width:min(92vw, 760px); }
+  :root:root:root .zw-stage .zw-grid.sq{ width:min(100%, 720px, calc((100dvh - 520px) * 0.8333)); }
+  :root:root .zw-stage .zw-grid.sq .zw-cell{ font-size:clamp(36px, 6vw, 64px); }
+  .zw-stage .zw-title.zw-logo{ width:min(96%, 720px); } .zw-logo .zl-svg{ max-height:220px; }
+  :root:root .zw-stage .zw-hint{ font-size:28px; padding:14px 28px; }
+  :root:root .zw-stage .zw-foot{ margin-bottom:28px; }
+}
+.zw-stage .zw-hint{ touch-action:manipulation; }
