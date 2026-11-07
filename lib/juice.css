@@ -2961,3 +2961,6 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 
 /* ---- fix pass 3, fix 6: Zap Words - ZAP-TASTIC! sits in the band under the logo, above the letter board (placed and sized by the game), not over the letters ---- */
 :root:root .zw-bigword.band{ line-height:1; -webkit-text-stroke-width:2px; text-shadow:0 3px 0 #ff3fb5; }
+
+/* ---- fix pass 3, fix 7: Space Launch - the readout's label reads 'Altitude' (the status pill now gives the total in points) ---- */
+:root:root .sl-alt small{ font-size:11px; letter-spacing:0.8px; text-transform:none; }
