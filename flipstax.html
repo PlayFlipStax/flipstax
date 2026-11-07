@@ -5886,6 +5886,9 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     const swallow = (e)=>{ e.stopPropagation(); e.preventDefault(); };
     ['click', 'pointerdown', 'pointerup', 'touchstart'].forEach(t=> g.addEventListener(t, swallow, true));
     el.parentNode.insertBefore(g, el.nextSibling);   // (after the original: getElementById still finds the real one first)
+    // run 1 job 10: a title card's copy drops its sign, line and icon at once (0.12 s), so its fading backdrop never leaves a see-through plate over the
+    // next scene (it sat over the Mystery Wheel's lower half)
+    if (g.classList.contains('gintro') || g.classList.contains('mreveal')) g.querySelectorAll('.gi-sign, .gi-line, .gi-icon, .gi-beam, .gi-spot, .mr-inner').forEach(n=> n.animate([{ opacity:1 }, { opacity:0 }], { duration:120, fill:'forwards' }));
     const a = g.animate([{ opacity:1 }, { opacity:0 }], { duration:XFADE_OUT_MS, easing:'ease-in', fill:'forwards' });
     a.onfinish = ()=> g.remove();
     setTimeout(()=> g.remove(), XFADE_OUT_MS + 250);
@@ -11891,7 +11894,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       '<div class="lw-pop mw-pop" aria-live="polite"><b></b><small></small></div><div class="ll-slime" aria-hidden="true">' + GOOP_SVG + '</div>';
     { const tb = luckyOv.querySelector('.ll-title .sign-bulbs'); if (tb) requestAnimationFrame(()=> ringBulbs(tb, 18, 6)); }
     // (mega 5: four soft white and warm-gold beams sweep behind the wheel, with about 20 slow shimmer sparkles - lib/spotlights.js)
-    if (window.Spotlights) Spotlights.mount(luckyOv, { colors:['#ffffff', '#ffd88a'], beams:4, sparkles:20, opacity:0.16, before: luckyOv.querySelector('.ll-inner') });
+    if (window.Spotlights) Spotlights.mount(luckyOv, { colors:['#ffffff', '#ffd88a'], beams:4, sparkles:20, opacity:0.3, before: luckyOv.querySelector('.ll-inner') });
     const wheel = luckyOv.querySelector('.mw-wheel'), rotEl = luckyOv.querySelector('.mw-rot'), pointer = luckyOv.querySelector('.mw-pointer'), hub = luckyOv.querySelector('.mw-btn'), hubT = hub.querySelector('b'), pop = luckyOv.querySelector('.mw-pop');
     // the wheel sits exactly on the ring of the cover-fit stage art (recomputed on resize)
     const place = ()=>{

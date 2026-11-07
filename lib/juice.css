@@ -2622,3 +2622,8 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 :root:root .ww-logo .wl-swirl{ left:62%; top:73%; width:30%; }
 :root:root .solve-overlay.tray .ww-logo{ width:min(100%, 600px, calc(26svh * 400 / 240)); }
 @media (max-height:700px){ :root:root .solve-overlay.tray .ww-logo{ width:min(100%, calc(20svh * 400 / 240)); } }
+
+/* ---- run 1 job 10: Mystery Wheel - the title plate sits fully below the REPLAY MODE pill (test builds show the pill at the top), and the spotlight
+   beams are brighter (opacity 0.3, was 0.16; set in flipstax.html). The intro card's see-through plate over the wheel is fixed in sceneOut. ---- */
+:root.replay .lucky-overlay.mw .mw-inner{ top:calc(42px + env(safe-area-inset-top)); }
+@media (max-height:700px){ :root.replay .lucky-overlay.mw .mw-inner{ top:calc(38px + env(safe-area-inset-top)); } :root.replay .lucky-overlay.mw .ll-title{ font-size:clamp(22px, 7vw, 28px); padding:4px 14px; } }
