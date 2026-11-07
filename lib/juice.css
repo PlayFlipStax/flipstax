@@ -2602,3 +2602,8 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
   :root:root:root.mode-daily .event-overlay.has-plate.bb-emojiDecode .qz-plate{ margin-bottom:4px; }
 }
 @media (max-height:700px){ :root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt{ min-height:132px; padding-top:8px; padding-bottom:44px; font-size:clamp(52px, 11svh, 76px); } }
+
+/* run 1 job 8: Fact or Fib with Safari's toolbars showing (about 390x664 / 360x560 visible) - a smaller gauge and buzzers on short screens so the buzzers,
+   rims included, sit fully above the clock bar and are easy to tap */
+@media (max-height:700px){ .ff-lie .ff-gauge{ width:min(100%, calc(16svh * 1.5625)); } :root:root:root .ff-stage.ff-lie .ff-btn{ width:clamp(72px, 12.5svh, 110px); } :root:root .ff-stage.ff-lie .ff-bubble{ min-height:84px; } }
+@media (max-height:600px){ .ff-lie .ff-gauge{ width:min(100%, calc(14svh * 1.5625)); } :root:root:root .ff-stage.ff-lie .ff-btn{ width:clamp(66px, 12svh, 96px); font-size:20px; } .ff-lie .ff-gut{ display:none; } :root:root .ff-stage.ff-lie .ff-bubble{ min-height:72px; padding:8px 10px 10px; } }
