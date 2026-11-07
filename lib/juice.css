@@ -2763,3 +2763,14 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 @keyframes zwWord{ from{ transform:translate(-50%, -50%) scale(0.3); opacity:0; } to{ transform:translate(-50%, -50%) scale(1); opacity:1; } }
 :root.lite .zw-bigword, :root.lite .zw-pc b{ animation:none; }
 @media (prefers-reduced-motion: reduce){ .zw-bigword, .zw-pc b{ animation:none; } }
+
+/* ---- run 2 job 8: Orbit Drop - a wider play area (the instruction line goes on phones and the header is tighter, so the board, which keeps its
+   shape, can be wider; DROP and the slider still sit above the bottom bars), and the neon sign flashes softly (opacity only, under 2 a second) ---- */
+@media (max-width:599px){ :root:root .fin-plinko .pk-line{ display:none; } }
+:root:root:root:root .plinko-board{ width:max(200px, min(100%, 470px, calc((100dvh - 318px) * 0.643))); }
+@media (max-height:780px){ :root:root:root:root .plinko-board{ width:max(180px, min(100%, 430px, calc((100dvh - 262px) * 0.643))); } }
+@media (min-width:600px){ :root:root:root:root .plinko-board{ width:max(200px, min(100%, 780px, calc((100dvh - 410px) * 0.643))); } }
+:root:root .fin-plinko .pk-banner{ animation:odNeonFlash 1.5s ease-in-out infinite; }
+@keyframes odNeonFlash{ 0%, 100%{ opacity:1; } 50%{ opacity:0.72; } }
+:root.lite .fin-plinko .pk-banner{ animation:none !important; }
+@media (prefers-reduced-motion: reduce){ :root:root .fin-plinko .pk-banner{ animation:none !important; } }
