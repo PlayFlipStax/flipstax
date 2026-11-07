@@ -362,3 +362,7 @@
 :root:root .mg-zigZap .zz-grid{ --zc:min(112px, 29vw, calc((100dvh - 300px) / 3.3)); gap:10px; }
 @media (min-width:600px){ :root:root .mg-zigZap .zz-grid{ --zc:min(220px, 24vw, calc((100dvh - 420px) / 3.3)); gap:16px; } }
 .mg-zigZap .zz-cell{ touch-action:manipulation; }
+
+/* makeover job 11: Space Launch - Flip is off the screen (the corner host is hidden; his lines and scoring are unchanged) */
+.mg-spaceLaunch .nx-host{ display:none !important; }
+.mg-spaceLaunch .nx-gold, .mg-spaceLaunch button{ touch-action:manipulation; }
