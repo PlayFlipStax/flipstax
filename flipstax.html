@@ -12130,8 +12130,12 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     // makeover job 4: Emoji Decode's answer blocks are game-board panels - a numbered cover that flips away to show the answer, and a green check
     // (right) or a big red X (wrong) that shows on the result
     if (key === 'emojiDecode'){
-      const n = Math.max(0, els.eventTiles.indexOf(tileEl)) + 1;
-      tileEl.insertAdjacentHTML('beforeend', '<span class="ed-cover" aria-hidden="true"><b>' + n + '</b></span>' +
+      const n = Math.max(0, els.eventTiles.indexOf(tileEl)) + 1, L = 'ABCD'[n - 1] || String(n);
+      // fix pass 2A job 3: each answer is a flying saucer - a glass dome, a letter key A to D before the answer, rim lights on their own band under the
+      // label (they never run over the text) and a soft beam underneath
+      tileEl.insertAdjacentHTML('afterbegin', '<i class="ed-dome" aria-hidden="true"></i><i class="ed-beam" aria-hidden="true"></i><b class="ed-key" aria-hidden="true">' + L + '</b>');
+      tileEl.insertAdjacentHTML('beforeend', '<i class="ed-lights" aria-hidden="true">' + '<i></i>'.repeat(9) + '</i>');
+      tileEl.insertAdjacentHTML('beforeend', '<span class="ed-cover" aria-hidden="true"><b>' + L + '</b></span>' +
         '<span class="ed-mark ok" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M9 21 L17 29 L32 12" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>' +
         '<span class="ed-mark no" aria-hidden="true"><svg viewBox="0 0 40 40"><path d="M11 11 L29 29 M29 11 L11 29" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg></span>');
     }
@@ -12222,7 +12226,15 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       if (perfect){
         // mega 4 item 6: the shared BIG WIN CELEBRATION (lib/celebrate.js) - the banner word slams in, confetti, lasers, spotlights, the bulb chase - then on
         const word = st.game === 'emojiDecode' ? 'PERFECT DECODE!' : 'PERFECT WARP!';
-        if (window.Celebrate && !DEBUG_FAST) Celebrate.win({ word, sfx, done: ()=>{ cleanup(); done(); } });
+        if (st.game === 'emojiDecode' && !DEBUG_FAST){   // fix pass 2A job 3: a quick PERFECT DECODE! (under 3 s): the TV flashes, confetti, the word scales in with a bounce
+          const still = isLite() || prefersReducedMotion() || !Element.prototype.animate;
+          const w = document.createElement('div'); w.className = 'ed-perfect'; w.textContent = word; ov.appendChild(w); sfx.cheer(); if (sfx.solveWin) sfx.solveWin();
+          if (!still){ w.animate([{ transform:'translate(-50%,-50%) scale(0.3)', opacity:0 }, { transform:'translate(-50%,-50%) scale(1.15)', opacity:1, offset:0.6 }, { transform:'translate(-50%,-50%) scale(1)', opacity:1 }], { duration:520, easing:'ease-out', fill:'both' });
+            const fl = document.createElement('i'); fl.className = 'ed-tvflash'; els.eventPrompt.appendChild(fl); fl.animate([{ opacity:0 }, { opacity:0.85, offset:0.25 }, { opacity:0 }], { duration:500 }).onfinish = ()=> fl.remove();
+            FX.confettiBurst(showFx); setTimeout(()=> FX.confettiBurst(showFx), 900); }
+          setTimeout(()=>{ w.remove(); cleanup(); done(); }, 2600);
+        }
+        else if (window.Celebrate && !DEBUG_FAST) Celebrate.win({ word, sfx, done: ()=>{ cleanup(); done(); } });
         else { breakBanner(ov, word, 1500, true); sfx.cheer(); setTimeout(()=>{ cleanup(); done(); }, dt(1500)); }
       } else if (st.game === 'emojiDecode'){
         breakBanner(ov, right + ' of ' + N + ' decoded', 1200, false);
@@ -12252,6 +12264,14 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     });
     if (key === 'emojiDecode'){   // makeover job 4: the panels flip over one after another (0.22 s apart); lite and reduced motion: already open
       const still = isLite() || prefersReducedMotion();
+      // fix pass 2A job 3: the alien TV - a spiral galaxy turning behind (one turn in 90 s), two planets, twinkling stars, and antennae with blinking tips
+      if (!document.getElementById('edSpace')){
+        let tw = ''; for (let k = 0; k < 22; k++) tw += '<i class="es-tw" style="left:' + ((k * 41 + 5) % 96) + '%;top:' + ((k * 29 + 9) % 94) + '%;--d:' + (2.2 + (k % 4) * 0.7).toFixed(1) + 's;--dl:-' + ((k * 0.9) % 3).toFixed(1) + 's"></i>';
+        ov.insertAdjacentHTML('afterbegin', '<div id="edSpace" class="ed-space" aria-hidden="true"><i class="es-gal">' + wwGalaxySvg() + '</i>' + tw + '<i class="es-planet a"></i><i class="es-planet b"></i></div>');
+        els.eventPrompt.insertAdjacentHTML('beforebegin', '<div class="ed-ant" aria-hidden="true"><i class="l"></i><i class="r"></i></div>');
+      }
+      ov.querySelectorAll('.ed-tvflash, .ed-perfect').forEach(e=> e.remove());
+      tiles.forEach(t=> t.getAnimations && t.getAnimations().forEach(a=>{ if (!(window.CSSAnimation && a instanceof CSSAnimation) && !(window.CSSTransition && a instanceof CSSTransition)) a.cancel(); }));
       tiles.forEach((t, i)=>{ t.classList.remove('ed-flip', 'ed-open'); if (i >= n) return; if (still){ t.classList.add('ed-open'); return; } t.style.setProperty('--ed-d', (0.15 + i * 0.22).toFixed(2) + 's'); void t.offsetWidth; t.classList.add('ed-flip'); });
     }
     if (key !== 'timeWarp') hostSay(HOST_LINES[key] || def.rule, 2600);   // (Time Warp says 'Tap the earlier event' once, in its banner)
@@ -12284,7 +12304,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     const cleanup = ()=>{
       ov.classList.add('hidden'); ov.classList.remove('brainbreak', 'stack', 'bb-two', 'flash-win', 'bb-revealed', 'bb-' + key); els.eventSubtitle.classList.remove('res-win', 'res-miss'); ov.style.removeProperty('--bb');
       ov.querySelectorAll('.bb-banner, .bb-pop, .tw-leds, .tw-track, .ed-bigx').forEach(e=> e.remove());
-      tiles.forEach(t=>{ t.style.display = ''; t.classList.remove('is-right', 'is-wrong'); t.onclick = null; });
+      tiles.forEach(t=>{ t.style.display = ''; t.classList.remove('is-right', 'is-wrong'); t.onclick = null; if (t.getAnimations) t.getAnimations().forEach(a=>{ if (!(window.CSSAnimation && a instanceof CSSAnimation) && !(window.CSSTransition && a instanceof CSSTransition)) a.cancel(); }); });   // (fix pass 2A: the saucers' lift-off and drift are dropped)
     };
     const finish = ()=>{ if (st.keep && runActive){ done(cleanup); return; } cleanup(); if (runActive) done(); };   // (a part of a series hands the clean-up to the series)
     const resolve = (pick)=>{
@@ -12316,6 +12336,13 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
         if (rd.why) els.eventPrompt.textContent = rd.why;
         showFlash('win'); hostMood('cheer'); hostSay(hostLine('right')); sfx.combo(); if (key === 'priceProbe') sfx.cashRegister(); else sfx.cheer(); ov.classList.add('flash-win');
         if (right){ FX.burstAt(showFx, right, { count:12, spread:100, shapes:['star', 'coin'] }); FX.pop(right, 1.25); }
+        if (key === 'emojiDecode' && right && !isLite() && !prefersReducedMotion() && Element.prototype.animate){   // fix pass 2A job 3: the right saucer lifts off on its beam, the others drift away, the TV flashes once
+          const fl = document.createElement('i'); fl.className = 'ed-tvflash'; els.eventPrompt.appendChild(fl);
+          fl.animate([{ opacity:0 }, { opacity:0.85, offset:0.25 }, { opacity:0 }], { duration:500, easing:'ease-out' }).onfinish = ()=> fl.remove();
+          right.animate([{ transform:'translateY(0) scale(1)' }, { transform:'translateY(-6px) scale(1.06)', offset:0.35 }, { transform:'translateY(-110vh) scale(0.7)' }], { duration:1300, delay:500, easing:'cubic-bezier(.5,0,.8,.6)', fill:'forwards' });
+          tiles.forEach((t, i)=>{ if (i >= n || t === right) return; const dir = i % 2 ? 1 : -1;
+            t.animate([{ transform:'translate(0,0) rotate(0deg)', opacity:1 }, { transform:'translate(' + (dir * 70) + 'vw, ' + (10 + i * 4) + 'px) rotate(' + (dir * 14) + 'deg)', opacity:0 }], { duration:1100, delay:600 + i * 60, easing:'ease-in', fill:'forwards' }); });
+        }
         if (key === 'timeWarp' && !isLite() && !prefersReducedMotion() && Element.prototype.animate){   // makeover job 5: 12 clocks and gears blast out of the tunnel's centre and fade (1.2 s)
           const b = document.createElement('div'); b.className = 'tw-blast'; b.setAttribute('aria-hidden', 'true');
           const G = ['\u23F0', '\u2699\uFE0F', '\uD83D\uDD70\uFE0F', '\u231A', '\u2699\uFE0F', '\u23F1\uFE0F'], W = ov.clientWidth, H = ov.clientHeight;

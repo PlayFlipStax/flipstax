@@ -2492,3 +2492,88 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .solve-overlay.tray.ww-qwerty .solve-kb-key.hit::after{ opacity:1; }
 .solve-overlay.tray.ww-qwerty .solve-kb-key:active{ transform:translateY(3px) scale(0.95); }
 @media (max-height:700px){ :root:root .solve-overlay.tray.ww-qwerty .solve-kb-key{ height:clamp(38px, 7svh, 48px); } }
+
+/* ---- fix pass 2A job 3: Emoji Decode, the alien TV. A spiral galaxy turning behind (90 s a turn) with two planets and twinkling stars; the emojis on a
+   rounded CRT TV (scan lines, a glossy shine, the progress bar in its screen, two LEDs and a speaker grille) with two antennae whose tips blink slowly;
+   the four answers are flying saucers (orange, pink, green, blue) with glass domes, letter keys A-D, rim lights chasing on their own band under the
+   label, a soft beam underneath, bobbing gently. Transform and opacity only; lite and reduced motion: all still. ---- */
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode{ background:radial-gradient(ellipse at 50% 40%, #2a1470 0%, #120838 60%, #070320 100%) !important; isolation:isolate; }
+.bb-emojiDecode .ed-fx, .bb-emojiDecode .bb-marquee{ display:none !important; }
+.ed-space, .ed-ant{ display:none; }
+.event-overlay.bb-emojiDecode .ed-space{ display:block; position:absolute; inset:0; z-index:-1; overflow:hidden; pointer-events:none; }
+.ed-space > i{ position:absolute; display:block; }
+.ed-space .es-gal{ left:50%; top:50%; width:118vmax; height:118vmax; margin:-59vmax 0 0 -59vmax; opacity:0.85; animation:wwGalTurn 90s linear infinite; will-change:transform; }
+.ed-space .es-gal svg{ display:block; width:100%; height:100%; }
+.ed-space .es-tw{ width:3px; height:3px; margin:-1.5px; border-radius:50%; background:#fff; animation:wkTw var(--d) ease-in-out var(--dl) infinite alternate; }
+.ed-space .es-planet{ border-radius:50%; }
+.ed-space .es-planet.a{ left:-9%; top:64%; width:clamp(70px, 24vw, 200px); aspect-ratio:1; background:radial-gradient(circle at 60% 35%, #bff8ff 0%, #3aa8d8 50%, #0e3a6a 100%); }
+.ed-space .es-planet.b{ right:-6%; top:74%; width:clamp(50px, 16vw, 140px); aspect-ratio:1; background:radial-gradient(circle at 40% 35%, #ffd0f2 0%, #e84aa8 55%, #6a0a4a 100%); }
+/* the antennae */
+.event-overlay.bb-emojiDecode .ed-ant{ display:block; position:relative; flex:none; align-self:center; width:min(56%, 280px); height:clamp(30px, 5svh, 56px); margin-bottom:-4px; z-index:1; }
+.ed-ant i{ position:absolute; bottom:0; left:50%; width:3px; height:100%; background:linear-gradient(180deg, #c8cfe0, #6a7290); transform-origin:50% 100%; }
+.ed-ant i.l{ transform:rotate(-34deg); } .ed-ant i.r{ transform:rotate(34deg); }
+.ed-ant i::after{ content:''; position:absolute; left:50%; top:-7px; width:12px; height:12px; margin-left:-6px; border-radius:50%; background:radial-gradient(circle, #ffffff 0%, #ff4fc4 55%, #a0106e 100%); box-shadow:0 0 10px 3px rgba(255,79,196,0.75); animation:edTip 1.6s ease-in-out infinite alternate; }
+.ed-ant i.r::after{ background:radial-gradient(circle, #ffffff 0%, #5ff4ff 55%, #0a6a8a 100%); box-shadow:0 0 10px 3px rgba(95,244,255,0.75); animation-delay:-0.8s; }
+@keyframes edTip{ from{ opacity:0.35; } to{ opacity:1; } }
+/* the TV */
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt{ position:relative; isolation:isolate; overflow:hidden; width:min(86%, 520px); align-self:center; box-sizing:border-box; padding:clamp(18px, 3svh, 30px) 20px calc(clamp(18px, 3svh, 30px) + 36px); min-height:clamp(150px, 24svh, 300px);
+  border-radius:34px; border:0; outline:0; background:linear-gradient(180deg, #d4dae8 0%, #9aa3bd 55%, #6c7590 100%); box-shadow:inset 0 2px 0 rgba(255,255,255,0.7), inset 0 -4px 0 rgba(0,0,0,0.25), 0 10px 0 #3a3f58, 0 14px 22px rgba(0,0,0,0.5); text-shadow:none; animation:none; }
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt::before{ display:block !important; content:''; position:absolute; left:12px; right:12px; top:12px; bottom:40px; z-index:-1; border-radius:24px / 30px;
+  background:repeating-linear-gradient(180deg, rgba(255,255,255,0.06) 0 2px, rgba(0,0,0,0) 2px 4px), radial-gradient(ellipse at 50% 45%, #2a9a9a 0%, #0f5a64 60%, #082c36 100%); box-shadow:inset 0 0 0 4px #1a1e30, inset 0 0 24px rgba(0,0,0,0.6); }
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt::after{ display:block !important; content:''; position:absolute; left:18%; right:18%; top:16px; height:28%; z-index:2; border-radius:40% / 60%; background:linear-gradient(180deg, rgba(255,255,255,0.28), rgba(255,255,255,0)); pointer-events:none; }
+.bb-emojiDecode .event-prompt .ed-tvflash{ position:absolute; inset:12px 12px 40px; z-index:3; border-radius:24px; background:#ffffff; opacity:0; pointer-events:none; }
+/* the LEDs and the speaker grille on the TV's bottom edge, and the progress bar in the screen */
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt{ background-image:radial-gradient(circle, #ff4fc4 0 5px, rgba(0,0,0,0) 5.5px), radial-gradient(circle, #5ff4ff 0 5px, rgba(0,0,0,0) 5.5px), repeating-linear-gradient(90deg, #3a3f58 0 2px, rgba(0,0,0,0) 2px 5px), linear-gradient(180deg, #d4dae8 0%, #9aa3bd 55%, #6c7590 100%);
+  background-size:12px 12px, 12px 12px, 60px 10px, 100% 100%; background-position:28px calc(100% - 14px), 50px calc(100% - 14px), calc(100% - 28px) calc(100% - 15px), 0 0; background-repeat:no-repeat; }
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-timerbar{ position:relative; z-index:3; width:min(56%, 340px); align-self:center; margin:calc(-40px - 22px) auto 40px; height:10px; border-radius:6px; background:rgba(0,0,0,0.45); border:0; box-shadow:none; }
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-timerbar-fill{ background:linear-gradient(90deg, #fff6c2, #ffe27a); border-radius:6px; }
+/* the saucers */
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-grid{ gap:clamp(26px, 4.4svh, 46px); padding-top:clamp(14px, 2.4svh, 26px); }
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile{ position:relative; overflow:visible; isolation:isolate; min-height:clamp(58px, 8.6svh, 110px); height:auto; padding:0 15% 3% 15%; border-radius:50% / 50%; border:3px solid rgba(255,255,255,0.9);
+  background:radial-gradient(ellipse at 50% 30%, var(--s1) 0%, var(--s2) 55%, var(--s3) 100%) !important; box-shadow:0 6px 0 var(--s3), 0 10px 16px rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; gap:10px;
+  animation:none; translate:0 0; touch-action:manipulation; }
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(1){ --s1:#ffd08a; --s2:#ff8a1f; --s3:#8a3a00; --sl:#ff8a1f; }
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(2){ --s1:#ffc2ec; --s2:#ff3fb5; --s3:#7a0a4a; --sl:#ff3fb5; }
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(3){ --s1:#c8ffd2; --s2:#2ed866; --s3:#0a5a2a; --sl:#2ed866; }
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(4){ --s1:#c8e0ff; --s2:#4a7cff; --s3:#1a2a7a; --sl:#4a7cff; }
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(n){ color:#ffffff; text-shadow:0 2px 0 rgba(0,0,0,0.45); font-size:clamp(22px, 6.8vw, 44px); letter-spacing:1px; }
+.bb-emojiDecode .event-tile .bb-name{ position:relative; z-index:2; margin-bottom:6%; }
+.ed-key, .ed-dome, .ed-beam, .ed-lights{ display:none; }
+.bb-emojiDecode .event-tile .ed-key{ display:block; position:relative; z-index:2; margin-bottom:6%; font:900 1em/1 var(--f-display, sans-serif); color:#fff6c2; }
+.bb-emojiDecode .event-tile .ed-dome{ display:block; position:absolute; left:33%; right:33%; top:-46%; height:62%; z-index:-1; border-radius:50% 50% 12% 12% / 90% 90% 12% 12%;
+  background:radial-gradient(ellipse at 40% 30%, rgba(255,255,255,0.85) 0%, rgba(200,240,255,0.55) 30%, rgba(120,190,230,0.35) 70%); border:2px solid rgba(255,255,255,0.7); }
+.bb-emojiDecode .event-tile .ed-beam{ display:block; position:absolute; left:24%; right:24%; top:96%; height:70%; z-index:-2; clip-path:polygon(18% 0, 82% 0, 100% 100%, 0 100%); background:linear-gradient(180deg, var(--sl), rgba(255,255,255,0)); opacity:0.32; }
+.bb-emojiDecode .event-tile .ed-lights{ display:flex; position:absolute; left:14%; right:14%; bottom:9%; height:8px; justify-content:space-between; z-index:1; pointer-events:none; }
+.ed-lights i{ width:clamp(5px, 1.6vw, 9px); height:clamp(5px, 1.6vw, 9px); border-radius:50%; background:#fff6c2; opacity:0.35; animation:edChase 1.35s ease-in-out infinite; }
+.ed-lights i:nth-child(1){ animation-delay:0s; } .ed-lights i:nth-child(2){ animation-delay:0.15s; } .ed-lights i:nth-child(3){ animation-delay:0.3s; } .ed-lights i:nth-child(4){ animation-delay:0.45s; } .ed-lights i:nth-child(5){ animation-delay:0.6s; }
+.ed-lights i:nth-child(6){ animation-delay:0.75s; } .ed-lights i:nth-child(7){ animation-delay:0.9s; } .ed-lights i:nth-child(8){ animation-delay:1.05s; } .ed-lights i:nth-child(9){ animation-delay:1.2s; }
+@keyframes edChase{ 0%, 100%{ opacity:0.3; } 30%{ opacity:1; } }
+/* the bob: the individual translate property, so it never fights the flip-in or the lift-off */
+.bb-emojiDecode .event-tile.ed-flip, .bb-emojiDecode .event-tile.ed-open{ }
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode:not(.bb-revealed) .event-tile{ animation-name:edFlip, edBob; animation-duration:0.5s, 2.8s; animation-timing-function:ease-in-out, ease-in-out; animation-iteration-count:1, infinite; animation-direction:normal, alternate; animation-fill-mode:both, none; animation-delay:var(--ed-d, 0s), calc(var(--ed-d, 0s) + 0.6s); }
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode:not(.bb-revealed) .event-tile:not(.ed-flip){ animation-name:none, edBob; }
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(2){ --bob:-0.7s; } :root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(3){ --bob:-1.4s; }
+@keyframes edBob{ from{ translate:0 -3px; } to{ translate:0 4px; } }
+/* the cover (before the flip): a dark saucer with its letter */
+:root:root:root .bb-emojiDecode .event-tile .ed-cover{ inset:-3px; border-radius:50% / 50%; background:radial-gradient(ellipse at 50% 30%, #4a5a8a, #1a2050 70%); border:3px solid rgba(255,255,255,0.9); }
+:root:root:root .bb-emojiDecode .event-tile .ed-cover b{ background:none; border:0; min-width:0; height:auto; font-size:clamp(26px, 7vw, 44px); color:#fff6c2; }
+/* the results: keep the green check and red X; the mark sits at the saucer's right end, clear of the text */
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.is-right{ border-color:#7dff9a; box-shadow:0 0 0 4px #1fae4e, 0 0 22px 6px rgba(93,255,138,0.75), 0 6px 0 var(--s3); }
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.is-wrong{ --s1:#ff9aa8; --s2:#e01e44; --s3:#5a0414; }
+:root:root:root .bb-emojiDecode .event-tile .ed-mark{ right:3%; top:50%; margin-top:-24px; width:42px; height:42px; }
+.ed-perfect{ position:absolute; left:50%; top:30%; z-index:40; transform:translate(-50%, -50%); white-space:nowrap; pointer-events:none; font:900 clamp(40px, 12vw, 96px)/1 var(--f-display, sans-serif); color:#ffffff; -webkit-text-stroke:3px #14286e; paint-order:stroke fill; text-shadow:0 6px 0 #ff4fb4; }
+:root.lite .ed-space *, :root.lite .ed-ant i::after, :root.lite .ed-lights i, :root.lite.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile{ animation:none !important; }
+:root.lite .ed-lights i{ opacity:0.85; }
+@media (prefers-reduced-motion: reduce){ .ed-space *, .ed-ant i::after, .ed-lights i, :root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile{ animation:none !important; } .ed-lights i{ opacity:0.85; } }
+@media (max-height:700px){ :root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt{ min-height:120px; padding-top:14px; } :root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-grid{ gap:24px; } .event-overlay.bb-emojiDecode .ed-ant{ height:24px; } }
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt::before{ height:auto; width:auto; opacity:1; transform:none; animation:none; margin:0; }
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt::after{ width:auto; opacity:1; transform:none; animation:none; margin:0; bottom:auto; }
+/* fit: a smaller TV and saucers on phones so all four saucers clear the bottom; the letter key sits beside the answer */
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt{ min-height:clamp(120px, 19svh, 260px); padding-top:clamp(12px, 2svh, 24px); }
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile{ flex-direction:row; min-height:clamp(52px, 7.4svh, 100px); flex:0 0 auto; }
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-grid{ gap:clamp(22px, 3.6svh, 40px); padding-top:clamp(12px, 2svh, 22px); flex:0 0 auto; }
+.bb-emojiDecode .event-tile .ed-dome{ top:-40%; height:52%; }
+.bb-emojiDecode .event-tile .bb-name, .bb-emojiDecode .event-tile .ed-key{ margin-bottom:0; margin-top:4%; }
+:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile{ min-height:clamp(56px, 8svh, 104px); padding-bottom:4%; }
+:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt{ font-size:clamp(44px, 8.4svh, 96px); line-height:1.05; white-space:nowrap; }
+.ed-perfect{ top:60%; }   /* (in the space the saucers left, clear of the TV) */
