@@ -2964,3 +2964,11 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 
 /* ---- fix pass 3, fix 7: Space Launch - the readout's label reads 'Altitude' (the status pill now gives the total in points) ---- */
 :root:root .sl-alt small{ font-size:11px; letter-spacing:0.8px; text-transform:none; }
+
+/* ---- Part A job 4: Mystery Wheel - a full-width stage. When the stage art (tied to the wheel's size) is narrower than the screen, the whole screen gets a
+   warm dark backdrop in the art's own tones and the art's side edges fade into it, so there are no black bars; the floor under the podium may run off the
+   bottom so the wheel is as large as fits (flipstax.html place()). ---- */
+:root:root .lucky-overlay.mw.mw-wide{ background:radial-gradient(70% 55% at 50% 36%, #3b2e22 0%, #241b14 45%, #0d0907 80%, #060406 100%) !important; }
+:root:root .lucky-overlay.mw.mw-wide .mw-bg{
+  -webkit-mask-image:linear-gradient(180deg, transparent, #000 14%), linear-gradient(90deg, transparent 0%, #000 13%, #000 87%, transparent 100%);
+  -webkit-mask-composite:source-in; mask-image:linear-gradient(180deg, transparent, #000 14%), linear-gradient(90deg, transparent 0%, #000 13%, #000 87%, transparent 100%); mask-composite:intersect; }
