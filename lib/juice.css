@@ -2854,3 +2854,39 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root:root .zz-set.party .zs-wall i{ animation:zsChase 0.6s linear calc(var(--k) * 0.035s) 6; }
 :root.lite .zz-set .zs-wall i{ animation:none !important; opacity:0.55; }
 @media (prefers-reduced-motion: reduce){ .zz-set .zs-wall i{ animation:none !important; opacity:0.55; } }
+
+/* ---- run 2 job 11: Space Launch ----
+   (a) a taller rocket screen: the status pill moves down into the score row (beside the score), LAUNCH! sits at the bottom of the play area (same size),
+   and the scene takes the space; on tablets the scene is no longer capped at 62% of the screen. */
+:root:root .nx-sl .mg-foot{ display:flex; align-items:center; gap:10px; }
+:root:root .nx-sl .mg-foot .nx-panel{ flex:1 1 auto; width:auto; max-width:420px; min-height:38px; margin:0; padding-top:4px; padding-bottom:4px; }
+:root:root .nx-sl .mg-foot .nx-panel .sc-msg{ font-size:clamp(15px, 4.4vw, 26px); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+:root:root .nx-sl .sl-go{ margin-top:10px; margin-bottom:2px; }
+@media (min-width:600px){ :root:root .nx-sl .sl-wrap{ max-height:none; max-width:720px; } }
+/* (b) the altitude readout and the space layer the rocket climbs into */
+.sl-alt{ position:absolute; left:8px; top:8px; z-index:5; display:flex; flex-direction:column; align-items:flex-start; padding:4px 10px 5px; border-radius:10px; pointer-events:none;
+  background:rgba(6,4,30,0.72); border:2px solid rgba(39,230,255,0.7); font-variant-numeric:tabular-nums; }
+.sl-alt small{ font:800 10px/1 var(--f-display); letter-spacing:1.5px; color:#7ff3ff; }
+.sl-alt b{ font:900 clamp(16px, 4.6vw, 30px)/1.05 var(--f-display); color:#fff4d6; }
+.sl-space{ position:absolute; inset:0; z-index:1; opacity:0; pointer-events:none;
+  background:radial-gradient(1.6px 1.6px at 14% 18%, #fff 55%, transparent), radial-gradient(1.2px 1.2px at 72% 12%, #fff 55%, transparent), radial-gradient(2px 2px at 44% 40%, #fff 55%, transparent),
+    radial-gradient(1.4px 1.4px at 86% 52%, #fff 55%, transparent), radial-gradient(1.8px 1.8px at 24% 66%, #fff 55%, transparent), radial-gradient(1.2px 1.2px at 60% 78%, #fff 55%, transparent),
+    radial-gradient(1.4px 1.4px at 34% 88%, #fff 55%, transparent), radial-gradient(70% 50% at 70% 30%, rgba(122,60,255,0.35), transparent 70%), linear-gradient(180deg, #02020e, #0a0630 70%, #160a48); }
+.sl-scene.to-space .sl-alt{ border-color:#ffe27a; }
+/* (c) the clouds drift at their own depths (parallax), the stars twinkle, and a ring of lights round the screen chases (opacity, one step every 0.4 s) */
+.sl-cloud{ animation:slDrift 16s ease-in-out infinite alternate; }
+.sl-cloud.c2{ animation-duration:24s; animation-delay:-6s; } .sl-cloud.c3{ animation-duration:32s; animation-delay:-12s; }
+@keyframes slDrift{ from{ transform:translateX(-14%); } to{ transform:translateX(14%); } }
+.sl-par.far .sl-stars{ animation:slTwinkle 3.4s ease-in-out infinite alternate; }
+@keyframes slTwinkle{ from{ opacity:0.55; } to{ opacity:1; } }
+.sl-perim{ position:absolute; inset:3px; z-index:6; pointer-events:none; }
+.sl-perim i{ position:absolute; inset:0; --s:18px; --d:3px; opacity:0.3; animation:slPerim 1.2s steps(1) infinite;
+  background:
+    radial-gradient(circle, #ffe27a 0 var(--d), rgba(0,0,0,0) calc(var(--d) + 1.2px)) var(--o, 0) 0 / var(--s) var(--s) repeat-x,
+    radial-gradient(circle, #ffe27a 0 var(--d), rgba(0,0,0,0) calc(var(--d) + 1.2px)) var(--o, 0) 100% / var(--s) var(--s) repeat-x,
+    radial-gradient(circle, #ff8ad0 0 var(--d), rgba(0,0,0,0) calc(var(--d) + 1.2px)) 0 var(--o, 0) / var(--s) var(--s) repeat-y,
+    radial-gradient(circle, #ff8ad0 0 var(--d), rgba(0,0,0,0) calc(var(--d) + 1.2px)) 100% var(--o, 0) / var(--s) var(--s) repeat-y; }
+.sl-perim i:nth-child(2){ --o:6px; animation-delay:-0.4s; } .sl-perim i:nth-child(3){ --o:12px; animation-delay:-0.8s; }
+@keyframes slPerim{ 0%{ opacity:1; } 33.34%, 100%{ opacity:0.3; } }
+:root.lite .sl-cloud, :root.lite .sl-par.far .sl-stars, :root.lite .sl-perim i{ animation:none; } :root.lite .sl-perim i{ opacity:0.8; }
+@media (prefers-reduced-motion: reduce){ .sl-cloud, .sl-par.far .sl-stars, .sl-perim i{ animation:none; } .sl-perim i{ opacity:0.8; } }
