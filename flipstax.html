@@ -13508,8 +13508,10 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       // mega 4 item 6: the top results get the shared BIG WIN CELEBRATION - a perfect run (the first six Brain Beams all right) or a solved Riddle Round;
       // any other right answer gets the small one from the answer
       if (window.Celebrate && !DEBUG_FAST){
-        if (runPerfect && runTriviaAttempted === RUN_WORD_LENGTH) Celebrate.win({ word:'PERFECT RUN!', wordTop:'28%' });
-        else if (runQuizMystery) Celebrate.win({ word:'RIDDLE SOLVED!', wordTop:'28%' });
+        // run 1 job 18: while the big word is up, the result line under it (CORRECT! +10 POINTS) fades out, so the two never overlap; it comes back after
+        const hush = ()=>{ const pr = els.eventPrompt; if (!pr.animate) return ()=>{}; const a = pr.animate([{ opacity:1 }, { opacity:0 }], { duration:250, fill:'forwards' }); return ()=>{ try{ a.cancel(); }catch(e){} }; };
+        if (runPerfect && runTriviaAttempted === RUN_WORD_LENGTH){ const back = hush(); Celebrate.win({ word:'PERFECT RUN!', wordTop:'28%', done: back }); }
+        else if (runQuizMystery){ const back = hush(); Celebrate.win({ word:'RIDDLE SOLVED!', wordTop:'28%', done: back }); }
         else Celebrate.small(els.eventTiles[runPendingQCorrectIdx]);
       }
       els.eventSubtitle.textContent = bannerParts.join(' \u00b7 ');
