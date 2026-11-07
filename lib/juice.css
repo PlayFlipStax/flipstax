@@ -2627,3 +2627,12 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
    beams are brighter (opacity 0.3, was 0.16; set in flipstax.html). The intro card's see-through plate over the wheel is fixed in sceneOut. ---- */
 :root.replay .lucky-overlay.mw .mw-inner{ top:calc(42px + env(safe-area-inset-top)); }
 @media (max-height:700px){ :root.replay .lucky-overlay.mw .mw-inner{ top:calc(38px + env(safe-area-inset-top)); } :root.replay .lucky-overlay.mw .ll-title{ font-size:clamp(22px, 7vw, 28px); padding:4px 14px; } }
+
+/* ---- run 1 job 11: Orbit Drop - the DROP button and the slider stay fully above the bottom edge (the safe area, Safari's toolbar, the TEST bar and
+   the TEST button): the stage keeps 52 px clear at the bottom and the board is a little smaller; the round ? badge rides above the TEST banner. ---- */
+:root:root #finOverlay.daily-orbit .fin-plinko{ padding-bottom:calc(52px + env(safe-area-inset-bottom)); box-sizing:border-box; }
+:root:root:root .plinko-board{ width:max(200px, min(100%, 460px, calc((100dvh - 372px) * 0.643))); }
+@media (max-height:780px){ :root:root:root .plinko-board{ width:max(180px, min(100%, 420px, calc((100dvh - 312px) * 0.643))); } }
+@media (min-width:600px){ :root:root:root .plinko-board{ width:max(200px, min(100%, 760px, calc((100dvh - 430px) * 0.643))); } }
+body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); }
+@media (max-height:600px){ :root:root #finOverlay.daily-orbit .fin-plinko{ padding-bottom:calc(62px + env(safe-area-inset-bottom)); } }
