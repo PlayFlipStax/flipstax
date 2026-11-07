@@ -4852,7 +4852,7 @@
     <div class="fin-buttons"><div class="daily-btn primary fin-go" id="finToPlinko" role="button" tabindex="0"></div></div>
   </div>
   <div class="fin-stage fin-plinko hidden" id="finPlinko">
-    <div class="pk-banner" id="pkBanner">ORBIT DROP</div>
+    <div class="pk-banner" id="pkBanner">ORBIT <span class="nd">DROP</span></div>
     <div class="pk-line" id="pkLine">Slide to aim, then tap DROP! Every chip pays.</div>
     <div class="pk-status"><span class="pk-run" id="pkRunScore"></span><span class="pk-chipno" id="pkChipNo"></span><span class="pk-bonus">Bonus <b id="pkBonus">+0</b></span></div>
     <div class="plinko-board show-flash" id="plinkoBoard" role="slider" tabindex="0" aria-label="Aim the UFO: left and right arrows, Enter to drop" aria-valuemin="0" aria-valuemax="100">
@@ -14680,7 +14680,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     els.finOverlay.classList.remove('hidden');
     updatePauseBtnVisibility();
     finTapShieldAt = performance.now(); startFinSky();
-    document.getElementById('pkBanner').textContent = 'ORBIT DROP';
+    document.getElementById('pkBanner').innerHTML = 'ORBIT <span class="nd">DROP</span>';
     document.getElementById('pkLine').textContent = line;
     renderPlinko();   // (the board is up under the host's intro, so an early tap never meets a blank one)
     hostIntro('orbitDrop', ()=>{ if (dailyOrbit === o && !o.dropped) renderPlinko(); });   // (not once a chip is already in the air)
