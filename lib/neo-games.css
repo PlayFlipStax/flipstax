@@ -408,3 +408,4 @@
 
 /* run 1 job 15: ZiG's STEAL IT! badge sits inside the question card's top-right corner (beside FLIP'S QUESTION), no longer over the instruction line */
 :root:root .zz-stealb{ left:auto; right:10px; top:8px; transform:rotate(-4deg); padding:4px 12px; font-size:clamp(17px, 5vw, 24px); }
+@media (max-height:700px){ :root:root:root .mg-zigZap .zz-grid{ --zc:min(112px, 29vw, calc((100dvh - 330px) / 3.3)); } }   /* (run 2: room for the neon sign on short screens) */
