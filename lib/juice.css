@@ -2647,3 +2647,13 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
   :root:root .zw-stage .zw-foot{ margin-bottom:28px; }
 }
 .zw-stage .zw-hint{ touch-action:manipulation; }
+
+/* ---- run 1 job 17: Twin Flip - a bright, readable marquee title (warm white letters with a gold glow and a dark edge), a bigger sign set higher, and a
+   slightly bigger board moved up (the rule line above it is dropped; the sign says what to do) ---- */
+.mg-twinFlip .mg-rule{ display:none !important; }
+.mg-twinFlip .mg-head{ margin-top:0 !important; }
+:root:root:root .tf-stage .tf-title{ margin:0 auto 6px; padding:9px 26px; transform:scale(1.08); transform-origin:50% 0; }
+:root:root:root .tf-stage .tf-title span{ color:#fff8dc; -webkit-text-stroke:0; text-shadow:0 2px 0 #5a2a00, 0 0 8px rgba(255,214,90,0.95), 0 0 18px rgba(255,190,40,0.7); font-size:clamp(30px, 9.6vw, 44px); letter-spacing:3px; }
+.tf-stage.tf-stage.tf-stage.tf-stage .tf-grid{ width:min(100%, 900px, calc((100dvh - 200px) * 0.77)); }
+@media (max-height:700px){ .tf-stage.tf-stage.tf-stage.tf-stage .tf-grid{ width:min(100%, 900px, calc((100dvh - 214px) * 0.77)); } }
+@media (min-width:600px){ :root:root:root .tf-stage .tf-title span{ font-size:clamp(44px, 7vw, 72px); } }
