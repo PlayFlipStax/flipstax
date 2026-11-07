@@ -2587,3 +2587,18 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 .cbr-brand{ white-space:pre-line; }
 :root:root .cbr-ad.car .cbr-brand{ -webkit-text-stroke:0; color:#ffffff; text-shadow:0 3px 0 #2a0a5a; font-size:clamp(34px, 10vw, 80px); line-height:0.95; }
 @media (max-height:700px){ :root:root .cbr-tv{ bottom:calc(112px + env(safe-area-inset-bottom)); } :root:root:root .show-card.cbr .cbr-skip{ bottom:calc(58px + env(safe-area-inset-bottom)); min-height:46px; } }
+
+/* ---- run 1 job 7: Emoji Decode touch-ups - the red X at about 40% of its size and gone after about 1 s (so it never hides the saucers), the emojis
+   on the TV about 40% larger, and on short screens (360x640) smaller saucers so all four clear the hint and TEST bars ---- */
+:root:root .ed-bigx{ width:min(28vw, 25vh, 184px); margin:calc(min(28vw, 25vh, 184px) / -2) 0 0 calc(min(28vw, 25vh, 184px) / -2); top:38%; animation:edBigX2 1s ease-out both; }
+@keyframes edBigX2{ 0%{ transform:scale(0.3); opacity:0; } 15%{ transform:scale(1.1); opacity:1; } 25%{ transform:scale(1); } 65%{ opacity:1; } 100%{ opacity:0; transform:scale(1); } }
+:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt{ font-size:clamp(56px, min(11.8svh, 24vw), 134px); letter-spacing:0; }
+@media (max-height:700px){
+  :root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile{ min-height:44px; }
+  :root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-grid{ gap:18px; padding-top:10px; }
+  :root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(n){ font-size:clamp(18px, 5.6vw, 24px); }
+  :root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt{ min-height:104px; padding-top:10px; padding-bottom:40px; }
+  .event-overlay.bb-emojiDecode .ed-ant{ height:18px; }
+  :root:root:root.mode-daily .event-overlay.has-plate.bb-emojiDecode .qz-plate{ margin-bottom:4px; }
+}
+@media (max-height:700px){ :root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt{ min-height:132px; padding-top:8px; padding-bottom:44px; font-size:clamp(52px, 11svh, 76px); } }
