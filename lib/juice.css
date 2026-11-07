@@ -2952,3 +2952,9 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
   /* (the cards' 38 px of padding toward the VS badge, which sits at the right edge, is evened to 8 px, and the year tag is 48 px tall, was 56, so all three fit) */
   :root:root:root:root:root:root .event-overlay.stack.bb-two.bb-timeWarp .event-tile{ padding-top:8px; padding-bottom:8px; }
   :root:root:root:root:root:root .event-overlay.bb-timeWarp .bb-tag{ height:48px; } }
+
+/* ---- fix pass 3, fix 4: ZiG Zap ZaBam! - ZaBAM! stays fully opaque: the two flashes (which dimmed it to 35%) become two quick pulses in size (transform only) ---- */
+:root:root .zz-bigword{ opacity:1; animation:zzWordIn 0.45s cubic-bezier(.2,1.5,.4,1) both, zzWordPulse 1.2s ease-in-out 0.6s 1 both; }
+@keyframes zzWordPulse{ 0%, 50%, 100%{ transform:translate(-50%, -50%) scale(1); } 25%, 75%{ transform:translate(-50%, -50%) scale(1.12); } }
+:root.lite .zz-bigword, :root:root .zz-bigword.still{ animation:none; opacity:1; }
+@media (prefers-reduced-motion: reduce){ :root:root .zz-bigword{ animation:none; } }
