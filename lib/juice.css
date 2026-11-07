@@ -2734,3 +2734,16 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 @media (prefers-reduced-motion: reduce){ .md-house, .md-spot{ transition:opacity 0.3s ease; } }
 :root:root:root .event-grid > .event-tile.md.art-open{ z-index:4; }
 .md-spot{ z-index:3; background:linear-gradient(180deg, rgba(255,248,214,0) 0%, rgba(255,248,214,0.12) 55%, rgba(255,248,214,0.26) 100%); }
+
+/* ---- run 2 job 5: backgrounds. The Mystery Wheel: a gentle shimmer of small twinkling sparkles (opacity only) besides the beams. The Riddle Round: a
+   slowly turning sunburst of lighter-green rays (a layer larger than the screen, one turn a minute) under the floating question marks.
+   Lite and reduced motion: still. ---- */
+.mw-shimmer{ position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
+.mw-shimmer i{ position:absolute; width:calc(6px * var(--z)); height:calc(6px * var(--z)); border-radius:50%; background:radial-gradient(circle, #ffffff 0 30%, rgba(255,232,170,0.7) 50%, rgba(255,232,170,0) 72%); opacity:0.15; animation:mwShim var(--d) ease-in-out var(--dl) infinite alternate; }
+@keyframes mwShim{ from{ opacity:0.1; } to{ opacity:0.9; } }
+.rd-sky::before{ content:''; position:absolute; left:50%; top:40%; width:170vmax; height:170vmax; margin:-85vmax 0 0 -85vmax; pointer-events:none;
+  background:repeating-conic-gradient(from 0deg, rgba(220,255,190,0.34) 0deg 8deg, rgba(220,255,190,0) 8deg 20deg); animation:rdRays 60s linear infinite; will-change:transform; }
+@keyframes rdRays{ to{ transform:rotate(360deg); } }
+:root.lite .mw-shimmer i, :root.lite .rd-sky::before{ animation:none; } :root.lite .mw-shimmer i{ opacity:0.5; }
+@media (prefers-reduced-motion: reduce){ .mw-shimmer i, .rd-sky::before{ animation:none; } .mw-shimmer i{ opacity:0.5; } }
+.paused .mw-shimmer i, .paused .rd-sky::before, :root.tab-hidden .rd-sky::before{ animation-play-state:paused; }
