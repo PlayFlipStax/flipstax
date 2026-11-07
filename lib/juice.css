@@ -2685,3 +2685,11 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 @media (max-width:599px){ :root:root:root:root:root .event-overlay.stack.bb-two.bb-timeWarp .bb-glyph{ font-size:clamp(36px, 5.6svh, 80px); } }
 @media (max-height:700px){ :root:root:root:root .event-overlay.stack.bb-timeWarp .bb-name{ font-size:clamp(20px, 6vw, 24px); } }
 @media (max-height:700px){ :root:root:root:root:root .event-overlay.stack.bb-timeWarp .bb-name{ font-size:clamp(18px, 5.4vw, 22px); } }
+
+/* ---- run 1 job 21: Crowd Showdown - the white result plate under a picked card never shows empty (... until the vote count arrives), and each card has
+   its own light colours: yellow bulbs round the top card, orange round the bottom one ---- */
+.half.revealed .votes-n:empty::before{ content:'...'; letter-spacing:2px; }
+:root:root .mq-ring.top .mq.mq-a{ --bulb:#ffd23f; --bulb-hi:#fffbe0; } :root:root .mq-ring.top .mq.mq-b{ --bulb:#ffe866; --bulb-hi:#fffde8; }
+:root:root .mq-ring.bottom .mq.mq-a{ --bulb:#ff8a1f; --bulb-hi:#fff0dc; } :root:root .mq-ring.bottom .mq.mq-b{ --bulb:#ffa64d; --bulb-hi:#fff4e6; }
+.half.revealed .votes-n:empty{ opacity:0.75; transition:none; }
+:root:root .mq-ring.bottom .mq.mq-a{ --bulb-hi:#ffd6a8; } :root:root .mq-ring.bottom .mq.mq-b{ --bulb-hi:#ffe0b8; }

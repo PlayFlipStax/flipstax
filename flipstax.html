@@ -18421,8 +18421,9 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     clearTimeout(celebrateTriviaCorrect._t);
     celebrateTriviaCorrect._t = setTimeout(()=> el.classList.add('hidden'), 1000);
   }
-  els.halfA.addEventListener('click', ()=>{ sfx.vsTick(); playTrack(gameTrackKey()); tapFeedback(els.halfA, els.halfB); vote('A'); });
-  els.halfB.addEventListener('click', ()=>{ sfx.vsTick(); playTrack(gameTrackKey()); tapFeedback(els.halfB, els.halfA); vote('B'); });
+  // (run 1 job 21: the top card and the bottom card each have their own sound - the tick plus a bright C6 chime on top, a lower G#5 chime below)
+  els.halfA.addEventListener('click', ()=>{ sfx.vsTick(); if (sfx.tap) sfx.tap('top'); playTrack(gameTrackKey()); tapFeedback(els.halfA, els.halfB); vote('A'); });
+  els.halfB.addEventListener('click', ()=>{ sfx.vsTick(); if (sfx.tap) sfx.tap('bottom'); playTrack(gameTrackKey()); tapFeedback(els.halfB, els.halfA); vote('B'); });
   document.addEventListener('keydown', (e)=>{
     // Typing "1"/"2" into a riddle answer box is not a vote.
     if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
