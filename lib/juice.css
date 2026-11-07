@@ -2774,3 +2774,28 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 @keyframes odNeonFlash{ 0%, 100%{ opacity:1; } 50%{ opacity:0.72; } }
 :root.lite .fin-plinko .pk-banner{ animation:none !important; }
 @media (prefers-reduced-motion: reduce){ :root:root .fin-plinko .pk-banner{ animation:none !important; } }
+
+/* ---- run 2 job 9: Price Probe win - gold coins and green cash notes tossed up and falling (transform and opacity only), a big word and the points
+   counting up, about 2.8 s. Lite and reduced motion: the still word. ---- */
+.pr-winfx{ position:absolute; inset:0; z-index:60; overflow:hidden; pointer-events:none; }
+.pr-winfx i{ position:absolute; left:0; top:0; margin:-17px 0 0 -17px; will-change:transform; font-style:normal; }
+.pr-coin{ width:34px; height:34px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #fff6b0, #ffd23f 45%, #c98a00 100%); border:3px solid #a86c00; box-sizing:border-box;
+  display:flex; align-items:center; justify-content:center; font:900 18px/1 var(--f-display, sans-serif); color:#7a4a00; }
+.pr-note{ width:52px; height:26px; border-radius:4px; box-sizing:border-box; border:2px solid #0d5a2e;
+  background:radial-gradient(circle at 50% 50%, #e8ffe0 0 6px, transparent 7px), linear-gradient(90deg, #2fae5c, #7ddc8a 50%, #2fae5c); }
+.pr-winbox{ position:absolute; left:50%; top:42%; z-index:61; transform:translate(-50%, -50%); display:flex; flex-direction:column; align-items:center; gap:6px; pointer-events:none;
+  animation:prWinIn 0.55s cubic-bezier(.2,1.5,.4,1) both; }
+.pr-winword{ white-space:nowrap; font:900 clamp(40px, 12.5vw, 104px)/1 var(--f-display, sans-serif); color:#fff3a0; -webkit-text-stroke:3px #0d3b26; paint-order:stroke fill;
+  text-shadow:0 5px 0 #c98a00, 0 10px 18px rgba(0,0,0,0.45); letter-spacing:1px; }
+.pr-winpts{ font:900 clamp(30px, 9vw, 72px)/1 var(--f-display, sans-serif); color:#ffffff; -webkit-text-stroke:2px #0d3b26; paint-order:stroke fill; text-shadow:0 4px 0 #1f8a4c;
+  padding:4px 22px; border-radius:99px; background:rgba(5,42,26,0.94); font-variant-numeric:tabular-nums; }
+.pr-winbox.still{ animation:none; }
+@keyframes prWinIn{ from{ transform:translate(-50%, -50%) scale(0.3); opacity:0; } to{ transform:translate(-50%, -50%) scale(1); opacity:1; } }
+:root.lite .pr-winbox{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .pr-winbox{ animation:none; } }
+.pr-winfx::before{ content:''; position:absolute; inset:0; background:radial-gradient(70% 40% at 50% 42%, rgba(5,30,40,0.72), rgba(5,30,40,0.35) 75%); animation:prWash 0.4s ease-out both; }
+.pr-winfx.still::before{ animation:none; }
+@keyframes prWash{ from{ opacity:0; } to{ opacity:1; } }
+@media (min-width:600px){ .pr-winfx i{ margin:-24px 0 0 -24px; } .pr-coin{ width:48px; height:48px; font-size:26px; border-width:4px; } .pr-note{ width:76px; height:38px; } }
+:root.lite .pr-winfx::before{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .pr-winfx::before{ animation:none; } }
