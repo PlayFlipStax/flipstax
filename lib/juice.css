@@ -2747,3 +2747,19 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root.lite .mw-shimmer i, :root.lite .rd-sky::before{ animation:none; } :root.lite .mw-shimmer i{ opacity:0.5; }
 @media (prefers-reduced-motion: reduce){ .mw-shimmer i, .rd-sky::before{ animation:none; } .mw-shimmer i{ opacity:0.5; } }
 .paused .mw-shimmer i, .paused .rd-sky::before, :root.tab-hidden .rd-sky::before{ animation-play-state:paused; }
+
+/* ---- run 2 job 6: Zap Words - white tiles with a deep-violet letter that pops on the warm background, and the over-50 party (each tile blinking
+   through its own three colours: stacked layers taking turns, opacity only, 2.5 changes a second; confetti; ZAP-TASTIC!) ---- */
+:root:root:root .zw-stage .zw-grid.sq .zw-cell svg .hx{ fill:#ffffff; stroke:#e8c27a; }
+:root:root:root .zw-stage .zw-grid.sq .zw-cell.on svg .hx{ fill:#ffffff; }
+:root:root:root .zw-stage .zw-cell, :root:root:root .zw-stage .zw-cell:nth-child(n){ color:#3a0a6e; }
+.zw-pc{ position:absolute; inset:6%; z-index:2; border-radius:20%; overflow:hidden; pointer-events:none; }
+.zw-pc b{ position:absolute; inset:0; opacity:0; animation:zwParty 1.2s steps(1) infinite; animation-delay:var(--pd); }
+.zw-pc b:nth-child(2){ animation-delay:calc(var(--pd) - 0.4s); } .zw-pc b:nth-child(3){ animation-delay:calc(var(--pd) - 0.8s); }
+@keyframes zwParty{ 0%{ opacity:0.9; } 33.34%{ opacity:0; } 100%{ opacity:0; } }
+.zw-bigword{ position:absolute; left:50%; top:40%; z-index:9; transform:translate(-50%, -50%); white-space:nowrap; pointer-events:none; font:900 clamp(44px, 14vw, 110px)/1 var(--f-display, sans-serif); color:#ffffff;
+  -webkit-text-stroke:3px #5a0a8a; paint-order:stroke fill; text-shadow:0 6px 0 #ff3fb5; animation:zwWord 0.5s cubic-bezier(.2,1.4,.4,1) both; }
+.zw-bigword.still{ animation:none; }
+@keyframes zwWord{ from{ transform:translate(-50%, -50%) scale(0.3); opacity:0; } to{ transform:translate(-50%, -50%) scale(1); opacity:1; } }
+:root.lite .zw-bigword, :root.lite .zw-pc b{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .zw-bigword, .zw-pc b{ animation:none; } }
