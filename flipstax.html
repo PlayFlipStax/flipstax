@@ -16272,13 +16272,14 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // makeover job 7: the Word Warp logo (Daily tray). WORD is four white tiles with navy letters on a gentle upward arc; WARP starts as the same tiles, then
   // each one stretches, skews and tilts more than the one before it, with two faint trail copies behind it, spiralling toward a swirl of cyan and pink
   // arms at the lower right. HTML tiles in a box sized by its own width (container units), so it always fits; the swirl turns the opposite way to the galaxy.
-  const WW_LOGO_TILES = [ ['W', 8, 60, -12, 0, 1], ['O', 19.5, 48, -7, 0, 1], ['R', 31, 41, -2, 0, 1], ['D', 42.5, 38, 3, 0, 1],
-    ['W', 54.5, 36, 10, -5, 1.06], ['A', 67.5, 30, 24, -10, 1.16], ['R', 81, 34, 46, -15, 1.28], ['P', 91, 56, 72, -21, 1.4] ];
+  // (run 1 job 9: about 40% larger tiles on a taller box - WORD across the top left, a clear gap, then WARP spiralling down the right into the swirl)
+  const WW_LOGO_TILES = [ ['W', 8.5, 32, -12, 0, 1], ['O', 22.5, 23, -7, 0, 1], ['R', 36.5, 18, -2, 0, 1], ['D', 50.5, 16.5, 3, 0, 1],
+    ['W', 74, 17, 12, -5, 1.06], ['A', 85.5, 27, 30, -10, 1.14], ['R', 85.5, 46, 58, -15, 1.24], ['P', 79, 67, 86, -20, 1.34] ];
   function wwLogoHtml(){
     const tile = (t, cls, op)=> '<span class="wl-t' + (cls || '') + '" style="left:' + t[1] + '%;top:' + t[2] + '%;--r:' + t[3] + 'deg;--sk:' + t[4] + 'deg;--sx:' + t[5] + (op != null ? ';opacity:' + op : '') + '"><b>' + t[0] + '</b></span>';
     const lerp = (a, b, f)=> [b[0], a[1] + (b[1] - a[1]) * f, a[2] + (b[2] - a[2]) * f, a[3] + (b[3] - a[3]) * f, a[4] + (b[4] - a[4]) * f, a[5] + (b[5] - a[5]) * f];
     let h = '';
-    for (let k = 4; k < 8; k++){ h += tile(lerp(WW_LOGO_TILES[k - 1], WW_LOGO_TILES[k], 0.45), ' tr', 0.14) + tile(lerp(WW_LOGO_TILES[k - 1], WW_LOGO_TILES[k], 0.72), ' tr', 0.3); }
+    for (let k = 5; k < 8; k++){ h += tile(lerp(WW_LOGO_TILES[k - 1], WW_LOGO_TILES[k], 0.45), ' tr', 0.14) + tile(lerp(WW_LOGO_TILES[k - 1], WW_LOGO_TILES[k], 0.72), ' tr', 0.3); }
     // the swirl: four spiral arms (two cyan, two pink), as round-capped strokes
     const arm = (a0, col)=>{ let d = ''; for (let i = 0; i <= 28; i++){ const t = i / 28, a = a0 + t * 4.2, r = 6 + t * 40; d += (i ? 'L' : 'M') + (Math.cos(a) * r).toFixed(1) + ' ' + (Math.sin(a) * r).toFixed(1); } return '<path d="' + d + '" stroke="' + col + '"/>'; };
     const sw = '<span class="wl-swirl"><svg viewBox="-50 -50 100 100"><circle r="47" fill="rgba(125,249,255,0.12)"/><g fill="none" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">' +
@@ -16354,6 +16355,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     const layer = document.createElement('div'); layer.className = 'ww-win ww-mega'; layer.setAttribute('aria-hidden', 'true'); ov.appendChild(layer);
     const scoreEl = els.runBanner && els.runBanner.querySelector('.sp-num'), to = shownScore(runScore), from = shownScore(runScore - (runWarpPoints || 0));
     const word = document.createElement('div'); word.className = 'ww-mega-word'; word.textContent = 'WARPED IT!'; word.style.opacity = '0'; layer.appendChild(word);
+    { let fs = 100; word.style.fontSize = fs + 'px'; const want = W * 0.9; for (let k = 0; k < 3; k++){ const w = word.scrollWidth || word.getBoundingClientRect().width; if (!w) break; fs = fs * want / w; word.style.fontSize = fs.toFixed(1) + 'px'; } }   // (run 1 job 9: about 90% of the screen's width)
     const pts = document.createElement('div'); pts.className = 'ww-mega-pts'; pts.textContent = runWarpPoints ? '+' + runWarpPoints + ' pts' : ''; pts.style.opacity = '0'; layer.appendChild(pts);
     const countUp = (ms)=>{ if (!scoreEl) return; if (still || !ms){ scoreEl.textContent = to.toLocaleString(); return; } const t0 = performance.now();
       (function f(now){ const t = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - t, 3); scoreEl.textContent = Math.round(from + (to - from) * e).toLocaleString(); if (t < 1) requestAnimationFrame(f); })(t0); };
@@ -16372,7 +16374,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       ov.classList.add('ww-done');
       const inner = ov.querySelector('.solve-inner');
       [inner, els.solveSlots, els.solveRack].forEach(e=>{ if (e && e.animate) anims.push(e.animate([{ opacity:1 }, { opacity:0 }], { duration:400, fill:'forwards' })); });
-      word.style.opacity = '1'; pts.style.opacity = '1'; sfx.solveWin(); countUp(0);
+      word.style.opacity = '1'; pts.style.opacity = '1'; if (word.animate){ word.animate([{ opacity:0 }, { opacity:1 }], { duration:450, fill:'backwards' }); pts.animate([{ opacity:0 }, { opacity:1 }], { duration:450, fill:'backwards' }); } sfx.solveWin(); countUp(0);
       setTimeout(fin, 1800); return;
     }
     // 1. the spiral in, the galaxy spun up
@@ -16391,10 +16393,10 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     setTimeout(()=> wwSpinRate(1), 1500);
     // 2. the burst, the word, the sound and the count-up
     setTimeout(()=>{
-      const COL = ['#5ff4ff', '#ff6ac8', '#ffffff', '#b98cff', '#7dff9a', '#ffe27a'];
-      for (let k = 0; k < 50; k++){
+      const COL = ['#5ff4ff', '#ff6ac8', '#ffffff', '#b98cff', '#ffb38a', '#ffd8f4'];   // (the galaxy's colours: cyan, pink, white, violet, peach)
+      for (let k = 0; k < 64; k++){
         const comet = k % 3 === 0, p = document.createElement('i'); p.className = comet ? 'ww-comet' : 'ww-star'; p.style.setProperty('--c', COL[k % COL.length]); p.style.left = cx + 'px'; p.style.top = cy + 'px'; layer.appendChild(p);
-        const a = (k / 50) * Math.PI * 2 + Math.random() * 0.25, dist = Math.min(W, H) * (0.3 + Math.random() * 0.4), deg = a * 180 / Math.PI, sc = 0.7 + Math.random() * 0.8;
+        const a = (k / 64) * Math.PI * 2 + Math.random() * 0.25, dist = Math.min(W, H) * (0.3 + Math.random() * 0.45), deg = a * 180 / Math.PI, sc = 0.7 + Math.random() * 0.8;
         p.animate(comet ? [{ transform:'translate(-50%,-50%) rotate(' + deg + 'deg) translateX(0) scaleX(0.3)', opacity:1 }, { transform:'translate(-50%,-50%) rotate(' + deg + 'deg) translateX(' + dist.toFixed(0) + 'px) scaleX(1.2)', opacity:0 }]
           : [{ transform:'translate(-50%,-50%) translate(0,0) scale(0.2) rotate(0deg)', opacity:1 }, { transform:'translate(-50%,-50%) translate(' + (Math.cos(a) * dist).toFixed(0) + 'px,' + (Math.sin(a) * dist).toFixed(0) + 'px) scale(' + sc.toFixed(2) + ') rotate(' + (Math.random() * 360).toFixed(0) + 'deg)', opacity:0 }],
           { duration:1000 + Math.random() * 300, delay:Math.random() * 120, easing:'cubic-bezier(.15,.7,.3,1)', fill:'both' });

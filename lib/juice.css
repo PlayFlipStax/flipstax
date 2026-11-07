@@ -2607,3 +2607,18 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
    rims included, sit fully above the clock bar and are easy to tap */
 @media (max-height:700px){ .ff-lie .ff-gauge{ width:min(100%, calc(16svh * 1.5625)); } :root:root:root .ff-stage.ff-lie .ff-btn{ width:clamp(72px, 12.5svh, 110px); } :root:root .ff-stage.ff-lie .ff-bubble{ min-height:84px; } }
 @media (max-height:600px){ .ff-lie .ff-gauge{ width:min(100%, calc(14svh * 1.5625)); } :root:root:root .ff-stage.ff-lie .ff-btn{ width:clamp(66px, 12svh, 96px); font-size:20px; } .ff-lie .ff-gut{ display:none; } :root:root .ff-stage.ff-lie .ff-bubble{ min-height:72px; padding:8px 10px 10px; } }
+
+/* ---- run 1 job 9: Word Warp touch-ups ---- */
+/* WARPED IT! is one clean bright gradient word (white to cyan to pink, no outline, no offset shadow copy), sized by the script to about 90% of the width */
+:root:root .ww-mega-word{ -webkit-text-stroke:0; text-shadow:none; color:transparent; background:linear-gradient(180deg, #ffffff 0%, #c8fbff 38%, #5ff4ff 58%, #ff6ac8 100%); -webkit-background-clip:text; background-clip:text; letter-spacing:1px; line-height:1.05; padding:0 2px; }
+:root:root .ww-mega-pts{ -webkit-text-stroke:0; text-shadow:0 2px 0 rgba(10,4,40,0.7); top:calc(46% + 13vw); }
+.ww-star{ width:clamp(16px, 4.6vw, 34px); }
+/* the planet moves to the right edge, below the timer and clear of the win star's points */
+:root:root .wk-planet{ right:-7%; left:auto; top:55%; width:clamp(64px, 18vw, 140px); }
+/* the larger logo: a taller box, bigger tiles and letters (it still fits the width - no letter is cut off) */
+:root:root .ww-logo .wl-box{ aspect-ratio:400 / 240; }
+:root:root .ww-logo .wl-t{ width:14.5%; }
+:root:root .ww-logo .wl-t b{ font-size:11.4cqw; }
+:root:root .ww-logo .wl-swirl{ left:62%; top:73%; width:30%; }
+:root:root .solve-overlay.tray .ww-logo{ width:min(100%, 600px, calc(26svh * 400 / 240)); }
+@media (max-height:700px){ :root:root .solve-overlay.tray .ww-logo{ width:min(100%, calc(20svh * 400 / 240)); } }
