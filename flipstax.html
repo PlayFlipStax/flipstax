@@ -7064,7 +7064,13 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     wrong: ()=>{ playTone(220,0,0.22,'sawtooth',0.06); },
     // Star Sequence (lib/star-sequence.js): beam i's own note - a C major pentatonic, blue C5, pink E5, orange G5, green A5, gold C6 (Web Audio; the audio
     // context is unlocked by the game's START tap)
-    starNote: (i)=>{ const f = [523.25, 659.25, 783.99, 880, 1046.5][Math.max(0, Math.min(4, i | 0))]; playTone(f, 0, 0.42, 'triangle', 0.11); playTone(f * 2, 0, 0.24, 'sine', 0.025); },
+    // run 1 job 3: each beam is a short bright synth 'pew' - a square wave that drops an octave in 0.16 s under a quick sine chirp, the pitch rising across the five beams
+    starNote: (i)=>{ const k = Math.max(0, Math.min(4, i | 0)), f = [659.25, 783.99, 987.77, 1174.66, 1396.91][k]; if (!sfxOn) return; const ctx = getAudioCtx(); if (!ctx) return;
+      try{ const t0 = ctx.currentTime;
+        const pew = (type, f0, f1, dur, vol)=>{ const o = ctx.createOscillator(), g = ctx.createGain(); o.type = type; o.frequency.setValueAtTime(f0, t0); o.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
+          g.gain.setValueAtTime(0.0001, t0); g.gain.linearRampToValueAtTime(vol, t0 + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur); o.connect(g); g.connect(ctx.destination); o.start(t0); o.stop(t0 + dur + 0.03); };
+        pew('square', f * 2, f, 0.16, 0.045); pew('sine', f * 3, f * 1.5, 0.1, 0.05); pew('triangle', f, f * 0.98, 0.3, 0.07);
+      }catch(e){} },
     powerUp: ()=>{ playTone(440,0,0.07,'square',0.09); playTone(660,0.06,0.09,'square',0.09); playTone(880,0.13,0.18,'square',0.1); haptic([10,20,10]); },
     spinTick: (i)=>{ playTone(280 + i*35, 0, 0.05, 'square', 0.05); },
     // A+ tier 2: the prize wheel's peg tick - a soft short click, higher and snappier while the wheel is fast, lower as it slows (muted with the sound setting)
@@ -11739,8 +11745,12 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     };
     api.rng = mulberry32((api.seed ^ hashStr('mg-' + key)) >>> 0);
     api.shuffle = (a)=> shuffle(a.slice(), api.rng);
+    // run 1 job 3: a game that asks for quiet (Star Sequence: its notes are the music) pauses the show's track while it plays and carries it on from there after
+    const hushKey = g.quietMusic && currentTrackKey && trackEls[currentTrackKey] && !trackEls[currentTrackKey].paused ? currentTrackKey : null;
+    if (hushKey) try{ trackEls[hushKey].pause(); }catch(e){}
     const close = (silent)=>{
       over = true; stopTimer(); if (api.onClose) try{ api.onClose(); }catch(e){}
+      if (hushKey && musicOn && currentTrackKey === hushKey && trackEls[hushKey] && trackEls[hushKey].paused) trackEls[hushKey].play().catch(()=>{});
       sceneOut(ov, true); ov.remove(); mgOpen = null; noteOverlayClosed(); updatePauseBtnVisibility();
       if (!silent && done) done();
     };

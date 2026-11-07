@@ -101,3 +101,8 @@
 }
 /* a still dark veil over the galaxy (deepest at the edges and the bottom), so the beams and the stars read clearly on the bright art */
 .sq-set .sq-veil{ position:absolute; inset:0; pointer-events:none; background:radial-gradient(120% 75% at 50% 42%, rgba(6,3,22,0.28), rgba(6,3,22,0.62) 100%), linear-gradient(180deg, rgba(6,3,22,0) 55%, rgba(6,3,22,0.45)); }
+
+/* run 1 job 3: a more visible neon breath and UFO light blink in normal mode (opacity only, under 3 a second; lite and reduced motion stay still) */
+.sq-neon .t.glow{ animation-duration:1.2s; }
+@keyframes sqNeon{ from{ opacity:0.3; } to{ opacity:1; } }
+@keyframes sqTwinkle{ from{ opacity:0.12; } to{ opacity:1; } }
