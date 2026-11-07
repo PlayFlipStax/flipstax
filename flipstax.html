@@ -6991,6 +6991,22 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     }),
   };
   const sfx = {
+    // Part A job 2: a very quiet ambient pad for a game to play under itself (Star Sequence) - two soft, slightly detuned low tones (A2 and E3) through a
+    // low-pass filter, fading in over 1.5 s to a level well under the game's own notes; returns { stop(ms) }, which fades it out. Nothing when sound is off.
+    pad: ()=>{
+      if (!sfxOn) return null; const ctx = getAudioCtx(); if (!ctx) return null;
+      try{
+        const t = ctx.currentTime, out = ctx.createGain(), lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 520; lp.Q.value = 0.4;
+        out.gain.setValueAtTime(0.0001, t); out.gain.linearRampToValueAtTime(0.022, t + 1.5); lp.connect(out); out.connect(ctx.destination);
+        const oscs = [[110, 'triangle', -4], [110, 'sine', 5], [164.81, 'sine', -3], [220, 'sine', 2]].map(([f, type, det], k)=>{
+          const o = ctx.createOscillator(), g = ctx.createGain(); o.type = type; o.frequency.value = f; o.detune.value = det; g.gain.value = [0.55, 0.5, 0.35, 0.12][k]; o.connect(g); g.connect(lp); o.start(t); return o; });
+        const lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 0.12; lg.gain.value = 0.006; lfo.connect(lg); lg.connect(out.gain); lfo.start(t);   // (a slow swell)
+        let stopped = false;
+        return { stop(ms){ if (stopped) return; stopped = true; const n = ctx.currentTime, d = Math.max(0.05, (ms || 1200) / 1000);
+          try{ out.gain.cancelScheduledValues(n); out.gain.setValueAtTime(out.gain.value, n); out.gain.linearRampToValueAtTime(0.0001, n + d); }catch(e){}
+          oscs.concat([lfo]).forEach(o=>{ try{ o.stop(n + d + 0.05); }catch(e){} }); setTimeout(()=>{ try{ out.disconnect(); }catch(e){} }, d * 1000 + 200); } };
+      }catch(e){ return null; }
+    },
     // The GOOP: a sad trombone - three steps down, the last one sagging with a wobble.
     wahwah: ()=> withSfxCtx((ctx, t)=>{
       [[392, 0], [370, 0.32], [349, 0.64]].forEach(([f, s])=> playTone(f, s, 0.28, 'sawtooth', 0.05));
