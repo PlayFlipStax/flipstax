@@ -106,3 +106,11 @@
 .sq-neon .t.glow{ animation-duration:1.2s; }
 @keyframes sqNeon{ from{ opacity:0.3; } to{ opacity:1; } }
 @keyframes sqTwinkle{ from{ opacity:0.12; } to{ opacity:1; } }
+
+/* run 2 job 7: the win show */
+.sq-winfx{ position:absolute; inset:0; z-index:30; pointer-events:none; overflow:hidden; }
+.sq-saucer.sq-winblink .sq-lights i{ animation:sqTwinkle 0.4s steps(1) infinite alternate !important; }
+.sq-dust{ position:absolute; top:0; width:7px; height:7px; background:var(--c); clip-path:polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); will-change:transform, opacity; }
+.sq-dust.big{ width:13px; height:13px; background:#fff6c2; }
+.sq-winword{ position:absolute; left:50%; top:42%; transform:translate(-50%, -50%); white-space:nowrap; font:900 clamp(46px, 14vw, 110px)/1 var(--f-display, sans-serif); color:#ffffff; -webkit-text-stroke:3px #2a0a6a; paint-order:stroke fill; text-shadow:0 6px 0 #ff4fb4; }
+.sq-dust{ width:10px; height:10px; } .sq-dust.big{ width:18px; height:18px; }
