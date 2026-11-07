@@ -89,3 +89,11 @@
 :root:root:root.mode-daily .event-overlay.has-plate .qz-plate.neon > small{ margin-top:2px; }
 :root:root:root.mode-daily .event-overlay.has-plate .qz-plate.neon > small{ margin-top:8px; }
 @media (max-height:700px){ :root:root:root.mode-daily .event-overlay.has-plate .qz-plate.neon{ width:min(72%, 290px); margin-bottom:2px; } }
+/* the neo games' sign plate (Galactic Chomper, ZiG Zap ZaBam!, Space Launch, Alien Blast): the neon sign in place of the plain title */
+:root:root:root .nx-sign.neon{ background:none !important; border:0 !important; box-shadow:none !important; padding:0 !important; width:min(94%, 460px); display:flex; flex-direction:column; align-items:center; }
+:root:root:root .nx-sign.neon::before, :root:root:root .nx-sign.neon::after{ display:none !important; }
+:root:root:root .nx-sign.neon > .nl{ width:100%; margin:0; }
+:root:root:root .nx-sign.neon > small{ margin-top:4px; padding:2px 12px; border-radius:99px; background:rgba(8,4,30,0.8); }
+:root:root:root .nx-sign.neon > small:empty{ display:none; }
+@media (max-height:700px){ :root:root:root .nx-sign.neon{ width:min(80%, 320px); } }
+:root:root .nl-munchMix .nl-icon{ height:48%; flex-basis:26%; }   /* (the jaws: about 40% of the sign's height) */
