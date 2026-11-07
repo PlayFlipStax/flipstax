@@ -2693,3 +2693,18 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root:root .mq-ring.bottom .mq.mq-a{ --bulb:#ff8a1f; --bulb-hi:#fff0dc; } :root:root .mq-ring.bottom .mq.mq-b{ --bulb:#ffa64d; --bulb-hi:#fff4e6; }
 .half.revealed .votes-n:empty{ opacity:0.75; transition:none; }
 :root:root .mq-ring.bottom .mq.mq-a{ --bulb-hi:#ffd6a8; } :root:root .mq-ring.bottom .mq.mq-b{ --bulb-hi:#ffe0b8; }
+
+/* ---- run 2 job 1: performance - nothing turns or drifts where it cannot be seen. The sunburst's rays (a 2.5 megapixel layer) pause while the sunburst
+   is off; the VS cards' drifting stripes, their marquee rings and the body's clouds pause whenever a full screen covers the board (a game, an event
+   screen, the Word Warp, the finale or a show card); the galaxy is a small picture scaled up and turned (see wwGalaxyFill). ---- */
+.sunburst:not(.on) .sb-rays{ animation-play-state:paused; }
+:root:is(.event-open, :has(#mgOverlay), :has(#solveOverlay:not(.hidden)), :has(#finOverlay:not(.hidden)), :has(#showCard:not(.hidden)), :has(#luckyOverlay:not(.hidden))) #board .half > .dd,
+:root:is(.event-open, :has(#mgOverlay), :has(#solveOverlay:not(.hidden)), :has(#finOverlay:not(.hidden)), :has(#showCard:not(.hidden)), :has(#luckyOverlay:not(.hidden))) .mq-ring .mq,
+:root:is(:has(#mgOverlay), :has(#solveOverlay:not(.hidden)), :has(#finOverlay:not(.hidden)), :has(#luckyOverlay:not(.hidden))) body::before,
+:root:is(:has(#mgOverlay), :has(#solveOverlay:not(.hidden)), :has(#finOverlay:not(.hidden)), :has(#luckyOverlay:not(.hidden))) body::after{ animation-play-state:paused; }
+.gal-pic{ background-size:100% 100% !important; background-repeat:no-repeat; }
+:root:root:root .solve-overlay.tray .ww-galaxy i.gal-pic, :root:root .ed-space .es-gal.gal-pic{ left:50%; top:50%; width:768px; height:768px; margin:-384px 0 0 -384px; transform:rotate(0deg) scale(var(--gs, 1)); animation:wwGalTurnS 90s linear infinite; }
+@keyframes wwGalTurnS{ from{ transform:rotate(0deg) scale(var(--gs, 1)); } to{ transform:rotate(360deg) scale(var(--gs, 1)); } }
+:root.lite .gal-pic, :root.lite :root .gal-pic{ animation:none !important; }
+@media (prefers-reduced-motion: reduce){ .gal-pic{ animation:none !important; } }
+:root:root:root .solve-overlay.tray .ww-galaxy::before{ display:none !important; animation:none !important; }

@@ -11663,8 +11663,19 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     img.src = url;
   }
   let mgOpen = null;
+  // run 2 job 1: the general clean-up for every game screen. While a game is open, intervals started by the game files themselves (lib/...) are noted;
+  // when its screen closes every one still running is cleared, and every animation on the screen (and on any element it left on the page body) is
+  // cancelled before the screen is removed, so nothing keeps ticking behind the next scene. (Timeouts are left alone: the show's own flow uses them.)
+  let mgIvSet = null;
+  { const si = window.setInterval.bind(window); window.setInterval = function(f, ms){ const id = si.apply(null, arguments); if (mgIvSet){ try{ const st = new Error().stack || ''; if (/\/lib\/[a-z-]+\.js/.test(st.split('\n').slice(1, 3).join(' '))) mgIvSet.add(id); }catch(e){} } return id; }; }
+  function mgSweep(ov, ivs){
+    if (ivs){ ivs.forEach(id=> clearInterval(id)); ivs.clear(); }
+    if (mgIvSet === ivs) mgIvSet = null;
+    try{ if (ov && ov.getAnimations) ov.getAnimations({ subtree:true }).forEach(a=>{ try{ a.cancel(); }catch(e){} }); }catch(e){}
+  }
   function runMiniGame(key, st, done){
     const g = miniGame(key); if (!g) return false;
+    const mgIv = mgIvSet = new Set();
     if (mgOpen) mgOpen.close(true);
     const c = g.colors || ['#ffd23f', '#c2275f', '#2a0b4e'];
     if (window.__liteSettle) window.__liteSettle();
@@ -11753,6 +11764,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     if (hushKey) try{ trackEls[hushKey].pause(); }catch(e){}
     const close = (silent)=>{
       over = true; stopTimer(); if (api.onClose) try{ api.onClose(); }catch(e){}
+      mgSweep(ov, mgIv);   // (run 2 job 1: the general clean-up)
       if (hushKey && musicOn && currentTrackKey === hushKey && trackEls[hushKey] && trackEls[hushKey].paused) trackEls[hushKey].play().catch(()=>{});
       sceneOut(ov, true); ov.remove(); mgOpen = null; noteOverlayClosed(); updatePauseBtnVisibility();
       if (!silent && done) done();
@@ -12280,8 +12292,9 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       // fix pass 2A job 3: the alien TV - a spiral galaxy turning behind (one turn in 90 s), two planets, twinkling stars, and antennae with blinking tips
       if (!document.getElementById('edSpace')){
         let tw = ''; for (let k = 0; k < 22; k++) tw += '<i class="es-tw" style="left:' + ((k * 41 + 5) % 96) + '%;top:' + ((k * 29 + 9) % 94) + '%;--d:' + (2.2 + (k % 4) * 0.7).toFixed(1) + 's;--dl:-' + ((k * 0.9) % 3).toFixed(1) + 's"></i>';
-        ov.insertAdjacentHTML('afterbegin', '<div id="edSpace" class="ed-space" aria-hidden="true"><i class="es-gal">' + wwGalaxySvg() + '</i>' + tw + '<i class="es-planet a"></i><i class="es-planet b"></i></div>');
+        ov.insertAdjacentHTML('afterbegin', '<div id="edSpace" class="ed-space" aria-hidden="true"><i class="es-gal"></i>' + tw + '<i class="es-planet a"></i><i class="es-planet b"></i></div>');
         els.eventPrompt.insertAdjacentHTML('beforebegin', '<div class="ed-ant" aria-hidden="true"><i class="l"></i><i class="r"></i></div>');
+        wwGalaxyFill(ov.querySelector('#edSpace .es-gal'));
       }
       ov.querySelectorAll('.ed-tvflash, .ed-perfect').forEach(e=> e.remove());
       tiles.forEach(t=> t.getAnimations && t.getAnimations().forEach(a=>{ if (!(window.CSSAnimation && a instanceof CSSAnimation) && !(window.CSSTransition && a instanceof CSSTransition)) a.cancel(); }));
@@ -16321,10 +16334,28 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       '<svg class="wk-big" viewBox="0 0 100 100">' + big + '</svg><i class="wk-planet"><i class="wk-pring"></i></i><i class="wk-shoot"></i>';
     const inner = els.solveOverlay.querySelector('.solve-inner'); els.solveOverlay.insertBefore(d, inner);
   }
+  // run 2 job 1: the galaxy as a picture. The inline SVG (blurred arms, 260 stars) on a layer 118vmax across made a texture of about 38 MB on a 3x phone,
+  // turning every frame. Now it is drawn ONCE into a 768 px canvas and shown as a background picture on a 768 px layer that is scaled up by transform
+  // (--gs) and turned - the phone keeps a small texture and only rotates it. If drawing fails, the SVG stays as before.
+  let wwGalaxyUrl = null, wwGalaxyP = null;
+  function wwGalaxyPicture(){
+    if (wwGalaxyP) return wwGalaxyP;
+    wwGalaxyP = new Promise(res=>{
+      try{ const img = new Image(); img.onload = ()=>{ try{ const c = document.createElement('canvas'); c.width = c.height = 768; const g = c.getContext('2d'); g.drawImage(img, 0, 0, 768, 768); wwGalaxyUrl = c.toDataURL('image/jpeg', 0.86); res(wwGalaxyUrl); }catch(e){ res(null); } };
+        img.onerror = ()=> res(null); img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(wwGalaxySvg().replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" width="768" height="768" ')); }catch(e){ res(null); }
+    });
+    return wwGalaxyP;
+  }
+  function wwGalaxyScale(){ const s = Math.max(innerWidth, innerHeight) * 1.18 / 768; document.documentElement.style.setProperty('--gs', s.toFixed(3)); }
+  addEventListener('resize', wwGalaxyScale); wwGalaxyScale();
+  function wwGalaxyFill(el){
+    if (!el || el.dataset.gal) return; el.dataset.gal = '1';
+    wwGalaxyPicture().then(url=>{ if (url){ el.classList.add('gal-pic'); el.style.backgroundImage = 'url(' + url + ')'; el.innerHTML = ''; } else el.innerHTML = wwGalaxySvg(); });
+  }
   function wwLogoEnsure(){
     wwSkyEnsure();
     { const inner = els.solveOverlay.querySelector('.solve-inner'); if (inner) inner.style.opacity = ''; }
-    { const gi = document.querySelector('.ww-galaxy i'); if (gi && !gi.querySelector('svg')) gi.innerHTML = wwGalaxySvg(); }
+    { const gi = document.querySelector('.ww-galaxy i'); if (gi) wwGalaxyFill(gi); }
     if (document.getElementById('wwLogo')) return;
     const inner = els.solveOverlay.querySelector('.solve-inner'); if (!inner) return;
     const d = document.createElement('div'); d.className = 'ww-logo'; d.id = 'wwLogo'; d.setAttribute('role', 'img'); d.setAttribute('aria-label', 'Word Warp'); d.innerHTML = wwLogoHtml();
