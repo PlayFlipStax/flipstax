@@ -2338,3 +2338,35 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 @media (max-height:700px){ :root:root:root .mg-factOrFib .mg-sign{ padding:7px 14px 9px; } :root:root:root .mg-factOrFib .mg-sign span{ font-size:clamp(32px, 10vw, 44px) !important; } :root:root .ff-stage.ff-show .ff-btn{ min-height:76px; font-size:36px; } }
 @media (min-width:600px){ .mg-factOrFib .mg-inner{ max-width:min(90vw, 760px); } :root:root .ff-stage.ff-show .ff-bubble{ max-height:40vh; font-size:clamp(30px, 4.6vw, 46px); } :root:root .ff-stage.ff-show .ff-btn{ min-height:200px; font-size:84px; } }
 :root:root .ff-stage.ff-show .ff-stamp{ top:10px; right:10px; }   /* (inside the screen, which clips its overflow) */
+
+/* ---- makeover job 13: Price Probe - a bold price-tag title plate, price-tag cards and larger answer buttons. Gameplay unchanged. ---- */
+:root:root:root .mg-priceProbe .mg-sign{ position:relative; display:flex !important; align-items:center; justify-content:center; width:min(90%, 560px); margin:4px auto 6px; padding:10px 18px 12px 64px; border-radius:14px 40px 40px 14px;
+  background:linear-gradient(180deg, #fff6b0 0%, #ffd23f 60%, #e6a800 100%) !important; border:4px solid #ffffff !important; box-shadow:0 0 0 3px #6a4300, 0 8px 0 3px #3a2400 !important; transform:rotate(-2deg); }
+:root:root:root .mg-priceProbe .mg-sign::before{ content:'$'; position:absolute; left:12px; top:50%; width:40px; height:40px; margin-top:-20px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  background:#0d6b3a; color:#fff6b0; font:900 28px/1 var(--f-display, sans-serif); box-shadow:inset 0 0 0 3px #fff6b0; border:0; }
+:root:root:root .mg-priceProbe .mg-sign::after{ content:''; position:absolute; right:18px; top:50%; width:14px; height:14px; margin-top:-7px; border-radius:50%; background:#1a3a5a; box-shadow:inset 0 2px 0 rgba(0,0,0,0.4), 0 0 0 3px #fff; border:0; }
+:root:root:root .mg-priceProbe .mg-sign span{ font:900 clamp(36px, 11vw, 76px)/1 var(--f-display, sans-serif) !important; letter-spacing:2px; color:#0d3b26 !important; text-shadow:0 3px 0 rgba(255,255,255,0.6) !important; -webkit-text-stroke:0; }
+/* the cards: hanging price tags - warm tag paper, a punched hole and a string at the top, a dashed inner edge, a slight swing each */
+:root:root .pr-stage .pr-body{ height:min(56dvh, 470px); }
+:root:root .pr-stage .pr-card{ overflow:visible; margin-top:16px; border-radius:12px 12px 18px 18px; border:3px solid #ffffff; touch-action:manipulation;
+  background:linear-gradient(180deg, #fffbe8 0%, #ffeaa0 100%); box-shadow:0 6px 0 rgba(20,40,60,0.45); color:#2a1a05; }
+:root:root .pr-stage .pr-card::before{ content:''; position:absolute; left:50%; top:9px; width:16px; height:16px; margin-left:-8px; border-radius:50%; background:#1a3a5a; box-shadow:inset 0 2px 0 rgba(0,0,0,0.45), 0 0 0 3px #e6b94a; }
+:root:root .pr-stage .pr-card::after{ content:''; position:absolute; left:50%; top:-18px; width:3px; height:28px; margin-left:-1.5px; background:linear-gradient(180deg, rgba(255,255,255,0), #f2e6c8); border-radius:2px; pointer-events:none; }
+:root:root .pr-stage .pr-card:nth-child(1){ transform:rotate(-2deg); } :root:root .pr-stage .pr-card:nth-child(3){ transform:rotate(2deg); }
+.pr-stage .pr-card > span:first-child{ margin-top:14px; }
+:root:root .pr-stage .pr-g{ font-size:clamp(50px, 15vw, 110px); }
+:root:root .pr-stage .pr-n{ font-size:clamp(17px, 5vw, 34px); }
+:root:root .pr-stage .pr-d{ font-size:clamp(12px, 3.5vw, 22px); }
+:root:root .pr-stage .pr-p{ font-size:clamp(20px, 6vw, 40px); min-height:clamp(34px, 9vw, 60px); padding:4px 10px; border-radius:10px; }
+:root:root .pr-stage .pr-card.lit{ background:linear-gradient(180deg, #e2ffd0, #8fe66c); }
+@media (max-height:700px){ :root:root .pr-stage .pr-body{ height:min(54dvh, 360px); } :root:root:root .mg-priceProbe .mg-sign{ padding:6px 14px 8px 56px; } :root:root:root .mg-priceProbe .mg-sign span{ font-size:clamp(30px, 9vw, 40px) !important; } }
+@media (min-width:600px){ .mg-priceProbe .mg-inner{ max-width:min(90vw, 760px); } :root:root .pr-stage .pr-meter{ flex-basis:48px; } }
+:root:root:root .mg-priceProbe .mg-sign span{ white-space:nowrap; font-size:clamp(28px, 8.4vw, 64px) !important; }
+:root:root .pr-stage .pr-body{ height:min(47dvh, 470px); }
+@media (max-height:700px){ :root:root .pr-stage .pr-body{ height:min(46dvh, 330px); } :root:root:root .mg-priceProbe .mg-sign span{ font-size:clamp(24px, 7.4vw, 32px) !important; } :root:root:root .mg-priceProbe .mg-sign{ margin:0 auto 2px; } :root:root .pr-stage .pr-card{ margin-top:12px; } }
+@media (min-width:600px){ :root:root .pr-stage .pr-body{ height:min(50dvh, 820px); } }
+:root:root:root .mg-priceProbe .mg-sign{ padding-right:46px; }
+@media (min-width:600px){ :root:root .pr-stage .pr-ask{ font-size:clamp(34px, 5.4vw, 52px); } }
+:root:root:root .mg-priceProbe .mg-sign{ padding-left:72px; padding-right:52px; }
+:root:root:root .mg-priceProbe .mg-sign span{ font-size:clamp(26px, 7.6vw, 60px) !important; }
+@media (min-width:600px){ :root:root:root .mg-priceProbe .mg-sign{ padding-left:86px; } }
