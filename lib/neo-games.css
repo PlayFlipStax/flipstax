@@ -366,3 +366,28 @@
 /* makeover job 11: Space Launch - Flip is off the screen (the corner host is hidden; his lines and scoring are unchanged) */
 .mg-spaceLaunch .nx-host{ display:none !important; }
 .mg-spaceLaunch .nx-gold, .mg-spaceLaunch button{ touch-action:manipulation; }
+
+/* ---- makeover job 14: Alien Blast - a drifting starfield, a glowing ship and aliens, a particle burst on every hit and bigger explosions. Controls and
+   scoring unchanged. Transform and opacity only; lite and reduced motion: the stars stand still, no bursts (the existing still rules cover .ab-set *). ---- */
+.ab-set .as-field{ left:0; right:0; top:-100%; height:200%; pointer-events:none; will-change:transform; animation:abField 60s linear infinite; }
+.ab-set .as-field.f1{ background-image:radial-gradient(1.4px 1.4px at 20px 30px, #ffffff, rgba(255,255,255,0)), radial-gradient(1.2px 1.2px at 140px 90px, #d8f4ff, rgba(255,255,255,0)), radial-gradient(1.6px 1.6px at 80px 160px, #ffffff, rgba(255,255,255,0)), radial-gradient(1px 1px at 200px 210px, #ffe6f6, rgba(255,255,255,0)); background-size:240px 240px; opacity:0.8; }
+.ab-set .as-field.f2{ background-image:radial-gradient(2px 2px at 60px 70px, #ffffff, rgba(255,255,255,0)), radial-gradient(2.4px 2.4px at 230px 200px, #c8f8ff, rgba(255,255,255,0)), radial-gradient(1.8px 1.8px at 150px 300px, #fff0c8, rgba(255,255,255,0)); background-size:320px 360px; opacity:0.9; animation-duration:34s; }
+@keyframes abField{ from{ transform:translateY(0); } to{ transform:translateY(50%); } }
+.ab-set .as-shoot{ width:90px; height:2px; border-radius:2px; background:linear-gradient(90deg, rgba(255,255,255,0), #ffffff); opacity:0; transform:rotate(18deg); animation:abShoot 8s ease-in var(--d) infinite; }
+@keyframes abShoot{ 0%, 86%{ opacity:0; transform:rotate(18deg) translateX(0); } 88%{ opacity:1; } 100%{ opacity:0; transform:rotate(18deg) translateX(220px); } }
+/* the glow: still drop-shadows on the ship and the aliens, a soft underglow in each portal */
+:root:root .ab-ufo svg{ filter:drop-shadow(0 0 6px #27e6ff) drop-shadow(0 0 16px rgba(39,230,255,0.7)); }
+:root:root .ab-actor.green .ab-svg{ filter:drop-shadow(0 0 6px rgba(53,240,138,0.95)) drop-shadow(0 4px 4px rgba(0,0,0,0.4)); }
+:root:root .ab-actor.gold .ab-svg{ filter:drop-shadow(0 0 8px rgba(255,210,63,1)) drop-shadow(0 4px 4px rgba(0,0,0,0.4)); }
+:root:root .ab-actor.red .ab-svg{ filter:drop-shadow(0 0 6px rgba(255,58,42,0.95)) drop-shadow(0 4px 4px rgba(0,0,0,0.4)); }
+:root:root .ab-actor.armor .ab-svg, :root:root .ab-actor.sleepy .ab-svg{ filter:drop-shadow(0 0 6px rgba(160,200,255,0.9)) drop-shadow(0 4px 4px rgba(0,0,0,0.4)); }
+:root:root .ab-actor.bomb .ab-svg{ filter:drop-shadow(0 0 6px rgba(255,140,40,0.9)) drop-shadow(0 4px 4px rgba(0,0,0,0.4)); }
+.nx-ab .ab-portal::before{ content:''; position:absolute; left:6%; right:6%; bottom:2%; height:30%; border-radius:50%; background:radial-gradient(ellipse, rgba(53,240,138,0.45), rgba(53,240,138,0) 70%); pointer-events:none; }
+/* the bursts */
+.ab-pop, .ab-spark2, .ab-fire{ position:absolute; z-index:7; pointer-events:none; }
+.ab-pop{ width:90px; height:90px; border-radius:50%; background:radial-gradient(circle, #ffffff 0%, var(--c) 35%, rgba(255,255,255,0) 70%); }
+.ab-spark2{ width:16px; height:4px; border-radius:2px; background:linear-gradient(90deg, rgba(255,255,255,0), var(--c) 50%, #ffffff); transform-origin:0 50%; }
+.ab-fire{ width:40px; height:40px; border-radius:50%; background:radial-gradient(circle at 45% 40%, #fff6c8 0%, #ffb02e 35%, #ff4a1a 62%, rgba(255,60,20,0) 72%); }
+:root:root .ab-flash{ width:240px; height:240px; }
+:root:root .ab-shock{ width:90px; height:90px; border-width:6px; }
+:root:root .nx-slam.boom{ font-size:clamp(56px, 17vw, 110px); }
