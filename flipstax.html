@@ -16450,7 +16450,8 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     const C = [[[8,18],[16,12],[24,16],[30,8]], [[70,6],[78,14],[88,10],[93,20]], [[6,62],[12,70],[20,66],[26,76]], [[80,58],[86,66],[94,62]]];
     let lines = ''; C.forEach((c, k)=>{ lines += '<polyline class="wk-cl" style="--dl:-' + (k * 0.8).toFixed(1) + 's" points="' + c.map(p=> p.join(',')).join(' ') + '"/>' + c.map(p=> '<circle class="wk-cn" cx="' + p[0] + '" cy="' + p[1] + '" r="0.9"/>').join(''); });
     const d = document.createElement('div'); d.id = 'wwSky'; d.className = 'ww-sky'; d.setAttribute('aria-hidden', 'true');
-    d.innerHTML = '<i class="wk-neb a"></i><i class="wk-neb b"></i><i class="wk-neb c"></i>' + tw + '<svg class="wk-const" viewBox="0 0 100 100" preserveAspectRatio="none">' + lines + '</svg>' +
+    d.innerHTML = '<i class="wk-warp a"></i><i class="wk-warp b"></i><i class="wk-warp c"></i>' +   // (final polish job 4: a faint hyperspace starfield streaming outward)
+      '<i class="wk-neb a"></i><i class="wk-neb b"></i><i class="wk-neb c"></i>' + tw + '<svg class="wk-const" viewBox="0 0 100 100" preserveAspectRatio="none">' + lines + '</svg>' +
       '<i class="wk-planet"><i class="wk-pring"></i></i><i class="wk-shoot"></i>';
     const inner = els.solveOverlay.querySelector('.solve-inner'); els.solveOverlay.insertBefore(d, inner);
   }

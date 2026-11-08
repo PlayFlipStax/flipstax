@@ -3029,3 +3029,28 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 .vol-song.mute.on{ border-color:#ff8a8a; background:rgba(255,90,90,0.16); } .vol-song.mute.on .vs-dot{ background:#ff7a7a; border-color:#ff7a7a; } .vol-song.mute.on .vs-on{ background:#ff9a9a; }
 :root:root .vol-pop{ z-index:520; }
 :root:root .vol-pop{ background:#18082c; }
+
+/* ---- final polish job 4: Word Warp's background is alive while you play, in the spirit of the Time Warp tunnel - the galaxy turns once every 30 s
+   (was 90), a faint hyperspace starfield streams outward from the centre (three large star layers that grow and fade in turn), the nebula glows drift
+   slowly, the stars twinkle, a shooting star crosses every 7 s (was 9) and the ringed planet bobs and rocks gently. A few large layers, transform and
+   opacity only. Lite and reduced motion: all still (the starfield shows as one faint still layer). ---- */
+:root:root:root:root .solve-overlay.tray .ww-galaxy i.gal-pic{ animation-duration:30s; }
+.wk-warp{ left:50%; top:46%; width:150vmax; height:150vmax; margin:-75vmax 0 0 -75vmax; border-radius:50%; opacity:0; will-change:transform, opacity;
+  background:
+    radial-gradient(1.4px 1.4px at 12% 18%, #ffffff 60%, transparent), radial-gradient(1.2px 1.2px at 31% 72%, #d8f4ff 60%, transparent),
+    radial-gradient(1.6px 1.6px at 58% 9%, #ffffff 60%, transparent), radial-gradient(1.2px 1.2px at 77% 41%, #ffe6f6 60%, transparent),
+    radial-gradient(1.4px 1.4px at 88% 84%, #ffffff 60%, transparent), radial-gradient(1.2px 1.2px at 44% 55%, #d8f4ff 60%, transparent),
+    radial-gradient(1.6px 1.6px at 6% 63%, #ffffff 60%, transparent), radial-gradient(1.2px 1.2px at 67% 92%, #ffffff 60%, transparent);
+  background-size:140px 140px; -webkit-mask-image:radial-gradient(circle, transparent 6%, #000 30%); mask-image:radial-gradient(circle, transparent 6%, #000 30%);
+  animation:wkWarp 7.5s linear infinite; }
+.wk-warp.b{ animation-delay:-2.5s; background-size:180px 180px; } .wk-warp.c{ animation-delay:-5s; background-size:110px 110px; }
+@keyframes wkWarp{ 0%{ transform:scale(0.35); opacity:0; } 25%{ opacity:0.55; } 80%{ opacity:0.4; } 100%{ transform:scale(1.9); opacity:0; } }
+.wk-neb.a{ animation:wkDriftA 26s ease-in-out infinite alternate; } .wk-neb.b{ animation:wkDriftB 32s ease-in-out infinite alternate; } .wk-neb.c{ animation:wkDriftC 22s ease-in-out infinite alternate; }
+@keyframes wkDriftA{ from{ transform:translate(0, 0) scale(1); } to{ transform:translate(9vw, 4vh) scale(1.12); } }
+@keyframes wkDriftB{ from{ transform:translate(0, 0) scale(1.05); } to{ transform:translate(-10vw, -5vh) scale(0.95); } }
+@keyframes wkDriftC{ from{ transform:translate(0, 0); } to{ transform:translate(6vw, -6vh); } }
+:root:root .wk-shoot{ animation:wkShoot 7s ease-in 1.5s infinite; }
+:root:root .wk-planet{ animation:wkPlanet 7s ease-in-out infinite alternate; will-change:transform; }
+@keyframes wkPlanet{ from{ transform:translateY(-9px) rotate(-7deg); } to{ transform:translateY(9px) rotate(7deg); } }
+:root.lite .wk-warp, :root.lite .wk-warp.b, :root.lite .wk-warp.c{ animation:none !important; } :root.lite .wk-warp.a{ opacity:0.25; transform:scale(1); } :root.lite .wk-warp.b, :root.lite .wk-warp.c{ display:none; }
+@media (prefers-reduced-motion: reduce){ .wk-warp{ animation:none !important; } .wk-warp.a{ opacity:0.25; transform:scale(1); } .wk-warp.b, .wk-warp.c{ display:none; } }
