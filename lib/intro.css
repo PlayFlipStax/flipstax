@@ -117,3 +117,6 @@
 .ip-edge{ position:absolute; left:0; width:100%; height:100%; z-index:1; pointer-events:none; opacity:0; image-rendering:auto; }
 .ip-edge.top{ top:0; transform-origin:50% 0; -webkit-mask-image:linear-gradient(180deg, #000 90%, transparent); mask-image:linear-gradient(180deg, #000 90%, transparent); }
 .ip-edge.bot{ bottom:0; transform-origin:50% 100%; -webkit-mask-image:linear-gradient(0deg, #000 90%, transparent); mask-image:linear-gradient(0deg, #000 90%, transparent); }
+
+/* the landing's 'Watch intro' (test hosts only): in the bottom-right corner, above the TEST button, never over ENTER */
+:root:root #introWatch{ left:auto; right:10px; bottom:calc(58px + env(safe-area-inset-bottom)); transform:none; min-height:36px; padding:8px 12px; font-size:12px; }

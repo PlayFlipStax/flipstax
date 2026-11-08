@@ -19538,11 +19538,24 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     if (ms && window.Intro && Intro.enabled){ const w = document.createElement('button'); w.type = 'button'; w.className = 'ms-watch-intro'; w.textContent = 'Watch intro';
       w.addEventListener('click', (e)=>{ e.stopPropagation(); Intro.run(null, { force:true }); });
       ms.appendChild(w); } }
+  // ENTER: unlock audio inside the tap and start the intro music right away, honouring the saved Mute and volumes. If the phone still blocked it
+  // (the context stays suspended or the track did not start), the next few taps try again.
+  let kickTaps = 0;
+  function audioKick(why){
+    try{
+      if (soundOn){ const ctx = getAudioCtx(); if (ctx && ctx.state === 'suspended') ctx.resume().catch(()=>{}); }
+      if (musicOn){ const k = currentTrackKey; if (!k || k === 'intro' || k === 'fanfare' || why === 'enter'){ if (!(currentTrackKey === 'intro' && trackEls.intro && !trackEls.intro.paused)) playTrack('intro'); } }
+    }catch(e){}
+    if (why === 'enter' && !audioKick.armed){ audioKick.armed = true;
+      const retry = ()=>{ kickTaps++; const ctx = audioCtx, el = trackEls.intro, bad = (soundOn && ctx && ctx.state !== 'running') || (musicOn && currentTrackKey === 'intro' && el && el.paused);
+        if (!bad || kickTaps > 4){ document.removeEventListener('pointerdown', retry, true); return; } audioKick('retry'); };
+      document.addEventListener('pointerdown', retry, true); }
+  }
   els.homeEnterBtn.addEventListener('click', ()=>{
     const ov = els.homeOverlay;
     if (ov.classList.contains('entering')) return;
     // (the tap is the gesture phones need before any sound)
-    try{ if (soundOn) getAudioCtx(); }catch(e){}
+    audioKick('enter');   // (the same tap: unlock the audio and start the intro music; a blocked start is retried on the next tap)
     const beams = [...ov.querySelectorAll('.st-beam')], host = document.getElementById('homeHost');
     const enter = ()=>{
       ov.classList.add('hidden'); ov.classList.remove('entering');
