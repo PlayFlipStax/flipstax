@@ -16596,82 +16596,126 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     }, 1500);
     setTimeout(fin, 2950);
   }
-  // ---- final polish job 5: the Word Warp finale. About 2 s of the real game - the galaxy and the planet spin up fast, the solved letters light up, the
-  // tiles, logo and keyboard are pulled into the centre, one single bright flash - then the finale video full screen (media/ww-finale-540.mp4: a 540-wide
-  // copy of gemini_generated_video_f21c8f48.mp4 starting at 3.0 s, where the explosion begins, past the mock Word Warp screen), with WARPED IT! and the
-  // points counting up over it for the first 2 s; its own sound at the sound-effect volume (muted when sound effects are off), the background music
-  // paused; TAP TO SKIP after 1.5 s; at the end it fades into the goodbye and the results, unchanged. The video is loaded only when the win starts (and
-  // unlocked inside the winning tap, so a phone lets it play with sound); everything (video, layers, animations, timers, listeners) is removed after.
-  // Lite and reduced motion: a still WARPED IT! card for 2 s, then the goodbye. If the video cannot play, the same still card.
+  // Win stretch (Word Warp only): the win in four beats on the real game screen, then the finale video, unchanged.
+  //   A. CELEBRATE (0 - 3 s): the solved tiles light gold and pop; 40 confetti pieces burst out, 12 light spots and sparkles pop round the screen and
+  //      5 laser beams sweep up and fan out from the bottom edge (pink, cyan, gold); WARPED IT! with the points counting up over it; the show's win
+  //      fanfare and the crowd's cheer (no new sound files); the background music carries on.
+  //   B. GALAXY SPINS UP (3 - 4.5 s): the confetti, lasers and lights fade out and the galaxy speeds up from its slow turn to a fast spin.
+  //   C. SUCKED IN (4.5 - 6 s): the tiles, logo, keyboard, planet, WARPED IT! and any leftover confetti are pulled into the centre while the galaxy shrinks
+  //      to a black-hole point; then one single bright flash.
+  //   D. VIDEO (from about 6.1 s): the finale video exactly as before - from the explosion, its own sound at the sound-effect volume, the music paused - with
+  //      no second WARPED IT! (it already showed in A); then the goodbye with Flip and the results.
+  // The video starts loading when A starts. TAP TO SKIP shows from the first second and jumps straight to the goodbye. Everything (confetti, lasers, lights,
+  // the card, timers, listeners, the video) is removed when the sequence ends or is skipped. Lite and reduced motion: the still WARPED IT! card for 2 s,
+  // then the goodbye, as before. Transform and opacity only; a few dozen large pieces.
   const WW_FINALE_SRC = 'media/ww-finale-540.mp4';
+  const WW_BEAT = { A:3000, B:1500, C:1500 };
   function wwFinaleWin(solvedAt, done){
     const still = FX.reduced() || isLite() || !Element.prototype.animate, ov = els.solveOverlay;
-    const W = innerWidth, H = innerHeight, cx = W / 2, cy = H / 2;
+    const W = innerWidth, H = innerHeight, cx = W / 2, cy = H * 0.46;
     const timers = [], anims = [], later = (fn, ms)=>{ const id = setTimeout(fn, ms); timers.push(id); return id; };
-    let ended = false, vid = null, vidLayer = null, onSkip = null, srcNode = null;
+    let ended = false, vid = null, vidLayer = null, srcNode = null, skipBtn = null, rateT = 0;
     const points = runWarpPoints || 0, scoreEl = els.runBanner && els.runBanner.querySelector('.sp-num'), to = shownScore(runScore);
     if (scoreEl) scoreEl.textContent = to.toLocaleString();
-    // the WARPED IT! card (the word and the points) - over the video, or alone (lite, reduced motion, no video)
     const card = document.createElement('div'); card.className = 'ww-fin-card'; card.setAttribute('aria-live', 'polite');
     card.innerHTML = '<b class="ww-mega-word">WARPED IT!</b><span class="ww-mega-pts">' + (points ? '+' + points + ' pts' : '') + '</span>';
     const fitWord = ()=>{ const w = card.querySelector('.ww-mega-word'); let fs = 100; w.style.fontSize = fs + 'px'; for (let k = 0; k < 3; k++){ const ww = w.scrollWidth || w.getBoundingClientRect().width; if (!ww) break; fs = fs * W * 0.88 / ww; w.style.fontSize = fs.toFixed(1) + 'px'; } };
+    const fxLayer = document.createElement('div'); fxLayer.className = 'ww-party'; fxLayer.setAttribute('aria-hidden', 'true');
+    const galaxy = document.querySelector('.ww-galaxy'), sky = document.getElementById('wwSky'), planet = sky && sky.querySelector('.wk-planet');
     const finish = ()=>{
-      if (ended) return; ended = true; timers.forEach(clearTimeout); anims.forEach(a=>{ try{ a.cancel(); }catch(e){} }); wwSpinRate(1);
-      if (onSkip && vidLayer) vidLayer.removeEventListener('click', onSkip);
+      if (ended) return; ended = true; timers.forEach(clearTimeout); clearInterval(rateT); ov.querySelectorAll('.ww-iris').forEach(n=> n.remove()); anims.forEach(a=>{ try{ a.cancel(); }catch(e){} }); wwSpinRate(1);
       const inner = ov.querySelector('.solve-inner'); if (inner) inner.style.opacity = '0';
-      ov.classList.remove('celebrating', 'ww-done'); ov.querySelectorAll('.ww-flash').forEach(n=> n.remove());
-      const top = vidLayer || card;
-      done();   // (the goodbye and the results build underneath, then the video or the card fades away over them)
-      const gone = ()=>{ if (vid){ try{ vid.pause(); }catch(e){} try{ if (srcNode) srcNode.disconnect(); }catch(e){} vid.removeAttribute('src'); try{ vid.load(); }catch(e){} } if (vidLayer) vidLayer.remove(); card.remove(); };
-      if (top && top.animate && !still){ const a = top.animate([{ opacity:1 }, { opacity:0 }], { duration:500, easing:'ease-in', fill:'forwards' }); a.onfinish = gone; setTimeout(gone, 700); } else gone();
+      ov.classList.remove('celebrating', 'ww-done'); document.querySelectorAll('.ww-flash').forEach(n=> n.remove());
+      if (skipBtn) skipBtn.remove();
+      const top = vidLayer;
+      done();   // (the goodbye and the results build underneath, then the video fades away over them)
+      const gone = ()=>{ if (vid){ try{ vid.pause(); }catch(e){} try{ if (srcNode) srcNode.disconnect(); }catch(e){} vid.removeAttribute('src'); try{ vid.load(); }catch(e){} } if (vidLayer) vidLayer.remove(); card.remove(); fxLayer.remove(); };
+      if (top && top.animate && !still){ card.remove(); fxLayer.remove(); const a = top.animate([{ opacity:1 }, { opacity:0 }], { duration:500, easing:'ease-in', fill:'forwards' }); a.onfinish = gone; setTimeout(gone, 700); } else gone();
     };
-    const stillCard = ()=>{ card.classList.add('still'); document.body.appendChild(card); fitWord(); later(finish, 2000); };
-    if (still){ ov.classList.add('ww-done'); const inner = ov.querySelector('.solve-inner'); if (inner) inner.style.opacity = '0'; sfx.solveWin && sfx.solveWin(); stillCard(); return; }
-    // the video: made now (in the winning tap) and unlocked with a quick play / pause, so it may play with sound 2 s later
+    if (still){ ov.classList.add('ww-done'); const inner = ov.querySelector('.solve-inner'); if (inner) inner.style.opacity = '0'; sfx.solveWin && sfx.solveWin(); card.classList.add('still'); document.body.appendChild(card); fitWord(); later(finish, 2000); return; }
+    // the video starts loading now (and is unlocked inside the winning tap, so a phone lets it play with sound later)
     vid = document.createElement('video'); vid.className = 'ww-fin-video'; vid.setAttribute('playsinline', ''); vid.playsInline = true; vid.preload = 'auto';
     vid.muted = !sfxOn; vid.src = WW_FINALE_SRC;
     try{ const pr = vid.play(); if (pr && pr.then) pr.then(()=>{ if (!vid.dataset.go) try{ vid.pause(); vid.currentTime = 0; }catch(e){} }, ()=>{}); }catch(e){}
-    // 1. the real game, about 2 s: the spin-up, the lit letters, everything pulled into the centre, one flash
-    sfx.cheer();
-    wwSpinRate(5);
-    const planet = document.querySelector('#wwSky .wk-planet'); if (planet) anims.push(planet.animate([{ transform:'rotate(0deg) scale(1)' }, { transform:'rotate(720deg) scale(1.15)' }], { duration:1900, easing:'cubic-bezier(.5,0,.8,.6)', fill:'forwards' }));
-    Array.from(els.solveSlots.children).forEach((s, k)=> later(()=> s.classList.add('ww-lit'), k * 70));
-    const pieces = [].concat(Array.from(els.solveSlots.children), Array.from(els.solveRack.children), Array.from(ov.querySelectorAll('.ww-logo .wl-t, .ww-logo .wl-swirl, .solve-buttons .daily-btn, .solve-attempts, .solve-header, .solve-bar, .solve-keyboard .solve-kb-key'))).filter(e=> e.getBoundingClientRect().width);
-    pieces.forEach((e, k)=>{
-      const r = e.getBoundingClientRect(), dx = cx - (r.left + r.width / 2), dy = cy - (r.top + r.height / 2), dir = dx >= 0 ? 1 : -1, d = 550 + (k * 23) % 260;
-      const mx = dx * 0.4 - dy * 0.3 * dir, my = dy * 0.4 + dx * 0.3 * dir;
-      anims.push(e.animate([{ transform:'translate(0,0) rotate(0deg) scale(1)', opacity:1 }, { transform:'translate(' + mx.toFixed(0) + 'px,' + my.toFixed(0) + 'px) rotate(' + (200 * dir) + 'deg) scale(0.7)', opacity:1, offset:0.5 },
-        { transform:'translate(' + dx.toFixed(0) + 'px,' + dy.toFixed(0) + 'px) rotate(' + (540 * dir) + 'deg) scale(0.05)', opacity:0 }], { duration:1000, delay:d, easing:'cubic-bezier(.45,0,.75,.9)', fill:'forwards' }));
-    });
-    const flash = document.createElement('i'); flash.className = 'ww-flash'; flash.setAttribute('aria-hidden', 'true'); document.body.appendChild(flash);
-    later(()=>{ anims.push(flash.animate([{ opacity:0 }, { opacity:1 }], { duration:160, easing:'ease-out', fill:'forwards' })); }, 1780);   // (the one bright flash)
-    // 2. the video, from the explosion, under the flash as it clears
+    // TAP TO SKIP from the first second: straight to the goodbye
+    skipBtn = document.createElement('button'); skipBtn.type = 'button'; skipBtn.className = 'ww-fin-skip ww-skip-top'; skipBtn.textContent = 'TAP TO SKIP';
+    skipBtn.addEventListener('click', (e)=>{ e.stopPropagation(); e.preventDefault(); finish(); });
+    document.body.appendChild(skipBtn); later(()=> skipBtn.classList.add('on'), 1000);
+    // ---- A. CELEBRATE
+    document.body.appendChild(fxLayer); fxLayer.appendChild(card); fitWord();
+    sfx.solveWin && sfx.solveWin(); later(()=> sfx.cheer && sfx.cheer(), 250);
+    Array.from(els.solveSlots.children).forEach((s, k)=> later(()=>{ s.classList.add('ww-lit'); anims.push(s.animate([{ transform:'scale(1)' }, { transform:'scale(1.22)', offset:0.4 }, { transform:'scale(1)' }], { duration:420, easing:'cubic-bezier(.3,1.5,.5,1)' })); }, k * 80));
+    const wd = card.querySelector('.ww-mega-word'), pt = card.querySelector('.ww-mega-pts');
+    anims.push(wd.animate([{ transform:'translate(-50%,-50%) scale(0.3)', opacity:0 }, { transform:'translate(-50%,-50%) scale(1.15)', opacity:1, offset:0.6 }, { transform:'translate(-50%,-50%) scale(1)', opacity:1 }], { duration:550, delay:300, easing:'ease-out', fill:'both' }));
+    anims.push(pt.animate([{ opacity:0 }, { opacity:1 }], { duration:300, delay:500, fill:'both' }));
+    if (points){ const t0 = performance.now() + 500; (function f(now){ if (ended || !pt.isConnected) return; const k = Math.max(0, Math.min(1, (now - t0) / 1200)); pt.textContent = '+' + Math.round(points * (1 - Math.pow(1 - k, 3))) + ' pts'; if (k < 1) requestAnimationFrame(f); })(performance.now()); }
+    const COL = ['#ff4fb4', '#5ff4ff', '#ffd23f', '#b98cff', '#7dff9a', '#ffffff'], parts = [];
+    // 5 lasers from the bottom edge: they rise, sweep and fan out
+    for (let k = 0; k < 5; k++){
+      const L = document.createElement('i'); L.className = 'ww-laser'; L.style.setProperty('--c', ['#ff4fb4', '#5ff4ff', '#ffd23f', '#5ff4ff', '#ff4fb4'][k]); L.style.left = (10 + k * 20) + '%'; fxLayer.appendChild(L); parts.push(L);
+      const a0 = (k - 2) * 6, a1 = (k - 2) * 22 + (k % 2 ? 10 : -10);
+      anims.push(L.animate([{ transform:'rotate(' + a0 + 'deg) scaleY(0)', opacity:0 }, { transform:'rotate(' + a0 + 'deg) scaleY(1)', opacity:0.9, offset:0.2 }, { transform:'rotate(' + (a1 * 0.4) + 'deg) scaleY(1)', opacity:0.8, offset:0.55 }, { transform:'rotate(' + a1 + 'deg) scaleY(1)', opacity:0.85 }],
+        { duration:2600, delay:150 + k * 60, easing:'ease-in-out', fill:'both' }));
+    }
+    // 12 light spots and sparkles popping round the screen
+    for (let k = 0; k < 12; k++){
+      const sp = document.createElement('i'); sp.className = k % 3 ? 'ww-spot' : 'ww-spark'; sp.style.setProperty('--c', COL[k % COL.length]); sp.style.left = ((k * 41 + 9) % 92 + 4) + '%'; sp.style.top = ((k * 29 + 13) % 70 + 8) + '%'; fxLayer.appendChild(sp); parts.push(sp);
+      anims.push(sp.animate([{ transform:'scale(0.2)', opacity:0 }, { transform:'scale(1.15)', opacity:1, offset:0.3 }, { transform:'scale(0.9)', opacity:0.85, offset:0.6 }, { transform:'scale(1.05)', opacity:0 }], { duration:1100, delay:250 + (k * 170) % 1700, easing:'ease-out', fill:'both' }));
+    }
+    // 40 confetti pieces bursting out from the word, then drifting down
+    const conf = [];
+    for (let k = 0; k < 40; k++){
+      const c = document.createElement('i'); c.className = 'ww-conf' + (k % 3 === 0 ? ' r' : ''); c.style.setProperty('--c', COL[k % COL.length]); c.style.left = cx + 'px'; c.style.top = cy + 'px'; fxLayer.appendChild(c); conf.push(c);
+      const ang = (k / 40) * Math.PI * 2 + (k % 5) * 0.07, dist = Math.min(W, H) * (0.32 + (k % 7) * 0.06), x1 = Math.cos(ang) * dist, y1 = Math.sin(ang) * dist * 0.85 - 40, rot = ((k * 97) % 720) - 360;
+      c._x = x1; c._y = y1 + H * 0.22; c._r = rot;
+      anims.push(c.animate([{ transform:'translate(-50%,-50%) translate(0,0) rotate(0deg) scale(0.4)', opacity:1 }, { transform:'translate(-50%,-50%) translate(' + x1.toFixed(0) + 'px,' + y1.toFixed(0) + 'px) rotate(' + (rot / 2) + 'deg) scale(1)', opacity:1, offset:0.3 },
+        { transform:'translate(-50%,-50%) translate(' + (x1 * 1.05).toFixed(0) + 'px,' + (y1 + H * 0.22).toFixed(0) + 'px) rotate(' + rot + 'deg) scale(1)', opacity:1 }], { duration:2700, delay:200 + (k % 8) * 25, easing:'cubic-bezier(.2,.7,.4,1)', fill:'both' }));
+    }
+    // ---- B. GALAXY SPINS UP: the party fades, the galaxy speeds from its slow turn to a fast spin
     later(()=>{
-      ov.classList.add('ww-done');
-      if (ended) return;
-      vidLayer = document.createElement('div'); vidLayer.className = 'ww-fin'; vidLayer.appendChild(vid);
-      const skip = document.createElement('button'); skip.type = 'button'; skip.className = 'ww-fin-skip'; skip.textContent = 'TAP TO SKIP'; vidLayer.appendChild(skip);
-      vidLayer.appendChild(card); document.body.appendChild(vidLayer); fitWord();
-      // its sound: at the sound-effect volume (through the effects gain when it is running - a phone ignores a video's own volume); the music pauses
+      parts.forEach(p=> anims.push(p.animate([{ opacity:getComputedStyle(p).opacity }, { opacity:0 }], { duration:600, fill:'forwards' })));
+      conf.forEach(c=>{ c.style.opacity = '1'; anims.push(c.animate([{ opacity:1 }, { opacity:0.4 }], { duration:700, fill:'forwards', composite:'replace' })); });   // (most of the confetti fades; what is left is pulled in, in C)
+      const t0 = performance.now(); rateT = setInterval(()=>{ const k = Math.min(1, (performance.now() - t0) / WW_BEAT.B); wwSpinRate(1 + 9 * k * k); if (k >= 1) clearInterval(rateT); }, 60);
+    }, WW_BEAT.A);
+    // ---- C. SUCKED IN: everything pulled into the centre, the galaxy shrinks to a point, one flash
+    const tC = WW_BEAT.A + WW_BEAT.B;
+    later(()=>{
+      const pieces = [].concat(Array.from(els.solveSlots.children), Array.from(els.solveRack.children), Array.from(ov.querySelectorAll('.ww-logo .wl-t, .ww-logo .wl-swirl, .solve-buttons .daily-btn, .solve-attempts, .solve-header, .solve-bar, .solve-keyboard .solve-kb-key')), planet ? [planet] : [], [card]).filter(e=> e.getBoundingClientRect().width);
+      pieces.forEach((e, k)=>{
+        const r = e.getBoundingClientRect(), dx = W / 2 - (r.left + r.width / 2), dy = H / 2 - (r.top + r.height / 2), dir = dx >= 0 ? 1 : -1, d = (k * 19) % 300;
+        const mx = dx * 0.4 - dy * 0.3 * dir, my = dy * 0.4 + dx * 0.3 * dir, base = e === card ? 'translate(-50%,-50%) ' : '';
+        if (e === card){ anims.push(e.animate([{ transform:'translate(0,0) scale(1)', opacity:1 }, { transform:'translate(0,' + (H / 2 - cy).toFixed(0) + 'px) scale(0.05)', opacity:0 }], { duration:900, easing:'cubic-bezier(.5,0,.8,.6)', fill:'forwards' })); return; }
+        anims.push(e.animate([{ transform:base + 'translate(0,0) rotate(0deg) scale(1)', opacity:1 }, { transform:base + 'translate(' + mx.toFixed(0) + 'px,' + my.toFixed(0) + 'px) rotate(' + (200 * dir) + 'deg) scale(0.7)', opacity:1, offset:0.5 },
+          { transform:base + 'translate(' + dx.toFixed(0) + 'px,' + dy.toFixed(0) + 'px) rotate(' + (540 * dir) + 'deg) scale(0.04)', opacity:0 }], { duration:1050, delay:d, easing:'cubic-bezier(.45,0,.75,.9)', fill:'forwards' }));
+      });
+      conf.forEach(c=>{ const fx = c._x * 1.05, fy = c._y; anims.push(c.animate([{ transform:'translate(-50%,-50%) translate(' + fx.toFixed(0) + 'px,' + fy.toFixed(0) + 'px) rotate(' + c._r + 'deg)' }, { transform:'translate(-50%,-50%) translate(' + (W / 2 - cx).toFixed(0) + 'px,' + (H / 2 - cy).toFixed(0) + 'px) rotate(' + (c._r + 360) + 'deg) scale(0.05)' }], { duration:900, easing:'ease-in', fill:'forwards' })); });
+      // (the black hole: a black iris with a round clear centre, over the galaxy and under the board, closes to a point - scale only)
+      const iris = document.createElement('i'); iris.className = 'ww-iris'; iris.setAttribute('aria-hidden', 'true'); const inr = ov.querySelector('.solve-inner'); ov.insertBefore(iris, inr || null);
+      anims.push(iris.animate([{ transform:'scale(1)' }, { transform:'scale(0.004)' }], { duration:1400, easing:'cubic-bezier(.55,0,.85,.45)', fill:'forwards' })); iris._ww = true;
+      [galaxy, sky].forEach(g=>{ if (g && g.animate) anims.push(g.animate([{ transform:'scale(1) rotate(0deg)', opacity:1 }, { transform:'scale(0.02) rotate(200deg)', opacity:0.9 }], { duration:1350, easing:'cubic-bezier(.6,0,.9,.5)', fill:'forwards' })); });
+      ov.classList.add('ww-sucking');   // (the galaxy and the sky become a disc - a static clip - so they shrink to a point, not a rectangle)
+      [els.solveSlots, els.solveRack].forEach(e=>{ if (e && e.animate) anims.push(e.animate([{ opacity:1 }, { opacity:0 }], { duration:700, delay:300, fill:'forwards' })); });
+    }, tC);
+    const flash = document.createElement('i'); flash.className = 'ww-flash'; flash.setAttribute('aria-hidden', 'true'); document.body.appendChild(flash);
+    later(()=> anims.push(flash.animate([{ opacity:0 }, { opacity:1 }], { duration:160, easing:'ease-out', fill:'forwards' })), tC + WW_BEAT.C - 160);   // (the one bright flash)
+    // ---- D. VIDEO: exactly as before, without a second WARPED IT!
+    later(()=>{
+      ov.classList.add('ww-done'); if (ended) return;
+      vidLayer = document.createElement('div'); vidLayer.className = 'ww-fin'; vidLayer.appendChild(vid); document.body.insertBefore(vidLayer, skipBtn);
+      fxLayer.remove();
       vid.muted = !sfxOn;
       try{ const ctx = sfxOn ? getAudioCtx() : null; if (ctx && masterGain && ctx.state === 'running'){ srcNode = ctx.createMediaElementSource(vid); srcNode.connect(masterGain); vid.volume = 1; } else vid.volume = Math.max(0, Math.min(1, sfxVol)); }catch(e){ vid.volume = Math.max(0, Math.min(1, sfxVol)); }
       pauseAllTracks();
       vid.dataset.go = '1'; try{ vid.currentTime = 0; }catch(e){}
       const pr = vid.play();
-      const fail = ()=>{ if (ended) return; if (vidLayer){ vidLayer.remove(); vidLayer = null; } stillCard(); if (flash.animate){ flash.animate([{ opacity:1 }, { opacity:0 }], { duration:300, fill:'forwards' }).onfinish = ()=> flash.remove(); } else flash.remove(); };
+      const fail = ()=>{ if (ended) return; if (vidLayer){ vidLayer.remove(); vidLayer = null; } card.style.opacity = ''; card.getAnimations().forEach(a=> a.cancel()); card.classList.add('still'); document.body.appendChild(card); fitWord(); later(finish, 2000);
+        if (flash.animate){ flash.animate([{ opacity:1 }, { opacity:0 }], { duration:300, fill:'forwards' }).onfinish = ()=> flash.remove(); } else flash.remove(); };
       if (pr && pr.catch) pr.catch(fail);
       vid.addEventListener('error', fail);
       vid.addEventListener('ended', finish);
       later(finish, 9000);   // (a safety net: the clip is 7 s)
       flash.animate([{ opacity:1 }, { opacity:0 }], { duration:450, easing:'ease-out', fill:'forwards' }).onfinish = ()=> flash.remove();
-      // WARPED IT! and the points over the first 2 s
-      const wd = card.querySelector('.ww-mega-word'), pt = card.querySelector('.ww-mega-pts');
-      wd.animate([{ transform:'translate(-50%,-50%) scale(0.3)', opacity:0 }, { transform:'translate(-50%,-50%) scale(1.15)', opacity:1, offset:0.6 }, { transform:'translate(-50%,-50%) scale(1)', opacity:1 }], { duration:550, easing:'ease-out', fill:'both' });
-      if (points){ const t0 = performance.now(); (function f(now){ if (ended || !pt.isConnected) return; const k = Math.min(1, (now - t0) / 1200); pt.textContent = '+' + Math.round(points * (1 - Math.pow(1 - k, 3))) + ' pts'; if (k < 1) requestAnimationFrame(f); })(t0); }
-      later(()=>{ if (card.animate) card.animate([{ opacity:1 }, { opacity:0 }], { duration:400, fill:'forwards' }); }, 2000);
-      // TAP TO SKIP after 1.5 s
-      later(()=>{ skip.classList.add('on'); onSkip = (e)=>{ e.stopPropagation(); e.preventDefault(); finish(); }; vidLayer && vidLayer.addEventListener('click', onSkip); }, 1500);
-    }, 1950);
+    }, tC + WW_BEAT.C + 20);
   }
   function wwWin(solvedAt, done){
     if (WW_FINALE) return wwFinaleWin(solvedAt, done);

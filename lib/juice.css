@@ -3087,3 +3087,18 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
    and it is capped to the width left of the button, with an ellipsis if ever needed) ---- */
 :root:root .test-tag{ max-width:calc(100vw - 132px - env(safe-area-inset-right)); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; box-sizing:border-box; }
 @media (max-width:379px){ :root:root .test-tag{ font-size:12.5px; } }
+
+/* ---- win stretch: Word Warp's celebration beat - the party layer over the board (confetti, light spots, sparkles, lasers from the bottom edge) and the
+   TAP TO SKIP that shows from the first second ---- */
+.ww-party{ position:fixed; inset:0; z-index:590; pointer-events:none; overflow:hidden; }
+.ww-party .ww-fin-card{ position:absolute; z-index:3; }
+.ww-conf{ position:absolute; width:14px; height:22px; border-radius:3px; background:var(--c); will-change:transform; }
+.ww-conf.r{ width:16px; height:16px; border-radius:50%; }
+.ww-spot{ position:absolute; width:120px; height:120px; margin:-60px 0 0 -60px; border-radius:50%; background:radial-gradient(circle, color-mix(in srgb, var(--c) 70%, transparent), transparent 70%); opacity:0; }
+.ww-spark{ position:absolute; width:36px; height:36px; margin:-18px 0 0 -18px; background:var(--c); clip-path:polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%); opacity:0; }
+.ww-laser{ position:absolute; bottom:-10px; width:10px; height:115vh; margin-left:-5px; border-radius:6px; transform-origin:50% 100%; opacity:0;
+  background:linear-gradient(0deg, #ffffff 0%, var(--c) 12%, color-mix(in srgb, var(--c) 50%, transparent) 60%, transparent 100%); }
+.ww-skip-top{ position:fixed !important; z-index:620 !important; }
+.ww-galaxy, #wwSky{ transform-origin:50% 50%; }
+.ww-iris{ position:fixed; left:50%; top:50%; width:300vmax; height:300vmax; margin:-150vmax 0 0 -150vmax; z-index:2; pointer-events:none; will-change:transform;
+  background:radial-gradient(circle, transparent 0, transparent 18.5%, #000 19.2%); }
