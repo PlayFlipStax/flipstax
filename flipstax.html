@@ -16505,7 +16505,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   //              score pill counts up with the +N;
   //   ~2.9 s     done() - the results flow continues. Transform and opacity only.
   // Lite and reduced motion: the galaxy and logo stay still; the board fades, WARPED IT! shows (no scaling) with the points, then done().
-  const WW_SPIRAL_WIN = true;
+  const WW_SPIRAL_WIN = true, WW_FINALE = true;   // (final polish job 5: the finale video - wwFinaleWin; the spiral win stays as a fallback when WW_FINALE is false)
   function wwSpiralWin(solvedAt, done){
     const still = FX.reduced() || isLite() || !Element.prototype.animate, ov = els.solveOverlay;
     const W = innerWidth, H = innerHeight, cx = W / 2, cy = H / 2;
@@ -16562,7 +16562,85 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     }, 1500);
     setTimeout(fin, 2950);
   }
+  // ---- final polish job 5: the Word Warp finale. About 2 s of the real game - the galaxy and the planet spin up fast, the solved letters light up, the
+  // tiles, logo and keyboard are pulled into the centre, one single bright flash - then the finale video full screen (media/ww-finale-540.mp4: a 540-wide
+  // copy of gemini_generated_video_f21c8f48.mp4 starting at 3.0 s, where the explosion begins, past the mock Word Warp screen), with WARPED IT! and the
+  // points counting up over it for the first 2 s; its own sound at the sound-effect volume (muted when sound effects are off), the background music
+  // paused; TAP TO SKIP after 1.5 s; at the end it fades into the goodbye and the results, unchanged. The video is loaded only when the win starts (and
+  // unlocked inside the winning tap, so a phone lets it play with sound); everything (video, layers, animations, timers, listeners) is removed after.
+  // Lite and reduced motion: a still WARPED IT! card for 2 s, then the goodbye. If the video cannot play, the same still card.
+  const WW_FINALE_SRC = 'media/ww-finale-540.mp4';
+  function wwFinaleWin(solvedAt, done){
+    const still = FX.reduced() || isLite() || !Element.prototype.animate, ov = els.solveOverlay;
+    const W = innerWidth, H = innerHeight, cx = W / 2, cy = H / 2;
+    const timers = [], anims = [], later = (fn, ms)=>{ const id = setTimeout(fn, ms); timers.push(id); return id; };
+    let ended = false, vid = null, vidLayer = null, onSkip = null, srcNode = null;
+    const points = runWarpPoints || 0, scoreEl = els.runBanner && els.runBanner.querySelector('.sp-num'), to = shownScore(runScore);
+    if (scoreEl) scoreEl.textContent = to.toLocaleString();
+    // the WARPED IT! card (the word and the points) - over the video, or alone (lite, reduced motion, no video)
+    const card = document.createElement('div'); card.className = 'ww-fin-card'; card.setAttribute('aria-live', 'polite');
+    card.innerHTML = '<b class="ww-mega-word">WARPED IT!</b><span class="ww-mega-pts">' + (points ? '+' + points + ' pts' : '') + '</span>';
+    const fitWord = ()=>{ const w = card.querySelector('.ww-mega-word'); let fs = 100; w.style.fontSize = fs + 'px'; for (let k = 0; k < 3; k++){ const ww = w.scrollWidth || w.getBoundingClientRect().width; if (!ww) break; fs = fs * W * 0.88 / ww; w.style.fontSize = fs.toFixed(1) + 'px'; } };
+    const finish = ()=>{
+      if (ended) return; ended = true; timers.forEach(clearTimeout); anims.forEach(a=>{ try{ a.cancel(); }catch(e){} }); wwSpinRate(1);
+      if (onSkip && vidLayer) vidLayer.removeEventListener('click', onSkip);
+      const inner = ov.querySelector('.solve-inner'); if (inner) inner.style.opacity = '0';
+      ov.classList.remove('celebrating', 'ww-done'); ov.querySelectorAll('.ww-flash').forEach(n=> n.remove());
+      const top = vidLayer || card;
+      done();   // (the goodbye and the results build underneath, then the video or the card fades away over them)
+      const gone = ()=>{ if (vid){ try{ vid.pause(); }catch(e){} try{ if (srcNode) srcNode.disconnect(); }catch(e){} vid.removeAttribute('src'); try{ vid.load(); }catch(e){} } if (vidLayer) vidLayer.remove(); card.remove(); };
+      if (top && top.animate && !still){ const a = top.animate([{ opacity:1 }, { opacity:0 }], { duration:500, easing:'ease-in', fill:'forwards' }); a.onfinish = gone; setTimeout(gone, 700); } else gone();
+    };
+    const stillCard = ()=>{ card.classList.add('still'); document.body.appendChild(card); fitWord(); later(finish, 2000); };
+    if (still){ ov.classList.add('ww-done'); const inner = ov.querySelector('.solve-inner'); if (inner) inner.style.opacity = '0'; sfx.solveWin && sfx.solveWin(); stillCard(); return; }
+    // the video: made now (in the winning tap) and unlocked with a quick play / pause, so it may play with sound 2 s later
+    vid = document.createElement('video'); vid.className = 'ww-fin-video'; vid.setAttribute('playsinline', ''); vid.playsInline = true; vid.preload = 'auto';
+    vid.muted = !sfxOn; vid.src = WW_FINALE_SRC;
+    try{ const pr = vid.play(); if (pr && pr.then) pr.then(()=>{ if (!vid.dataset.go) try{ vid.pause(); vid.currentTime = 0; }catch(e){} }, ()=>{}); }catch(e){}
+    // 1. the real game, about 2 s: the spin-up, the lit letters, everything pulled into the centre, one flash
+    sfx.cheer();
+    wwSpinRate(5);
+    const planet = document.querySelector('#wwSky .wk-planet'); if (planet) anims.push(planet.animate([{ transform:'rotate(0deg) scale(1)' }, { transform:'rotate(720deg) scale(1.15)' }], { duration:1900, easing:'cubic-bezier(.5,0,.8,.6)', fill:'forwards' }));
+    Array.from(els.solveSlots.children).forEach((s, k)=> later(()=> s.classList.add('ww-lit'), k * 70));
+    const pieces = [].concat(Array.from(els.solveSlots.children), Array.from(els.solveRack.children), Array.from(ov.querySelectorAll('.ww-logo .wl-t, .ww-logo .wl-swirl, .solve-buttons .daily-btn, .solve-attempts, .solve-header, .solve-bar, .solve-keyboard .solve-kb-key'))).filter(e=> e.getBoundingClientRect().width);
+    pieces.forEach((e, k)=>{
+      const r = e.getBoundingClientRect(), dx = cx - (r.left + r.width / 2), dy = cy - (r.top + r.height / 2), dir = dx >= 0 ? 1 : -1, d = 550 + (k * 23) % 260;
+      const mx = dx * 0.4 - dy * 0.3 * dir, my = dy * 0.4 + dx * 0.3 * dir;
+      anims.push(e.animate([{ transform:'translate(0,0) rotate(0deg) scale(1)', opacity:1 }, { transform:'translate(' + mx.toFixed(0) + 'px,' + my.toFixed(0) + 'px) rotate(' + (200 * dir) + 'deg) scale(0.7)', opacity:1, offset:0.5 },
+        { transform:'translate(' + dx.toFixed(0) + 'px,' + dy.toFixed(0) + 'px) rotate(' + (540 * dir) + 'deg) scale(0.05)', opacity:0 }], { duration:1000, delay:d, easing:'cubic-bezier(.45,0,.75,.9)', fill:'forwards' }));
+    });
+    const flash = document.createElement('i'); flash.className = 'ww-flash'; flash.setAttribute('aria-hidden', 'true'); document.body.appendChild(flash);
+    later(()=>{ anims.push(flash.animate([{ opacity:0 }, { opacity:1 }], { duration:160, easing:'ease-out', fill:'forwards' })); }, 1780);   // (the one bright flash)
+    // 2. the video, from the explosion, under the flash as it clears
+    later(()=>{
+      ov.classList.add('ww-done');
+      if (ended) return;
+      vidLayer = document.createElement('div'); vidLayer.className = 'ww-fin'; vidLayer.appendChild(vid);
+      const skip = document.createElement('button'); skip.type = 'button'; skip.className = 'ww-fin-skip'; skip.textContent = 'TAP TO SKIP'; vidLayer.appendChild(skip);
+      vidLayer.appendChild(card); document.body.appendChild(vidLayer); fitWord();
+      // its sound: at the sound-effect volume (through the effects gain when it is running - a phone ignores a video's own volume); the music pauses
+      vid.muted = !sfxOn;
+      try{ const ctx = sfxOn ? getAudioCtx() : null; if (ctx && masterGain && ctx.state === 'running'){ srcNode = ctx.createMediaElementSource(vid); srcNode.connect(masterGain); vid.volume = 1; } else vid.volume = Math.max(0, Math.min(1, sfxVol)); }catch(e){ vid.volume = Math.max(0, Math.min(1, sfxVol)); }
+      pauseAllTracks();
+      vid.dataset.go = '1'; try{ vid.currentTime = 0; }catch(e){}
+      const pr = vid.play();
+      const fail = ()=>{ if (ended) return; if (vidLayer){ vidLayer.remove(); vidLayer = null; } stillCard(); if (flash.animate){ flash.animate([{ opacity:1 }, { opacity:0 }], { duration:300, fill:'forwards' }).onfinish = ()=> flash.remove(); } else flash.remove(); };
+      if (pr && pr.catch) pr.catch(fail);
+      vid.addEventListener('error', fail);
+      vid.addEventListener('ended', finish);
+      later(finish, 9000);   // (a safety net: the clip is 7 s)
+      flash.animate([{ opacity:1 }, { opacity:0 }], { duration:450, easing:'ease-out', fill:'forwards' }).onfinish = ()=> flash.remove();
+      // WARPED IT! and the points over the first 2 s
+      const wd = card.querySelector('.ww-mega-word'), pt = card.querySelector('.ww-mega-pts');
+      wd.animate([{ transform:'translate(-50%,-50%) scale(0.3)', opacity:0 }, { transform:'translate(-50%,-50%) scale(1.15)', opacity:1, offset:0.6 }, { transform:'translate(-50%,-50%) scale(1)', opacity:1 }], { duration:550, easing:'ease-out', fill:'both' });
+      if (points){ const t0 = performance.now(); (function f(now){ if (ended || !pt.isConnected) return; const k = Math.min(1, (now - t0) / 1200); pt.textContent = '+' + Math.round(points * (1 - Math.pow(1 - k, 3))) + ' pts'; if (k < 1) requestAnimationFrame(f); })(t0); }
+      later(()=>{ if (card.animate) card.animate([{ opacity:1 }, { opacity:0 }], { duration:400, fill:'forwards' }); }, 2000);
+      // TAP TO SKIP after 1.5 s
+      later(()=>{ skip.classList.add('on'); onSkip = (e)=>{ e.stopPropagation(); e.preventDefault(); finish(); }; vidLayer && vidLayer.addEventListener('click', onSkip); }, 1500);
+    }, 1950);
+  }
   function wwWin(solvedAt, done){
+    if (WW_FINALE) return wwFinaleWin(solvedAt, done);
     if (WW_SPIRAL_WIN) return wwSpiralWin(solvedAt, done);
     // fix 6 item 2b: the SOLVED moment, in order - the tiles lock and flash gold, the tray fades out, the UFO beam comes down over the word, the letters bounce
     // one after another, SOLVED! slams in below the word (the tray's room, never over the tiles), then the BIG WIN CELEBRATION (lib/celebrate.js) with the
