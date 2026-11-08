@@ -3013,3 +3013,18 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root:root .vol-pop input[type="range"]{ flex:1 1 auto; width:auto; min-width:0; height:32px; touch-action:manipulation; }
 :root:root .vol-row b{ min-width:40px; text-align:right; }
 :root:root .vol-mute{ touch-action:manipulation; }
+
+/* ---- final polish job 2: the music list in the sound panel - rows 44 px tall, the active one marked (a lit dot, a gold row and PLAYING / ON); it scrolls
+   inside the panel on short screens ---- */
+:root:root .vol-pop{ max-height:calc(100dvh - 60px); overflow:hidden; }
+.vol-list{ flex:1 1 100%; display:flex; flex-direction:column; gap:4px; margin-top:4px; padding-top:8px; border-top:1px solid rgba(255,214,90,0.3);
+  max-height:calc(100dvh - 210px); overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+.vol-song{ display:flex; align-items:center; gap:10px; min-height:44px; padding:0 12px; border-radius:12px; border:2px solid transparent; background:rgba(255,255,255,0.06);
+  color:#fff3c4; font:800 15px/1.1 var(--f-body, sans-serif); text-align:left; cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+.vol-song .vs-dot{ flex:none; width:14px; height:14px; border-radius:50%; border:2px solid rgba(255,214,90,0.7); box-sizing:border-box; }
+.vol-song .vs-name{ flex:1 1 auto; min-width:0; }
+.vol-song .vs-on{ display:none; font:900 11px/1 var(--f-body, sans-serif); letter-spacing:1px; color:#3a1500; background:#ffd23f; padding:3px 7px; border-radius:99px; }
+.vol-song.on{ border-color:#ffd23f; background:rgba(255,210,63,0.16); }
+.vol-song.on .vs-dot{ background:#ffd23f; border-color:#ffd23f; } .vol-song.on .vs-on{ display:inline-block; }
+.vol-song.mute.on{ border-color:#ff8a8a; background:rgba(255,90,90,0.16); } .vol-song.mute.on .vs-dot{ background:#ff7a7a; border-color:#ff7a7a; } .vol-song.mute.on .vs-on{ background:#ff9a9a; }
+:root:root .vol-pop{ z-index:520; }

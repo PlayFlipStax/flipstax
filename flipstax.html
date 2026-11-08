@@ -4308,7 +4308,7 @@
 <div class="studio page-set" data-studio aria-hidden="true"></div>
 <div class="show-marquee off" id="showMarquee" aria-hidden="true"></div>
 <!-- The sound panel: one master volume and the mute button (opened from the speaker). -->
-<div class="vol-pop hidden" id="volPop" role="dialog" aria-label="Sound and pace"><div class="vol-row"><button type="button" class="vol-mute" id="musMute" aria-label="Mute music">🎵</button><span class="vol-name">Music</span><input type="range" id="musSlider" min="0" max="100" step="5" aria-label="Music volume"><b id="musPct"></b></div><div class="vol-row"><button type="button" class="vol-mute" id="sfxMute" aria-label="Mute sound effects">🔔</button><span class="vol-name">SFX</span><input type="range" id="sfxSlider" min="0" max="100" step="5" aria-label="Sound effects volume"><b id="sfxPct"></b></div><button type="button" class="vol-relax" id="volRelax" role="switch" aria-checked="false"><span class="vr-box"></span><span>Relaxed pace <small>8 s a VS card, not 5</small></span></button></div>
+<div class="vol-pop hidden" id="volPop" role="dialog" aria-label="Sound and pace"><div class="vol-row"><button type="button" class="vol-mute" id="musMute" aria-label="Mute music">🎵</button><span class="vol-name">Music</span><input type="range" id="musSlider" min="0" max="100" step="5" aria-label="Music volume"><b id="musPct"></b></div><div class="vol-row"><button type="button" class="vol-mute" id="sfxMute" aria-label="Mute sound effects">🔔</button><span class="vol-name">SFX</span><input type="range" id="sfxSlider" min="0" max="100" step="5" aria-label="Sound effects volume"><b id="sfxPct"></b></div><div class="vol-list" id="volList" role="radiogroup" aria-label="Music"></div><button type="button" class="vol-relax" id="volRelax" role="switch" aria-checked="false"><span class="vr-box"></span><span>Relaxed pace <small>8 s a VS card, not 5</small></span></button></div>
 <div class="fx-layer show-fx" id="showFx" aria-hidden="true"></div>
 <div class="show-card hidden" id="showCard"></div>
 <div class="show-host" id="showHost" aria-hidden="true"><div class="alien" id="showAlien"></div><div class="show-say" id="showSay"></div></div>
@@ -7151,6 +7151,17 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     if (isPaused) return;
     if (musicOn) playTrack(currentTrackKey === 'fanfare' ? 'intro' : (currentTrackKey || 'run')); else pauseAllTracks();
   }
+  // final polish job 2: pick the music - -1 Flip's Theme (the default), 0-7 a song, 'mute' the music off. A song switches the gameplay music right away
+  // (from the top, then looping); on the home screen or the results the theme there plays on and the pick takes over when play starts.
+  function pickMusic(v){
+    if (v === 'mute'){ setMusicOn(false); return; }
+    const was = altPick; altPick = v; lsSet(MUSIC_PICK_KEY, String(v));
+    const inPlay = currentTrackKey === 'run' || currentTrackKey === 'infinity' || currentTrackKey === 'alt';
+    if (!musicOn){ musicOn = true; lsSet('flipstax_music_on', '1'); syncSoundIcon(); }
+    if (isPaused) return;
+    if (inPlay && (was !== v || !trackEls[currentTrackKey] || trackEls[currentTrackKey].paused)){ clearTimeout(altT); pauseAllTracks(); const k = gameTrackKey(); currentTrackKey = null; playTrack(k); }
+    else if (!currentTrackKey || (trackEls[currentTrackKey] && trackEls[currentTrackKey].paused)) playTrack(currentTrackKey === 'fanfare' || !currentTrackKey ? 'intro' : currentTrackKey);
+  }
   function setSfxOn(on){ sfxOn = !!on; lsSet('flipstax_sfx_on', sfxOn ? '1' : '0'); syncSoundIcon(); if (sfxOn) getAudioCtx(); }
   function applyMusicVolume(){
     musicRouteAll();
@@ -7243,6 +7254,42 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     if (src !== TRACK_SRC.run){ TRACK_SRC.run = src; if (trackEls.run){ try{ trackEls.run.pause(); }catch(e){} delete trackEls.run; } }
   }
   const MUSIC_VOLUME = 0.55;
+  // ---- final polish job 2: the music picker (the speaker panel). 'Flip's Theme' is the default - the show's own gameplay music (Daily: Top Score
+  // Carousel; Infinity: its playlist), unchanged for new players; or one of eight songs (copies in audio/alt/ of incoming-assets/music/), which then
+  // plays as the gameplay music in both modes, looping seamlessly; or Mute (the music off). The intro, results and outro themes are never changed.
+  // Each song: lead = where its sound starts, out = where its sound ends (measured from the files: each ends with about 2.3 s of silence). The loop
+  // uses two elements of the same file: the next pass starts at `lead` just as this one reaches `out`, so the silence never plays.
+  // Only the chosen song is loaded (an element is made when it first plays); nothing is precached.
+  const ALT_SONGS = [
+    { name:'Nebula Nights',     src:'audio/alt/nebula-nights.mp3',     lead:0.05, out:180.0 },    // (Midnight_Stakes.mp3)
+    { name:'Cosmic Cruise',     src:'audio/alt/cosmic-cruise.mp3',     lead:0.06, out:176.0 },    // (High_Noon_Parade.mp3)
+    { name:'Warp Speed Boogie', src:'audio/alt/warp-speed-boogie.mp3', lead:0.01, out:178.2 },    // (Chrome_Bumper_Parade.mp3)
+    { name:'Moonbase Groove',   src:'audio/alt/moonbase-groove.mp3',   lead:0.06, out:176.6 },    // (Pacific_Drive.mp3)
+    { name:'Stardust Shuffle',  src:'audio/alt/stardust-shuffle.mp3',  lead:0.05, out:174.05 },   // (Palm_Tree_Pivot.mp3)
+    { name:'Saturn Strut',      src:'audio/alt/saturn-strut.mp3',      lead:0.03, out:180.15 },   // (Saturday_Afternoon_Swagger.mp3)
+    { name:'Alien Disco Fever', src:'audio/alt/alien-disco-fever.mp3', lead:1.0,  out:172.55 },   // (Top_Of_The_Board.mp3)
+    { name:'Meteor Mayhem',     src:'audio/alt/meteor-mayhem.mp3',     lead:0.06, out:176.75 },   // (Victory_Lap.mp3)
+  ];
+  const MUSIC_PICK_KEY = 'flipstax_music_pick_v1';
+  let altPick = (()=>{ const v = parseInt(lsGet(MUSIC_PICK_KEY), 10); return v >= 0 && v < ALT_SONGS.length ? v : -1; })();   // (-1: Flip's Theme)
+  const altEls = [null, null]; let altCur = 0, altT = 0, altSrcIdx = -1;
+  function altEl(k){
+    if (altSrcIdx !== altPick){ altEls.forEach(a=>{ if (a){ try{ a.pause(); a.removeAttribute('src'); a.load(); }catch(e){} } }); altEls[0] = altEls[1] = null; altSrcIdx = altPick; altCur = 0; }
+    if (!altEls[k]){ const a = new Audio(ALT_SONGS[altPick].src); a.preload = k === altCur ? 'auto' : 'metadata'; a._base = MUSIC_VOLUME; a.volume = a._base * masterVol;
+      a.addEventListener('play', ()=> musicRoute(a)); a.addEventListener('playing', ()=>{ if (currentTrackKey !== 'alt' || altEls[altCur] !== a){ try{ a.pause(); }catch(e){} return; } setTimeout(altArm, 300); });
+      a.addEventListener('ended', ()=>{ if (currentTrackKey !== 'alt' || altEls[altCur] !== a || !musicOn) return; altCur = 1 - altCur; const n2 = altEl(altCur); trackEls.alt = n2; try{ n2.currentTime = ALT_SONGS[altPick].lead; }catch(e){} n2.play().catch(()=>{}); });   // (a fallback: the timer normally hands over first)
+      altEls[k] = a; }
+    return altEls[k];
+  }
+  // the seamless loop: while the song plays, a timer starts the other element at `lead` exactly as this one reaches `out`
+  function altArm(){
+    clearTimeout(altT); if (altPick < 0) return; const a = altEls[altCur]; if (!a || a.paused || currentTrackKey !== 'alt') return;
+    const S = ALT_SONGS[altPick], left = S.out - a.currentTime;
+    if (left > 4){ altT = setTimeout(altArm, Math.min(30000, (left - 3) * 1000)); return; }
+    const nx = altEl(1 - altCur); try{ nx.preload = 'auto'; nx.load && nx.readyState < 2 && nx.load(); }catch(e){}
+    altT = setTimeout(()=>{ if (currentTrackKey !== 'alt' || !musicOn) return; const cur = altEls[altCur]; altCur = 1 - altCur; const n2 = altEls[altCur]; trackEls.alt = n2;
+      try{ n2.currentTime = S.lead; }catch(e){} n2.muted = false; n2.play().catch(()=>{}); try{ cur.pause(); }catch(e){} setTimeout(altArm, 1000); }, Math.max(0, left * 1000 - 30));
+  }
   // Which gameplay track fits the current mode - Infinity has its own,
   // everything else that used to hardcode 'run' goes through this.
   function gameTrackKey(){
@@ -7253,6 +7300,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   let currentTrackKey = null;
   function getTrackEl(key){
     if (key === 'infinity') return (trackEls.infinity = infinityEl(infIdx));
+    if (key === 'alt') return (trackEls.alt = altEl(altCur));
     if (!trackEls[key]){
       const a = new Audio(TRACK_SRC[key]);
       a.loop = ONE_SHOT_TRACKS.indexOf(key) === -1;
@@ -7397,6 +7445,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   }
 
   function pauseAllTracks(){
+    clearTimeout(altT); altEls.forEach(a=>{ if (a) try{ a.pause(); }catch(e){} });
     Object.keys(trackEls).forEach(k=>{ try{ trackEls[k].pause(); }catch(e){} });
     pauseInfinityPlaylist();
   }
@@ -7410,6 +7459,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // so now it's skipped entirely once the right track is already
   // audibly playing, instead of just skipping the currentTime reset.
   function playTrack(key){
+    if ((key === 'run' || key === 'infinity') && altPick >= 0) key = 'alt';   // (final polish job 2: a picked song is the gameplay music)
     // "Already playing" only counts if it was already THE current track -
     // an element left audible by anything else must be restarted from the
     // top, not adopted mid-song.
@@ -7429,15 +7479,16 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     if (key === 'infinity'){ pauseInfinityPlaylist(); infStartFresh(); }
     const el = getTrackEl(key);
     el.muted = false;
-    try{ el.currentTime = key === 'infinity' ? infStartAt(infIdx) : 0; }catch(e){}
+    try{ el.currentTime = key === 'infinity' ? infStartAt(infIdx) : key === 'alt' ? ALT_SONGS[altPick].lead : 0; }catch(e){}
     el.play().catch(()=>{});
+    if (key === 'alt') setTimeout(altArm, 600);
   }
   // The secret riddle has its own track: the Daily theme stops (keeping its
   // place) while the riddle is up and carries on from there afterwards,
   // like Pause / Resume. Until the track's file is in TRACK_SRC, the theme
   // just keeps playing.
   function startSecretMusic(){
-    if (!TRACK_SRC.secret || currentTrackKey !== 'run') return;
+    if (!TRACK_SRC.secret || (currentTrackKey !== 'run' && currentTrackKey !== 'alt')) return;
     playTrack('secret');   // pauses the theme where it is
   }
   function stopSecretMusic(){
@@ -7461,10 +7512,10 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     if (currentTrackKey !== 'secret' && currentTrackKey !== 'secretWin') return;
     stopSecretMusic();
     if (trackEls.secretWin) try{ trackEls.secretWin.pause(); }catch(e){}
-    currentTrackKey = 'run';
+    currentTrackKey = altPick >= 0 ? 'alt' : 'run';
     if (!musicOn) return;
-    const el = getTrackEl('run');
-    el.muted = false; el.play().catch(()=>{});
+    const el = getTrackEl(currentTrackKey);
+    el.muted = false; el.play().catch(()=>{}); if (currentTrackKey === 'alt') setTimeout(altArm, 600);
   }
   // End of a Daily run: the Daily theme stops and the results screen gets its
   // own track - Victory Lap Results if the word was solved, Better Luck Next
@@ -19026,24 +19077,30 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     row.mute.classList.toggle('off', !on); row.mute.setAttribute('aria-pressed', on ? 'false' : 'true'); row.mute.setAttribute('aria-label', (on ? 'Mute ' : 'Unmute ') + label);
     row.slider.value = String(Math.round(vol * 100)); row.pct.textContent = on ? Math.round(vol * 100) + '%' : 'off';
   }
-  function renderVolPop(){ volRelax.setAttribute('aria-checked', relaxedPace ? 'true' : 'false'); renderVolRow(volMus, musicOn, musicVol, 'music'); renderVolRow(volSfx, sfxOn, sfxVol, 'sound effects'); }
+  // final polish job 2: the music list - Flip's Theme first, the eight songs, Mute last; the active one is marked
+  const volList = document.getElementById('volList');
+  volList.innerHTML = [['-1', 'Flip’s Theme']].concat(ALT_SONGS.map((s, i)=> [String(i), s.name])).concat([['mute', 'Mute']]).map(([v, n])=>
+    '<button type="button" class="vol-song' + (v === 'mute' ? ' mute' : '') + '" role="radio" data-v="' + v + '"><span class="vs-dot" aria-hidden="true"></span><span class="vs-name">' + n + '</span><span class="vs-on" aria-hidden="true">PLAYING</span></button>').join('');
+  volList.addEventListener('click', (e)=>{ const b = e.target.closest('.vol-song'); if (!b) return; e.stopPropagation(); const v = b.dataset.v; pickMusic(v === 'mute' ? 'mute' : parseInt(v, 10)); renderVolPop(); });
+  function renderVolList(){ const act = !musicOn ? 'mute' : String(altPick); volList.querySelectorAll('.vol-song').forEach(b=>{ const on = b.dataset.v === act; b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false'); b.querySelector('.vs-on').textContent = b.dataset.v === 'mute' ? 'ON' : 'PLAYING'; }); }
+  function renderVolPop(){ volRelax.setAttribute('aria-checked', relaxedPace ? 'true' : 'false'); renderVolRow(volMus, musicOn, musicVol, 'music'); renderVolRow(volSfx, sfxOn, sfxVol, 'sound effects'); renderVolList(); }
   let volPopT = 0;
   function closeVolPop(){ volPop.classList.add('hidden'); clearTimeout(volPopT); }
   function openVolPop(){
     const r = els.soundToggle.getBoundingClientRect();
     volPop.style.left = Math.max(8, Math.round(r.left)) + 'px'; volPop.style.top = Math.round(r.bottom + 6) + 'px';
-    renderVolPop(); volPop.classList.remove('hidden'); clearTimeout(volPopT); volPopT = setTimeout(closeVolPop, 5000);
+    renderVolPop(); volPop.classList.remove('hidden'); clearTimeout(volPopT);   // (final polish: no auto-close - a tap outside closes it)
     { const w = volPop.getBoundingClientRect().width; volPop.style.left = Math.max(8, Math.min(parseFloat(volPop.style.left) || 8, innerWidth - w - 8)) + 'px'; }
   }
   els.soundToggle.addEventListener('click', (e)=>{ e.stopPropagation(); if (volPop.classList.contains('hidden')) openVolPop(); else closeVolPop(); });
   els.soundToggle.addEventListener('keydown', (e)=>{ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); els.soundToggle.click(); } });
-  const volKeep = ()=>{ clearTimeout(volPopT); volPopT = setTimeout(closeVolPop, 6000); };
+  const volKeep = ()=>{ clearTimeout(volPopT); };
   volMus.mute.addEventListener('click', (e)=>{ e.stopPropagation(); setMusicOn(!musicOn); renderVolPop(); volKeep(); });
   volSfx.mute.addEventListener('click', (e)=>{ e.stopPropagation(); setSfxOn(!sfxOn); renderVolPop(); if (sfxOn) sfx.ding(); volKeep(); });
   volMus.slider.addEventListener('input', ()=>{ setMusicVolume(+volMus.slider.value / 100); if (musicVol > 0 && !musicOn) setMusicOn(true); renderVolPop(); volKeep(); });
   volSfx.slider.addEventListener('input', ()=>{ setSfxVolume(+volSfx.slider.value / 100); if (sfxVol > 0 && !sfxOn) setSfxOn(true); renderVolPop(); volKeep(); });
   volSfx.slider.addEventListener('change', ()=>{ if (sfxOn) sfx.ding(); });
-  volRelax.addEventListener('click', (e)=>{ e.stopPropagation(); setRelaxedPace(!relaxedPace); renderVolPop(); clearTimeout(volPopT); volPopT = setTimeout(closeVolPop, 5000); });
+  volRelax.addEventListener('click', (e)=>{ e.stopPropagation(); setRelaxedPace(!relaxedPace); renderVolPop(); clearTimeout(volPopT); });
   volPop.addEventListener('click', (e)=> e.stopPropagation());
   document.addEventListener('click', (e)=>{ if (!volPop.classList.contains('hidden') && !volPop.contains(e.target) && !els.soundToggle.contains(e.target)){ closeVolPop(); e.stopPropagation(); e.preventDefault(); } }, true);   // (the tap that closes it does nothing else)
 
