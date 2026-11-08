@@ -14367,7 +14367,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     const d = document.createElement('div'); d.className = 'disco odj' + (still ? ' still' : ''); d.setAttribute('role', 'button'); d.setAttribute('aria-label', 'The Mothership dance. Tap to skip');
     let spots = ''; for (let k = 0; k < 14; k++) spots += '<i style="--a:' + (k * 360 / 14) + 'deg;--d:' + (90 + (k * 53) % 160) + 'px;--c:' + ['#ffffff', '#ff8ad4', '#7df9ff', '#ffe27a', '#c792ff'][k % 5] + '"></i>';
     d.innerHTML = '<video class="odj-video" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video><i class="odj-veil"></i><div class="dc-spots">' + spots + '</div>' +
-      '<div class="dc-rig odj-rig"><i class="dc-cord"></i><div class="dc-ball"><i class="dc-facets"></i></div></div><button type="button" class="odj-skip">TAP TO SKIP</button>';
+      '<button type="button" class="odj-skip">TAP TO SKIP</button>';   // (no mirror ball over the dancers' faces)
     const vid = d.querySelector('video'); vid.muted = true; vid.playsInline = true;
     document.body.appendChild(d);
     marquee.classList.remove('strobe'); marquee.classList.add('disco'); marquee.classList.toggle('still', still);
