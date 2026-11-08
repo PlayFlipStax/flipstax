@@ -14350,6 +14350,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   })();
   window.__warpWord = (DEBUG_FAST || REPLAY) ? ()=> (runWord && runWord.word) : undefined;
   window.__warpWin = (DEBUG_FAST || REPLAY) ? ()=> winWarp() : undefined;
+  window.__goFinale = DEBUG_FAST ? ()=> goToFinale() : undefined;   // (tests only: the regular show, straight to the Word Warp)
   window.__discoTest = (DEBUG_FAST || REPLAY) ? ()=>{ discoShownFor = null; discoCelebrate('test'); } : undefined;
   window.__odDance = (DEBUG_FAST || REPLAY) ? ()=>{ discoShownFor = null; jackpotDance(); } : undefined;   // (tests only)
   // ---- final polish job 6: THE MOTHERSHIP's dance - the vertical three-girls dance video (media/od-dance-540.mp4, a 540-wide copy of
@@ -16707,12 +16708,28 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       try{ const ctx = sfxOn ? getAudioCtx() : null; if (ctx && masterGain && ctx.state === 'running'){ srcNode = ctx.createMediaElementSource(vid); srcNode.connect(masterGain); vid.volume = 1; } else vid.volume = Math.max(0, Math.min(1, sfxVol)); }catch(e){ vid.volume = Math.max(0, Math.min(1, sfxVol)); }
       pauseAllTracks();
       vid.dataset.go = '1'; try{ vid.currentTime = 0; }catch(e){}
+      // the finale must always reach the goodbye: if the clip errors, is refused, has not started 1.5 s after the flash, or freezes, the old
+      // hand-drawn disco scene (mirror ball, lights, dancers) plays instead, then on to the goodbye
+      let started = false, fellBack = false, lastT = -1, lastMove = performance.now();
+      const fail = ()=>{ if (ended || fellBack) return; fellBack = true; clearInterval(watch);
+        try{ vid.pause(); }catch(e){} try{ if (srcNode) srcNode.disconnect(); }catch(e){} if (vidLayer){ vidLayer.remove(); vidLayer = null; }
+        card.remove(); if (flash.animate){ flash.animate([{ opacity:1 }, { opacity:0 }], { duration:300, fill:'forwards' }).onfinish = ()=> flash.remove(); } else flash.remove();
+        const t7 = performance.now() + 7000; discoShownFor = null; let ok = false; try{ ok = discoCelebrate('ww-finale', ()=> later(finish, Math.max(0, t7 - performance.now()))); }catch(e){}
+        if (!ok) later(finish, 7000);
+        later(finish, 9500); };   // (the scene runs the clip's length, 7 s; whatever happens the goodbye comes by 9.5 s)
+      const mark = ()=>{ if (vid.currentTime > 0.05){ started = true; } };
+      vid.addEventListener('playing', ()=>{ lastMove = performance.now(); }); vid.addEventListener('timeupdate', mark);
+      const watch = setInterval(()=>{ if (ended || fellBack){ clearInterval(watch); return; }
+        const t = vid.currentTime; if (t !== lastT){ lastT = t; lastMove = performance.now(); }
+        else if (started && !vid.ended && performance.now() - lastMove > 1500) fail();   // (froze part-way)
+      }, 400);
+      later(()=>{ if (!started && !vid.ended) fail(); }, 1300);   // (nothing playing 1.5 s after the flash)
       const pr = vid.play();
-      const fail = ()=>{ if (ended) return; if (vidLayer){ vidLayer.remove(); vidLayer = null; } card.style.opacity = ''; card.getAnimations().forEach(a=> a.cancel()); card.classList.add('still'); document.body.appendChild(card); fitWord(); later(finish, 2000);
-        if (flash.animate){ flash.animate([{ opacity:1 }, { opacity:0 }], { duration:300, fill:'forwards' }).onfinish = ()=> flash.remove(); } else flash.remove(); };
-      if (pr && pr.catch) pr.catch(fail);
+      if (pr && pr.catch) pr.catch(()=>{ if (ended || fellBack) return;
+        // refused with sound (a phone that wants a tap): try once more silent before giving up
+        try{ vid.muted = true; const p2 = vid.play(); if (p2 && p2.catch) p2.catch(fail); }catch(e){ fail(); } });
       vid.addEventListener('error', fail);
-      vid.addEventListener('ended', finish);
+      vid.addEventListener('ended', ()=>{ if (!fellBack) finish(); });
       later(finish, 9000);   // (a safety net: the clip is 7 s)
       flash.animate([{ opacity:1 }, { opacity:0 }], { duration:450, easing:'ease-out', fill:'forwards' }).onfinish = ()=> flash.remove();
     }, tC + WW_BEAT.C + 20);
