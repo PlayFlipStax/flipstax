@@ -13060,7 +13060,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // offer), then 'Thanks for watching!' with a TIP ME card (Ko-fi) and an ADVERTISE HERE card (playflipstax@gmail.com). A SKIP button appears after 2 s
   // (CONTINUE on the last card); a tap anywhere outside the links does the same. The flow after the break is unchanged (done()). Invented brands only.
   // Transform and opacity only; lite and reduced motion: no turning or popping, plain cuts.
-  const CB_RETRO = true, CB_AD_MS = 2400;
+  const CB_RETRO = true, CB_AD_MS = 3250, CB_LAST_MS = 5000, CB_KS = CB_AD_MS / 2400;   // (each ad 3.25 s; its fades and pops are scaled by CB_KS; the last card holds 5 s)
   const CB_ADS = [
     { k:'food', brand:'COSMO BURGER', line:'The burger that\u2019s out of this world!', deal:'2 FOR $3.99*', fine:'*Not a real burger. Not a real price.',
       art:'<svg viewBox="0 0 200 160"><ellipse cx="100" cy="146" rx="80" ry="9" fill="rgba(0,0,0,0.25)"/><path d="M28 70 Q30 18 100 16 Q170 18 172 70 Z" fill="#f2a43a" stroke="#4a1d00" stroke-width="5"/><g fill="#fff3c4"><ellipse cx="70" cy="40" rx="5" ry="3"/><ellipse cx="100" cy="32" rx="5" ry="3"/><ellipse cx="128" cy="42" rx="5" ry="3"/><ellipse cx="88" cy="52" rx="5" ry="3"/><ellipse cx="118" cy="56" rx="5" ry="3"/></g><path d="M22 78 Q40 66 58 80 Q76 66 94 80 Q112 66 130 80 Q148 66 178 78 L176 88 L24 88 Z" fill="#4be04b" stroke="#145a14" stroke-width="4"/><rect x="24" y="86" width="152" height="12" rx="4" fill="#ffd23f" stroke="#7a5200" stroke-width="4"/><rect x="22" y="96" width="156" height="22" rx="10" fill="#7a3510" stroke="#3a1400" stroke-width="5"/><path d="M28 118 Q30 140 100 140 Q170 140 172 118 Z" fill="#e8902c" stroke="#4a1d00" stroke-width="5"/></svg>' },
@@ -13076,7 +13076,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       '<div class="cbr-ad" aria-live="polite"><i class="cbr-burst"></i><div class="cbr-art"></div><b class="cbr-brand"></b><span class="cbr-line"></span><em class="cbr-deal"></em><small class="cbr-fine"></small></div>' +
       '<div class="cbr-last"><b class="cbr-thanks">Thanks for watching!</b><div class="cbr-cards">' +
         '<a class="cbr-card tip" href="https://ko-fi.com/flipstax" target="_blank" rel="noopener noreferrer"><span class="cbr-ct">TIP ME</span><img src="images/kofi-logo.webp" width="56" height="56" alt="" decoding="async"><span class="cbr-cs">Buy Flip a coffee</span></a>' +
-        '<a class="cbr-card adv" href="mailto:playflipstax@gmail.com?subject=Advertise%20on%20FlipStax"><span class="cbr-ct">ADVERTISE HERE</span><span class="cbr-big">\uD83D\uDCFA</span><span class="cbr-cs">playflipstax@gmail.com</span></a>' +
+        '<a class="cbr-card adv" href="mailto:playflipstax@gmail.com?subject=Advertise%20on%20FlipStax"><span class="cbr-ct">ADVERTISE HERE</span><span class="cbr-big">\uD83D\uDCFA</span><span class="cbr-cs">10, 20 or 30 sec spots \u00B7 playflipstax@gmail.com</span></a>' +
       '</div></div>' +
       '<i class="cbr-scan" aria-hidden="true"></i><span class="cbr-bug" aria-hidden="true">FLIPSTAX TV</span><span class="cbr-tag" aria-hidden="true">COMMERCIAL BREAK</span>' +
       '</div></div><button type="button" class="cbr-skip">SKIP \u25B6</button>';
@@ -13091,24 +13091,24 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       if (!mine) return;
       showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; noteOverlayClosed(); done(); };
     const lastCard = ()=>{ clearT(); if (!alive()){ gone = true; return; } stage = 'last'; showCard.classList.remove('ad-on', 'intro'); showCard.classList.add('last'); skip.textContent = 'CONTINUE \u25B6';
-      sfx.chime(6); L(CB_COFFEE_MS + 1500, finish); L(CB_COFFEE_MS + 4500, finish); };
+      sfx.chime(6); L(CB_LAST_MS, finish); };
     const showAd = (i)=>{ if (!alive()){ clearT(); gone = true; return; } if (i >= CB_ADS.length){ lastCard(); return; } stage = 'prod'; const a = CB_ADS[i];
       showCard.classList.remove('intro'); showCard.classList.add('ad-on'); prod.className = 'cbr-ad ' + a.k;
       prod.querySelector('.cbr-art').innerHTML = a.art; prod.querySelector('.cbr-brand').textContent = a.brand; prod.querySelector('.cbr-line').textContent = a.line;
       prod.querySelector('.cbr-deal').textContent = a.deal; prod.querySelector('.cbr-fine').textContent = a.fine;
       if (!still){
-        prod.animate([{ opacity:0 }, { opacity:1 }], { duration:180, fill:'both' });
-        prod.querySelector('.cbr-art').animate(a.k === 'car' ? [{ transform:'translateX(-120%)' }, { transform:'translateX(6%)', offset:0.75 }, { transform:'translateX(0)' }] : [{ transform:'scale(0.5) rotate(-8deg)', opacity:0 }, { transform:'scale(1.12) rotate(3deg)', opacity:1, offset:0.65 }, { transform:'scale(1) rotate(0deg)', opacity:1 }], { duration:520, easing:'cubic-bezier(.2,.8,.3,1)', fill:'both' });
-        prod.querySelector('.cbr-brand').animate([{ transform:'scale(2.2)', opacity:0 }, { transform:'scale(0.94)', opacity:1, offset:0.7 }, { transform:'scale(1)', opacity:1 }], { duration:420, delay:260, easing:'ease-out', fill:'both' });
-        prod.querySelector('.cbr-line').animate([{ transform:'translateY(14px)', opacity:0 }, { transform:'translateY(0)', opacity:1 }], { duration:320, delay:520, easing:'ease-out', fill:'both' });
-        prod.querySelector('.cbr-deal').animate([{ transform:'rotate(-12deg) scale(0)' }, { transform:'rotate(-12deg) scale(1.18)', offset:0.7 }, { transform:'rotate(-12deg) scale(1)' }], { duration:380, delay:820, easing:'ease-out', fill:'both' });
+        prod.animate([{ opacity:0 }, { opacity:1 }], { duration:180*CB_KS, fill:'both' });
+        prod.querySelector('.cbr-art').animate(a.k === 'car' ? [{ transform:'translateX(-120%)' }, { transform:'translateX(6%)', offset:0.75 }, { transform:'translateX(0)' }] : [{ transform:'scale(0.5) rotate(-8deg)', opacity:0 }, { transform:'scale(1.12) rotate(3deg)', opacity:1, offset:0.65 }, { transform:'scale(1) rotate(0deg)', opacity:1 }], { duration:520*CB_KS, easing:'cubic-bezier(.2,.8,.3,1)', fill:'both' });
+        prod.querySelector('.cbr-brand').animate([{ transform:'scale(2.2)', opacity:0 }, { transform:'scale(0.94)', opacity:1, offset:0.7 }, { transform:'scale(1)', opacity:1 }], { duration:420*CB_KS, delay:260*CB_KS, easing:'ease-out', fill:'both' });
+        prod.querySelector('.cbr-line').animate([{ transform:'translateY(14px)', opacity:0 }, { transform:'translateY(0)', opacity:1 }], { duration:320*CB_KS, delay:520*CB_KS, easing:'ease-out', fill:'both' });
+        prod.querySelector('.cbr-deal').animate([{ transform:'rotate(-12deg) scale(0)' }, { transform:'rotate(-12deg) scale(1.18)', offset:0.7 }, { transform:'rotate(-12deg) scale(1)' }], { duration:380*CB_KS, delay:820*CB_KS, easing:'ease-out', fill:'both' });
       }
       sfx.chime(2 + i);
       L(CB_AD_MS, ()=> showAd(i + 1)); };
     showCard.classList.add('intro');
     L(CB_SKIP_MS, ()=>{ if (alive()) showCard.classList.add('can-skip'); });
     L(CB_INTRO_MS, ()=> showAd(0));
-    L(CB_INTRO_MS + CB_ADS.length * CB_AD_MS + CB_COFFEE_MS + 7000, finish);   // (a hard stop: whatever happens, the break ends and hands back to the show)
+    L(CB_INTRO_MS + CB_ADS.length * CB_AD_MS + CB_LAST_MS + 7000, finish);   // (a hard stop: whatever happens, the break ends and hands back to the show)
     function go(e){ if (gone) return; if (!alive()){ clearT(); gone = true; return; } if (e && e.target.closest && e.target.closest('a')) return;
       if (e && performance.now() - shownAt < CB_SKIP_MS) return;
       if (stage === 'last') finish(); else lastCard(); }

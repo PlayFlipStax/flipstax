@@ -3102,3 +3102,8 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 .ww-galaxy, #wwSky{ transform-origin:50% 50%; }
 .ww-iris{ position:fixed; left:50%; top:50%; width:300vmax; height:300vmax; margin:-150vmax 0 0 -150vmax; z-index:2; pointer-events:none; will-change:transform;
   background:radial-gradient(circle, transparent 0, transparent 18.5%, #000 19.2%); }
+
+/* commercial timing: the COMMERCIAL BREAK tag clears the speaker button (top-left); the ADVERTISE line sits on one line under the card */
+:root:root .cbr-tag{ left:78px; }
+:root:root .cbr-card.adv{ grid-template-rows:auto auto auto; }
+:root:root .cbr-card.adv .cbr-cs{ grid-column:1 / -1; grid-row:3; white-space:nowrap; word-break:normal; text-align:center; font-size:clamp(8px, 2.8vw, 20px); margin-top:4px; }
