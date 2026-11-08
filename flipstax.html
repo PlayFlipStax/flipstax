@@ -18277,7 +18277,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     document.body.appendChild(tag); testTagEl = tag;
   }
   function noteTapTiming(totalMs, talliesMs){
-    if (testTagEl) testTagEl.textContent = testTagBase + ' \u00B7 tap\u2192result ' + (totalMs / 1000).toFixed(2) + 's (tallies ' + (talliesMs / 1000).toFixed(2) + 's)';
+    if (testTagEl){ testTagEl.textContent = testTagBase + ' \u00B7 ' + (totalMs / 1000).toFixed(2) + 's'; testTagEl.title = 'tap to result ' + (totalMs / 1000).toFixed(2) + 's, tallies ' + (talliesMs / 1000).toFixed(2) + 's'; }   // (final polish job 7: short, so it never reaches the TEST button)
   }
   // Item counts already fetched for reveals (slug -> count), so Guess the
   // Crowd can often find a qualifying card without another request.

@@ -3082,3 +3082,8 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
   opacity:0; pointer-events:none; transition:opacity 0.3s ease; touch-action:manipulation; }
 .disco.odj.skip-on .odj-skip{ opacity:1; pointer-events:auto; }
 .disco.odj.still .odj-skip{ display:none; }
+
+/* ---- final polish job 7: the test line on previews stays short of the TEST button on every phone (its timing reads 'TEST · votes not saved · 0.62s',
+   and it is capped to the width left of the button, with an ellipsis if ever needed) ---- */
+:root:root .test-tag{ max-width:calc(100vw - 132px - env(safe-area-inset-right)); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; box-sizing:border-box; }
+@media (max-width:379px){ :root:root .test-tag{ font-size:12.5px; } }
