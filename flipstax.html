@@ -4308,7 +4308,7 @@
 <div class="studio page-set" data-studio aria-hidden="true"></div>
 <div class="show-marquee off" id="showMarquee" aria-hidden="true"></div>
 <!-- The sound panel: one master volume and the mute button (opened from the speaker). -->
-<div class="vol-pop hidden" id="volPop" role="dialog" aria-label="Sound and pace"><div class="vol-row"><button type="button" class="vol-mute" id="musMute" aria-label="Mute music">🎵</button><span class="vol-name">Music</span><input type="range" id="musSlider" min="0" max="100" step="5" aria-label="Music volume"><b id="musPct"></b></div><div class="vol-row"><button type="button" class="vol-mute" id="sfxMute" aria-label="Mute sound effects">🔔</button><span class="vol-name">SFX</span><input type="range" id="sfxSlider" min="0" max="100" step="5" aria-label="Sound effects volume"><b id="sfxPct"></b></div><div class="vol-list" id="volList" role="radiogroup" aria-label="Music"></div><button type="button" class="vol-relax" id="volRelax" role="switch" aria-checked="false"><span class="vr-box"></span><span>Relaxed pace <small>8 s a VS card, not 5</small></span></button></div>
+<div class="vol-pop hidden" id="volPop" role="dialog" aria-label="Sound"><div class="vol-row"><button type="button" class="vol-mute" id="musMute" aria-label="Mute music">🎵</button><span class="vol-name">Music</span><input type="range" id="musSlider" min="0" max="100" step="5" aria-label="Music volume"><b id="musPct"></b></div><div class="vol-row"><button type="button" class="vol-mute" id="sfxMute" aria-label="Mute sound effects">🔔</button><span class="vol-name">SFX</span><input type="range" id="sfxSlider" min="0" max="100" step="5" aria-label="Sound effects volume"><b id="sfxPct"></b></div><div class="vol-list" id="volList" role="radiogroup" aria-label="Music"></div></div>
 <div class="fx-layer show-fx" id="showFx" aria-hidden="true"></div>
 <div class="show-card hidden" id="showCard"></div>
 <div class="show-host" id="showHost" aria-hidden="true"><div class="alien" id="showAlien"></div><div class="show-say" id="showSay"></div></div>
@@ -6061,8 +6061,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   const ACT_DEFAULT_VS_MS = 5000, VS_RELAXED_MS = (window.FLIPSTAX_VS_TIMER && window.FLIPSTAX_VS_TIMER.relaxed) || 8000;
   // 'Relaxed pace' (the sound / settings popover): each VS card waits 8 s for a pick instead of 5. Kept on this device.
   const RELAXED_KEY = 'flipstax_relaxed_pace';
-  let relaxedPace = false; try{ relaxedPace = localStorage.getItem(RELAXED_KEY) === '1'; }catch(e){}
-  function setRelaxedPace(on){ relaxedPace = !!on; try{ localStorage.setItem(RELAXED_KEY, on ? '1' : '0'); }catch(e){} }
+  const relaxedPace = false;   // (final polish job 3: the Relaxed pace control is gone - every VS card waits the normal time; a saved setting is ignored)
   // G2: the show's hold times live at the top of data/rundown.js (FLIPSTAX_TIMING); these are the fallbacks.
   // G2: the show's hold times live at the top of data/rundown.js (FLIPSTAX_TIMING); these are the fallbacks. Each is scaled by PACE here
   // (title cards at least TITLE_CARD_MIN); SKIP_AFTER is the shared TAP_AFTER_MS.
@@ -19070,7 +19069,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     startDailyRun();
   });
   // The speaker opens the sound panel (Run 4B): Music and SFX, each with its own mute and volume, and Relaxed pace.
-  const volPop = document.getElementById('volPop'), volRelax = document.getElementById('volRelax');
+  const volPop = document.getElementById('volPop');
   const vch = (id)=> ({ mute: document.getElementById(id + 'Mute'), slider: document.getElementById(id + 'Slider'), pct: document.getElementById(id + 'Pct') });
   const volMus = vch('mus'), volSfx = vch('sfx');
   function renderVolRow(row, on, vol, label){
@@ -19083,7 +19082,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     '<button type="button" class="vol-song' + (v === 'mute' ? ' mute' : '') + '" role="radio" data-v="' + v + '"><span class="vs-dot" aria-hidden="true"></span><span class="vs-name">' + n + '</span><span class="vs-on" aria-hidden="true">PLAYING</span></button>').join('');
   volList.addEventListener('click', (e)=>{ const b = e.target.closest('.vol-song'); if (!b) return; e.stopPropagation(); const v = b.dataset.v; pickMusic(v === 'mute' ? 'mute' : parseInt(v, 10)); renderVolPop(); });
   function renderVolList(){ const act = !musicOn ? 'mute' : String(altPick); volList.querySelectorAll('.vol-song').forEach(b=>{ const on = b.dataset.v === act; b.classList.toggle('on', on); b.setAttribute('aria-checked', on ? 'true' : 'false'); b.querySelector('.vs-on').textContent = b.dataset.v === 'mute' ? 'ON' : 'PLAYING'; }); }
-  function renderVolPop(){ volRelax.setAttribute('aria-checked', relaxedPace ? 'true' : 'false'); renderVolRow(volMus, musicOn, musicVol, 'music'); renderVolRow(volSfx, sfxOn, sfxVol, 'sound effects'); renderVolList(); }
+  function renderVolPop(){ renderVolRow(volMus, musicOn, musicVol, 'music'); renderVolRow(volSfx, sfxOn, sfxVol, 'sound effects'); renderVolList(); }
   let volPopT = 0;
   function closeVolPop(){ volPop.classList.add('hidden'); clearTimeout(volPopT); }
   function openVolPop(){
@@ -19100,7 +19099,6 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   volMus.slider.addEventListener('input', ()=>{ setMusicVolume(+volMus.slider.value / 100); if (musicVol > 0 && !musicOn) setMusicOn(true); renderVolPop(); volKeep(); });
   volSfx.slider.addEventListener('input', ()=>{ setSfxVolume(+volSfx.slider.value / 100); if (sfxVol > 0 && !sfxOn) setSfxOn(true); renderVolPop(); volKeep(); });
   volSfx.slider.addEventListener('change', ()=>{ if (sfxOn) sfx.ding(); });
-  volRelax.addEventListener('click', (e)=>{ e.stopPropagation(); setRelaxedPace(!relaxedPace); renderVolPop(); clearTimeout(volPopT); });
   volPop.addEventListener('click', (e)=> e.stopPropagation());
   document.addEventListener('click', (e)=>{ if (!volPop.classList.contains('hidden') && !volPop.contains(e.target) && !els.soundToggle.contains(e.target)){ closeVolPop(); e.stopPropagation(); e.preventDefault(); } }, true);   // (the tap that closes it does nothing else)
 

@@ -3028,3 +3028,4 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 .vol-song.on .vs-dot{ background:#ffd23f; border-color:#ffd23f; } .vol-song.on .vs-on{ display:inline-block; }
 .vol-song.mute.on{ border-color:#ff8a8a; background:rgba(255,90,90,0.16); } .vol-song.mute.on .vs-dot{ background:#ff7a7a; border-color:#ff7a7a; } .vol-song.mute.on .vs-on{ background:#ff9a9a; }
 :root:root .vol-pop{ z-index:520; }
+:root:root .vol-pop{ background:#18082c; }
