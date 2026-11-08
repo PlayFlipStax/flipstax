@@ -14351,10 +14351,44 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   window.__warpWord = (DEBUG_FAST || REPLAY) ? ()=> (runWord && runWord.word) : undefined;
   window.__warpWin = (DEBUG_FAST || REPLAY) ? ()=> winWarp() : undefined;
   window.__discoTest = (DEBUG_FAST || REPLAY) ? ()=>{ discoShownFor = null; discoCelebrate('test'); } : undefined;
+  window.__odDance = (DEBUG_FAST || REPLAY) ? ()=>{ discoShownFor = null; jackpotDance(); } : undefined;   // (tests only)
+  // ---- final polish job 6: THE MOTHERSHIP's dance - the vertical three-girls dance video (media/od-dance-540.mp4, a 540-wide copy of
+  // gemini_generated_video_a2f24f7e.mp4), muted, full screen, with a mirror ball dropping in over it on a string and coloured light spots turning round it,
+  // and the marquee bulbs flashing (2 a second); TAP TO SKIP after 1 s; when it ends (or is skipped) it fades and Orbit Drop carries on into the existing
+  // ROUND SIX DONE flow. It replaces the older code-drawn disco here (which stays as the fallback if the video cannot play). The video is loaded only now,
+  // and stopped and removed afterwards. Lite and reduced motion: a still frame of it for 2.5 s, then on. Once an episode, like the disco before it.
+  const OD_DANCE_SRC = 'media/od-dance-540.mp4';
+  function jackpotDance(done){
+    const id = (runActive || dailyOrbit) ? 'daily-' + (runStartDate || todayStr()) : 'inf-' + (infRun && infRun.startedAt || 'run');
+    if (discoShownFor === id){ if (done) done(); return; }
+    discoShownFor = id;
+    const still = isLite() || prefersReducedMotion();
+    const d = document.createElement('div'); d.className = 'disco odj' + (still ? ' still' : ''); d.setAttribute('role', 'button'); d.setAttribute('aria-label', 'The Mothership dance. Tap to skip');
+    let spots = ''; for (let k = 0; k < 14; k++) spots += '<i style="--a:' + (k * 360 / 14) + 'deg;--d:' + (90 + (k * 53) % 160) + 'px;--c:' + ['#ffffff', '#ff8ad4', '#7df9ff', '#ffe27a', '#c792ff'][k % 5] + '"></i>';
+    d.innerHTML = '<video class="odj-video" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video><i class="odj-veil"></i><div class="dc-spots">' + spots + '</div>' +
+      '<div class="dc-rig odj-rig"><i class="dc-cord"></i><div class="dc-ball"><i class="dc-facets"></i></div></div><button type="button" class="odj-skip">TAP TO SKIP</button>';
+    const vid = d.querySelector('video'); vid.muted = true; vid.playsInline = true;
+    document.body.appendChild(d);
+    marquee.classList.remove('strobe'); marquee.classList.add('disco'); marquee.classList.toggle('still', still);
+    let over = false; const t0 = performance.now(), timers = [];
+    const end = ()=>{ if (over) return; over = true; timers.forEach(clearTimeout); marquee.classList.remove('disco', 'still'); d.classList.add('out');
+      setTimeout(()=>{ try{ vid.pause(); }catch(e){} vid.removeAttribute('src'); try{ vid.load(); }catch(e){} d.remove(); }, 350); if (done) done(); };
+    const fallback = ()=>{ if (over) return; over = true; timers.forEach(clearTimeout); marquee.classList.remove('disco', 'still'); try{ vid.pause(); }catch(e){} vid.removeAttribute('src'); d.remove(); discoShownFor = null; discoCelebrate('mothership', done); };
+    d.addEventListener('click', (e)=>{ e.stopPropagation(); if (performance.now() - t0 >= 1000) end(); });
+    vid.addEventListener('error', fallback);
+    if (still){ vid.preload = 'metadata'; vid.src = OD_DANCE_SRC + '#t=3'; requestAnimationFrame(()=> d.classList.add('on')); timers.push(setTimeout(end, 2500)); return; }
+    vid.src = OD_DANCE_SRC;
+    vid.addEventListener('ended', end);
+    vid.addEventListener('timeupdate', ()=>{ if (!over && vid.duration && vid.duration - vid.currentTime < 0.5) end(); });
+    const pr = vid.play(); if (pr && pr.catch) pr.catch(fallback);
+    requestAnimationFrame(()=> d.classList.add('on'));
+    timers.push(setTimeout(()=> d.classList.add('skip-on'), 1000));
+    timers.push(setTimeout(end, 12000));   // (a safety net: the clip is 10 s)
+  }
   function pkJackpotShow(c){
     hostMood('laugh');
     sfx.siren(); setTimeout(()=> sfx.roar(), 200);
-    setTimeout(()=> discoCelebrate('mothership'), 2300);   // D7: then the disco (once an episode)
+    setTimeout(()=> jackpotDance(), 2300);   // (final polish job 6: after the UFO has sucked up the loot, the three-girls dance video - once an episode)
     marquee.classList.remove('strobe'); void marquee.offsetWidth; marquee.classList.add('strobe');
     clearTimeout(pkJackpotShow._t); pkJackpotShow._t = setTimeout(()=> marquee.classList.remove('strobe'), 2300);
     if (prefersReducedMotion()) return;
