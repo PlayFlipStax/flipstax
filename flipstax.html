@@ -12528,7 +12528,10 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // A+ job 2: the outro video (about 2 MB) starts loading as the last games begin, so it plays at once
   let outroPreloaded = false;
   function preloadOutro(){ if (outroPreloaded || isLite() || prefersReducedMotion()) return; outroPreloaded = true; try{ fetch('data/outro/outro.mp4').catch(()=>{}); }catch(e){} }
-  function goToFinale(){ preloadOutro();
+  // stability: nothing of Orbit Drop's jackpot (the dance video, its layer, the marquee look) is left when Word Warp's title card shows
+  function orbitLeftovers(){ document.querySelectorAll('.disco.odj, .disco').forEach(d=>{ d.querySelectorAll('video').forEach(v=>{ try{ v.pause(); }catch(e){} v.removeAttribute('src'); try{ v.load(); }catch(e){} }); d.remove(); });
+    try{ marquee.classList.remove('disco', 'still', 'strobe'); }catch(e){} }
+  function goToFinale(){ preloadOutro(); orbitLeftovers();
     if (!runActive || runPhase === 'solving' || runPhase === 'finale-bumper') return;
     stopTallyPolling(); clearRoundTimer();
     els.eventOverlay.classList.add('hidden');
@@ -14373,7 +14376,8 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     marquee.classList.remove('strobe'); marquee.classList.add('disco'); marquee.classList.toggle('still', still);
     let over = false; const t0 = performance.now(), timers = [];
     const end = ()=>{ if (over) return; over = true; timers.forEach(clearTimeout); marquee.classList.remove('disco', 'still'); d.classList.add('out');
-      setTimeout(()=>{ try{ vid.pause(); }catch(e){} vid.removeAttribute('src'); try{ vid.load(); }catch(e){} d.remove(); }, 350); if (done) done(); };
+      try{ vid.pause(); }catch(e){} vid.removeAttribute('src'); try{ vid.load(); }catch(e){}   // (the video is released at once; only the empty layer fades)
+      setTimeout(()=>{ d.remove(); }, 350); if (done) done(); };
     const fallback = ()=>{ if (over) return; over = true; timers.forEach(clearTimeout); marquee.classList.remove('disco', 'still'); try{ vid.pause(); }catch(e){} vid.removeAttribute('src'); d.remove(); discoShownFor = null; discoCelebrate('mothership', done); };
     d.addEventListener('click', (e)=>{ e.stopPropagation(); if (performance.now() - t0 >= 1000) end(); });
     vid.addEventListener('error', fallback);
