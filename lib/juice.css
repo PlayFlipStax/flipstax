@@ -2993,3 +2993,23 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root:root .ff-lie .ff-gauge.lit-done.lit-fact .fg-fib, :root:root .ff-lie .ff-gauge.lit-done.lit-fib .fg-fact{ opacity:0.5; }
 :root.lite .ff-lie .fg-fact, :root.lite .ff-lie .fg-mid, :root.lite .ff-lie .fg-fib{ transition:none; }
 @media (prefers-reduced-motion: reduce){ .ff-lie .fg-fact, .ff-lie .fg-mid, .ff-lie .fg-fib{ transition:none; } }
+
+/* ---- final polish job 1: the speaker - bigger and easy to find, in the same place on every screen (home included): next to the back arrow at the top
+   left, a 36 px glass button with a clear speaker icon (a crossed speaker when sound is off) inside a 44 px tap area, above the game screens ---- */
+:root:root:root .sound-toggle.spk{ position:fixed; top:calc(0px + env(safe-area-inset-top)); left:calc(46px + env(safe-area-inset-left)); z-index:66;
+  width:44px; height:44px; min-width:44px; min-height:44px; padding:0; box-sizing:border-box; display:flex; align-items:center; justify-content:center;
+  opacity:1; filter:none !important; color:#fff3c4; font-size:0; cursor:pointer; touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+:root:root:root .sound-toggle.spk::before{ content:''; position:absolute; left:4px; top:4px; width:36px; height:36px; box-sizing:border-box; border-radius:50%;
+  background:rgba(18,8,42,0.78); border:2px solid #ffd23f; box-shadow:0 2px 6px rgba(0,0,0,0.35); }
+:root:root:root .sound-toggle.spk svg{ position:relative; width:21px; height:21px; display:block; }
+:root:root:root .sound-toggle.spk.off{ color:#ffb3b3; } :root:root:root .sound-toggle.spk.off::before{ border-color:#ff7a7a; }
+:root:root:root .sound-toggle.spk:active::before{ transform:scale(0.92); }
+:root:root .left-group{ padding-left:96px; }
+:root:root:root .sound-toggle.spk{ z-index:380; }
+:root:root .left-group{ min-height:44px; }
+:root:root:is(.mode-daily, .mode-infinity) .left-group{ min-height:34px; }
+/* (the sound panel fits the screen, and its sliders are long with a 32 px touch height) */
+:root:root .vol-pop{ width:min(340px, calc(100vw - 16px)); box-sizing:border-box; }
+:root:root .vol-pop input[type="range"]{ flex:1 1 auto; width:auto; min-width:0; height:32px; touch-action:manipulation; }
+:root:root .vol-row b{ min-width:40px; text-align:right; }
+:root:root .vol-mute{ touch-action:manipulation; }

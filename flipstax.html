@@ -4323,10 +4323,11 @@
 </div>
 <div class="app">
   <span class="back-btn hidden" id="backBtn">←</span>
+  <!-- final polish job 1: the speaker - the same place on every screen, next to the back arrow; opens the sound panel -->
+  <span class="sound-toggle spk" id="soundToggle" role="button" tabindex="0" aria-label="Sound settings" aria-haspopup="dialog"></span>
   <header>
     <div class="top-row">
       <div class="left-group">
-        <span class="sound-toggle" id="soundToggle" role="button" tabindex="0" aria-label="Sound" aria-haspopup="dialog">🔊</span>
         <div class="logo jc-wordmark" aria-label="FlipStax"><img class="hud-logo" src="images/flipstax-lockup-400.webp" alt="FlipStax" width="86" height="46" decoding="async"><span class="flip">Flip</span><span class="stax">Stax</span></div>
       </div>
       <!-- You, lifetime: tier name over your Flipz (votes, ever) and play streak. -->
@@ -6586,12 +6587,26 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   let musicVol = volOf(lsGet('flipstax_music_vol'), oldVol), sfxVol = volOf(lsGet('flipstax_sfx_vol'), oldVol);
   let soundOn = musicOn || sfxOn;
   let masterVol = musicVol;   // (the music level - kept under its old name for the music code below)
-  let audioCtx = null, masterGain = null;
+  let audioCtx = null, masterGain = null, audioOut = null, musicGain = null;
+  // Final polish job 1: the Music slider really sets the music's volume. A phone's browser (iOS) ignores an audio element's .volume, so each music element
+  // is routed through Web Audio once the context is running - element -> its own trim (its _base) -> musicGain (the Music slider) -> the speakers - and
+  // the element itself stays at full volume. Until then (no tap yet) the element's own .volume is used, as before.
+  function musicRoute(a){
+    if (!a || a._routed) return;
+    const ctx = audioCtx; if (!ctx || ctx.state !== 'running' || !audioOut) return;
+    try{
+      if (!musicGain){ musicGain = ctx.createGain(); musicGain.gain.value = masterVol; musicGain.connect(audioOut); }
+      const src = ctx.createMediaElementSource(a), trim = ctx.createGain(); trim.gain.value = a._base != null ? a._base : 1;
+      src.connect(trim); trim.connect(musicGain); a._routed = true; a._trim = trim; a.volume = 1;
+    }catch(e){}
+  }
+  function musicRouteAll(){ Object.keys(trackEls).forEach(k=> musicRoute(trackEls[k])); infEls.forEach(musicRoute); }
   function getAudioCtx(){
     if (!audioCtx){
       try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
       catch(e){ return null; }
       try{
+        audioOut = audioCtx.destination;   // (final polish job 1: the real output, kept for the music, which has its own gain - musicGain)
         masterGain = audioCtx.createGain(); masterGain.gain.value = sfxVol * sfxVol; masterGain.connect(audioCtx.destination);
         Object.defineProperty(audioCtx, 'destination', { value: masterGain, configurable: true });
       }catch(e){ masterGain = null; }
@@ -7128,7 +7143,9 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     if (masterGain && audioCtx) masterGain.gain.setTargetAtTime(sfxVol * sfxVol, audioCtx.currentTime, 0.02);
   }
   function setMasterVolume(v){ setMusicVolume(v); setSfxVolume(v); }   // (both channels at once)
-  function syncSoundIcon(){ soundOn = musicOn || sfxOn; if (els.soundToggle) els.soundToggle.textContent = soundOn ? '\uD83D\uDD0A' : '\uD83D\uDD07'; }
+  const SPK_ON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  const SPK_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+  function syncSoundIcon(){ soundOn = musicOn || sfxOn; if (els.soundToggle){ els.soundToggle.innerHTML = soundOn ? SPK_ON : SPK_OFF; els.soundToggle.classList.toggle('off', !soundOn); } }
   function setMusicOn(on){
     musicOn = !!on; lsSet('flipstax_music_on', musicOn ? '1' : '0'); syncSoundIcon();
     if (isPaused) return;
@@ -7136,8 +7153,10 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   }
   function setSfxOn(on){ sfxOn = !!on; lsSet('flipstax_sfx_on', sfxOn ? '1' : '0'); syncSoundIcon(); if (sfxOn) getAudioCtx(); }
   function applyMusicVolume(){
-    Object.keys(trackEls).forEach(k=>{ const a = trackEls[k]; if (a && a._base != null) a.volume = a._base * masterVol; });
-    infEls.forEach(a=>{ if (a && a._base != null) a.volume = a._base * masterVol; });
+    musicRouteAll();
+    Object.keys(trackEls).forEach(k=>{ const a = trackEls[k]; if (a && a._base != null) a.volume = a._routed ? 1 : a._base * masterVol; });
+    infEls.forEach(a=>{ if (a && a._base != null) a.volume = a._routed ? 1 : a._base * masterVol; });
+    if (musicGain && audioCtx) musicGain.gain.setTargetAtTime(masterVol, audioCtx.currentTime, 0.02);
   }
   // Both channels on or off at once (the "Tap for sound" hint, older callers).
   function setSoundOn(on){
@@ -7238,7 +7257,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       const a = new Audio(TRACK_SRC[key]);
       a.loop = ONE_SHOT_TRACKS.indexOf(key) === -1;
       a.preload = 'auto';
-      a._base = MUSIC_VOLUME; a.volume = MUSIC_VOLUME * masterVol;
+      a._base = MUSIC_VOLUME; a.volume = MUSIC_VOLUME * masterVol; a.addEventListener('play', ()=> musicRoute(a));
       // Safety net: whatever queued or started this element (a play() that
       // was waiting on a user gesture, a stale handler), if it starts
       // playing while a different track is the current one, stop it.
@@ -7287,7 +7306,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       const t = INFINITY_PLAYLIST[i];
       const a = new Audio(t.src);
       a.preload = 'auto';
-      a._base = MUSIC_VOLUME * t.gain; a.volume = a._base * masterVol;
+      a._base = MUSIC_VOLUME * t.gain; a.volume = a._base * masterVol; a.addEventListener('play', ()=> musicRoute(a));
       a.addEventListener('playing', ()=>{ if (!infIsActive(i)){ try{ a.pause(); }catch(e){} } });
       a.addEventListener('timeupdate', ()=>{ if (infIsActive(i)) infWatch(); });
       // Fallback only (e.g. a background tab throttled the handoff timer):
@@ -18976,7 +18995,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   // touch the icon: it used to call setSoundOn(), which also plays a track -
   // so Daily's theme started at launch (unmuted, where autoplay is allowed),
   // ran underneath the intro, and was never stopped.
-  els.soundToggle.textContent = soundOn ? '🔊' : '🔇';
+  syncSoundIcon();
   renderStatusBanner();
   renderRunBanner();
   els.readoutDone.addEventListener('click', finishDailySession);
