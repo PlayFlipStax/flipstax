@@ -14372,13 +14372,13 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
     d.innerHTML = '<video class="odj-video" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video><i class="odj-veil"></i><div class="dc-spots">' + spots + '</div>' +
       '<button type="button" class="odj-skip">TAP TO SKIP</button>';   // (no mirror ball over the dancers' faces)
     const vid = d.querySelector('video'); vid.muted = true; vid.playsInline = true;
-    document.body.appendChild(d);
+    document.body.appendChild(d); document.documentElement.classList.add('ww-fin-mem');   // (stability: the stage's big pictures are hidden while the dance video plays)
     marquee.classList.remove('strobe'); marquee.classList.add('disco'); marquee.classList.toggle('still', still);
     let over = false; const t0 = performance.now(), timers = [];
-    const end = ()=>{ if (over) return; over = true; timers.forEach(clearTimeout); marquee.classList.remove('disco', 'still'); d.classList.add('out');
+    const end = ()=>{ if (over) return; over = true; document.documentElement.classList.remove('ww-fin-mem'); timers.forEach(clearTimeout); marquee.classList.remove('disco', 'still'); d.classList.add('out');
       try{ vid.pause(); }catch(e){} vid.removeAttribute('src'); try{ vid.load(); }catch(e){}   // (the video is released at once; only the empty layer fades)
       setTimeout(()=>{ d.remove(); }, 350); if (done) done(); };
-    const fallback = ()=>{ if (over) return; over = true; timers.forEach(clearTimeout); marquee.classList.remove('disco', 'still'); try{ vid.pause(); }catch(e){} vid.removeAttribute('src'); d.remove(); discoShownFor = null; discoCelebrate('mothership', done); };
+    const fallback = ()=>{ if (over) return; over = true; document.documentElement.classList.remove('ww-fin-mem'); timers.forEach(clearTimeout); marquee.classList.remove('disco', 'still'); try{ vid.pause(); }catch(e){} vid.removeAttribute('src'); d.remove(); discoShownFor = null; discoCelebrate('mothership', done); };
     d.addEventListener('click', (e)=>{ e.stopPropagation(); if (performance.now() - t0 >= 1000) end(); });
     vid.addEventListener('error', fallback);
     if (still){ vid.preload = 'metadata'; vid.src = OD_DANCE_SRC + '#t=3'; requestAnimationFrame(()=> d.classList.add('on')); timers.push(setTimeout(end, 2500)); return; }
@@ -16515,7 +16515,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
   function wwLogoEnsure(){
     wwSkyEnsure();
     { const inner = els.solveOverlay.querySelector('.solve-inner'); if (inner) inner.style.opacity = ''; }
-    { const gi = document.querySelector('.ww-galaxy i'); if (gi) wwGalaxyFill(gi); }
+    { const gi = document.querySelector('.ww-galaxy i'); if (gi){ gi.style.display = ''; wwGalaxyFill(gi); } }
     if (document.getElementById('wwLogo')) return;
     const inner = els.solveOverlay.querySelector('.solve-inner'); if (!inner) return;
     const d = document.createElement('div'); d.className = 'ww-logo'; d.id = 'wwLogo'; d.setAttribute('role', 'img'); d.setAttribute('aria-label', 'Word Warp'); d.innerHTML = wwLogoHtml();
@@ -16626,16 +16626,21 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       const inner = ov.querySelector('.solve-inner'); if (inner) inner.style.opacity = '0';
       ov.classList.remove('celebrating', 'ww-done'); ov.querySelectorAll('.ww-flash').forEach(n=> n.remove());
       const top = vidLayer || card;
-      done();   // (the goodbye and the results build underneath, then the video or the card fades away over them)
+      // stability: the video is released completely (paused, source removed, load(), element removed) BEFORE the goodbye and the results are built;
+      // the black layer stays up over the gap and then fades away over the goodbye
+      if (vid){ try{ vid.pause(); }catch(e){} try{ if (srcNode) srcNode.disconnect(); }catch(e){} srcNode = null; vid.removeAttribute('src'); try{ vid.load(); }catch(e){} vid.remove(); vid = null; }
+      document.documentElement.classList.remove('ww-fin-mem');
+      const gap = vidLayer && !still ? 140 : 0;
+      setTimeout(()=>{ done(); }, gap);   // (the goodbye and the results build underneath, then the black layer or the card fades away over them)
       const gone = ()=>{ if (vid){ try{ vid.pause(); }catch(e){} try{ if (srcNode) srcNode.disconnect(); }catch(e){} vid.removeAttribute('src'); try{ vid.load(); }catch(e){} } if (vidLayer) vidLayer.remove(); card.remove(); };
-      if (top && top.animate && !still){ const a = top.animate([{ opacity:1 }, { opacity:0 }], { duration:500, easing:'ease-in', fill:'forwards' }); a.onfinish = gone; setTimeout(gone, 700); } else gone();
+      if (top && top.animate && !still){ setTimeout(()=>{ const a = top.animate([{ opacity:1 }, { opacity:0 }], { duration:500, easing:'ease-in', fill:'forwards' }); a.onfinish = gone; setTimeout(gone, 700); }, gap + 120); } else gone();
     };
     const stillCard = ()=>{ card.classList.add('still'); document.body.appendChild(card); fitWord(); later(finish, 2000); };
     if (still){ ov.classList.add('ww-done'); const inner = ov.querySelector('.solve-inner'); if (inner) inner.style.opacity = '0'; sfx.solveWin && sfx.solveWin(); stillCard(); return; }
     // the video: made now (in the winning tap) and unlocked with a quick play / pause, so it may play with sound 2 s later
     vid = document.createElement('video'); vid.className = 'ww-fin-video'; vid.setAttribute('playsinline', ''); vid.playsInline = true; vid.preload = 'auto';
     vid.muted = !sfxOn; vid.src = WW_FINALE_SRC;
-    try{ const pr = vid.play(); if (pr && pr.then) pr.then(()=>{ if (!vid.dataset.go) try{ vid.pause(); vid.currentTime = 0; }catch(e){} }, ()=>{}); }catch(e){}
+    try{ const pr = vid.play(); if (pr && pr.then) pr.then(()=>{ if (vid && !vid.dataset.go) try{ vid.pause(); vid.currentTime = 0; }catch(e){} }, ()=>{}); }catch(e){}
     // 1. the real game, about 2 s: the spin-up, the lit letters, everything pulled into the centre, one flash
     sfx.cheer();
     wwSpinRate(5);
@@ -16662,6 +16667,7 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       try{ const ctx = sfxOn ? getAudioCtx() : null; if (ctx && masterGain && ctx.state === 'running'){ srcNode = ctx.createMediaElementSource(vid); srcNode.connect(masterGain); vid.volume = 1; } else vid.volume = Math.max(0, Math.min(1, sfxVol)); }catch(e){ vid.volume = Math.max(0, Math.min(1, sfxVol)); }
       pauseAllTracks();
       vid.dataset.go = '1'; try{ vid.currentTime = 0; }catch(e){}
+      wwTeardown();   // (stability: the Word Warp screen behind the video is dismantled - see wwTeardown)
       // the finale must always reach the goodbye: if the clip errors, is refused, has not started 1.5 s after the flash, or freezes, the old
       // hand-drawn disco scene (mirror ball, lights, dancers) plays instead, then on to the goodbye
       let started = false, fellBack = false, lastT = -1, lastMove = performance.now();
@@ -16671,13 +16677,13 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
         const t7 = performance.now() + 7000; discoShownFor = null; let ok = false; try{ ok = discoCelebrate('ww-finale', ()=> later(finish, Math.max(0, t7 - performance.now()))); }catch(e){}
         if (!ok) later(finish, 7000);
         later(finish, 9500); };   // (the scene runs the clip's length, 7 s; whatever happens the goodbye comes by 9.5 s)
-      const mark = ()=>{ if (vid.currentTime > 0.05){ started = true; } };
+      const mark = ()=>{ if (vid && vid.currentTime > 0.05){ started = true; } };
       vid.addEventListener('playing', ()=>{ lastMove = performance.now(); }); vid.addEventListener('timeupdate', mark);
-      const watch = setInterval(()=>{ if (ended || fellBack){ clearInterval(watch); return; }
+      const watch = setInterval(()=>{ if (ended || fellBack || !vid){ clearInterval(watch); return; }
         const t = vid.currentTime; if (t !== lastT){ lastT = t; lastMove = performance.now(); }
-        else if (started && !vid.ended && performance.now() - lastMove > 1500) fail();   // (froze part-way)
+        else if (started && vid && !vid.ended && performance.now() - lastMove > 1500) fail();   // (froze part-way)
       }, 400);
-      later(()=>{ if (!started && !vid.ended) fail(); }, 1300);   // (nothing playing 1.5 s after the flash)
+      later(()=>{ if (vid && !started && !vid.ended) fail(); }, 1300);   // (nothing playing 1.5 s after the flash)
       const pr = vid.play();
       if (pr && pr.catch) pr.catch(()=>{ if (ended || fellBack) return;
         // refused with sound (a phone that wants a tap): try once more silent before giving up
@@ -16694,6 +16700,23 @@ const SHARE_URL = 'https://flipstax-one.vercel.app';
       // TAP TO SKIP after 1.5 s
       later(()=>{ skip.classList.add('on'); onSkip = (e)=>{ e.stopPropagation(); e.preventDefault(); finish(); }; vidLayer && vidLayer.addEventListener('click', onSkip); }, 1500);
     }, 1950);
+  }
+  // stability (finale memory fix): when the finale video starts, everything of the Word Warp screen behind it is removed - the hyperspace starfield, the nebulae, the
+  // planet, the constellations, the galaxy picture, the logo, the tiles and keys, and their animations - plus the landing picture, which is not needed any more.
+  // Nothing is deleted on disk; wwLogoEnsure() builds the sky and logo again if the Word Warp is ever shown again.
+  function wwTeardown(){
+    try{
+      const ov = els.solveOverlay;
+      document.getAnimations().forEach(a=>{ const t = a.effect && a.effect.target; if (t && t.closest && t.closest('#solveOverlay, #wwSky, .ww-galaxy')) try{ a.cancel(); }catch(e){} });
+      const sky = document.getElementById('wwSky'); if (sky) sky.remove();
+      const gi = document.querySelector('.ww-galaxy i'); if (gi){ gi.style.backgroundImage = 'none'; gi.classList.remove('gal-pic'); gi.innerHTML = ''; delete gi.dataset.gal; gi.style.display = 'none'; }
+      document.documentElement.classList.add('ww-fin-mem');   // (the stage behind is hidden while the video plays; finish() brings it back before the goodbye)
+      wwGalaxyUrl = null; wwGalaxyP = null;
+      const logo = document.getElementById('wwLogo'); if (logo) logo.remove();
+      [els.solveSlots, els.solveRack].forEach(e=>{ if (e) e.innerHTML = ''; });
+      const kb = document.getElementById('solveKeyboard'); if (kb) kb.innerHTML = '';
+      document.querySelectorAll('#introLand img.il-bg, #introLand .il-ship').forEach(i=>{ try{ i.removeAttribute('src'); }catch(e){} });
+    }catch(e){}
   }
   function wwWin(solvedAt, done){
     if (WW_FINALE) return wwFinaleWin(solvedAt, done);

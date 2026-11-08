@@ -3092,3 +3092,9 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root:root .cbr-tag{ left:78px; }
 :root:root .cbr-card.adv{ grid-template-rows:auto auto auto; }
 :root:root .cbr-card.adv .cbr-cs{ grid-column:1 / -1; grid-row:3; white-space:nowrap; word-break:normal; text-align:center; font-size:clamp(8px, 2.8vw, 20px); margin-top:4px; }
+
+/* finale memory fix: the hyperspace starfield layers are about half the size (80vmax, scaled 0.66 to 3.56 for the same on-screen sweep, tiles halved to match) - a third of the memory on a phone */
+:root:root .wk-warp{ width:80vmax; height:80vmax; margin:-40vmax 0 0 -40vmax; background-size:75px 75px; animation-name:wkWarp2; }
+:root:root .wk-warp.b{ background-size:96px 96px; } :root:root .wk-warp.c{ background-size:59px 59px; }
+@keyframes wkWarp2{ 0%{ transform:scale(0.66); opacity:0; } 25%{ opacity:0.55; } 80%{ opacity:0.4; } 100%{ transform:scale(3.56); opacity:0; } }
+:root.ww-fin-mem #stage{ display:none !important; }   /* (finale memory fix: the stage's big pictures are not kept on screen behind the finale video) */
