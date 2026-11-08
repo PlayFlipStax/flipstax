@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>FlipStax stats</title>
+<style>
+  :root{ --bg:#14091f; --ink:#f4eaff; --dim:#b9a6d6; --line:#3a2559; --gold:#ffd23f; }
+  body{ margin:0; padding:16px; background:var(--bg); color:var(--ink); font:14px/1.4 system-ui, sans-serif; }
+  h1{ font-size:20px; margin:0 0 12px; } input,select,button{ font:inherit; padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:#1f1030; color:var(--ink); }
+  button{ background:var(--gold); color:#2a1300; border:0; font-weight:700; cursor:pointer; } .err{ color:#ff8a8a; margin-top:8px; }
+  table{ border-collapse:collapse; width:100%; margin-top:12px; } th,td{ padding:6px 8px; border-bottom:1px solid var(--line); text-align:right; }
+  th:first-child,td:first-child{ text-align:left; } th{ color:var(--dim); font-weight:600; } tr.today td{ color:var(--gold); } td.sum{ font-weight:700; }
+  .wrap{ overflow-x:auto; }
+</style></head><body>
+<h1>FlipStax stats</h1>
+<form id="f"><input id="k" type="password" placeholder="Stats key" autocomplete="off"> <select id="env"><option value="production">production</option><option value="preview">preview</option></select> <button>Show</button></form>
+<div class="err" id="err"></div><div class="wrap" id="out"></div>
+<script>
+  const f = document.getElementById('f'), out = document.getElementById('out'), err = document.getElementById('err');
+  f.addEventListener('submit', async (e)=>{
+    e.preventDefault(); err.textContent = ''; out.textContent = '';
+    const r = await fetch('/api/stats?env=' + document.getElementById('env').value, { headers: { 'x-stats-key': document.getElementById('k').value }, cache: 'no-store' });
+    if (!r.ok){ err.textContent = r.status === 401 ? 'Wrong key.' : r.status === 503 ? 'STATS_KEY is not set on the server.' : 'Error ' + r.status; return; }
+    const d = await r.json(), names = {};
+    d.days.forEach(x=> Object.keys(x.counts).forEach(n=> names[n] = 1));
+    const order = ['show_started', 'reached_results', 'share_clicked'], rest = Object.keys(names).filter(n=> order.indexOf(n) < 0).sort();
+    const rows = order.concat(rest);
+    let h = '<table><tr><th>' + d.env + '</th>' + d.days.map((x, i)=> '<th>' + (i === 0 ? 'today' : x.date.slice(5)) + '</th>').join('') + '<th>7 days</th></tr>';
+    rows.forEach(n=>{ const v = d.days.map(x=> +x.counts[n] || 0), sum = v.slice(0, 7).reduce((a, b)=> a + b, 0);
+      h += '<tr' + (n === 'show_started' ? ' class="today"' : '') + '><td>' + n.replace(/</g, '&lt;') + '</td>' + v.map(x=> '<td>' + x + '</td>').join('') + '<td class="sum">' + sum + '</td></tr>'; });
+    out.innerHTML = h + '</table><p style="color:var(--dim)">Days are UTC. Counters only - nothing identifies a player.</p>';
+  });
+</script></body></html>

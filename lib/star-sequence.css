@@ -1,0 +1,116 @@
+/* FlipStax - STAR SEQUENCE (lib/star-sequence.js, registry id starSequence). Portrait, the whole screen: the Math galaxy turning behind, the neon sign and the
+   Chomper-style status bar at the top, the saucer, five feathered beams fanning down to five gem stars on glowing pools, the progress dots, the score pill.
+   Transform and opacity only; the beams' soft edges are a STATIC blur inside their SVGs (never animated); no more than 3 flashes a second.
+   Lite mode and reduced motion: nothing turns, bobs, pulses, chases or twinkles. */
+.nx-sq, .nx-sq .nx-stage, .nx-sq .sq-field, .nx-sq .sq-hit, .nx-sq .sq-hit polygon, .nx-sq .sq-start, .nx-sq button{ touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+.nx-sq .nx-host{ display:none !important; }   /* (Flip is the saucer here) */
+:root:root.stage-on .mg-overlay.nx-sq, .mg-overlay.nx-sq{ background:#05020f !important; }
+.mg-overlay.nx-sq::before, .mg-overlay.nx-sq::after{ display:none !important; }
+.sq-set{ background:#05020f; }
+.sq-set .sq-galaxy{ position:absolute; left:50%; top:50%; width:150vmax; height:150vmax; margin:-75vmax 0 0 -75vmax; background:#05020f center / cover no-repeat; will-change:transform; }   /* (larger than the screen's diagonal: its corners never show while it turns) */
+.nx-sq .nx-casino{ padding:0; }
+.nx-sq .nx-panel{ order:1; flex:none; margin:8px auto 0; }
+.nx-sq .nx-play{ order:2; margin-top:4px; justify-content:flex-start; }
+.nx-sq .mg-foot{ position:relative; z-index:6; margin-top:-2px; }
+
+/* ---- the neon sign: a dark panel, four mounting dots, a dotted inner border, STAR (hot pink) and SEQUENCE (cyan) in outlined tubing with a white-hot core,
+   a gold star at each end, and a ring of 24 bulbs chasing round the border (4 lit at a time, a lap in 2 s) ---- */
+.sq-sign{ position:relative; z-index:2; flex:none; box-sizing:border-box; width:min(90%, 360px); margin:6px auto 0; padding:9px 12px 8px; border-radius:18px;
+  background:linear-gradient(180deg, #160c34, #07041a); border:2px solid #3b2b70; box-shadow:0 6px 18px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.12); }
+.sq-mount{ position:absolute; width:7px; height:7px; border-radius:50%; background:radial-gradient(circle at 35% 35%, #e9e6f6, #8c86a8 60%, #4a4562); }
+.sq-mount.a{ left:7px; top:7px; } .sq-mount.b{ right:7px; top:7px; } .sq-mount.c{ left:7px; bottom:7px; } .sq-mount.d{ right:7px; bottom:7px; }
+.sq-sign-in{ position:relative; display:flex; flex-direction:column; align-items:center; padding:5px 6px 6px; border:2px dotted rgba(255,79,180,0.5); border-radius:12px; }
+.sq-row1{ display:flex; align-items:center; justify-content:center; gap:4%; width:100%; }
+.sq-row2{ margin-top:2px; }
+.sq-gold{ flex:none; width:clamp(26px, 9vw, 40px); height:clamp(26px, 9vw, 40px); filter:drop-shadow(0 0 5px rgba(255,210,63,0.85)); }
+.sq-gold svg{ display:block; width:100%; height:100%; }
+.sq-neon{ position:relative; display:inline-block; font:400 var(--fs)/1 'FS Righteous', 'Big Shoulders Display', sans-serif; letter-spacing:0.06em; white-space:nowrap; }
+.sq-neon.pink{ --c:#ff3fb5; --hi:#ffc2e8; --fs:clamp(40px, 14vw, 62px); --sw:2.6px; }
+.sq-neon.cyan{ --c:#27e6ff; --hi:#c8f8ff; --fs:clamp(20px, 6.9vw, 30px); --sw:1.8px; letter-spacing:0.14em; }
+.sq-neon .t{ display:block; color:transparent; -webkit-text-stroke:var(--sw) var(--c); }
+.sq-neon .t:not(.base){ position:absolute; left:0; top:0; right:0; bottom:0; }
+.sq-neon .t.base{ text-shadow:0 0 5px var(--c), 0 0 12px var(--c); }
+.sq-neon .t.glow{ -webkit-text-stroke:var(--sw) var(--hi); text-shadow:0 0 8px var(--c), 0 0 20px var(--c); opacity:0.6; animation:sqNeon 1.5s ease-in-out infinite alternate; will-change:opacity; }
+.sq-neon.cyan .t.glow{ animation-delay:-1.5s; }   /* (out of phase with the pink) */
+.sq-neon .t.boost{ -webkit-text-stroke:calc(var(--sw) * 1.2) #ffffff; text-shadow:0 0 10px var(--c), 0 0 26px var(--c); opacity:0; will-change:opacity; }
+.sq-neon .t.core{ -webkit-text-stroke:0.8px rgba(255,255,255,0.95); }
+@keyframes sqNeon{ from{ opacity:0.6; } to{ opacity:1; } }
+.sq-bulbs{ position:absolute; inset:0; pointer-events:none; }
+.sq-bulbs i{ position:absolute; width:6px; height:6px; margin:-3px 0 0 -3px; border-radius:50%; background:#fff3b8; box-shadow:0 0 5px 1px rgba(255,214,90,0.9); opacity:0.25; animation:sqChase 2s linear infinite; }
+@keyframes sqChase{ 0%{ opacity:1; } 15%{ opacity:1; } 21%{ opacity:0.25; } 94%{ opacity:0.25; } 100%{ opacity:1; } }
+
+/* ---- the field: the saucer, the beams, the stars and pools, the tap targets, START ---- */
+.sq-field{ position:relative; flex:1 1 auto; width:100%; min-height:0; --k:1; --dot:9px; }
+.sq-saucer{ position:absolute; z-index:6; animation:sqBob 4s ease-in-out infinite; pointer-events:none; }
+@keyframes sqBob{ 0%, 100%{ transform:translateY(0); } 50%{ transform:translateY(-4px); } }
+.sq-simg{ position:relative; z-index:2; display:block; width:100%; height:100%; }
+.sq-sglow, .sq-sflare{ position:absolute; left:8%; right:8%; top:52%; height:78%; border-radius:50%; z-index:1; pointer-events:none; }
+.sq-sglow{ background:radial-gradient(closest-side, rgba(190,150,255,0.6), rgba(190,150,255,0)); opacity:0.5; animation:sqGlow 1.5s ease-in-out infinite alternate; }
+.sq-sflare{ background:radial-gradient(closest-side, var(--c, #fff), rgba(255,255,255,0)); opacity:0; }
+@keyframes sqGlow{ from{ opacity:0.4; } to{ opacity:0.85; } }
+.sq-lights{ position:absolute; inset:0; z-index:3; }
+.sq-lights i{ position:absolute; width:calc(var(--dot) * var(--ls, 1)); height:calc(var(--dot) * var(--ls, 1)); transform:translate(-50%, -50%); border-radius:50%;
+  background:radial-gradient(circle, #ffffff 0 16%, var(--lc) 42%, rgba(255,255,255,0) 72%); opacity:0.3; animation:sqTwinkle 0.9s ease-in-out infinite alternate; }
+@keyframes sqTwinkle{ from{ opacity:0.25; } to{ opacity:1; } }
+.sq-beams{ position:absolute; inset:0; pointer-events:none; }
+.sq-beams svg{ position:absolute; left:0; top:0; overflow:visible; pointer-events:none; will-change:opacity; }
+.sq-bbase{ z-index:1; opacity:0.7; }
+.sq-blit{ z-index:2; opacity:0; }
+.sq-hit{ position:absolute; left:0; top:0; z-index:8; }
+.sq-stars{ position:absolute; inset:0; z-index:5; pointer-events:none; }
+.sq-star{ position:absolute; width:0; height:0; }
+.sq-star > *{ position:absolute; display:block; }
+.sq-gem{ width:calc(54px * var(--k)); height:calc(54px * var(--k)); left:calc(-27px * var(--k)); top:calc(-27px * var(--k)); opacity:0.9; z-index:3; filter:drop-shadow(0 0 5px var(--c)) brightness(1.08); will-change:transform; }
+.sq-gem svg{ display:block; width:100%; height:100%; }
+.sq-sglo{ width:calc(104px * var(--k)); height:calc(104px * var(--k)); left:calc(-52px * var(--k)); top:calc(-52px * var(--k)); border-radius:50%; z-index:2; opacity:0;
+  background:radial-gradient(closest-side, var(--c), rgba(255,255,255,0)); }
+.sq-flare{ width:calc(118px * var(--k)); height:calc(118px * var(--k)); left:calc(-59px * var(--k)); top:calc(-59px * var(--k)); z-index:4; opacity:0;
+  background:radial-gradient(closest-side, #ffffff 0 30%, rgba(255,255,255,0.4) 60%, rgba(255,255,255,0));
+  clip-path:polygon(50% 0, 56% 44%, 100% 50%, 56% 56%, 50% 100%, 44% 56%, 0 50%, 44% 44%); }
+.sq-pool, .sq-pflare{ width:calc(70px * var(--k)); height:calc(20px * var(--k)); left:calc(-35px * var(--k)); top:calc(20px * var(--k)); border-radius:50%; z-index:1; }
+.sq-pool{ opacity:0.8; background:radial-gradient(closest-side, color-mix(in srgb, var(--c) 55%, #ffffff), var(--c) 45%, rgba(255,255,255,0) 100%); box-shadow:0 0 0 1.5px color-mix(in srgb, var(--c) 60%, #ffffff) inset; }
+.sq-pflare{ opacity:0; background:radial-gradient(closest-side, #ffffff, var(--c) 45%, rgba(255,255,255,0)); }
+.sq-bolt{ position:absolute; left:0; top:0; z-index:5; width:calc(10px * var(--k)); height:calc(56px * var(--k)); margin:calc(-28px * var(--k)) 0 0 calc(-5px * var(--k)); border-radius:50%; pointer-events:none; opacity:0;
+  background:linear-gradient(180deg, rgba(255,255,255,0), var(--c) 28%, #ffffff 58%, #ffffff 76%, rgba(255,255,255,0)); }
+.sq-bolt::before{ content:''; position:absolute; left:-120%; right:-120%; top:10%; bottom:10%; border-radius:50%; background:radial-gradient(closest-side, var(--c), rgba(255,255,255,0)); opacity:0.7; }
+.sq-spark{ position:absolute; left:0; top:0; z-index:6; width:calc(12px * var(--k)); height:calc(12px * var(--k)); margin:calc(-6px * var(--k)) 0 0 calc(-6px * var(--k)); pointer-events:none; opacity:0;
+  background:var(--c); clip-path:polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%); }
+.sq-start{ position:absolute; left:50%; z-index:9; transform:translate(-50%, -50%); min-width:170px; min-height:64px; padding:10px 34px; border-radius:999px; border:3px solid #ffffff; cursor:pointer;
+  font:900 34px/1 var(--f-display); letter-spacing:3px; color:#3a1a00; background:linear-gradient(180deg, #fff3a8, #ffcb2b 55%, #ff9a1a); box-shadow:0 0 0 3px #7a4a00, 0 6px 0 3px #7a4a00, 0 0 24px rgba(255,210,63,0.7); }
+.sq-start.gone{ display:none; }
+/* the progress: the round's label and 4 big dots (a dot for each cleared round before the last, 7-step one) */
+.sq-prog{ position:relative; z-index:6; flex:none; display:flex; flex-direction:column; align-items:center; gap:6px; padding:4px 0 0; }
+.sq-plabel{ font:900 16px/1 var(--f-display); letter-spacing:2px; color:#fff4d6; text-shadow:0 0 8px rgba(125,249,255,0.7); }
+.sq-dots{ display:flex; gap:14px; }
+.sq-dots i{ width:24px; height:24px; border-radius:50%; box-sizing:border-box; border:3px solid #7df9ff; background:#1b1f50; }
+.sq-dots i.on{ border-color:#ffffff; background:radial-gradient(circle at 40% 35%, #fff6c8, #ffd84a 60%, #e0a800); }
+.mg-overlay.nx-sq .nx-slam.sqgood{ font-size:clamp(40px, 12vw, 72px); color:#ffe45c; }
+@media (max-height:700px){ .sq-sign{ padding:6px 10px 5px; } .sq-sign-in{ padding:3px 6px 4px; } .sq-neon.pink{ --fs:clamp(34px, 12vw, 52px); } .sq-neon.cyan{ --fs:clamp(17px, 5.8vw, 26px); }
+  .sq-gold{ width:26px; height:26px; } .sq-dots i{ width:20px; height:20px; } .sq-plabel{ font-size:14px; } .sq-prog{ gap:4px; } }
+@media (min-width:600px){ .sq-sign{ width:min(64%, 600px); padding:14px 18px 12px; border-radius:24px; } .sq-neon.pink{ --fs:clamp(62px, 10.5vw, 120px); --sw:3.6px; } .sq-neon.cyan{ --fs:clamp(30px, 5.2vw, 58px); --sw:2.4px; }
+  .sq-gold{ width:clamp(40px, 6.5vw, 70px); height:clamp(40px, 6.5vw, 70px); } .sq-bulbs i{ width:9px; height:9px; margin:-4.5px 0 0 -4.5px; }
+  .sq-dots i{ width:34px; height:34px; } .sq-plabel{ font-size:24px; } .sq-start{ font-size:52px; min-width:260px; min-height:92px; } }
+/* lite mode and reduced motion: still - no turning, bobbing, pulsing, chasing or twinkling; a played beam just changes brightness (the game sets it) */
+:root.lite .sq-saucer, :root.lite .sq-sglow, :root.lite .sq-lights i, :root.lite .sq-bulbs i, :root.lite .sq-neon .t.glow{ animation:none !important; }
+:root.lite .sq-lights i{ opacity:0.75; } :root.lite .sq-bulbs i{ opacity:0.6; } :root.lite .sq-neon .t.glow{ opacity:0.85; } :root.lite .sq-sglow{ opacity:0.6; }
+:root.lite .nx-sq .sq-star.on .sq-gem{ transform:scale(1.333); opacity:1; } :root.lite .nx-sq .sq-star.on .sq-flare, :root.lite .nx-sq .sq-star.on .sq-sglo{ opacity:0.85; } :root.lite .nx-sq .sq-star.on .sq-pflare{ opacity:0.9; }
+@media (prefers-reduced-motion: reduce){
+  .sq-saucer, .sq-sglow, .sq-lights i, .sq-bulbs i, .sq-neon .t.glow{ animation:none !important; }
+  .sq-lights i{ opacity:0.75; } .sq-bulbs i{ opacity:0.6; } .sq-neon .t.glow{ opacity:0.85; } .sq-sglow{ opacity:0.6; }
+  .nx-sq .sq-star.on .sq-gem{ transform:scale(1.333); opacity:1; } .nx-sq .sq-star.on .sq-flare, .nx-sq .sq-star.on .sq-sglo{ opacity:0.85; } .nx-sq .sq-star.on .sq-pflare{ opacity:0.9; }
+}
+/* a still dark veil over the galaxy (deepest at the edges and the bottom), so the beams and the stars read clearly on the bright art */
+.sq-set .sq-veil{ position:absolute; inset:0; pointer-events:none; background:radial-gradient(120% 75% at 50% 42%, rgba(6,3,22,0.28), rgba(6,3,22,0.62) 100%), linear-gradient(180deg, rgba(6,3,22,0) 55%, rgba(6,3,22,0.45)); }
+
+/* run 1 job 3: a more visible neon breath and UFO light blink in normal mode (opacity only, under 3 a second; lite and reduced motion stay still) */
+.sq-neon .t.glow{ animation-duration:1.2s; }
+@keyframes sqNeon{ from{ opacity:0.3; } to{ opacity:1; } }
+@keyframes sqTwinkle{ from{ opacity:0.12; } to{ opacity:1; } }
+
+/* run 2 job 7: the win show */
+.sq-winfx{ position:absolute; inset:0; z-index:30; pointer-events:none; overflow:hidden; }
+.sq-saucer.sq-winblink .sq-lights i{ animation:sqTwinkle 0.4s steps(1) infinite alternate !important; }
+.sq-dust{ position:absolute; top:0; width:7px; height:7px; background:var(--c); clip-path:polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); will-change:transform, opacity; }
+.sq-dust.big{ width:13px; height:13px; background:#fff6c2; }
+.sq-winword{ position:absolute; left:50%; top:42%; transform:translate(-50%, -50%); white-space:nowrap; font:900 clamp(46px, 14vw, 110px)/1 var(--f-display, sans-serif); color:#ffffff; -webkit-text-stroke:3px #2a0a6a; paint-order:stroke fill; text-shadow:0 6px 0 #ff4fb4; }
+.sq-dust{ width:10px; height:10px; } .sq-dust.big{ width:18px; height:18px; }

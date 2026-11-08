@@ -1,0 +1,103 @@
+/* FlipStax - the stage (lib/stage.js): the photo studio set in three shots - close, wide, dim. Transform and opacity
+   only; lite mode and reduced motion hold the pictures still. DESIGN.md "The stage" has the scene -> shot table. */
+.stage{ position:fixed; inset:0; z-index:-5; overflow:hidden; pointer-events:none; background:#12062a; container-type:size; }
+.stg-shot{ position:absolute; inset:0; overflow:hidden; opacity:0; visibility:hidden; transition:opacity 0s linear 600ms, visibility 0s linear 600ms; }
+/* a camera cut: the incoming shot fades in ON TOP of the outgoing one, which stays fully opaque until the new one is fully on (then it goes at once),
+   so the picture is solid the whole time - two shots fading at once left a quarter of the screen showing the dark stage under them */
+.stg-shot.on{ opacity:1; visibility:visible; z-index:2; transition:opacity 600ms var(--ease-io, ease-in-out), visibility 0s; }
+.stg-shot:not(.on) *{ animation-play-state:paused !important; }
+.stg-img{ position:absolute; inset:0; width:100%; height:100%; display:block; -webkit-user-drag:none; user-select:none; }
+
+/* The plate: the picture at its own aspect ratio, covering the screen (container units), so everything placed on it in
+   percent (the sign, the panel, the glow) stays on the same spot of the set at any crop. Anchored 30% down: a short
+   wide screen keeps the marquee in view. */
+.stg-plate{ position:absolute; left:50%; transform-origin:50% 30%; }
+.stg-close .stg-plate{ --pw:max(100cqw, 75cqh); width:var(--pw); height:calc(var(--pw) * 4 / 3); margin-left:calc(var(--pw) / -2);
+  top:min(0px, calc((100cqh - var(--pw) * 4 / 3) * 0.3)); }
+.stg-wide .stg-plate{ --pw:max(100cqw, 133.9cqh); --pan:calc((var(--pw) - 100cqw) / 2); width:var(--pw); height:calc(var(--pw) / 1.339); margin-left:calc(var(--pw) / -2);
+  top:min(0px, calc((100cqh - var(--pw) / 1.339) * 0.3)); animation:stgPan 36s var(--ease-io, ease-in-out) infinite alternate; }
+/* close: a slow push-in over the scene (stage.js sets --push-ms to the scene's length) */
+.stg-close.push .stg-plate{ animation:stgPush var(--push-ms, 9s) linear forwards; }
+@keyframes stgPush{ from{ transform:scale(1); } to{ transform:scale(1.06); } }
+/* wide: from one end of the stage to the other and back (nothing to pan when the screen is as wide as the picture) */
+@keyframes stgPan{ from{ transform:translateX(var(--pan)); } to{ transform:translateX(calc(var(--pan) * -1)); } }
+
+/* Gentle life: a warm glow breathing round the arch, a soft light sweeping across now and then. */
+.stg-glow{ position:absolute; left:20%; top:6%; width:60%; height:52%; border-radius:50%; opacity:0.25;
+  background:radial-gradient(closest-side, rgba(255,200,120,0.55), rgba(255,90,200,0.22) 55%, rgba(255,90,200,0) 100%);
+  animation:stgGlow 4.6s var(--ease-io, ease-in-out) infinite alternate; }
+@keyframes stgGlow{ from{ opacity:0.18; } to{ opacity:0.5; } }
+.stg-sweep{ position:absolute; top:-10%; left:0; width:34%; height:120%; opacity:0.55;
+  background:linear-gradient(100deg, rgba(255,240,220,0) 0%, rgba(255,240,220,0.13) 45%, rgba(255,255,255,0.2) 50%, rgba(255,240,220,0.13) 55%, rgba(255,240,220,0) 100%);
+  transform:translateX(-120%) skewX(-12deg); animation:stgSweep 11s var(--ease-io, ease-in-out) 1.5s infinite; }
+@keyframes stgSweep{ 0%{ transform:translateX(-120%) skewX(-12deg); } 55%, 100%{ transform:translateX(320%) skewX(-12deg); } }
+
+/* The marquee: the close shot's cream panel is darkened to match the wide shot's dark sign, and live text glows on it. */
+.stg-panel{ position:absolute; border-radius:0.6% / 1.4%;
+  background:linear-gradient(180deg, rgba(34,10,44,0.95), rgba(18,4,30,0.97)); box-shadow:inset 0 0 2.2cqw rgba(0,0,0,0.75); }
+.stg-sign{ position:absolute; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4%; text-align:center;
+  container-type:size; opacity:0; transition:opacity 300ms ease; }
+.stg-sign.on{ opacity:1; }
+.stg-logo{ display:none; max-width:92%; max-height:96%; width:auto; height:auto; object-fit:contain; }
+.stg-sign.logo .stg-logo{ display:block; }
+.stg-sign.logo .stg-sub, .stg-sign.logo .stg-main{ display:none !important; }
+.stg-sign span, .stg-sign b{ display:block; max-width:96%; white-space:nowrap; overflow:hidden; font-family:var(--f-display, 'Big Shoulders Display', 'Arial Narrow', sans-serif); font-weight:900; text-transform:uppercase; line-height:1; }
+.stg-main{ font-size:min(56cqh, 15cqw); letter-spacing:0.04em; color:#fff;
+  text-shadow:0 0 0.12em #fff, 0 0 0.35em rgba(255,92,200,0.95), 0 0 0.8em rgba(255,60,172,0.7); }
+.stg-sub{ font-size:min(24cqh, 7.5cqw); letter-spacing:0.18em; color:#ffe9a0; text-shadow:0 0 0.3em rgba(255,200,80,0.9); }
+.stg-sign:not(.two) .stg-sub{ display:none !important; }
+.stg-sign.two .stg-main{ font-size:min(46cqh, 15cqw); }
+.stg-sign.long .stg-main{ font-size:min(44cqh, 11.5cqw); }
+.stg-sign.xlong .stg-main{ font-size:min(38cqh, 8.8cqw); letter-spacing:0.02em; }
+
+/* dim: the blurred close shot under a dark scrim (55%, never below 45%) and a vignette - text over it keeps 4.5:1. */
+.stg-dim .stg-img{ object-fit:cover; object-position:50% 30%; }
+.stg-scrim{ position:absolute; inset:0;
+  background:radial-gradient(120% 90% at 50% 42%, rgba(8,2,20,0) 40%, rgba(8,2,20,0.65) 100%), rgba(10,3,24,0.55); }
+
+/* Lite mode and reduced motion: the pictures hold still (the camera cuts still crossfade). */
+:root.lite .stg-plate, :root.lite .stg-glow, :root.lite .stg-sweep{ animation:none !important; }
+:root.lite .stg-sweep{ display:none; }
+@media (prefers-reduced-motion: reduce){ .stg-plate, .stg-glow, .stg-sweep{ animation:none !important; } .stg-sweep{ display:none; } }
+
+/* ---- The scenes (DESIGN.md "The stage" has the table). The stage paints just under the overlay it backs
+   (.stage-backed), so that overlay's own set and backdrop step aside; its buttons, cards and text stay as they were. */
+/* landing and menu: the close shot, with a soft scrim at the top and bottom where the text and buttons sit */
+:root.stage-on .home-overlay.stage-backed, :root.stage-on .split-select-overlay.stage-backed{
+  background:linear-gradient(180deg, rgba(14,4,30,0.5) 0%, rgba(14,4,30,0.12) 34%, rgba(14,4,30,0.08) 55%, rgba(14,4,30,0.55) 100%) !important; }
+:root.stage-on .stage-backed > .studio{ display:none; }
+:root.stage-on .show-card.stage-backed{ background:transparent !important; }
+/* the cold open (wide, then a push on the close shot), the act cards (close, the act on the marquee), the Mystery Game
+   door (close): their drawn studio, the act card's dimming scrim and colour sweeps step aside */
+:root.stage-on .show-card.stage-backed .co-studio, :root.stage-on .show-card.stage-backed .mr-studio,
+:root.stage-on .show-card.stage-backed .cue-stage{ display:none; }
+:root.stage-on .show-card.cue.stage-backed:not(.finale)::before{ display:none; }
+:root.stage-on .show-card.cue.stage-backed .cue-wipe > .bg{ opacity:0.85; }
+/* results and the outro: the wide shot under a scrim, so the score panel reads as before */
+:root.stage-on #readoutOverlay.stage-backed{ background:radial-gradient(120% 90% at 50% 42%, rgba(8,2,20,0) 40%, rgba(8,2,20,0.65) 100%), linear-gradient(rgba(10,3,24,0.5), rgba(10,3,24,0.5)) !important; }   /* the wide shot dimmed like gameplay: scrim + vignette */
+:root.stage-on #readoutOverlay.stage-backed .warp-bg{ display:none; }
+:root.stage-on .fin-overlay.stage-backed{ background:linear-gradient(180deg, rgba(14,4,30,0.62), rgba(14,4,30,0.45) 40%, rgba(14,4,30,0.7)) !important; }
+
+/* gameplay: the dim shot. The VS screen and the Daily question rounds show the stage layer itself (the world layer
+   above it goes clear); the full-screen game overlays paint the same picture as their own backdrop (the same crop,
+   so nothing jumps), with the same scrim and vignette. Orbit Drop keeps its own look. */
+:root.stage-on .show-bg{ background:none !important; }
+:root.stage-on .show-bg > .rays, :root.stage-on .show-bg > .glow{ display:none; }
+:root.stage-on :is(.mg-overlay, .lucky-overlay, .ir-overlay, .guess-overlay, .solve-overlay, .riddle-overlay),
+:root.stage-on.mode-infinity .event-overlay{
+  background:radial-gradient(120% 90% at 50% 42%, rgba(8,2,20,0) 40%, rgba(8,2,20,0.65) 100%), linear-gradient(rgba(10,3,24,0.55), rgba(10,3,24,0.55)),
+    url(../data/stage/stage-dim.webp) 50% 30% / cover no-repeat, #12062a !important; }
+:root.stage-on :is(.mg-overlay, .ir-overlay, .guess-overlay, .solve-overlay, .event-overlay, .riddle-overlay) :is(.mg-bg, .ir-bg, .guess-bg, .warp-bg, .ev-bg){ background:none !important; }
+:root.stage-on :is(.mg-overlay, .ir-overlay, .guess-overlay, .solve-overlay, .event-overlay, .riddle-overlay) :is(.mg-bg, .ir-bg, .guess-bg, .warp-bg, .ev-bg) > :is(.rays, .glow){ display:none; }
+:root.stage-on .mg-overlay .mg-bg{ display:none; }
+
+/* ---- A+ follow-up (screen bleed): a Mystery Game sits on its OWN opaque backdrop in its own colours - never the stage picture, which showed the
+   portal arches behind it as it started. (Zap Words, Twin Flip and Fact or Fib paint their own, as before.) ---- */
+:root.stage-on .mg-overlay{ background:radial-gradient(120% 75% at 50% 25%, var(--mg-a) 0%, var(--mg-b) 48%, var(--mg-c) 100%), #12062a !important; }
+:root.stage-on .mg-overlay.mg-saucerShuffle{ background:radial-gradient(120% 75% at 50% 25%, #3b2a9a 0%, #1d1566 52%, #0a0630 100%), #0a0630 !important; }
+:root.stage-on .mg-overlay.mg-saucerShuffle .mg-bg{ display:block; }
+/* A+: the sign frame on the Play Today screen shows the logo and, under it, the show's EPISODE N */
+.stg-ep{ display:none; font-style:normal; font-family:var(--f-display, 'Big Shoulders Display', 'Arial Narrow', sans-serif); font-weight:900; text-transform:uppercase; line-height:1; white-space:nowrap;
+  font-size:min(20cqh, 7cqw); letter-spacing:0.2em; padding-left:0.2em; color:#ffe9a0; text-shadow:0 0 0.3em rgba(255,200,80,0.9); }
+.stg-sign.logo.ep .stg-ep{ display:block; }
+.stg-sign.logo.ep .stg-logo{ max-height:70%; }

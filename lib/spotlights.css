@@ -1,0 +1,21 @@
+/* Spotlights (lib/spotlights.js): soft beams and slow shimmer sparkles behind a stage. Transform and opacity only; no animated blur or shadow;
+   no flashing (a sparkle takes 4-7 s to fade in and out). Lite mode and reduced motion: still beams at their base angle, still faint sparkles. */
+.spot-layer{ position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
+.spot-beam{ position:absolute; top:-4%; width:30%; height:92%; margin-left:-15%; transform-origin:50% 0; opacity:var(--spot-o, 0.16);
+  background:linear-gradient(180deg, var(--c, #fff) 0%, color-mix(in srgb, var(--c, #fff) 45%, transparent) 40%, transparent 92%);
+  clip-path:polygon(46% 0, 54% 0, 100% 100%, 0 100%); transform:rotate(var(--a, 0deg));
+  animation:spotSweep 8s ease-in-out infinite alternate; will-change:transform; }
+@keyframes spotSweep{ from{ transform:rotate(var(--a0, -10deg)); } to{ transform:rotate(var(--a1, 10deg)); } }
+.spot-spark{ position:absolute; width:10px; height:10px; margin:-5px 0 0 -5px; opacity:0; transform:scale(calc(var(--z, 1) * 0.5));
+  background:radial-gradient(circle, #fff 0 18%, color-mix(in srgb, var(--c, #fff) 70%, transparent) 30%, transparent 62%);
+  clip-path:polygon(50% 0, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0 50%, 40% 40%);
+  animation:spotShimmer 5s ease-in-out infinite; }
+@keyframes spotShimmer{ 0%, 100%{ opacity:0; transform:scale(calc(var(--z, 1) * 0.5)) rotate(0deg); } 50%{ opacity:0.75; transform:scale(var(--z, 1)) rotate(45deg); } }
+:root.lite .spot-beam{ animation:none; transform:rotate(var(--a, 0deg)); }
+:root.lite .spot-spark{ animation:none; opacity:0.35; transform:scale(calc(var(--z, 1) * 0.7)); }
+@media (prefers-reduced-motion: reduce){
+  .spot-beam{ animation:none !important; transform:rotate(var(--a, 0deg)); }
+  .spot-spark{ animation:none !important; opacity:0.35; transform:scale(calc(var(--z, 1) * 0.7)); }
+}
+/* the Mystery Wheel: the new beams replace the two older sweeping lights on its stage art */
+.lucky-overlay.mw .mw-bg::before, .lucky-overlay.mw .mw-bg::after{ display:none; }

@@ -1,0 +1,99 @@
+/* FlipStax - NEON LOGOS (run 2 job 2; lib/neon-logos.js). A dark panel with a glowing coloured border, three interleaved rings of bulbs that light in
+   turn (a chase, opacity only: one step every 0.4 s), a soft glow that breathes (opacity only), glowing two-line lettering and an animated icon.
+   Sized from its own width (container units), so it fits any screen with margin. Lite mode and reduced motion: everything still. */
+.nl{ position:relative; width:min(92%, 470px); aspect-ratio:3.3; margin:2px auto 0; container-type:inline-size; flex:none; box-sizing:border-box; }
+.nl-panel{ position:absolute; inset:7%  3.4%; display:flex; align-items:center; gap:3cqw; padding:0 4cqw; border-radius:5cqw; box-sizing:border-box;
+  background:linear-gradient(180deg, #10082e, #070318); border:0.9cqw solid var(--nb); box-shadow:0 0 1.6cqw var(--nb), inset 0 0 2.4cqw rgba(255,255,255,0.08); }
+.nl-glow{ position:absolute; inset:4% 1.6%; border-radius:6cqw; box-shadow:0 0 4cqw 1.2cqw var(--nb); opacity:0.45; animation:nlGlow 2.6s ease-in-out infinite alternate; pointer-events:none; }
+@keyframes nlGlow{ from{ opacity:0.3; } to{ opacity:0.85; } }
+/* the bulbs: three rings, each a third of a step along from the last; the rings light in turn - a chase */
+.nl-bulbs{ position:absolute; inset:0; pointer-events:none; }
+.nl-bulbs i{ position:absolute; inset:0 0.4%; border-radius:7cqw; --s:3.6cqw; --d:0.95cqw;
+  background:
+    radial-gradient(circle, var(--nbulb) 0 var(--d), rgba(0,0,0,0) calc(var(--d) + 0.3cqw)) var(--o, 0) 0 / var(--s) var(--s) repeat-x,
+    radial-gradient(circle, var(--nbulb) 0 var(--d), rgba(0,0,0,0) calc(var(--d) + 0.3cqw)) var(--o, 0) 100% / var(--s) var(--s) repeat-x,
+    radial-gradient(circle, var(--nbulb) 0 var(--d), rgba(0,0,0,0) calc(var(--d) + 0.3cqw)) 0 var(--o, 0) / var(--s) var(--s) repeat-y,
+    radial-gradient(circle, var(--nbulb) 0 var(--d), rgba(0,0,0,0) calc(var(--d) + 0.3cqw)) 100% var(--o, 0) / var(--s) var(--s) repeat-y;
+  opacity:0.35; animation:nlChase 1.2s steps(1) infinite; }
+.nl-bulbs i:nth-child(1){ --o:0; animation-delay:0s; } .nl-bulbs i:nth-child(2){ --o:1.2cqw; animation-delay:-0.4s; } .nl-bulbs i:nth-child(3){ --o:2.4cqw; animation-delay:-0.8s; }
+@keyframes nlChase{ 0%{ opacity:1; } 33.34%{ opacity:0.3; } 100%{ opacity:0.3; } }
+/* the lettering */
+.nl-text{ flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; justify-content:center; line-height:0.95; text-align:center; }
+.nl-l{ display:block; white-space:nowrap; color:#ffffff; font-family:var(--f-display, 'Big Shoulders Display', sans-serif); font-weight:900;
+  text-shadow:0 0 0.5cqw #ffffff, 0 0 1.6cqw var(--c), 0 0 3.4cqw var(--c); -webkit-text-stroke:0.25cqw var(--c); paint-order:stroke fill; }
+.nl-l.sm{ font-size:6.8cqw; letter-spacing:1.4cqw; margin-right:-1.4cqw; }
+.nl-l.md{ font-size:9.6cqw; letter-spacing:0.5cqw; }
+.nl-l.lg{ font-size:13.4cqw; letter-spacing:0.5cqw; }
+.nl-l.it{ font-style:italic; }
+.nl.both .nl-l.lg{ font-size:12cqw; }
+/* the icon */
+.nl-icon{ flex:0 0 var(--iw, 26%); height:76%; display:flex; align-items:center; justify-content:center; }
+.nl-icon svg{ display:block; width:100%; height:100%; overflow:visible; filter:drop-shadow(0 0 1.2cqw rgba(255,255,255,0.35)); }
+/* the ghost question marks round the Riddle Round sign */
+.nl-ghost{ position:absolute; font:900 7cqw/1 var(--f-display, sans-serif); font-style:normal; color:rgba(220,230,200,0.45); pointer-events:none; }
+.nl-ghost.g1{ left:-1%; top:-16%; } .nl-ghost.g2{ right:0; top:-14%; font-size:6cqw; } .nl-ghost.g3{ left:3%; bottom:-14%; font-size:5cqw; }
+
+/* ---- each icon's motion ---- */
+/* Mystery Wheel: the face turns slowly */
+.nli-wheel{ position:relative; height:100%; aspect-ratio:1; }
+.nlw-face{ position:absolute; inset:0; border-radius:50%; background:conic-gradient(#ff4d6d, #ffb02e, #ffe14a, #4be683, #3fd8ff, #6a6cff, #c04cff, #ff4d6d); border:1.1cqw solid #ffd23f; box-sizing:border-box; animation:nlSpin 12s linear infinite; }
+.nlw-hub{ position:absolute; left:50%; top:50%; width:20%; height:20%; margin:-10% 0 0 -10%; border-radius:50%; background:#ffffff; }
+@keyframes nlSpin{ to{ transform:rotate(360deg); } }
+/* Riddle Round: the two question-mark discs bob, out of step */
+.nl-riddle .nl-icon svg{ animation:nlBob 2.4s ease-in-out infinite alternate; }
+.nl-riddle .nl-icon.r svg{ animation-delay:-1.2s; }
+@keyframes nlBob{ from{ transform:translateY(-6%); } to{ transform:translateY(6%); } }
+/* Galactic Chomper: the jaws open and shut slowly, each turning about the hinge at the back */
+.nl-munchMix .nl-icon{ height:88%; }
+.nlj-up{ transform-box:view-box; transform-origin:14px 54px; animation:nlJawUp 1.8s ease-in-out infinite alternate; }
+.nlj-lo{ transform-box:view-box; transform-origin:14px 54px; animation:nlJawLo 1.8s ease-in-out infinite alternate; }
+@keyframes nlJawUp{ from{ transform:rotate(0deg); } to{ transform:rotate(-13deg); } }
+@keyframes nlJawLo{ from{ transform:rotate(0deg); } to{ transform:rotate(11deg); } }
+/* Time Warp: the pink sand trickles - the top bulb empties, the bottom fills, the thin stream flickers (opacity) */
+.nlh-top{ transform-box:fill-box; transform-origin:50% 100%; animation:nlSandTop 4s linear infinite; }
+.nlh-bot{ transform-box:fill-box; transform-origin:50% 100%; animation:nlSandBot 4s linear infinite; }
+.nlh-run{ animation:nlRun 0.5s steps(1) infinite; }
+@keyframes nlSandTop{ from{ transform:scaleY(1); } 92%{ transform:scaleY(0.05); } to{ transform:scaleY(1); } }
+@keyframes nlSandBot{ from{ transform:scaleY(0.1); } 92%{ transform:scaleY(1); } to{ transform:scaleY(0.1); } }
+@keyframes nlRun{ 0%{ opacity:1; } 50%{ opacity:0.55; } }
+/* ZiG Zap ZaBAM!: the two bolts flash - each lights twice a second, out of step (at most 2 changes a second each) */
+.nl-zigZap .nl-icon svg{ animation:nlBolt 1s steps(1) infinite; }
+.nl-zigZap .nl-icon.r svg{ animation-delay:-0.5s; }
+@keyframes nlBolt{ 0%{ opacity:1; } 50%{ opacity:0.3; } }
+/* Space Launch: the rocket shakes a little, its flame flickers */
+.nlr-body{ animation:nlShake 0.24s steps(2) infinite; }
+.nlr-flame{ transform-box:fill-box; transform-origin:50% 0; animation:nlFlame 0.5s ease-in-out infinite alternate; }
+@keyframes nlShake{ 0%{ transform:translate(-1px, 0); } 50%{ transform:translate(1px, -1px); } }
+@keyframes nlFlame{ from{ transform:scaleY(0.8); } to{ transform:scaleY(1.15); } }
+/* Alien Blast: the starburst pulses */
+.nla-burst{ transform-box:fill-box; transform-origin:50% 50%; animation:nlBurst 1.4s ease-in-out infinite alternate; }
+@keyframes nlBurst{ from{ transform:scale(0.92); opacity:0.8; } to{ transform:scale(1.06); opacity:1; } }
+/* Saucer Shuffle: the two saucers bob, out of step */
+.nli-saucers{ position:relative; width:100%; height:100%; }
+.nli-saucers .nls{ position:absolute; left:6%; width:88%; height:auto; animation:nlBob 2s ease-in-out infinite alternate; }
+.nli-saucers .nls.a{ top:4%; } .nli-saucers .nls.b{ top:50%; animation-delay:-1s; }
+
+/* lite mode and reduced motion: all still - lit bulbs, a steady glow, still icons */
+:root.lite .nl *, :root.lite .nl{ animation:none !important; }
+:root.lite .nl-bulbs i{ opacity:0.75; } :root.lite .nl-glow{ opacity:0.6; }
+@media (prefers-reduced-motion: reduce){ .nl *, .nl{ animation:none !important; } .nl-bulbs i{ opacity:0.75; } .nl-glow{ opacity:0.6; } }
+.paused .nl *, :root.tab-hidden .nl *{ animation-play-state:paused !important; }
+/* placements */
+.lucky-overlay.mw .mw-inner > .nl{ width:min(92%, 400px); margin-top:0; }
+.nl-l{ color:var(--c); -webkit-text-stroke:0; text-shadow:0 0 0.5cqw rgba(255,255,255,0.55), 0 0 1.8cqw var(--c), 0 0 3.8cqw var(--c); }
+.nl-l{ text-shadow:0 0 0.5cqw rgba(255,255,255,0.6), 0 0 1.6cqw var(--c), 0 0 3.4cqw var(--c), 0 0 6cqw var(--c); }
+/* the quiz title plate (Riddle Round, Time Warp): the neon sign in place of the plain title, the small line under it */
+:root:root:root.mode-daily .event-overlay.has-plate .qz-plate.neon{ background:none !important; border:0 !important; box-shadow:none !important; padding:0; width:min(94%, 470px); }
+:root:root:root.mode-daily .event-overlay.has-plate .qz-plate.neon > b{ display:none; }
+:root:root:root.mode-daily .event-overlay.has-plate .qz-plate.neon > .nl{ width:100%; }
+:root:root:root.mode-daily .event-overlay.has-plate .qz-plate.neon > small{ margin-top:2px; }
+:root:root:root.mode-daily .event-overlay.has-plate .qz-plate.neon > small{ margin-top:8px; }
+@media (max-height:700px){ :root:root:root.mode-daily .event-overlay.has-plate .qz-plate.neon{ width:min(72%, 290px); margin-bottom:2px; } }
+/* the neo games' sign plate (Galactic Chomper, ZiG Zap ZaBam!, Space Launch, Alien Blast): the neon sign in place of the plain title */
+:root:root:root .nx-sign.neon{ background:none !important; border:0 !important; box-shadow:none !important; padding:0 !important; width:min(94%, 460px); display:flex; flex-direction:column; align-items:center; }
+:root:root:root .nx-sign.neon::before, :root:root:root .nx-sign.neon::after{ display:none !important; }
+:root:root:root .nx-sign.neon > .nl{ width:100%; margin:0; }
+:root:root:root .nx-sign.neon > small{ margin-top:4px; padding:2px 12px; border-radius:99px; background:rgba(8,4,30,0.8); }
+:root:root:root .nx-sign.neon > small:empty{ display:none; }
+@media (max-height:700px){ :root:root:root .nx-sign.neon{ width:min(80%, 320px); } }
+:root:root .nl-munchMix .nl-icon{ height:48%; flex-basis:26%; }   /* (the jaws: about 40% of the sign's height) */

@@ -1,0 +1,134 @@
+/* FlipStax design system (Run 2, Oct 16) - see DESIGN.md for every token and component.
+
+   A bright, cheeky 70s/80s TV game show: bulb-marquee gold, hot pink, electric blue and cream on a night stage.
+   Loaded before lib/show.css; show.css's older token names (--gold-2, --pink, --f-display ...) stay as aliases of
+   these so nothing that already uses them changes. Motion: transform and opacity only, lite mode and reduced motion
+   honoured (see the end of this file). */
+
+:root{
+  /* ---------------------------------------------------------------- colour: the core palette */
+  --c-gold:#ffd23f;      --c-gold-hi:#fff4b8;   --c-gold-lo:#f5a300;   --c-gold-edge:#7a3d00;   /* the bulb-marquee gold */
+  --c-pink:#ff3c9d;      --c-pink-hi:#ff9ad1;   --c-pink-lo:#c2187a;                            /* hot pink */
+  --c-blue:#2f7bff;      --c-blue-hi:#8fd0ff;   --c-blue-lo:#1d3fb8;   --c-cyan:#7df9ff;        /* electric blue */
+  --c-cream:#fff6d8;     --c-cream-lo:#f1e3bd;                                                  /* cream cards and plates */
+  --c-ink:#2a1300;       --c-ink-soft:#5a3a20;                                                  /* text on cream / gold */
+  --c-night:#1c0b3d;     --c-night-lo:#0d0420;  --c-stage:#2a0b4e;                              /* the dark stage */
+  --c-white:#ffffff;     --c-text:#ffffff;      --c-text-soft:#e9dcff;                          /* text on the stage */
+  --c-ok:#22c56b;        --c-ok-hi:#5ee08a;     --c-ok-lo:#148a3c;                              /* right / bank / go */
+  --c-bad:#ff3b3b;       --c-bad-hi:#ff6a7d;    --c-bad-lo:#c0263f;                             /* wrong / miss */
+  --c-goop:#6fe63c;                                                                            /* the GOOP, always */
+
+  /* ---------------------------------------------------------------- colour: game worlds (a = light, b = mid, c = deep, bulb) */
+  --world-vs-a:#ff9ad1;      --world-vs-b:#ff3c9d;      --world-vs-c:#26105c;      --world-vs-bulb:#ffe9a0;
+  --world-beam-a:#8fd0ff;    --world-beam-b:#3b7bff;    --world-beam-c:#170a45;    --world-beam-bulb:#ffd23f;
+  --world-riddle-a:#e2ff8f;  --world-riddle-b:#3ddc4f;  --world-riddle-c:#04380f;  --world-riddle-bulb:#fff3a8;
+  --world-portal-a:#a7f3e0;  --world-portal-b:#14b8a6;  --world-portal-c:#022c22;  --world-portal-bulb:#ffd23f;
+  --world-emoji-a:#8ff3ff;   --world-emoji-b:#0ea5c6;   --world-emoji-c:#06283a;   --world-emoji-bulb:#ffffff;
+  --world-time-a:#d6b4ff;    --world-time-b:#7c3aed;    --world-time-c:#1e0a3d;    --world-time-bulb:#c8ff3d;
+  --world-warp-a:#ffd08a;    --world-warp-b:#ff6a2b;    --world-warp-c:#3d0b2b;    --world-warp-bulb:#ffd23f;
+  --world-orbit-a:#7df9ff;   --world-orbit-b:#6a1fb0;   --world-orbit-c:#0a0420;   --world-orbit-bulb:#7df9ff;
+  --world-peak-a:#ff9b7a;    --world-peak-b:#c2386a;    --world-peak-c:#16123f;    --world-peak-bulb:#ffc2a8;
+  --world-snap-a:#9fd43a;    --world-snap-b:#26440a;    --world-snap-c:#050802;    --world-snap-bulb:#e4ff7a;
+  --world-zap-a:#fff27a;     --world-zap-b:#4a5266;     --world-zap-c:#0b0d14;     --world-zap-bulb:#fff27a;
+  --world-twin-a:#ff5fd2;    --world-twin-b:#3d0f5c;    --world-twin-c:#08031a;    --world-twin-bulb:#7df9ff;
+  --world-fact-a:#ffd59a;    --world-fact-b:#e2731c;    --world-fact-c:#3a1503;    --world-fact-bulb:#ffe0a8;
+  --world-saucer-a:#e9e4ff;  --world-saucer-b:#7a4ab0;  --world-saucer-c:#1f0a2e;  --world-saucer-bulb:#e9e4ff;
+
+  /* ---------------------------------------------------------------- type */
+  --f-display:'Big Shoulders Display', 'Arial Narrow', sans-serif;   /* titles, numbers, buttons */
+  --f-body:'Inter', system-ui, sans-serif;                            /* sentences */
+  --fs-display:clamp(40px, 12vw, 58px);   /* one hero word or number a screen */
+  --fs-title:clamp(26px, 8vw, 34px);      /* plates, game names, big buttons */
+  --fs-body:17px;                          /* every sentence - never below 16px */
+  --fs-small:14px;                         /* labels and tags only (uppercase, tracked) */
+  --lh-tight:1; --lh-body:1.35;
+  --ls-label:2px; --ls-title:1.5px;
+
+  /* ---------------------------------------------------------------- spacing (4 px steps) */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px; --sp-8:32px; --sp-10:40px;
+  --gutter:16px;                                                     /* the screen's side padding */
+  --safe-top:calc(12px + env(safe-area-inset-top));
+  --safe-bottom:calc(12px + env(safe-area-inset-bottom));
+
+  /* ---------------------------------------------------------------- radii */
+  --r-sm:8px; --r-md:14px; --r-lg:20px; --r-xl:28px; --r-pill:999px;
+
+  /* ---------------------------------------------------------------- shadows and glows */
+  --sh-card:0 6px 0 rgba(20,0,40,0.45), 0 12px 24px rgba(0,0,0,0.3);  /* a raised card */
+  --sh-press:0 5px 0 rgba(0,0,0,0.4);                                   /* a pressable button's lip */
+  --sh-press-down:0 2px 0 rgba(0,0,0,0.4);
+  --sh-soft:0 8px 24px rgba(20,0,40,0.45);
+  --glow-gold:0 0 24px rgba(255,210,60,0.9);
+  --glow-pink:0 0 24px rgba(255,60,157,0.75);
+  --glow-blue:0 0 22px rgba(125,249,255,0.75);
+  --glow-ok:0 0 22px rgba(94,224,138,0.75);
+  --glow-bad:0 0 22px rgba(255,60,90,0.7);
+  --text-on-busy:0 2px 0 rgba(60,0,40,0.55), 0 0 12px rgba(60,0,40,0.5);  /* text over rays or art */
+
+  /* ---------------------------------------------------------------- motion */
+  --ease-pop:cubic-bezier(.3,1.6,.5,1);   /* things that land: plates, results, stamps */
+  --ease-out:cubic-bezier(.2,.8,.3,1);     /* things that arrive */
+  --ease-in:cubic-bezier(.6,0,.8,.3);      /* things that leave */
+  --ease-io:cubic-bezier(.45,0,.55,1);     /* things that sway */
+  --d-tap:120ms; --d-fast:160ms; --d-mid:320ms; --d-slow:700ms;
+  --stagger:80ms;                            /* entrance stagger between siblings (60-120 ms) */
+  --tap-min:44px;                            /* the smallest tap target */
+}
+
+/* ================================================================ components */
+
+/* Plate - a title banner: a bulb-lit sign (put .sign-bulbs inside for the bulbs). */
+.ds-plate{ position:relative; display:inline-flex; align-items:center; justify-content:center; padding:10px 22px 11px; border-radius:var(--r-md);
+  font:900 var(--fs-title)/var(--lh-tight) var(--f-display); letter-spacing:var(--ls-title); color:var(--c-white); text-transform:uppercase;
+  background:linear-gradient(180deg, rgba(20,4,36,0.88), rgba(10,2,22,0.94)); border:3px solid var(--plate-edge, var(--c-gold));
+  box-shadow:0 0 0 3px rgba(0,0,0,0.35), 0 0 26px var(--plate-edge, var(--c-gold)); text-shadow:0 0 12px var(--plate-edge, var(--c-gold)); }
+.ds-plate > span{ position:relative; z-index:3; }
+.ds-plate.cream{ background:linear-gradient(180deg, var(--c-cream), var(--c-cream-lo)); color:var(--c-ink); text-shadow:none; box-shadow:var(--sh-card); }
+
+/* Pill / tag - a short label: the act, a category, a status. Small type, tracked, uppercase. */
+.ds-pill{ display:inline-flex; align-items:center; gap:6px; min-height:28px; padding:4px 12px; border-radius:var(--r-pill);
+  font:800 var(--fs-small)/1 var(--f-body); letter-spacing:var(--ls-label); text-transform:uppercase; color:var(--c-white);
+  background:rgba(0,0,0,0.45); box-shadow:inset 0 0 0 1.5px rgba(255,255,255,0.35); }
+.ds-pill.gold{ color:var(--c-ink); background:linear-gradient(180deg, var(--c-gold-hi), var(--c-gold)); box-shadow:0 0 0 2px rgba(122,74,0,0.45); }
+.ds-pill.pink{ background:linear-gradient(180deg, var(--c-pink-hi), var(--c-pink)); }
+
+/* Buttons - primary (gold, the one main action) and secondary (dark glass). Never smaller than --tap-min. */
+.ds-btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:var(--tap-min); min-width:var(--tap-min); padding:12px 22px;
+  border-radius:var(--r-lg); border:3px solid var(--c-white); cursor:pointer; -webkit-tap-highlight-color:transparent;
+  font:900 clamp(20px, 6vw, 26px)/1 var(--f-display); letter-spacing:1px; color:var(--c-ink);
+  background:linear-gradient(180deg, var(--c-gold-hi), var(--c-gold) 50%, var(--c-gold-lo)); box-shadow:var(--sh-press);
+  transition:transform var(--d-tap) var(--ease-out), box-shadow var(--d-tap) var(--ease-out); }
+.ds-btn:active{ transform:translateY(3px); box-shadow:var(--sh-press-down); }
+.ds-btn:disabled, .ds-btn.disabled{ opacity:0.55; cursor:default; }
+.ds-btn.secondary{ color:var(--c-white); background:rgba(20,4,36,0.75); border-color:rgba(255,255,255,0.7); }
+.ds-btn.go{ color:var(--c-white); background:linear-gradient(180deg, var(--c-ok-hi), var(--c-ok-lo)); text-shadow:0 2px 0 rgba(0,0,0,0.3); }
+.ds-btn.stop{ color:var(--c-white); background:linear-gradient(180deg, var(--c-bad-hi), var(--c-bad-lo)); text-shadow:0 2px 0 rgba(0,0,0,0.3); }
+
+/* Card - a raised panel for content (a question, a statement, an item). Cream by default, .dark on the stage. */
+.ds-card{ position:relative; width:100%; padding:var(--sp-4) var(--sp-4) var(--sp-5); border-radius:var(--r-lg); border:3px solid var(--c-white);
+  background:linear-gradient(180deg, var(--c-white), var(--c-cream)); color:var(--c-ink); box-shadow:var(--sh-card); }
+.ds-card.dark{ background:linear-gradient(180deg, rgba(42,11,78,0.94), rgba(20,4,36,0.96)); color:var(--c-white); border-color:var(--card-edge, var(--c-gold)); }
+
+/* Timer - a bar (scaled with transform, never width) or a ring. The bar's fill is an <i>. */
+.ds-timer{ position:relative; flex:1; height:12px; border-radius:var(--r-pill); overflow:hidden; background:rgba(0,0,0,0.4); box-shadow:inset 0 0 0 1.5px rgba(255,255,255,0.35); }
+.ds-timer > i{ position:absolute; inset:0; display:block; background:linear-gradient(90deg, var(--c-gold-hi), var(--timer-c, var(--c-gold))); transform-origin:0 50%; transform:scaleX(1); }
+.ds-ring{ --p:1; width:48px; height:48px; border-radius:50%; background:conic-gradient(var(--timer-c, var(--c-gold)) calc(var(--p) * 360deg), rgba(0,0,0,0.4) 0); -webkit-mask:radial-gradient(circle, transparent 55%, #000 57%); mask:radial-gradient(circle, transparent 55%, #000 57%); }
+
+/* Score chip - the running score: a gold chip with a display-type number. */
+.ds-score{ display:inline-flex; align-items:center; justify-content:center; min-width:56px; min-height:34px; padding:4px 14px; border-radius:var(--r-pill);
+  font:900 22px/1 var(--f-display); color:var(--c-ink); background:linear-gradient(180deg, var(--c-gold-hi), var(--c-gold)); box-shadow:0 0 0 2px rgba(122,74,0,0.5); }
+
+/* Result bar - the big outcome: .win (gold) or .miss (red). Lands with --ease-pop. */
+.ds-result{ display:inline-flex; align-items:center; justify-content:center; padding:10px 28px 12px; border-radius:var(--r-pill);
+  font:900 var(--fs-display)/1 var(--f-display); letter-spacing:1px; }
+.ds-result.win{ background:linear-gradient(180deg, var(--c-gold-hi), var(--c-gold) 50%, #e9a100); color:#3a1f00; box-shadow:0 0 0 3px var(--c-gold-hi), var(--glow-gold); }
+.ds-result.miss{ background:linear-gradient(180deg, var(--c-bad-hi), #d61f3c 55%, #a3102b); color:var(--c-white); box-shadow:0 0 0 3px #ffc2cb, var(--glow-bad); }
+
+/* ================================================================ motion helpers */
+/* Staggered entrance: give siblings .ds-enter and --i: 0, 1, 2 ... (60-120 ms apart via --stagger). */
+.ds-enter{ opacity:0; transform:translateY(14px) scale(0.98); animation:dsEnter var(--d-mid) var(--ease-out) forwards; animation-delay:calc(var(--i, 0) * var(--stagger)); }
+@keyframes dsEnter{ to{ opacity:1; transform:none; } }
+.ds-pop{ animation:dsPop var(--d-mid) var(--ease-pop); }
+@keyframes dsPop{ 0%{ transform:scale(0.6); opacity:0; } 100%{ transform:none; opacity:1; } }
+:root.lite .ds-enter, :root.lite .ds-pop{ animation-duration:1ms; animation-delay:0ms; }
+@media (prefers-reduced-motion: reduce){ .ds-enter, .ds-pop{ animation:none; opacity:1; transform:none; } .ds-btn{ transition:none; } }

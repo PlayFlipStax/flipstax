@@ -1,0 +1,94 @@
+/* FlipStax - the host's poses (lib/host.js). The rig: the drawn host (.hr-svg) or a pose picture (.hr-img, two
+   layers that crossfade), all on one baseline. Transform and opacity only; lite mode and reduced motion hold still. */
+.host-rig{ position:relative; display:block; width:100%; line-height:0; transform-origin:50% 100%; }
+.host-rig .hr-svg{ transform-origin:50% 92%; }
+.host-rig .hr-svg svg{ display:block; width:100%; height:auto; }
+.host-rig .hr-img{ position:absolute; left:0; right:0; bottom:0; width:100%; height:auto; opacity:0; transition:opacity var(--d-fast, 160ms) linear; pointer-events:none; }
+.host-rig .hr-img.on{ opacity:1; }
+.host-rig.has-img .hr-svg{ visibility:hidden; }
+.host-rig.hr-pop{ animation:hrPop var(--d-mid, 320ms) var(--ease-pop, cubic-bezier(.3,1.6,.5,1)); }
+@keyframes hrPop{ 0%{ transform:scale(0.94); } 60%{ transform:scale(1.04); } 100%{ transform:none; } }
+
+/* Idle: the bob, a slow sway, a blink now and then (the drawn host's own idle lives in show.css: haBob, haBlink). */
+.host-rig[data-pose="idle"] .hr-svg{ animation:hrSway 6s var(--ease-io, ease-in-out) infinite alternate; }
+@keyframes hrSway{ from{ transform:rotate(-1.5deg); } to{ transform:rotate(1.5deg); } }
+.host-rig[data-pose="idleClosed"] .ha-eyes, .host-rig[data-pose="blink"] .ha-eyes{ transform-box:fill-box; transform-origin:50% 50%; animation:hrBlink .9s steps(1) 1; }
+.host-rig[data-pose="idleClosed"] .ha-eyes{ animation:none; transform:scaleY(0.12); }
+@keyframes hrBlink{ 0%, 40%{ transform:scaleY(0.12); } 41%, 100%{ transform:none; } }
+.host-rig[data-pose="wink"] .ha-eyes{ transform-box:fill-box; transform-origin:50% 50%; animation:hrWink 1s ease-in-out 1; }
+@keyframes hrWink{ 0%, 100%{ transform:none; } 30%, 70%{ transform:scaleY(0.25) skewY(-4deg); } }
+
+/* Acting out the poses with the drawn host (whole-figure moves, plus the free arm where there is one). */
+.host-rig[data-pose="wave"] .ha-arm-wave{ transform-box:view-box; transform-origin:141px 147px; animation:hrWave .45s ease-in-out 4 alternate; }
+@keyframes hrWave{ from{ transform:rotate(-150deg); } to{ transform:rotate(-115deg); } }
+.host-rig[data-pose="point"] .hr-svg{ transform:rotate(3deg); }
+.host-rig[data-pose="point"] .ha-arm-wave, .host-rig[data-pose="presenting"] .ha-arm-wave, .host-rig[data-pose="discoPoint"] .ha-arm-wave{ transform-box:view-box; transform-origin:141px 147px; transform:rotate(-95deg); transition:transform var(--d-mid, 320ms) var(--ease-out, ease-out); }
+.host-rig[data-pose="presenting"] .hr-svg{ transform:rotate(4deg) translateX(2%); transition:transform var(--d-mid, 320ms) var(--ease-out, ease-out); }
+.host-rig[data-pose="cheer"] .hr-svg{ animation:hrCheer .8s var(--ease-pop, ease-out) 2; }
+@keyframes hrCheer{ 0%, 100%{ transform:none; } 40%{ transform:translateY(-9%) scale(1.06); } 70%{ transform:translateY(0) scale(0.98, 1.02); } }
+.host-rig[data-pose="cheer"] .ha-arm-wave{ transform-box:view-box; transform-origin:141px 147px; transform:rotate(-160deg); }
+.host-rig[data-pose="think"] .hr-svg{ animation:hrThink 2.4s var(--ease-io, ease-in-out) infinite alternate; }
+@keyframes hrThink{ from{ transform:rotate(-5deg) translateX(-2%); } to{ transform:rotate(-2deg) translateX(-1%); } }
+.host-rig[data-pose="shrug"] .hr-svg{ animation:hrShrug .75s ease-in-out 2; }
+@keyframes hrShrug{ 0%, 100%{ transform:none; } 35%{ transform:translateY(2%) rotate(-4deg) scaleY(0.97); } 70%{ transform:translateY(2%) rotate(4deg) scaleY(0.97); } }
+.host-rig[data-pose="oops"] .hr-svg{ animation:hrOops .5s ease-in-out 3; }
+@keyframes hrOops{ 0%, 100%{ transform:none; } 25%{ transform:translateX(-4%) rotate(-5deg); } 75%{ transform:translateX(4%) rotate(5deg); } }
+.host-rig[data-pose="gasp"] .hr-svg{ animation:hrGasp 1.2s var(--ease-out, ease-out) 1; }
+@keyframes hrGasp{ 0%{ transform:none; } 15%{ transform:scale(1.1) translateY(-4%); } 100%{ transform:scale(1.02); } }
+.host-rig[data-pose="laugh"] .hr-svg{ animation:hrLaugh .3s ease-in-out 6 alternate; }
+@keyframes hrLaugh{ from{ transform:translateY(0) rotate(-2deg); } to{ transform:translateY(-3%) rotate(2deg); } }
+/* the disco */
+.host-rig[data-pose="discoPoint"] .hr-svg{ transform:rotate(-8deg); }
+.host-rig[data-pose="swayL"] .hr-svg{ animation:hrSwayL .5s ease-in-out infinite alternate; }
+.host-rig[data-pose="swayR"] .hr-svg{ animation:hrSwayR .5s ease-in-out infinite alternate; }
+@keyframes hrSwayL{ from{ transform:translateX(0) rotate(0); } to{ transform:translateX(-8%) rotate(-8deg); } }
+@keyframes hrSwayR{ from{ transform:translateX(0) rotate(0); } to{ transform:translateX(8%) rotate(8deg); } }
+.host-rig[data-pose="spin"] .hr-svg{ animation:hrSpin .8s ease-in-out infinite; }
+@keyframes hrSpin{ 0%{ transform:scaleX(1); } 50%{ transform:scaleX(-1); } 100%{ transform:scaleX(1); } }
+
+/* Lite mode and reduced motion: the pose shows as its still end state. */
+:root.lite .host-rig .hr-svg, :root.lite .host-rig.hr-pop, :root.lite .host-rig .ha-arm-wave{ animation:none !important; }
+@media (prefers-reduced-motion: reduce){ .host-rig .hr-svg, .host-rig.hr-pop, .host-rig .ha-arm-wave, .host-rig .ha-eyes{ animation:none !important; } }
+
+/* Image mode (HOST_IMAGE_MODE, lib/host.js): the rig is pictures only. One canvas, one baseline (feet on the bottom edge). */
+.host-rig.has-img{ aspect-ratio:607 / 900; }
+.host-rig.has-img .hr-img{ height:100%; object-fit:contain; object-position:50% 100%; transform-origin:50% 100%; -webkit-user-drag:none; }
+.host-rig.has-img[data-pose="idle"] .hr-img.on{ animation:hrBob 3.4s var(--ease-io, ease-in-out) infinite; }
+.host-rig.has-img[data-pose="laugh"] .hr-img.on{ animation:hrLaughImg .3s ease-in-out 6 alternate; }
+.host-rig.has-img[data-pose="cheer"] .hr-img.on{ animation:hrCheerImg .8s var(--ease-pop, ease-out) 2; }
+@keyframes hrBob{ 0%, 100%{ transform:translateY(0); } 50%{ transform:translateY(-1.5%); } }
+@keyframes hrLaughImg{ from{ transform:translateY(0) rotate(-1.5deg); } to{ transform:translateY(-2%) rotate(1.5deg); } }
+@keyframes hrCheerImg{ 0%, 100%{ transform:none; } 40%{ transform:translateY(-4%) scale(1.04); } }
+/* the head crop (the corner host, the visitor): the top of the same picture */
+.host-rig.hr-head.has-img{ aspect-ratio:1 / 1.1; overflow:hidden; }
+.host-rig.hr-head.has-img .hr-img{ left:-47%; right:auto; top:0; bottom:auto; width:194%; height:auto; object-fit:fill; transform-origin:50% 0; }
+:root.lite .host-rig.has-img .hr-img{ animation:none !important; }
+@media (prefers-reduced-motion: reduce){ .host-rig.has-img .hr-img{ animation:none !important; } }
+
+/* ---- Run 4 placements (image mode) ---- */
+/* the act cue card: the host stands whole on the stage below the card (the card rises to the middle; he is clear of it) */
+.cue-fig{ position:absolute; z-index:3; left:50%; bottom:calc(5vh + env(safe-area-inset-bottom)); width:min(30vh * 0.6743, 38vw, 190px); height:min(30vh, 281px); margin-left:calc(min(30vh * 0.6743, 38vw, 190px) / -2); pointer-events:none;
+  opacity:0; animation:cueFigIn 460ms var(--ease-pop, cubic-bezier(.3,1.6,.5,1)) calc(var(--cue-ms, 2.8s) * 0.16) forwards; }
+.cue-fig .host-rig{ height:100%; width:100%; }
+@keyframes cueFigIn{ from{ opacity:0; transform:translateY(30%) scale(0.9); } to{ opacity:1; transform:none; } }
+:root.lite .cue-fig, :root.lite .cue-fig .host-rig{ animation:none; opacity:1; }
+@media (prefers-reduced-motion: reduce){ .cue-fig{ animation:none; opacity:1; } }
+/* gameplay: the corner host only (a small head-and-shoulders in the bottom-left lane, the same size on every screen); the games'
+   own stage hosts (Fact or Fib, Saucer Shuffle) are not shown, and never centred */
+:root.host-img .ff-host, :root.host-img .su-host{ display:none !important; }
+:root.host-img:has(#mgOverlay .host-full) .show-host{ display:flex !important; }
+:root.host-img .show-host{ bottom:calc(2px + env(safe-area-inset-bottom)); left:10px; }
+:root.host-img .show-host .alien{ width:34px; height:36px; flex:0 0 auto; }
+:root.host-img .show-host .host-rig.hr-head.has-img{ aspect-ratio:auto; width:34px; height:36px; }
+:root.host-img .show-host .host-rig.hr-head.has-img .hr-img{ left:-30%; width:160%; }
+/* (the games with their own stage host had no bottom strip for the corner host; they have it now that he is not on the stage) */
+:root.host-img .mg-overlay .mg-inner{ padding-bottom:calc(50px + env(safe-area-inset-bottom)) !important; }
+
+/* ---- fix 5: Flip stands still. No jumping, bobbing, bouncing, swaying or popping anywhere - on the stage, in the intro, between games and in the finale. He just
+   stands in his pose; a pose change is a plain crossfade of the pictures, and where he appears he simply fades in. (Blinks stay: they are not movement of Flip.) ---- */
+.host-rig, .host-rig.hr-pop, .host-rig .hr-img, .host-rig .hr-img.on, .host-rig .hr-svg, .host-rig .ha-arm-wave, .host-full svg, .host-full .ha-arm-wave,
+.ir-host-art, .host-art, .alien, .alien.cheer, .alien.sad, .disco.on .dc-alien, .disco.on .dc-alien svg, .disco.on .dc-alien .ha-arm-wave, .vault-alien.pop{ animation:none !important; }
+.host-rig .hr-img{ transform:none !important; transition:opacity 0.3s ease !important; }
+.fs-host, .ir-overlay:not(.intro) .ir-host, .cue-fig{ animation:hostStillIn 0.35s ease both !important; }
+.vault-alien.pop{ animation:hostStillIn 0.4s ease both !important; }
+@keyframes hostStillIn{ from{ opacity:0; } to{ opacity:1; } }

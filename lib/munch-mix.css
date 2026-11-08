@@ -1,0 +1,185 @@
+/* FlipStax - GALACTIC CHOMPER (lib/munch-mix.js, registry id munchMix). The category's galaxy fills the screen and turns slowly (rotate only, 120 s a turn, full
+   brightness, no overlay); a large frosted-glass slab floats over it with a thin glowing edge in the category's colour; the tiles are coloured glass with a bright
+   rim; the snake and the chomper move UNDER the tile text so every word stays readable. Transform and opacity only; at most 3 flashes a second; lite mode and
+   reduced motion: plain fades and a still galaxy. */
+.nx-gc, .nx-gc .nx-stage, .nx-gc button, .nx-gc .gc-tile, .nx-gc .gc-chomp{ touch-action:manipulation; -webkit-tap-highlight-color:transparent; }
+.nx-gc .nx-host{ display:none !important; }   /* (no Flip in this game) */
+/* the galaxy: two layers crossfade when the category changes */
+.gc-set{ background:#05020f; }
+.gc-set .gc-galaxy{ left:50%; top:50%; width:150vmax; height:150vmax; margin:-75vmax 0 0 -75vmax; background:#05020f center / cover no-repeat; opacity:0; transition:opacity 0.8s ease; animation:gcTurn 120s linear infinite; }
+.gc-set .gc-galaxy.on{ opacity:1; }
+@keyframes gcTurn{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+.gc-set .gc-streaks{ left:50%; top:50%; width:160vmax; height:160vmax; margin:-80vmax 0 0 -80vmax; opacity:0; border-radius:50%;
+  background:repeating-conic-gradient(from 0deg, rgba(255,255,255,0.95) 0deg 0.5deg, rgba(255,255,255,0) 0.5deg 6deg);
+  -webkit-mask-image:radial-gradient(circle, transparent 6%, #000 22%, #000 60%, transparent 72%); mask-image:radial-gradient(circle, transparent 6%, #000 22%, #000 60%, transparent 72%); }
+.gc-set .gc-hole{ left:50%; top:46%; width:46vmin; height:46vmin; margin:-23vmin 0 0 -23vmin; border-radius:50%; opacity:0; transform:scale(0);
+  background:radial-gradient(circle, #000 0 34%, rgba(0,0,0,0.92) 40%, rgba(255,140,60,0.75) 46%, rgba(255,63,181,0.45) 54%, rgba(120,60,255,0.2) 64%, rgba(0,0,0,0) 72%); }
+:root.lite .gc-set .gc-galaxy{ animation:none; } @media (prefers-reduced-motion: reduce){ .gc-set .gc-galaxy{ animation:none; } }
+/* the play area: the slab is about 92% of the width; only the sign, the banner, the CHOMP button and the status pill are outside it */
+.nx-gc .nx-play{ margin-top:6px; justify-content:flex-start; }
+.nx-gc .nx-rule{ font-size:clamp(16px, 4.8vw, 22px); }
+.gc-wrap{ position:relative; flex:1 1 auto; width:100%; min-height:0; display:flex; align-items:center; justify-content:center; container-type:size; }
+.gc-slab{ position:relative; width:min(100cqw, calc(100cqh * 4 / 4.5)); aspect-ratio:4 / 4.5; padding:2.4%; box-sizing:border-box; border-radius:22px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.2), rgba(255,255,255,0.07) 40%, rgba(20,16,60,0.28)); border:1.5px solid rgba(255,255,255,0.55);
+  box-shadow:0 0 0 1.5px var(--edge, #3FA9FF), 0 0 22px var(--edge, #3FA9FF), 0 18px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.55);
+  animation:gcFloat 6s ease-in-out infinite alternate; }
+@keyframes gcFloat{ from{ transform:translateY(-3px); } to{ transform:translateY(3px); } }
+:root.lite .gc-slab{ animation:none; } @media (prefers-reduced-motion: reduce){ .gc-slab{ animation:none; } }
+.gc-board{ position:relative; width:100%; height:100%; }
+.gc-slab{ --edge:#3FA9FF; }
+.gc-grid{ position:absolute; inset:0; display:grid; grid-template-columns:repeat(4, 1fr); grid-template-rows:repeat(5, 1fr); gap:7px; }
+.gc-labels{ z-index:5; pointer-events:none; }
+.gc-snake{ position:absolute; inset:0; z-index:3; pointer-events:none; }
+/* the tiles: coloured glass, a bright 2 px rim and a soft glow */
+.gc-tile{ position:relative; border:0; padding:0; margin:0; background:none; cursor:pointer; z-index:1; --tc:#3FA9FF; }
+.gc-glass{ position:absolute; inset:0; border-radius:14px; border:2px solid rgba(255,255,255,0.92);
+  background:linear-gradient(180deg, rgba(255,255,255,0.42) 0%, rgba(255,255,255,0.08) 46%, rgba(0,0,0,0.12) 100%), var(--tc);
+  box-shadow:0 0 12px color-mix(in srgb, var(--tc) 70%, transparent), inset 0 -5px 0 rgba(0,0,0,0.16); transition:opacity 0.25s ease; }
+.gc-flash, .gc-warn, .gc-sock{ position:absolute; inset:0; border-radius:14px; pointer-events:none; opacity:0; }
+.gc-flash{ background:linear-gradient(180deg, #ffd0f0, #ff3fb5 55%, #b0127a); }
+.gc-tile.b .gc-flash{ background:linear-gradient(180deg, #d0fbff, #27e6ff 55%, #0a7aa8); }
+.gc-tile.nope .gc-flash{ background:linear-gradient(180deg, #ffb0a0, #ff2a2a 55%, #8a0000); }
+.gc-warn{ inset:-4px; border-radius:17px; border:3px solid #ff3fb5; box-shadow:0 0 12px rgba(255,63,181,0.9); }
+.gc-tile.warn .gc-warn{ animation:gcWarn 0.5s ease-in both; }
+@keyframes gcWarn{ from{ opacity:0; } to{ opacity:1; } }
+/* a blank socket: dark, with a faint ring in the palette's grey */
+.gc-sock{ background:radial-gradient(circle at 50% 45%, rgba(10,8,30,0.96), rgba(4,3,14,0.98) 70%); box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--grey, #B8C2D6) 45%, transparent), inset 0 4px 10px rgba(0,0,0,0.6); }
+.gc-tile.blank .gc-glass{ opacity:0; } .gc-tile.blank .gc-sock{ opacity:1; }
+.gc-board{ --grey:#B8C2D6; }
+/* the labels: large bold text in the colour that reads best on its tile */
+.gc-lab{ position:relative; display:flex; align-items:center; justify-content:center; container-type:inline-size; --ink:#0b1230; }
+.gc-lab b{ font:900 clamp(16px, 30cqw, 44px)/1 var(--f-display); letter-spacing:0.3px; color:var(--ink); white-space:nowrap; text-align:center; max-width:94%;
+  text-shadow:0 0 3px color-mix(in srgb, var(--ink) 0%, transparent); paint-order:stroke fill; -webkit-text-stroke:0; }
+.gc-lab.l b{ font-size:clamp(14px, 24cqw, 36px); } .gc-lab.xl b{ font-size:clamp(12px, 19cqw, 30px); } .gc-lab.xxl b{ font-size:clamp(11px, 15.5cqw, 26px); }
+.gc-lab.gone b{ opacity:0; }
+/* where the chomper or the snake passes behind a word, a soft halo keeps it readable */
+.gc-lab b{ text-shadow:0 0 6px rgba(255,255,255,0.55); }
+.gc-lab[style*="fff4d6"] b{ text-shadow:0 0 6px rgba(0,0,0,0.75), 0 1px 0 rgba(0,0,0,0.5); }
+/* the chomper: about 20% taller than a tile, its feet on the tile's lower edge, under the text */
+.gc-chomper{ position:absolute; left:0; top:0; z-index:4; width:0; height:0; pointer-events:none; --th:80px; }
+.gc-cb{ position:absolute; left:0; bottom:0; width:calc(var(--th) * 1.2 * 0.523); height:calc(var(--th) * 1.2); margin-left:calc(var(--th) * -0.314); transform-origin:50% 100%; animation:gcBreathe 3.6s ease-in-out infinite alternate; }
+@keyframes gcBreathe{ from{ transform:scale(1); } to{ transform:scale(1.025); } }
+.gc-cb img{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; object-position:50% 100%; filter:drop-shadow(0 4px 5px rgba(0,0,0,0.5)); }
+.gc-cb .gc-o{ opacity:0; } .gc-chomper.open .gc-o{ opacity:1; } .gc-chomper.open .gc-c{ opacity:0; }
+.gc-chomper.woozy .gc-c{ filter:drop-shadow(0 4px 5px rgba(0,0,0,0.5)) hue-rotate(40deg) saturate(0.75); }
+.gc-stars{ position:absolute; left:50%; top:4%; width:0; height:0; opacity:0; }
+.gc-stars b{ position:absolute; left:-9px; top:-9px; font-size:18px; line-height:1; color:#ffe27a; }
+.gc-chomper.woozy .gc-stars{ opacity:1; animation:gcStars 0.9s linear infinite; }
+.gc-stars b:nth-child(1){ transform:translate(-22px, 0); } .gc-stars b:nth-child(2){ transform:translate(20px, -6px); } .gc-stars b:nth-child(3){ transform:translate(0, -18px); }
+@keyframes gcStars{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+:root.lite .gc-cb, :root.lite .gc-chomper.woozy .gc-stars{ animation:none; } @media (prefers-reduced-motion: reduce){ .gc-cb, .gc-chomper.woozy .gc-stars{ animation:none; } }
+/* the snake: slim round segments (about 55% of a tile), magenta to orange with a yellow belly stripe and a soft glow, under the tile text */
+.gc-seg, .gc-head{ position:absolute; left:0; top:0; width:0; height:0; }
+.gc-seg::before{ content:''; position:absolute; width:calc(var(--tw, 80px) * 0.55 * var(--sz, 1)); aspect-ratio:1; border-radius:50%; transform:translate(-50%, -50%);
+  background:linear-gradient(90deg, transparent 38%, rgba(255,226,90,0.95) 40%, rgba(255,226,90,0.95) 60%, transparent 62%), radial-gradient(circle at 38% 32%, #ffc0e6, var(--sc, #e0287c) 52%, color-mix(in srgb, var(--sc, #e0287c) 70%, #000) 100%);
+  box-shadow:0 0 10px color-mix(in srgb, var(--sc, #e0287c) 80%, transparent); }
+.gc-head img{ position:absolute; width:calc(var(--tw, 80px) * 0.78); height:auto; transform:translate(-50%, -50%) rotate(var(--rot, 0deg)); filter:drop-shadow(0 0 6px rgba(255,63,181,0.7)); }
+/* the CHOMP button: the shared gold button, big and centred at the bottom */
+.nx-gc .gc-chomp{ margin:8px auto 0; font:900 clamp(26px, 8vw, 34px)/1 var(--f-display); letter-spacing:2px; }
+/* the status pill: three strike lights on the right */
+.nx-gc .nx-panel{ padding-right:64px !important; }
+.gc-strikes{ position:absolute; right:12px; top:50%; z-index:2; display:flex; gap:6px; transform:translateY(-50%); }
+.gc-strikes i{ width:13px; height:13px; border-radius:50%; background:radial-gradient(circle at 40% 35%, #ffffff, #5dff9a 55%, #17b85a); box-shadow:0 0 8px rgba(93,255,154,0.9); transition:opacity 0.25s ease; }
+.gc-strikes i.off{ background:radial-gradient(circle at 40% 35%, #ffb0b0, #ff3a3a 55%, #8a0a0a); box-shadow:0 0 8px rgba(255,58,58,0.85); }
+/* the crack, the slams */
+.gc-crack{ position:absolute; inset:0; z-index:6; width:100%; height:100%; opacity:0; pointer-events:none; overflow:visible; }
+.gc-crack path{ fill:none; stroke:#ffffff; stroke-width:1.4; stroke-linejoin:round; stroke-linecap:round; vector-effect:non-scaling-stroke; filter:drop-shadow(0 0 3px rgba(150,220,255,0.95)); }
+.nx-slam.gcclear{ font-size:clamp(30px, 9vw, 52px); color:#fff4d6; text-shadow:0 4px 0 #7a4a00, 0 0 18px rgba(245,184,58,0.8); }
+.nx-slam.gcsplash{ font-size:clamp(40px, 12vw, 66px); color:#ffffff; text-shadow:0 4px 0 rgba(10,10,40,0.7), 0 0 22px var(--edge, #3FA9FF); }
+.nx-slam.gcvictory{ font-size:clamp(52px, 16vw, 92px); color:#fff4d6; text-shadow:0 5px 0 #7a4a00, 0 0 26px rgba(255,226,122,0.95); }
+.nx-slam.gcpop{ font-size:clamp(30px, 9vw, 44px); color:#ff3fb5; text-shadow:0 3px 0 #4a0030, 0 0 14px rgba(255,63,181,0.9); }
+.gc-ring{ position:absolute; z-index:6; width:20px; height:20px; margin:-10px 0 0 -10px; border-radius:50%; border:4px solid #fff; box-sizing:border-box; pointer-events:none; }
+.gc-ring.bite{ border-color:#ff3a3a; }
+.gc-bit{ position:absolute; z-index:7; width:8px; height:8px; margin:-4px 0 0 -4px; border-radius:50%; pointer-events:none; }
+.gc-fly{ position:absolute; z-index:6; border-radius:14px; pointer-events:none; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+@media (min-width:600px){ .gc-grid{ gap:12px; } .gc-glass, .gc-flash, .gc-sock{ border-radius:20px; } .nx-gc .gc-chomp{ min-height:84px; font-size:44px; } .gc-strikes i{ width:18px; height:18px; } }
+@media (max-height:700px){ .gc-grid{ gap:5px; } .gc-glass, .gc-flash, .gc-sock{ border-radius:11px; } .nx-gc .gc-chomp{ min-height:48px; margin-top:6px; font-size:26px; } }
+.nx-gc .gc-wrap{ width:92vw; max-width:none; align-self:center; flex-shrink:0; flex-grow:1; }
+/* the effects' pieces: the rim flash (the combo and a cleared board), the socket's fading glow ring, the eaten piece */
+.gc-rimflash{ position:absolute; inset:-4px; border-radius:25px; border:3px solid #ffffff; box-shadow:0 0 18px var(--edge, #3FA9FF), inset 0 0 14px var(--edge, #3FA9FF); opacity:0; pointer-events:none; z-index:8; }
+.gc-sockring{ position:absolute; inset:6%; border-radius:12px; border:2px solid color-mix(in srgb, var(--grey, #B8C2D6) 80%, #fff); box-shadow:0 0 12px color-mix(in srgb, var(--grey, #B8C2D6) 80%, transparent); opacity:0; pointer-events:none; z-index:2; }
+.gc-fly b{ font:900 clamp(14px, 6vw, 30px)/1 var(--f-display); color:#fff; text-shadow:0 2px 0 rgba(0,0,0,0.35); white-space:nowrap; }
+.gc-fly{ border:2px solid #fff; box-shadow:0 0 16px rgba(255,255,255,0.8); }
+.nx-slam.gcpop.bite{ color:#ff3a3a; text-shadow:0 3px 0 #4a0000, 0 0 14px rgba(255,58,58,0.9); }
+.gc-board .nx-slam.gcpop{ font-size:clamp(24px, 7vw, 36px); }
+
+/* ---- change request: a bigger board, the chomper over the text, a big clock bar, a faster galaxy and shooting stars ---- */
+/* the board fills the play area from under the banner to above the status pill, 16 px from each side; the tiles stretch into taller rectangles
+   (about 10 px apart), capped so they never get longer than about 1.3 times their width (the tablet size) */
+.nx-gc .nx-play{ margin-top:8px; }
+.nx-gc .gc-wrap{ width:calc(100vw - 32px); flex:1 1 auto; align-self:center; }
+.gc-slab{ width:100%; height:100%; max-height:calc((100vw - 32px) * 1.66); aspect-ratio:auto; padding:8px; }
+.gc-grid{ gap:10px; }
+@media (max-height:700px){ .gc-grid{ gap:8px; } .gc-slab{ padding:6px; } }
+@media (min-width:600px){ .gc-grid{ gap:14px; } .gc-slab{ padding:12px; } }
+/* bigger words, still sized by the tile */
+.gc-lab b{ font-size:clamp(18px, 32cqw, 64px); } .gc-lab.l b{ font-size:clamp(15px, 25cqw, 52px); } .gc-lab.xl b{ font-size:clamp(13px, 20cqw, 44px); } .gc-lab.xxl b{ font-size:clamp(12px, 16.5cqw, 38px); }
+/* the chomper: about 120% of a tile's width, fully opaque, ABOVE the words; the word of the tile it stands on is hidden */
+.gc-chomper{ z-index:6; --cw:96px; }
+.gc-cb{ width:var(--cw); height:calc(var(--cw) / 0.523); margin-left:calc(var(--cw) / -2); }
+.gc-lab.under b{ opacity:0; }
+/* the clock: a big bar along the bottom of the status pill */
+.nx-gc .nx-ptimer{ height:9px; bottom:5px; left:12px; right:70px; border-radius:5px; transform-origin:50% 50%; }
+.nx-gc .nx-panel{ padding-bottom:14px !important; }
+/* the galaxy turns once in 90 s */
+.gc-set .gc-galaxy{ animation-duration:90s; }
+/* the shooting stars: a thin bright line, a glowing head, a fading trail */
+.gc-set .gc-shoot{ left:0; top:0; height:2px; border-radius:2px; transform-origin:100% 50%; margin-left:-100%; pointer-events:none;
+  background:linear-gradient(90deg, rgba(255,255,255,0) 0%, color-mix(in srgb, var(--sc, #fff) 70%, transparent) 70%, #ffffff 100%); }
+.gc-set .gc-shoot::after{ content:''; position:absolute; right:-4px; top:50%; width:8px; height:8px; margin-top:-4px; border-radius:50%; background:#ffffff; box-shadow:0 0 8px 3px var(--sc, #fff); }
+.gc-set .gc-streaks{ z-index:1; } .gc-set .gc-hole{ z-index:2; }
+:root.lite .gc-set .gc-shoot{ display:none; } @media (prefers-reduced-motion: reduce){ .gc-set .gc-shoot{ display:none; } }
+/* fix: the tile the chomper stands on keeps its own glass colour on every board (even once eaten - its dark socket shows when he hops off); his body covers its word */
+.gc-tile.blank.under .gc-glass{ opacity:1; } .gc-tile.blank.under .gc-sock{ opacity:0; }
+/* the status pill: a fixed right-hand column with the seconds left and the strike dots; the message keeps to the left of it, on one line */
+.nx-gc .nx-panel{ padding-left:14px !important; padding-right:112px !important; justify-content:flex-start; }
+.nx-gc .nx-panel .sc-msg{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-align:left; }
+.gc-side{ position:absolute; right:10px; top:50%; z-index:2; display:flex; align-items:center; gap:8px; transform:translateY(-55%); }
+.gc-side .gc-strikes{ position:static; transform:none; gap:5px; }
+.gc-secs{ min-width:42px; text-align:right; font:900 30px/1 var(--f-display); color:#ffffff; text-shadow:0 0 8px rgba(125,249,255,0.8); font-variant-numeric:tabular-nums; }
+.gc-secs.low{ color:#ff4d4d; text-shadow:0 0 8px rgba(255,60,60,0.8); }
+.nx-gc .nx-ptimer{ right:112px; }
+@media (min-width:600px){ .nx-gc .nx-panel{ padding-right:150px !important; } .gc-secs{ font-size:42px; min-width:60px; } .nx-gc .nx-ptimer{ right:150px; } }
+/* the score pill: the same size relative to the screen on every phone and tablet */
+.nx-gc .mg-score{ font-size:clamp(22px, 5.6vw, 46px); min-height:clamp(34px, 8.7vw, 72px); min-width:clamp(56px, 14.4vw, 118px); padding:4px clamp(14px, 3.6vw, 30px); }
+/* the dance-floor light: a bright overlay on the tile (under the chomper and the words) */
+.gc-lit{ position:absolute; inset:0; border-radius:14px; pointer-events:none; opacity:0; z-index:1;
+  background:radial-gradient(circle at 50% 50%, #ffffff 0%, var(--lc, #2fb4ff) 45%, color-mix(in srgb, var(--lc, #2fb4ff) 75%, transparent) 100%);
+  box-shadow:0 0 16px var(--lc, #2fb4ff), inset 0 0 0 2px #ffffff; }
+.gc-lit.white{ background:radial-gradient(circle, #ffffff 0%, #ffffff 55%, rgba(255,255,255,0.75) 100%); }
+@media (min-width:600px){ .gc-lit{ border-radius:20px; } } @media (max-height:700px){ .gc-lit{ border-radius:11px; } }
+/* the hyperspace jump's pieces, out from the centre: warp streaks, comets, laser bolts (transform and opacity only) */
+.gc-set .gc-warp, .gc-set .gc-comet, .gc-set .gc-bolt{ position:absolute; transform-origin:0 50%; pointer-events:none; z-index:3; }
+.gc-set .gc-warp{ height:2px; margin-top:-1px; border-radius:2px; background:linear-gradient(90deg, rgba(255,255,255,0), var(--sc, #fff) 60%, #ffffff); }
+.gc-set .gc-comet{ width:90px; height:3px; margin-top:-1.5px; border-radius:3px; background:linear-gradient(90deg, rgba(255,255,255,0), color-mix(in srgb, var(--sc, #fff) 80%, transparent) 70%, #ffffff); }
+.gc-set .gc-comet::after{ content:''; position:absolute; right:-6px; top:50%; width:12px; height:12px; margin-top:-6px; border-radius:50%; background:#ffffff; box-shadow:0 0 10px 4px var(--sc, #fff); }
+.gc-set .gc-bolt{ width:70px; height:4px; margin-top:-2px; border-radius:4px; background:linear-gradient(90deg, #ffffff, var(--sc, #fff)); box-shadow:0 0 10px var(--sc, #fff); }
+.gc-set .gc-hole{ margin:-23vmin 0 0 -23vmin; z-index:2; }
+/* the English galaxy is bright behind the board: a subtle dark backing keeps every tile and word clear of it */
+.gc-slab[data-pack="ENGLISH"]{ background:linear-gradient(180deg, rgba(14,8,40,0.5), rgba(10,6,30,0.42) 50%, rgba(14,8,40,0.55)); }
+/* ---- mega 5 item 7: the win polish. Warp streaks thicker (4 px) and brighter (a white core); comets with a bigger head (20 px) and a longer trail
+   (160 px); VICTORY! bigger, in gold lettering on the navy title plate with the neon cyan outline (the GALACTIC CHOMPER sign's look). Static shadows only. ---- */
+.gc-set .gc-warp{ height:4px; margin-top:-2px; border-radius:4px; background:linear-gradient(90deg, rgba(255,255,255,0), color-mix(in srgb, var(--sc, #fff) 85%, transparent) 45%, var(--sc, #fff) 70%, #ffffff 92%); }
+.gc-set .gc-comet{ width:160px; height:5px; margin-top:-2.5px; border-radius:5px; background:linear-gradient(90deg, rgba(255,255,255,0), color-mix(in srgb, var(--sc, #fff) 55%, transparent) 45%, var(--sc, #fff) 80%, #ffffff); }
+.gc-set .gc-comet::after{ right:-10px; width:20px; height:20px; margin-top:-10px; box-shadow:0 0 14px 6px var(--sc, #fff); }
+.nx-slam.gcvictory{ z-index:9; padding:10px 26px 14px; border-radius:20px; border:3px solid #7df9ff; letter-spacing:4px;
+  font:900 clamp(64px, 20vw, 132px)/1 'Big Shoulders Display', var(--f-display);
+  background:linear-gradient(180deg, rgba(20,10,60,0.94), rgba(8,4,34,0.96)); box-shadow:0 0 22px rgba(125,249,255,0.6), inset 0 1px 0 rgba(255,255,255,0.3);
+  color:#ffe45c; text-shadow:0 0 18px rgba(255,210,63,0.85), 0 4px 0 #7a4a00; }
+/* ---- mega 5 item 8: the status pill and the score pill are phone-sized on every screen (fixed px, as at 390 x 844) - they no longer grow on a
+   tablet such as 824 x 1830 (the score pill used to scale with the screen). ---- */
+.nx-gc .mg-score{ font-size:22px; min-height:34px; min-width:56px; padding:4px 14px; }
+@media (min-width:600px){
+  :root .nx-gc .nx-panel{ width:280px; min-height:52px; padding-right:112px !important; }
+  :root .nx-gc .nx-panel .sc-msg{ font-size:22px; }
+  :root .nx-gc .gc-secs{ font-size:30px; min-width:42px; }
+  :root .nx-gc .nx-ptimer{ right:112px; }
+  :root .nx-gc .gc-strikes i{ width:13px; height:13px; }
+}
+/* mega 5 item 11: lite mode and reduced motion - a still Galactic Chomper: no fades between galaxies, on the tiles, the strike dots or the black hole */
+:root.lite .gc-set .gc-galaxy, :root.lite .gc-glass, :root.lite .gc-sock, :root.lite .gc-strikes i, :root.lite .gc-set .gc-hole{ transition:none !important; }
+@media (prefers-reduced-motion: reduce){ .gc-set .gc-galaxy, .gc-glass, .gc-sock, .gc-strikes i, .gc-set .gc-hole{ transition:none !important; } }
+
+/* run 1 job 19: the board's category word (MATH, SCIENCE...) sits ABOVE the board - over the rule line, on its own dark pill - never over the tiles,
+   and goes after 0.7 s (set in lib/munch-mix.js) */
+:root:root .nx-slam.gcsplash{ top:-28px; z-index:9; padding:4px 20px 6px; border-radius:16px; background:rgba(8,6,34,0.92); box-shadow:0 0 0 2px var(--edge, #3FA9FF); font-size:clamp(28px, 8.4vw, 46px); }

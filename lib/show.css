@@ -1,0 +1,195 @@
+/* FlipStax - the game-show look (Direction A "Showtime"), shared by the game
+   (flipstax.html) and the style board (style-board/a.html).
+
+   A cheeky 70s/80s TV game show: sunburst rays in each screen's own colour
+   world, a gold frame round the screen that flashes on a win or a miss,
+   the alien host, the silver UFO prop, and the particles the helpers in
+   lib/show-fx.js throw about.
+
+   Rules kept everywhere: only transform and opacity are animated; motion
+   pauses while the tab is hidden (:root.tab-hidden, set by show-fx.js) or
+   the layer is covered (.paused); prefers-reduced-motion (or :root.rm)
+   shows still end states. Three token names the game already used
+   (--ink, --panel, --accent) carry a show- prefix here. */
+:root{
+  /* palette */
+  --gold-1:#fff4b8; --gold-2:#ffd23f; --gold-3:#f5a300; --gold-edge:#7a3d00;
+  --orange:#ff8a1f; --pink:#ff3c9d; --magenta:#c2275f; --purple:#6a1fb0; --night:#1c0b3d;
+  --cream:#fff6d8; --show-ink:#2a1300; --ok:#22c56b; --ok-edge:#0b5a2d; --bad:#ff3b3b; --bad-edge:#7a0d0d;
+  --bulb:#fff3b0; --bulb-glow:rgba(255,226,120,0.95);
+  /* type */
+  --f-display:'Big Shoulders Display', 'Arial Narrow', sans-serif;
+  --f-body:'Inter', system-ui, sans-serif;
+  /* surfaces and shadows */
+  --show-panel:rgba(32,8,56,0.78); --panel-edge:rgba(255,214,90,0.55);
+  --sh-panel:0 8px 24px rgba(20,0,40,0.45);
+  --sh-btn:0 6px 0 var(--gold-edge), 0 12px 22px rgba(30,0,30,0.4);
+  --sh-btn-down:0 2px 0 var(--gold-edge), 0 5px 10px rgba(30,0,30,0.35);
+  --glow-gold:0 0 24px rgba(255,210,60,0.9);
+  --text-on-busy:0 2px 0 rgba(60,0,40,0.55), 0 0 12px rgba(60,0,40,0.5);
+  /* motion */
+  --ease-pop:cubic-bezier(.3,1.6,.5,1); --ease-out:cubic-bezier(.2,.8,.3,1); --ease-io:cubic-bezier(.45,0,.55,1);
+  --t-fast:160ms; --t-mid:320ms; --t-slow:700ms;
+  --ray-turn:48s; --bulb-chase:0.9s; --bulb-gap:26;
+}
+/* Each screen's colour world (sunburst stops + accent) and its own rays:
+   colour, ray width (--ray-on), spacing (--ray-period: 360 / period rays),
+   speed and direction - one family, different worlds. */
+.w-entry  { --w1:#ffd64a; --w2:#ff8a1f; --w3:#c2275f; --w4:#3a0f6b; --show-accent:var(--gold-2); }
+.w-vs     { --w1:#ff9ad1; --w2:#ff3c9d; --w3:#8d2ad6; --w4:#26105c; --show-accent:#7df9ff; }
+.w-trivia { --w1:#8fd0ff; --w2:#3b7bff; --w3:#5a24c8; --w4:#170a45; --show-accent:#ffd23f; }
+.w-powerup{ --w1:#a7f3e0; --w2:#14b8a6; --w3:#047857; --w4:#022c22; --show-accent:#ffd23f; }   /* Portal Pick: teal and emerald (Brain Beam is blue and violet) */
+.w-jumble { --w1:#ffd08a; --w2:#ff6a2b; --w3:#d81b4a; --w4:#3d0b2b; --show-accent:#ffd23f; }
+.w-results{ --w1:#ffe27a; --w2:#ff8a1f; --w3:#c2275f; --w4:#4a1478; --show-accent:var(--gold-2); }
+.w-price  { --w1:#d4ff9a; --w2:#2fd17a; --w3:#0e8f6a; --w4:#06323a; --show-accent:#ffe066; }
+.w-odd    { --w1:#e6b3ff; --w2:#a34dff; --w3:#5a1aa8; --w4:#1e0a3d; --show-accent:#c8ff3d; }
+.w-emoji  { --w1:#fff27a; --w2:#ffb21f; --w3:#ff3c9d; --w4:#5a1052; --show-accent:#ffffff; }
+.w-first  { --w1:#9ff5ea; --w2:#1fc7c1; --w3:#ff6b5a; --w4:#3a0f3d; --show-accent:#ffd23f; }
+.w-scan   { --w1:#ffb4a8; --w2:#ef4444; --w3:#9f1239; --w4:#2a0613; --show-accent:#ffd23f; }   /* Crowd Scan: crimson */
+.w-riddle  { --w1:#e2ff8f; --w2:#3ddc4f; --w3:#0e9a33; --w4:#04380f; --show-accent:#fff3a8; }   /* riddles: vivid green, with question marks flying across */
+.w-cash    { --w1:#fff0a0; --w2:#f2b705; --w3:#1f8a4c; --w4:#052a1a; --show-accent:#ffd23f; }   /* Price Probe: gold and money green */
+.w-hunt   { --w1:#9fb8ff; --w2:#5468ff; --w3:#2a1ea8; --w4:#0e0a33; --show-accent:#5ff8ff; }
+.w-vs     { --ray-c:rgba(255,236,250,0.26); --ray-on:6deg;  --ray-period:12deg; --ray-speed:40s; --ray-dir:normal; }
+.w-trivia { --ray-c:rgba(220,236,255,0.22); --ray-on:4deg;  --ray-period:10deg; --ray-speed:56s; --ray-dir:reverse; }
+.w-powerup{ --ray-c:rgba(200,255,240,0.26); --ray-on:9deg;  --ray-period:20deg; --ray-speed:34s; --ray-dir:normal; }
+.w-jumble { --ray-c:rgba(255,232,190,0.24); --ray-on:5deg;  --ray-period:12deg; --ray-speed:44s; --ray-dir:reverse; }
+.w-results{ --ray-c:rgba(255,246,200,0.28); --ray-on:7deg;  --ray-period:15deg; --ray-speed:30s; --ray-dir:normal; }
+.w-price  { --ray-c:rgba(220,255,225,0.22); --ray-on:8deg;  --ray-period:18deg; --ray-speed:50s; --ray-dir:reverse; }
+.w-odd    { --ray-c:rgba(240,220,255,0.24); --ray-on:3deg;  --ray-period:9deg;  --ray-speed:62s; --ray-dir:normal; }
+.w-emoji  { --ray-c:rgba(255,250,200,0.26); --ray-on:10deg; --ray-period:24deg; --ray-speed:38s; --ray-dir:reverse; }
+.w-first  { --ray-c:rgba(220,255,250,0.22); --ray-on:6deg;  --ray-period:14deg; --ray-speed:46s; --ray-dir:normal; }
+.w-scan   { --ray-c:rgba(255,226,214,0.24); --ray-on:5deg;  --ray-period:15deg; --ray-speed:48s; --ray-dir:reverse; }
+.w-riddle  { --ray-c:rgba(240,255,200,0.26); --ray-on:7deg;  --ray-period:16deg; --ray-speed:42s; --ray-dir:normal; }
+.w-cash    { --ray-c:rgba(255,248,200,0.26); --ray-on:6deg;  --ray-period:15deg; --ray-speed:36s; --ray-dir:normal; }
+.w-hunt   { --ray-c:rgba(200,240,255,0.22); --ray-on:4deg;  --ray-period:11deg; --ray-speed:52s; --ray-dir:reverse; }
+
+/* ---------- the sunburst (a world's background) ---------- */
+/* <div class="bg w-vs"><i class="rays"></i><i class="glow"></i></div> */
+.bg{ position:absolute; inset:0; overflow:hidden; background:radial-gradient(120% 75% at 50% 20%, var(--w1) 0%, var(--w2) 26%, var(--w3) 58%, var(--w4) 100%); }
+.bg .rays{ position:absolute; left:50%; top:22%; width:1320px; height:1320px; margin:-660px 0 0 -660px; will-change:transform;
+  background:repeating-conic-gradient(from 0deg, var(--ray-c, rgba(255,250,220,0.22)) 0deg var(--ray-on, 7deg), transparent var(--ray-on, 7deg) var(--ray-period, 15deg));
+  animation:rayTurn var(--ray-speed, var(--ray-turn)) linear infinite; animation-direction:var(--ray-dir, normal); }
+.bg .glow{ position:absolute; left:50%; top:20%; width:420px; height:420px; margin:-210px 0 0 -210px; border-radius:50%;
+  background:radial-gradient(circle, rgba(255,255,230,0.55), rgba(255,255,230,0) 65%); animation:glowPulse 4s var(--ease-io) infinite alternate; }
+@keyframes rayTurn{ to{ transform:rotate(360deg); } }
+@keyframes glowPulse{ from{ opacity:0.6; transform:scale(0.92); } to{ opacity:1; transform:scale(1.06); } }
+.amb{ position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:1; }
+.amb .drift{ position:absolute; top:-16px; width:8px; height:12px; border-radius:2px; opacity:0.8;
+  animation:drift var(--dur) linear var(--delay) infinite; }
+@keyframes drift{ from{ transform:translate(0, 0) rotate(0deg); } to{ transform:translate(var(--sway), calc(var(--fall, 100vh) + 30px)) rotate(var(--spin)); } }
+
+/* ---------- the frame flash (perimeter glow on a win, red on a miss) ---------- */
+/* Any .show-flash element (or the style board's .frame): FX.flash(el, 'win' | 'lose'). */
+.show-flash::after, .frame::after{ content:''; position:absolute; inset:0; z-index:4; pointer-events:none; border-radius:inherit; opacity:0;
+  box-shadow:inset 0 0 0 7px var(--gold-2), inset 0 0 60px rgba(255,214,60,0.75); }
+.show-flash.flash-win::after, .frame.flash-win::after{ animation:frameFlash 1s ease-out; }
+/* (Run 4A, light safety: a softer red - a thin edge and a low glow, one pulse - never a large saturated red flash) */
+.show-flash.flash-lose::after, .frame.flash-lose::after{ box-shadow:inset 0 0 0 5px var(--bad), inset 0 0 34px rgba(255,70,100,0.42); animation:frameFlash 0.9s ease-out; }
+@keyframes frameFlash{ 0%{ opacity:0; } 12%{ opacity:1; } 30%{ opacity:0.4; } 45%{ opacity:1; } 100%{ opacity:0; } }
+.fx-layer{ position:absolute; inset:0; z-index:6; pointer-events:none; overflow:hidden; }
+
+/* ---------- the host (alien) ---------- */
+.alien{ width:58px; height:66px; flex-shrink:0; animation:alienBob 2.4s var(--ease-io) infinite alternate; }
+.alien-svg{ width:100%; height:100%; overflow:visible; }
+@keyframes alienBob{ from{ transform:translateY(0); } to{ transform:translateY(-6px); } }
+.alien.cheer{ animation:alienCheer 0.5s var(--ease-pop) 3; } .alien.sad{ animation:alienSad 1.4s var(--ease-out); }
+@keyframes alienCheer{ 0%, 100%{ transform:translateY(0) scale(1); } 40%{ transform:translateY(-22px) scale(1.12) rotate(-6deg); } }
+@keyframes alienSad{ 0%{ transform:none; } 25%{ transform:translateY(8px) scaleY(0.88) rotate(-8deg); } 60%{ transform:translateY(8px) scaleY(0.9) rotate(8deg); } 100%{ transform:none; } }
+
+/* ---------- the UFO (a prop: silver, with a teal-blue beam and laser) ---------- */
+.ufo{ position:absolute; left:0; top:0; width:90px; height:52px; z-index:5; pointer-events:none; }
+.ufo-svg{ width:100%; height:100%; overflow:visible; filter:drop-shadow(0 4px 6px rgba(40,0,40,0.4)); }
+.ufo-dome{ fill:#bff8ff; stroke:#2a6f8f; stroke-width:3; } .ufo-dome-shine{ fill:#fff; opacity:0.8; }
+.ufo-body{ fill:#c7d0da; stroke:#4d5d6e; stroke-width:3; } .ufo-rim{ fill:#f1f5f9; }
+.ufo-light{ fill:#fff; animation:ufoLights 0.6s steps(1) infinite; } .ufo-light.l2{ animation-delay:-0.2s; } .ufo-light.l3{ animation-delay:-0.4s; }
+@keyframes ufoLights{ 0%{ fill:#ff3c9d; } 33%{ fill:#7df9ff; } 66%{ fill:#fff; } }
+.ufo-pass{ opacity:0; }
+.ufo .beam{ position:absolute; left:50%; top:40px; width:var(--beam-w, 120px); height:var(--beam-h, 160px); margin-left:calc(var(--beam-w, 120px) / -2); transform-origin:50% 0; transform:scaleY(0); opacity:0;
+  background:linear-gradient(180deg, rgba(95,235,255,0.9), rgba(95,235,255,0.15)); clip-path:polygon(32% 0, 68% 0, 100% 100%, 0 100%); transition:transform 0.25s var(--ease-out), opacity 0.25s; }
+.ufo.on .beam{ transform:scaleY(1); opacity:1; }
+.zap{ position:absolute; top:0; width:4px; margin-left:-2px; transform-origin:50% 0; background:linear-gradient(180deg, #ffffff, #5ff8ff 40%, #1fa7ff); box-shadow:0 0 10px #38d8ff; border-radius:2px; }
+
+/* ---------- particles (FX.burst and friends) ---------- */
+.fx-p{ position:absolute; width:12px; height:12px; pointer-events:none; }
+.fx-p svg{ width:100%; height:100%; fill:currentColor; display:block; }
+.fx-ripple{ position:absolute; border:3px solid #fff3c4; border-radius:50%; pointer-events:none; box-shadow:0 0 10px rgba(255,240,180,0.6); }
+.fx-dot{ width:7px; height:7px; border-radius:50%; }
+.fx-sweep{ position:absolute; overflow:hidden; pointer-events:none; }
+.fx-sweep b{ position:absolute; top:-20%; bottom:-20%; left:0; width:45%; background:linear-gradient(90deg, transparent, rgba(255,236,140,0.85), transparent); }
+.fx-coin{ border-radius:50%; width:14px; height:14px; background:radial-gradient(circle at 35% 35%, #fff8c8, #ffc21a 55%, #b86a00) !important; box-shadow:0 0 0 1.5px #7a3d00; }
+.fx-strip{ width:6px; height:14px; border-radius:2px; }
+
+/* ---------- pausing and reduced motion ---------- */
+:root.tab-hidden .bg *, :root.tab-hidden .alien, :root.tab-hidden .ufo-light,
+.paused .rays, .paused .glow, .paused .drift, .paused .alien, .offscreen .rays, .offscreen .glow, .offscreen .drift{ animation-play-state:paused !important; }
+@media (prefers-reduced-motion: reduce){
+  .bg .rays, .bg .glow, .amb .drift, .alien, .alien.cheer, .alien.sad, .ufo-light, .show-flash::after, .frame::after{ animation:none !important; }
+  .amb .drift{ display:none; }
+}
+:root.rm .bg .rays, :root.rm .bg .glow, :root.rm .amb .drift, :root.rm .alien, :root.rm .ufo-light{ animation:none !important; }
+
+/* ---------- flying question marks (the riddle world) ---------- */
+/* <div class="qm-field"><span style="--y:..;--s:..;--d:..;--dl:.."></span>...</div> inside a .bg.w-riddle; transform only. */
+.qm-field{ display:none; position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:1; }
+.bg.w-riddle .qm-field{ display:block; }
+.qm-field span{ position:absolute; left:0; top:var(--y); font:900 var(--s) 'Big Shoulders Display', Arial Black, sans-serif; line-height:1; color:rgba(255,255,255,0.5); text-shadow:0 0 18px rgba(255,255,255,0.6), 0 3px 0 rgba(0,70,20,0.35);
+  transform:translateX(-25vw); animation:qmFly var(--d) linear var(--dl) infinite; will-change:transform; }
+@keyframes qmFly{ from{ transform:translateX(-25vw) rotate(-14deg); } 50%{ transform:translateX(52vw) rotate(10deg); } to{ transform:translateX(125vw) rotate(-14deg); } }
+.paused .qm-field span, :root.tab-hidden .qm-field span{ animation-play-state:paused !important; }
+@media (prefers-reduced-motion: reduce){ .qm-field span{ animation:none; transform:translateX(calc(var(--x, 30) * 1vw)); } }
+
+/* ---------- the galaxy world (Infinity's background, Oct 2026) ----------
+   Deep space: a nebula (soft magenta, blue and teal clouds in the gradient), two layers of stars that twinkle
+   (opacity only), and sun rays slanting through from the top corner (the .rays layer, turning very slowly,
+   plus a warm glow at the sun). Different from Daily's sunburst on purpose. */
+.w-galaxy{ --w1:#2a1a6b; --w2:#150a42; --w3:#0a0426; --w4:#04010f; --show-accent:#ffd23f; }
+.bg.w-galaxy{ background:
+  radial-gradient(60% 38% at 22% 28%, rgba(255,60,172,0.34), rgba(255,60,172,0) 70%),
+  radial-gradient(55% 42% at 82% 62%, rgba(40,140,255,0.32), rgba(40,140,255,0) 72%),
+  radial-gradient(50% 30% at 30% 86%, rgba(30,220,200,0.24), rgba(30,220,200,0) 70%),
+  radial-gradient(40% 26% at 68% 18%, rgba(160,90,255,0.3), rgba(160,90,255,0) 70%),
+  radial-gradient(120% 75% at 50% 20%, var(--w1) 0%, var(--w2) 30%, var(--w3) 62%, var(--w4) 100%); }
+.bg.w-galaxy .rays{ left:96%; top:-6%; --ray-c:rgba(255,226,150,0.17); --ray-on:5deg; --ray-period:26deg; --ray-speed:150s; --ray-dir:normal;
+  -webkit-mask-image:radial-gradient(circle, #000 0, rgba(0,0,0,0.85) 22%, transparent 62%); mask-image:radial-gradient(circle, #000 0, rgba(0,0,0,0.85) 22%, transparent 62%); }
+.bg.w-galaxy .glow{ left:96%; top:-2%; width:340px; height:340px; margin:-170px 0 0 -170px; background:radial-gradient(circle, rgba(255,236,170,0.75), rgba(255,200,90,0.25) 38%, rgba(255,200,90,0) 68%); }
+.bg.w-galaxy::before, .bg.w-galaxy::after{ content:''; position:absolute; inset:0; pointer-events:none; }
+.bg.w-galaxy::before{ background-image:
+  radial-gradient(1.4px 1.4px at 14px 22px, #fff, transparent), radial-gradient(1px 1px at 61px 88px, #fff, transparent), radial-gradient(1.6px 1.6px at 98px 41px, #cfe6ff, transparent),
+  radial-gradient(1px 1px at 33px 119px, #fff, transparent), radial-gradient(1.2px 1.2px at 126px 105px, #ffe9c4, transparent);
+  background-size:140px 140px; opacity:0.9; animation:starTwinkle 3.4s ease-in-out infinite alternate; }
+.bg.w-galaxy::after{ background-image:
+  radial-gradient(1.8px 1.8px at 40px 30px, #fff, transparent), radial-gradient(1.2px 1.2px at 130px 70px, #ffd9f2, transparent), radial-gradient(1.5px 1.5px at 78px 150px, #d8ecff, transparent),
+  radial-gradient(1px 1px at 160px 12px, #fff, transparent), radial-gradient(1.4px 1.4px at 12px 96px, #fff, transparent);
+  background-size:190px 190px; background-position:37px 53px; opacity:0.5; animation:starTwinkle 4.6s ease-in-out -1.8s infinite alternate; }
+@keyframes starTwinkle{ from{ opacity:0.35; } to{ opacity:1; } }
+.paused::before, .paused::after, :root.tab-hidden .bg.w-galaxy::before, :root.tab-hidden .bg.w-galaxy::after{ animation-play-state:paused !important; }
+@media (prefers-reduced-motion: reduce){ .bg.w-galaxy::before, .bg.w-galaxy::after{ animation:none; } }
+
+/* ---------- Time Warp's world: a time tunnel / clock vortex ---------- */
+.w-timewarp{ --w1:#7a2bd8; --w2:#2a0e6e; --w3:#0b0430; --w4:#02010f; --show-accent:#c8ff3d; }
+.bg.w-timewarp .rays{ top:38%; background:repeating-radial-gradient(circle, rgba(200,255,61,0.2) 0 3px, rgba(200,255,61,0) 3px 38px), repeating-conic-gradient(from 0deg, rgba(200,255,61,0.2) 0deg 5deg, rgba(200,255,61,0) 5deg 20deg); animation-duration:26s; animation-direction:reverse;
+  -webkit-mask-image:radial-gradient(circle, #000 0, rgba(0,0,0,0.8) 30%, transparent 68%); mask-image:radial-gradient(circle, #000 0, rgba(0,0,0,0.8) 30%, transparent 68%); }
+.bg.w-timewarp .glow{ top:38%; background:radial-gradient(circle, rgba(220,255,120,0.7), rgba(200,255,61,0) 62%); }
+.bg.w-timewarp::before, .bg.w-timewarp::after{ content:''; position:absolute; left:50%; top:38%; pointer-events:none; }
+.bg.w-timewarp::before{ width:78vmin; height:78vmin; margin:-39vmin 0 0 -39vmin; border-radius:50%; border:8px dotted rgba(200,255,61,0.28); animation:rayTurn 70s linear infinite; }
+.bg.w-timewarp::after{ width:5px; height:34vmin; margin:-34vmin 0 0 -2.5px; border-radius:3px; transform-origin:50% 100%; background:linear-gradient(180deg, rgba(220,255,120,0), rgba(220,255,120,0.55)); animation:rayTurn 12s linear infinite; }
+.paused.w-timewarp::before, .paused.w-timewarp::after{ animation-play-state:paused !important; }
+@media (prefers-reduced-motion: reduce){ .bg.w-timewarp::before, .bg.w-timewarp::after{ animation:none; } }
+
+/* ---------- Oddball Alert's world: a spotlit lineup stage ---------- */
+.w-orange{ --w1:#ffe0a8; --w2:#ff9a2e; --w3:#e2560f; --w4:#4a1606; --show-accent:#fff3c4; --ray-c:rgba(255,244,214,0.26); --ray-on:7deg; --ray-period:16deg; --ray-speed:44s; --ray-dir:normal; }   /* Oddball Alert */
+.w-stage{ --w1:#2b1650; --w2:#150833; --w3:#0a0418; --w4:#030108; --show-accent:#fff3c4; }
+.bg.w-stage{ background:radial-gradient(90% 28% at 50% 104%, rgba(255,95,210,0.38), rgba(255,95,210,0) 70%), linear-gradient(180deg, #05020d 0%, #140730 58%, #2a0e52 100%); }
+.bg.w-stage .rays{ left:50%; top:-3%; --ray-c:rgba(255,248,214,0.3);
+  background:conic-gradient(from 160deg at 50% 50%, transparent 0deg, var(--ray-c) 0deg 6deg, transparent 6deg 16deg, rgba(255,214,240,0.26) 16deg 23deg, transparent 23deg 33deg, var(--ray-c) 33deg 38deg, transparent 38deg 360deg);
+  animation:spotSweep 7s ease-in-out infinite alternate; -webkit-mask-image:linear-gradient(180deg, #000 0, rgba(0,0,0,0.75) 46%, transparent 62%); mask-image:linear-gradient(180deg, #000 0, rgba(0,0,0,0.75) 46%, transparent 62%); }
+.bg.w-stage .glow{ top:-4%; background:radial-gradient(circle, rgba(255,250,225,0.5), rgba(255,250,225,0) 62%); }
+@keyframes spotSweep{ from{ transform:rotate(-16deg); } to{ transform:rotate(16deg); } }
+@media (prefers-reduced-motion: reduce){ .bg.w-stage .rays{ animation:none; } }
+
+/* ---------- Emoji Decode's world: a neon cinema at night ---------- */
+.w-neon{ --w1:#2b0f58; --w2:#150838; --w3:#0a0420; --w4:#04010e; --show-accent:#7df9ff; }
+.bg.w-neon{ background:radial-gradient(62% 40% at 18% 22%, rgba(255,60,172,0.34), rgba(255,60,172,0) 70%), radial-gradient(62% 40% at 84% 74%, rgba(40,210,255,0.3), rgba(40,210,255,0) 70%),
+  repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 2px, rgba(255,255,255,0) 2px 5px), linear-gradient(180deg, #0a0420, #170a35 60%, #0a0420); }
+.bg.w-neon .rays{ --ray-c:rgba(255,120,220,0.16); --ray-on:3deg; --ray-period:18deg; --ray-speed:90s; }
+.bg.w-neon .glow{ background:radial-gradient(circle, rgba(125,249,255,0.4), rgba(125,249,255,0) 65%); }
