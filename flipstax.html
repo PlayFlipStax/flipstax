@@ -12359,6 +12359,21 @@ const SHARE_URL = 'https://playflipstax.com';
   // Emoji Decode and Time Warp each play 3, one after another in the same card, from the next unused items of the frozen schedule
   // (each show takes the next 3 and wraps round); a banner and a burst follow when every one is right. (mega 4 item 5: Time Warp was 2 pairs; each right
   // pair is still BRAIN_BREAK_POINTS (10) times the round's multiplier, as Emoji Decode's puzzles are - so 30 for a PERFECT WARP, all 3 right.)
+  // fixes 2: Emoji Decode fit. The emoji row is shrunk (font size only) until it sits inside the TV's screen with a margin, so the outer emoji are never
+  // cropped by the frame; each answer is kept to one line in its saucer - a long one (LET SLEEPING DOGS LIE) is set smaller instead of wrapping onto a
+  // second line and pushing the last saucer down under Flip's speech bubble. Measured once per puzzle; nothing animates.
+  function edFit(tiles, n){
+    const p = els.eventPrompt; if (!p) return;
+    p.style.fontSize = ''; p.style.letterSpacing = '';
+    const range = document.createRange(); range.selectNodeContents(p);
+    const w = range.getBoundingClientRect().width, cs = getComputedStyle(p), avail = p.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 28;   // (28: clear of the screen's rounded inner edge)
+    if (w > 0 && avail > 0 && w > avail){ const fs = parseFloat(cs.fontSize); p.style.fontSize = Math.max(28, Math.floor(fs * avail / w)) + 'px'; }
+    tiles.forEach((t, i)=>{ if (i >= n) return; const nm = t.querySelector('.bb-name'); if (!nm) return;
+      nm.style.fontSize = ''; nm.style.whiteSpace = 'nowrap';
+      const box = nm.parentElement.clientWidth * 0.78, ww = nm.scrollWidth;   // (the key letter and the edges of the saucer take the rest)
+      if (ww > box && box > 0){ const fs = parseFloat(getComputedStyle(nm).fontSize); nm.style.fontSize = Math.max(12, Math.floor(fs * box / ww)) + 'px'; } });
+  }
+  if (REPLAY || DEBUG_FAST) window.__edFit = ()=> edFit(Array.from(document.querySelectorAll('#eventOverlay .event-tile')), 4);   // (tests only)
   const BREAK_PARTS = { emojiDecode:3, timeWarp:3 };
   // fix 4: the Time Warp timeline (see runBrainBreakOne). Positions are transforms only; lite mode and reduced motion get plain fades and no roll.
   const TW_D0 = [-260, 2060], TW_TICKS = [[-130, 'BC'], [1000, '1000'], [1500, '1500'], [1800, '1800'], [2000, '2000']];
@@ -12470,6 +12485,7 @@ const SHARE_URL = 'https://playflipstax.com';
       ov.querySelectorAll('.ed-tvflash, .ed-perfect').forEach(e=> e.remove());
       tiles.forEach(t=> t.getAnimations && t.getAnimations().forEach(a=>{ if (!(window.CSSAnimation && a instanceof CSSAnimation) && !(window.CSSTransition && a instanceof CSSTransition)) a.cancel(); }));
       tiles.forEach((t, i)=>{ t.classList.remove('ed-flip', 'ed-open'); if (i >= n) return; if (still){ t.classList.add('ed-open'); return; } t.style.setProperty('--ed-d', (0.15 + i * 0.22).toFixed(2) + 's'); void t.offsetWidth; t.classList.add('ed-flip'); });
+      edFit(tiles, n);   // (fixes 2: the emoji row and every answer fit their frames)
     }
     if (key !== 'timeWarp') hostSay(HOST_LINES[key] || def.rule, 2600);   // (Time Warp says 'Tap the earlier event' once, in its banner)
     // Time Warp's progress: one glowing round LED per puzzle (lit for this one; green or red once answered)
