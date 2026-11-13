@@ -57,6 +57,7 @@
 <link rel="stylesheet" href="lib/neon-logos.css">
 <link rel="stylesheet" href="lib/spotlights.css">
 <link rel="stylesheet" href="lib/star-sequence.css">
+<link rel="stylesheet" href="lib/game-select.css">
 <link rel="preload" as="image" href="data/stage/stage-close.webp" type="image/webp">
 <style>
   /* fix 7: no double-tap zoom anywhere: touch-action manipulation on the page itself (lib/juice.css also sets it on every game screen and tappable) */
@@ -4954,6 +4955,7 @@
 <script src="lib/munch-mix.js"></script>
 <script src="lib/spotlights.js"></script>
 <script src="lib/star-sequence.js"></script>
+<script src="lib/game-select.js"></script>
 <script src="lib/orbit-physics.js"></script>
 <script src="lib/host-alien.js"></script>
 <script src="data/host/manifest.js"></script>
@@ -6155,8 +6157,16 @@ const SHARE_URL = 'https://playflipstax.com';
   // Run 4A, the Mystery Door (Round 3): four different bonus games behind four doors, by the date (the same for
   // everyone that day), from RUNDOWN.door.pool - only games whose data loaded, and none twice in the episode.
   const DOOR_COUNT = 3;   // (A+: the Mystery Portal has exactly three doors)
+  // GAME SELECT: the Mystery Portal is an arcade select screen with ALL its games on it every day (RUNDOWN.door.select, in the grid's order) - the date no
+  // longer draws three of them. GAME_SELECT_ON = false brings the three doors and their date-seeded draw back (the code below is kept for that).
+  const GAME_SELECT_ON = !!(RUNDOWN.door && Array.isArray(RUNDOWN.door.select) && RUNDOWN.door.select.length && window.GameSelect);
+  const GAME_SELECT_TITLE = 'SELECT GAME';           // the screen's big title (two words go on two lines)
+  const GAME_SELECT_SHOW = 'GALACTIC GAME NIGHT';    // the small show name above it
+  function showSelectGames(){ return (RUNDOWN.door.select || []).filter(g=> mysteryAvailable(showSwap(g))).map(showSwap); }
   function showDoorGames(date){
-    const pool = ((RUNDOWN.door && RUNDOWN.door.pool) || []).filter(g=> mysteryAvailable(g));
+    // (with the select screen on, this date-seeded draw of three only feeds the results' "Tomorrow" tease - and only from games that are on the screen)
+    const sel = GAME_SELECT_ON ? RUNDOWN.door.select : null;
+    const pool = ((RUNDOWN.door && RUNDOWN.door.pool) || []).filter(g=> mysteryAvailable(g) && (!sel || sel.indexOf(g) >= 0));
     return shuffle(pool.slice(), mulberry32(hashStr('flipstax-door-' + date))).slice(0, DOOR_COUNT).map(showSwap);   // (fix 6: Snap Sort on hold - see SHOW_GAME_SWAP)
   }
   function showAd(date){
@@ -6169,7 +6179,7 @@ const SHARE_URL = 'https://playflipstax.com';
   function buildShowPlan(date){
     if (SHOW_DATE_OVERRIDE) date = SHOW_DATE_OVERRIDE;
     const rng = mulberry32(hashStr('flipstax-show-' + date));
-    const mystery = showMysteryGames(date), doors = showDoorGames(date);
+    const mystery = showMysteryGames(date), doors = GAME_SELECT_ON ? showSelectGames() : showDoorGames(date);   // (Game Select: every game, every day - no draw)
     const steps = [], day = schedDay(date), beamSlots = {};
     RUNDOWN.acts.forEach((act, ai)=>{
       if (act.ad){ steps.push({ t:'ad', ad: showAd(date) }); return; }
@@ -11307,6 +11317,7 @@ const SHARE_URL = 'https://playflipstax.com';
   function showEnter(scene, info){
     if (runActive && (scene === 'mystery' || scene === 'lucky' || scene === 'cosmic' || scene === 'game')) trackEvent('game_started:' + (scene === 'mystery' ? info : scene === 'game' ? (EV_GAME[info] || info) : EV_GAME[scene]));
     showCancelPending();
+    if (gsView){ try{ gsView.close(); }catch(e){} gsView = null; }   // (the Game Select screen never outlives its scene)
     Show.gen++; Show.scene = scene; Show.state = scene === 'vs' ? 'live' : 'playing'; Show.info = info || ''; Show.since = performance.now();
     Show.stats.scenes.push(scene + (info && scene !== 'vs' ? ':' + info : ''));
     showLog('enter', info); frScene('enter', scene, info && scene !== 'vs' ? info : (scene === 'vs' && current ? current.id : ''));
@@ -11458,7 +11469,7 @@ const SHARE_URL = 'https://playflipstax.com';
       return true;
     }
     if (key === 'lucky') return typeof runLuckyLights === 'function' && runLuckyLights(st, done);
-    if (key === 'door') return runMysteryDoor(st, done);
+    if (key === 'door') return GAME_SELECT_ON ? runGameSelect(st, done) : runMysteryDoor(st, done);
     if (key === 'orbitDrop') return runRoundOrbit(st, done);
     if (miniGame(key) && mysteryAvailable(key)) return runMiniGame(key, st, done);
     return false;
@@ -11613,6 +11624,55 @@ const SHARE_URL = 'https://playflipstax.com';
     if (isLite() || prefersReducedMotion()){ cells.forEach(c=> c.classList.remove('still')); return; }
     setTimeout(()=>{ cells.forEach(c=> c.classList.remove('hot', 'pad')); }, 400);   // (a 0.4 s flash, then the floor goes quiet)
   }
+  // ---------- GAME SELECT: the Mystery Portal as a retro arcade select screen (lib/game-select.js) ----------
+  // All the Portal's games are on the screen (st.doors = RUNDOWN.door.select). A tap highlights a tile, PLAY confirms; with no tap for GS_PICK_MS the
+  // screen picks (a game not yet played, if there is one), so the show never stalls. The chosen game then runs exactly as a door's game did: its own
+  // intro card, then the game, then `done`. STAMPS: each game the player has played keeps a star, saved on the device (GS_KEY; every read and write is
+  // in try/catch - without storage the screen still works, just with no stars). ONCE A DAY: the day's pick is saved too, so coming back to the screen
+  // the same day (a refresh mid-show) offers only that game. Replay / test mode: any game, every time; its stars are kept apart (GS_KEY + '_replay').
+  const GS_PICK_MS = 20000, GS_KEY = 'flipstax_gameselect_v1';
+  const GS_COLORS = ['#ff3fb5', '#27e6ff', '#ffd23f', '#4be683', '#a78bff', '#ff8a2e', '#ff3fb5', '#27e6ff', '#ffd23f'];
+  const GS_DESC = { alienBlast:'Tap the green aliens. Dodge the red ones!', factOrFib:'True or false? Trust your gut!', emojiDecode:'Read the emojis. What do they spell?',
+    timeWarp:'Which came first? Tap the earlier event!', starSequence:'Watch the lights. Copy the pattern!', spaceLaunch:'Stop the marker in the green zone!',
+    priceProbe:'Which one costs the most?', saucerShuffle:'Follow the star under the saucers!', zigZap:'Answer right. Three in a row beats Flip!', snapSort:'Tap the words that fit!' };
+  const GS_EMOJI = { factOrFib:'🧠', emojiDecode:'🧩', priceProbe:'🏷️' };   // (the games with no logo art yet: a large full-colour emoji stands in)
+  function gsLoad(){ try{ const o = JSON.parse(localStorage.getItem(GS_KEY + (REPLAY ? '_replay' : '')) || '{}'); return o && typeof o === 'object' ? o : {}; }catch(e){ return {}; } }
+  function gsSave(o){ try{ localStorage.setItem(GS_KEY + (REPLAY ? '_replay' : ''), JSON.stringify(o)); }catch(e){} }
+  function gsArt(game){
+    if (game === 'starSequence') return '<img src="data/star-sequence/saucer.png" alt="" draggable="false">';
+    const ic = window.NeonLogo && NeonLogo.icon ? NeonLogo.icon(game) : '';
+    return ic || '<span class="gs-emo">' + (GS_EMOJI[game] || DOOR_ICONS[game] || '✨') + '</span>';
+  }
+  function runGameSelect(st, done){
+    const games = (st.doors || []).filter(g=> mysteryAvailable(g));
+    if (!games.length || !window.GameSelect) return runMysteryDoor(st, done);
+    const g = Show.gen, today = runStartDate || todayStr(), store = gsLoad(), played = (store.played && typeof store.played === 'object') ? store.played : {};
+    runPhase = 'break';
+    stopTallyPolling(); clearRoundTimer(); clearTimeout(eventTimeoutId);
+    els.eventOverlay.classList.add('hidden');
+    const locked = !REPLAY && store.day === today && games.indexOf(store.pick) >= 0 ? store.pick : null;   // (once a day: today's game is already chosen)
+    let view = null;
+    view = GameSelect.open({
+      title: GAME_SELECT_TITLE, show: GAME_SELECT_SHOW, played, locked, sfx, autoMs: dt(GS_PICK_MS), confirmMs: dt(650),
+      games: games.map((k, i)=> ({ key:k, name: mysteryName(k), desc: GS_DESC[k] || explainerText(k, false) || '', color: GS_COLORS[i % GS_COLORS.length], art: gsArt(k) })),
+      onPick: (game)=>{
+        if (g !== Show.gen){ if (view) view.close(); return; }
+        played[game] = true; gsSave({ played, day: today, pick: game });
+        if (view) view.close();
+        runCurrentGame = mysteryName(game); Show.info = 'door:' + game;
+        // (as behind a door: the game's own title card, then the game)
+        showGameIntro(game, ()=>{
+          if (g !== Show.gen) return;
+          const ok = game === 'riddle' ? (runTriviaQuestion(null, null, { t:'quiz', riddle:true, mystery:true, seed: st.seed, day: st.day }), true)
+            : miniGame(game) ? runMiniGame(game, { seed: st.seed, door:true, day: st.day }, done) : runBrainBreak({ game, seed: st.seed, day: st.day }, done);
+          if (!ok) showDone(g, 'door game unavailable');
+        });
+      },
+    });
+    gsView = view;
+    return true;
+  }
+  var gsView = null;   // (var: read by showEnter, which is defined earlier in the file)
   function runMysteryDoor(st, done){
     const games = (st.doors || []).filter(g=> mysteryAvailable(g)).slice(0, DOOR_COUNT);
     if (!games.length) return false;
@@ -17173,8 +17233,13 @@ const SHARE_URL = 'https://playflipstax.com';
     // Tomorrow on FlipStax: the next episode, its countdown and a tease of its Mystery Games.
     const tomorrow = dayAfter(r.date || todayStr());
     document.getElementById('eprNextEp').textContent = 'EPISODE ' + showEpisode(tomorrow);
+    if (GAME_SELECT_ON){   // (Game Select: every game is on the screen every day)
+      const n = showSelectGames().length;
+      document.getElementById('eprTease').textContent = n ? 'Tomorrow: pick from all ' + n + ' games. Plus a new crowd, new Brain Beams and a new word.' : '';
+    } else {
     const g = showDoorGames(tomorrow).filter(Boolean).map(mysteryName);
     document.getElementById('eprTease').textContent = g.length ? 'Behind the Mystery Doors: ' + g.slice(0, -1).join(', ') + (g.length > 1 ? ' or ' : '') + g[g.length - 1] + '. Plus a new crowd, new Brain Beams and a new word.' : '';
+    }
     const clock = document.getElementById('eprCountdown');
     const tick = (first)=>{
       if (!first && !els.readoutOverlay.classList.contains('show')){ clearInterval(eprClockT); eprClockT = null; return; }
@@ -19975,6 +20040,7 @@ const SHARE_URL = 'https://playflipstax.com';
       dailyScanDone = null; cosmicDaily = null; try{ closeGuessRound(); }catch(e){}
       if (mgOpen) try{ mgOpen.close(true); }catch(e){}   // (a Mystery Game left open by an earlier jump)
       if (luckyOv){ luckyGen++; luckyOv.classList.add('hidden'); luckyOv.innerHTML = ''; }
+      if (gsView){ try{ gsView.close(); }catch(e){} gsView = null; }
       showCard.classList.add('hidden'); showCard.innerHTML = '';
       document.getElementById('showSay').classList.remove('on');
     }
