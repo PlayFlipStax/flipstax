@@ -3098,3 +3098,9 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root:root .wk-warp.b{ background-size:96px 96px; } :root:root .wk-warp.c{ background-size:59px 59px; }
 @keyframes wkWarp2{ 0%{ transform:scale(0.66); opacity:0; } 25%{ opacity:0.55; } 80%{ opacity:0.4; } 100%{ transform:scale(3.56); opacity:0; } }
 :root.ww-fin-mem #stage{ display:none !important; }   /* (finale memory fix: the stage's big pictures are not kept on screen behind the finale video) */
+
+/* ---- fixes 4: the results screen's labels under the numbers (FLIPZ EARNED, LETTERS WON ...) and 'Tell us what you think' are larger and easier to read
+   (the share picture is drawn separately and is not affected) ---- */
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os small{ font-size:12.5px; line-height:1.08; letter-spacing:0.2px; font-weight:900; }
+@media (max-width:380px){ :root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os small{ font-size:11.5px; letter-spacing:0; } }
+:root .outro-feedback{ font-size:16px; font-weight:800; color:#ffffff; text-shadow:0 1px 3px rgba(0,0,20,0.85); padding:6px 10px; touch-action:manipulation; }
