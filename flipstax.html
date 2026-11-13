@@ -11440,7 +11440,7 @@ const SHARE_URL = 'https://playflipstax.com';
     return false;
   }
   // ---------- Run 4A: the round-end games ----------
-  const ROUND_GAME_NAMES = { riddle:()=> GN.riddleRound, lucky:()=> 'Mystery Wheel', door:()=> 'Mystery Doors', orbitDrop:()=> GN.orbitDrop };
+  const ROUND_GAME_NAMES = { riddle:()=> GN.riddleRound, lucky:()=> 'Mystery Wheel', door:()=> 'Select Game', orbitDrop:()=> GN.orbitDrop };
   function roundGameName(key){ return ROUND_GAME_NAMES[key] ? ROUND_GAME_NAMES[key]() : mysteryName(key); }
   // Run 4A: every round-end game opens with the game intro and its explainer card, then plays.
   function roundGameReady(st){
@@ -12965,7 +12965,7 @@ const SHARE_URL = 'https://playflipstax.com';
   const GAME_INTRO = {
     riddle:   { name:()=> GN.riddleRound, c:['#c9ff7a', '#18a83a'] },
     lucky:    { name:()=> 'Mystery Wheel', c:['#ffd23f', '#9c1238'] },
-    door:     { name:()=> 'Mystery Doors', c:['#ff9ad1', '#6d28d9'] },
+    door:     { name:()=> 'Select Game', c:['#ff9ad1', '#6d28d9'] },
     zapWords: { name:()=> GN.zapWords, c:['#ffe94d', '#4a4f63'] },
     twinFlip: { name:()=> GN.twinFlip, c:['#ff5ad9', '#3b0a6b'] },
     orbitDrop:{ name:()=> GN.orbitDrop, c:['#7df9ff', '#1d3fb8'] },

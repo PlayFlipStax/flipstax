@@ -46,7 +46,7 @@ window.FLIPSTAX_RUNDOWN = {
   coldOpen: { firstMs: 12000, returningMs: 3000 },
   acts: [
     { id:'r1', round:1, title:'ROUND ONE',   sub:'ROUND 1', mult:1, vsTimerMs:VS_TIMER_MS, world:'vs',
-      announce:'Round One! Doors, my friends. Doors!',
+      announce:'Round One! Pick your game, my friends. Pick your game!',
       steps:[ { vs:VS_PER_ROUND }, { beam:'easy' },   { game:'door' },      { reward:true } ] },   // (mega 5: the show order is Portal, Wheel, Zap Words, Galactic Chomper, Twin Flip, Orbit Drop)
     { id:'r2', round:2, title:'ROUND TWO',   sub:'ROUND 2', mult:1, vsTimerMs:VS_TIMER_MS, world:'vs',
       announce:'Round Two! Things are heating up!',
