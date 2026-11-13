@@ -3104,3 +3104,5 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os small{ font-size:12.5px; line-height:1.08; letter-spacing:0.2px; font-weight:900; }
 @media (max-width:380px){ :root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os small{ font-size:11.5px; letter-spacing:0; } }
 :root .outro-feedback{ font-size:16px; font-weight:800; color:#ffffff; text-shadow:0 1px 3px rgba(0,0,20,0.85); padding:6px 10px; touch-action:manipulation; }
+/* fixes 5: the cold open's TAP TO SKIP - larger, a solid dark pill with a gold border */
+:root:root .co-skip{ font:900 16px/1 var(--f-body, Inter, sans-serif); letter-spacing:0.08em; padding:11px 20px; background:rgba(8,4,24,0.88); box-shadow:inset 0 0 0 2px #ffd23f; text-shadow:0 1px 2px #000; }

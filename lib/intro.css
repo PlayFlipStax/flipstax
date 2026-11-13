@@ -120,3 +120,13 @@
 
 /* the landing's 'Watch intro' (test hosts only): in the bottom-right corner, above the TEST button, never over ENTER */
 :root:root #introWatch{ left:auto; right:10px; bottom:calc(58px + env(safe-area-inset-bottom)); transform:none; min-height:36px; padding:8px 12px; font-size:12px; }
+
+/* ---- fixes 5: the landing's one-line tagline under the logo (inside the picture box, so it sits under the logo at every screen shape); a still line ---- */
+.il-pic{ container-type:inline-size; }
+.il-tagline{ position:absolute; left:4%; right:4%; top:67.5%; margin:0; text-align:center; white-space:nowrap; pointer-events:none;
+  font:400 clamp(10px, 3.3cqw, 16px)/1.2 'FS Righteous', sans-serif; letter-spacing:0.02em; color:#fff3c4;
+  text-shadow:0 0 8px rgba(255,190,80,0.55), 0 2px 0 rgba(20,6,40,0.95), 0 0 2px rgba(20,6,40,0.95); }
+:root.il-leaving .il-tagline{ opacity:0; transition:opacity .45s ease; }
+/* fixes 5: TAP TO SKIP easy to see - a solid dark pill with a gold border, larger bold type, fully opaque once shown */
+:root:root .ip-skip{ min-height:46px; padding:0 18px; background:rgba(8,4,24,0.88); border:2px solid #ffd23f; color:#ffffff; font:400 16px/1 'FS Righteous', sans-serif; letter-spacing:0.08em; text-shadow:0 1px 2px #000; touch-action:manipulation; }
+:root:root .ip-skip.show{ opacity:1; }
