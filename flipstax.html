@@ -11801,7 +11801,10 @@ const SHARE_URL = 'https://playflipstax.com';
   function miniGame(key){ return window.MiniGames && window.MiniGames.games && window.MiniGames.games[key]; }
   // A mini-game's background art (style-board/assets/bg-<game>.png) is used only once it has loaded; until the file
   // exists the game keeps its designed gradient + pattern. Each file is checked once a page load.
-  const GAME_BG_FILE = { peakOrPlunge:'bg-peak', snapSort:'bg-snap', zapWords:'bg-zap', twinFlip:'bg-twin', factOrFib:'bg-fact', saucerShuffle:'bg-saucer' };
+  // fixes 3: none of these files exist (and style-board/ is not deployed), so every game screen asked for a missing picture - a 404 each time. Off until real
+  // art is added: set GAME_BG_ART to true then. Nothing on disk changed.
+  const GAME_BG_ART = false;
+  const GAME_BG_FILE = GAME_BG_ART ? { peakOrPlunge:'bg-peak', snapSort:'bg-snap', zapWords:'bg-zap', twinFlip:'bg-twin', factOrFib:'bg-fact', saucerShuffle:'bg-saucer' } : {};
   const gameBgState = {};
   function gameBgFor(key, ov){
     const f = GAME_BG_FILE[key]; if (!f) return;
