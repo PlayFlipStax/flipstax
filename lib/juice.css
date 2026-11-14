@@ -3470,3 +3470,46 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root:root:root:root:root .pr-stage.pr-show .pr-card.dim::after{ display:block; content:''; position:absolute; inset:0; border-radius:inherit; background:rgba(74,5,36,0.14); pointer-events:none; left:0; top:0; width:auto; height:auto; margin:0; }
 /* the meter: a slim neon tube at the side */
 :root:root:root:root:root .pr-stage.pr-show .pr-meter{ background:rgba(74,5,36,0.9); box-shadow:inset 0 0 0 2px #ffd23f, 0 0 12px rgba(255,210,63,0.6); }
+
+/* ==== NEW COMPOSITION, EMOJI DECODE: "THE DECODER DECK". A new layout: the emoji are a big HOLOGRAM (a cyan pane of light with scan lines and
+   corner brackets) projected up out of a starship's decoder console, and the four answers are the console's keys - a two-by-two block of big
+   chunky buttons in coral, gold, green and cyan, each with its letter on a round cap. The TV, its antennae and the four stacked saucers are gone.
+   Behind: the ringed planet, the moon horizon and the drifting saucers. Colour family: teal and navy with coral and gold. Motion: none new (the
+   keys' old bob is off; the hologram is still). ==== */
+.event-overlay.bb-emojiDecode .ed-ant{ display:none !important; }
+/* the hologram */
+:root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt{ width:min(92%, 560px); min-height:clamp(150px, 25svh, 320px); padding:18px 18px 44px; overflow:visible; isolation:isolate; border-radius:18px;
+  border:3px solid #7df9ff; outline:0; background-image:none;
+  background:
+    linear-gradient(#bff8ff, #bff8ff) 12px 12px / 26px 3px no-repeat, linear-gradient(#bff8ff, #bff8ff) 12px 12px / 3px 26px no-repeat,
+    linear-gradient(#bff8ff, #bff8ff) calc(100% - 12px) 12px / 26px 3px no-repeat, linear-gradient(#bff8ff, #bff8ff) calc(100% - 12px) 12px / 3px 26px no-repeat,
+    repeating-linear-gradient(180deg, rgba(125,249,255,0.12) 0 2px, rgba(125,249,255,0) 2px 6px),
+    linear-gradient(180deg, rgba(39,230,255,0.34), rgba(18,96,140,0.42));
+  box-shadow:0 0 0 2px rgba(6,16,42,0.9), 0 0 26px 4px rgba(39,230,255,0.7), inset 0 0 30px rgba(125,249,255,0.35); }
+:root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt::before{ display:none !important; }
+/* the projector beam, from the console up to the hologram */
+:root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt::after{ display:block !important; content:''; position:absolute; z-index:-1; left:6%; right:6%; top:100%; bottom:auto; width:auto; height:clamp(26px, 5svh, 54px); margin:0; border-radius:0;
+  clip-path:polygon(0 0, 100% 0, 60% 100%, 40% 100%); background:linear-gradient(180deg, rgba(125,249,255,0.55), rgba(125,249,255,0.12)); opacity:1; transform:none; animation:none; }
+/* the console: a metal deck with a neon lip, the four keys in a two-by-two block */
+:root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-grid{ display:grid; grid-template-columns:1fr 1fr; gap:clamp(10px, 1.8svh, 16px) 12px; margin-top:clamp(22px, 4.4svh, 50px); padding:clamp(14px, 2.2svh, 22px) 14px clamp(16px, 2.4svh, 24px); flex:0 0 auto; position:relative;
+  border-radius:26px 26px 18px 18px; border:3px solid #dfe9ff;
+  background:
+    radial-gradient(circle at 14px 14px, #ffd23f 0 3px, #06102a 4px 5.4px, rgba(0,0,0,0) 6px), radial-gradient(circle at calc(100% - 14px) 14px, #ffd23f 0 3px, #06102a 4px 5.4px, rgba(0,0,0,0) 6px),
+    linear-gradient(180deg, #2b4672 0%, #16284c 55%, #0a1632 100%);
+  box-shadow:0 0 0 3px #06102a, 0 -3px 16px rgba(39,230,255,0.55), 0 10px 0 3px #030814; }
+:root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-grid::before{ content:''; position:absolute; left:50%; top:-13px; width:74px; height:20px; margin-left:-37px; border-radius:50%; background:radial-gradient(ellipse closest-side, #ffffff, #7df9ff 55%, #0c4a6a 100%); border:3px solid #06102a; box-shadow:0 0 16px 4px rgba(125,249,255,0.9); }
+:root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile, :root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode:not(.bb-revealed) .event-tile{ animation-name:none; translate:none; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; width:auto; min-height:clamp(92px, 13.4svh, 150px); margin:0; padding:22px 8px 12px;
+  border-radius:20px; border:3px solid #ffffff; background:linear-gradient(180deg, var(--k1), var(--k2)) !important; box-shadow:inset 0 3px 0 rgba(255,255,255,0.55), inset 0 -6px 0 rgba(0,0,0,0.18), 0 7px 0 var(--k3), 0 12px 10px rgba(0,0,0,0.45); touch-action:manipulation; overflow:visible; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(1){ --k1:#ff9a7a; --k2:#f0502e; --k3:#8a1f0a; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(2){ --k1:#ffe27a; --k2:#f2a800; --k3:#8a5a00; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(3){ --k1:#8dffb0; --k2:#19c25c; --k3:#0a6a2e; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(4){ --k1:#8fe9ff; --k2:#0fa8e0; --k3:#07517a; }
+.bb-emojiDecode .event-tile .ed-dome, .bb-emojiDecode .event-tile .ed-beam, .bb-emojiDecode .event-tile .ed-lights{ display:none !important; }
+:root:root:root:root:root .bb-emojiDecode .event-tile .ed-key{ position:absolute; left:50%; top:-15px; margin:0 0 0 -17px; width:34px; height:34px; display:flex; align-items:center; justify-content:center; border-radius:50%; font-size:20px; color:#06102a; background:radial-gradient(circle at 38% 30%, #ffffff, #dfe9ff 60%, #9fb0d6); border:3px solid #06102a; box-shadow:0 2px 0 #06102a; z-index:3; }
+:root:root:root:root:root .bb-emojiDecode .event-tile .bb-name{ white-space:normal !important; font-size:clamp(17px, 5vw, 26px) !important; line-height:1.04; text-align:center; color:#ffffff; text-shadow:0 2px 0 rgba(0,0,0,0.38); -webkit-text-stroke:0; max-width:100%; overflow-wrap:break-word; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(2) .bb-name{ color:#3a2400; text-shadow:0 1px 0 rgba(255,255,255,0.5); }
+:root:root:root:root:root .bb-emojiDecode .event-tile .ed-cover{ inset:-3px; border-radius:20px; background:linear-gradient(180deg, #3a4f80, #141f44); }
+:root:root:root:root:root .bb-emojiDecode .event-tile .ed-mark{ right:-8px; top:-12px; margin-top:0; width:36px; height:36px; }
+:root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.is-right{ box-shadow:0 0 0 4px #1fae4e, 0 0 22px 6px rgba(93,255,138,0.8), 0 7px 0 var(--k3); }
+:root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.is-wrong{ --k1:#ff9aa8; --k2:#e01e44; --k3:#5a0414; }
+@media (max-height:700px){ :root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt{ min-height:118px; padding:10px 14px 40px; } :root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile{ min-height:74px; padding:18px 6px 8px; } :root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-grid{ margin-top:20px; padding:12px 12px 14px; } }
