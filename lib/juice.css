@@ -3133,3 +3133,60 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root:root:root .tf-stage.tf-space .tf-tile.up .tf-face{ display:flex; align-items:center; justify-content:center; }
 :root:root:root .tf-stage.tf-space .tf-face svg{ width:100%; height:auto; max-height:100%; aspect-ratio:1; filter:none; }
 :root:root:root .tf-stage.tf-space .tf-pairs{ background:#071530; }
+
+/* ==== MAKEOVER job 2: FACT OR FIB on the show stage (.ff-warm, on top of .ff-lie). Warm colour family: crimson curtain, amber spotlight, brass and
+   cream - no teal terminal, no purple. A neon sign with gold bulbs (lib/neon-logos.js 'factOrFib'), the lie detector as a brass-and-cream studio dial,
+   the statement on a cream cue card in the show's own lettering, the explanation - the payoff - as big as the statement on a gold strip, and Flip
+   beside the dial working it. Still pictures only: nothing new animates (the dial's needle and wave were already transform-only). ==== */
+:root:root:root:root:root .mg-overlay.mg-factOrFib:has(.ff-warm){
+  background:
+    radial-gradient(ellipse 70% 38% at 50% 30%, rgba(255,214,120,0.42), rgba(255,214,120,0) 70%),
+    linear-gradient(180deg, rgba(0,0,0,0) 0 74%, #5a2a08 74%, #2a1204 100%),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0 13px, rgba(255,255,255,0.05) 13px 22px, rgba(0,0,0,0.08) 22px 32px),
+    linear-gradient(180deg, #8c1524 0%, #6a0f1c 45%, #3d0810 100%) !important; }
+.mg-factOrFib:has(.ff-warm) .mg-bg{ display:none !important; }
+/* the sign: the neon logo takes the plate's place */
+:root:root:root:root:root .mg-factOrFib .mg-sign.ff-neon{ background:none !important; border:0 !important; box-shadow:none !important; padding:0 !important; width:min(96%, 470px) !important; max-width:none !important; flex:none !important; margin:0 auto 2px; display:block !important; }
+.mg-factOrFib .mg-sign.ff-neon::before, .mg-factOrFib .mg-sign.ff-neon::after{ display:none !important; }
+.mg-factOrFib .mg-sign.ff-neon > .nl{ width:100%; margin:0; }
+.mg-factOrFib .mg-sign.ff-neon > :not(.nl){ display:none !important; }
+.mg-factOrFib .mg-sign.ff-neon .nl-l.md{ font-size:8.6cqw; }
+:root:root:root:root:root .mg-factOrFib:has(.ff-warm) .mg-act{ background:linear-gradient(180deg, #5a0a20, #2a030b) !important; border-color:#e6b94a !important; color:#ffe9a8 !important; }
+@media (max-height:700px){ :root:root:root:root:root .mg-factOrFib .mg-sign.ff-neon{ width:min(74%, 300px) !important; } }
+/* the label over the dial */
+.ff-warm .ff-sub{ font:900 clamp(12px, 3.4vw, 17px)/1 var(--f-display, sans-serif); letter-spacing:4px; color:#ffd98a; text-shadow:0 2px 0 #3a0810; }
+/* the dial: a brass rim, a cream face, brown ticks and needle */
+.ff-warm.ff-lie .ff-gauge{ background:radial-gradient(ellipse at 50% 90%, #fffaf0 0%, #ffe9bd 70%, #f2cf8a 100%); border:4px solid #e6b94a; box-shadow:0 0 0 3px #6a3d00, 0 0 0 5px #ffe9a8, 0 8px 0 5px #3a1a04; }
+.ff-warm .ff-gauge line{ stroke:#6a3d00; }
+.ff-warm .ff-gauge .fg-needle path{ fill:#2a1206; }
+.ff-warm .fg-l{ font:900 12px var(--f-display, sans-serif); fill:#0f7a3c; } .ff-warm .fg-l.r{ fill:#c2182f; }
+.ff-warm .fg-wave{ stroke:#e0572b; }
+.ff-warm.ff-lie .ff-gauge.lit-ok.lit-fact .fg-fact, .ff-warm.ff-lie .ff-gauge.lit-ok.lit-fib .fg-fib{ stroke:#12c25e; }
+/* the cue card: the statement in the show's lettering, dark on cream */
+:root:root:root:root .ff-stage.ff-warm .ff-bubble{ align-items:center; justify-content:center; text-align:center; background:linear-gradient(180deg, #fffdf4, #ffeecb); border:4px solid #e6b94a; border-radius:18px;
+  box-shadow:0 0 0 3px #6a3d00, 0 7px 0 3px #3a1a04; color:#2a1206; padding:16px 16px 14px; }
+.ff-stage.ff-warm .ff-bubble::after{ display:none; }
+.ff-warm .ff-in, .ff-warm .ff-cur{ display:none !important; }
+:root:root:root:root .ff-stage.ff-warm .ff-text{ display:block; font-family:var(--f-body, Inter, sans-serif); font-weight:900; color:#2a1206; text-shadow:none; line-height:1.18; }
+.ff-stage.ff-warm .ff-text::before{ content:none; }
+/* the payoff: as big as the statement, on a gold strip */
+:root:root:root:root .ff-stage.ff-warm .ff-fact{ display:block; align-self:stretch; margin-top:10px; padding:8px 10px; border:0; border-radius:10px; background:linear-gradient(180deg, #ffe27a, #ffc21a); box-shadow:inset 0 0 0 2px #a86a00;
+  font-family:var(--f-body, Inter, sans-serif); font-weight:900; line-height:1.18; color:#3a1a04; text-shadow:none; }
+:root:root:root:root .ff-stage.ff-warm .ff-fact:empty{ display:none; }
+:root:root:root:root .ff-stage.ff-warm .ff-stamp{ font-family:var(--f-display, sans-serif); }
+/* the round lamps and TRUST YOUR GUT */
+.ff-warm .ff-dots i{ background:rgba(60,8,16,0.7); box-shadow:inset 0 0 0 2px #e6b94a; }
+.ff-warm .ff-gut{ font:900 clamp(12px, 3.3vw, 16px)/1 var(--f-display, sans-serif); letter-spacing:3px; color:#ffe9a8; text-shadow:0 2px 0 #3a0810; }
+/* Flip beside the dial, working it (a still pose; he does not pop up from the bottom here) */
+:root:root:root:root .ff-warm.ff-lie .ff-host{ display:block !important; position:absolute; z-index:3; right:-2%; top:clamp(10px, 3svh, 30px); width:min(27vw, 120px); margin:0; opacity:1 !important; transform:none !important; animation:none !important; pointer-events:none; }
+:root:root:root:root .ff-warm.ff-lie .ff-gauge{ margin-right:min(16vw, 70px); width:min(calc(100% - min(18vw, 80px)), calc(25svh * 1.5625), 520px); }
+.ff-stage.ff-warm{ position:relative; }
+.mg-factOrFib .mg-head:has(.ff-neon){ width:100% !important; align-self:stretch; }
+/* (the old sign's lettering rules reach every span in the plate: the neon logo's lines take their own colours and sizes back) */
+:root:root:root:root:root:root .mg-factOrFib .mg-sign.ff-neon .nl-l{ display:block !important; color:var(--c) !important; -webkit-text-stroke:0 !important; font-family:var(--f-display, 'Big Shoulders Display', sans-serif) !important; font-weight:900 !important; line-height:0.95 !important; letter-spacing:0.5cqw !important;
+  text-shadow:0 0 0.5cqw rgba(255,255,255,0.6), 0 0 1.6cqw var(--c), 0 0 3.4cqw var(--c), 0 0 6cqw var(--c) !important; }
+:root:root:root:root:root:root .mg-factOrFib .mg-sign.ff-neon .nl-l.lg{ font-size:13.4cqw !important; }
+:root:root:root:root:root:root .mg-factOrFib .mg-sign.ff-neon .nl-l.md{ font-size:9cqw !important; }
+:root:root:root:root:root .mg-factOrFib .mg-sign.ff-neon{ width:min(80%, 400px) !important; }
+:root:root:root:root .ff-warm.ff-lie .ff-gauge{ width:min(calc(100% - min(18vw, 80px)), calc(20svh * 1.5625), 520px); }
+.ff-stage.ff-warm.ff-lie{ gap:clamp(4px, 0.9svh, 10px) !important; }

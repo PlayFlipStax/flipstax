@@ -13308,7 +13308,7 @@ const SHARE_URL = 'https://playflipstax.com';
     ov.classList.toggle('has-plate', on);
     if (on){ p.querySelector('b').textContent = title; p.querySelector('small').textContent = sub || ''; }
     // run 2 job 2: a game with a neon sign (Riddle Round, Time Warp) shows it on the plate in place of the plain title; the small line stays under it
-    { const key = on && window.NeonLogo ? ({ 'RIDDLE ROUND':'riddle', 'TIME WARP':'timeWarp' })[String(title).toUpperCase()] : null, old = p && p.querySelector('.nl');
+    { const key = on && window.NeonLogo ? ({ 'RIDDLE ROUND':'riddle', 'TIME WARP':'timeWarp', 'EMOJI DECODE':'emojiDecode', 'PRICE PROBE':'priceProbe' })[String(title).toUpperCase()] : null, old = p && p.querySelector('.nl');
       if (key && NeonLogo.has(key)){ if (!old || !old.classList.contains('nl-' + key)){ if (old) old.remove(); p.insertAdjacentHTML('afterbegin', NeonLogo.html(key)); } p.classList.add('neon'); }
       else if (p){ p.classList.remove('neon'); if (old) old.remove(); } }
     return on;
