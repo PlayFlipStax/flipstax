@@ -3264,3 +3264,40 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 .ed-space .es-ufo.u1{ left:-2%; top:27%; }
 .ed-space .es-ufo.u2{ right:-2%; top:34%; }
 .ed-space .es-ufo.u3{ right:15%; top:22.5%; }
+
+/* ==== REDESIGN 1: THE VS CARDS (Crowd Showdown) in the Galactic Game Night world. The cards keep their own bright colours and their pop; the world
+   comes to them: a chrome MOTHERSHIP hovers in the gap between the two cards with the gold VS as its dome, a ring of running lights and a soft beam
+   fanning up over one card and down over the other; each card is a window on space - a big ringed planet rises in one corner of the top card and a
+   cratered moon sits in a corner of the bottom one - and the drifting pattern behind the pictures is now planets, saucers, rockets and stars
+   (white, see-through, so it suits any card colour). Motion: only the two existing pattern drifts (transform) and the mothership's lights (opacity,
+   one change every 0.6 s). Lite and reduced motion: all still. ==== */
+:root.mode-daily #board .half > .dd-back{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cg fill='%23fff' opacity='.2'%3E%3Ccircle cx='52' cy='58' r='22'/%3E%3Ccircle cx='190' cy='176' r='13'/%3E%3Cpath d='M150 40 l3 9 9 3 -9 3 -3 9 -3 -9 -9 -3 9 -3z'/%3E%3Cpath d='M60 170 l4 12 12 4 -12 4 -4 12 -4 -12 -12 -4 12 -4z'/%3E%3Ccircle cx='110' cy='120' r='3'/%3E%3Ccircle cx='215' cy='70' r='2.5'/%3E%3Ccircle cx='20' cy='130' r='2.5'/%3E%3Ccircle cx='130' cy='215' r='3'/%3E%3C/g%3E%3Cg fill='none' stroke='%23fff' stroke-width='5' opacity='.2'%3E%3Cellipse cx='52' cy='58' rx='38' ry='9' transform='rotate(-20 52 58)'/%3E%3C/g%3E%3Cg fill='%23000' opacity='.07'%3E%3Ccircle cx='184' cy='172' r='4'/%3E%3Ccircle cx='195' cy='181' r='2.5'/%3E%3C/g%3E%3C/svg%3E"); }
+:root.mode-daily #board .half > .dd-front{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cg fill='%23fff' opacity='.26'%3E%3Cpath d='M30 40 q2 -14 16 -14 q14 0 16 14z'/%3E%3Cellipse cx='46' cy='44' rx='30' ry='9'/%3E%3Cpath d='M132 150 c6 -14 6 -26 0 -40 c-6 14 -6 26 0 40z M124 142 l-8 10 8 -3z M140 142 l8 10 -8 -3z'/%3E%3Cpath d='M120 40 l2.5 7.5 7.5 2.5 -7.5 2.5 -2.5 7.5 -2.5 -7.5 -7.5 -2.5 7.5 -2.5z'/%3E%3Ccircle cx='40' cy='130' r='3'/%3E%3Ccircle cx='160' cy='86' r='2.5'/%3E%3Ccircle cx='84' cy='98' r='2'/%3E%3C/g%3E%3Cpath d='M36 52 L26 84 H66 L56 52z' fill='%23fff' opacity='.1'/%3E%3C/svg%3E"); }
+/* each card is a window on space: a ringed planet rising in the top card's corner, a cratered moon in the bottom card's */
+:root.mode-daily #board .half > .gloss::before, :root.mode-daily #board .half > .gloss::after{ content:''; position:absolute; pointer-events:none; }
+:root.mode-daily #board .half.top > .gloss::before{ right:-34px; top:-30px; width:150px; height:150px; border-radius:50%;
+  background:radial-gradient(circle at 36% 34%, rgba(255,255,255,0.5), rgba(255,255,255,0.2) 55%, rgba(0,0,30,0.12) 100%); box-shadow:inset -10px -12px 0 rgba(0,0,40,0.1); }
+:root.mode-daily #board .half.top > .gloss::after{ right:-76px; top:26px; width:236px; height:44px; border-radius:50%; border:6px solid rgba(255,255,255,0.42); border-bottom-color:rgba(255,255,255,0.75); transform:rotate(-22deg); }
+:root.mode-daily #board .half.bottom > .gloss::before{ left:-40px; bottom:-44px; width:160px; height:160px; border-radius:50%;
+  background:radial-gradient(circle at 62% 30%, rgba(0,0,40,0.14) 0 9px, rgba(0,0,0,0) 10px), radial-gradient(circle at 78% 56%, rgba(0,0,40,0.12) 0 14px, rgba(0,0,0,0) 15px), radial-gradient(circle at 46% 52%, rgba(0,0,40,0.1) 0 6px, rgba(0,0,0,0) 7px),
+    radial-gradient(circle at 60% 36%, rgba(255,255,255,0.5), rgba(255,255,255,0.2) 60%, rgba(0,0,30,0.12) 100%); }
+:root.mode-daily #board .half.bottom > .gloss::after{ right:16px; bottom:18px; width:20px; height:20px; border-radius:50%; background:rgba(255,255,255,0.45); box-shadow:-26px 14px 0 -6px rgba(255,255,255,0.5), 18px -40px 0 -7px rgba(255,255,255,0.5); }
+/* the MOTHERSHIP in the gap: the gold VS is its dome; a chrome hull with a ring of running lights; a beam fans over both cards */
+:root:root:root.mode-daily #board .divider{ isolation:isolate; overflow:visible; background:none; border:0; box-shadow:none; color:#4a1d00; text-shadow:0 1px 0 rgba(255,255,255,0.6); }
+:root.mode-daily #board .divider::before{ content:''; position:absolute; z-index:-1; left:50%; top:50%; width:min(244px, 64vw); height:70px; margin:-35px 0 0 calc(min(244px, 64vw) / -2); border-radius:50%; box-sizing:border-box;
+  border:3px solid #1b1440;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0) 0 25px, #7a3d00 25.5px 28px, rgba(0,0,0,0) 28.5px),
+    radial-gradient(circle at 50% 50%, rgba(255,251,224,0) 0 19px, rgba(224,154,0,0.55) 25px, rgba(0,0,0,0) 25.5px),
+    radial-gradient(circle at 50% 50%, #fff6c2 0 8px, #ffe680 15px, #ffc21a 25px, rgba(0,0,0,0) 25.5px),
+    radial-gradient(circle, #fffbe0 0 3.2px, #ffc21a 4.2px, rgba(255,194,26,0) 5.6px) 50% 86% / 26px 12px repeat-x,
+    linear-gradient(180deg, #ffffff 0%, #e4e9f7 26%, #a3acc8 44%, #5d6686 45%, #7b85a6 68%, #3c4466 100%);
+  box-shadow:0 5px 0 #1b1440, 0 0 0 2px rgba(255,255,255,0.6), 0 0 26px 5px rgba(125,249,255,0.8); }
+:root.mode-daily #board .divider::after{ content:''; position:absolute; z-index:-2; left:50%; top:50%; width:min(330px, 86vw); height:230px; margin:-115px 0 0 calc(min(330px, 86vw) / -2); pointer-events:none;
+  clip-path:polygon(34% 50%, 4% 0, 96% 0, 66% 50%, 96% 100%, 4% 100%);
+  background:linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(210,250,255,0.3) 38%, rgba(255,255,255,0.5) 50%, rgba(210,250,255,0.3) 62%, rgba(255,255,255,0) 100%);
+  animation:vsBeam 2.4s ease-in-out infinite alternate; }
+@keyframes vsBeam{ from{ opacity:0.55; } to{ opacity:1; } }
+:root.lite.mode-daily #board .divider::after{ animation:none; opacity:0.8; }
+@media (prefers-reduced-motion: reduce){ :root.mode-daily #board .divider::after{ animation:none; opacity:0.8; } }
+.paused #board .divider::after, :root.tab-hidden #board .divider::after{ animation-play-state:paused; }
