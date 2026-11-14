@@ -3232,3 +3232,35 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 /* the meter and the lamps in the family's colours */
 :root:root:root .pr-stage.pr-show .pr-meter{ background:#4a0524; border-color:#ffd23f; }
 :root:root:root .pr-stage.pr-show .pr-dots i{ background:rgba(74,5,36,0.75); box-shadow:inset 0 0 0 2px #ffd23f; }
+
+/* ==== MAKEOVER job 4: EMOJI DECODE, a stronger set. Colour family: deep-space teal and navy with gold, coral and cyan - the purple wash is gone.
+   A neon sign (lib/neon-logos.js 'emojiDecode', shown on the title plate), a lit stage floor under the saucers, three more planets (a ringed gold
+   one, a coral one, a small moon) and three saucers drifting round the TV. Motion: transform only, slow drifts (9-14 s); still in lite mode and
+   reduced motion. Small inline drawings and gradients only. ==== */
+:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode{ background:radial-gradient(ellipse 80% 40% at 50% 30%, #12607a 0%, rgba(18,96,122,0) 75%), linear-gradient(180deg, #06243c 0%, #041428 60%, #020a18 100%) !important; }
+.event-overlay.bb-emojiDecode .ed-space .es-gal{ opacity:0.28; }
+.ed-space .es-floor{ left:-10%; right:-10%; bottom:0; height:17%; background:
+  repeating-linear-gradient(90deg, rgba(255,210,63,0.5) 0 2px, rgba(255,210,63,0) 2px 46px),
+  linear-gradient(180deg, #0f5a6e 0%, #0a3346 45%, #041826 100%); border-top:3px solid #ffd23f; box-shadow:0 -6px 22px rgba(39,230,255,0.35); transform:perspective(300px) rotateX(38deg); transform-origin:50% 100%; }
+.ed-space .es-planet.a{ background:radial-gradient(circle at 60% 35%, #c8fbff 0%, #2bb8d8 50%, #0b4a66 100%); }
+.ed-space .es-planet.b{ background:radial-gradient(circle at 40% 35%, #ffe0cc 0%, #ff7a5a 55%, #8a2a1a 100%); }
+.ed-space .es-planet.c{ right:4%; top:9%; width:clamp(44px, 13vw, 110px); aspect-ratio:1; background:radial-gradient(circle at 38% 32%, #fff3c4 0%, #ffc23f 50%, #a86a00 100%); }
+.ed-space .es-planet.c > i{ position:absolute; left:-32%; right:-32%; top:38%; height:24%; border-radius:50%; border:3px solid #ffe9a8; border-bottom-color:rgba(255,233,168,0.25); transform:rotate(-18deg); }
+.ed-space .es-planet.d{ left:5%; top:13%; width:clamp(22px, 6.5vw, 54px); aspect-ratio:1; background:radial-gradient(circle at 36% 32%, #ffffff 0%, #c9d2e6 55%, #6a7696 100%); }
+.ed-space .es-planet.e{ left:-5%; top:38%; width:clamp(34px, 10vw, 84px); aspect-ratio:1; background:radial-gradient(circle at 60% 34%, #d8ffd0 0%, #4be683 50%, #0f6a3a 100%); }
+.ed-space .es-ufo{ position:absolute; display:block; width:clamp(46px, 14vw, 110px); height:auto; overflow:visible; will-change:transform; }
+.ed-space .es-ufo.u1{ left:3%; top:25%; animation:esDrift 11s ease-in-out infinite alternate; }
+.ed-space .es-ufo.u2{ right:2%; top:31%; width:clamp(36px, 11vw, 86px); animation:esDrift 9s ease-in-out -3s infinite alternate-reverse; }
+.ed-space .es-ufo.u3{ right:22%; top:3.5%; width:clamp(30px, 9vw, 70px); animation:esDrift 14s ease-in-out -6s infinite alternate; }
+@keyframes esDrift{ from{ transform:translate(-8px, -5px) rotate(-5deg); } to{ transform:translate(10px, 7px) rotate(6deg); } }
+:root.lite .ed-space .es-ufo{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .ed-space .es-ufo{ animation:none; } }
+.paused .ed-space .es-ufo, :root.tab-hidden .ed-space .es-ufo{ animation-play-state:paused; }
+/* (the neon sign is kept compact here so the four answers keep their room above Flip's speech bubble; the props sit in the gaps round the TV) */
+:root:root:root:root.mode-daily .event-overlay.has-plate.bb-emojiDecode .qz-plate.neon{ width:min(66%, 300px); margin-bottom:0; }
+:root:root:root:root.mode-daily .event-overlay.has-plate.bb-emojiDecode .qz-plate.neon > small{ margin-top:4px; }
+.ed-space .es-planet.c{ right:-5%; top:17.5%; }
+.ed-space .es-planet.d{ left:7%; top:21%; }
+.ed-space .es-ufo.u1{ left:-2%; top:27%; }
+.ed-space .es-ufo.u2{ right:-2%; top:34%; }
+.ed-space .es-ufo.u3{ right:15%; top:22.5%; }
