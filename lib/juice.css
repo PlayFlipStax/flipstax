@@ -3419,3 +3419,23 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root:root:root:root .pr-stage.pr-show .pr-ask{ position:relative; z-index:2; margin-bottom:6px; }
 :root:root:root:root .pr-stage.pr-show .pr-ask{ color:#ffffff; text-shadow:0 2px 0 #7a0a3e, 0 0 10px rgba(122,10,62,0.6); }
 :root:root:root:root .mg-priceProbe:has(.pr-show) .mg-rule{ color:#ffffff; text-shadow:0 1px 0 #4a0524; background:rgba(122,10,62,0.82); border-radius:12px; padding:6px 10px; box-shadow:0 0 0 2px rgba(255,210,63,0.7); }
+
+/* ==== REDESIGN 5: EMOJI DECODE - "alien TV, live from orbit". The TV is broadcasting from the surface of a small world: a cratered gold-lit moon
+   curves along the bottom of the screen under the stage floor, a huge ringed planet hangs behind the TV, and signal rings pulse out from the
+   antennae (scale and opacity only, 2.6 s; still in lite / reduced motion). Colour family: deep teal and navy, gold, coral and cyan. ==== */
+:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode{
+  background:
+    radial-gradient(ellipse 150% 22% at 50% 108%, #0f5a6e 0 58%, #ffd23f 59.5%, rgba(255,210,63,0.45) 63%, rgba(255,210,63,0) 80%),
+    radial-gradient(ellipse 74% 6.5% at 64% 33%, rgba(0,0,0,0) 0 62%, rgba(255,233,168,0.85) 64% 74%, rgba(0,0,0,0) 76%),
+    radial-gradient(circle at 64% 33%, #ffe9a8 0 6%, #ff9a5a 15%, #c9502a 21.4%, rgba(0,0,0,0) 21.8%),
+    radial-gradient(ellipse 80% 40% at 50% 30%, #12607a 0%, rgba(18,96,122,0) 75%),
+    linear-gradient(180deg, #06243c 0%, #041428 60%, #020a18 100%) !important; }
+.event-overlay.bb-emojiDecode .ed-ant::before, .event-overlay.bb-emojiDecode .ed-ant::after{ content:''; position:absolute; left:50%; bottom:70%; width:84%; aspect-ratio:2; margin-left:-42%; border-radius:50% 50% 0 0 / 100% 100% 0 0; pointer-events:none;
+  border:3px solid #7df9ff; border-bottom:0; opacity:0; transform-origin:50% 100%; animation:edSignal 2.6s ease-out infinite; }
+.event-overlay.bb-emojiDecode .ed-ant::after{ border-color:#ffd23f; animation-delay:-1.3s; }
+@keyframes edSignal{ 0%{ transform:scale(0.25); opacity:0; } 20%{ opacity:0.85; } 100%{ transform:scale(1.1); opacity:0; } }
+:root.lite .event-overlay.bb-emojiDecode .ed-ant::before, :root.lite .event-overlay.bb-emojiDecode .ed-ant::after{ animation:none; opacity:0.35; transform:scale(0.8); }
+@media (prefers-reduced-motion: reduce){ .event-overlay.bb-emojiDecode .ed-ant::before, .event-overlay.bb-emojiDecode .ed-ant::after{ animation:none; opacity:0.35; transform:scale(0.8); } }
+.paused .ed-ant::before, .paused .ed-ant::after, :root.tab-hidden .ed-ant::before, :root.tab-hidden .ed-ant::after{ animation-play-state:paused; }
+.ed-space .es-floor{ display:none; }
+.ed-space .es-planet.c{ display:none; }

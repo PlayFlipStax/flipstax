@@ -91,3 +91,27 @@ Risks
 - `lib/neon-logos.js`: three new icons (`gauge`, `tag`, `tv`) and three new signs. `lib/neon-logos.css`: their motion (transform only).
 - `NeonLogo.has('priceProbe')` and `has('emojiDecode')` are now true. Nothing else keys off those two names, but grep `NeonLogo.has` if a sign appears somewhere unexpected.
 - Not done: the old QA scripts in `screenshots/qa/tools/` that call removed hooks (see the earlier door / portal job).
+
+
+---
+
+# Addendum: the full redesign pass (after the note above)
+
+Five more look-only commits on `makeover`, on top of everything above. Same status: **no fast check, no lite / reduced-motion / 360x640 shots**; each screen opened once at 390x844 from the TEST menu with no console errors. All of it is CSS appended at the end of `lib/juice.css` in blocks headed `REDESIGN 1` to `REDESIGN 5` (no JS or data changes in this pass).
+
+| Screen | Commit | Idea |
+|---|---|---|
+| VS cards | `675ba9f` | A chrome mothership in the gap, the gold VS as its hub, a beam over both cards; a ringed planet / cratered moon in the card corners; the drifting pattern is planets, saucers, rockets and stars. Card colours untouched. |
+| Twin Flip | `4468a83` | The mothership's card table: hull across the top with the title as its neon sign, a tractor beam over a glass table with a teal rim, a planet horizon below. |
+| Fact or Fib | `519ef6c` | The TRUTH-O-TRON: one turquoise-and-chrome machine holds the dial, the statement ticket and the buttons; antennae with glowing bulbs. Flip is hidden on this screen. |
+| Price Probe | `8bdc706` | The tags hang from an orange-and-gold saucer over an alien sunset, with a round gold display stage. |
+| Emoji Decode | see `git log` (the commit after `8bdc706`) | Alien TV live from orbit: a big ringed planet behind the TV, a gold-lit moon horizon, signal rings from the antennae. The stage floor and the gold planet from the earlier pass are hidden. |
+
+Check, per screen
+- **VS cards**: the mothership is drawn on `.divider::before/::after` (the divider's own background is now transparent). Check the deal-in animation, the result state (crowd board over it), Infinity mode (rules are scoped to `.mode-daily`), and that the beam (a see-through white fan over both cards, opacity pulse 2.4 s) does not hurt the title plates' readability. `.gloss::before/::after` carry the planet and the moon.
+- **Twin Flip**: the hull's lower edge sits behind the title; check 360x640 and tablets, where the hull is capped at 680 px wide. The old floor-spotlight elements in `.mg-bg` are hidden while `.tf-space` is on.
+- **Fact or Fib**: the cabinet's frame takes about 50 px, so the dial is 13.5svh tall and the buttons about 110 px across at 390x844 (were about 140). Still large, but confirm the tap targets and **the longest statements at 360x640**. The antennae sit above the cabinet in the gap under the ROUND pill.
+- **Price Probe**: the saucer is `.pr-body::before` (behind the tags), the beam `.pr-body::after`. The question line has `z-index:2` so it stays above them. Check a LEAST round and the win effect.
+- **Emoji Decode**: the signal rings are `.ed-ant::before/::after` (scale + opacity, 2.6 s).
+
+Self-critique: VS, Twin Flip and Fact or Fib are clear steps up. Price Probe is better but the least resolved - the planet behind the sign reads as a pale blob and the saucer is thin. Emoji Decode gained depth, not a new composition.
