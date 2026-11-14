@@ -16878,13 +16878,8 @@ const SHARE_URL = 'https://playflipstax.com';
     // Tomorrow on FlipStax: the next episode, its countdown and a tease of its Mystery Games.
     const tomorrow = dayAfter(r.date || todayStr());
     document.getElementById('eprNextEp').textContent = 'EPISODE ' + showEpisode(tomorrow);
-    if (GAME_SELECT_ON){   // (Game Select: every game is on the screen every day)
-      const n = showSelectGames().length;
-      document.getElementById('eprTease').textContent = n ? 'Tomorrow: pick from all ' + n + ' games. Plus a new crowd, new Brain Beams and a new word.' : '';
-    } else {
-    const g = showDoorGames(tomorrow).filter(Boolean).map(mysteryName);
-    document.getElementById('eprTease').textContent = g.length ? 'Behind the Mystery Doors: ' + g.slice(0, -1).join(', ') + (g.length > 1 ? ' or ' : '') + g[g.length - 1] + '. Plus a new crowd, new Brain Beams and a new word.' : '';
-    }
+    { const n = GAME_SELECT_ON ? showSelectGames().length : showDoorGames(tomorrow).filter(Boolean).length;   // (the old 'Behind the Mystery Doors' tease is retired)
+      document.getElementById('eprTease').textContent = n ? 'Tomorrow: pick from all ' + n + ' games. Plus a new crowd, new Brain Beams and a new word.' : ''; }
     const clock = document.getElementById('eprCountdown');
     const tick = (first)=>{
       if (!first && !els.readoutOverlay.classList.contains('show')){ clearInterval(eprClockT); eprClockT = null; return; }
@@ -19475,7 +19470,7 @@ const SHARE_URL = 'https://playflipstax.com';
         lines:['Rounds 1–2 score normal points, Rounds 3–4 ×2, Rounds 5–6 ×3.',
           'Win a round’s game for an ◉ orb. Each orb is one drop in ' + GN.orbitDrop + '.'],
         chipsLabel:'Each round ends with',
-        chips:[ ['🚪 Mystery Portal', 'Round 1'], ['🎡 Mystery Wheel', 'Round 2'],
+        chips:[ ['🕹️ Select Game', 'Round 1'], ['🎡 Mystery Wheel', 'Round 2'],
                 ['⚡ ' + GN.zapWords, 'Round 3'], ['👾 ' + GN.munchMix, 'Round 4'], ['🃏 ' + GN.twinFlip, 'Round 5'], ['🛸 ' + GN.orbitDrop, 'Round 6'] ] },
       HOWTO_LAST_DAILY,
     ],
