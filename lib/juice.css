@@ -3190,3 +3190,45 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root:root:root:root:root .mg-factOrFib .mg-sign.ff-neon{ width:min(80%, 400px) !important; }
 :root:root:root:root .ff-warm.ff-lie .ff-gauge{ width:min(calc(100% - min(18vw, 80px)), calc(20svh * 1.5625), 520px); }
 .ff-stage.ff-warm.ff-lie{ gap:clamp(4px, 0.9svh, 10px) !important; }
+
+/* ==== MAKEOVER job 3: PRICE PROBE on a showcase stage (.pr-show). Colour family: orange, gold and hot pink - no blue sunburst, no purple. A neon sign
+   with gold bulbs and a swinging price tag (lib/neon-logos.js 'priceProbe'), hot-pink showcase curtains at the sides, an orange-and-gold sunburst, a
+   gold stage floor under the cream tags. The MOST / LEAST switch is the loudest thing on screen: the biggest lettering, a white ring and a glow in
+   its own colour (MOST gold on hot pink, LEAST white on electric blue - the one cool colour, so the switch can never be missed). After the reveal the
+   tags you did not pick stay full-strength cream under a light shade, so they are still easy to read. Still pictures only: nothing new animates. ==== */
+:root:root:root:root:root .mg-overlay.mg-priceProbe:has(.pr-show){
+  background:
+    linear-gradient(90deg, #d6126e 0, #ff3c9d 5%, #b80d5c 9%, rgba(184,13,92,0) 9.5%, rgba(184,13,92,0) 90.5%, #b80d5c 91%, #ff3c9d 95%, #d6126e 100%),
+    linear-gradient(180deg, rgba(0,0,0,0) 0 80%, #c9820a 80%, #7a4a00 100%),
+    radial-gradient(ellipse 60% 34% at 50% 46%, rgba(255,246,190,0.75), rgba(255,246,190,0) 72%),
+    repeating-conic-gradient(from 0deg at 50% 46%, #ff9a2e 0deg 10deg, #ffb83d 10deg 20deg),
+    #ff9a2e !important; }
+.mg-priceProbe:has(.pr-show) .mg-bg{ display:none !important; }
+/* the sign: the neon logo takes the plate's place */
+.mg-priceProbe .mg-head:has(.pp-neon){ width:100% !important; align-self:stretch; }
+:root:root:root:root:root .mg-priceProbe .mg-sign.pp-neon{ background:none !important; border:0 !important; box-shadow:none !important; padding:0 !important; width:min(78%, 400px) !important; max-width:none !important; flex:none !important; margin:0 auto 2px; display:block !important; border-radius:0 !important; }
+.mg-priceProbe .mg-sign.pp-neon::before, .mg-priceProbe .mg-sign.pp-neon::after{ display:none !important; }
+.mg-priceProbe .mg-sign.pp-neon > :not(.nl){ display:none !important; }
+.mg-priceProbe .mg-sign.pp-neon > .nl{ width:100%; margin:0; }
+:root:root:root:root:root:root .mg-priceProbe .mg-sign.pp-neon .nl-l{ display:block !important; white-space:nowrap; color:var(--c) !important; -webkit-text-stroke:0 !important; font-family:var(--f-display, 'Big Shoulders Display', sans-serif) !important; font-weight:900 !important; line-height:0.95 !important;
+  text-shadow:0 0 0.5cqw rgba(255,255,255,0.6), 0 0 1.6cqw var(--c), 0 0 3.4cqw var(--c), 0 0 6cqw var(--c) !important; }
+:root:root:root:root:root:root .mg-priceProbe .mg-sign.pp-neon .nl-l.sm{ font-size:6.8cqw !important; letter-spacing:1.4cqw !important; }
+:root:root:root:root:root:root .mg-priceProbe .mg-sign.pp-neon .nl-l.lg{ font-size:13.4cqw !important; letter-spacing:0.5cqw !important; }
+@media (max-height:700px){ :root:root:root:root:root .mg-priceProbe .mg-sign.pp-neon{ width:min(62%, 260px) !important; } }
+:root:root:root:root:root .mg-priceProbe:has(.pr-show) .mg-act{ background:linear-gradient(180deg, #7a0a3e, #4a0524) !important; border-color:#ffd23f !important; color:#fff3c4 !important; }
+:root:root:root .mg-priceProbe:has(.pr-show) .mg-rule{ color:#3a1400; text-shadow:0 1px 0 rgba(255,255,255,0.45); font-weight:900; }
+/* the question, and the switch - the loudest thing on screen */
+:root:root:root .pr-stage.pr-show .pr-ask{ color:#3a1400; text-shadow:0 2px 0 rgba(255,246,190,0.7); }
+:root:root:root .pr-stage.pr-show .pr-ask b{ margin:0 4px; padding:3px 16px 5px; border-radius:14px; font-size:1.5em; letter-spacing:2px; color:#fff07a; background:linear-gradient(180deg, #ff5cb0, #e0127a);
+  border:3px solid #ffffff; box-shadow:0 0 0 3px #7a0a3e, 0 5px 0 3px #7a0a3e, 0 0 20px 6px rgba(255,60,157,0.75); text-shadow:0 2px 0 #7a0a3e; }
+:root:root:root .pr-stage.pr-show .pr-ask b.least{ color:#ffffff; background:linear-gradient(180deg, #3fd0ff, #0a78e0); box-shadow:0 0 0 3px #063a7a, 0 5px 0 3px #063a7a, 0 0 20px 6px rgba(63,208,255,0.85); text-shadow:0 2px 0 #063a7a; }
+/* the tags: gold rims on the stage; the price plate in hot pink and gold */
+:root:root:root .pr-stage.pr-show .pr-card{ border-color:#ffd23f; box-shadow:0 0 0 2px #a86a00, 0 8px 0 2px rgba(90,40,0,0.55); }
+:root:root:root .pr-stage.pr-show .pr-p{ background:#7a0a3e; color:#ffd23f; }
+/* after the reveal: the tags you did not pick stay readable (full-strength cream under a light shade - not faded to grey) */
+:root:root:root .pr-stage.pr-show .pr-card.dim{ opacity:1; }
+:root:root:root .pr-stage.pr-show .pr-card.dim::after{ content:''; position:absolute; inset:0; border-radius:inherit; background:rgba(90,40,0,0.16); pointer-events:none; }
+:root:root:root .pr-stage.pr-show .pr-card.lit{ box-shadow:0 0 0 4px #1fae4e, 0 0 22px 6px rgba(60,220,110,0.8), 0 8px 0 4px rgba(90,40,0,0.55); }
+/* the meter and the lamps in the family's colours */
+:root:root:root .pr-stage.pr-show .pr-meter{ background:#4a0524; border-color:#ffd23f; }
+:root:root:root .pr-stage.pr-show .pr-dots i{ background:rgba(74,5,36,0.75); box-shadow:inset 0 0 0 2px #ffd23f; }
