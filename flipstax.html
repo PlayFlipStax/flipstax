@@ -11160,8 +11160,6 @@ const SHARE_URL = 'https://playflipstax.com';
       else advanceAfterTrivia();
     } else if (ph === 'secondchance' || ph === 'secondchance-resolving'){
       startSolvePhase();
-    } else if (ph === 'powerup' && !runPowerupDone){
-      runPowerUpRoundForRun(runPowerupEndsAt);
     } else if (ph === 'riddle' && currentRiddle){
       startRiddleRound(currentRiddle, riddleEndsAt);
     } else if (ph === 'powerup' && runPowerupDone && checkSecretUnlock()){
@@ -11399,7 +11397,7 @@ const SHARE_URL = 'https://playflipstax.com';
         return true;
       }
       if (st.t === 'quiz'){ showEnter('quiz', st.level || ''); runTriviaQuestion(null, null, st); if (!runShow.beamBanner){ runShow.beamBanner = true; showBeamBanner(); } return true; }
-      if (st.t === 'portal'){ showEnter('portal'); runPortalDoors = st.doors; runPowerUpRoundForRun(null); return true; }
+      if (st.t === 'portal') continue;   // (retired: the old power-up portal; no round of the show has one)
       if (st.t === 'mystery' || st.t === 'break'){
         runPhase = 'break'; saveRunSnapshot();
         const g = showEnter('mystery', st.game);
@@ -13560,125 +13558,8 @@ const SHARE_URL = 'https://playflipstax.com';
     }, { text: els.eventPrompt.textContent });   // (A+ pacing: the result gets its reading time)
   }
 
-  function runPowerUpRoundForRun(resumeEndsAt){
-    runPhase = 'powerup';
-    runPowerupDone = false;
-    runPowerupEndsAt = resumeEndsAt || (Date.now() + dt(5000));
-    const remain = Math.max(0, runPowerupEndsAt - Date.now());
-    stopTallyPolling();
-    clearRoundTimer();
-    els.eventOverlay.classList.remove('hidden');
-    els.eventOverlay.classList.add('powerup'); els.eventOverlay.classList.remove('stack'); els.eventPrompt.classList.remove('long');
-    els.powerupIcon.classList.remove('hidden');
-    fitTopChip();
-    els.eventSubtitle.textContent = '\uD83C\uDF00 ' + GN.portalPick.toUpperCase();
-    els.eventPrompt.textContent = 'Pick a portal \u2014 a power-up waits behind each';
-    // B2: four doors, a power-up behind each (the plan's order, by the date).
-    const doors = runPortalDoors || RUN_POWERUPS.map(p=> p.key);
-    els.eventTiles.forEach((tileEl,i)=>{
-      const pu = RUN_POWERUPS.find(p=> p.key === doors[i]) || RUN_POWERUPS[i];
-      tileEl.innerHTML = '<span class="pu-door">' + (i + 1) + '</span><span class="pu-prize"><span class="pu-icon">'+pu.icon+'</span><span class="pu-label">'+pu.label+'</span></span>';
-      tileEl.style.backgroundColor = '';
-      tileEl.dataset.pu = pu.key;
-      tileEl.classList.add('portal'); tileEl.classList.remove('open', 'is-right', 'is-wrong');
-      tileEl.onclick = ()=>{
-        // B9: the door rattles to a drumroll, then swings open.
-        clearTimeout(eventTimeoutId); els.eventTiles.forEach(t=> t.onclick = null);
-        tileEl.classList.add('picked-wait'); sfx.drumroll(QUIZ_DRUMROLL_MS);
-        setTimeout(()=>{ tileEl.classList.remove('picked-wait'); tileEl.classList.add('open'); portalFx(tileEl, pu.key); resolveRunPowerUp(pu.key); }, dt(QUIZ_DRUMROLL_MS));
-      };
-    });
-    hostSay(hostLine('portal'), 1500);
-    startEventTimerBar(remain, dt(5000));
-    clearTimeout(eventTimeoutId);
-    eventTimeoutId = setTimeout(()=> resolveRunPowerUp(null), remain);
-    saveRunSnapshot();
-  }
-  function resolveRunPowerUp(key){
-    if (runPhase !== 'powerup' || runPowerupDone) return;
-    runPowerupDone = true;
-    clearTimeout(eventTimeoutId);
-    els.eventTiles.forEach(t=> t.onclick = null);
-    if (key !== null) runPowerupPickOrder.push(key);
-    if (key === 'wildcard' && runPowerupPickOrder.filter(k=> k === 'wildcard').length === 1){ progress.wildRuns++; saveProgress(); }
-    // Wild Card: decided now (and saved) so a refresh mid-spin can't re-roll it.
-    let wildWin = false;
-    if (key === 'wildcard'){
-      wildWin = Math.random() < 0.5;
-      const floor = runThresholdsHit.length ? Math.max.apply(null, runThresholdsHit) : 0;
-      runWildcardDelta = wildWin ? 25 : -Math.max(0, Math.min(25, runScore - floor));
-    }
-    saveRunSnapshot();
-    els.eventOverlay.classList.remove('powerup');
-    els.eventSubtitle.textContent = '';
-    if (key === null){
-      els.eventPrompt.textContent = '\u23F1\uFE0F Power-up expired';
-      finishRunPowerUp();
-    } else if (key === 'points10'){
-      sfx.powerUp();
-      addRunScore(10);
-      els.eventPrompt.textContent = '\u26A1 +10 points!';
-      finishRunPowerUp();
-    } else if (key === 'slowclock'){
-      sfx.powerUp();
-      runWarpBonusMs += RUN_WARP_BONUS_MS;
-      saveRunSnapshot();
-      els.eventPrompt.textContent = '\u23F1\uFE0F +' + Math.round(RUN_WARP_BONUS_MS / 1000) + 's banked for the ' + GN.wordWarp;
-      finishRunPowerUp();
-    } else if (key === 'wildcard'){
-      let ticks = 0;
-      els.eventPrompt.classList.remove('wildcard-pop');
-      void els.eventPrompt.offsetWidth;
-      els.eventPrompt.classList.add('wildcard-pop');
-      const rollInterval = setInterval(()=>{
-        sfx.spinTick(ticks);
-        els.eventPrompt.textContent = '\uD83C\uDF81 ' + pick(['+25?','\u221225?']);
-        ticks++;
-        if (ticks >= 6){
-          clearInterval(rollInterval);
-          if (runWildcardDelta == null) return;   // run left mid-spin; resume applies it
-          const delta = runWildcardDelta; runWildcardDelta = null;
-          if (wildWin){ addRunScore(delta); sfx.correct(); els.eventPrompt.textContent = '\uD83C\uDF81 ' + GN.cosmicSurprise.toUpperCase() + ': +25 points!'; }
-          else{
-            // A loss can't drop the score below the last trivia milestone
-            // reached (a full -25 used to open ~2.5-minute gaps before the
-            // next trivia). Already below it (a missed trivia) = no loss.
-            const floor = runThresholdsHit.length ? Math.max.apply(null, runThresholdsHit) : 0;
-            const loss = -delta;
-            addRunScore(-loss);
-            sfx.wrong();
-            els.eventPrompt.textContent = '\uD83C\uDF81 ' + GN.cosmicSurprise.toUpperCase() + ': ' + (loss === 25 ? '\u221225 points'
-              : loss > 0 ? ('\u2212' + loss + ' points (floored at ' + floor + ')') : 'no points lost \u2014 your milestone is safe');
-          }
-          finishRunPowerUp();
-        }
-      }, 90);
-    } else if (key === 'hint'){
-      sfx.powerUp();
-      runHintsRevealed = Math.min(runHintsRevealed + 1, runWord.hints.length);
-      saveRunSnapshot();
-      els.eventPrompt.textContent = '\ud83d\udca1 Free hint banked for the word solve';
-      finishRunPowerUp();
-    }
-  }
-  function finishRunPowerUp(){
-    setTimeout(()=>{
-      if (DEBUG_FAST && window.__holdResult) return;   // tests: keep the result on screen
-      els.eventOverlay.classList.add('hidden');
-      if (!runActive) return;
-      // The secret's trigger lives here now, not in trivia: check right
-      // after every power-up resolves, since that's the only place the
-      // required 5-step order can ever actually complete.
-      if (checkSecretUnlock()){
-        riddleTriggeredThisRun = true;
-        startRiddleRound();
-        return;
-      }
-      els.eventTiles.forEach(t=>{ t.classList.remove('portal', 'open', 'pu-points10', 'pu-slowclock', 'pu-wildcard', 'pu-hint'); delete t.dataset.pu; });
-      if (runClockExpired()){ goToFinale(); return; }
-      showDoneFrom(['portal'], 'portal pick');
-    }, dt(cine(1500)));
-  }
+  // (the Daily power-up portal - "Pick a portal, a power-up waits behind each" - is retired: no round of the show has a portal step, so
+  // runPowerUpRoundForRun / resolveRunPowerUp / finishRunPowerUp were unreachable and are removed; Infinity's own power-up drop is unchanged)
 
   // The Super Secret Hidden Riddle (see checkSecretUnlock). Visually
   // and mechanically distinct from the regular trivia/power-up overlay -
@@ -19217,7 +19098,6 @@ const SHARE_URL = 'https://playflipstax.com';
       startColdOpenTap: () => showCard.click(),
       playSfx: (name, arg) => { const errs = []; try{ sfx[name](arg); }catch(e){ errs.push(String(e)); } return { name, on: soundOn, ctx: audioCtx ? audioCtx.state : null, errs }; },
       dailyVault: (score, bonus) => { playDailyVault({ score, warpPoints: bonus || 0, comboBonus: 0 }, ()=>{ window.__dailyVaultDone = true; }); return 'ok'; },
-      showRunPowerUp: () => runPowerUpRoundForRun(),
       showInfTrivia: () => runWildEvent(),
       showInfPowerUp: () => runPowerUpRound(),
       holdEvent: () => { clearTimeout(eventTimeoutId); },
@@ -19882,7 +19762,6 @@ const SHARE_URL = 'https://playflipstax.com';
       { label:'Commercial break', go: atType(s=> s.t === 'act' && (RUNDOWN.acts[s.act] || {}).id === 'r3', 0, 70, 2, (i)=>{ runPlan.splice(i, 0, { t:'sponsor', forced:true }); }) },
       { label:'Round 3 card', go: roundCard(3) },
       { label:'Select Game', go: roundGame('door', 96, 3) },
-      { label:'Portal Pick (old)', go: atType(doorStep, 0, 96, 3, (i)=>{ runPlan.splice(i, 0, { t:'portal', act:runPlan[i].act, doors: RUN_POWERUPS.map(p=> p.key) }); }) },
       { label:'Round 5 card', go: roundCard(5) },
       { label:'Mystery Wheel', go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = null; }) },
       ...['JACKPOT +100', 'ORB +1', 'GOOP -25', 'Mystery: Saucer Shuffle', '+25', 'GOOP -50', 'ORB +1 (2)', 'LOSE A SPIN', 'Riddle Round', 'DANCE PARTY'].map((t, i)=> ({ label:'Wheel: ' + t, go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = i; }) })),
