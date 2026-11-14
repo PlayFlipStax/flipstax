@@ -3439,3 +3439,34 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 .paused .ed-ant::before, .paused .ed-ant::after, :root.tab-hidden .ed-ant::before, :root.tab-hidden .ed-ant::after{ animation-play-state:paused; }
 .ed-space .es-floor{ display:none; }
 .ed-space .es-planet.c{ display:none; }
+
+/* ==== NEW COMPOSITION, PRICE PROBE: "THE COSMIC BAZAAR". A new layout, not a re-skin: the three lots are stacked as wide hover-trays (the item in
+   a round porthole on the left, its name and detail in the middle, a big price plate on the right) - large, easy targets - in front of a retro
+   sci-fi sunset: a striped synth sun going down behind the domes and spires of an alien bazaar, a neon grid floor running to the horizon, a ringed
+   planet and two small saucers in the sky. Colour family: hot pink, orange and gold. One still drawing (a small inline SVG) on a gradient sky:
+   nothing animates but the game's own effects. (The earlier saucer, beam, curtains and pale planet are gone.) ==== */
+:root:root:root:root:root:root:root .mg-overlay.mg-priceProbe:has(.pr-show){
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 844' preserveAspectRatio='xMidYMax slice'%3E%3Cdefs%3E%3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff6b0'/%3E%3Cstop offset='.55' stop-color='%23ffc21a'/%3E%3Cstop offset='1' stop-color='%23ff6a3a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='195' cy='566' r='158' fill='url(%23s)'/%3E%3Cg fill='%23ff7a5a'%3E%3Crect x='30' y='560' width='330' height='5'/%3E%3Crect x='30' y='584' width='330' height='8'/%3E%3Crect x='30' y='612' width='330' height='11'/%3E%3Crect x='30' y='644' width='330' height='15'/%3E%3Crect x='30' y='680' width='330' height='20'/%3E%3C/g%3E%3Cg fill='%237a0a3e'%3E%3Cellipse cx='84' cy='392' rx='24' ry='6'/%3E%3Cpath d='M72 390 q12 -16 24 0z'/%3E%3Cellipse cx='318' cy='432' rx='18' ry='4.5'/%3E%3Cpath d='M309 431 q9 -12 18 0z'/%3E%3Cpath d='M0 716 V676 h18 v-32 q16 -32 32 0 v32 h16 v-74 l11 -26 l11 26 v74 h20 q26 -54 52 0 h14 v-48 h14 v-32 l9 -20 l9 20 v32 h14 v48 h18 q32 -64 64 0 h12 v-84 l10 -24 l10 24 v84 h22 v-38 q17 -30 34 0 v38 h20 V716Z'/%3E%3C/g%3E%3Cg fill='%23ffe27a'%3E%3Crect x='28' y='656' width='5' height='7'/%3E%3Crect x='84' y='628' width='4' height='8'/%3E%3Crect x='84' y='650' width='4' height='8'/%3E%3Crect x='134' y='668' width='6' height='6'/%3E%3Crect x='196' y='640' width='4' height='9'/%3E%3Crect x='258' y='664' width='6' height='6'/%3E%3Crect x='296' y='620' width='4' height='9'/%3E%3Crect x='296' y='646' width='4' height='9'/%3E%3Crect x='350' y='690' width='5' height='7'/%3E%3C/g%3E%3Crect y='714' width='390' height='130' fill='%234a0524'/%3E%3Cg stroke='%23ff4fa8' stroke-width='2' opacity='.85'%3E%3Cpath d='M0 716 H390 M0 728 H390 M0 746 H390 M0 772 H390 M0 808 H390'/%3E%3Cpath d='M195 716 V844 M150 716 L60 844 M105 716 L-90 844 M240 716 L330 844 M285 716 L480 844 M60 716 L-260 844 M330 716 L650 844'/%3E%3C/g%3E%3C/svg%3E") center bottom / cover no-repeat,
+    radial-gradient(circle at 18% 9%, #ffffff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 72% 6%, #ffffff 0 1.4px, rgba(255,255,255,0) 2.2px), radial-gradient(circle at 90% 20%, #fff 0 1.1px, rgba(255,255,255,0) 1.9px), radial-gradient(circle at 8% 24%, #fff 0 1.1px, rgba(255,255,255,0) 1.9px),
+    linear-gradient(180deg, #8a0a4a 0%, #d6126e 22%, #ff4f7a 44%, #ff8a3c 66%, #ffc24a 84%) !important; }
+/* the sign and the rule on the new sky */
+:root:root:root:root:root .mg-priceProbe:has(.pr-show) .mg-rule{ background:rgba(74,5,36,0.86); box-shadow:0 0 0 2px #ffd23f; }
+/* the three lots: wide hover-trays, stacked */
+:root:root:root:root:root .pr-stage.pr-show .pr-body::before, :root:root:root:root:root .pr-stage.pr-show .pr-body::after{ display:none; }
+:root:root:root:root:root .pr-stage.pr-show .pr-cards{ flex-direction:column; gap:clamp(12px, 2.2svh, 20px); justify-content:center; }
+:root:root:root:root:root .pr-stage.pr-show .pr-card, :root:root:root:root:root .pr-stage.pr-show .pr-card:nth-child(n){ flex:1 1 0; max-height:128px; min-height:84px; margin:0; transform:none; display:grid; grid-template-columns:clamp(68px, 21vw, 104px) minmax(0, 1fr) auto; grid-template-rows:1fr auto auto 1fr; column-gap:10px; align-items:center; justify-items:start; text-align:left;
+  padding:6px 10px 6px 8px; border-radius:60px 18px 18px 60px; border:3px solid #ffffff; background:linear-gradient(180deg, #fffdf2 0%, #ffeeb8 100%);
+  box-shadow:0 0 0 3px #a80b54, 0 6px 0 3px #5a0530, 0 18px 14px -8px rgba(74,5,36,0.75), 0 0 18px 2px rgba(255,230,130,0.55); }
+:root:root:root:root:root .pr-stage.pr-show .pr-card::before{ content:''; position:absolute; left:8%; right:8%; top:auto; bottom:-17px; width:auto; height:10px; margin:0; border-radius:50%; background:radial-gradient(ellipse closest-side, rgba(255,246,190,0.95), rgba(255,246,190,0)); box-shadow:none; }
+:root:root:root:root:root .pr-stage.pr-show .pr-card::after{ display:none; }
+:root:root:root:root:root .pr-stage.pr-show .pr-g{ grid-column:1; grid-row:1 / 5; justify-self:center; margin:0 !important; width:100%; aspect-ratio:1; max-height:100%; display:flex; align-items:center; justify-content:center; border-radius:50%;
+  font-size:clamp(38px, 11.5vw, 60px); background:radial-gradient(circle at 40% 32%, #ffffff 0%, #ffe3f1 60%, #ffc2de 100%); box-shadow:inset 0 0 0 3px #ff3c9d, inset 0 0 0 6px #ffffff, 0 0 0 2px #a80b54; }
+:root:root:root:root:root .pr-stage.pr-show .pr-n{ grid-column:2; grid-row:2; font-size:clamp(19px, 5.6vw, 30px); line-height:1.05; color:#3a1400; }
+:root:root:root:root:root .pr-stage.pr-show .pr-d{ grid-column:2; grid-row:3; font-size:clamp(13px, 3.7vw, 19px); color:#a05a1a; margin-top:2px; }
+:root:root:root:root:root .pr-stage.pr-show .pr-p{ grid-column:3; grid-row:1 / 5; margin:0; min-width:clamp(74px, 22vw, 116px); min-height:clamp(44px, 12vw, 62px); padding:4px 10px; border-radius:14px; font-size:clamp(22px, 6.4vw, 36px);
+  background:linear-gradient(180deg, #a80b54, #5a0530); color:#ffe27a; box-shadow:inset 0 0 0 2px #ffd23f, 0 3px 0 #2a0218; }
+:root:root:root:root:root .pr-stage.pr-show .pr-card.lit{ background:linear-gradient(180deg, #f1ffe6, #a8f08a); box-shadow:0 0 0 4px #1fae4e, 0 6px 0 4px #0a5a2a, 0 0 24px 6px rgba(80,230,120,0.85); }
+:root:root:root:root:root .pr-stage.pr-show .pr-card.dim::after{ display:block; content:''; position:absolute; inset:0; border-radius:inherit; background:rgba(74,5,36,0.14); pointer-events:none; left:0; top:0; width:auto; height:auto; margin:0; }
+/* the meter: a slim neon tube at the side */
+:root:root:root:root:root .pr-stage.pr-show .pr-meter{ background:rgba(74,5,36,0.9); box-shadow:inset 0 0 0 2px #ffd23f, 0 0 12px rgba(255,210,63,0.6); }
