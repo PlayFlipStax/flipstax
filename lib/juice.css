@@ -3622,3 +3622,35 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 @media (max-height:700px){ :root:root:root:root:root:root:root:root .ff-warm.ff-lie .ff-gauge{ width:min(60%, calc(12svh * 1.5625), 300px); } :root:root:root:root:root:root .ff-stage.ff-warm.ff-lie .ff-btn{ width:clamp(84px, min(28vw, 13.5svh), 120px); } :root:root:root:root:root:root:root .ff-stage.ff-warm.ff-lie{ margin-top:24px; margin-bottom:16px; padding:6px 10px 10px; } }
 /* the buttons' deck: a darker inset panel so they read as mounted on the machine */
 :root:root:root:root:root:root .ff-stage.ff-warm.ff-lie .ff-btns{ align-self:stretch; padding:8px 6px 10px; border-radius:18px; background:linear-gradient(180deg, #0f6a60, #0a4a44); box-shadow:inset 0 3px 8px rgba(0,0,0,0.45), 0 0 0 2px #baffef; }
+
+/* ==== VS cards cleanup: no stickers on the cards (planet, saucer, alien, rocket removed); the mothership behind VS redrawn as one clean saucer -
+   a teal glass dome round the gold VS coin, a chrome hull with a dark rim and a row of gold lights; the beam stays faint. ==== */
+:root:root:root.mode-daily #board .half > .gloss::before, :root:root:root.mode-daily #board .half > .gloss::after{ display:none !important; }
+:root:root:root:root.mode-daily #board .divider{ box-shadow:none; border-radius:50%; }
+:root:root:root.mode-daily #board .divider::before{ width:min(250px, 66vw); height:58px; margin:-20px 0 0 calc(min(250px, 66vw) / -2); border:3px solid #0c1838; border-radius:50%;
+  background:
+    radial-gradient(circle, #fffbe0 0 3px, #ffc21a 4.2px, rgba(255,194,26,0) 5.8px) 50% 62% / 24px 12px repeat-x,
+    linear-gradient(180deg, #f4f8ff 0%, #c9d2e8 34%, #8692b4 50%, #4a5578 51%, #2a3458 100%);
+  box-shadow:0 4px 0 #0c1838, 0 0 20px 3px rgba(125,249,255,0.55); }
+:root:root:root.mode-daily #board .divider::after{ width:86px; height:86px; margin:-52px 0 0 -43px; clip-path:none; border-radius:50%; z-index:-1; animation:none; opacity:1;
+  background:radial-gradient(circle at 38% 30%, rgba(255,255,255,0.85) 0 8%, rgba(190,248,255,0.55) 30%, rgba(39,180,220,0.45) 70%, rgba(14,90,130,0.6) 100%);
+  border:3px solid #0c1838; box-sizing:border-box; }
+/* (VS saucer, take 2: the gold VS coin sits in front, centred on a chrome hull; a teal glass dome rises behind it out of the hull's top) */
+:root:root:root:root:root.mode-daily #board .divider{ border:3px solid #7a3d00; border-radius:50%;
+  background:radial-gradient(circle at 34% 28%, #fffbe0 0%, #ffe680 22%, #ffc21a 52%, #e09a00 86%); color:#4a1d00; text-shadow:0 1px 0 rgba(255,255,255,0.6);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,0.75), inset 0 -4px 0 rgba(122,61,0,0.35), 0 3px 0 #5a2a00, 0 0 14px rgba(255,210,63,0.7); }
+:root:root:root:root.mode-daily #board .divider::before{ width:min(270px, 70vw); height:48px; margin:-14px 0 0 calc(min(270px, 70vw) / -2); border:3px solid #0c1838;
+  background:
+    radial-gradient(circle, #fffbe0 0 3px, #ff4fa8 4.2px, rgba(255,79,168,0) 5.8px) 50% 58% / 26px 12px repeat-x,
+    linear-gradient(180deg, #ffffff 0%, #d4dcef 30%, #9aa6c6 48%, #56628a 52%, #3a4570 78%, #222b4a 100%);
+  box-shadow:0 4px 0 #0c1838, 0 0 22px 4px rgba(125,249,255,0.6); }
+:root:root:root:root.mode-daily #board .divider::after{ width:112px; height:56px; margin:-50px 0 0 -56px; border-radius:56px 56px 0 0; border:3px solid #0c1838; border-bottom:0; z-index:-2;
+  background:radial-gradient(ellipse at 36% 30%, rgba(255,255,255,0.9) 0 10%, rgba(190,248,255,0.75) 34%, #27b8dc 78%, #0e6a92 100%); }
+/* (VS saucer, take 3: the whole saucer is one drawing behind the coin - glass dome, chrome hull, pink lights - and the gold coin is drawn on top of it,
+   both under the VS lettering) */
+:root:root:root:root:root:root.mode-daily #board .divider{ background:none; border:0; box-shadow:none; }
+:root:root:root:root:root.mode-daily #board .divider::before{ width:min(290px, 76vw); height:110px; margin:-62px 0 0 calc(min(290px, 76vw) / -2); border:0; border-radius:0; box-shadow:none; z-index:-2;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 290 110'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.38' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23ffffff'/%3E%3Cstop offset='.35' stop-color='%23c8faff'/%3E%3Cstop offset='1' stop-color='%231a8fb8'/%3E%3C/radialGradient%3E%3ClinearGradient id='h' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23ffffff'/%3E%3Cstop offset='.42' stop-color='%23b7c2dc'/%3E%3Cstop offset='.5' stop-color='%23606c94'/%3E%3Cstop offset='1' stop-color='%23262f52'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M85 62 C85 4 205 4 205 62Z' fill='url(%23g)' stroke='%230c1838' stroke-width='4'/%3E%3Cpath d='M104 30 C112 18 126 13 138 13' fill='none' stroke='%23fff' stroke-width='5' stroke-linecap='round' opacity='.8'/%3E%3Cellipse cx='145' cy='70' rx='140' ry='30' fill='url(%23h)' stroke='%230c1838' stroke-width='4'/%3E%3Cpath d='M22 66 Q145 52 268 66' fill='none' stroke='%23fff' stroke-opacity='.7' stroke-width='3'/%3E%3Cg fill='%23ff4fa8' stroke='%23fff' stroke-width='2'%3E%3Ccircle cx='38' cy='76' r='5'/%3E%3Ccircle cx='70' cy='83' r='5'/%3E%3Ccircle cx='220' cy='83' r='5'/%3E%3Ccircle cx='252' cy='76' r='5'/%3E%3C/g%3E%3Cpath d='M110 99 L100 108 M180 99 L190 108' stroke='%237df9ff' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  filter:drop-shadow(0 0 10px rgba(125,249,255,0.6)); }
+:root:root:root:root:root.mode-daily #board .divider::after{ width:58px; height:58px; margin:-29px 0 0 -29px; border-radius:50%; border:3px solid #7a3d00; box-sizing:border-box; z-index:-1; clip-path:none; opacity:1; animation:none;
+  background:radial-gradient(circle at 34% 28%, #fffbe0 0%, #ffe680 22%, #ffc21a 52%, #e09a00 86%); box-shadow:inset 0 2px 0 rgba(255,255,255,0.75), 0 3px 0 #5a2a00, 0 0 12px rgba(255,210,63,0.8); }
