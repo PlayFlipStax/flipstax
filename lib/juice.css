@@ -3301,3 +3301,49 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root.lite.mode-daily #board .divider::after{ animation:none; opacity:0.8; }
 @media (prefers-reduced-motion: reduce){ :root.mode-daily #board .divider::after{ animation:none; opacity:0.8; } }
 .paused #board .divider::after, :root.tab-hidden #board .divider::after{ animation-play-state:paused; }
+
+/* ==== REDESIGN 2: TWIN FLIP - "the mothership's card table". The whole screen is one space scene: a chrome mothership hangs at the top with the
+   title as the neon sign on its hull, its tractor beam falls over a glass card table held in the beam, and far below a huge glowing planet curves
+   along the bottom of the screen with a thin bright rim. Colour family: electric teal and deep navy, gold lettering, coral accents - no maroon, no
+   purple. Card backs: the grey alien on its nebula inside a chrome-and-teal frame; face-up cards are bright star-chart cards. Motion: none new - the
+   scene is still (gradients and two small inline drawings), so it costs nothing while the cards flip. ==== */
+:root:root:root:root:root .mg-overlay.mg-twinFlip, :root:root:root:root:root.stage-on .mg-overlay.mg-twinFlip{
+  background:
+    radial-gradient(circle at 12% 30%, #ffffff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 88% 24%, #ffffff 0 1.4px, rgba(255,255,255,0) 2.2px),
+    radial-gradient(circle at 94% 58%, #fff3c4 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 5% 66%, #ffffff 0 1.3px, rgba(255,255,255,0) 2px),
+    radial-gradient(circle at 70% 8%, #ffffff 0 1px, rgba(255,255,255,0) 1.8px), radial-gradient(circle at 26% 12%, #bff8ff 0 1.2px, rgba(255,255,255,0) 2px),
+    radial-gradient(ellipse 140% 30% at 50% 108%, #0b3d52 0 62%, #7df9ff 63.2%, rgba(39,230,255,0.5) 66%, rgba(39,230,255,0) 84%),
+    radial-gradient(ellipse 140% 30% at 50% 108%, #1a7a8c 0 24%, #0b3d52 62%, rgba(0,0,0,0) 62.5%),
+    radial-gradient(ellipse 80% 34% at 50% 6%, rgba(39,230,255,0.4), rgba(39,230,255,0) 72%),
+    radial-gradient(ellipse 60% 30% at 86% 46%, rgba(255,110,150,0.2), rgba(255,110,150,0) 70%),
+    linear-gradient(180deg, #041a33 0%, #06243f 46%, #020d1f 100%) !important; }
+/* the scene layer: the mothership's hull across the top, and its tractor beam */
+:root:root:root:root .mg-overlay.mg-twinFlip .mg-bg{ display:block !important; background:none !important; -webkit-mask-image:none !important; mask-image:none !important; overflow:hidden; }
+.mg-twinFlip:has(.tf-space) .mg-bg > *{ display:none !important; }
+:root:root:root .mg-twinFlip:has(.tf-space) .mg-bg::before{ content:''; position:absolute; left:50%; top:-78px; width:min(132%, 680px); height:276px; margin:0 0 0 calc(min(132%, 680px) / -2); border-radius:50%; box-sizing:border-box; animation:none !important; transform:none; opacity:1;
+  border:3px solid #0c1838;
+  background:
+    radial-gradient(circle, #fffbe0 0 3.6px, #ffc21a 4.8px, rgba(255,194,26,0) 6.6px) 50% 95.5% / 30px 14px repeat-x,
+    radial-gradient(circle, #bff8ff 0 5px, #27e6ff 6.5px, #0c1838 7.5px 9px, rgba(0,0,0,0) 9.5px) 50% 71% / 46px 22px repeat-x,
+    linear-gradient(180deg, #0f1a3a 0%, #2a3760 46%, #56628a 62%, #aab3cf 80%, #e9eefb 88%, #6a7598 93%, #232e52 100%);
+  box-shadow:0 6px 0 #0c1838, 0 0 40px 6px rgba(39,230,255,0.55); }
+:root:root:root .mg-twinFlip:has(.tf-space) .mg-bg::after{ content:''; position:absolute; z-index:0; inset:192px 0 10% 0; border:0; border-radius:0; box-shadow:none; pointer-events:none;
+  clip-path:polygon(22% 0, 78% 0, 100% 100%, 0 100%);
+  background:linear-gradient(180deg, rgba(160,248,255,0.5) 0%, rgba(39,230,255,0.2) 40%, rgba(39,230,255,0.05) 100%); }
+/* the title: the neon sign on the hull */
+:root:root:root:root .tf-stage.tf-space .tf-title{ transform:none; margin:0 auto 10px; padding:8px 20px 9px; border-radius:14px; background:linear-gradient(180deg, #071530, #0b2046); border:3px solid #27e6ff;
+  box-shadow:0 0 0 2px #06102a, 0 0 14px 2px rgba(39,230,255,0.85), inset 0 0 14px rgba(39,230,255,0.35); }
+:root:root:root:root .tf-stage.tf-space .tf-title::before, :root:root:root:root .tf-stage.tf-space .tf-title::after{ display:none; }
+:root:root:root:root .tf-stage.tf-space .tf-title span{ color:#fff6c2; background:none; -webkit-text-fill-color:#fff6c2; -webkit-text-stroke:0; filter:none; letter-spacing:4px; font-size:clamp(32px, 10.4vw, 48px);
+  text-shadow:0 0 6px #ffd23f, 0 0 16px rgba(255,190,40,0.95), 0 0 30px rgba(255,150,40,0.7), 0 2px 0 #7a4a00; }
+:root:root:root:root .tf-stage.tf-space .tf-title .ts{ color:#7df9ff; text-shadow:0 0 8px #27e6ff, 0 0 16px rgba(39,230,255,0.8); font-size:18px; }
+:root:root:root:root .tf-stage.tf-space .tf-title .tw{ color:#bff8ff; }
+/* the card table: a pane of glass held in the beam, a teal neon rim, the galaxy glowing through it */
+:root:root:root:root .tf-stage.tf-space .tf-grid{ border:3px solid #7df9ff; border-radius:20px; box-shadow:0 0 0 3px #06102a, 0 0 22px 4px rgba(39,230,255,0.7), inset 0 0 26px rgba(39,230,255,0.28), 0 18px 30px -8px rgba(0,0,0,0.6); }
+/* the cards: a chrome-and-teal frame round the nebula back; a bright star-chart face */
+:root:root:root:root .tf-stage.tf-space .tf-tile, :root:root:root:root .tf-stage.tf-space .tf-tile:nth-child(n){ border:2px solid #dfe9ff; background:linear-gradient(160deg, #1d4f80, #0a1c40); box-shadow:inset 0 0 0 2px rgba(125,249,255,0.55), 0 5px 0 #030a1c, 0 0 10px rgba(39,230,255,0.35); border-radius:13px; }
+:root:root:root:root .tf-stage.tf-space .tf-tile.up{ background:radial-gradient(circle at 50% 46%, #ffffff 0%, #eafcff 55%, #bfeeff 100%); border-color:#ffffff; box-shadow:inset 0 0 0 2px rgba(39,230,255,0.5), 0 5px 0 #030a1c, 0 0 16px 2px rgba(125,249,255,0.75); }
+:root:root:root:root .tf-stage.tf-space .tf-tile.up:not(.done){ border-color:#ffd23f; box-shadow:inset 0 0 0 2px rgba(255,210,63,0.6), 0 6px 0 #030a1c, 0 0 0 3px rgba(255,210,63,0.9), 0 0 18px 4px rgba(255,210,63,0.8); }
+:root:root:root:root .tf-stage.tf-space .tf-tile.done{ border-color:#7df9ff; box-shadow:inset 0 0 0 2px rgba(39,230,255,0.5), 0 5px 0 #030a1c; }
+:root:root:root:root .tf-stage.tf-space .tf-pairs{ background:#06102a; border:2px solid #7df9ff; color:#eafcff; text-shadow:0 0 8px rgba(39,230,255,0.9); box-shadow:0 0 12px rgba(39,230,255,0.6); }
+.mg-twinFlip:has(.tf-space) .mg-rule{ color:#eafcff; text-shadow:0 2px 0 #020d1f; }
