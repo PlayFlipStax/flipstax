@@ -115,3 +115,62 @@ Check, per screen
 - **Emoji Decode**: the signal rings are `.ed-ant::before/::after` (scale + opacity, 2.6 s).
 
 Self-critique: VS, Twin Flip and Fact or Fib are clear steps up. Price Probe is better but the least resolved - the planet behind the sign reads as a pale blob and the saucer is thin. Emoji Decode gained depth, not a new composition.
+
+
+---
+
+# Addendum 2: the six-screen design pass (latest; supersedes the notes above where they differ)
+
+Design only. **No fast check, no lite / reduced-motion screenshots.** Each screen was opened from the TEST menu at 390x844 with no console errors; Fact or Fib was also measured at 360x640. Everything is CSS appended at the end of `lib/juice.css` (no JS, no data, `data/schedule.js` untouched). Later blocks override earlier ones for the same screen, so the earlier "REDESIGN" blocks for Price Probe and Emoji Decode are now mostly dead CSS - safe to prune once the look is approved.
+
+| # | Screen | Commit | Idea |
+|---|---|---|---|
+| 1 | Price Probe | `2643307` | THE COSMIC BAZAAR. New layout: three wide stacked hover-trays (item in a round porthole, name + detail, big price plate). Behind: a striped synth sun setting behind an alien bazaar skyline, a neon grid floor. |
+| 2 | Emoji Decode | `b6a9b26` | THE DECODER DECK. New layout: emoji on a big cyan hologram projected from a starship console; the four answers are a 2x2 block of chunky console keys with letter caps. |
+| 3 | Snap Sort | `12d0459` | ALIEN RADAR. A chrome-bezel radar scope with green rings and a turning sweep; amber timer lamps on the bezel; a saucer at the centre; words are phosphor-green blips; gold-green lock on a right tap, red on a wrong one; the category on an amber mission plate. Built on the existing Snap Sort screen (it runs; TEST menu "Snap Sort: easy"). |
+| 4 | VS cards | `f78e1e2` | Full-colour cartoon stickers on every card (ringed planet + saucer on top; peeking green alien + rocket on the bottom) and a bigger mothership in the gap. |
+| 5 | Twin Flip | `1b3beae` | The top is the mothership itself: chrome hull, teal dome, three windows with grey aliens watching, gold lights, a beam emitter; the title is its neon sign; matched pairs glow gold and teal. |
+| 6 | Fact or Fib | see `git log` (the commit after `1b3beae`) | Layout fix: buttons wholly inside the cabinet on an inset deck, clear of the timer bar and score chip (measured at 390x844 and 360x640). |
+
+## What Opus needs to finish, per screen
+
+**Price Probe**
+- Check 360x640: three trays must fit `.pr-body` (rows are `flex:1`, min 84 px, max 128 px).
+- A LEAST round, the reveal (lit tag green, unpicked tags under a light shade), and the win effect (`pr-winfx` reads the sign's rectangle).
+- Long item names: the name wraps in the middle column; check the longest names and details do not push the price plate off.
+- The meter is still a vertical tube on the right.
+
+**Emoji Decode**
+- **Answer text**: the keys force `white-space:normal` and a fixed size with `!important`, overriding the inline sizes `edFit` sets. Check the longest answers wrap to at most 3 lines in a key at 360 px wide; if not, teach `edFit` about the 2x2 layout instead of the CSS override.
+- The flip-in covers (`.ed-cover`), the green tick / red X marks (now on the key's top-right corner), PERFECT DECODE and the big X.
+- The emoji row still uses `edFit` to fit the hologram.
+- 360x640 has its own block (`max-height:700px`): hologram 118 px, keys 74 px. Not looked at.
+
+**Snap Sort**
+- It is on hold in the show; nothing was re-enabled. The wheel's mystery wedge still plays Saucer Shuffle / ZiG Zap - wiring Snap Sort in is yours.
+- The items are still WORDS spiralling into the centre (the existing mechanic). The brief's "things fly by" with pictures (dolphin, shark) needs item art or emoji in the data and probably a new flight path - a mechanics decision, not done.
+- **Win and loss moments were not designed** beyond the tap feedback: the round ends through the shared result card. Suggested: on a good round the sweep speeds up and the scope floods gold-green with "ALL CLEAR"; on a poor one the scope goes to red static with "SIGNAL LOST".
+- The scope is sized `min(90vw, 39svh)`; check 360x640 (the rule line is hidden under 700 px tall).
+- Nothing in the styling tells a right word from a wrong one before the tap (`.fits` has the same rim) - keep it that way.
+- The old vortex photo (`data/scenes/snap-sort-vortex.webp`) is no longer shown; the file is untouched.
+
+**VS cards**
+- The stickers sit on `.gloss::before/::after` inside each card, under the content. Check they never sit behind important text: the alien is bottom-right of the bottom card and is overlapped by long title plates (plate on top); the help button is bottom-left.
+- The drifting pattern draws over the stickers faintly. If that bothers, raise the stickers above `.dd` (z-index) - not done.
+- Result state, deal-in, Infinity mode (rules are `.mode-daily` only), twist cards with cream text panels.
+
+**Twin Flip**
+- The board is a little smaller to make room for the ship (`100dvh - 292px`); check tap targets at 360x640 (`100dvh - 262px` there).
+- The TOTAL RECALL win still uses the shared big-win celebration; a ship-themed win (the aliens cheer, the beam pulses) is not built.
+- The pool wiring from the first pass still stands (see section 1 above).
+
+**Fact or Fib**
+- Longest statements at 360x640: the ticket window is now flexible (min 78 px) and the text shrinks to fit it.
+- Buttons are 110 px at 390x844 and 86 px at 360x640.
+
+## iPhone risks of the new looks
+- **Inline SVG backgrounds** (Price Probe's scene, Twin Flip's mothership, the VS stickers): static, small, but each is decoded as a bitmap at the element's size. The Price Probe one covers the whole screen.
+- **`conic-gradient`** for the radar sweep (rotated by transform, 4 s) and `repeating-radial-gradient` for the rings: check smoothness on an older iPhone; the sweep layer has `will-change:transform`.
+- **Heavy `:has()`, stacked `:root` selectors and `!important`** to beat older rules. A half-old look on a phone means a specificity miss.
+- **Big glows** (`box-shadow` blur on the scope, the hologram, the trays) are static, never animated.
+- New motion added in this pass: the radar sweep (transform), the blip dots (opacity). Everything else is still.
