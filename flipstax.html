@@ -11757,7 +11757,7 @@ const SHARE_URL = 'https://playflipstax.com';
   // bolt; the painted wheel (data/wheel/face.webp) is sized and placed in JS so it exactly fills that ring and turns about the hub. The face
   // has 10 equal wedges from 12 o'clock, clockwise: gold, cyan, magenta, green, amber, deep blue, purple, red, teal, pink, and 30 rim
   // bulbs every 12 degrees; live labels and soft bulb glows ride on top. SPIN, then STOP; 3 spins. Ten results, one wedge each (10% each),
-  // the pairs never side by side. GOOP takes points (never below zero), a MYSTERY GAME plays Saucer Shuffle or Snap Sort as a bonus round
+  // the pairs never side by side. GOOP takes points (never below zero), a MYSTERY GAME plays Snap Sort as a bonus round
   // and comes back, DANCE PARTY plays the dance video (+10), LOSE A SPIN takes one of the spins left.
   const MW_STAGE = { src:'data/wheel/stage.webp', w:1080, h:1935, cx:543, cy:616, r:469 };   // the ring in the stage art (measured)
   const MW_FACE = { src:'data/wheel/face.webp', disc:0.957 };   // the painted wheel's disc is 95.7% of the image width
@@ -11894,7 +11894,7 @@ const SHARE_URL = 'https://playflipstax.com';
         popShow('GOOPED!', took ? '-' + took + ' points' : 'Nothing to lose - phew!');
       }
       else if (w.kind === 'LOSE'){ const had = left(); if (had > 0) lost++; sfx.wrong(); popShow('LOSE A SPIN!', had > 0 ? 'One spin gone' : 'No spins left to lose'); }
-      else if (w.kind === 'SAUCER' || w.kind === 'SNAP'){ const key = w.kind === 'SAUCER' ? 'saucerShuffle' : showSwap('snapSort');   /* (fix 6: Snap Sort on hold - the SNAP wedge plays ZiG Zap ZaBam!) */ sfx.correct(); popShow('MYSTERY GAME!', mysteryName(key) + ' - a bonus round'); after = (go)=> bonusGame(key, go); }
+      else if (w.kind === 'SAUCER' || w.kind === 'SNAP'){ const key = mysteryAvailable('snapSort') ? 'snapSort' : 'saucerShuffle';   /* (finishing item 1: the MYSTERY GAME wedge plays Snap Sort - the wheel's two games are Riddle Round and Snap Sort; Saucer Shuffle stays on Game Select and is only the fallback if Snap Sort's data did not load. Snap Sort is no longer swapped here.) */ sfx.correct(); popShow('MYSTERY GAME!', mysteryName(key) + ' - a bonus round'); after = (go)=> bonusGame(key, go); }
       else if (w.kind === 'RIDDLE'){ sfx.correct(); popShow('RIDDLE ROUND!', 'One riddle - a bonus round'); after = (go)=> bonusRiddle(go); }
       else if (w.kind === 'DANCE'){ points(10); sfx.cheer(); popShow('DANCE PARTY!', '+10 points - get down!'); after = (go)=> danceParty(go); }
       renderBank(); if (!isLite()) FX.pop(pop, 1.1);   // (mega 5 item 11: no bump in lite mode; FX.pop already skips reduced motion)
@@ -19814,7 +19814,7 @@ const SHARE_URL = 'https://playflipstax.com';
       { label:'Select Game', go: roundGame('door', 96, 3) },
       { label:'Round 5 card', go: roundCard(5) },
       { label:'Mystery Wheel', go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = null; }) },
-      ...['JACKPOT +100', 'ORB +1', 'GOOP -25', 'Mystery: Saucer Shuffle', '+25', 'GOOP -50', 'ORB +1 (2)', 'LOSE A SPIN', 'Riddle Round', 'DANCE PARTY'].map((t, i)=> ({ label:'Wheel: ' + t, go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = i; }) })),
+      ...['JACKPOT +100', 'ORB +1', 'GOOP -25', 'Mystery: Snap Sort', '+25', 'GOOP -50', 'ORB +1 (2)', 'LOSE A SPIN', 'Riddle Round', 'DANCE PARTY'].map((t, i)=> ({ label:'Wheel: ' + t, go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = i; }) })),
       { label:'Price Probe', go: mysteryAs('priceProbe') },
       { label:'Oddball Alert', go: mysteryAs('oddballAlert') },
       { label:'Emoji Decode', go: mysteryAs('emojiDecode') },
