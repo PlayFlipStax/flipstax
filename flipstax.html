@@ -11780,11 +11780,13 @@ const SHARE_URL = 'https://playflipstax.com';
     MW_WEDGES.forEach((w, i)=>{
       const a0 = i * MW_W, a1 = a0 + MW_W, mid = a0 + MW_W / 2, d = 'M' + cx + ' ' + cy + ' L' + pt(a0, R) + ' A' + R + ' ' + R + ' 0 0 1 ' + pt(a1, R) + ' Z';
       s += '<g class="mw-wedge" data-i="' + i + '"><path class="mw-dim" d="' + d + '"/><path class="mw-hl" d="' + d + '"/>' +
-        '<g transform="rotate(' + mid + ' ' + cx + ' ' + cy + ')">' +
-        (w.icon === 'ORB' ? '<circle cx="200" cy="52" r="13" fill="url(#orbGrad)" stroke="#fff" stroke-width="1.5"/><ellipse cx="196" cy="47" rx="4.5" ry="3" fill="#fff" opacity="0.8"/>'
-          : '<text x="200" y="53" font-size="25" text-anchor="middle" dominant-baseline="central">' + w.icon + '</text>') +
-        '<g transform="translate(200 ' + (cy - 112) + ') rotate(90)"><text text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="' + (w.t.length > 5 ? 17 : 22) + '" letter-spacing="0.5" y="-9" fill="' + w.ink + '" stroke="' + w.out + '" stroke-width="3" paint-order="stroke">' + w.t + '</text>' +
-        '<text text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="' + (w.s.length > 4 ? 15 : 19) + '" y="11" fill="' + w.ink + '" stroke="' + w.out + '" stroke-width="3" paint-order="stroke">' + w.s + '</text></g></g></g>';
+        // (polish: every label stands upright at rest - the icon above two big lines - in a group that is turned back against the wedge's angle and the
+        // wheel's rotation (.mw-up; set by mwUpright when the wheel lands); the old labels ran along the spokes, half of them upside down)
+        '<g transform="rotate(' + mid + ' ' + cx + ' ' + cy + ') translate(200 ' + (cy - 119) + ')"><g class="mw-up" transform="rotate(' + (-mid) + ')">' +
+        (w.icon === 'ORB' ? '<circle cx="0" cy="-25" r="9.5" fill="url(#orbGrad)" stroke="#fff" stroke-width="1.5"/><ellipse cx="-3" cy="-28.5" rx="3.4" ry="2.2" fill="#fff" opacity="0.8"/>'
+          : '<text x="0" y="-25" font-size="18" text-anchor="middle" dominant-baseline="central">' + w.icon + '</text>') +
+        '<text text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="' + (w.t.length > 6 ? 17.5 : w.t.length > 4 ? 20 : 24) + '" letter-spacing="0.5" y="0" fill="' + w.ink + '" stroke="' + w.out + '" stroke-width="3.5" stroke-linejoin="round" paint-order="stroke">' + w.t + '</text>' +
+        '<text text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Black, Arial" font-weight="900" font-size="' + (w.s.length > 4 ? 16.5 : 20) + '" y="20" fill="' + w.ink + '" stroke="' + w.out + '" stroke-width="3.5" stroke-linejoin="round" paint-order="stroke">' + w.s + '</text></g></g></g>';
     });
     let ga = '', gb = '';
     for (let k = 0; k < 30; k++){ const c = '<circle cx="' + (cx + Math.sin(k * 12 * Math.PI / 180) * 180).toFixed(1) + '" cy="' + (cy - Math.cos(k * 12 * Math.PI / 180) * 180).toFixed(1) + '" r="7.5"/>'; if (k % 2) gb += c; else ga += c; }
@@ -11833,7 +11835,14 @@ const SHARE_URL = 'https://playflipstax.com';
     const gone = ()=> gen !== luckyGen || luckyOv.classList.contains('hidden') || !runActive;
     const setRot = (a)=>{ rotEl.style.transform = 'rotate(' + a.toFixed(2) + 'deg)'; };
     const wedgeEls = ()=> [...luckyOv.querySelectorAll('.mw-wedge')];
-    const markWin = (wi)=>{ wheel.classList.add('landed'); wedgeEls().forEach((g, i)=>{ g.classList.toggle('win', i === wi); g.classList.toggle('dim', i !== wi); }); };
+    // the labels turn upright when the wheel comes to rest (a 0.3 s turn by the shortest way; a cut in lite mode and reduced motion); a look only
+    let upRot = 0, upRaf = 0;
+    const setUp = (r)=>{ upRot = r; luckyOv.querySelectorAll('.mw-up').forEach((g, i)=> g.setAttribute('transform', 'rotate(' + (-(i * MW_W + MW_W / 2 + r)).toFixed(1) + ')')); };
+    const mwUpright = ()=>{ cancelAnimationFrame(upRaf); const d = ((rot - upRot) % 360 + 540) % 360 - 180, from = rot - d, t0 = performance.now();
+      if (prefersReducedMotion() || isLite() || Math.abs(d) < 1){ setUp(rot); return; }
+      const step = (now)=>{ const k = Math.min(1, (now - t0) / 300), e = 1 - (1 - k) * (1 - k); setUp(from + d * e); if (k < 1 && luckyGen === gen) upRaf = requestAnimationFrame(step); };
+      upRaf = requestAnimationFrame(step); };
+    const markWin = (wi)=>{ mwUpright(); wheel.classList.add('landed'); wedgeEls().forEach((g, i)=>{ g.classList.toggle('win', i === wi); g.classList.toggle('dim', i !== wi); }); };
     const clearWin = ()=>{ wheel.classList.remove('landed'); wedgeEls().forEach(g=> g.classList.remove('win', 'dim')); };
     const close = ()=>{
       clearTimeout(autoT); cancelAnimationFrame(raf); state = 'done'; removeEventListener('resize', onResize);
