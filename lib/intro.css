@@ -130,3 +130,20 @@
 /* fixes 5: TAP TO SKIP easy to see - a solid dark pill with a gold border, larger bold type, fully opaque once shown */
 :root:root .ip-skip{ min-height:46px; padding:0 18px; background:rgba(8,4,24,0.88); border:2px solid #ffd23f; color:#ffffff; font:400 16px/1 'FS Righteous', sans-serif; letter-spacing:0.08em; text-shadow:0 1px 2px #000; touch-action:manipulation; }
 :root:root .ip-skip.show{ opacity:1; }
+
+/* ==== THE LANDING, polish pass: the first screen sells the show. The pitch is two clear lines under the logo (a bold gold line, a white line under it),
+   the button says PLAY with a play arrow and is wider, and the dark bottom third is lit like a stage floor: the saucer's beam lands in a pool of
+   teal light with a soft violet glow at the foot. All still, except the button's existing ring. ==== */
+:root:root .il-pic::after{ background:radial-gradient(ellipse 85% 20% at 50% 15%, rgba(46,214,240,0.3), rgba(46,214,240,0) 74%), radial-gradient(ellipse 100% 34% at 50% 100%, rgba(150,70,255,0.34), rgba(150,70,255,0) 72%), rgb(9,6,38); }
+:root:root .il-tagline{ top:66.2%; left:2%; right:2%; white-space:normal; font:inherit; letter-spacing:0; text-shadow:none; }
+.il-tagline b{ display:block; font:900 clamp(15px, 6.2cqw, 28px)/1.05 var(--f-display, 'FS Righteous', sans-serif); letter-spacing:0.04em; color:#ffe27a; white-space:nowrap;
+  text-shadow:0 0 12px rgba(255,190,60,0.75), 0 2px 0 #5a2600, 0 0 3px rgba(20,6,40,0.95); }
+.il-tagline span{ display:block; margin-top:0.5em; font:400 clamp(12px, 4.3cqw, 19px)/1.1 'FS Righteous', sans-serif; letter-spacing:0.05em; color:#ffffff; white-space:nowrap;
+  text-shadow:0 0 8px rgba(95,244,255,0.7), 0 2px 0 rgba(10,4,40,0.95); }
+:root:root.intro-new .home-overlay .home-enter-btn.enter-big{ width:min(84vw, 350px); padding:18px 0 20px; font-size:clamp(40px, 12.5vw, 54px); letter-spacing:5px; border-radius:22px;
+  box-shadow:0 7px 0 #a85a00, 0 0 0 3px #5a2600, 0 0 34px 6px rgba(255,200,60,0.55); touch-action:manipulation; }
+:root:root.intro-new .home-overlay .home-enter-btn.enter-big::before{ content:'\25B6'; display:inline-block; margin-right:0.28em; font-size:0.78em; vertical-align:0.06em; letter-spacing:0; }
+:root:root .ip-skip{ min-height:48px; padding:0 20px; font-size:17px; box-shadow:0 0 14px rgba(255,210,63,0.5); }
+/* the cold open: the curtain's valance covers the top of the stage sign, so the sign shows one clear line there (EPISODE N), sitting low in the sign */
+:root:has(#showCard.curtain:not(.hidden)) .stg-sign.two .stg-sub{ display:none !important; }
+:root:has(#showCard.curtain:not(.hidden)) .stg-sign.two{ justify-content:flex-end; padding-bottom:1.5%; }
