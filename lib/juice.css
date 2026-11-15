@@ -3754,3 +3754,26 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
     linear-gradient(180deg, #040a22 0%, #0c1e50 50%, #050b28 100%); }
 :root:root:root:root .show-card.gintro .gi-sign span{ color:color-mix(in srgb, var(--gi-a) 30%, #ffffff); -webkit-text-fill-color:currentColor;
   text-shadow:0 0 5px #ffffff, 0 0 14px var(--gi-a), 0 0 30px var(--gi-a), 0 0 54px var(--gi-a), 0 4px 0 rgba(0,0,20,0.7); }
+
+/* ==== ZAP WORDS, new setting: "storm planet". The flat orange sunburst becomes a place: a hot dusk sky running from deep magenta down to
+   orange and gold, a huge sun on the horizon, dark rock mesas along the bottom, two lightning bolts forking down the sides, and the letter grid
+   mounted on a dark indigo POWER BOARD with an electric-yellow rim and corner bolts so the white tiles really pop. Only colours and backgrounds
+   change: the tiles' size, spacing and positions are exactly as before (the board is a layer behind the grid, it takes no room). Still picture. ==== */
+:root:root:root:root.stage-on .mg-overlay.mg-zapWords, :root:root:root:root .mg-overlay.mg-zapWords{
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 844' preserveAspectRatio='xMidYMax slice'%3E%3Cdefs%3E%3CradialGradient id='s' cx='.5' cy='.5' r='.5'%3E%3Cstop offset='0' stop-color='%23fffbe0'/%3E%3Cstop offset='.6' stop-color='%23ffd23f'/%3E%3Cstop offset='1' stop-color='%23ff8a2e'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='195' cy='770' r='170' fill='url(%23s)'/%3E%3Cg fill='none' stroke='%23fff6a0' stroke-width='5' stroke-linejoin='round' stroke-linecap='round'%3E%3Cpath d='M30 0 L14 70 L34 78 L10 170 L26 178 L6 250' opacity='.95'/%3E%3Cpath d='M362 0 L378 60 L358 70 L382 150 L366 160 L384 236' opacity='.95'/%3E%3C/g%3E%3Cg fill='none' stroke='%2327e6ff' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M30 0 L14 70 L34 78 L10 170 L26 178 L6 250'/%3E%3Cpath d='M362 0 L378 60 L358 70 L382 150 L366 160 L384 236'/%3E%3C/g%3E%3Cpath d='M0 844 V760 l22 -8 l10 -40 h36 l8 34 l30 10 l14 -22 h30 l10 30 l44 12 l30 -14 l16 -38 h40 l10 44 l30 6 l18 -26 h28 l12 24 V844Z' fill='%234a0a3a'/%3E%3Cpath d='M0 844 V800 l40 -12 l50 14 l60 -16 l70 18 l60 -14 l60 12 l50 -10 V844Z' fill='%232a0626'/%3E%3C/svg%3E") center bottom / cover no-repeat,
+    linear-gradient(180deg, #7a0a5a 0%, #d6126e 24%, #ff5a4a 52%, #ff9a2e 78%, #ffd23f 100%) !important; }
+:root:root:root:root .mg-overlay.mg-zapWords .mg-bg::before{ opacity:0.14; }
+/* the power board behind the grid (a layer only: it takes no room and moves nothing) */
+:root:root:root .zw-stage .zw-grid.sq{ position:relative; isolation:isolate; }
+:root:root:root .zw-stage .zw-grid.sq::before{ content:''; position:absolute; z-index:-1; inset:-9px; border-radius:22px; pointer-events:none; border:3px solid #ffe14a;
+  background:
+    radial-gradient(circle at 12px 12px, #ffe14a 0 3px, #1a0a3a 4px 5.4px, rgba(0,0,0,0) 6px), radial-gradient(circle at calc(100% - 12px) 12px, #ffe14a 0 3px, #1a0a3a 4px 5.4px, rgba(0,0,0,0) 6px),
+    radial-gradient(circle at 12px calc(100% - 12px), #ffe14a 0 3px, #1a0a3a 4px 5.4px, rgba(0,0,0,0) 6px), radial-gradient(circle at calc(100% - 12px) calc(100% - 12px), #ffe14a 0 3px, #1a0a3a 4px 5.4px, rgba(0,0,0,0) 6px),
+    linear-gradient(180deg, #2a1466 0%, #1a0a44 100%);
+  box-shadow:0 0 0 3px #1a0a3a, 0 0 22px 4px rgba(255,225,74,0.75), 0 10px 0 3px rgba(42,6,38,0.7); }
+:root:root:root:root .zw-stage .zw-grid.sq .zw-cell svg .hx{ fill:#fffdf4; stroke:#ffe14a; stroke-width:2.5; }
+:root:root:root:root .zw-stage .zw-grid.sq .zw-cell svg{ filter:drop-shadow(0 3px 0 rgba(10,2,40,0.55)); }
+.mg-zapWords .mg-rule{ text-shadow:0 2px 0 #5a0540; }
+:root:root:root:root .zw-stage .zw-grid.sq::before{ inset:-7px; box-shadow:0 0 0 3px #1a0a3a, 0 0 22px 4px rgba(255,225,74,0.75); }
+.zw-stage .zw-foot{ position:relative; z-index:2; }
