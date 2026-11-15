@@ -4183,3 +4183,10 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
   :root:root:root:root:root:root .pr-stage.pr-show .pr-d{ font-size:clamp(11px, 3.2vw, 14px); margin-top:1px; white-space:nowrap; line-height:1.1; }
   :root:root:root:root.mode-daily .take, :root:root:root:root.mode-infinity .take{ font-size:calc(clamp(24px, 7.2vw, 36px) * var(--tk, 1)); }
 }
+
+/* ==== finishing item 7: Brain Beam readability. The question panel sits above the beam's rays and particles (its dark glass already reads as
+   lit by the beam), so the yellow highlight words and the right / wrong line are never crossed by rays; over the answer bars the rays and
+   particles are fainter, so a dimmed or red bar's text stays clean. The beam still pours down the whole screen. ==== */
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-prompt{ position:relative; z-index:5; }
+:root:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-beam::before, :root:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-beam .ov-tint{
+  -webkit-mask-image:linear-gradient(180deg, #000 0%, rgba(0,0,0,0.7) 14%, rgba(0,0,0,0.4) 38%, rgba(0,0,0,0.2) 52%, rgba(0,0,0,0.2) 100%); mask-image:linear-gradient(180deg, #000 0%, rgba(0,0,0,0.7) 14%, rgba(0,0,0,0.4) 38%, rgba(0,0,0,0.2) 52%, rgba(0,0,0,0.2) 100%); }
