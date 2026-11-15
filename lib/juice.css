@@ -4190,3 +4190,11 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-prompt{ position:relative; z-index:5; }
 :root:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-beam::before, :root:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-beam .ov-tint{
   -webkit-mask-image:linear-gradient(180deg, #000 0%, rgba(0,0,0,0.7) 14%, rgba(0,0,0,0.4) 38%, rgba(0,0,0,0.2) 52%, rgba(0,0,0,0.2) 100%); mask-image:linear-gradient(180deg, #000 0%, rgba(0,0,0,0.7) 14%, rgba(0,0,0,0.4) 38%, rgba(0,0,0,0.2) 52%, rgba(0,0,0,0.2) 100%); }
+
+/* ==== finishing item 10: still versions. Snap Sort's galaxy swirl and the blinking dot on each word, and the VS screen's sweeping spotlights
+   (reduced motion only - lite already stops them), stand still in lite mode and reduced motion. ==== */
+:root.lite .ss-vspin, :root.lite .ss-galaxy .ss-vimg, :root.lite .ss-galaxy .ss-word::before, :root.lite .mg-overlay.mg-snapSort::before{ animation:none !important; }
+@media (prefers-reduced-motion: reduce){
+  .ss-vspin, .ss-galaxy .ss-vimg, .ss-galaxy .ss-word::before, .mg-overlay.mg-snapSort::before, .sb-cone, .sb-cone.l, .sb-cone.r{ animation:none !important; }
+  .doodle-scatter-track{ animation:none !important; }   /* (the landing's drifting doodles behind the picture) */
+}
