@@ -17597,7 +17597,7 @@ const SHARE_URL = 'https://playflipstax.com';
   if (!/[?&]frame=bulbs(&|$)/.test(location.search)) document.documentElement.classList.add('frame-new');
   // The tube's colour, --tube: a strong colour from the screen's own family - a game's neon-sign border colour, else its first colour made vivid,
   // else its world's colour below. Set whenever the frame's --bulb changes (one observer on the frame's own style attribute).
-  const TUBE_COLORS = { vs:'#b06bff', trivia:'#3fa9ff', powerup:'#2ef0c0', jumble:'#ff9a2e', riddle:'#c8ff3a', odd:'#c46aff', entry:'#ffc83a', galaxy:'#8a7bff', cash:'#ffd23f', timewarp:'#5ff4ff', stage:'#ffc83a', neon:'#27e6ff', results:'#ffc83a', first:'#2ee8d0', scan:'#ff6a5a' };
+  const TUBE_COLORS = { vs:'#b06bff', trivia:'#3fa9ff', powerup:'#2ef0c0', jumble:'#ff9a2e', riddle:'#3ae0d0', odd:'#c46aff', entry:'#ffc83a', galaxy:'#8a7bff', cash:'#ffd23f', timewarp:'#5ff4ff', stage:'#ffc83a', neon:'#27e6ff', results:'#ffc83a', first:'#2ee8d0', scan:'#ff6a5a' };
   const TUBE_GAMES = { twinFlip:'#ff5ab8', snapSort:'#ff9a2e', zapWords:'#ffe14a', peakOrPlunge:'#ff7a5a', starSequence:'#ff4fb4' };
   function vividHex(hex){
     const m = /^#?([0-9a-f]{6})$/i.exec((hex || '').trim()); if (!m) return null;
