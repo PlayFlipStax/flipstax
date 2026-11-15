@@ -3918,3 +3918,38 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root:root:root .show-card.explainer .ex-card .ex-q{ background:var(--gi-a, #ffc83a); color:#0a0626; box-shadow:0 0 10px var(--gi-a, #ffc83a); }
 :root:root:root .show-card.explainer .ex-card .ex-text{ color:#ffffff; font-size:clamp(18px, 5vw, 21px); line-height:1.4; }
 :root:root:root .show-card.explainer .ex-card .ex-skip{ color:rgba(255,255,255,0.75); }
+
+/* ==== PEAK OR PLUNGE, polish pass (look only): it was a flat pink page with a paper card - the weakest game beside its neighbours. Now "the
+   summit at dusk on an alien world": a deep indigo sky falling to a magenta and coral horizon, stars, a ringed planet, and two ranges of dark
+   peaks with snow-lit tips. The title is a neon sign (dark plate, a coral tube, a white core line, green and pink arrows). Both cards are dark
+   glass edged by a neon tube - the known number in cyan, the mystery number in pink - with white names and big glowing values. All still. ==== */
+:root:root .mg-peakOrPlunge .mg-bg{ background:
+  radial-gradient(circle at 10% 9%, #fff 0 1.3px, rgba(255,255,255,0) 2px), radial-gradient(circle at 88% 6%, #fff 0 1.4px, rgba(255,255,255,0) 2.2px), radial-gradient(circle at 64% 16%, #bff8ff 0 1.1px, rgba(255,255,255,0) 2px),
+  radial-gradient(circle at 30% 22%, #fff 0 1px, rgba(255,255,255,0) 1.8px), radial-gradient(circle at 94% 34%, #fff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 4% 40%, #ffe9a0 0 1.2px, rgba(255,255,255,0) 2px),
+  radial-gradient(ellipse 90% 26% at 50% 86%, rgba(255,150,90,0.75), rgba(255,150,90,0) 72%),
+  linear-gradient(180deg, #080a34 0%, #1c1160 34%, #5a1c86 62%, #c2386a 84%, #ff8a5a 100%) !important; }
+:root:root .mg-peakOrPlunge .mg-bg .rays{ display:none !important; }
+:root:root .mg-peakOrPlunge .mg-bg::before{ content:''; position:absolute; right:-34px; top:12%; width:150px; height:150px; pointer-events:none; opacity:0.9;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 150'%3E%3Cdefs%3E%3CradialGradient id='p' cx='.35' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23ffd0a8'/%3E%3Cstop offset='.5' stop-color='%23ff7a8a'/%3E%3Cstop offset='1' stop-color='%237a2a9a'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='75' cy='75' r='40' fill='url(%23p)'/%3E%3Cellipse cx='75' cy='75' rx='68' ry='15' fill='none' stroke='%23ffe9a0' stroke-width='4' transform='rotate(-18 75 75)' opacity='.85'/%3E%3C/svg%3E") center / contain no-repeat; }
+:root:root .mg-peakOrPlunge .mg-bg::after{ inset:auto 0 0 0; height:30%; background:
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 200' preserveAspectRatio='none'%3E%3Cpath d='M0 200V120l50-60 40 44 60-90 56 84 44-50 60 70 50-58 40 50v90z' fill='%233a1470'/%3E%3Cpath d='M150 14l-18 27 12-6 8 8 8-10 10 8z' fill='%23ffd0e8'/%3E%3Cpath d='M0 200v-50l70-56 50 44 70-64 60 60 50-40 100 76v30z' fill='%2312083c'/%3E%3Cpath d='M190 74l-16 15 12-3 6 7 7-8 9 6z' fill='%23bff8ff'/%3E%3C/svg%3E") center bottom / 100% 100% no-repeat !important; }
+/* the sign */
+:root:root:root .mg-peakOrPlunge .mg-sign{ background:linear-gradient(180deg, #160c48, #070422) !important; border:3px solid #ff7a5a !important; border-radius:18px !important; outline:1px solid rgba(255,255,255,0.75); outline-offset:-2.5px;
+  box-shadow:0 0 18px 3px rgba(255,122,90,0.8), inset 0 0 14px rgba(255,122,90,0.4) !important; padding:10px 20px 11px !important; }
+:root:root:root .mg-peakOrPlunge .mg-sign .sign-bulbs{ display:none !important; }
+:root:root:root .mg-peakOrPlunge .mg-sign > span{ color:#fff3c4 !important; text-shadow:0 0 14px #ff7a5a, 0 0 4px #ff7a5a, 0 2px 0 rgba(0,0,20,0.8) !important; letter-spacing:2px; white-space:nowrap; }
+:root:root:root .mg-peakOrPlunge .mg-sign > span::before{ content:'\25B2'; margin-right:0.4em; font-size:0.72em; color:#4dff95; text-shadow:0 0 10px #4dff95; }
+:root:root:root .mg-peakOrPlunge .mg-sign > span::after{ content:'\25BC'; margin-left:0.4em; font-size:0.72em; color:#ff6ab0; text-shadow:0 0 10px #ff6ab0; }
+/* the cards */
+:root:root .mg-peakOrPlunge .pp-card{ background:linear-gradient(180deg, rgba(22,14,80,0.94), rgba(8,5,36,0.96)); color:#ffffff; border:3px solid #5ff4ff; border-radius:20px;
+  box-shadow:0 0 16px 2px rgba(95,244,255,0.6), inset 0 0 14px rgba(95,244,255,0.25); }
+:root:root .mg-peakOrPlunge .pp-card.pp-next{ border-color:#ff6ab0; box-shadow:0 0 16px 2px rgba(255,106,176,0.6), inset 0 0 14px rgba(255,106,176,0.25); }
+:root:root .mg-peakOrPlunge .pp-card.pp-next.right{ border-color:#4dff95; box-shadow:0 0 22px 4px rgba(77,255,149,0.75), inset 0 0 14px rgba(77,255,149,0.3); }
+:root:root .mg-peakOrPlunge .pp-card.pp-next.wrong{ border-color:#ff4a5a; box-shadow:0 0 22px 4px rgba(255,74,90,0.75), inset 0 0 14px rgba(255,74,90,0.3); }
+:root:root .mg-peakOrPlunge .pp-name{ color:#ffffff; text-align:center; }
+:root:root .mg-peakOrPlunge .pp-known .pp-val b{ color:#bffcff; text-shadow:0 0 16px rgba(95,244,255,0.85), 0 3px 0 rgba(0,0,30,0.7); }
+:root:root .mg-peakOrPlunge .pp-next .pp-val b{ color:#ffe27a; text-shadow:0 0 16px rgba(255,200,60,0.8), 0 3px 0 rgba(0,0,30,0.7); }
+:root:root .mg-peakOrPlunge .pp-next .pp-val b.pp-q{ color:#ff9ad0; text-shadow:0 0 16px rgba(255,106,176,0.95); }
+:root:root .mg-peakOrPlunge .pp-vs{ color:#ffffff; text-shadow:0 0 10px rgba(255,160,110,0.95), 0 2px 0 rgba(0,0,30,0.7); }
+:root:root .mg-peakOrPlunge .pp-btn{ border-color:#ffffff; box-shadow:0 5px 0 rgba(0,0,30,0.6), 0 0 14px rgba(255,255,255,0.35); text-shadow:0 2px 0 rgba(0,0,0,0.35); }
+:root:root:root:root .mg-overlay.mg-peakOrPlunge .mg-bg{ display:block !important; }
