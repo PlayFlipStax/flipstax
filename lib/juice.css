@@ -4153,3 +4153,24 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root:root:root .lucky-overlay.mw .mw-pop b{ color:#ffe27a !important; text-shadow:0 0 14px rgba(255,200,60,0.8), 0 3px 0 rgba(0,0,30,0.8); }
 :root:root:root .lucky-overlay.mw .mw-pop small{ color:#ffffff; }
 :root:root:root .lucky-overlay.mw .mw-btn{ box-shadow:0 5px 0 #8a5200, 0 0 0 3px #3a1a6a, 0 0 22px 4px rgba(255,200,60,0.6); }
+
+/* ==== OLDER SAFARI (before 16.2) has no color-mix(). A colour built with it from a custom property is not dropped at parse time - the whole
+   declaration fails when it is computed, so an earlier fallback line does not help. This block re-declares those properties without color-mix,
+   only where color-mix is not supported, at a higher specificity than the rules it covers: the title cards, the explainer card, Riddle Round's
+   keys, Twin Flip's tiles and Zap Words' found tiles. Plain solid colours stand in for the mixes. ==== */
+@supports not (color: color-mix(in srgb, red 50%, blue)){
+  :root:root:root:root:root .show-card.gintro .gi-bg{ background:radial-gradient(ellipse 130% 34% at 50% 112%, #0a1638 0 60%, #ffffff 60.6%, var(--gi-a) 62%, rgba(0,0,0,0) 70%), linear-gradient(180deg, #040a22 0%, #0c1e50 50%, #050b28 100%); }
+  :root:root:root:root:root .show-card.gintro .gi-bg::after{ background:repeating-conic-gradient(from 0deg, var(--gi-a) 0deg 7deg, rgba(0,0,0,0) 7deg 18deg); opacity:0.45; }
+  :root:root:root:root:root .show-card.gintro .gi-icon::after{ background:radial-gradient(ellipse closest-side, #ffffff 0%, var(--gi-a) 45%, rgba(0,0,0,0) 100%); box-shadow:0 0 22px 4px var(--gi-a); }
+  :root:root:root:root:root .show-card.gintro .gi-sign{ box-shadow:0 0 0 3px #03061a, 0 0 22px 4px var(--gi-a), 0 14px 26px -8px rgba(0,0,0,0.7); }
+  :root:root:root:root:root .show-card.gintro .gi-sign span{ color:#ffffff; }
+  :root:root:root:root:root .show-card.gintro .gi-line{ box-shadow:inset 0 0 0 2px var(--gi-a); }
+  :root:root:root:root:root .show-card.explainer{ background:linear-gradient(180deg, #070a2c 0%, #150a44 55%, #070a2c 100%); }
+  :root:root:root:root:root .show-card.explainer .ex-card{ box-shadow:0 0 20px 3px var(--gi-a, #ffc83a); }
+  :root:root:root:root:root .show-card.explainer .ex-card .ex-head{ border-bottom:1.5px solid var(--gi-a, #ffc83a); }
+  :root:root:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:not(.is-right):not(.is-wrong){ background:linear-gradient(180deg, rgba(28,16,96,0.95), rgba(8,6,44,0.97)) !important; box-shadow:0 0 14px 2px var(--pod), inset 0 2px 0 rgba(255,255,255,0.2); }
+  :root:root:root .tf-stage .tf-tile.up{ background:var(--pc); box-shadow:inset 0 3px 0 rgba(255,255,255,0.7), inset 0 -5px 0 rgba(0,0,0,0.16), 0 5px 0 rgba(0,0,0,0.45); }
+  :root:root:root .tf-stage .tf-tile.done{ box-shadow:inset 0 3px 0 rgba(255,255,255,0.7), inset 0 -5px 0 rgba(0,0,0,0.16), 0 5px 0 rgba(0,0,0,0.45); }
+  :root:root:root .zw-stage .zw-cell{ --tint:var(--tc); }
+  :root:root:root .zw-cell.found{ background:var(--wc); }
+}
