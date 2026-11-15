@@ -4006,3 +4006,29 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
   box-shadow:0 0 14px 2px color-mix(in srgb, var(--pod) 75%, transparent), inset 0 0 14px color-mix(in srgb, var(--pod) 35%, transparent), inset 0 2px 0 rgba(255,255,255,0.25); color:#ffffff; text-shadow:0 0 10px var(--pod), 0 2px 0 rgba(0,0,30,0.8); }
 :root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile:not(.is-right):not(.is-wrong) .tkey{ left:14px; color:#04103c; border:2px solid #ffffff; background:radial-gradient(circle at 35% 30%, #ffffff, var(--pod) 60%); box-shadow:0 0 12px 2px var(--pod); }
 :root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile{ border-radius:999px; }
+
+/* ==== RIDDLE ROUND, "THE INTERCEPT" (sci-fi pass; look only - riddles, answers, order, timer bar and timing untouched). A transmission picked
+   up from the outer rim: over the deep-space green backdrop sit faint radar rings; the riddle is on a listening-post terminal (near-black green
+   glass, a lime tube, scan lines, a TRANSMISSION INTERCEPTED tag, a signal trace along its foot) in phosphor-white type; the four answers are
+   signal keys - squared dark-glass keys, each edged by its own colour from the green family (lime, mint, yellow, aqua), with a lit key-cap for
+   its number. Right and wrong keep their solid colours. All still. Colour family: phosphor green. ==== */
+:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-riddle .ov-tint{ background:
+  radial-gradient(circle at 50% 108%, rgba(0,0,0,0) 0 19%, rgba(182,255,58,0.3) 19.4% 19.9%, rgba(0,0,0,0) 20.3% 33%, rgba(182,255,58,0.22) 33.4% 33.9%, rgba(0,0,0,0) 34.3% 47%, rgba(182,255,58,0.15) 47.4% 47.9%, rgba(0,0,0,0) 48.3% 61%, rgba(182,255,58,0.1) 61.4% 61.9%, rgba(0,0,0,0) 62.3%) !important; }
+:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-riddle .rd-sky{ opacity:0.3 !important; }
+/* the terminal (the riddle) */
+:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-prompt{ border:2.5px solid #b6ff3a; border-radius:10px; padding:26px 18px 30px; overflow:visible;
+  background:repeating-linear-gradient(180deg, rgba(182,255,58,0.08) 0 1px, rgba(0,0,0,0) 1px 4px), linear-gradient(180deg, rgba(8,44,24,0.95), rgba(2,16,10,0.97)) !important;
+  box-shadow:0 0 18px 2px rgba(182,255,58,0.65), inset 0 0 28px rgba(182,255,58,0.22); color:#f2ffe0; text-shadow:0 0 10px rgba(182,255,58,0.75), 0 2px 0 rgba(0,20,0,0.8); }
+:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-prompt::before{ content:'\25CF  TRANSMISSION INTERCEPTED'; display:block; position:absolute; inset:auto; left:14px; top:-11px; width:auto; height:auto; padding:4px 11px; border-radius:4px; animation:none !important; opacity:1;
+  background:#b6ff3a !important; color:#06200c; font:900 10.5px/1 var(--f-body, Inter, sans-serif); letter-spacing:2px; white-space:pre; text-shadow:none; box-shadow:0 0 10px rgba(182,255,58,0.9); -webkit-mask:none; mask:none; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-prompt::after{ content:''; display:block; position:absolute; inset:auto 14px 8px 14px; height:14px; animation:none !important; opacity:0.85; pointer-events:none; -webkit-mask:none; mask:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 14' preserveAspectRatio='none'%3E%3Cpath d='M0 7h14l3-5 4 10 4-12 4 12 3-5h12l3-3 3 6 3-3h14l3-6 4 12 4-10 3 4h30' fill='none' stroke='%23b6ff3a' stroke-width='1.4' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat !important; }
+/* the signal keys (the answers) */
+:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile{ --pod:#b6ff3a; border-radius:14px; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:nth-child(2){ --pod:#3affc8; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:nth-child(3){ --pod:#ffe14a; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:nth-child(4){ --pod:#5ad6ff; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:not(.is-right):not(.is-wrong){ border:3px solid var(--pod);
+  background:linear-gradient(90deg, color-mix(in srgb, var(--pod) 30%, transparent), rgba(0,0,0,0) 34%), linear-gradient(180deg, rgba(10,50,30,0.95), rgba(3,18,14,0.97)) !important;
+  box-shadow:0 0 14px 2px color-mix(in srgb, var(--pod) 70%, transparent), inset 0 0 14px color-mix(in srgb, var(--pod) 30%, transparent), inset 0 2px 0 rgba(255,255,255,0.2); color:#ffffff; text-shadow:0 0 10px var(--pod), 0 2px 0 rgba(0,20,0,0.8); }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:not(.is-right):not(.is-wrong) .tkey{ left:14px; color:#06200c; border:2px solid #ffffff; border-radius:10px; background:linear-gradient(180deg, #ffffff, var(--pod) 55%); box-shadow:0 3px 0 rgba(0,0,0,0.5), 0 0 12px 1px var(--pod); }
