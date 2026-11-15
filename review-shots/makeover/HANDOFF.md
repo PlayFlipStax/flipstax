@@ -230,3 +230,18 @@ Look only. Nothing pushed. Fresh 390x844 stills of every screen are in this fold
 **For Opus to check:** 360x640 on all four (landing pitch width, the scorecard's height and whether SHARE stays on screen, wheel labels at a small wheel); lite and reduced motion (scorecard animations are switched off there, the wheel labels cut to upright; the frame sparks use the old rules); the frame's `miss / strobe / unison / disco` states with the 6 px sparks; the tube colour on every game and in Infinity; the Results layouts other than `.outro.blue` (the scorecard rules apply to all, only blue was looked at); a results card with fewer stats (the grid is three columns); the old-browser fallback for `:has()` on the cold-open sign and the wheel's tube colour; `outline` with rounded corners on the scorecard needs Safari 16.4+ (older shows a square hairline - remove the outline if that matters).
 
 **Not done yet (batch 2, item 5):** the game screens one by one.
+
+## Addendum 7 - whole-game polish, batch 2 (the game screens)
+
+Look only. Nothing pushed. Every game and event screen was shot fresh at 390x844 and judged side by side (`p0-sheet0..3.jpg`, `q0-sheet.jpg` in this folder). Only the screens weaker than their neighbours were changed, one commit each:
+
+- **Mystery Wheel start** (`1993b43`): the starting state sets every label upright explicitly (`setUp(rot)` when the wheel is built). It measured upright already; this makes it certain.
+- **Explainer card** (`ce59502`): starfield in the game's colours, dark-glass card with the neon tube (`--gi-a`), glowing title, larger white rule. Uses `color-mix()`.
+- **Peak or Plunge** (`dee91a7`): new dusk-planet background drawn in `.mg-bg` (forced visible - the old art file `--game-bg` is covered, not removed), neon title sign, both cards dark glass with neon tubes.
+- **Riddle Round** (this commit): deep-space green backdrop on `#eventOverlay.quiz-riddle`, `.show-bg.w-riddle`, `#evBg.w-riddle` and Infinity's `.bg.w-riddle`; old rays and marks dimmed.
+
+**Judged good enough and left alone:** VS cards, Brain Beam, Select Game, Price Probe, Emoji Decode, Time Warp, Snap Sort, Zap Words, Twin Flip, Fact or Fib, Saucer Shuffle, ZiG Zap, Alien Blast, Galactic Chomper, Star Sequence, Space Launch, Word Warp, Orbit Drop, the round cards.
+
+**Seen but not done (weaker, lower priority):** the Infinity-mode riddle card (orange paper style) and the Vault / Infinity results card (orange rays, bevelled buttons) still use the old look; Snap Sort's title is a plain neon box with no icon sign; Oddball Alert, Crowd Scan, Cosmic Surprise and Reward beat were not captured (the TEST-menu shots moved on to the next screen before the still), so they were not judged.
+
+**For Opus to check:** Peak or Plunge right / wrong card states and 360x640 fit (cards are flex, untouched in size); Riddle Round in Infinity and on the wheel (same rules apply, not looked at); the explainer card with a long rule and with TAP TO SKIP instead of GOT IT; `color-mix()` and rounded `outline` fallbacks on old Safari; lite and reduced motion (all three screens are still, nothing new animates).
