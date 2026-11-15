@@ -147,3 +147,9 @@
 /* the cold open: the curtain's valance covers the top of the stage sign, so the sign shows one clear line there (EPISODE N), sitting low in the sign */
 :root:has(#showCard.curtain:not(.hidden)) .stg-sign.two .stg-sub{ display:none !important; }
 :root:has(#showCard.curtain:not(.hidden)) .stg-sign.two{ justify-content:flex-end; padding-bottom:1.5%; }
+/* finishing item 5: short screens - a slightly smaller PLAY button so it never covers the pitch's second line, and the cold open's stage sign
+   keeps its one line (EPISODE N) clear of the curtain's valance */
+@media (max-height:700px){
+  :root:root:root.intro-new .home-overlay .home-enter-btn.enter-big{ padding:12px 0 14px; font-size:clamp(34px, 10.5vw, 42px); }
+  :root:has(#showCard.curtain:not(.hidden)) .stg-sign.two .stg-main{ font-size:min(36cqh, 11cqw) !important; }
+}

@@ -4174,3 +4174,12 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
   :root:root:root .zw-stage .zw-cell{ --tint:var(--tc); }
   :root:root:root .zw-cell.found{ background:var(--wc); }
 }
+
+/* ==== finishing item 5: short screens (360x640 and the like). Price Probe: the name and the small descriptor shrink a step so a two-line name and
+   its descriptor stay inside the card (the descriptor stays on one line). VS cards: a long name (three lines) shrinks a step so the saucer between
+   the cards never covers its last line. ==== */
+@media (max-height:700px){
+  :root:root:root:root:root:root .pr-stage.pr-show .pr-n{ font-size:clamp(16px, 4.9vw, 22px); line-height:1.02; }
+  :root:root:root:root:root:root .pr-stage.pr-show .pr-d{ font-size:clamp(11px, 3.2vw, 14px); margin-top:1px; white-space:nowrap; line-height:1.1; }
+  :root:root:root:root.mode-daily .take, :root:root:root:root.mode-infinity .take{ font-size:calc(clamp(24px, 7.2vw, 36px) * var(--tk, 1)); }
+}
