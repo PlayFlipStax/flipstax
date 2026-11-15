@@ -3899,3 +3899,22 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root:root:root #readoutOverlay.ep.outro-on .outro.end .outro-donate{ background:linear-gradient(180deg, rgba(22,12,70,0.95), rgba(7,4,32,0.97)) !important; border:2px solid #ffc83a !important; color:#ffe27a !important; box-shadow:0 0 10px rgba(255,200,58,0.4) !important; }
 :root:root:root #readoutOverlay.ep.outro-on .outro.blue.end .outro-end{ top:calc(16.5vh + 2px + env(safe-area-inset-top)); }
 :root:root:root #readoutOverlay.ep.outro-on .outro.end .outro-donate span{ color:#ffe27a !important; text-shadow:none !important; }
+
+/* ==== THE EXPLAINER CARD ("how to play", before a game), polish pass: it was a pale paper card on a flat backdrop - the one screen that did not
+   look like the show. Now: a starfield in the game's own colours, and a dark-glass card edged by the show's neon tube (the game's colour, a white
+   core line, a soft static glow); the title glows in the game's colour, the rule is white and larger, GOT IT stays the gold button. Still. ==== */
+:root:root .show-card.explainer{ background:
+  radial-gradient(circle at 12% 14%, #fff 0 1.3px, rgba(255,255,255,0) 2px), radial-gradient(circle at 84% 9%, #fff 0 1.5px, rgba(255,255,255,0) 2.3px), radial-gradient(circle at 70% 24%, #bff8ff 0 1.1px, rgba(255,255,255,0) 2px),
+  radial-gradient(circle at 24% 78%, #fff 0 1.4px, rgba(255,255,255,0) 2.2px), radial-gradient(circle at 90% 70%, #fff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 48% 92%, #ffe9a0 0 1.3px, rgba(255,255,255,0) 2.1px),
+  radial-gradient(circle at 6% 46%, #fff 0 1px, rgba(255,255,255,0) 1.8px), radial-gradient(circle at 60% 6%, #fff 0 1px, rgba(255,255,255,0) 1.8px),
+  radial-gradient(ellipse 90% 34% at 50% 44%, color-mix(in srgb, var(--gi-a, #b06bff) 42%, transparent), rgba(0,0,0,0) 72%),
+  radial-gradient(ellipse 70% 40% at 0% 100%, color-mix(in srgb, var(--gi-b, #27e6ff) 36%, transparent), rgba(0,0,0,0) 70%),
+  linear-gradient(180deg, #070a2c 0%, #150a44 55%, #070a2c 100%); }
+:root:root:root .show-card.explainer .ex-card{ background:linear-gradient(180deg, rgba(24,14,76,0.96), rgba(8,5,34,0.97)); border:3px solid var(--gi-a, #ffc83a); border-radius:22px; outline:1px solid rgba(255,255,255,0.75); outline-offset:-2.5px;
+  box-shadow:0 0 20px 3px var(--gi-a, #ffc83a), inset 0 0 16px 1px color-mix(in srgb, var(--gi-a, #ffc83a) 45%, transparent); color:#ffffff; }
+:root:root:root .show-card.explainer .ex-card::before{ display:none; }
+:root:root:root .show-card.explainer .ex-card .ex-head{ background:none; border-bottom:1.5px solid color-mix(in srgb, var(--gi-a, #ffc83a) 60%, transparent); padding:14px 18px 12px; }
+:root:root:root .show-card.explainer .ex-card .ex-head b{ color:#ffffff; text-shadow:0 0 14px var(--gi-a, #ffc83a), 0 0 4px var(--gi-a, #ffc83a), 0 2px 0 rgba(0,0,20,0.8); }
+:root:root:root .show-card.explainer .ex-card .ex-q{ background:var(--gi-a, #ffc83a); color:#0a0626; box-shadow:0 0 10px var(--gi-a, #ffc83a); }
+:root:root:root .show-card.explainer .ex-card .ex-text{ color:#ffffff; font-size:clamp(18px, 5vw, 21px); line-height:1.4; }
+:root:root:root .show-card.explainer .ex-card .ex-skip{ color:rgba(255,255,255,0.75); }
