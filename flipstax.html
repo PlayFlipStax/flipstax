@@ -17560,6 +17560,8 @@ const SHARE_URL = 'https://playflipstax.com';
     marquee.innerHTML = groups.map((g, k)=> '<b class="mq-g" style="--k:' + k + '">' + g.join('') + '</b>').join('');
   }
   buildMarquee(); addEventListener('resize', buildMarquee);
+  // ?frame=new (any host; a look switch only): the neon-tube frame in place of the gold bulbs - lib/juice.css :root.frame-new. Default: the bulbs, unchanged.
+  if (/[?&]frame=new(&|$)/.test(location.search)) document.documentElement.classList.add('frame-new');
   // ---------- Lite mode (C8) ----------
   // On with ?lite=1 (?lite=0 keeps it off), or by itself when the page averages under 20fps for 3 seconds (measured with
   // requestAnimationFrame while the tab is visible, never in the 4s after a screen, card or video starts; it then stays on for the

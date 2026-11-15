@@ -3840,3 +3840,13 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 /* the hint: a clear gold pill */
 :root:root.mode-daily .hint{ align-self:center; width:max-content; max-width:92%; margin:6px auto calc(8px + env(safe-area-inset-bottom)); padding:9px 20px; border-radius:99px; background:linear-gradient(180deg, #fff3a8, #ffc21a); color:#2a1000;
   font:900 clamp(15px, 4.4vw, 19px)/1 var(--f-display, sans-serif); letter-spacing:1.5px; text-transform:uppercase; box-shadow:0 0 0 2px #7a4a00, 0 4px 0 2px #5a2a00, 0 0 16px rgba(255,210,63,0.6); }
+
+/* ==== THE FRAME, alternative (only with ?frame=new; the gold bulbs stay the default): "the neon orbit". A thin glowing neon tube runs round the
+   screen in the screen's own colour (--bulb), with a fine white inner line like a starship viewport; the old bulbs become small white running
+   lights riding on the tube - the same four groups fading in turn (opacity only), so they read as lights orbiting the frame. The tube is 3 px
+   wide and sits 5 px in from the edge: thinner than the bulbs, so it covers less. Still in lite mode and reduced motion (the existing rules). ==== */
+:root.frame-new .show-frame{ border-color:transparent !important; box-shadow:none !important; background:none !important; }
+:root.frame-new .show-marquee::before{ content:''; position:fixed; inset:5px; border-radius:22px; pointer-events:none; border:3px solid var(--bulb, #ffd23f);
+  box-shadow:0 0 0 1px rgba(255,255,255,0.55), 0 0 10px 1px var(--bulb, #ffd23f), inset 0 0 10px 1px var(--bulb, #ffd23f); }
+:root.frame-new .show-marquee::after{ content:''; position:fixed; inset:10.5px; border-radius:17px; pointer-events:none; border:1px solid rgba(255,255,255,0.5); }
+:root.frame-new .show-marquee i, :root.frame-new .show-marquee i:nth-child(n){ width:7px !important; height:7px !important; margin:-3.5px 0 0 -3.5px !important; border-radius:50% !important; background:#ffffff !important; box-shadow:0 0 6px 2px var(--bulb, #ffd23f) !important; border:0 !important; }

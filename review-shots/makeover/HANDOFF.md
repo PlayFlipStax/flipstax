@@ -209,3 +209,11 @@ Opus should check
 - Infinity mode is untouched (all rules are `.mode-daily`).
 - The blinking stops in lite and reduced motion (rule included, not verified).
 - The purple spotlight background still shows in the thin margins (the `.show-bg.w-vs` override only dims its children) - finish or drop.
+
+---
+
+# Addendum 5: the frame alternative (`?frame=new`)
+
+- What it is: "the neon orbit" - a 3 px neon tube 5 px in from the edge in the screen's own `--bulb` colour, a fine white inner line, and the old bulbs shrunk to 7 px white running lights riding on it (same four fading groups). Default (no parameter) is unchanged; the switch is one line after `buildMarquee()` and the CSS is the `:root.frame-new` block at the end of `lib/juice.css`.
+- Opus should check: screens whose `--bulb` is white or pale (Twin Flip) read as a white tube - give those games a stronger frame colour if wanted; the Mystery Wheel's per-bulb colour rules and the `.blink / .unison / .miss / .strobe / .disco` marquee states with the small dots; that nothing near the edge is covered at 360x640 (Zap Words, Saucer Shuffle, the ? button).
+- Also check: lite and reduced motion (the existing still rules apply to the dots; not verified), and that `.show-frame`'s gold line being hidden in this mode does not remove anything else it was used for.
