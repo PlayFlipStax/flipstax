@@ -11842,6 +11842,7 @@ const SHARE_URL = 'https://playflipstax.com';
       if (prefersReducedMotion() || isLite() || Math.abs(d) < 1){ setUp(rot); return; }
       const step = (now)=>{ const k = Math.min(1, (now - t0) / 300), e = 1 - (1 - k) * (1 - k); setUp(from + d * e); if (k < 1 && luckyGen === gen) upRaf = requestAnimationFrame(step); };
       upRaf = requestAnimationFrame(step); };
+    setUp(rot);   // (the starting state: every label upright before the first spin)
     const markWin = (wi)=>{ mwUpright(); wheel.classList.add('landed'); wedgeEls().forEach((g, i)=>{ g.classList.toggle('win', i === wi); g.classList.toggle('dim', i !== wi); }); };
     const clearWin = ()=>{ wheel.classList.remove('landed'); wedgeEls().forEach(g=> g.classList.remove('win', 'dim')); };
     const close = ()=>{
