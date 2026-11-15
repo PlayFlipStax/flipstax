@@ -17541,6 +17541,29 @@ const SHARE_URL = 'https://playflipstax.com';
     else if (kind === 'coin'){ playTone(1568, 0, 0.08, 'square', 0.03); playTone(2093, 0.06, 0.12, 'square', 0.03); }
     else if (kind === 'tick') playTone(1200, 0, 0.025, 'square', 0.02);
   };
+  // ---------- Brain Beam: the tap flourish (a look only) ----------
+  // When the player taps an answer on Brain Beam, the saucer fires a quick beam down onto THAT bar and the bar flashes (0.45 s, transform and
+  // opacity only). It runs only on the player's own tap, once per question, never before a tap and never on any other bar; it reads nothing
+  // about which answer is right and changes nothing about how or when the verdict shows. Off in lite mode and reduced motion.
+  function bbShot(tile){
+    const ov = document.getElementById('eventOverlay'), plate = document.getElementById('qzPlate'), grid = tile.parentNode;
+    if (!ov || !plate || !ov.animate || !ov.classList.contains('quiz-beam')) return;
+    if (document.documentElement.classList.contains('lite') || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+    const now = performance.now(); if (grid.querySelector('.is-right, .is-wrong') || (grid._bbAt && now - grid._bbAt < 1500)) return; grid._bbAt = now;
+    const o = ov.getBoundingClientRect(), p = plate.getBoundingClientRect(), t = tile.getBoundingClientRect(); if (!p.width || !t.width) return;
+    const y0 = p.top + p.height * 0.9 - o.top, y1 = t.top + t.height / 2 - o.top; if (y1 - y0 < 20) return;
+    const shot = document.createElement('i'), hit = document.createElement('i'); shot.className = 'bb-shot'; hit.className = 'bb-hit'; shot.setAttribute('aria-hidden', 'true'); hit.setAttribute('aria-hidden', 'true');
+    shot.style.cssText = 'left:' + (t.left - o.left).toFixed(1) + 'px;top:' + y0.toFixed(1) + 'px;width:' + t.width.toFixed(1) + 'px;height:' + (y1 - y0).toFixed(1) + 'px';
+    hit.style.cssText = 'left:' + (t.left - o.left - 8).toFixed(1) + 'px;top:' + (t.top - o.top - 8).toFixed(1) + 'px;width:' + (t.width + 16).toFixed(1) + 'px;height:' + (t.height + 16).toFixed(1) + 'px';
+    ov.appendChild(shot); ov.appendChild(hit);
+    const done = ()=>{ shot.remove(); hit.remove(); };
+    try{
+      shot.animate([{ transform:'scaleY(0.05)', opacity:0.95 }, { transform:'scaleY(1)', opacity:0.9, offset:0.3 }, { transform:'scaleY(1)', opacity:0.7, offset:0.6 }, { transform:'scaleY(1)', opacity:0 }], { duration:450, easing:'ease-out', fill:'forwards' });
+      hit.animate([{ opacity:0, transform:'scale(0.9)' }, { opacity:0, transform:'scale(0.9)', offset:0.22 }, { opacity:0.9, transform:'scale(1)', offset:0.42 }, { opacity:0, transform:'scale(1.06)' }], { duration:450, easing:'ease-out', fill:'forwards' });
+    }catch(e){}
+    setTimeout(done, 520);
+  }
+  document.addEventListener('click', (e)=>{ const tile = e.target && e.target.closest ? e.target.closest('#eventGrid .event-tile') : null; if (tile) { try{ bbShot(tile); }catch(err){} } }, true);
   // ---------- The marquee frame ----------
   const marquee = document.getElementById('showMarquee');
   const BULB_COLORS = { vs:'#ffb0dc', trivia:'#9fd0ff', powerup:'#7ff5d0', jumble:'#ffc07a', riddle:'#d4ff6a', odd:'#e6b8ff', entry:'#ffe27a', galaxy:'#ffe27a', cash:'#ffe066', timewarp:'#c8ff3d', stage:'#fff3c4', neon:'#7df9ff', results:'#ffe27a', first:'#9ff5ea', scan:'#ffb4a8' };
