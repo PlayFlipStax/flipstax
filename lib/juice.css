@@ -3777,3 +3777,28 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 .mg-zapWords .mg-rule{ text-shadow:0 2px 0 #5a0540; }
 :root:root:root:root .zw-stage .zw-grid.sq::before{ inset:-7px; box-shadow:0 0 0 3px #1a0a3a, 0 0 22px 4px rgba(255,225,74,0.75); }
 .zw-stage .zw-foot{ position:relative; z-index:2; }
+
+/* ==== SAUCER SHUFFLE, new setting: "the landing pad". The busy neon wall is gone - the three chrome saucers were lost against it. Now they hover
+   over a round landing pad on a small blue world: a deep cobalt sky with stars, a coral ringed planet high on one side, soft teal and coral nebula
+   glows, and a wide pad of concentric neon rings (gold, coral, cyan) under the saucers with a pool of light on it. Each saucer has a glow under it so
+   it reads at a glance. Colour family: cobalt, coral and gold. Still picture: gradients only. ==== */
+:root:root:root:root:root.stage-on .mg-overlay.mg-saucerShuffle, :root:root:root:root:root .mg-overlay.mg-saucerShuffle{
+  background:
+    radial-gradient(circle at 10% 14%, #fff 0 1.3px, rgba(255,255,255,0) 2px), radial-gradient(circle at 78% 10%, #fff 0 1.5px, rgba(255,255,255,0) 2.3px), radial-gradient(circle at 92% 34%, #fff 0 1.2px, rgba(255,255,255,0) 2px),
+    radial-gradient(circle at 6% 40%, #bff8ff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 60% 26%, #fff 0 1px, rgba(255,255,255,0) 1.8px), radial-gradient(circle at 34% 6%, #fff 0 1.1px, rgba(255,255,255,0) 1.9px),
+    radial-gradient(ellipse 30% 2.6% at 84% 27%, rgba(0,0,0,0) 0 60%, #fff3c4 63% 82%, rgba(0,0,0,0) 85%),
+    radial-gradient(circle at 84% 27%, #ffe0cc 0 3%, #ff7a5a 7%, #b83a22 9.6%, rgba(0,0,0,0) 10%),
+    radial-gradient(ellipse 46% 9% at 50% 66%, rgba(255,246,190,0.55), rgba(255,246,190,0) 72%),
+    radial-gradient(ellipse 62% 13% at 50% 68%, rgba(0,0,0,0) 0 54%, #ffd23f 55.5% 58%, rgba(0,0,0,0) 59.5% 68%, #ff7a5a 69.5% 72%, rgba(0,0,0,0) 73.5% 84%, #27e6ff 85.5% 88.5%, rgba(0,0,0,0) 90%),
+    radial-gradient(ellipse 70% 15% at 50% 68%, #16357a 0 88%, rgba(0,0,0,0) 89%),
+    radial-gradient(ellipse 150% 30% at 50% 108%, #0f2a66 0 62%, #27e6ff 63.2%, rgba(39,230,255,0.4) 66%, rgba(0,0,0,0) 84%),
+    radial-gradient(ellipse 70% 30% at 14% 34%, rgba(39,230,255,0.28), rgba(39,230,255,0) 72%),
+    radial-gradient(ellipse 70% 30% at 88% 52%, rgba(255,122,90,0.26), rgba(255,122,90,0) 72%),
+    linear-gradient(180deg, #06123a 0%, #0c2466 52%, #050c2c 100%) !important; }
+:root:root:root .mg-overlay.mg-saucerShuffle::before, :root:root:root .mg-overlay.mg-saucerShuffle::after{ display:none !important; }
+:root:root:root .mg-saucerShuffle .sc-curtain, :root:root:root .mg-saucerShuffle .sc-blaze.wall, :root:root:root .mg-saucerShuffle .sc-blaze.floor{ display:none !important; }
+:root:root:root .mg-saucerShuffle .sc-casino, :root:root:root .mg-saucerShuffle .sc-table{ background:none !important; border-color:transparent !important; box-shadow:none !important; }
+/* the saucers: a pool of light under each */
+:root:root .su-saucer .su-img{ filter:drop-shadow(0 0 10px rgba(190,248,255,0.85)) drop-shadow(0 10px 8px rgba(0,0,30,0.55)); }
+:root:root:root .mg-saucerShuffle .sc-panel{ background:linear-gradient(180deg, #0f2a66, #06123a); border:3px solid #ffd23f; box-shadow:0 0 16px rgba(255,210,63,0.6); }
+:root:root:root .mg-saucerShuffle .su-panels{ display:none !important; }
