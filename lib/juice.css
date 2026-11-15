@@ -3664,3 +3664,51 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
     radial-gradient(ellipse 90% 50% at 70% 36%, rgba(255,150,90,0.3), rgba(255,150,90,0) 72%),
     linear-gradient(180deg, #071a3a 0%, #0b2a52 50%, #06142e 100%) !important; }
 :root:root:root:root:root:root .mg-factOrFib:has(.ff-warm) .mg-act{ background:#06142e !important; border-color:#45e0cf !important; color:#baffef !important; }
+
+/* ==== SNAP SORT, colour and life: "COSMIC RADAR". Layout: the category plate sits directly under the ROUND pill, the combo row under that, and the
+   scope is much bigger (the rule box is not shown here: the explainer card and the host's line carry it). Colour: the deck is deep space navy with
+   pink and teal nebula glows and stars; the scope's glass is midnight blue with cyan range rings, a magenta cross-hair and a cyan-to-pink sweep,
+   inside a chrome bezel with gold timer lamps; every blip is a bright candy capsule - pink, cyan, gold, lime, orange in turn (the colour is by
+   order only and says nothing about right or wrong). The mission plate is hot pink and gold. ==== */
+:root:root:root:root:root.stage-on .mg-overlay.mg-snapSort, :root:root:root:root:root .mg-overlay.mg-snapSort{
+  background:
+    radial-gradient(circle at 10% 12%, #fff 0 1.3px, rgba(255,255,255,0) 2px), radial-gradient(circle at 86% 8%, #fff 0 1.4px, rgba(255,255,255,0) 2.2px), radial-gradient(circle at 94% 40%, #bff8ff 0 1.2px, rgba(255,255,255,0) 2px),
+    radial-gradient(circle at 5% 52%, #fff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 70% 94%, #fff 0 1.3px, rgba(255,255,255,0) 2px), radial-gradient(circle at 22% 90%, #ffd0ec 0 1.2px, rgba(255,255,255,0) 2px),
+    radial-gradient(ellipse 70% 34% at 12% 30%, rgba(255,79,168,0.4), rgba(255,79,168,0) 72%),
+    radial-gradient(ellipse 70% 36% at 92% 70%, rgba(39,230,255,0.35), rgba(39,230,255,0) 72%),
+    radial-gradient(ellipse 60% 26% at 50% 100%, rgba(255,160,60,0.3), rgba(255,160,60,0) 72%),
+    linear-gradient(180deg, #0a1440 0%, #0b1e54 50%, #060c2a 100%) !important; }
+:root:root:root:root:root .mg-snapSort .mg-rule{ display:none !important; }
+:root:root:root:root .mg-snapSort .mg-sign{ background:linear-gradient(180deg, #101c4c, #070d2c) !important; border:2px solid #27e6ff !important; box-shadow:0 0 14px rgba(39,230,255,0.7), inset 0 1px 0 rgba(255,255,255,0.22) !important; }
+:root:root:root:root .mg-snapSort .mg-sign span{ color:#fff6c2; text-shadow:0 0 6px #ffd23f, 0 0 16px rgba(255,190,40,0.95), 0 0 30px rgba(255,120,60,0.6); }
+:root:root:root:root .mg-snapSort .mg-act{ background:#070d2c; border-color:#ff4fa8; color:#ffd0ec; box-shadow:0 0 8px rgba(255,79,168,0.5); }
+/* the mission plate: hot pink and gold */
+:root:root:root:root .ss-stage.ss-galaxy .ss-cat{ order:-2; margin-top:0; background:linear-gradient(180deg, #e0127a, #8a0a4a) !important; border:3px solid #ffd23f !important;
+  box-shadow:0 0 0 3px #3a0420, 0 0 18px rgba(255,79,168,0.75), inset 0 2px 0 rgba(255,255,255,0.35) !important; color:#fff6c2; text-shadow:0 3px 0 #5a0530, 0 0 14px rgba(255,210,63,0.7); }
+:root:root:root:root .ss-stage.ss-galaxy .ss-cat small{ color:#ffe27a; text-shadow:none; letter-spacing:4px; }
+:root:root:root:root .ss-stage.ss-galaxy .ss-combo{ order:-1; background:#070d2c; border:2px solid #27e6ff; color:#eafcff; box-shadow:0 0 10px rgba(39,230,255,0.4); }
+:root:root:root:root .ss-stage.ss-galaxy .ss-pips i{ background:#101c4c; box-shadow:inset 0 0 0 2px #27e6ff; }
+:root:root:root:root .ss-stage.ss-galaxy{ gap:8px; }
+/* the scope: bigger, midnight blue glass, cyan rings, a magenta cross-hair, a cyan-to-pink sweep */
+:root:root:root:root:root .ss-galaxy .ss-vortex{ width:min(94vw, 50svh, 700px); height:min(94vw, 50svh, 700px); }
+:root:root:root:root .ss-galaxy .ss-vimg{ border-color:#dfe9ff;
+  background:
+    linear-gradient(rgba(255,79,168,0.7), rgba(255,79,168,0.7)) 50% 50% / 100% 1.5px no-repeat, linear-gradient(rgba(255,79,168,0.7), rgba(255,79,168,0.7)) 50% 50% / 1.5px 100% no-repeat,
+    repeating-radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 0 17.5%, rgba(39,230,255,0.75) 17.5% 18.1%, rgba(0,0,0,0) 18.1% 25%),
+    radial-gradient(circle at 50% 50%, #1c4fae 0%, #0f2a78 50%, #070f3a 100%);
+  box-shadow:0 0 0 3px #1a2330, 0 0 0 9px #7b85a6, 0 0 0 12px #1a2330, 0 0 34px 8px rgba(39,230,255,0.5), inset 0 0 40px rgba(0,0,20,0.7); }
+:root:root:root:root .ss-galaxy .ss-vspin{ background:conic-gradient(from 0deg, rgba(39,230,255,0) 0deg, rgba(39,230,255,0) 270deg, rgba(39,230,255,0.22) 315deg, rgba(255,120,200,0.8) 359deg, rgba(255,120,200,0) 360deg); }
+:root:root:root:root .ss-galaxy .ss-core{ box-shadow:0 0 0 3px rgba(190,248,255,0.8), 0 0 22px 6px rgba(39,230,255,0.8); }
+/* the blips: bright candy capsules, a colour each in turn */
+:root:root:root:root .ss-galaxy .ss-word{ color:#0a1030; text-shadow:0 1px 0 rgba(255,255,255,0.5); border:2.5px solid #ffffff; background:linear-gradient(180deg, var(--b1, #ffe27a), var(--b2, #ffb81f)); box-shadow:0 4px 0 var(--b3, #8a5a00), 0 0 16px 3px var(--b4, rgba(255,210,63,0.75)); }
+:root:root:root:root .ss-galaxy .ss-word.fits{ border-color:#ffffff; }
+:root:root:root:root .ss-galaxy .ss-word::before{ background:#0a1030; box-shadow:0 0 0 2px rgba(255,255,255,0.7); }
+.ss-galaxy .ss-item:nth-child(5n+1) .ss-word{ --b1:#ff9ad0; --b2:#ff4fa8; --b3:#8a0a4a; --b4:rgba(255,79,168,0.8); }
+.ss-galaxy .ss-item:nth-child(5n+2) .ss-word{ --b1:#a8f6ff; --b2:#27d6f0; --b3:#07517a; --b4:rgba(39,230,255,0.8); }
+.ss-galaxy .ss-item:nth-child(5n+3) .ss-word{ --b1:#ffe27a; --b2:#ffb81f; --b3:#8a5a00; --b4:rgba(255,210,63,0.8); }
+.ss-galaxy .ss-item:nth-child(5n+4) .ss-word{ --b1:#c8ff8a; --b2:#5ad93a; --b3:#1a6a0a; --b4:rgba(120,255,90,0.8); }
+.ss-galaxy .ss-item:nth-child(5n+5) .ss-word{ --b1:#ffc08a; --b2:#ff7a2a; --b3:#8a3200; --b4:rgba(255,140,60,0.8); }
+:root:root:root:root .ss-galaxy .ss-trail{ background:radial-gradient(circle, #ffffff, rgba(255,160,220,0.85) 45%, rgba(255,160,220,0) 72%); }
+:root:root:root:root .ss-galaxy .ss-fly.right{ background:linear-gradient(180deg, #fffbe0, #b8ff6a 50%, #2fd96b); color:#03100b; }
+:root:root:root:root .ss-galaxy .ss-fly.wrong{ background:linear-gradient(180deg, #ff9a8a, #ff3a3a 52%, #9a0a16); color:#fff; text-shadow:none; }
+:root:root:root:root:root .ss-stage.ss-galaxy{ margin-top:-12px; }
