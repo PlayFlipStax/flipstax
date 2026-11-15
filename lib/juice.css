@@ -3802,3 +3802,41 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root:root .su-saucer .su-img{ filter:drop-shadow(0 0 10px rgba(190,248,255,0.85)) drop-shadow(0 10px 8px rgba(0,0,30,0.55)); }
 :root:root:root .mg-saucerShuffle .sc-panel{ background:linear-gradient(180deg, #0f2a66, #06123a); border:3px solid #ffd23f; box-shadow:0 0 16px rgba(255,210,63,0.6); }
 :root:root:root .mg-saucerShuffle .su-panels{ display:none !important; }
+
+/* ==== VS CARDS, "THE ORBIT STAGE" (first-impression pass). The two cards are two lit stages in space with the show's mothership hovering between
+   them. Behind everything: deep-space navy with stars and soft pink and teal nebula glows (no purple spotlights). Each card keeps its own bold
+   colour and the faint space pattern, and gains show lighting: a soft pool of light on the side nearest the mothership and a gentle darkening
+   toward the far corners, so the card looks lit from the ship. The picture stands on a glowing hover-pad. The name sits on a neon marquee plate
+   (dark glass, a bright white tube border, a soft glow). The mothership is redrawn - glass dome, chrome hull, a soft cyan under-glow, the gold VS
+   coin in its centre - with six rim lights that blink alternately (opacity only, one change every 0.5 s). The hint is a clear gold pill.
+   Nothing sits on top of the cards' pictures or names. ==== */
+:root:root.mode-daily .show-bg.w-vs{
+  background:
+    radial-gradient(circle at 8% 6%, #fff 0 1.3px, rgba(255,255,255,0) 2px), radial-gradient(circle at 92% 12%, #fff 0 1.4px, rgba(255,255,255,0) 2.2px), radial-gradient(circle at 96% 52%, #bff8ff 0 1.2px, rgba(255,255,255,0) 2px),
+    radial-gradient(circle at 3% 50%, #fff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 50% 98%, #fff 0 1.2px, rgba(255,255,255,0) 2px),
+    radial-gradient(ellipse 80% 30% at 0% 50%, rgba(39,230,255,0.45), rgba(39,230,255,0) 72%), radial-gradient(ellipse 80% 30% at 100% 50%, rgba(255,79,168,0.45), rgba(255,79,168,0) 72%),
+    linear-gradient(180deg, #050b28 0%, #0b1c52 50%, #050b28 100%) !important; }
+:root:root.mode-daily .show-bg.w-vs > *{ opacity:0.12; }
+/* show lighting on each card (behind the content): a pool of light toward the ship, darker far corners */
+:root:root:root:root.mode-daily #board .half > .gloss::before{ display:block !important; content:''; position:absolute; inset:0; left:0; right:0; top:0; bottom:0; width:auto; height:auto; border-radius:0; transform:none; border:0; box-shadow:none; pointer-events:none; }
+:root:root:root:root.mode-daily #board .half.top > .gloss::before{ background:radial-gradient(ellipse 70% 46% at 50% 104%, rgba(255,255,255,0.55), rgba(255,255,255,0) 72%), radial-gradient(ellipse 120% 90% at 50% 100%, rgba(0,0,30,0) 55%, rgba(0,0,40,0.34) 100%); }
+:root:root:root:root.mode-daily #board .half.bottom > .gloss::before{ background:radial-gradient(ellipse 70% 46% at 50% -4%, rgba(255,255,255,0.55), rgba(255,255,255,0) 72%), radial-gradient(ellipse 120% 90% at 50% 0%, rgba(0,0,30,0) 55%, rgba(0,0,40,0.34) 100%); }
+/* the picture on its hover-pad */
+:root.mode-daily #board .half:not(.revealed) .scene{ position:relative; }
+:root.mode-daily #board .half:not(.revealed) .scene::after{ content:''; position:absolute; z-index:-1; left:50%; bottom:-4%; width:132%; height:26%; margin-left:-66%; border-radius:50%; pointer-events:none;
+  border:3px solid rgba(255,255,255,0.9); background:radial-gradient(ellipse closest-side, rgba(255,255,255,0.75), rgba(255,255,255,0.18) 62%, rgba(255,255,255,0)); box-shadow:0 0 18px 4px rgba(255,255,255,0.55); }
+/* the name: a neon marquee plate */
+:root:root.mode-daily #board .half:not(.revealed) .content{ background:linear-gradient(180deg, rgba(13,26,72,0.94), rgba(5,11,36,0.96)); border:3px solid #ffffff; border-radius:18px;
+  box-shadow:0 0 0 3px rgba(5,11,36,0.85), 0 0 18px 3px rgba(255,255,255,0.6), inset 0 0 16px rgba(125,249,255,0.28); }
+:root:root:root.mode-daily #board .half:not(.revealed) .take{ text-shadow:0 0 10px rgba(125,249,255,0.55), 0 3px 0 rgba(0,0,30,0.7); letter-spacing:0.5px; }
+/* the mothership: one drawing with the coin in it, and a blinking layer of rim lights over it */
+:root:root:root:root:root:root.mode-daily #board .divider::before{ width:min(310px, 80vw); height:118px; margin:-66px 0 0 calc(min(310px, 80vw) / -2); z-index:-2; border:0; border-radius:0; box-shadow:none; filter:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 310 118'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.38' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23fff'/%3E%3Cstop offset='.35' stop-color='%23c8faff'/%3E%3Cstop offset='1' stop-color='%231a8fb8'/%3E%3C/radialGradient%3E%3ClinearGradient id='h' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff'/%3E%3Cstop offset='.4' stop-color='%23bcc7e0'/%3E%3Cstop offset='.5' stop-color='%23606c94'/%3E%3Cstop offset='1' stop-color='%23222b4e'/%3E%3C/linearGradient%3E%3CradialGradient id='c' cx='.36' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23fffbe0'/%3E%3Cstop offset='.35' stop-color='%23ffe680'/%3E%3Cstop offset='.7' stop-color='%23ffc21a'/%3E%3Cstop offset='1' stop-color='%23d98e00'/%3E%3C/radialGradient%3E%3CradialGradient id='u'%3E%3Cstop offset='0' stop-color='%237df9ff' stop-opacity='.85'/%3E%3Cstop offset='1' stop-color='%237df9ff' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cellipse cx='155' cy='74' rx='155' ry='42' fill='url(%23u)'/%3E%3Cpath d='M93 62 C93 0 217 0 217 62Z' fill='url(%23g)' stroke='%230c1838' stroke-width='4'/%3E%3Cpath d='M112 30 C120 17 134 11 147 11' fill='none' stroke='%23fff' stroke-width='5' stroke-linecap='round' opacity='.85'/%3E%3Cellipse cx='155' cy='72' rx='146' ry='30' fill='url(%23h)' stroke='%230c1838' stroke-width='4'/%3E%3Cpath d='M26 68 Q155 52 284 68' fill='none' stroke='%23fff' stroke-opacity='.75' stroke-width='3'/%3E%3Cg fill='%237a1050' stroke='%230c1838' stroke-width='2'%3E%3Ccircle cx='34' cy='76' r='6'/%3E%3Ccircle cx='66' cy='84' r='6'/%3E%3Ccircle cx='100' cy='89' r='6'/%3E%3Ccircle cx='210' cy='89' r='6'/%3E%3Ccircle cx='244' cy='84' r='6'/%3E%3Ccircle cx='276' cy='76' r='6'/%3E%3C/g%3E%3Ccircle cx='155' cy='66' r='31' fill='url(%23c)' stroke='%237a3d00' stroke-width='4'/%3E%3Ccircle cx='155' cy='66' r='24' fill='none' stroke='%23fff6c2' stroke-opacity='.7' stroke-width='2'/%3E%3C/svg%3E") center / contain no-repeat; }
+:root:root:root:root:root:root.mode-daily #board .divider::after{ width:min(310px, 80vw); height:118px; margin:-66px 0 0 calc(min(310px, 80vw) / -2); z-index:-1; border:0; border-radius:0; box-shadow:none; clip-path:none; box-sizing:border-box;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 310 118'%3E%3Cg fill='%23fff' stroke='%23ff4fa8' stroke-width='3'%3E%3Ccircle cx='34' cy='76' r='5'/%3E%3Ccircle cx='100' cy='89' r='5'/%3E%3Ccircle cx='244' cy='84' r='5'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 310 118'%3E%3Cg fill='%23fff6a0' stroke='%23ffc21a' stroke-width='3'%3E%3Ccircle cx='66' cy='84' r='5'/%3E%3Ccircle cx='210' cy='89' r='5'/%3E%3Ccircle cx='276' cy='76' r='5'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+  animation:vsRim 1s steps(1) infinite; opacity:1; }
+@keyframes vsRim{ 0%{ opacity:1; } 50%{ opacity:0.25; } }
+:root.lite.mode-daily #board .divider::after{ animation:none !important; } @media (prefers-reduced-motion: reduce){ :root.mode-daily #board .divider::after{ animation:none !important; } }
+/* the hint: a clear gold pill */
+:root:root.mode-daily .hint{ align-self:center; width:max-content; max-width:92%; margin:6px auto calc(8px + env(safe-area-inset-bottom)); padding:9px 20px; border-radius:99px; background:linear-gradient(180deg, #fff3a8, #ffc21a); color:#2a1000;
+  font:900 clamp(15px, 4.4vw, 19px)/1 var(--f-display, sans-serif); letter-spacing:1.5px; text-transform:uppercase; box-shadow:0 0 0 2px #7a4a00, 0 4px 0 2px #5a2a00, 0 0 16px rgba(255,210,63,0.6); }

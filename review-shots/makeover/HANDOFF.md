@@ -191,3 +191,21 @@ Aesthetics only, all CSS appended at the end of `lib/juice.css`. **No fast check
 | Saucer Shuffle | see `git log` (after `9946441`) | The landing pad: cobalt sky, coral ringed planet, concentric neon rings under the saucers, a glow on each saucer. | The photo wall, curtains, wall / floor blaze layers and the `su-panels` lights are hidden with `display:none` - check the shuffle, the reveal and the PERFECT SHUFFLE win still read without them. The saucer glow is a static `drop-shadow` on an image that moves by transform: watch frame rate on an older iPhone; drop the filter if it stutters. |
 
 Not started: Alien Blast (already one of the strongest; left alone), Word Warp (looked at; holds up - any new layer there must be added to the memory clean-up from `8a9a942`), Results, Game Select, Orbit Drop, ZiG Zap, Price Probe's light touch.
+
+
+---
+
+# Addendum 4: VS cards, "The Orbit Stage" (latest VS pass)
+
+CSS only, the last block in `lib/juice.css`. One 390x844 play shot and one after-vote shot, no console errors. No 360x640, lite or reduced-motion check.
+
+What changed: show lighting on each card (`.gloss::before`: a pool of light toward the ship, darker far corners); the picture on a hover-pad (`.scene::after`, unrevealed cards only); the name on a neon marquee plate (`.half:not(.revealed) .content`); the mothership redrawn with the gold coin inside the drawing (`.divider::before`) and a blinking layer of rim lights (`.divider::after`, opacity only, `steps(1)` 1 s = one change every 0.5 s); the hint is a gold pill; the background behind the cards is navy with stars.
+
+Opus should check
+- **Long names at 360x640** on the marquee plate (it has a 3 px border and a glow; the text size is unchanged).
+- The hover-pad under very wide or very tall pictures and under avatar cards; it is hidden once a card is revealed.
+- The mothership is `min(310px, 80vw)` wide and 118 px tall, centred on the gap: confirm it never covers a category chip or a name on short screens, and how it looks in the deal-in animation and under the crowd board.
+- The hint pill: both texts ("Tap the one you prefer", "Tap who wins") and the after-vote text fit on one line at 360 px; it is `width:max-content`.
+- Infinity mode is untouched (all rules are `.mode-daily`).
+- The blinking stops in lite and reduced motion (rule included, not verified).
+- The purple spotlight background still shows in the thin margins (the `.show-bg.w-vs` override only dims its children) - finish or drop.
