@@ -3953,3 +3953,15 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root:root .mg-peakOrPlunge .pp-vs{ color:#ffffff; text-shadow:0 0 10px rgba(255,160,110,0.95), 0 2px 0 rgba(0,0,30,0.7); }
 :root:root .mg-peakOrPlunge .pp-btn{ border-color:#ffffff; box-shadow:0 5px 0 rgba(0,0,30,0.6), 0 0 14px rgba(255,255,255,0.35); text-shadow:0 2px 0 rgba(0,0,0,0.35); }
 :root:root:root:root .mg-overlay.mg-peakOrPlunge .mg-bg{ display:block !important; }
+
+/* ==== RIDDLE ROUND, polish pass (look only): the flat lime field behind the riddle is replaced by deep space in the riddle's own colour family -
+   a near-black green sky with stars and soft lime and teal nebula glows - so the lime neon sign, the riddle board and the answer bars are the
+   bright things on screen, as in the other games. The old rays and floating marks are dimmed far back. ==== */
+:root:root.mode-daily .show-bg.w-riddle, :root:root:root:root #eventOverlay.event-overlay.quiz-riddle, :root:root:root #evBg.w-riddle, :root:root.mode-infinity .bg.w-riddle{ background:
+  radial-gradient(circle at 9% 12%, #fff 0 1.3px, rgba(255,255,255,0) 2px), radial-gradient(circle at 90% 8%, #fff 0 1.4px, rgba(255,255,255,0) 2.2px), radial-gradient(circle at 96% 46%, #d6ff7a 0 1.2px, rgba(255,255,255,0) 2px),
+  radial-gradient(circle at 4% 58%, #fff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 52% 97%, #fff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 30% 30%, #bff8ff 0 1px, rgba(255,255,255,0) 1.8px),
+  radial-gradient(ellipse 90% 30% at 50% 16%, rgba(170,255,60,0.42), rgba(170,255,60,0) 72%), radial-gradient(ellipse 80% 34% at 100% 78%, rgba(40,220,200,0.36), rgba(40,220,200,0) 72%),
+  radial-gradient(ellipse 70% 30% at 0% 92%, rgba(190,255,70,0.3), rgba(190,255,70,0) 72%),
+  linear-gradient(180deg, #04160c 0%, #0a2c1a 46%, #06231c 78%, #030f12 100%) !important; }
+:root:root.mode-daily .show-bg.w-riddle > *, :root:root:root #evBg.w-riddle > *, :root:root.mode-infinity .bg.w-riddle > *{ opacity:0.14 !important; }
+:root:root:root:root #eventOverlay.event-overlay.quiz-riddle::before, :root:root:root:root #eventOverlay.event-overlay.quiz-riddle::after{ opacity:0.12 !important; }
