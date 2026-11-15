@@ -3964,7 +3964,6 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
   radial-gradient(ellipse 70% 30% at 0% 92%, rgba(190,255,70,0.3), rgba(190,255,70,0) 72%),
   linear-gradient(180deg, #04160c 0%, #0a2c1a 46%, #06231c 78%, #030f12 100%) !important; }
 :root:root.mode-daily .show-bg.w-riddle > *, :root:root:root #evBg.w-riddle > *, :root:root.mode-infinity .bg.w-riddle > *{ opacity:0.14 !important; }
-:root:root:root:root #eventOverlay.event-overlay.quiz-riddle::before, :root:root:root:root #eventOverlay.event-overlay.quiz-riddle::after{ opacity:0.12 !important; }
 
 /* ==== BRAIN BEAM, "THE ABDUCTION BEAM" (the show's signature screen; look only - the question, the answers and their order, scoring, timing, the
    timer bar and the right / wrong verdict colours are untouched). One idea, top to bottom: a big chrome saucer hovers at the top of the screen
@@ -4025,31 +4024,71 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root.lite.mode-daily .event-overlay.quiz-beam .qz-plate, :root.lite.mode-daily .event-overlay.quiz-beam .qz-plate::after, :root.lite.mode-daily .event-overlay.quiz-beam .ov-tint::before, :root.lite.mode-daily .event-overlay.quiz-beam .event-grid::after{ animation:none !important; }
 @media (prefers-reduced-motion: reduce){ :root.mode-daily .event-overlay.quiz-beam .qz-plate, :root.mode-daily .event-overlay.quiz-beam .qz-plate::after, :root.mode-daily .event-overlay.quiz-beam .ov-tint::before, :root.mode-daily .event-overlay.quiz-beam .event-grid::after{ animation:none !important; } }
 
-/* ==== RIDDLE ROUND, "THE INTERCEPT" (sci-fi pass; look only - riddles, answers, order, timer bar and timing untouched). A transmission picked
-   up from the outer rim: over the deep-space green backdrop sit faint radar rings; the riddle is on a listening-post terminal (near-black green
-   glass, a lime tube, scan lines, a TRANSMISSION INTERCEPTED tag, a signal trace along its foot) in phosphor-white type; the four answers are
-   signal keys - squared dark-glass keys, each edged by its own colour from the green family (lime, mint, yellow, aqua), with a lit key-cap for
-   its number. Right and wrong keep their solid colours. All still. Colour family: phosphor green. ==== */
+/* ==== RIDDLE ROUND, "THE DECODER" (redo; look only - riddles, answers and their order, the timer bar, timing and the right / wrong colours are
+   untouched; the deep-space green backdrop shared with Infinity and the wheel's riddle is unchanged). The bulb sign and the gold "?" medallions
+   are gone. The screen is an alien decoding station that has caught something strange: the title is a dark monolith plate with glitching
+   phosphor lettering, a slit-pupilled alien eye watching from each side (they blink), and a ticker of alien glyphs running along its foot;
+   streams of the same glyphs fall down both edges of the screen; the riddle sits on the listening-post terminal (scan lines, the TRANSMISSION
+   INTERCEPTED tag, a signal trace); the answers are angular signal keys, each in its own colour of the green family with a diamond key-cap and
+   a glyph of its own; along the foot, a jagged ridge with a dish and a watching monolith. Movement: the glyph ticker and the two streams slide,
+   the eyes blink (transform and opacity only). Colour family: phosphor green. ==== */
 :root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-riddle .ov-tint{ background:
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 70' preserveAspectRatio='none'%3E%3Cpath d='M0 70V44l22-12 16 10 26-22 20 16 30-8 24 12 34-20 22 14 28-6 30 14 26-18 24 10 30-14 30 16 28-8v52z' fill='%23041c12' stroke='%23b6ff3a' stroke-width='1.5' stroke-linejoin='round'/%3E%3Cpath d='M300 40V14h14v26z' fill='%2302100a' stroke='%23b6ff3a' stroke-width='1.5'/%3E%3Cellipse cx='307' cy='22' rx='4' ry='2' fill='%23b6ff3a'/%3E%3Cpath d='M86 34V20' stroke='%23b6ff3a' stroke-width='2'/%3E%3Cpath d='M72 8Q86 30 100 8z' fill='%23041c12' stroke='%23b6ff3a' stroke-width='1.5' transform='rotate(-20 86 16)'/%3E%3Cg fill='none' stroke='%233affc8' stroke-width='1.5' stroke-linecap='round'%3E%3Cpath d='M100 6a8 8 0 0 1 6 6'/%3E%3Cpath d='M104 0a15 15 0 0 1 10 10' opacity='.7'/%3E%3C/g%3E%3C/svg%3E") center bottom / 100% 62px no-repeat,
   radial-gradient(circle at 50% 108%, rgba(0,0,0,0) 0 19%, rgba(182,255,58,0.3) 19.4% 19.9%, rgba(0,0,0,0) 20.3% 33%, rgba(182,255,58,0.22) 33.4% 33.9%, rgba(0,0,0,0) 34.3% 47%, rgba(182,255,58,0.15) 47.4% 47.9%, rgba(0,0,0,0) 48.3% 61%, rgba(182,255,58,0.1) 61.4% 61.9%, rgba(0,0,0,0) 62.3%) !important; }
-:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-riddle .rd-sky{ opacity:0.3 !important; }
+:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-riddle .rd-sky{ display:none !important; }
+/* the glyph streams down both edges */
+:root:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-riddle::before, :root:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-riddle::after{ content:''; display:block; position:absolute; z-index:-1; top:0; bottom:auto; height:calc(100% + 110px); width:11px; pointer-events:none; opacity:0.7 !important;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 160' fill='none' stroke='%23b6ff3a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath transform='translate(2 2)' d='M6 1a5 5 0 1 0 .01 0z M6 5.2a.8.8 0 1 0 .01 0z'/%3E%3Cpath transform='translate(2 18)' d='M6 1L11 11H1z'/%3E%3Cpath transform='translate(2 34)' d='M1 3l4 3-4 3 M7 3l4 3-4 3'/%3E%3Cpath transform='translate(2 50)' d='M2 2v8M6 2v8M10 2v5'/%3E%3Cpath transform='translate(2 66)' d='M6 11V6M6 6L2 1M6 6l4-5'/%3E%3Cpath transform='translate(2 82)' d='M1 1h10v10H1zM1 6h5'/%3E%3Cpath transform='translate(2 98)' d='M1 9a5 5 0 0 1 10 0M3.5 9a2.5 2.5 0 0 1 5 0'/%3E%3Cpath transform='translate(2 114)' d='M6 1v10M1 6h10'/%3E%3Cpath transform='translate(2 130)' d='M2 11L6 1M6 11l4-10'/%3E%3Cpath transform='translate(2 146)' d='M6 1l5 5-5 5-5-5z'/%3E%3C/svg%3E") 0 0 / 11px 110px repeat-y !important; transform:translateY(-110px); animation:rdStream 9s linear infinite; -webkit-mask:none; mask:none; border-radius:0; filter:none; }
+:root:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-riddle::before{ left:1.5px; right:auto; }
+:root:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-riddle::after{ right:1.5px; left:auto; animation-duration:12s; animation-delay:-4s; }
+@keyframes rdStream{ from{ transform:translateY(-110px); } to{ transform:translateY(0); } }
+/* the title: a monolith plate, glitching letters, two watching eyes, a glyph ticker */
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-bulbs, :root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-ghost, :root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-glow{ display:none !important; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-riddle{ aspect-ratio:4; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-panel{ inset:4% 2%; overflow:hidden; border:2.5px solid #b6ff3a; border-radius:4px 22px 4px 22px; padding:0 3cqw 3.2cqw;
+  background:repeating-linear-gradient(180deg, rgba(182,255,58,0.07) 0 1px, rgba(0,0,0,0) 1px 4px), linear-gradient(180deg, #06281a, #020d08); box-shadow:0 0 16px 2px rgba(182,255,58,0.7), inset 0 0 22px rgba(182,255,58,0.22); }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-panel::after{ content:''; position:absolute; left:0; bottom:1.2cqw; width:300%; height:3.2cqw; opacity:0.85; pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 16' fill='none' stroke='%23b6ff3a' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath transform='translate(2 2)' d='M6 1a5 5 0 1 0 .01 0z M6 5.2a.8.8 0 1 0 .01 0z'/%3E%3Cpath transform='translate(18 2)' d='M6 1L11 11H1z'/%3E%3Cpath transform='translate(34 2)' d='M1 3l4 3-4 3 M7 3l4 3-4 3'/%3E%3Cpath transform='translate(50 2)' d='M2 2v8M6 2v8M10 2v5'/%3E%3Cpath transform='translate(66 2)' d='M6 11V6M6 6L2 1M6 6l4-5'/%3E%3Cpath transform='translate(82 2)' d='M1 1h10v10H1zM1 6h5'/%3E%3Cpath transform='translate(98 2)' d='M1 9a5 5 0 0 1 10 0M3.5 9a2.5 2.5 0 0 1 5 0'/%3E%3Cpath transform='translate(114 2)' d='M6 1v10M1 6h10'/%3E%3Cpath transform='translate(130 2)' d='M2 11L6 1M6 11l4-10'/%3E%3Cpath transform='translate(146 2)' d='M6 1l5 5-5 5-5-5z'/%3E%3C/svg%3E") 0 0 / 32cqw 100% repeat-x; animation:rdTicker 9s linear infinite; }
+@keyframes rdTicker{ to{ transform:translateX(-32cqw); } }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-icon{ flex:0 0 15%; height:60%; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Cdefs%3E%3CradialGradient id='i'%3E%3Cstop offset='0' stop-color='%23f6ffd0'/%3E%3Cstop offset='.55' stop-color='%23b6ff3a'/%3E%3Cstop offset='1' stop-color='%231f8a2a'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath d='M2 22Q22 3 42 22Q22 41 2 22z' fill='%2303140c' stroke='%23b6ff3a' stroke-width='2.5' stroke-linejoin='round'/%3E%3Ccircle cx='22' cy='22' r='9.5' fill='url(%23i)'/%3E%3Cellipse cx='22' cy='22' rx='2.6' ry='8' fill='%2303140c'/%3E%3Ccircle cx='18.5' cy='18' r='2' fill='%23fff'/%3E%3Cpath d='M8 10l3 4M22 5v5M36 10l-3 4' stroke='%23b6ff3a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat; animation:rdBlink 4.6s ease-in-out infinite; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-icon.r{ animation-delay:-2.1s; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-icon svg{ display:none !important; }
+@keyframes rdBlink{ 0%, 90%, 100%{ transform:scaleY(1); } 94%{ transform:scaleY(0.08); } }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-l{ -webkit-text-stroke:0 !important; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-l.lg{ font:400 12cqw/1 'FS Righteous', var(--f-display, sans-serif) !important; letter-spacing:1.6cqw !important; color:#f2ffd6 !important;
+  text-shadow:-0.7cqw 0 0 rgba(255,58,208,0.75), 0.7cqw 0 0 rgba(58,255,200,0.8), 0 0 3cqw #b6ff3a !important; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-l.sm{ font-size:4.6cqw !important; letter-spacing:3.2cqw !important; margin-right:-3.2cqw; color:#3affc8 !important; text-shadow:0 0 2cqw rgba(58,255,200,0.8) !important; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate > small{ color:#b6ff3a !important; letter-spacing:3px !important; text-shadow:0 0 8px rgba(182,255,58,0.8); }
 /* the terminal (the riddle) */
-:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-prompt{ border:2.5px solid #b6ff3a; border-radius:10px; padding:26px 18px 30px; overflow:visible;
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-prompt{ border:2.5px solid #b6ff3a; border-radius:4px 20px 4px 20px; padding:26px 18px 30px; overflow:visible;
   background:repeating-linear-gradient(180deg, rgba(182,255,58,0.08) 0 1px, rgba(0,0,0,0) 1px 4px), linear-gradient(180deg, rgba(8,44,24,0.95), rgba(2,16,10,0.97)) !important;
   box-shadow:0 0 18px 2px rgba(182,255,58,0.65), inset 0 0 28px rgba(182,255,58,0.22); color:#f2ffe0; text-shadow:0 0 10px rgba(182,255,58,0.75), 0 2px 0 rgba(0,20,0,0.8); }
-:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-prompt::before{ content:'\25CF  TRANSMISSION INTERCEPTED'; display:block; position:absolute; inset:auto; left:14px; top:-11px; width:auto; height:auto; padding:4px 11px; border-radius:4px; animation:none !important; opacity:1;
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-prompt::before{ content:'\25CF  TRANSMISSION INTERCEPTED'; display:block; position:absolute; inset:auto; left:14px; top:-11px; width:auto; height:auto; padding:4px 11px; border-radius:2px 8px 2px 8px; animation:none !important; opacity:1;
   background:#b6ff3a !important; color:#06200c; font:900 10.5px/1 var(--f-body, Inter, sans-serif); letter-spacing:2px; white-space:pre; text-shadow:none; box-shadow:0 0 10px rgba(182,255,58,0.9); -webkit-mask:none; mask:none; }
-:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-prompt::after{ content:''; display:block; position:absolute; inset:auto 14px 8px 14px; height:14px; animation:none !important; opacity:0.85; pointer-events:none; -webkit-mask:none; mask:none;
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-prompt::after{ content:''; display:block; position:absolute; inset:auto 14px 8px 14px; height:14px; animation:none !important; opacity:0.85; pointer-events:none; -webkit-mask:none; mask:none;
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 14' preserveAspectRatio='none'%3E%3Cpath d='M0 7h14l3-5 4 10 4-12 4 12 3-5h12l3-3 3 6 3-3h14l3-6 4 12 4-10 3 4h30' fill='none' stroke='%23b6ff3a' stroke-width='1.4' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat !important; }
 /* the signal keys (the answers) */
-:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile{ --pod:#b6ff3a; border-radius:14px; }
-:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:nth-child(2){ --pod:#3affc8; }
-:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:nth-child(3){ --pod:#ffe14a; }
-:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:nth-child(4){ --pod:#5ad6ff; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile{ --pod:#b6ff3a; --gx:0%; border-radius:4px 20px 4px 20px; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:nth-child(2){ --pod:#3affc8; --gx:33.3%; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:nth-child(3){ --pod:#ffe14a; --gx:66.6%; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:nth-child(4){ --pod:#5ad6ff; --gx:100%; }
 :root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:not(.is-right):not(.is-wrong){ border:3px solid var(--pod);
   background:linear-gradient(90deg, color-mix(in srgb, var(--pod) 30%, transparent), rgba(0,0,0,0) 34%), linear-gradient(180deg, rgba(10,50,30,0.95), rgba(3,18,14,0.97)) !important;
   box-shadow:0 0 14px 2px color-mix(in srgb, var(--pod) 70%, transparent), inset 0 0 14px color-mix(in srgb, var(--pod) 30%, transparent), inset 0 2px 0 rgba(255,255,255,0.2); color:#ffffff; text-shadow:0 0 10px var(--pod), 0 2px 0 rgba(0,20,0,0.8); }
-:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:not(.is-right):not(.is-wrong) .tkey{ left:14px; color:#06200c; border:2px solid #ffffff; border-radius:10px; background:linear-gradient(180deg, #ffffff, var(--pod) 55%); box-shadow:0 3px 0 rgba(0,0,0,0.5), 0 0 12px 1px var(--pod); }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:not(.is-right):not(.is-wrong) .tkey{ left:16px; width:42px; height:42px; margin-top:-21px; color:#06200c; border:0; border-radius:0; clip-path:polygon(50% 0, 100% 50%, 50% 100%, 0 50%); background:linear-gradient(180deg, #ffffff, var(--pod) 60%); box-shadow:none; font-size:22px; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:not(.is-right):not(.is-wrong)::before{ content:''; display:block; position:absolute; inset:auto; right:16px; top:50%; width:24px; height:24px; margin-top:-12px; opacity:0.75; pointer-events:none; border:0; border-radius:0; box-shadow:none; transform:none; animation:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 16' fill='none' stroke='%23ffffff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath transform='translate(2 2)' d='M6 1a5 5 0 1 0 .01 0z M6 5.2a.8.8 0 1 0 .01 0z'/%3E%3Cpath transform='translate(18 2)' d='M6 11V6M6 6L2 1M6 6l4-5'/%3E%3Cpath transform='translate(34 2)' d='M1 9a5 5 0 0 1 10 0M3.5 9a2.5 2.5 0 0 1 5 0'/%3E%3Cpath transform='translate(50 2)' d='M6 1l5 5-5 5-5-5z'/%3E%3C/svg%3E") var(--gx) 50% / auto 100% no-repeat; }
+/* a short screen: a smaller sign, a tighter terminal without the trace, so the four keys keep their height */
+@media (max-height:700px){
+  :root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-riddle{ width:min(64%, 250px); }
+  :root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate > small{ display:none !important; }
+  :root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-prompt{ padding:16px 14px 12px; margin-top:8px; min-height:0; }
+  :root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-prompt::after{ display:none; }
+  :root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile{ font-size:clamp(17px, 5.4vw, 22px); line-height:1; }
+  :root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:not(.is-right):not(.is-wrong) .tkey{ width:34px; height:34px; margin-top:-17px; font-size:18px; }
+}
+:root.lite.mode-daily #eventOverlay.quiz-riddle::before, :root.lite.mode-daily #eventOverlay.quiz-riddle::after, :root.lite.mode-daily .event-overlay.quiz-riddle .qz-plate .nl-panel::after, :root.lite.mode-daily .event-overlay.quiz-riddle .qz-plate .nl-icon{ animation:none !important; }
+@media (prefers-reduced-motion: reduce){ :root.mode-daily #eventOverlay.quiz-riddle::before, :root.mode-daily #eventOverlay.quiz-riddle::after, :root.mode-daily .event-overlay.quiz-riddle .qz-plate .nl-panel::after, :root.mode-daily .event-overlay.quiz-riddle .qz-plate .nl-icon{ animation:none !important; } }
 
 /* ==== MYSTERY WHEEL, "THE ORBITAL DIAL" (sci-fi pass; drawing only - the wedges, their order, labels, prizes and odds, the spin, how it lands, the
    pointer's position, the SPIN button's behaviour and every payout are untouched). The black-and-gold casino stage is gone. Now the wheel is an
