@@ -11480,7 +11480,7 @@ const SHARE_URL = 'https://playflipstax.com';
   const DOOR_PICK_MS = 8000;
   const DOOR_ICONS = { riddle:'🧩', emojiDecode:'😀', timeWarp:'⌛', snapSort:'📸', saucerShuffle:'🛸', factOrFib:'❓', priceProbe:'🏷️', zigZap:'⚡', alienBlast:'👽', spaceLaunch:'🚀', munchMix:'🍴', starSequence:'⭐' };
   // A+ pacing: every game's icon, for its title card
-  const GAME_ICONS = Object.assign({ riddle:'🧩', lucky:'🎡', door:'🕹️', zapWords:'⚡', twinFlip:'🃏', orbitDrop:'🛸', wordWarp:'🌀', peakOrPlunge:'⛰️', oddballAlert:'🔍', crowdScan:'👥', vs:'🆚' }, DOOR_ICONS);
+  const GAME_ICONS = Object.assign({ riddle:'🧩', lucky:'🎡', door:'🕹️', zapWords:'⚡', twinFlip:'👽', orbitDrop:'🛸', wordWarp:'🌀', peakOrPlunge:'⛰️', oddballAlert:'🔍', crowdScan:'👥', vs:'🆚' }, DOOR_ICONS);
   // ---------- GAME SELECT: the Mystery Portal as a retro arcade select screen (lib/game-select.js) ----------
   // All the Portal's games are on the screen (st.doors = RUNDOWN.door.select). A tap highlights a tile, PLAY confirms; with no tap for GS_PICK_MS the
   // screen picks (a game not yet played, if there is one), so the show never stalls. The chosen game then runs exactly as a door's game did: its own
@@ -19526,7 +19526,7 @@ const SHARE_URL = 'https://playflipstax.com';
           'Win a round’s game for an ◉ orb. Each orb is one drop in ' + GN.orbitDrop + '.'],
         chipsLabel:'Each round ends with',
         chips:[ ['🕹️ Select Game', 'Round 1'], ['🎡 Mystery Wheel', 'Round 2'],
-                ['⚡ ' + GN.zapWords, 'Round 3'], ['👾 ' + GN.munchMix, 'Round 4'], ['🃏 ' + GN.twinFlip, 'Round 5'], ['🛸 ' + GN.orbitDrop, 'Round 6'] ] },
+                ['⚡ ' + GN.zapWords, 'Round 3'], ['👾 ' + GN.munchMix, 'Round 4'], ['👽 ' + GN.twinFlip, 'Round 5'], ['🛸 ' + GN.orbitDrop, 'Round 6'] ] },
       HOWTO_LAST_DAILY,
     ],
     infinity: [
