@@ -174,3 +174,20 @@ Design only. **No fast check, no lite / reduced-motion screenshots.** Each scree
 - **Heavy `:has()`, stacked `:root` selectors and `!important`** to beat older rules. A half-old look on a phone means a specificity miss.
 - **Big glows** (`box-shadow` blur on the scope, the hologram, the trays) are static, never animated.
 - New motion added in this pass: the radar sweep (transform), the blip dots (opacity). Everything else is still.
+
+
+---
+
+# Addendum 3: the whole-game look pass (latest)
+
+Aesthetics only, all CSS appended at the end of `lib/juice.css`. **No fast check, no lite / reduced-motion, 390x844 only** (one screenshot per screen from the TEST menu, no console errors).
+
+| Screen | Commit | Idea | Opus: check |
+|---|---|---|---|
+| Fact or Fib | `3ac17eb` | The TRUTH-O-TRON on a moon: navy space, a huge warm ringed planet, atomic starbursts, a cratered moon surface. Red curtain gone. | One full-screen inline SVG background. 360x640. |
+| Snap Sort | `f5be041` | Cosmic Radar: category plate directly under ROUND, combo under it, scope `min(94vw, 50svh)`; navy deck with nebula glows; blue scope, cyan rings, pink sweep; candy-coloured blips. | **The rule box is hidden on this screen** (`.mg-snapSort .mg-rule{display:none}`) - confirm the explainer card still explains the game. Blip colour is by `nth-child` only (not right / wrong) - keep. The stage has `margin-top:-12px`. 360x640. Still on hold in the show. |
+| Game title card | `0019812` | Live from orbit: a mothership the beams come from, the icon on a halo, a neon sign in the game's colour over a fan of rays, a planet horizon in the game's colour. | Uses `color-mix()` (Safari 16.2+) - on older iOS the tints fall back to nothing; add plain fallbacks if old phones matter. Check every game's card (colours come from `--gi-a` / `--gi-b`), the Select Game card (`.gi-portal`), long names at 360 px (sign is `clamp(40px, 12.4vw, 76px)`). The ray fan is a static masked conic gradient. |
+| Zap Words | `9946441` | Storm planet: dusk sky, a huge sun, mesas, lightning down the sides; the grid on a dark power board with a yellow rim. | **Tile size and spacing were not changed** (cell 68 px, pitch 74 px at 390 wide) - the board is `.zw-grid::before` at `inset:-7px`, and the grid got `position:relative; isolation:isolate`. Confirm swiping still works and the board does not cover the HINT button (`.zw-foot` raised to `z-index:2`). |
+| Saucer Shuffle | see `git log` (after `9946441`) | The landing pad: cobalt sky, coral ringed planet, concentric neon rings under the saucers, a glow on each saucer. | The photo wall, curtains, wall / floor blaze layers and the `su-panels` lights are hidden with `display:none` - check the shuffle, the reveal and the PERFECT SHUFFLE win still read without them. The saucer glow is a static `drop-shadow` on an image that moves by transform: watch frame rate on an older iPhone; drop the filter if it stutters. |
+
+Not started: Alien Blast (already one of the strongest; left alone), Word Warp (looked at; holds up - any new layer there must be added to the memory clean-up from `8a9a942`), Results, Game Select, Orbit Drop, ZiG Zap, Price Probe's light touch.
