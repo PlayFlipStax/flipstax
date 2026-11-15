@@ -281,3 +281,26 @@ Look only. Nothing pushed. Stills at 390x844: Brain Beam before `s1-brain-beam.p
 - **Riddle Round** (this commit): the decoder block now paints its own violet / indigo / teal backdrop on the Daily overlay and on `.mode-daily .show-bg.w-riddle`; the shared green rule from Addendum 7 is still there and still serves Infinity. `TUBE_COLORS.riddle` is now teal. New: `.qz-plate::before/::after` are the radio-wave rings; `.event-prompt::after` is the oscilloscope strip. The fixes from Addendum 9 (ticker tile size, id selectors for `.ov-tint` / `.rd-sky`) are kept.
 
 **For Opus to check:** the tap beam on a real phone (keyboard answers do not fire it unless they call `click()`); right / wrong / gold bar states on Brain Beam with the rays drawn over them, and `.picked-wait`; the rays' contrast over the question on a dim screen (lower the alphas in `#eventOverlay.quiz-beam::before` if needed); a four-line question at 360x640 on both screens; the riddle on the wheel (Daily rules apply there) and in Infinity (unchanged green); lite and reduced motion; `repeating-conic-gradient`, `cqw`, `color-mix()` on old Safari.
+
+## Finishing pass (Opus, Nov 15 2026) - mechanics, correctness, safety
+
+Rollback tag before this pass: `before-finishing-20261115`. Nothing pushed. Hashes below are from `git log` (some tables above are out of date - trust `git log`).
+Test scripts: `screenshots/qa/tools/finishing/` (wheel.py, snapsort.py, twinflip.py, zapwords.py, layout.py, frames.py, quiz.py, play.py, wordwarp.py, still.py, title.py). Shots: `review-shots/makeover/finishing/`.
+
+| Item | Commit | What |
+|---|---|---|
+| 1 Snap Sort / wheel | `c9d6b4c` | The wheel's MYSTERY GAME wedge plays Snap Sort (Saucer Shuffle only if Snap Sort's data is missing). Snap Sort win / loss / wrong taps / close checked; wheel hand-off and return checked. Saucer Shuffle still on Game Select. |
+| 2 Twin Flip | `d0bc7c0` | Win flourish (fast flip wave + saucer beam, 1.3 s; still gold glow in lite / reduced motion). 40 space faces, 8 a day, 5-day lap confirmed; data/schedule.js unchanged against main. |
+| 3 Zap Words | - | Tile size and spacing identical to before the makeover (measured both versions at 390 and 360); swipe and HINT work. |
+| 4 Mystery Wheel | - | All 10 wedges spun: each lands, pays as before, labels upright at rest and after landing; Snap Sort and Riddle Round hand off and return. |
+| 5 Layouts | `585d94e` | 360x640 fixes: Price Probe card text, long VS names under the saucer, landing PLAY over the pitch, cold-open EPISODE sign under the valance. |
+| 6 Frame | - | Neon tube on all 20 active screens, each its own colour; `?frame=bulbs` still gives the gold bulbs. |
+| 7 Brain Beam / Riddle | `d7c6168` | Question panel above the rays; rays fainter over the bars. Long text OK at both sizes; tap beam is gone in 0.75 s and the verdict comes at the same time as on Riddle Round (no beam). |
+| 8 Saucer Shuffle, Alien Blast, Word Warp | - | All play to a result and close. Word Warp's win: clean-up runs (stage hidden, sky removed) during the video, then Results. The makeover added no new Word Warp layers. |
+| 9 Older Safari | `89b38e4`, `411bf9a` | color-mix fallbacks (@supports not); Twin Flip title icon is now the alien face. |
+| 10 Still versions | `2f9adad` | Snap Sort swirl + word blips (lite and reduced motion), VS spotlights and landing doodles (reduced motion). |
+| 11 Memory | `1eb416b` | Brain Beam: one moving layer instead of three. |
+| 12 Fast check | - | 3 of 3 pass; commercial break: ok. |
+
+**Not checked here (needs a real phone or another browser):** an actual iPhone (memory, frame rate, touch feel); Safari older than 16.2 (the fallbacks are written but not seen); sound; reduced motion is simulated (the real OS setting was not used).
+**Known, left as is:** in lite mode a few small loops from before the makeover keep moving (falling confetti specks, the round timer's shimmer, the landing texture, the Results bulbs). Snap Sort's tier on the wheel follows the act like everywhere else (medium in late rounds until SNAP_SORT_REVIEWED is true).
