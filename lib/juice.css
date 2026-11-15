@@ -3965,3 +3965,44 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
   linear-gradient(180deg, #04160c 0%, #0a2c1a 46%, #06231c 78%, #030f12 100%) !important; }
 :root:root.mode-daily .show-bg.w-riddle > *, :root:root:root #evBg.w-riddle > *, :root:root.mode-infinity .bg.w-riddle > *{ opacity:0.14 !important; }
 :root:root:root:root #eventOverlay.event-overlay.quiz-riddle::before, :root:root:root:root #eventOverlay.event-overlay.quiz-riddle::after{ opacity:0.12 !important; }
+
+/* ==== BRAIN BEAM, "THE SIGNAL" (sci-fi pass; look only - the question, answers, order, timer bar and timing are untouched). It looked like a
+   generic quiz show (a blue bulb board, four candy bars). Now a question beamed in from a saucer: deep blue space with stars, a cyan planet rim
+   and the beam's cone of light behind everything; the title plate is the saucer's console (a cyan neon tube, a little saucer firing its beam on
+   the left, signal arcs on the right); the question sits on a holo-screen (dark glass, scan lines, corner brackets, an INCOMING SIGNAL tag on
+   its edge); the four answers are glowing pods - dark glass capsules, each edged by its own neon colour, with a lit orb for its number. The
+   right and wrong states keep their solid green and red, so the verdict is unmistakable. All still. Colour family: electric blue and cyan. ==== */
+:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-beam{ background:
+  radial-gradient(circle at 6% 30%, #fff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 95% 22%, #fff 0 1.3px, rgba(255,255,255,0) 2.1px), radial-gradient(circle at 3% 72%, #bff8ff 0 1.2px, rgba(255,255,255,0) 2px),
+  radial-gradient(circle at 97% 64%, #fff 0 1.1px, rgba(255,255,255,0) 1.9px), radial-gradient(circle at 50% 99%, #fff 0 1.2px, rgba(255,255,255,0) 2px),
+  conic-gradient(from 180deg at 50% 6%, rgba(95,244,255,0) 0deg, rgba(95,244,255,0) 148deg, rgba(95,244,255,0.34) 164deg, rgba(190,252,255,0.5) 180deg, rgba(95,244,255,0.34) 196deg, rgba(95,244,255,0) 212deg, rgba(95,244,255,0) 360deg),
+  radial-gradient(ellipse 120% 26% at 50% 112%, #2fd8ff 0%, #1a6cff 34%, rgba(26,108,255,0) 70%),
+  linear-gradient(180deg, #050a30 0%, #0a1a66 48%, #071046 100%) !important; }
+:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-beam .ov-tint{ background:none !important; }
+/* the console (title plate) */
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam.has-plate .qz-plate{ background:linear-gradient(180deg, #10206e, #050a30); border:3px solid #5ff4ff; border-radius:999px; outline:1px solid rgba(255,255,255,0.75); outline-offset:-2.5px;
+  box-shadow:0 0 16px 2px rgba(95,244,255,0.8), inset 0 0 14px rgba(95,244,255,0.4); padding-left:54px; padding-right:54px; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam.has-plate .qz-plate b{ color:#ffffff; text-shadow:0 0 12px #5ff4ff, 0 0 4px #5ff4ff, 0 2px 0 rgba(0,0,40,0.8); }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam.has-plate .qz-plate small{ color:#ffe27a; letter-spacing:0.8px; font-size:10.5px; overflow:visible; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam.has-plate .qz-plate::before, :root:root:root.mode-daily .event-overlay.stack.quiz-beam.has-plate .qz-plate::after{ content:''; display:block; position:absolute; top:50%; width:44px; height:40px; margin-top:-20px; pointer-events:none; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam.has-plate .qz-plate::before{ left:10px; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 40'%3E%3Cpath d='M16 20 L6 40 H38 L28 20z' fill='%235ff4ff' opacity='.45'/%3E%3Cellipse cx='22' cy='11' rx='9' ry='8' fill='%23bffcff'/%3E%3Cellipse cx='19' cy='8' rx='3' ry='2' fill='%23fff'/%3E%3Cellipse cx='22' cy='16' rx='20' ry='6.5' fill='%23c9d3ee'/%3E%3Cellipse cx='22' cy='18' rx='20' ry='5' fill='%236a78a8'/%3E%3Ccircle cx='8' cy='17' r='1.8' fill='%23ffe27a'/%3E%3Ccircle cx='22' cy='20' r='1.8' fill='%23ff6ab0'/%3E%3Ccircle cx='36' cy='17' r='1.8' fill='%23ffe27a'/%3E%3C/svg%3E") center / contain no-repeat; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam.has-plate .qz-plate::after{ right:10px; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 40' fill='none' stroke-linecap='round'%3E%3Ccircle cx='10' cy='30' r='4' fill='%23ffe27a'/%3E%3Cpath d='M10 19a11 11 0 0 1 11 11' stroke='%235ff4ff' stroke-width='3.5'/%3E%3Cpath d='M10 11a19 19 0 0 1 19 19' stroke='%235ff4ff' stroke-width='3.5' opacity='.75'/%3E%3Cpath d='M10 3a27 27 0 0 1 27 27' stroke='%235ff4ff' stroke-width='3.5' opacity='.45'/%3E%3C/svg%3E") center / contain no-repeat; }
+/* the holo-screen (the question) */
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-prompt{ border:2.5px solid #5ff4ff; border-radius:16px; padding:24px 20px 20px; overflow:visible;
+  background:repeating-linear-gradient(180deg, rgba(95,244,255,0.09) 0 1px, rgba(0,0,0,0) 1px 4px), linear-gradient(180deg, rgba(16,52,130,0.92), rgba(5,14,58,0.95)) !important;
+  box-shadow:0 0 18px 2px rgba(95,244,255,0.7), inset 0 0 26px rgba(95,244,255,0.28); text-shadow:0 0 10px rgba(95,244,255,0.7), 0 2px 0 rgba(0,0,40,0.8); }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-prompt::before{ content:'INCOMING SIGNAL'; display:block; position:absolute; inset:auto; left:50%; top:-11px; width:auto; height:auto; transform:translateX(-50%); padding:4px 12px; border-radius:99px; animation:none !important; opacity:1;
+  background:#5ff4ff !important; color:#04103c; font:900 11px/1 var(--f-body, Inter, sans-serif); letter-spacing:2.5px; white-space:nowrap; text-shadow:none; box-shadow:0 0 10px rgba(95,244,255,0.9); -webkit-mask:none; mask:none; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-prompt::after{ content:''; display:block; position:absolute; inset:7px; height:auto; animation:none !important; opacity:0.9; pointer-events:none; -webkit-mask:none; mask:none;
+  background:linear-gradient(#fff,#fff) 0 0 / 16px 2px no-repeat, linear-gradient(#fff,#fff) 0 0 / 2px 16px no-repeat, linear-gradient(#fff,#fff) 100% 0 / 16px 2px no-repeat, linear-gradient(#fff,#fff) 100% 0 / 2px 16px no-repeat,
+    linear-gradient(#fff,#fff) 0 100% / 16px 2px no-repeat, linear-gradient(#fff,#fff) 0 100% / 2px 16px no-repeat, linear-gradient(#fff,#fff) 100% 100% / 16px 2px no-repeat, linear-gradient(#fff,#fff) 100% 100% / 2px 16px no-repeat !important; }
+/* the answer pods */
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile{ --pod:#5ff4ff; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile:nth-child(2){ --pod:#ff6ad0; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile:nth-child(3){ --pod:#8dff5a; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile:nth-child(4){ --pod:#ffc23a; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile:not(.is-right):not(.is-wrong){ border:3px solid var(--pod); border-radius:999px;
+  background:radial-gradient(ellipse 60% 90% at 50% 120%, color-mix(in srgb, var(--pod) 42%, transparent), rgba(0,0,0,0) 70%), linear-gradient(180deg, rgba(22,34,110,0.95), rgba(6,8,44,0.97)) !important;
+  box-shadow:0 0 14px 2px color-mix(in srgb, var(--pod) 75%, transparent), inset 0 0 14px color-mix(in srgb, var(--pod) 35%, transparent), inset 0 2px 0 rgba(255,255,255,0.25); color:#ffffff; text-shadow:0 0 10px var(--pod), 0 2px 0 rgba(0,0,30,0.8); }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile:not(.is-right):not(.is-wrong) .tkey{ left:14px; color:#04103c; border:2px solid #ffffff; background:radial-gradient(circle at 35% 30%, #ffffff, var(--pod) 60%); box-shadow:0 0 12px 2px var(--pod); }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile{ border-radius:999px; }
