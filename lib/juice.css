@@ -3856,3 +3856,46 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 /* the VS cards: the edge bulbs go; each card is edged by one white neon tube with a soft glow */
 :root.frame-new.mode-daily #board .mq-ring{ display:none !important; }
 :root:root.frame-new.mode-daily #board .half:not(.picked)::after{ border:3px solid #ffffff; box-shadow:0 0 12px 2px rgba(255,255,255,0.7), inset 0 0 12px 1px rgba(255,255,255,0.45); }
+
+/* ==== THE RESULTS, "THE SCORECARD" (look only; the share picture is untouched). The eight candy tiles become one dark-glass scorecard edged by
+   the show's gold neon tube: a header line (GALACTIC GAME NIGHT - EPISODE #N), the final score as the hero in big gold numerals, and the six
+   other stats as quiet glass tiles, each number in its own neon colour. The small score pill above is hidden once the card shows (the card's
+   hero replaces it). Life after the confetti: a soft halo breathes behind the score, a sheen crosses it every few seconds and two stars
+   twinkle (transform and opacity only, slow). SHARE stays the one gold button; the coffee button becomes a quieter glass button. ==== */
+:root:root:root #readoutOverlay.ep.outro-on .outro.end .outro-badge{ opacity:0 !important; }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats{ position:relative; display:grid; grid-template-columns:repeat(3, 1fr); gap:7px; width:100%; max-width:372px; padding:10px 12px 12px; border-radius:22px;
+  background:linear-gradient(180deg, rgba(22,12,70,0.95), rgba(7,4,32,0.97)); border:3px solid #ffc83a; outline:1px solid rgba(255,255,255,0.75); outline-offset:-2.5px;
+  box-shadow:0 0 18px 3px rgba(255,200,58,0.65), inset 0 0 16px 1px rgba(255,200,58,0.3); }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os{ position:relative; padding:8px 2px 7px; gap:4px; border-radius:12px; border:1.5px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.07); box-shadow:none; }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os b{ font-size:30px; color:#ffe27a; text-shadow:0 2px 0 rgba(0,0,0,0.55); }
+:root:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os small{ font-size:11.5px; font-weight:800; letter-spacing:0.6px; color:rgba(255,255,255,0.92); }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.ok b{ color:#4dff95; } :root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.str b{ color:#ff8ad0; }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.flz b{ color:#cdb0ff; } :root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.ltr b{ color:#5ff4ff; }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.orb b{ color:#ffa25a; }
+/* the header line */
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.ep{ grid-column:1 / -1; order:-2; flex-direction:row; justify-content:center; align-items:baseline; gap:7px; padding:2px 0 8px; border:0; border-bottom:1.5px solid rgba(255,200,58,0.45); border-radius:0; background:none; }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.ep::before{ content:'GALACTIC GAME NIGHT \00B7'; font:800 12px/1 var(--f-body, Inter, sans-serif); letter-spacing:2px; color:#5ff4ff; white-space:nowrap; }
+:root:root:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.ep small{ order:1; font:800 12px/1 var(--f-body, Inter, sans-serif); letter-spacing:2px; color:#5ff4ff; }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.ep b{ order:2; font-size:20px; color:#ffffff; text-shadow:0 0 10px rgba(95,244,255,0.8); }
+/* the hero: the final score */
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.pts:first-child{ grid-column:1 / -1; order:-1; flex-direction:column-reverse; gap:2px; padding:8px 0 6px; border:0; background:none; overflow:hidden; }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.pts:first-child b{ position:relative; z-index:1; font-size:clamp(76px, 25vw, 104px); line-height:0.92; letter-spacing:2px; color:#ffe27a;
+  text-shadow:0 2px 0 #fff6c8, 0 6px 0 #b86400, 0 9px 0 rgba(40,10,0,0.7), 0 0 30px rgba(255,200,60,0.75); }
+:root:root:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.pts:first-child small{ position:relative; z-index:1; font-size:14px; letter-spacing:5px; color:#ffffff; text-shadow:0 0 10px rgba(255,200,58,0.9); }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.pts:first-child::before{ content:''; position:absolute; left:8%; right:8%; top:6%; bottom:0; border-radius:50%; pointer-events:none;
+  background:radial-gradient(closest-side, rgba(255,190,60,0.5), rgba(255,120,200,0.18) 60%, rgba(255,190,60,0)); animation:scHalo 3.2s ease-in-out infinite alternate; }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.pts:first-child::after{ content:''; position:absolute; z-index:2; top:0; bottom:0; left:0; width:26%; pointer-events:none;
+  background:linear-gradient(100deg, rgba(255,255,255,0), rgba(255,255,255,0.4) 50%, rgba(255,255,255,0)); transform:translateX(-140%); animation:scSheen 5s ease-in-out 1.2s infinite; }
+@keyframes scHalo{ from{ opacity:0.45; transform:scale(0.92); } to{ opacity:1; transform:scale(1.06); } }
+@keyframes scSheen{ 0%{ transform:translateX(-140%); } 38%, 100%{ transform:translateX(520%); } }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats::before, :root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats::after{ content:'\2726'; position:absolute; z-index:2; top:62px; font-size:22px; line-height:1; color:#fff6c8;
+  text-shadow:0 0 10px #ffc83a; pointer-events:none; animation:scTwinkle 2.6s ease-in-out infinite; }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats::before{ left:26px; } :root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats::after{ right:26px; top:104px; font-size:16px; animation-delay:-1.3s; }
+@keyframes scTwinkle{ 0%, 100%{ opacity:0.15; transform:scale(0.6) rotate(0deg); } 50%{ opacity:1; transform:scale(1.15) rotate(30deg); } }
+:root.lite #readoutOverlay .outro-stats::before, :root.lite #readoutOverlay .outro-stats::after, :root.lite #readoutOverlay .outro-stats .os.pts:first-child::before, :root.lite #readoutOverlay .outro-stats .os.pts:first-child::after{ animation:none !important; }
+@media (prefers-reduced-motion: reduce){ #readoutOverlay .outro-stats::before, #readoutOverlay .outro-stats::after, #readoutOverlay .outro-stats .os.pts:first-child::before, #readoutOverlay .outro-stats .os.pts:first-child::after{ animation:none !important; } }
+/* the headline a little smaller (the score is the hero), the coffee button quieter than SHARE */
+:root:root:root #readoutOverlay.ep.outro-on .outro .outro-end .outro-mid .outro-head{ font-size:clamp(24px, 7.4vw, 32px); letter-spacing:2px; color:#ffffff; text-shadow:0 0 14px rgba(95,244,255,0.85), 0 2px 0 rgba(10,4,40,0.9); }
+:root:root:root #readoutOverlay.ep.outro-on .outro.end .outro-donate{ background:linear-gradient(180deg, rgba(22,12,70,0.95), rgba(7,4,32,0.97)) !important; border:2px solid #ffc83a !important; color:#ffe27a !important; box-shadow:0 0 10px rgba(255,200,58,0.4) !important; }
+:root:root:root #readoutOverlay.ep.outro-on .outro.blue.end .outro-end{ top:calc(16.5vh + 2px + env(safe-area-inset-top)); }
+:root:root:root #readoutOverlay.ep.outro-on .outro.end .outro-donate span{ color:#ffe27a !important; text-shadow:none !important; }
