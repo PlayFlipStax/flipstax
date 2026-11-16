@@ -7332,6 +7332,79 @@ const SHARE_URL = 'https://playflipstax.com';
     return trackEls[key];
   }
 
+  // ---- SOLO PASS: THE INTRO THEME. There is no theme file: the intro (the saucer cold open) plays a short snippet of one of the eight songs in audio/alt/
+  // (ALT_SONGS, the music picker's songs - the files are not edited and nothing is added). The snippet starts just before a strong downbeat of the song
+  // (INTRO_THEME_HITS, seconds, measured from the files: the start of the fullest section, a crash on the one), fades in over 0.3 s so the fade ends on that
+  // beat, plays for the length of the intro and fades out over 0.6 s so it ends with it; then the run's music starts as before. Default: Alien Disco Fever.
+  // On a test host ?theme=1 ... ?theme=8 auditions the others (the order of ALT_SONGS: 1 Nebula Nights, 2 Cosmic Cruise, 3 Warp Speed Boogie, 4 Moonbase
+  // Groove, 5 Stardust Shuffle, 6 Saturn Strut, 7 Alien Disco Fever, 8 Meteor Mayhem) and always plays the full first-visit intro.
+  // Light: one <audio> element, made when the intro is about to play (preload = metadata), seeked straight to the snippet (a range request - only that part
+  // of the file is fetched), and let go of when the intro ends. It is a music track like the others (trackEls.theme): the Music switch, the volume, Pause and
+  // 'every other track stops' all apply. A phone needs a tap before sound: the element is started muted inside the ENTER / Play tap and unmuted once it has
+  // reached the snippet. The fades use the element's own Web Audio trim (a phone ignores element.volume); before routing they step element.volume.
+  const INTRO_THEME_HITS = [80.30, 47.34, 133.52, 125.11, 126.47, 112.36, 154.56, 73.08];   // (one per ALT_SONGS entry)
+  const INTRO_THEME_DEFAULT = 6;   // Alien Disco Fever
+  const INTRO_THEME_TEST = (()=>{ if (!TEST_HOST) return -1; try{ const v = parseInt(new URLSearchParams(location.search).get('theme'), 10); return v >= 1 && v <= ALT_SONGS.length ? v - 1 : -1; }catch(e){ return -1; } })();
+  const introThemeIdx = INTRO_THEME_TEST >= 0 ? INTRO_THEME_TEST : INTRO_THEME_DEFAULT;
+  const INTRO_THEME_FADE_IN = 0.3, INTRO_THEME_FADE_OUT = 0.6;
+  TRACK_SRC.theme = ALT_SONGS[introThemeIdx].src; ONE_SHOT_TRACKS.push('theme');
+  const introThemeAt = ()=> Math.max(0, INTRO_THEME_HITS[introThemeIdx] - INTRO_THEME_FADE_IN);
+  let themeT = 0, themeStepT = 0, themeGo = 0;
+  function themeEl(){
+    if (trackEls.theme) return trackEls.theme;
+    const a = new Audio(); a.preload = 'metadata'; a.loop = false; a._base = MUSIC_VOLUME; a.volume = MUSIC_VOLUME * masterVol;
+    a.addEventListener('play', ()=> musicRoute(a));
+    a.addEventListener('playing', ()=>{ if (currentTrackKey !== 'theme'){ try{ a.pause(); }catch(e){} } });
+    a.src = TRACK_SRC.theme; trackEls.theme = a; return a;
+  }
+  function themeSeek(a){
+    const at = introThemeAt(); try{ a.currentTime = at; }catch(e){}
+    if (a.readyState < 1) a.addEventListener('loadedmetadata', ()=>{ try{ if (Math.abs(a.currentTime - at) > 0.5) a.currentTime = at; }catch(e){} }, { once:true });
+  }
+  function themeGain(to, sec, from){
+    const a = trackEls.theme; if (!a) return; clearInterval(themeStepT);
+    if (a._routed && a._trim && audioCtx){ const g = a._trim.gain, t = audioCtx.currentTime;
+      try{ g.cancelScheduledValues(t); g.setValueAtTime(from != null ? from * a._base : g.value, t); g.linearRampToValueAtTime(to * a._base, t + sec); }catch(e){ try{ g.value = to * a._base; }catch(e2){} } return; }
+    const v0 = from != null ? from * a._base * masterVol : a.volume, v1 = to * a._base * masterVol, steps = Math.max(1, Math.round(sec / 0.03)); let k = 0;
+    try{ a.volume = Math.max(0, Math.min(1, v0)); }catch(e){}
+    themeStepT = setInterval(()=>{ k++; if (a._routed){ clearInterval(themeStepT); try{ a.volume = 1; }catch(e){} return; }   // (routed meanwhile: the trim carries the level)
+      try{ a.volume = Math.max(0, Math.min(1, v0 + (v1 - v0) * k / steps)); }catch(e){} if (k >= steps) clearInterval(themeStepT); }, 30);
+  }
+  // inside the ENTER tap (a phone lets an element play later only if a tap started it): start it muted at the snippet; it is paused again as soon as it plays
+  function primeIntroTheme(){
+    if (!musicOn || trackEls.theme) return;
+    try{ const a = themeEl(); a.muted = true; themeSeek(a); const p = a.play(); if (p && p.catch) p.catch(()=>{}); }catch(e){}
+  }
+  // the intro starts: `ms` is its length
+  function playIntroTheme(ms){
+    clearTimeout(themeT); clearTimeout(themeGo);
+    pauseAllTracks(); currentTrackKey = 'theme';
+    if (!musicOn) return;
+    try{
+      const a = themeEl(), at = introThemeAt(); musicRoute(a);
+      a.muted = true; themeSeek(a);
+      const p = a.play(); if (p && p.catch) p.catch(()=>{});
+      // heard only from the snippet: unmuted (and faded in) once playback is really there - never the song's own opening
+      let on = false;
+      const start = (force)=>{ if (on || currentTrackKey !== 'theme' || trackEls.theme !== a) return; if (!force && (a.paused || Math.abs(a.currentTime - at) > 2.5)) return;
+        on = true; clearTimeout(themeGo); ['playing', 'seeked', 'timeupdate'].forEach(ev=> a.removeEventListener(ev, onEv)); a.muted = false; themeGain(1, INTRO_THEME_FADE_IN, 0); };
+      const onEv = ()=> start(false);
+      ['playing', 'seeked', 'timeupdate'].forEach(ev=> a.addEventListener(ev, onEv));
+      themeGo = setTimeout(()=>{ if (Math.abs(a.currentTime - at) <= 2.5) start(true); }, 1500);   // (it never reached the snippet - a server without range requests: stay silent rather than play the wrong part)
+      themeT = setTimeout(()=>{ if (currentTrackKey === 'theme') themeGain(0, INTRO_THEME_FADE_OUT); }, Math.max(0, ms - INTRO_THEME_FADE_OUT * 1000 - 40));
+      start(false);
+    }catch(e){}
+  }
+  // the intro is over (or was skipped): stop, and let go of the file
+  function endIntroTheme(){
+    clearTimeout(themeT); clearTimeout(themeGo); clearInterval(themeStepT);
+    if (currentTrackKey === 'theme') currentTrackKey = 'run';
+    const a = trackEls.theme; if (!a) return;
+    try{ a.pause(); }catch(e){}
+    delete trackEls.theme;
+    setTimeout(()=>{ try{ a.removeAttribute('src'); a.load(); }catch(e){} }, 200);
+  }
+
   // ---- Infinity playlist: one element per song, created as it's needed.
   const infEls = [];
   const infUnlocked = [];
@@ -7470,6 +7543,11 @@ const SHARE_URL = 'https://playflipstax.com';
   // audibly playing, instead of just skipping the currentTime reset.
   function playTrack(key){
     if ((key === 'run' || key === 'infinity') && altPick >= 0) key = 'alt';   // (final polish job 2: a picked song is the gameplay music)
+    if (key === 'theme'){   // (solo pass: the intro theme, switched back on or resumed while the intro is still up - it carries on from where it was)
+      currentTrackKey = 'theme'; if (!musicOn) return;
+      try{ const a = themeEl(); a.muted = false; themeGain(1, 0.2); const p = a.play(); if (p && p.catch) p.catch(()=>{}); }catch(e){}
+      return;
+    }
     // "Already playing" only counts if it was already THE current track -
     // an element left audible by anything else must be restarted from the
     // top, not adopted mid-song.
@@ -12492,7 +12570,7 @@ const SHARE_URL = 'https://playflipstax.com';
     // It plays whenever the video did not (the video is now only ?intro=full and the test host's 'Watch intro'). Lite mode and reduced motion get it as a still:
     // Flip on the pad, the saucer parked above, the sign lit, the line. Transform and opacity only.
     const saucer = !afterIntro, quietCO = isLite() || prefersReducedMotion();
-    const first = !seen || afterIntro || window.__introSaucer === true; window.__introSaucer = false;   // (__introSaucer: lib/intro.js, a first visit or ?intro=1)
+    const first = !seen || afterIntro || window.__introSaucer === true || INTRO_THEME_TEST >= 0; window.__introSaucer = false;   // (__introSaucer: lib/intro.js, a first visit or ?intro=1)
     const lines = !first ? [HOST_INTRO_BACK] : HOST_INTRO_LINES.slice(0, 1);
     const T = afterIntro ? { open:0, pull:600, walk:0, walkMs:0, talk:1500 }
             : quietCO ? { open:0, pull:first ? 700 : 500, fly:0, flyMs:0, beam:-1, walk:0, walkMs:0, land:0, sign:0, talk:first ? 600 : 400, away:-1 }
@@ -12502,6 +12580,7 @@ const SHARE_URL = 'https://playflipstax.com';
     lines.forEach(l=>{ starts.push(at); at += !first ? cueLineMs(l) : COLD_OPEN_AUTO_MS; });
     const total = Math.max(!first ? ((RUNDOWN.coldOpen || {}).returningMs || 3000) : 0, saucer && first ? 5900 : 0, at);
     showCard.className = 'show-card curtain lines' + (saucer ? ' saucer' + (quietCO ? ' still' : '') : '');
+    playIntroTheme(total);   // (solo pass: the intro theme - a snippet of an existing song, for exactly as long as the intro)
     showCard.style.setProperty('--pull', T.pull + 'ms'); showCard.style.setProperty('--walk', T.walkMs + 'ms'); if (saucer) showCard.style.setProperty('--fly', T.flyMs + 'ms');
     showCard.innerHTML = '<div class="studio co-studio" aria-hidden="true">' + STUDIO_HTML + '</div><i class="co-follow" aria-hidden="true"></i>' +
       (saucer ? '<i class="co-pad" aria-hidden="true"><i></i><b></b></i><i class="co-tbeam" aria-hidden="true"></i>' : '') +
@@ -12524,7 +12603,7 @@ const SHARE_URL = 'https://playflipstax.com';
       const Wd = innerWidth, Hd = innerHeight, kk = Math.max(Wd / 540, Hd / 960), oyy = (Hd - 960 * kk) / 2, fh = 640 * kk, fw = fh * 0.6743;
       rig.style.cssText = 'width:' + fw.toFixed(1) + 'px;margin-left:' + (-fw / 2 + 10 * kk).toFixed(1) + 'px;bottom:' + (Hd - (oyy + 850 * kk)).toFixed(1) + 'px;';
     }
-    if (afterIntro){ showCard.classList.add('walk', 'intro-curt'); window.__introOpen = ()=>{ window.__introOpen = null; showCard.classList.add('open'); }; later(1400, ()=>{ if (window.__introOpen) window.__introOpen(); }); } else later(T.open, ()=>{ showCard.classList.add('open'); if (sfx.bumper) sfx.bumper(false); });
+    if (afterIntro){ showCard.classList.add('walk', 'intro-curt'); window.__introOpen = ()=>{ window.__introOpen = null; showCard.classList.add('open'); }; later(1400, ()=>{ if (window.__introOpen) window.__introOpen(); }); } else later(T.open, ()=>{ showCard.classList.add('open'); if (sfx.bumper && !musicOn) sfx.bumper(false); });   // (the synth bumper only when the theme is not playing)
     if (saucer){
       const cl = showCard.classList, root = document.documentElement.classList;
       later(T.fly, ()=> cl.add('sc-in'));
@@ -12546,7 +12625,7 @@ const SHARE_URL = 'https://playflipstax.com';
       if (gone) return;
       if (e && e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
       if (e && performance.now() - shownAt < SKIP_MIN_MS) return;   // G2: a tap skips only after SKIP_AFTER (and never the tap that opened it)
-      gone = true; timers.forEach(clearTimeout); coldOpenCancel = null; document.documentElement.classList.remove('gg-lit');
+      gone = true; timers.forEach(clearTimeout); coldOpenCancel = null; document.documentElement.classList.remove('gg-lit'); endIntroTheme();
       try{ localStorage.setItem(COLD_OPEN_SEEN_KEY, '1'); }catch(err){}
       showCard.removeEventListener('click', go); document.removeEventListener('keydown', go);
       showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden';
@@ -12555,7 +12634,7 @@ const SHARE_URL = 'https://playflipstax.com';
     };
     later(total, ()=> go());
     showCard.addEventListener('click', go); document.addEventListener('keydown', go);
-    coldOpenCancel = ()=>{ gone = true; timers.forEach(clearTimeout); document.documentElement.classList.remove('gg-lit'); showCard.removeEventListener('click', go); document.removeEventListener('keydown', go); coldOpenCancel = null; };
+    coldOpenCancel = ()=>{ gone = true; timers.forEach(clearTimeout); document.documentElement.classList.remove('gg-lit'); if (currentTrackKey === 'theme') endIntroTheme(); showCard.removeEventListener('click', go); document.removeEventListener('keydown', go); coldOpenCancel = null; };
   }
   // The act cue card (reusable): the host holds up a cue card that flips in over a colour
   // sweep in the act's world, for about 1.5 s. `st` is { title, sub, world }.
@@ -17030,6 +17109,7 @@ const SHARE_URL = 'https://playflipstax.com';
       outroLater(OUTRO_START_MS, ()=>{ if (!started) fail(); });   // (never stuck on a stalled load)
     }catch(e){ fail(); }
   }
+  if (DEBUG_FAST || REPLAY) window.__themeState = ()=>{ const a = trackEls.theme; return { key: currentTrackKey, idx: introThemeIdx, src: TRACK_SRC.theme, at: introThemeAt(), el: !!a, t: a ? +a.currentTime.toFixed(2) : null, paused: a ? a.paused : null, muted: a ? a.muted : null, vol: a ? +a.volume.toFixed(3) : null, routed: a ? !!a._routed : null, gain: a && a._trim ? +a._trim.gain.value.toFixed(3) : null, ready: a ? a.readyState : null }; };   // (tests)
   if (DEBUG_FAST || REPLAY) window.__shareNums = ()=>{ const p = prebuildDailyShare(runResultToday); return p.promise.then(q=> ({ drawn: q.canvas && q.canvas.__nums, now: shareNumbers(runResultToday), text: buildRunShareText(runResultToday) })); };
   if (DEBUG_FAST || REPLAY) window.__shareImage = ()=> prebuildDailyShare(runResultToday).promise.then(p=> p.canvas ? p.canvas.toDataURL('image/png') : null);   // (tests: the picture the share sheet would send)
   els.solveOverlay.addEventListener('pointerdown', ()=>{ if (runActive) unlockRunEndMusic(); }, true);   // (a Word Warp tap unlocks the ending's music for later)
@@ -19362,6 +19442,7 @@ const SHARE_URL = 'https://playflipstax.com';
     if (ov.classList.contains('entering')) return;
     // (the tap is the gesture phones need before any sound)
     audioKick('enter');   // (the same tap: unlock the audio and start the intro music; a blocked start is retried on the next tap)
+    if (!runResultToday || REPLAY) primeIntroTheme();   // (solo pass: the show starts straight from this tap - unlock the intro theme's element too)
     const beams = [...ov.querySelectorAll('.st-beam')], host = document.getElementById('homeHost');
     const enter = ()=>{
       ov.classList.add('hidden'); ov.classList.remove('entering');
