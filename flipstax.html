@@ -12121,16 +12121,35 @@ const SHARE_URL = 'https://playflipstax.com';
   // second line and pushing the last saucer down under Flip's speech bubble. Measured once per puzzle; nothing animates.
   function edFit(tiles, n){
     const p = els.eventPrompt; if (!p) return;
-    p.style.fontSize = ''; p.style.letterSpacing = '';
+    p.style.fontSize = ''; p.style.letterSpacing = ''; p.classList.remove('ed-fit'); p.style.removeProperty('--ed-fit');
     const range = document.createRange(); range.selectNodeContents(p);
     const w = range.getBoundingClientRect().width, cs = getComputedStyle(p), avail = p.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 28;   // (28: clear of the screen's rounded inner edge)
-    if (w > 0 && avail > 0 && w > avail){ const fs = parseFloat(cs.fontSize); p.style.fontSize = Math.max(28, Math.floor(fs * avail / w)) + 'px'; }
+    // (iPhone fix: the fitted size is a variable that only Emoji Decode's own rule reads. It used to be written straight onto the shared
+    // question box and was never cleared, so the next Brain Beam / Riddle Round / Time Warp question - and its verdict - came up at the
+    // emoji size, 48-87 px, and spilled over the title and the answers.)
+    if (w > 0 && avail > 0 && w > avail){ const fs = parseFloat(cs.fontSize); p.style.setProperty('--ed-fit', Math.max(28, Math.floor(fs * avail / w)) + 'px'); p.classList.add('ed-fit'); }
     tiles.forEach((t, i)=>{ if (i >= n) return; const nm = t.querySelector('.bb-name'); if (!nm) return;
       nm.style.fontSize = ''; nm.style.whiteSpace = 'nowrap';
       const box = nm.parentElement.clientWidth * 0.78, ww = nm.scrollWidth;   // (the key letter and the edges of the saucer take the rest)
       if (ww > box && box > 0){ const fs = parseFloat(getComputedStyle(nm).fontSize); nm.style.fontSize = Math.max(12, Math.floor(fs * box / ww)) + 'px'; } });
   }
   if (REPLAY || DEBUG_FAST) window.__edFit = ()=> edFit(Array.from(document.querySelectorAll('#eventOverlay .event-tile')), 4);   // (tests only)
+  // Safety limit for question and verdict text (Brain Beam, Riddle Round, Time Warp and the other quiz-style breaks): whenever the text
+  // changes, any stray fixed size is dropped (so the stylesheet's clamp - its maximum - applies), then the text is stepped down, 1 px at a
+  // time, until it sits inside its box. Checked again once the web fonts arrive and when the screen resizes (Safari's toolbars). Emoji
+  // Decode keeps its own fit (edFit). Nothing animates; a question that already fits is untouched.
+  function promptFit(){
+    const p = els.eventPrompt, ov = els.eventOverlay; if (!p || !ov || ov.classList.contains('bb-emojiDecode')) return;
+    p.style.fontSize = '';
+    if (ov.classList.contains('hidden') || !ov.matches('.quiz-beam, .quiz-riddle, .brainbreak')) return;
+    const box = p.getBoundingClientRect(); if (!box.width || !box.height || !p.textContent.trim()) return;
+    const range = document.createRange(), over = ()=>{ range.selectNodeContents(p); const r = range.getBoundingClientRect(), b = p.getBoundingClientRect(); return r.height > b.height + 1 || r.width > b.width + 1; };
+    let fs = parseFloat(getComputedStyle(p).fontSize) || 24;
+    for (let k = 0; k < 40 && fs > 12 && over(); k++){ fs -= 1; p.style.fontSize = fs + 'px'; }
+  }
+  { let q = 0; const later = ()=>{ if (!q) q = requestAnimationFrame(()=>{ q = 0; promptFit(); }); };
+    if (els.eventPrompt && window.MutationObserver) new MutationObserver(later).observe(els.eventPrompt, { childList:true, characterData:true, subtree:true });
+    addEventListener('resize', later); if (document.fonts && document.fonts.ready){ document.fonts.ready.then(later); if (document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', later); } }
   const BREAK_PARTS = { emojiDecode:3, timeWarp:3 };
   // fix 4: the Time Warp timeline (see runBrainBreakOne). Positions are transforms only; lite mode and reduced motion get plain fades and no roll.
   const TW_D0 = [-260, 2060], TW_TICKS = [[-130, 'BC'], [1000, '1000'], [1500, '1500'], [1800, '1800'], [2000, '2000']];
