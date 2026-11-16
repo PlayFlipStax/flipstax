@@ -4269,7 +4269,7 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 .outro.studio.end .outro-set::after{ opacity:1; }
 .outro-set{ position:absolute; inset:0; overflow:hidden; pointer-events:none; }
 .outro-set > *{ position:absolute; }
-.os-cast{ left:2%; right:2%; top:calc(16.5vh + 62px + env(safe-area-inset-top)); bottom:21.5%; background:url(../data/host/wave.webp) 50% 100% / contain no-repeat; animation:osBob 2.6s ease-in-out infinite alternate; }
+.os-cast{ left:2%; right:2%; top:calc(16.5vh + 62px + env(safe-area-inset-top)); bottom:21.5%; background:url(../data/host/flip2-wave.webp) 50% 100% / contain no-repeat; animation:osBob 2.6s ease-in-out infinite alternate; }
 @keyframes osBob{ from{ transform:translateY(0); } to{ transform:translateY(-7px); } }
 .os-pad{ left:50%; bottom:calc(21.5% - 20px); width:min(90vw, 370px); height:42px; margin-left:calc(min(90vw, 370px) / -2); border-radius:50%; box-sizing:border-box; border:3px solid #ff4fd8;
   background:radial-gradient(ellipse closest-side, rgba(234,255,255,0.75), rgba(95,244,255,0.3) 55%, rgba(40,20,120,0.9) 72%, rgba(20,8,70,0.9)); box-shadow:0 0 16px 2px rgba(255,79,216,0.7), inset 0 0 0 5px rgba(20,8,70,0.9), inset 0 0 0 7.5px #5ff4ff; }
@@ -4365,3 +4365,5 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
    standing still (no bob, the doors do not slide) until the results come in over the closed doors */
 .outro.studio.still:not(.end):not(.poster-on) .os-door{ animation:none; }
 .outro.studio.still .os-cast{ animation:none; }
+/* (one render: ROUND DONE and the ending use data/host/flip2-wave.webp - the full-body Flip of the opener and the round cards, the same 607 x 900 canvas, so the
+   same size and footing. The older big-head sprites data/host/wave.webp and cheer.webp are not used on any show beat; the files stay.) */

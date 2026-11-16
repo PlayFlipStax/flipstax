@@ -12683,7 +12683,7 @@ const SHARE_URL = 'https://playflipstax.com';
     // lifted off the poster frame (same pose, a still); the video is not loaded any more (the files stay)
     const ROUND_DONE_VIDEO = false;
     showCard.className = 'show-card reward has-art art-round has-cast solo';   // (solo pass: Flip alone, cheering - his own pose picture, no dancers)
-    showCard.style.setProperty('--rw-art', 'url(../data/host/cheer.webp)');
+    showCard.style.setProperty('--rw-art', 'url(../data/host/flip2-wave.webp)');   // (the same full-body Flip as every other beat - lib/host.js FLIP2: there is no cheer in that set, the arm-up wave is its celebratory pose; never the old big-head sprite cheer.webp)
     if (window.Stage) Stage.cue('close', { over:showCard, cls:'reward', sign:{ sub:'', main:'' } });
     // solo pass: a bigger celebration for Flip alone - a slow fan of light rays behind him, two shockwave rings off the hover pad and falling confetti
     // (lib/juice.css, ROUND DONE PARTY: transform and opacity only, nothing flashes; lite mode and reduced motion get the rays and a still scatter of confetti)
