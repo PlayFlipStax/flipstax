@@ -4288,3 +4288,20 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root.lite .os-cast, :root.lite .os-door{ animation:none; }
 @media (prefers-reduced-motion: reduce){ .os-cast, .os-door{ animation:none; } }
 @media (max-height:700px){ .os-sign{ top:calc(40px + env(safe-area-inset-top)); font-size:38px; width:min(70vw, 250px); margin-left:calc(min(70vw, 250px) / -2); padding:5px 0 7px 6px; } .os-beam{ height:calc(30px + env(safe-area-inset-top)); } }
+
+/* ==== POLISH PASS: THE GAME SPOTLIGHT CARD IN THE STUDIO (look only; the icon, the name, the one-line instruction, their timing and the tap to skip
+   are untouched). The chrome saucer across the top, the fan of rays behind the icon and the three white beams that swung round the card are gone.
+   The card now stands in the drawn studio, dimmed so the name reads: a slim lighting rig across the ceiling (the opener's beam), one soft still pool
+   of light in the game's colour falling on the name, and the icon on a neon hover pad like Flip's. Nothing sweeps or flashes: the only movement
+   left is the name's own arrival and its lamps' slow chase (about one step a second). ==== */
+:root.stage-on:root:root:root:root:root .show-card.gintro.stage-backed{ background:transparent !important; }
+:root:root:root:root:root:root .show-card.gintro .gi-bg{ opacity:1; background:radial-gradient(ellipse 95% 62% at 50% 50%, rgba(5,3,30,0.8), rgba(5,3,30,0.55) 68%, rgba(5,3,30,0.34)) !important; }
+:root:root:root:root:root:root .show-card.gintro .gi-bg::before{ left:0; top:0; width:100%; margin:0; height:calc(34px + env(safe-area-inset-top)); border-bottom:3px solid #5ff4ff; box-sizing:content-box;
+  background:radial-gradient(circle, #fff 0 1.6px, #ff4fd8 2.4px, rgba(255,79,216,0) 4px) 0 calc(100% - 4px) / 26px 8px repeat-x, linear-gradient(180deg, #070320, #1c0e6a) !important; box-shadow:0 0 18px 2px rgba(95,244,255,0.7), 0 6px 14px rgba(0,0,20,0.6); }
+:root:root:root:root:root:root .show-card.gintro .gi-bg::after{ left:0; top:calc(37px + env(safe-area-inset-top)); width:100%; height:66%; margin:0; border-radius:0; opacity:0.3;
+  background:linear-gradient(180deg, var(--gi-a) 0%, rgba(255,255,255,0.5) 30%, rgba(255,255,255,0) 100%) !important; clip-path:polygon(43% 0, 57% 0, 98% 100%, 2% 100%);
+  -webkit-mask-image:linear-gradient(180deg, #000 0%, #000 45%, transparent 100%) !important; mask-image:linear-gradient(180deg, #000 0%, #000 45%, transparent 100%) !important; }
+:root:root:root:root:root:root .show-card.gintro .gi-beam, :root:root:root:root:root:root .show-card.gintro .gi-spot{ display:none !important; }
+:root:root:root:root:root:root .show-card.gintro .gi-icon::after{ bottom:-8px; height:clamp(36px, 10.5vw, 54px); box-sizing:border-box; border:3px solid #ff4fd8;
+  background:radial-gradient(ellipse closest-side, rgba(234,255,255,0.8), rgba(95,244,255,0.3) 55%, rgba(40,20,120,0.9) 72%, rgba(20,8,70,0.9)) !important; box-shadow:0 0 16px 2px rgba(255,79,216,0.7), inset 0 0 0 5px rgba(20,8,70,0.9), inset 0 0 0 7.5px #5ff4ff !important; }
+:root:root:root:root:root:root .show-card.gintro .gi-sign{ background:linear-gradient(180deg, rgba(26,12,90,0.97), rgba(8,4,40,0.98)) !important; outline:1px solid rgba(255,255,255,0.8); outline-offset:-2.5px; }
