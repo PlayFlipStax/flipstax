@@ -4241,3 +4241,17 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 @media (max-height:700px){ :root.mode-daily .show-card.reward.art-round.has-cast::before{ margin-top:calc(72px + env(safe-area-inset-top)); } }
 :root.lite .show-card.flipstage.has-cast::before{ animation:none; }
 @media (prefers-reduced-motion: reduce){ .show-card.flipstage.has-cast::before{ animation:none; } }
+
+/* ==== POLISH PASS: THE MYSTERY GAME REVEAL IN THE STUDIO (look only). It stood on the red-and-gold theatre: a gold title plate, a gold bulb frame
+   and a red velvet curtain over the game's name. Same pieces, same moves, studio materials: the title is a cyan neon plate, the frame an indigo
+   console with a magenta tube and cool white lamps, the little curtain a pair of blast doors like the opener's (they part exactly as before), and
+   the light sweep that crosses the card is cool white instead of gold. The game's own colours behind the doors are untouched. ==== */
+.show-card.mreveal .mr-title{ color:#fff; background:linear-gradient(180deg, rgba(26,12,90,0.96), rgba(8,4,40,0.97)); border:3px solid #5ff4ff; outline:1px solid rgba(255,255,255,0.75); outline-offset:-2.5px;
+  box-shadow:0 0 18px 2px rgba(95,244,255,0.7), inset 0 0 14px rgba(95,244,255,0.3); text-shadow:0 0 6px #fff, 0 0 16px #5ff4ff, 0 2px 0 rgba(10,0,40,0.8); }
+.show-card.mreveal .mr-frame{ background:linear-gradient(180deg, #1c0e6a, #0a0530); border:4px solid #ff4fd8; --bulb:#dffcff; outline:1px solid rgba(255,255,255,0.8); outline-offset:-3px;
+  box-shadow:0 0 0 4px #0a0530, 0 0 26px 4px rgba(255,79,216,0.6), 0 14px 30px rgba(0,0,20,0.6); }
+.show-card.mreveal .mr-door{ box-shadow:inset 0 0 26px rgba(0,0,30,0.5), 0 0 0 2px #5ff4ff; }
+.show-card.mreveal .mr-curt{ background:repeating-linear-gradient(180deg, rgba(95,244,255,0) 0 30px, rgba(95,244,255,0.8) 30px 33px, rgba(95,244,255,0) 33px 52px), linear-gradient(90deg, #0b0534, #26138a 50%, #0f0744); }
+.show-card.mreveal .mr-curt.l{ box-shadow:inset -5px 0 0 #ff4fd8, inset -7px 0 0 rgba(255,255,255,0.85); }
+.show-card.mreveal .mr-curt.r{ box-shadow:inset 5px 0 0 #ff4fd8, inset 7px 0 0 rgba(255,255,255,0.85); }
+:root:has(#showCard.mreveal:not(.hidden)) #showFx .fx-sweep b{ background:linear-gradient(90deg, transparent, rgba(200,250,255,0.55), transparent); }
