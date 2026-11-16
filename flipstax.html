@@ -12552,7 +12552,9 @@ const SHARE_URL = 'https://playflipstax.com';
   const ROUND_ART = ['scene-win-flip', 'scene-girl-green', 'scene-girl-purple', 'scene-girl-pink', 'scene-girls-pose', 'scene-all-group'];
   const ROUND_ART_FALLBACK = ['scene-win-flip', 'scene-win', 'scene-group'];
   // The round title cards (A+): Round 2 to 6 each have a different picture, no picture on two rounds running; the last round is the whole group.
-  const ROUND_TITLE_ART = { 2:'scene-girl-green', 3:'scene-girl-purple', 4:'scene-girl-pink', 5:'scene-girls-pose', 6:'scene-all-group' };
+  const ROUND_TITLE_ART = { 2:'scene-girl-green', 3:'scene-girl-purple', 4:'scene-girl-pink', 5:'scene-girls-pose', 6:'scene-all-group' };   // (the old gold-stage pictures: no longer shown, the files stay)
+  // polish pass: the same girls in the same poses, lifted off those pictures (tools/build-studio-cast.py -> data/cast/studio/), stand in the drawn studio instead
+  const ROUND_TITLE_CAST = { 2:'green-jump', 3:'purple-jump', 4:'pink-jump', 5:'girls-pose', 6:'all-group' };
   const roundArtOk = {};
   function probeRoundArt(){ ROUND_ART.forEach(n=>{ if (n in roundArtOk) return; roundArtOk[n] = null; const im = new Image(); im.onload = ()=>{ roundArtOk[n] = true; }; im.onerror = ()=>{ roundArtOk[n] = false; }; im.src = 'data/scenes/round/' + n + '.webp'; }); }
   // (the Round Done card no longer uses these pictures - probeRoundArt() is not called)
@@ -12575,13 +12577,17 @@ const SHARE_URL = 'https://playflipstax.com';
     // Flip alone (data/scenes/win.webp) otherwise; a soft gradient keeps the text readable (lib/juice.css .rw-art)
     // A+ round art: the Round Done card plays dance-girls.mp4 (muted, looping, 540 px, its end faded into its start) over a still poster of its
     // first frame; lite mode and reduced motion get only the poster. (The round pictures themselves are on the round title cards.)
-    showCard.className = 'show-card reward has-art art-round';
-    showCard.style.setProperty('--rw-art', 'url(../data/scenes/round/dance-poster.webp)');
+    // polish pass: the dancers' video and its poster were filmed on the old gold stage - the card now stands in the drawn studio with the three girls
+    // lifted off the poster frame (same pose, a still); the video is not loaded any more (the files stay)
+    const ROUND_DONE_VIDEO = false;
+    showCard.className = 'show-card reward has-art art-round has-cast';
+    showCard.style.setProperty('--rw-art', 'url(../data/cast/studio/girls-dance.webp)');
+    if (window.Stage) Stage.cue('close', { over:showCard, cls:'reward', sign:{ sub:'', main:'' } });
     showCard.innerHTML = '<i class="rw-sun" aria-hidden="true"></i><div class="rw-panel"><div class="rw-title"></div><div class="rw-frame"><i class="mq mq-a" aria-hidden="true"></i><i class="mq mq-b" aria-hidden="true"></i><div class="rw-row">' +
       '<span class="rw-chip pts" style="--i:0"><b>+' + pts + '</b><small>points</small></span>' +
       '<span class="rw-chip letter ' + (letter || 'none') + '" style="--i:1"><b>' + (letter === 'got' ? '?' : letter === 'miss' ? '✕' : '–') + '</b><small>' + (letter === 'got' ? 'letter won' : 'no letter') + '</small></span>' +
       '<span class="rw-chip keys" style="--i:2"><b>◉ ' + keys + '</b><small>orb' + (keys === 1 ? '' : 's') + '</small></span></div></div></div>';   // (A+: only points gained, the letter won and keys - no running totals)
-    if (!prefersReducedMotion()){   // (lite mode keeps the dancers: it only stops the marquee and blur)
+    if (ROUND_DONE_VIDEO && !prefersReducedMotion()){   // (lite mode keeps the dancers: it only stops the marquee and blur)
       try{
         const vid = document.createElement('video'); vid.className = 'rw-video'; vid.muted = true; vid.loop = true; vid.playsInline = true; vid.preload = 'auto'; vid.setAttribute('aria-hidden', 'true'); vid.setAttribute('disablepictureinpicture', '');
         vid.addEventListener('playing', ()=> vid.classList.add('on'));
@@ -12633,9 +12639,9 @@ const SHARE_URL = 'https://playflipstax.com';
     const m = st.mult || a.mult || 1, line = st.announce || a.announce || '', round = st.round || a.round || 0;
     // A+ round art: Rounds 2-6 open on their own picture (data/scenes/round/, ROUND_TITLE_ART) instead of the stage's arch - the girls on top,
     // the sign, the points pill and the host's line in the dark gradient at the bottom; the host is not drawn over the picture.
-    const tArt = !fin && ROUND_TITLE_ART[round] || null;
-    showCard.className = 'show-card flipstage' + (fin ? ' finale' : '') + (tArt ? ' has-art art-title' : '');
-    if (tArt) showCard.style.setProperty('--rw-art', 'url(../data/scenes/round/' + tArt + '.webp)'); else showCard.style.removeProperty('--rw-art');
+    const tArt = !fin && ROUND_TITLE_CAST[round] || null;
+    showCard.className = 'show-card flipstage' + (fin ? ' finale' : '') + (tArt ? ' has-cast' : '');
+    if (tArt) showCard.style.setProperty('--rw-art', 'url(../data/cast/studio/' + tArt + '.webp)'); else showCard.style.removeProperty('--rw-art');
     showCard.innerHTML = '<div class="fs-host host-full" aria-hidden="true">' + Host.html({ pose: fin ? 'cheer' : 'presenting' }) + '</div>' +
       '<div class="fs-title"><b></b><span></span></div>' +
       (m > 1 || fin ? '<div class="fs-pill ds-pill gold">' + (fin ? 'GRAND PRIZE' : 'POINTS ×' + m) + '</div>' : '') +
@@ -12649,8 +12655,8 @@ const SHARE_URL = 'https://playflipstax.com';
     // the title card moves on by itself after ROUND_CARD_MS (about 3 s with the zoom out), shows ONE line from the host, and a tap skips it;
     // a first-time VS explainer is a card of its own afterwards (showExplainer), not a second host line on this one
     const ROUND_CARD_MS = 2200, ms = ROUND_CARD_MS;
-    if (window.Stage && !tArt) Stage.cue('close', { over:showCard, cls:'flipstage', push:true, ms, sign:{ sub: signSub, main: signMain } });
-    showCard.classList.toggle('staged', !!(window.Stage && Stage.ready) && !tArt);
+    if (window.Stage) Stage.cue('close', { over:showCard, cls:'flipstage', push:true, ms, sign:{ sub: signSub, main: signMain } });   // (polish pass: every round card stands in the studio)
+    showCard.classList.toggle('staged', !!(window.Stage && Stage.ready));
     clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
     if (sfx.bumper) sfx.bumper(!!st.finale);
     if (fin) setTimeout(()=> sfx.drumrollLong(), 500);   // the finale: a long drumroll under the spotlight

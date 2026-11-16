@@ -4212,3 +4212,32 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 /* iPhone fix: Emoji Decode's fitted emoji size (edFit) applies only while Emoji Decode is on screen; it used to be left on the shared
    question box and blew up the next Brain Beam / Riddle Round / Time Warp question. */
 .event-overlay.bb-emojiDecode .event-prompt.ed-fit{ font-size:var(--ed-fit) !important; }
+
+/* ==== POLISH PASS: THE ROUND CARDS AND ROUND DONE IN THE STUDIO (look only). Rounds 2-6 used to open on a photo of the old gold stage with the
+   girls painted in, and ROUND DONE on a video filmed there. Both now stand in the drawn studio (lib/stage.css, STUDIO block) like Round 1: the
+   same girls in the same poses, lifted off those pictures (data/cast/studio/), stand on a neon hover pad in front of the window; the round's name
+   is on the neon sign; the points pill sits just under the sign. Flip gets the same pad on his own cards. Nothing new moves. ==== */
+.show-card.flipstage.has-cast .fs-host{ display:none; }
+.show-card.flipstage.has-cast::before{ content:''; position:absolute; z-index:3; left:2%; right:2%; top:calc(214px + env(safe-area-inset-top)); bottom:calc(196px + env(safe-area-inset-bottom)); pointer-events:none;
+  background:var(--rw-art) 50% 100% / contain no-repeat; animation:hostStillIn 0.35s ease both; }
+.show-card.flipstage.has-cast::after, :root.mode-daily .show-card.reward.art-round.has-cast::after{ content:''; position:absolute; z-index:2; left:50%; bottom:calc(178px + env(safe-area-inset-bottom)); width:min(84vw, 340px); height:40px; margin-left:calc(min(84vw, 340px) / -2); border-radius:50%; box-sizing:border-box; pointer-events:none;
+  border:3px solid #ff4fd8; background:radial-gradient(ellipse closest-side, rgba(234,255,255,0.75), rgba(95,244,255,0.3) 55%, rgba(40,20,120,0.9) 72%, rgba(20,8,70,0.9)); box-shadow:0 0 16px 2px rgba(255,79,216,0.7), inset 0 0 0 5px rgba(20,8,70,0.9), inset 0 0 0 7.5px #5ff4ff; }
+.show-card.flipstage.has-cast .fs-pill, .show-card.flipstage.staged .fs-pill{ top:calc(179px + env(safe-area-inset-top)); }
+/* Flip's hover pad on his own cards (Round 1, the Grand Finale, the outro), as in the opener */
+.show-card.flipstage.staged .fs-host::before, .show-card.flipstage.staged .fs-host::after{ content:''; position:absolute; z-index:-1; left:50%; border-radius:50%; pointer-events:none; box-sizing:border-box; }
+.show-card.flipstage.staged .fs-host::before{ bottom:-22px; width:170%; height:44px; margin-left:-85%; border:3px solid #ff4fd8; background:radial-gradient(ellipse closest-side, rgba(40,20,120,0.9), rgba(20,8,70,0.9)); box-shadow:0 0 16px 2px rgba(255,79,216,0.7); }
+.show-card.flipstage.staged .fs-host::after{ bottom:-13px; width:124%; height:28px; margin-left:-62%; border:2.5px solid #5ff4ff; background:radial-gradient(ellipse closest-side, rgba(234,255,255,0.85), rgba(95,244,255,0.35) 60%, rgba(95,244,255,0.1)); box-shadow:0 0 14px 2px rgba(95,244,255,0.8); }
+@media (max-height:700px){
+  .show-card.flipstage.has-cast::before{ top:calc(180px + env(safe-area-inset-top)); bottom:calc(150px + env(safe-area-inset-bottom)); }
+  .show-card.flipstage.has-cast::after{ bottom:calc(134px + env(safe-area-inset-bottom)); height:34px; }
+  .show-card.flipstage.has-cast .fs-pill, .show-card.flipstage.staged .fs-pill{ top:calc(149px + env(safe-area-inset-top)); }
+}
+/* ROUND DONE: the studio behind, the three girls on the pad, the panel as it was */
+:root.mode-daily .show-card.reward.has-art.art-round.has-cast.stage-backed{ background:linear-gradient(0deg, rgba(10,3,24,0.92) 0%, rgba(10,3,24,0.55) 22%, rgba(10,3,24,0) 40%) !important; }
+:root.mode-daily .show-card.reward.art-round.has-cast::before{ background:var(--rw-art) 50% 100% / contain no-repeat; -webkit-mask-image:none; mask-image:none; margin:calc(150px + env(safe-area-inset-top)) 2% 6px; z-index:1; }
+:root.mode-daily .show-card.reward.art-round.has-cast::after{ position:relative; grid-area:1 / 1; align-self:end; justify-self:center; left:auto; bottom:auto; margin:0 0 -12px; z-index:0; background-image:radial-gradient(ellipse closest-side, rgba(234,255,255,0.75), rgba(95,244,255,0.3) 55%, rgba(40,20,120,0.9) 72%, rgba(20,8,70,0.9)); }
+:root.mode-daily .show-card.reward.art-round.has-cast .rw-sun{ display:none; }
+:root.mode-daily .show-card.reward.art-round.has-cast .rw-panel{ z-index:2; }
+@media (max-height:700px){ :root.mode-daily .show-card.reward.art-round.has-cast::before{ margin-top:calc(72px + env(safe-area-inset-top)); } }
+:root.lite .show-card.flipstage.has-cast::before{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .show-card.flipstage.has-cast::before{ animation:none; } }
