@@ -4255,3 +4255,36 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 .show-card.mreveal .mr-curt.l{ box-shadow:inset -5px 0 0 #ff4fd8, inset -7px 0 0 rgba(255,255,255,0.85); }
 .show-card.mreveal .mr-curt.r{ box-shadow:inset 5px 0 0 #ff4fd8, inset 7px 0 0 rgba(255,255,255,0.85); }
 :root:has(#showCard.mreveal:not(.hidden)) #showFx .fx-sweep b{ background:linear-gradient(90deg, transparent, rgba(200,250,255,0.55), transparent); }
+
+/* ==== POLISH PASS: THE ENDING IN THE STUDIO (look only; same length, same tap to skip, same results). The goodbye video (the cast on the old gold
+   stage, a blue curtain closing on a FLIPSTAX sign) is not played any more. In its place, in the drawn studio (the stage layer behind this screen):
+   the cast lifted off the old end-of-show picture stands on a hover pad in front of the window under a neon FLIPSTAX sign; at 6.6 s the blast doors
+   slide shut (1.5 s); at 10 s the results lie over the closed doors, as they lay over the video's last frame. A skip, lite mode and reduced motion go
+   straight to the closed doors. Transform and opacity only: the cast's slow bob, the doors, nothing flashes. ==== */
+#readoutOverlay.ep.outro-on:has(.outro.studio){ background:none !important; }
+:root.outro-up #stage .stg-sign{ display:none !important; }
+.outro.studio .outro-video, .outro.studio .outro-poster{ display:none !important; }
+#readoutOverlay.ep.outro-on .outro.studio{ background:none !important; }
+.outro.studio .outro-set::after{ content:''; position:absolute; inset:0; background:rgba(6,2,26,0.5); opacity:0; transition:opacity 0.5s ease; }
+.outro.studio.end .outro-set::after{ opacity:1; }
+.outro-set{ position:absolute; inset:0; overflow:hidden; pointer-events:none; }
+.outro-set > *{ position:absolute; }
+.os-cast{ left:2%; right:2%; top:calc(16.5vh + 62px + env(safe-area-inset-top)); bottom:21.5%; background:url(../data/cast/studio/all-group.webp) 50% 100% / contain no-repeat; animation:osBob 2.6s ease-in-out infinite alternate; }
+@keyframes osBob{ from{ transform:translateY(0); } to{ transform:translateY(-7px); } }
+.os-pad{ left:50%; bottom:calc(21.5% - 20px); width:min(90vw, 370px); height:42px; margin-left:calc(min(90vw, 370px) / -2); border-radius:50%; box-sizing:border-box; border:3px solid #ff4fd8;
+  background:radial-gradient(ellipse closest-side, rgba(234,255,255,0.75), rgba(95,244,255,0.3) 55%, rgba(40,20,120,0.9) 72%, rgba(20,8,70,0.9)); box-shadow:0 0 16px 2px rgba(255,79,216,0.7), inset 0 0 0 5px rgba(20,8,70,0.9), inset 0 0 0 7.5px #5ff4ff; }
+.os-door{ top:0; bottom:0; width:50%; background:repeating-linear-gradient(180deg, rgba(95,244,255,0) 0 92px, rgba(95,244,255,0.75) 92px 97px, rgba(95,244,255,0) 97px 132px), linear-gradient(90deg, #0b0534, #26138a 50%, #0f0744); }
+.os-door.l{ left:0; transform:translateX(-101%); box-shadow:inset -5px 0 0 #ff4fd8, inset -7px 0 0 rgba(255,255,255,0.85); animation:osShutL 1.5s cubic-bezier(.6,0,.3,1) 6.6s forwards; }
+.os-door.r{ right:0; transform:translateX(101%); box-shadow:inset 5px 0 0 #ff4fd8, inset 7px 0 0 rgba(255,255,255,0.85); animation:osShutR 1.5s cubic-bezier(.6,0,.3,1) 6.6s forwards; }
+@keyframes osShutL{ from{ transform:translateX(-101%); } to{ transform:none; } }
+@keyframes osShutR{ from{ transform:translateX(101%); } to{ transform:none; } }
+.os-beam{ left:0; right:0; top:0; height:calc(34px + env(safe-area-inset-top)); background:linear-gradient(180deg, #070320, #1c0e6a); border-bottom:3px solid #5ff4ff; box-shadow:0 0 18px 2px rgba(95,244,255,0.7), 0 6px 14px rgba(0,0,20,0.6); }
+.os-sign{ z-index:1; left:50%; top:calc(46px + env(safe-area-inset-top)); width:min(78vw, 310px); margin-left:calc(min(78vw, 310px) / -2); box-sizing:border-box; padding:7px 0 9px 6px; text-align:center; border-radius:16px;
+  font:900 clamp(40px, 13.5vw, 54px)/1 var(--f-display); letter-spacing:6px; color:#eaffff; border:3px solid #5ff4ff; outline:1px solid rgba(255,255,255,0.8); outline-offset:-2.5px;
+  background:linear-gradient(180deg, rgba(26,12,90,0.96), rgba(8,4,40,0.97)); text-shadow:0 0 6px #fff, 0 0 16px #5ff4ff, 0 0 30px #5ff4ff, 0 3px 0 rgba(10,0,40,0.8);
+  box-shadow:0 0 0 4px #0a0530, 0 0 0 6px #ff4fd8, 0 0 22px 6px rgba(255,79,216,0.6), inset 0 0 16px rgba(95,244,255,0.35); }
+.outro.studio:is(.poster-on, .end) .os-door{ animation:none; transform:none; }
+.outro.studio:is(.poster-on, .end) :is(.os-cast, .os-pad){ visibility:hidden; animation:none; }
+:root.lite .os-cast, :root.lite .os-door{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .os-cast, .os-door{ animation:none; } }
+@media (max-height:700px){ .os-sign{ top:calc(40px + env(safe-area-inset-top)); font-size:38px; width:min(70vw, 250px); margin-left:calc(min(70vw, 250px) / -2); padding:5px 0 7px 6px; } .os-beam{ height:calc(30px + env(safe-area-inset-top)); } }

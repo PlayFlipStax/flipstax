@@ -16934,11 +16934,17 @@ const SHARE_URL = 'https://playflipstax.com';
   // that last frame (the 1d39dd0 screen: the FINAL SCORE pill, CONGRATULATIONS!, the 8 stat tiles, SHARE, the coffee button, 'Play again tomorrow'); Flip's personality
   // line, the badges and the old cards (best moment, today's personality, streak, new collectible cards, the Secret Riddler) scroll below. No red curtains.
   const OUTRO_WATCHDOG_MS = 15000, OUTRO_FALLBACK_MS = 1500, OUTRO_START_MS = 3500;
+  // polish pass: the goodbye video was filmed on the old stage - the ending now plays in the drawn studio instead (lib/juice.css, THE ENDING IN THE STUDIO): the
+  // cast, lifted off the old picture, in front of the window, then the blast doors close under the neon FLIPSTAX sign and the results lie over them. Same length
+  // as the video (10 s), same tap to skip, same quiet path for lite / reduced motion / fast test runs. The video and its poster stay in data/outro, not loaded here.
+  const OUTRO_STUDIO = true, OUTRO_STUDIO_MS = 10000;
   function outroMount(){
     const o = document.getElementById('outro'); if (!o || o.querySelector('.outro-extras')) return;
     // mega 4 item 1: no red curtains and no 'That's our show' card - the video's own blue curtain closes on the neon FLIPSTAX sign, and the results lie over
     // that last frame (the 1d39dd0 screen). The old cards and badges scroll below the buttons (the same elements, so the code that fills them is unchanged).
     o.classList.add('blue');
+    if (OUTRO_STUDIO && !o.querySelector('.outro-set')){ o.classList.add('studio'); const set = document.createElement('div'); set.className = 'outro-set'; set.setAttribute('aria-hidden', 'true');
+      set.innerHTML = '<i class="os-pad"></i><i class="os-cast"></i><i class="os-door l"></i><i class="os-door r"></i><i class="os-beam"></i><b class="os-sign">FLIPSTAX</b>'; o.insertBefore(set, document.getElementById('outroBadge')); }
     const lower = o.querySelector('.outro-lower'), x = document.createElement('div'); x.className = 'outro-extras';
     x.innerHTML = '<div class="ox-flip"><span class="ox-face">' + Host.html({ pose:'wave', kind:'head' }) + '</span><p class="ox-line" id="outroFlipLine"></p></div>';
     const cards = document.querySelector('#epResults .epr-cards'), unl = document.getElementById('readoutUnlocks'), rid = document.getElementById('readoutRiddler');
@@ -16982,6 +16988,7 @@ const SHARE_URL = 'https://playflipstax.com';
     outroLater(OUTRO_WATCHDOG_MS, ()=> outroEnd(true));   // (the watchdog: whatever happens, the buttons are there within 12 s)
     const quiet = isLite() || prefersReducedMotion() || (DEBUG_FAST && !REALTIME);   // (test runs and quiet modes: the poster, then the end state)
     if (quiet){ o.classList.add('poster-on'); outroLater(DEBUG_FAST && !REALTIME ? 300 : OUTRO_FALLBACK_MS, ()=> outroEnd(false)); return; }
+    if (OUTRO_STUDIO){ outroLater(OUTRO_STUDIO_MS, ()=> outroEnd(false, true)); return; }   // (the studio ending: as long as the video was, then the results)
     const fail = ()=>{ if (outroState !== 'playing') return; o.classList.add('poster-on'); outroClear(); outroLater(OUTRO_FALLBACK_MS, ()=> outroEnd(false)); outroLater(OUTRO_WATCHDOG_MS, ()=> outroEnd(true)); };
     try{
       v.muted = true; v.src = 'data/outro/outro.mp4'; v.currentTime = 0;   // (mega 4: always muted - the win or lose track plays under the ending)
