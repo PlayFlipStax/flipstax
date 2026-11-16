@@ -12554,7 +12554,9 @@ const SHARE_URL = 'https://playflipstax.com';
   // The round title cards (A+): Round 2 to 6 each have a different picture, no picture on two rounds running; the last round is the whole group.
   const ROUND_TITLE_ART = { 2:'scene-girl-green', 3:'scene-girl-purple', 4:'scene-girl-pink', 5:'scene-girls-pose', 6:'scene-all-group' };   // (the old gold-stage pictures: no longer shown, the files stay)
   // polish pass: the same girls in the same poses, lifted off those pictures (tools/build-studio-cast.py -> data/cast/studio/), stand in the drawn studio instead
-  const ROUND_TITLE_CAST = { 2:'green-jump', 3:'purple-jump', 4:'pink-jump', 5:'girls-pose', 6:'all-group' };
+  const ROUND_TITLE_CAST = { 2:'green-jump', 3:'purple-jump', 4:'pink-jump', 5:'girls-pose', 6:'all-group' };   // (solo pass: not used any more - the files stay)
+  // solo pass: Flip Sterling is the only host. Every round card shows him alone on his hover pad in the studio, in a different pose each round.
+  const ROUND_TITLE_POSE = { 1:'presenting', 2:'wave', 3:'think', 4:'cheer', 5:'shrug', 6:'presenting' };
   const roundArtOk = {};
   function probeRoundArt(){ ROUND_ART.forEach(n=>{ if (n in roundArtOk) return; roundArtOk[n] = null; const im = new Image(); im.onload = ()=>{ roundArtOk[n] = true; }; im.onerror = ()=>{ roundArtOk[n] = false; }; im.src = 'data/scenes/round/' + n + '.webp'; }); }
   // (the Round Done card no longer uses these pictures - probeRoundArt() is not called)
@@ -12580,8 +12582,8 @@ const SHARE_URL = 'https://playflipstax.com';
     // polish pass: the dancers' video and its poster were filmed on the old gold stage - the card now stands in the drawn studio with the three girls
     // lifted off the poster frame (same pose, a still); the video is not loaded any more (the files stay)
     const ROUND_DONE_VIDEO = false;
-    showCard.className = 'show-card reward has-art art-round has-cast';
-    showCard.style.setProperty('--rw-art', 'url(../data/cast/studio/girls-dance.webp)');
+    showCard.className = 'show-card reward has-art art-round has-cast solo';   // (solo pass: Flip alone, cheering - his own pose picture, no dancers)
+    showCard.style.setProperty('--rw-art', 'url(../data/host/cheer.webp)');
     if (window.Stage) Stage.cue('close', { over:showCard, cls:'reward', sign:{ sub:'', main:'' } });
     showCard.innerHTML = '<i class="rw-sun" aria-hidden="true"></i><div class="rw-panel"><div class="rw-title"></div><div class="rw-frame"><i class="mq mq-a" aria-hidden="true"></i><i class="mq mq-b" aria-hidden="true"></i><div class="rw-row">' +
       '<span class="rw-chip pts" style="--i:0"><b>+' + pts + '</b><small>points</small></span>' +
@@ -12608,7 +12610,8 @@ const SHARE_URL = 'https://playflipstax.com';
     }
     // Run 4B: the round-end game was won - the presenter pops out beside the panel now and then (lib/cast.js; only
     // pictures listed in data/cast/manifest.js; never takes a tap)
-    if (runActWon[st.act] && window.Cast) Cast.win({ side:'left', hold: Math.min(1900, cine(TIMING.REWARD_HOLD || 2200) - 300), always: CAST_ALWAYS, while: ()=> showCard.classList.contains('reward') && !showCard.classList.contains('hidden') });
+    // solo pass: the presenter (Cleo) no longer pops out - Flip is the only host on the card
+    if (false && runActWon[st.act] && window.Cast) Cast.win({ side:'left', hold: Math.min(1900, cine(TIMING.REWARD_HOLD || 2200) - 300), always: CAST_ALWAYS, while: ()=> showCard.classList.contains('reward') && !showCard.classList.contains('hidden') });
     const shownAt = performance.now();
     let gone = false;
     const go = (e)=>{
@@ -12639,10 +12642,10 @@ const SHARE_URL = 'https://playflipstax.com';
     const m = st.mult || a.mult || 1, line = st.announce || a.announce || '', round = st.round || a.round || 0;
     // A+ round art: Rounds 2-6 open on their own picture (data/scenes/round/, ROUND_TITLE_ART) instead of the stage's arch - the girls on top,
     // the sign, the points pill and the host's line in the dark gradient at the bottom; the host is not drawn over the picture.
-    const tArt = !fin && ROUND_TITLE_CAST[round] || null;
+    const tArt = null;   // (solo pass: no cast picture on any round - Flip himself stands on the card)
     showCard.className = 'show-card flipstage' + (fin ? ' finale' : '') + (tArt ? ' has-cast' : '');
     if (tArt) showCard.style.setProperty('--rw-art', 'url(../data/cast/studio/' + tArt + '.webp)'); else showCard.style.removeProperty('--rw-art');
-    showCard.innerHTML = '<div class="fs-host host-full" aria-hidden="true">' + Host.html({ pose: fin ? 'cheer' : 'presenting' }) + '</div>' +
+    showCard.innerHTML = '<div class="fs-host host-full" aria-hidden="true">' + Host.html({ pose: fin ? 'cheer' : (ROUND_TITLE_POSE[round] || 'presenting') }) + '</div>' +
       '<div class="fs-title"><b></b><span></span></div>' +
       (m > 1 || fin ? '<div class="fs-pill ds-pill gold">' + (fin ? 'GRAND PRIZE' : 'POINTS ×' + m) + '</div>' : '') +
       '<div class="fs-line" aria-live="polite"><span></span></div>';
@@ -16977,7 +16980,7 @@ const SHARE_URL = 'https://playflipstax.com';
   function startOutro(r){
     stopOutro(); loadOutroPoster(); outroMount();
     const o = document.getElementById('outro'), v = document.getElementById('outroVideo'); if (!o) return;
-    { const art = document.getElementById('outroArt'); if (art && !art.getAttribute('src')) art.src = 'data/scenes/round/scene-all-group.webp'; }   // (the end-of-show picture, loaded when the outro starts)
+    // (solo pass: the old end-of-show group picture is not loaded any more - its box has been hidden since the blue-curtain ending; the file stays)   // (the end-of-show picture, loaded when the outro starts)
     els.readoutOverlay.classList.add('outro-on');
     // Launch prep: one 'game_completed' analytics event per finished episode (Vercel Web Analytics; a no-op when it is blocked or in test modes),
     // and the feedback link only when FEEDBACK_URL is set.

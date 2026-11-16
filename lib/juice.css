@@ -4269,7 +4269,7 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 .outro.studio.end .outro-set::after{ opacity:1; }
 .outro-set{ position:absolute; inset:0; overflow:hidden; pointer-events:none; }
 .outro-set > *{ position:absolute; }
-.os-cast{ left:2%; right:2%; top:calc(16.5vh + 62px + env(safe-area-inset-top)); bottom:21.5%; background:url(../data/cast/studio/all-group.webp) 50% 100% / contain no-repeat; animation:osBob 2.6s ease-in-out infinite alternate; }
+.os-cast{ left:2%; right:2%; top:calc(16.5vh + 62px + env(safe-area-inset-top)); bottom:21.5%; background:url(../data/host/wave.webp) 50% 100% / contain no-repeat; animation:osBob 2.6s ease-in-out infinite alternate; }
 @keyframes osBob{ from{ transform:translateY(0); } to{ transform:translateY(-7px); } }
 .os-pad{ left:50%; bottom:calc(21.5% - 20px); width:min(90vw, 370px); height:42px; margin-left:calc(min(90vw, 370px) / -2); border-radius:50%; box-sizing:border-box; border:3px solid #ff4fd8;
   background:radial-gradient(ellipse closest-side, rgba(234,255,255,0.75), rgba(95,244,255,0.3) 55%, rgba(40,20,120,0.9) 72%, rgba(20,8,70,0.9)); box-shadow:0 0 16px 2px rgba(255,79,216,0.7), inset 0 0 0 5px rgba(20,8,70,0.9), inset 0 0 0 7.5px #5ff4ff; }
@@ -4305,3 +4305,13 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root:root:root:root:root:root .show-card.gintro .gi-icon::after{ bottom:-8px; height:clamp(36px, 10.5vw, 54px); box-sizing:border-box; border:3px solid #ff4fd8;
   background:radial-gradient(ellipse closest-side, rgba(234,255,255,0.8), rgba(95,244,255,0.3) 55%, rgba(40,20,120,0.9) 72%, rgba(20,8,70,0.9)) !important; box-shadow:0 0 16px 2px rgba(255,79,216,0.7), inset 0 0 0 5px rgba(20,8,70,0.9), inset 0 0 0 7.5px #5ff4ff !important; }
 :root:root:root:root:root:root .show-card.gintro .gi-sign{ background:linear-gradient(180deg, rgba(26,12,90,0.97), rgba(8,4,40,0.98)) !important; outline:1px solid rgba(255,255,255,0.8); outline-offset:-2.5px; }
+
+/* ==== SOLO PASS: FLIP STERLING IS THE ONLY HOST. The alien girls are out of every show beat (their pictures stay in data/cast and data/scenes,
+   unused): rounds 2-6 show Flip himself on his hover pad like Round 1 (a different pose each round, set in showActCard), ROUND DONE shows his cheer
+   pose, and the ending shows him waving. Here: the pads sized for one figure instead of a group. ==== */
+.os-pad{ width:min(60vw, 240px); margin-left:calc(min(60vw, 240px) / -2); }
+:root.mode-daily .show-card.reward.art-round.has-cast.solo::after{ width:min(60vw, 240px); margin-left:0; }
+/* one figure, not a group: Flip stands inside the window arch instead of filling the whole screen */
+.os-cast{ top:calc(16.5vh + 150px + env(safe-area-inset-top)); }
+:root.mode-daily .show-card.reward.art-round.has-cast.solo::before{ margin-top:calc(236px + env(safe-area-inset-top)); }
+@media (max-height:700px){ .os-cast{ top:calc(16.5vh + 96px + env(safe-area-inset-top)); } :root.mode-daily .show-card.reward.art-round.has-cast.solo::before{ margin-top:calc(128px + env(safe-area-inset-top)); } }
