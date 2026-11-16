@@ -374,3 +374,8 @@ Not done / to check
 - Still showing the old stage (no girls in any of them): the share picture (`data/outro/poster.webp`, the blue curtain), the commercial break (`data/scenes/sponsor.webp`), the blurred backdrop behind gameplay (`data/stage/stage-dim.webp`). None is a simple CSS swap; left alone.
 - Unused now, files kept: `data/cast/studio/*`, `data/scenes/round/*`, `data/cast/purple-presenting.webp` (still listed in `data/cast/manifest.js`), `ROUND_TITLE_CAST`, the `has-cast` rules for the round cards.
 - At 360x640 the greeting bubble covers Flip's legs in the intro (three lines of text); the host's size and place there were not changed.
+
+## One Flip (Nov 16 2026, after the solo pass)
+
+Flip is one size on every show beat: block `ONE FLIP` at the end of `lib/juice.css`. `--flip-h` = min(430 px, screen height - 320 px), so 430 px at 390x844 and 320 px at 360x640; the opener (`.co-stage-host` in the saucer intro), round cards 1-6 and the Grand Finale (`.fs-host`), ROUND DONE and the ending all use it, on a 240 px pad. Sizes only: no text, timing or skip change. The test menu gained Round 2 / 4 / 6 card entries. Fast check: commercial break ok, 3 of 3. Stills: `review-shots/solo/compare-6-one-flip-390.png`, `compare-7-one-flip-360.png`, `compare-8-one-flip-still.png`.
+Known: at 360x640 the opener's bubble covers his legs (face clear); the antenna tips come close to the points badge; in the still intro the parked saucer sits right on his antennae; after `?intro=full` the old opener still places him at the video's size.

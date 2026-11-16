@@ -19957,6 +19957,7 @@ const SHARE_URL = 'https://playflipstax.com';
       { label:'Round 3 card', go: roundCard(3) },
       { label:'Select Game', go: roundGame('door', 96, 3) },
       { label:'Round 5 card', go: roundCard(5) },
+      { label:'Round 2 card', go: roundCard(2) }, { label:'Round 4 card', go: roundCard(4) }, { label:'Round 6 card', go: roundCard(6) },   // (test menu only: every round card can be looked at)
       { label:'Mystery Wheel', go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = null; }) },
       ...['JACKPOT +100', 'ORB +1', 'GOOP -25', 'Mystery: Snap Sort', '+25', 'GOOP -50', 'ORB +1 (2)', 'LOSE A SPIN', 'Riddle Round', 'DANCE PARTY'].map((t, i)=> ({ label:'Wheel: ' + t, go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = i; }) })),
       { label:'Price Probe', go: mysteryAs('priceProbe') },
