@@ -74,9 +74,9 @@ PLANET = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="-84 -52 168 104">
 <path d="M-50 -9Q0 3 50 -9" fill="none" stroke="#a02aa0" stroke-width="5" opacity=".45"/>
 <path d="M-50 22Q0 36 50 22" fill="none" stroke="#7a1f9a" stroke-width="7" opacity=".5"/>
 <ellipse cy="9" rx="74" ry="16" fill="none" stroke="#2a0a50" stroke-width="7" opacity=".4"/>
-</g><circle cx="16" cy="14" r="52" fill="none" stroke="#2a0a50" stroke-width="22" opacity=".28"/></g>
+</g></g>
 <g transform="rotate(-18)">
-<path d="M-74 0A74 16 0 0 0 74 0" fill="none" stroke="url(#q)" stroke-width="8" stroke-linecap="round"/>
+<path d="M-74 0A74 16 0 0 0 74 0" fill="none" stroke="url(#q)" stroke-width="8"/>
 <path d="M-74 0A74 16 0 0 0 74 0" fill="none" stroke="#fff8d0" stroke-width="1.6" opacity=".9" transform="translate(0 -2.4)"/>
 <path d="M-74 0A74 16 0 0 0 74 0" fill="none" stroke="#a85a10" stroke-width="1.6" opacity=".7" transform="translate(0 1.2)"/>
 </g>
@@ -86,21 +86,21 @@ PLANET_OLD = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="-84 -52 168 104
 <defs><radialGradient id="p" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffd0f0"/><stop offset=".45" stop-color="#ff5ac8"/><stop offset="1" stop-color="#5a1a9a"/></radialGradient></defs>
 <circle r="44" fill="url(#p)"/><ellipse rx="74" ry="15" fill="none" stroke="#ffe27a" stroke-width="5" transform="rotate(-18)" opacity=".95"/><path d="M-42 -6 A44 44 0 0 1 42 -14" fill="none" stroke="url(#p)" stroke-width="9"/>
 </svg>'''
-SOLID = False   # (the planet fix is its own step)
+SOLID = True
 if not SOLID: PLANET = PLANET_OLD
 # ---- a small spiral galaxy (turns slowly) ----
-GALAXY = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 100 100">
-<defs><radialGradient id="k"><stop offset="0" stop-color="#fff"/><stop offset=".18" stop-color="#ffe9c0" stop-opacity=".95"/><stop offset=".5" stop-color="#b98bff" stop-opacity=".35"/><stop offset="1" stop-color="#5ff4ff" stop-opacity="0"/></radialGradient></defs>
-<circle r="46" fill="url(#k)" opacity=".7"/>
-<g fill="none" stroke-linecap="round">
-<path d="M0 0C10 -14 30 -12 36 4C40 18 28 32 12 34" stroke="#d8c4ff" stroke-width="5" opacity=".55"/>
-<path d="M0 0C-10 14 -30 12 -36 -4C-40 -18 -28 -32 -12 -34" stroke="#d8c4ff" stroke-width="5" opacity=".55"/>
-<path d="M0 0C14 8 14 26 0 30C-14 34 -28 24 -30 10" stroke="#9fe9ff" stroke-width="3" opacity=".5"/>
-<path d="M0 0C-14 -8 -14 -26 0 -30C14 -34 28 -24 30 -10" stroke="#9fe9ff" stroke-width="3" opacity=".5"/>
-</g>
-<g fill="#fff"><circle cx="22" cy="-18" r="1.1"/><circle cx="-24" cy="16" r="1.1"/><circle cx="10" cy="28" r=".9"/><circle cx="-12" cy="-28" r=".9"/><circle cx="34" cy="10" r=".8"/><circle cx="-34" cy="-10" r=".8"/></g>
-<circle r="5" fill="#fff"/>
-</svg>'''
+def galaxy():
+    import math
+    rnd = random.Random(5); dots = []
+    for arm in range(2):
+        for k in range(44):
+            t = k / 43.0; ang = arm * math.pi + t * 4.4; r = 5 + t * 39
+            x, y = r * math.cos(ang) + rnd.gauss(0, 1.6 + t * 2.2), r * math.sin(ang) + rnd.gauss(0, 1.6 + t * 2.2)
+            dots.append('<circle cx="%.1f" cy="%.1f" r="%.1f" fill="%s" opacity="%.2f"/>' % (x, y, rnd.choice([0.7, 0.9, 1.2, 1.6]) * (1.25 - t * 0.5), rnd.choice(['#fff', '#e6d8ff', '#bfeaff', '#ffd9f3']), 0.95 - t * 0.55))
+    arms = ''.join('<path d="M0 0' + ''.join('L%.1f %.1f' % ((5 + (k / 30.0) * 37) * math.cos(a * math.pi + (k / 30.0) * 4.4), (5 + (k / 30.0) * 37) * math.sin(a * math.pi + (k / 30.0) * 4.4)) for k in range(31)) + '" fill="none" stroke="#b9a4ff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity=".16"/>' for a in range(2))
+    return ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 100 100"><defs><radialGradient id="k"><stop offset="0" stop-color="#fff"/><stop offset=".14" stop-color="#ffe9c0" stop-opacity=".9"/>'
+            '<stop offset=".45" stop-color="#b98bff" stop-opacity=".28"/><stop offset="1" stop-color="#5ff4ff" stop-opacity="0"/></radialGradient></defs><circle r="48" fill="url(#k)" opacity=".75"/>' + arms + ''.join(dots) + '<circle r="3.4" fill="#fff"/></svg>')
+GALAXY = galaxy()
 S = ':root.stage-on #stage :is(.stg-close, .stg-wide)'
 CSS = '''/* ==== STUDIO:BEGIN (written by tools/build-studio-css.py - edit the script, not this block) ====
    THE ORBITING STUDIO, EVERYWHERE. The close and the wide shot are no longer the stage photos (data/stage/*.webp stay in the folder; only the
