@@ -12585,7 +12585,13 @@ const SHARE_URL = 'https://playflipstax.com';
     showCard.className = 'show-card reward has-art art-round has-cast solo';   // (solo pass: Flip alone, cheering - his own pose picture, no dancers)
     showCard.style.setProperty('--rw-art', 'url(../data/host/cheer.webp)');
     if (window.Stage) Stage.cue('close', { over:showCard, cls:'reward', sign:{ sub:'', main:'' } });
-    showCard.innerHTML = '<i class="rw-sun" aria-hidden="true"></i><div class="rw-panel"><div class="rw-title"></div><div class="rw-frame"><i class="mq mq-a" aria-hidden="true"></i><i class="mq mq-b" aria-hidden="true"></i><div class="rw-row">' +
+    // solo pass: a bigger celebration for Flip alone - a slow fan of light rays behind him, two shockwave rings off the hover pad and falling confetti
+    // (lib/juice.css, ROUND DONE PARTY: transform and opacity only, nothing flashes; lite mode and reduced motion get the rays and a still scatter of confetti)
+    let party = '<div class="rw-party" aria-hidden="true"><i class="rp-rays"></i><i class="rp-ring"></i><i class="rp-ring b"></i><span class="rp-conf">';
+    for (let k = 0; k < 26; k++){ const r = (n)=> ((k * 9301 + n * 49297 + 1234) % 233280) / 233280;
+      party += '<i class="c' + (k % 5) + (k % 3 === 0 ? ' sq' : '') + '" style="left:' + (3 + r(1) * 94).toFixed(1) + '%;--y:' + (6 + r(2) * 62).toFixed(1) + 'vh;--r:' + Math.round(r(3) * 360) + 'deg;--d:' + (2.6 + r(4) * 1.8).toFixed(2) + 's;--w:' + (-r(5) * 4.4).toFixed(2) + 's"></i>'; }
+    party += '</span></div>';
+    showCard.innerHTML = party + '<i class="rw-sun" aria-hidden="true"></i><div class="rw-panel"><div class="rw-title"></div><div class="rw-frame"><i class="mq mq-a" aria-hidden="true"></i><i class="mq mq-b" aria-hidden="true"></i><div class="rw-row">' +
       '<span class="rw-chip pts" style="--i:0"><b>+' + pts + '</b><small>points</small></span>' +
       '<span class="rw-chip letter ' + (letter || 'none') + '" style="--i:1"><b>' + (letter === 'got' ? '?' : letter === 'miss' ? '✕' : '–') + '</b><small>' + (letter === 'got' ? 'letter won' : 'no letter') + '</small></span>' +
       '<span class="rw-chip keys" style="--i:2"><b>◉ ' + keys + '</b><small>orb' + (keys === 1 ? '' : 's') + '</small></span></div></div></div>';   // (A+: only points gained, the letter won and keys - no running totals)
