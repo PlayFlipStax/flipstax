@@ -109,18 +109,30 @@ CSS = '''/* ==== STUDIO:BEGIN (written by tools/build-studio-css.py - edit the s
    Mystery Game reveal, the outro and the results all stand in one room and a cut from wide to close changes nothing. The window is a hole in the
    wall drawing; behind it, back to front: deep space, far stars, a still nebula and a teal moon, near stars, a small spiral galaxy, the ringed
    planet. The sign is a neon plate. Everything is placed on a 390 x 844 plate that covers the screen, so the layers stay registered at any size. */
-S{ background:#03021a !important; isolation:isolate; }
+S{ --pw:max(100cqw, 46.209cqh); background:SKY 50% 50% / var(--pw) calc(var(--pw) * 2.16411) no-repeat, #03021a !important; isolation:isolate; }
+S::before{ content:''; position:absolute; z-index:1; pointer-events:none; left:calc(50% - var(--pw) * 0.285); top:calc(50% + var(--pw) * 2.16411 * 0.015); width:calc(var(--pw) * 0.22); aspect-ratio:1; background:GALAXY center / contain no-repeat; }
 S .stg-plate{ --pw:max(100cqw, 46.209cqh); left:50% !important; top:50% !important; right:auto !important; bottom:auto !important; width:var(--pw) !important; height:calc(var(--pw) * 2.16411) !important;
   margin:calc(var(--pw) * -1.082055) 0 0 calc(var(--pw) / -2) !important; aspect-ratio:auto !important; animation:none !important; transform:none !important; translate:none !important;
-  background:SKY 0 0 / 100% 100% no-repeat; }
+}
 S :is(.stg-img, .stg-panel){ display:none !important; }
 /* far stars (behind the nebula's glow is fine: they sit under the plate's own picture only where it is clear) and near stars */
-S .stg-plate::before, S .stg-plate::after, S .stg-glow::before, S .stg-sweep::before{ content:''; position:absolute; pointer-events:none; }
+S .stg-plate::before, S .stg-plate::after{ content:''; position:absolute; pointer-events:none; }
 S .stg-plate::before{ z-index:0; left:14%; top:22%; width:144%; height:51.5%; background:FAR 0 0 / 50% 100% repeat-x; }
 S .stg-sweep{ z-index:1; left:14%; top:22%; width:144%; height:51.5%; opacity:1 !important; transform:none; animation:none; background:NEAR 0 0 / 50% 100% repeat-x !important; display:block !important; }
-S .stg-sweep::before{ left:6.2%; top:17%; width:16%; aspect-ratio:1; background:GALAXY center / contain no-repeat; }
 S .stg-glow{ z-index:2; left:42.6% !important; top:31.5% !important; width:43% !important; height:12.32% !important; border-radius:0; opacity:1 !important; animation:none; background:PLANET center / contain no-repeat !important; }
 S .stg-plate::after{ z-index:3; inset:0; background:WALL 0 0 / 100% 100% no-repeat; }
+/* the slow cosmos (transform only): far stars drift left over 4 minutes, near stars over 100 s (each tile repeats, so the loop has no seam), the galaxy
+   turns once in 3 minutes, the planet glides across the window and back over 80 s. Lite mode and reduced motion: all of it stands still. */
+S .stg-plate::before{ animation:stgStars 240s linear infinite; }
+S .stg-sweep{ animation:stgStars 100s linear infinite !important; }
+S::before{ animation:stgGalaxy 180s linear infinite; }
+S .stg-glow{ animation:stgPlanet 80s ease-in-out infinite alternate !important; }
+@keyframes stgStars{ from{ transform:translate3d(0, 0, 0); } to{ transform:translate3d(-50%, 0, 0); } }
+@keyframes stgGalaxy{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+@keyframes stgPlanet{ from{ transform:translate3d(-46%, 16%, 0) rotate(-5deg); } to{ transform:translate3d(12%, -10%, 0) rotate(4deg); } }
+.stg-shot:not(.on)::before, .stg-shot:not(.on) .stg-plate::before{ animation-play-state:paused !important; }
+L::before, L .stg-plate::before, L .stg-sweep, L .stg-glow{ animation:none !important; }
+@media (prefers-reduced-motion: reduce){ S::before, S .stg-plate::before, S .stg-sweep, S .stg-glow{ animation:none !important; } }
 /* the sign: a neon plate (it stays put on the screen, clear of the opener's ceiling beam, whatever the plate's crop) */
 S .stg-sign{ z-index:4; left:50% !important; top:calc(86px + env(safe-area-inset-top) + (var(--pw) * 2.16411 - 100cqh) / 2) !important; width:min(76cqw, 300px) !important; height:84px !important; margin-left:calc(min(76cqw, 300px) / -2); gap:6px; justify-content:center; box-sizing:border-box;
   border:3px solid #ff4fd8; border-radius:18px; outline:1px solid rgba(255,255,255,0.8); outline-offset:-2.5px; background:linear-gradient(180deg, rgba(26,12,90,0.96), rgba(8,4,40,0.97));
@@ -139,7 +151,7 @@ S .stg-sign .stg-ep{ color:#5ff4ff; text-shadow:0 0 8px rgba(95,244,255,0.8); fo
 /* ==== STUDIO:END ==== */
 '''
 CSS = CSS.replace('SKY', uri(SKY)).replace('FAR', uri(FAR)).replace('NEAR', uri(NEAR)).replace('GALAXY', uri(GALAXY)).replace('PLANET', uri(PLANET)).replace('WALL', uri(WALL))
-CSS = re.sub(r'(?m)^S |, S ', lambda m: m.group(0).replace('S ', S + ' '), CSS).replace('\nS{', '\n' + S + '{').replace('  S ', '  ' + S + ' ')
+CSS = re.sub(r'(?<![A-Za-z0-9_#.\'-])S(?=[ {:])', S, CSS); CSS = re.sub(r'(?<![A-Za-z0-9_#.\'-])L(?=[ {:])', S.replace(':root.stage-on', ':root.lite.stage-on'), CSS)
 p = os.path.join(ROOT, 'lib/stage.css'); src = open(p).read()
 a, b = src.find('/* ==== STUDIO:BEGIN'), src.find('/* ==== STUDIO:END ==== */')
 src = (src[:a] if a >= 0 else src.rstrip('\n') + '\n\n') + CSS + (src[b + len('/* ==== STUDIO:END ==== */'):].lstrip('\n') if b >= 0 else '')
