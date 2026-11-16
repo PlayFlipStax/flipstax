@@ -347,3 +347,30 @@ Left / not done
 - Not checked: a real phone, tablets and wide screens (the plate crops like the old opener did), the opener after the intro video (`intro-curt`), browsers without `:has()` (the ending's backdrop and the reveal's cool sweep use it; without it the ending keeps a dark scrim over the studio).
 - The fast check was run on the working tree, not on a frozen copy on its own port (that needs a copy outside this folder).
 - The test stills and scripts are in `screenshots/qa/tools/` (`polish_shots.py`, `polish_sheet.py`, `polish_motion.py`, `polish_probe.py`, `cut/`), not in git.
+
+
+---
+
+# Solo pass (branch `polish`, Nov 16 2026): Flip alone, the saucer intro, the intro theme
+
+Nothing pushed. Fast check on the tip: **commercial break: ok, 3 of 3 pass**. Looked at 390x844 and 360x640, lite (`?lite=1`) and simulated reduced motion; no console errors. Stills (local only): `review-shots/solo/` - `compare-1` to `compare-5` are the before / after sheets, `before-*` / `after-*` the single shots. Test scripts: `screenshots/qa/tools/solo_shots.py`, `solo_probe.py` (the intro's timeline), `solo_theme.py` (the theme's playback state), `solo_sheet.py`.
+
+| Commit | What |
+|---|---|
+| `4c89e22` | The girls are out: round cards 2-6 show Flip on his pad (`ROUND_TITLE_POSE`: presenting, wave, think, cheer, shrug, presenting), ROUND DONE shows `data/host/cheer.webp`, the ending shows `data/host/wave.webp`, the pop-out presenter (`Cast.win`) is switched off, the old group picture is no longer loaded for the results. No files deleted. |
+| `69052c2` | ROUND DONE party (`.rw-party` in `showRewardBeat`; CSS block `ROUND DONE PARTY` at the end of `lib/juice.css`): turning rays, two shockwave rings, falling confetti, Flip bouncing. |
+| `515796e` | The saucer intro (`showColdOpen`, class `saucer`; CSS block `THE SAUCER INTRO` at the end of `lib/intro.css`). `lib/intro.js`: the first-visit welcome no longer plays the video - only `?intro=full` and the test host's Watch intro link do. |
+| `4971975` | The intro theme (block `THE INTRO THEME` in `flipstax.html`, before the Infinity playlist): `playIntroTheme(ms)` / `endIntroTheme()` / `primeIntroTheme()`, track key `theme`. |
+
+The intro's timeline (first visit, measured): doors 0 s, saucer in 0.15-1.05 s, beam 1.0 s, Flip down 1.1-2.2 s, pad lights 2.2 s, sign 2.3 s, greeting 2.4 s, saucer leaves 2.8 s, ends 5.9 s. Returning: about 3.1 s with the Welcome back line. The sign reads EPISODE N (small) over GALACTIC GAME NIGHT.
+
+The theme: default Alien Disco Fever, from 154.26 s (0.3 s before the downbeat at 154.56 s). `?theme=N` (test hosts only): 1 Nebula Nights 80.30, 2 Cosmic Cruise 47.34, 3 Warp Speed Boogie 133.52, 4 Moonbase Groove 125.11, 5 Stardust Shuffle 126.47, 6 Saturn Strut 112.36, 7 Alien Disco Fever 154.56, 8 Meteor Mayhem 73.08 (the downbeat each snippet lands on, `INTRO_THEME_HITS`). To change the default, set `INTRO_THEME_DEFAULT` (0-based).
+
+Not done / to check
+- **Nobody has listened to the theme.** The offsets were picked by measuring loudness and onsets in the files, not by ear; the harness is silent. It was checked that the element seeks to the snippet, the gain ramps up in 0.3 s and down over the last 0.6 s, and the run's music takes over. Listen to all eight and move an offset if a snippet starts in an odd place.
+- A real iPhone: the muted start inside the tap and the later unmute, and the fade (it needs the Web Audio route).
+- A local server without range requests cannot seek into the mp3; the theme then stays silent rather than play the song's opening (1.5 s guard in `playIntroTheme`).
+- After `?intro=full` the video still ends on the old stage (its last frame, `data/intro/poster.webp`) and hands over to the old door-slide opener, not the saucer.
+- Still showing the old stage (no girls in any of them): the share picture (`data/outro/poster.webp`, the blue curtain), the commercial break (`data/scenes/sponsor.webp`), the blurred backdrop behind gameplay (`data/stage/stage-dim.webp`). None is a simple CSS swap; left alone.
+- Unused now, files kept: `data/cast/studio/*`, `data/scenes/round/*`, `data/cast/purple-presenting.webp` (still listed in `data/cast/manifest.js`), `ROUND_TITLE_CAST`, the `has-cast` rules for the round cards.
+- At 360x640 the greeting bubble covers Flip's legs in the intro (three lines of text); the host's size and place there were not changed.
