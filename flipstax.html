@@ -17080,7 +17080,7 @@ const SHARE_URL = 'https://playflipstax.com';
     { const d = document.getElementById('outroDetails'); d.textContent = 'details'; d.setAttribute('aria-expanded', 'false'); }
     document.documentElement.classList.remove('outro-up');
     if (!o) return;
-    o.classList.remove('end', 'instant', 'poster-on', 'closing');
+    o.classList.remove('end', 'instant', 'poster-on', 'closing', 'still');
     try{ v.pause(); }catch(e){} v.removeAttribute('src'); try{ v.load(); }catch(e){}
   }
   function startOutro(r){
@@ -17097,7 +17097,9 @@ const SHARE_URL = 'https://playflipstax.com';
     outroState = 'playing';
     outroLater(OUTRO_WATCHDOG_MS, ()=> outroEnd(true));   // (the watchdog: whatever happens, the buttons are there within 12 s)
     const quiet = isLite() || prefersReducedMotion() || (DEBUG_FAST && !REALTIME);   // (test runs and quiet modes: the poster, then the end state)
-    if (quiet){ o.classList.add('poster-on'); outroLater(DEBUG_FAST && !REALTIME ? 300 : OUTRO_FALLBACK_MS, ()=> outroEnd(false)); return; }
+    // (lite mode / reduced motion in the studio ending: Flip stands still on his pad in front of the open doors for the hold - the same big Flip, same place, as
+    // the normal ending, just not moving - instead of the doors being shut from the first frame with nobody there; then the results over the closed doors as before)
+    if (quiet){ o.classList.add(OUTRO_STUDIO && !(DEBUG_FAST && !REALTIME) ? 'still' : 'poster-on'); outroLater(DEBUG_FAST && !REALTIME ? 300 : OUTRO_FALLBACK_MS, ()=> outroEnd(false)); return; }
     if (OUTRO_STUDIO){ outroLater(OUTRO_STUDIO_MS, ()=> outroEnd(false, true)); return; }   // (the studio ending: as long as the video was, then the results)
     const fail = ()=>{ if (outroState !== 'playing') return; o.classList.add('poster-on'); outroClear(); outroLater(OUTRO_FALLBACK_MS, ()=> outroEnd(false)); outroLater(OUTRO_WATCHDOG_MS, ()=> outroEnd(true)); };
     try{
