@@ -309,3 +309,41 @@ Test scripts: `screenshots/qa/tools/finishing/` (wheel.py, snapsort.py, twinflip
 
 Look only, one commit, nothing pushed. Block `THE SHOW OPENER, "THE ORBITING STUDIO"` at the end of `lib/intro.css`; every rule is scoped with `:root:has(#showCard.curtain:not(.hidden))`, so only the opener card changes (a browser without `:has()` keeps the old theatre whole). The stage photo is hidden while the card is up (`.stg-img` display none - the file is still used by other screens) and one inline SVG on `#stage .stg-close` draws the studio. `.co-drape` are the blast doors (same opening animation), `.co-valance` the ceiling beam, `.stg-sign` the neon EPISODE plate (now both lines, below the beam), `.co-stage-host::before/::after` Flip's hover pad. No new animation. The earlier fixes that hid the sign's top line under the valance were removed (not needed now). Stills: `u0-opener-390.png` / `u1-opener-390.png`, `u0-opener-360.png` / `u1-opener-360.png`. Fast check: 3 of 3, commercial break ok.
 Not looked at: the doors fully closed before they open, the short variant after the intro video (`intro-curt`), lite / reduced motion (nothing new moves), a real phone.
+
+
+---
+
+# Polish pass (branch `polish`, from `main`): one studio for the whole show
+
+Look only. Nothing pushed. Fast check on the tip: **commercial break: ok, 3 of 3 pass**. Looked at 390x844 and 360x640 in normal mode and at 390x844 in lite mode (`?lite=1`), no console errors. Stills (local only): `review-shots/polish/` - `compare-1` to `compare-6` are before / after sheets; `b-*` are the before shots, `after-*` and `lite-*` the final ones.
+
+| Commit | What |
+|---|---|
+| `d025c54` | The drawn orbiting studio replaces the close and wide stage photos everywhere (opener from its first frame, Round 1, Grand Finale, outro card, menu, results backdrop). |
+| `5354675` | Rounds 2-6 title cards and ROUND DONE: the girls, lifted off the old gold-stage pictures, stand in the studio. |
+| `28376d0` | Mystery Game reveal: neon plate, indigo console, blast doors instead of gold frame and red curtain. |
+| `a7265f5` | The ending: the goodbye video is replaced by the cast in the studio, blast doors closing under a neon FLIPSTAX sign. |
+| `c24c2d8` | Game spotlight card: no UFO, no rays, no swinging beams - the dimmed studio, a ceiling rig, one still pool of light. |
+| `989f360` | The moving cosmos in the window (stars, galaxy, planet; transform only). |
+| `6c1bf7d` | The ringed planet is solid, ring behind the top half and in front of the bottom half. |
+
+How it is built
+- **The studio** is the block between `STUDIO:BEGIN` / `STUDIO:END` at the end of `lib/stage.css`, written by `python3 tools/build-studio-css.py` (edit the script, then run it). It restyles `#stage .stg-close` and `.stg-wide` to the same drawing, on a 390 x 844 plate that covers the screen. Back to front: sky (shot background), far stars (`.stg-plate::before`), galaxy (shot `::before`), near stars (`.stg-sweep`), planet (`.stg-glow`), the wall with a real window opening + neon + floor (`.stg-plate::after`), the neon sign (`.stg-sign`). The photos `data/stage/stage-close.webp` and `stage-wide.webp` are still downloaded by `lib/stage.js` (their `<img>` is hidden) - see "Left" below.
+- **The opener's own furniture** (blast doors, ceiling beam, lights, hover pad) is still in `lib/intro.css`.
+- **The cast** is `data/cast/studio/*.webp` (30-90 KB each), made by `tools/cutout.swift` on each old picture and then `tools/build-studio-cast.py <folder of the lifted PNGs>`. `ROUND_TITLE_CAST` in `flipstax.html` maps rounds 2-6 to them; the card class is `has-cast` (the old `has-art art-title` rules are now unused). CSS: the `POLISH PASS` blocks at the end of `lib/juice.css`.
+- **JS touched (look only)**: `showActCard` (cast picture, the stage cue for every round), `showRewardBeat` (`ROUND_DONE_VIDEO = false`, the cast still, a stage cue), `showGameIntro` (a stage cue), `outroMount` / `startOutro` (`OUTRO_STUDIO = true`: the set is built once, a 10 s timer stands in for the video's `ended`).
+
+What changed that is more than a backdrop - please confirm
+- **ROUND DONE no longer plays `dance-girls.mp4`**: the three girls are a still, lifted from the video's poster frame. The video could not be re-dressed. Set `ROUND_DONE_VIDEO = true` and drop the `has-cast` class to bring it back.
+- **The ending no longer plays `data/outro/outro.mp4`** (the cast waving, the blue curtain). Same 10 s, same skip, same results; the cast is a still with a slow bob and the doors close at 6.6 s. `OUTRO_STUDIO = false` brings the video back.
+- The Reward beat is on the "do not touch" list, but ROUND DONE was asked for by name: only its backdrop and picture changed, the panel is as it was.
+
+Left / not done
+- **The share picture** still draws on `data/outro/poster.webp` (the old stage). Not a show beat; untouched.
+- **The intro video** (`data/intro/mothership-intro.mp4`, `?intro=1` / `?intro=full`) is a rendered film; its behaviour is untouched and it was not looked at in this pass. If its last frame shows the old stage, the hand-over to the studio opener will show a change of set.
+- **The commercial break** (`data/scenes/sponsor.webp`) and the blurred stage behind gameplay (`stage-dim.webp`) still use the old photos - game screens and the break were out of scope.
+- `lib/stage.js` still loads `stage-close.webp` (156 KB) and `stage-wide.webp` (229 KB) although they are never shown now. Skipping those two loads would save memory, but `stage-on` waits on the close picture loading, so it needs a careful change and its own fast check.
+- **Reduced motion** could not be switched on in the offscreen test browser: its rules sit beside the lite rules and were checked by reading, not by eye. Lite was checked by eye and by measuring (all four sky layers report no animation).
+- Not checked: a real phone, tablets and wide screens (the plate crops like the old opener did), the opener after the intro video (`intro-curt`), browsers without `:has()` (the ending's backdrop and the reveal's cool sweep use it; without it the ending keeps a dark scrim over the studio).
+- The fast check was run on the working tree, not on a frozen copy on its own port (that needs a copy outside this folder).
+- The test stills and scripts are in `screenshots/qa/tools/` (`polish_shots.py`, `polish_sheet.py`, `polish_motion.py`, `polish_probe.py`, `cut/`), not in git.
