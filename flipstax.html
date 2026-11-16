@@ -12486,23 +12486,35 @@ const SHARE_URL = 'https://playflipstax.com';
     const afterIntro = window.__introCurtainsOpen === true; window.__introCurtainsOpen = false;
     // A+: 'Greetings, Earthlings!' is the whole welcome now - it advances on its own 3.5 s after the line appears (a tap still skips it)
     const COLD_OPEN_AUTO_MS = 3500;
-    const lines = seen && !afterIntro ? [HOST_INTRO_BACK] : HOST_INTRO_LINES.slice(0, 1);
+    // SOLO PASS, THE NEW INTRO (drawn in CSS, lib/intro.css THE SAUCER INTRO; no video, no pictures but Flip's own pose): the blast doors open, a saucer slides
+    // in over the window, its beam lowers Flip onto the glowing hover pad, the neon sign lights up with GALACTIC GAME NIGHT (and the EPISODE number), and Flip says
+    // his greeting - 5.9 s the first time, about 3 s for a returning player (the same lines and the same first / returning rule as before); a tap skips it.
+    // It plays whenever the video did not (the video is now only ?intro=full and the test host's 'Watch intro'). Lite mode and reduced motion get it as a still:
+    // Flip on the pad, the saucer parked above, the sign lit, the line. Transform and opacity only.
+    const saucer = !afterIntro, quietCO = isLite() || prefersReducedMotion();
+    const first = !seen || afterIntro || window.__introSaucer === true; window.__introSaucer = false;   // (__introSaucer: lib/intro.js, a first visit or ?intro=1)
+    const lines = !first ? [HOST_INTRO_BACK] : HOST_INTRO_LINES.slice(0, 1);
     const T = afterIntro ? { open:0, pull:600, walk:0, walkMs:0, talk:1500 }
-            : seen ? { open:0, pull:800, walk:100, walkMs:600, talk:600 }
-                   : { open:300, pull:2200, walk:900, walkMs:1400, talk:2500 };
+            : quietCO ? { open:0, pull:first ? 700 : 500, fly:0, flyMs:0, beam:-1, walk:0, walkMs:0, land:0, sign:0, talk:first ? 600 : 400, away:-1 }
+            : !first ? { open:0, pull:500, fly:0, flyMs:450, beam:380, walk:450, walkMs:700, land:1150, sign:1150, talk:900, away:1500 }
+                     : { open:0, pull:700, fly:150, flyMs:900, beam:1000, walk:1100, walkMs:1100, land:2200, sign:2300, talk:2400, away:2800 };
     const starts = []; let at = T.talk;
-    lines.forEach(l=>{ starts.push(at); at += seen && !afterIntro ? cueLineMs(l) : COLD_OPEN_AUTO_MS; });
-    const total = Math.max(seen && !afterIntro ? ((RUNDOWN.coldOpen || {}).returningMs || 3000) : 0, at);
-    showCard.className = 'show-card curtain lines';
-    showCard.style.setProperty('--pull', T.pull + 'ms'); showCard.style.setProperty('--walk', T.walkMs + 'ms');
+    lines.forEach(l=>{ starts.push(at); at += !first ? cueLineMs(l) : COLD_OPEN_AUTO_MS; });
+    const total = Math.max(!first ? ((RUNDOWN.coldOpen || {}).returningMs || 3000) : 0, saucer && first ? 5900 : 0, at);
+    showCard.className = 'show-card curtain lines' + (saucer ? ' saucer' + (quietCO ? ' still' : '') : '');
+    showCard.style.setProperty('--pull', T.pull + 'ms'); showCard.style.setProperty('--walk', T.walkMs + 'ms'); if (saucer) showCard.style.setProperty('--fly', T.flyMs + 'ms');
     showCard.innerHTML = '<div class="studio co-studio" aria-hidden="true">' + STUDIO_HTML + '</div><i class="co-follow" aria-hidden="true"></i>' +
-      '<div class="co-stage-host host-full" aria-hidden="true">' + Host.html({ pose:'wave' }) + '</div>' +
+      (saucer ? '<i class="co-pad" aria-hidden="true"><i></i><b></b></i><i class="co-tbeam" aria-hidden="true"></i>' : '') +
+      '<div class="co-stage-host host-full" aria-hidden="true">' + Host.html({ pose: saucer && !quietCO ? 'idle' : 'wave' }) + '</div>' +
+      (saucer ? '<i class="co-ufo" aria-hidden="true"><i class="cu-ship"></i></i>' : '') +
       '<div class="fs-line co-line" aria-live="polite"><span></span></div>' +
       '<i class="co-drape l"></i><i class="co-drape r"></i><i class="co-spot"></i><i class="co-valance"></i>' +
       '<div class="co-skip">TAP TO SKIP</div>';
     showCard.classList.remove('hidden');
     showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'Welcome to FlipStax, episode ' + ep + ', with your host ' + HOST_NAME + '. Tap to skip');
-    if (window.Stage){ Stage.loadWide(); Stage.cue('wide', { over:showCard, cls:'curtain', sign:{ sub:'WELCOME TO', main:'FLIPSTAX' } }); }   // Run 3: the wide shot, then a push in
+    const ggSign = { sub:'EPISODE ' + ep, main:'GALACTIC GAME NIGHT' };
+    if (window.Stage && saucer) Stage.cue('close', { over:showCard, cls:'curtain', push:true, ms: total + 600, sign: T.sign > 0 ? { sub:'', main:'' } : ggSign });   // (the sign is dark until it lights up)
+    else if (window.Stage){ Stage.loadWide(); Stage.cue('wide', { over:showCard, cls:'curtain', sign:{ sub:'WELCOME TO', main:'FLIPSTAX' } }); }   // Run 3: the wide shot, then a push in
     const timers = [], later = (ms, f)=> timers.push(setTimeout(f, ms));
     const lineEl = showCard.querySelector('.co-line'), rig = showCard.querySelector('.co-stage-host');
     // after the intro: Flip is already on his mark (walk, no travel) behind the CLOSED curtains; the held last frame of the video fades out over 0.6 s while the two
@@ -12513,10 +12525,19 @@ const SHARE_URL = 'https://playflipstax.com';
       rig.style.cssText = 'width:' + fw.toFixed(1) + 'px;margin-left:' + (-fw / 2 + 10 * kk).toFixed(1) + 'px;bottom:' + (Hd - (oyy + 850 * kk)).toFixed(1) + 'px;';
     }
     if (afterIntro){ showCard.classList.add('walk', 'intro-curt'); window.__introOpen = ()=>{ window.__introOpen = null; showCard.classList.add('open'); }; later(1400, ()=>{ if (window.__introOpen) window.__introOpen(); }); } else later(T.open, ()=>{ showCard.classList.add('open'); if (sfx.bumper) sfx.bumper(false); });
-    later(T.walk, ()=>{ showCard.classList.add('walk'); if (window.Stage) Stage.cue('close', { over:showCard, cls:'curtain', push:true, ms: total - T.walk + 600, sign:{ sub:'TONIGHT’S SHOW', main:'EPISODE ' + ep } }); });
+    if (saucer){
+      const cl = showCard.classList, root = document.documentElement.classList;
+      later(T.fly, ()=> cl.add('sc-in'));
+      if (T.beam >= 0) later(T.beam, ()=> cl.add('sc-beam'));
+      later(T.walk, ()=> cl.add('walk'));
+      later(T.land, ()=>{ cl.add('sc-land'); cl.remove('sc-beam'); });
+      if (T.sign > 0) later(T.sign, ()=>{ if (!quietCO) root.add('gg-lit'); if (window.Stage) Stage.cue('close', { over:showCard, cls:'curtain', sign: ggSign }); });   // (no push: the same shot, only the sign comes on)
+      if (T.away >= 0) later(T.away, ()=> cl.add('sc-away'));
+    }
+    else later(T.walk, ()=>{ showCard.classList.add('walk'); if (window.Stage) Stage.cue('close', { over:showCard, cls:'curtain', push:true, ms: total - T.walk + 600, sign:{ sub:'TONIGHT’S SHOW', main:'EPISODE ' + ep } }); });
     lines.forEach((l, i)=> later(starts[i], ()=>{
       cueLineSay(lineEl, l);
-      Host.pose(rig, seen ? 'wave' : HOST_INTRO_POSES[i % HOST_INTRO_POSES.length], { hold:0 });
+      Host.pose(rig, seen || saucer ? 'wave' : HOST_INTRO_POSES[i % HOST_INTRO_POSES.length], { hold:0 });
       if (i === 0) sfx.chime(4);
     }));
     let gone = false;
@@ -12525,7 +12546,7 @@ const SHARE_URL = 'https://playflipstax.com';
       if (gone) return;
       if (e && e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
       if (e && performance.now() - shownAt < SKIP_MIN_MS) return;   // G2: a tap skips only after SKIP_AFTER (and never the tap that opened it)
-      gone = true; timers.forEach(clearTimeout); coldOpenCancel = null;
+      gone = true; timers.forEach(clearTimeout); coldOpenCancel = null; document.documentElement.classList.remove('gg-lit');
       try{ localStorage.setItem(COLD_OPEN_SEEN_KEY, '1'); }catch(err){}
       showCard.removeEventListener('click', go); document.removeEventListener('keydown', go);
       showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden';
@@ -12534,7 +12555,7 @@ const SHARE_URL = 'https://playflipstax.com';
     };
     later(total, ()=> go());
     showCard.addEventListener('click', go); document.addEventListener('keydown', go);
-    coldOpenCancel = ()=>{ gone = true; timers.forEach(clearTimeout); showCard.removeEventListener('click', go); document.removeEventListener('keydown', go); coldOpenCancel = null; };
+    coldOpenCancel = ()=>{ gone = true; timers.forEach(clearTimeout); document.documentElement.classList.remove('gg-lit'); showCard.removeEventListener('click', go); document.removeEventListener('keydown', go); coldOpenCancel = null; };
   }
   // The act cue card (reusable): the host holds up a cue card that flips in over a colour
   // sweep in the act's world, for about 1.5 s. `st` is { title, sub, world }.

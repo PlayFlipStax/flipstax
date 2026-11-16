@@ -176,3 +176,59 @@
 :root:has(#showCard.curtain:not(.hidden)) #showCard.curtain .co-stage-host::before, :root:has(#showCard.curtain:not(.hidden)) #showCard.curtain .co-stage-host::after{ content:''; position:absolute; z-index:-1; left:50%; border-radius:50%; pointer-events:none; box-sizing:border-box; }
 :root:has(#showCard.curtain:not(.hidden)) #showCard.curtain .co-stage-host::before{ bottom:-22px; width:170%; height:44px; margin-left:-85%; border:3px solid #ff4fd8; background:radial-gradient(ellipse closest-side, rgba(40,20,120,0.9), rgba(20,8,70,0.9)); box-shadow:0 0 16px 2px rgba(255,79,216,0.7); }
 :root:has(#showCard.curtain:not(.hidden)) #showCard.curtain .co-stage-host::after{ bottom:-13px; width:124%; height:28px; margin-left:-62%; border:2.5px solid #5ff4ff; background:radial-gradient(ellipse closest-side, rgba(234,255,255,0.85), rgba(95,244,255,0.35) 60%, rgba(95,244,255,0.1)); box-shadow:0 0 14px 2px rgba(95,244,255,0.8); }
+
+/* ==== SOLO PASS: THE SAUCER INTRO (the show's welcome, drawn here - no video, no pictures but Flip's own pose). Card classes, set on a timer by
+   showColdOpen (flipstax.html): .saucer (this intro) -> .sc-in (the saucer slides in over the window) -> .sc-beam (its beam comes down) -> .walk (Flip
+   is lowered through the beam onto the pad) -> .sc-land (the beam goes out, the pad lights up, one ring rolls off it) -> :root.gg-lit (the neon sign
+   comes on: GALACTIC GAME NIGHT) -> .sc-away (the saucer leaves). 5.9 s the first time, about 3 s for a returning player. Transform and opacity only;
+   the sign comes on with two soft dips in 0.7 s (under 3 a second) and nothing else blinks. .still (lite mode, reduced motion): everything stands in
+   its end position from the first frame - Flip on the lit pad, the saucer parked above, the sign on. ==== */
+#showCard.curtain.saucer .co-follow{ display:none; }
+:root:has(#showCard.curtain:not(.hidden)) #showCard.curtain.saucer .co-stage-host::before, :root:has(#showCard.curtain:not(.hidden)) #showCard.curtain.saucer .co-stage-host::after{ display:none; }
+/* the hover pad stays on the floor while Flip comes down (same place and size as his own pad on the other cards) */
+.curtain.lines.saucer .co-pad{ position:absolute; z-index:1; left:50%; bottom:calc(150px + env(safe-area-inset-bottom)); width:min(30vh * 0.6743, 44vw, 210px); margin-left:calc(min(30vh * 0.6743, 44vw, 210px) / -2); height:0; pointer-events:none; }
+.curtain.saucer .co-pad::before, .curtain.saucer .co-pad::after, .curtain.saucer .co-pad > *{ content:''; position:absolute; left:50%; border-radius:50%; box-sizing:border-box; pointer-events:none; }
+.curtain.saucer .co-pad::before{ bottom:-22px; width:170%; height:44px; margin-left:-85%; border:3px solid #ff4fd8; background:radial-gradient(ellipse closest-side, rgba(40,20,120,0.9), rgba(20,8,70,0.9)); box-shadow:0 0 16px 2px rgba(255,79,216,0.7); }
+.curtain.saucer .co-pad::after{ bottom:-13px; width:124%; height:28px; margin-left:-62%; border:2.5px solid #5ff4ff; background:radial-gradient(ellipse closest-side, rgba(234,255,255,0.85), rgba(95,244,255,0.35) 60%, rgba(95,244,255,0.1)); box-shadow:0 0 14px 2px rgba(95,244,255,0.8); }
+.curtain.saucer .co-pad > i{ z-index:1; bottom:-30px; width:230%; height:70px; margin-left:-115%; background:radial-gradient(ellipse closest-side, rgba(255,255,255,0.85), rgba(125,249,255,0.55) 38%, rgba(125,249,255,0) 100%); opacity:0.15; transition:opacity 0.3s ease; }
+.curtain.saucer.sc-beam .co-pad > i{ opacity:0.55; }
+.curtain.saucer.sc-land .co-pad > i{ opacity:0.9; animation:coPadGlow 1.8s ease-in-out 0.3s infinite alternate; }
+@keyframes coPadGlow{ from{ opacity:0.9; } to{ opacity:0.5; } }
+.curtain.saucer .co-pad > b{ bottom:-22px; width:170%; height:44px; margin-left:-85%; border:3px solid #eaffff; opacity:0; }
+.curtain.saucer.sc-land .co-pad > b{ animation:coPadRing 0.9s cubic-bezier(.15,.7,.3,1) both; }
+@keyframes coPadRing{ 0%{ opacity:0.9; transform:scale(1); } 100%{ opacity:0; transform:scale(2.3); } }
+/* Flip rides the beam down: small and faint under the saucer, full size on the pad */
+.curtain.lines.saucer .co-stage-host{ transform-origin:50% 100%; transform:translateY(-37vh) scale(0.28); opacity:0; transition:transform var(--walk, 1.1s) cubic-bezier(.3,.5,.3,1), opacity 0.3s ease; }
+.curtain.lines.saucer.walk .co-stage-host{ transform:none; opacity:1; }
+/* the saucer */
+.curtain.saucer .co-ufo{ position:absolute; z-index:3; left:50%; top:calc(214px + env(safe-area-inset-top)); width:150px; height:64px; margin-left:-75px; pointer-events:none; opacity:0;
+  transform:translate(-105vw, -46px) rotate(-12deg); transition:transform var(--fly, 0.9s) cubic-bezier(.2,.85,.3,1), opacity 0.2s linear; will-change:transform; }
+.curtain.saucer.sc-in .co-ufo{ transform:none; opacity:1; }
+.curtain.saucer.sc-away .co-ufo{ transform:translate(34vw, -52vh) scale(0.45) rotate(10deg); opacity:0; transition:transform 0.75s cubic-bezier(.5,0,.8,.4), opacity 0.3s linear 0.45s; }
+.cu-ship{ position:absolute; inset:0; }
+.cu-ship::before{ content:''; position:absolute; left:44px; top:0; width:62px; height:42px; border-radius:31px 31px 10px 10px; box-sizing:border-box; border:2px solid #eaffff;
+  background:radial-gradient(ellipse 60% 55% at 38% 30%, rgba(255,255,255,0.95), rgba(125,249,255,0.75) 45%, rgba(40,120,220,0.7)); }
+.cu-ship::after{ content:''; position:absolute; left:0; top:25px; width:150px; height:36px; border-radius:50%; box-sizing:border-box; border:2px solid #ff4fd8;
+  background:radial-gradient(circle, #fff 0 2.2px, #ffe27a 3.2px, rgba(255,226,122,0) 5px) 4px 58% / 23.5px 14px repeat-x, linear-gradient(180deg, #f6ecff, #c6a2ff 30%, #6a35e0 62%, #260d78);
+  box-shadow:0 0 14px 2px rgba(255,79,216,0.65), 0 7px 12px rgba(125,249,255,0.55); }
+/* the beam: a cone from the saucer's belly to the pad (scaled down from the top, then faded out) */
+.curtain.saucer .co-tbeam{ position:absolute; z-index:1; left:50%; width:230px; margin-left:-115px; top:calc(266px + env(safe-area-inset-top)); bottom:calc(138px + env(safe-area-inset-bottom)); pointer-events:none;
+  background:linear-gradient(180deg, rgba(234,255,255,0.85), rgba(125,249,255,0.4) 55%, rgba(125,249,255,0.16)); clip-path:polygon(40% 0, 60% 0, 100% 100%, 0 100%);
+  transform-origin:50% 0; transform:scaleY(0.02); opacity:0; transition:transform 0.3s ease-out, opacity 0.35s ease; }
+.curtain.saucer.sc-beam .co-tbeam{ transform:none; opacity:1; }
+.curtain.saucer.sc-land .co-tbeam{ transform:none; opacity:0; }
+@media (max-height:660px){
+  .curtain.lines.saucer .co-pad{ bottom:calc(140px + env(safe-area-inset-bottom)); width:min(26vh * 0.6743, 40vw, 170px); margin-left:calc(min(26vh * 0.6743, 40vw, 170px) / -2); }
+  .curtain.saucer .co-ufo{ top:calc(150px + env(safe-area-inset-top)); width:120px; height:52px; margin-left:-60px; }
+  .curtain.saucer .co-ufo .cu-ship{ transform:scale(0.8); transform-origin:0 0; }
+  .curtain.saucer .co-tbeam{ top:calc(192px + env(safe-area-inset-top)); bottom:calc(130px + env(safe-area-inset-bottom)); width:180px; margin-left:-90px; }
+}
+/* the neon sign comes on */
+:root.gg-lit #stage .stg-sign.on{ animation:ggLit 0.7s linear both; }
+@keyframes ggLit{ 0%{ opacity:0; } 10%{ opacity:1; } 24%{ opacity:0.3; } 40%{ opacity:1; } 55%{ opacity:0.6; } 70%, 100%{ opacity:1; } }
+/* the still version (lite mode, reduced motion): no travel, no beam, no ring */
+.curtain.saucer.still .co-stage-host, .curtain.saucer.still .co-ufo, .curtain.saucer.still .co-tbeam, .curtain.saucer.still .co-pad > i{ transition:none !important; animation:none !important; }
+.curtain.saucer.still .co-tbeam, .curtain.saucer.still .co-pad > b{ display:none; }
+@media (prefers-reduced-motion: reduce){ .curtain.saucer .co-stage-host, .curtain.saucer .co-ufo, .curtain.saucer .co-tbeam, .curtain.saucer .co-pad > i{ transition:none !important; animation:none !important; } :root.gg-lit #stage .stg-sign.on{ animation:none; } }
+:root.lite.gg-lit #stage .stg-sign.on, :root.rm.gg-lit #stage .stg-sign.on{ animation:none; }
+@media (min-height:661px){ .curtain.saucer .co-ufo .cu-ship{ transform:scale(1.22); transform-origin:50% 60%; } }
