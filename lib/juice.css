@@ -3098,3 +3098,1117 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root:root .wk-warp.b{ background-size:96px 96px; } :root:root .wk-warp.c{ background-size:59px 59px; }
 @keyframes wkWarp2{ 0%{ transform:scale(0.66); opacity:0; } 25%{ opacity:0.55; } 80%{ opacity:0.4; } 100%{ transform:scale(3.56); opacity:0; } }
 :root.ww-fin-mem #stage{ display:none !important; }   /* (finale memory fix: the stage's big pictures are not kept on screen behind the finale video) */
+
+/* ---- fixes 4: the results screen's labels under the numbers (FLIPZ EARNED, LETTERS WON ...) and 'Tell us what you think' are larger and easier to read
+   (the share picture is drawn separately and is not affected) ---- */
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os small{ font-size:12.5px; line-height:1.08; letter-spacing:0.2px; font-weight:900; }
+@media (max-width:380px){ :root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os small{ font-size:11.5px; letter-spacing:0; } }
+:root .outro-feedback{ font-size:16px; font-weight:800; color:#ffffff; text-shadow:0 1px 3px rgba(0,0,20,0.85); padding:6px 10px; touch-action:manipulation; }
+/* fixes 5: the cold open's TAP TO SKIP - larger, a solid dark pill with a gold border */
+:root:root .co-skip{ font:900 16px/1 var(--f-body, Inter, sans-serif); letter-spacing:0.08em; padding:11px 20px; background:rgba(8,4,24,0.88); box-shadow:inset 0 0 0 2px #ffd23f; text-shadow:0 1px 2px #000; }
+
+/* ==== MAKEOVER job 1: TWIN FLIP in space (the marquee title and the stage floor stay). Card backs: a grey alien face on a nebula; a spiral galaxy behind
+   the board; the faces are the 40 space drawings (lib/twin-flip-faces.js) on a pale star-chart card. Colour family: deep-space navy and teal with the
+   marquee's gold - no purple. Everything here is a still picture (CSS gradients and two small inline SVGs): nothing new animates. ==== */
+:root:root:root .tf-stage.tf-space .tf-grid{ border-color:#e6b94a; box-shadow:0 0 0 3px #071530, 0 0 0 5px rgba(230,185,74,0.5);
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 520'%3E%3Cdefs%3E%3CradialGradient id='c'%3E%3Cstop offset='0' stop-color='%23fff6d0'/%3E%3Cstop offset='.35' stop-color='%23ffd27a' stop-opacity='.75'/%3E%3Cstop offset='1' stop-color='%2319c8d6' stop-opacity='0'/%3E%3C/radialGradient%3E%3Cfilter id='b' x='-20%25' y='-20%25' width='140%25' height='140%25'%3E%3CfeGaussianBlur stdDeviation='9'/%3E%3C/filter%3E%3C/defs%3E%3Cg transform='translate(200 260) rotate(-24) scale(1 .62)' fill='none' stroke-linecap='round' filter='url(%23b)'%3E%3Cpath d='M0 0 C40 -70 150 -60 170 30 C185 120 80 190 -40 170' stroke='%2327d6e6' stroke-width='34' opacity='.5'/%3E%3Cpath d='M0 0 C-40 70 -150 60 -170 -30 C-185 -120 -80 -190 40 -170' stroke='%23ff7ab8' stroke-width='34' opacity='.42'/%3E%3Cpath d='M0 0 C70 30 70 130 -10 150 C-110 170 -190 90 -180 -10' stroke='%23ffd27a' stroke-width='22' opacity='.34'/%3E%3Cpath d='M0 0 C-70 -30 -70 -130 10 -150 C110 -170 190 -90 180 10' stroke='%2327d6e6' stroke-width='22' opacity='.34'/%3E%3C/g%3E%3Ccircle cx='200' cy='260' r='70' fill='url(%23c)'/%3E%3Cg fill='%23fff'%3E%3Ccircle cx='40' cy='60' r='1.6'/%3E%3Ccircle cx='330' cy='40' r='1.3'/%3E%3Ccircle cx='370' cy='210' r='1.7'/%3E%3Ccircle cx='60' cy='330' r='1.2'/%3E%3Ccircle cx='120' cy='470' r='1.6'/%3E%3Ccircle cx='310' cy='460' r='1.3'/%3E%3Ccircle cx='25' cy='200' r='1.1'/%3E%3Ccircle cx='250' cy='110' r='1.2'/%3E%3Ccircle cx='150' cy='30' r='1.1'/%3E%3Ccircle cx='350' cy='350' r='1.2'/%3E%3C/g%3E%3C/svg%3E") center / cover no-repeat,
+    radial-gradient(ellipse at 50% 50%, #0c2550 0%, #071530 65%, #040a1c 100%); }
+/* the card back: a nebula (navy, teal and rose clouds, a few stars) with a grey alien face */
+:root:root:root .tf-stage.tf-space .tf-tile, :root:root:root .tf-stage.tf-space .tf-tile:nth-child(n){ background:linear-gradient(180deg, #16305e, #0a1836); border:2px solid #e6b94a; box-shadow:inset 0 0 0 2px rgba(255,236,170,0.35), 0 4px 0 #050c1e; }
+:root:root:root .tf-stage.tf-space .tf-back{ inset:5% 6%; border-radius:7px; font-size:0; overflow:hidden;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 60'%3E%3Cpath d='M24 8 C37 8 42 18 40 29 C38 40 30 52 24 52 C18 52 10 40 8 29 C6 18 11 8 24 8Z' fill='%23c5c9d4' stroke='%23161a30' stroke-width='2.2'/%3E%3Cpath d='M12 26 C17 22 22.5 26 22.5 33 C17 35.5 12 32 12 26Z' fill='%23101220'/%3E%3Cpath d='M36 26 C31 22 25.5 26 25.5 33 C31 35.5 36 32 36 26Z' fill='%23101220'/%3E%3Cpath d='M14.5 27.5 C16.5 26 18.5 26.5 19.5 28' fill='none' stroke='%23fff' stroke-width='1.2' stroke-linecap='round' opacity='.8'/%3E%3Cpath d='M28.5 28 C29.5 26.5 31.5 26 33.5 27.5' fill='none' stroke='%23fff' stroke-width='1.2' stroke-linecap='round' opacity='.8'/%3E%3Cpath d='M21.5 44 Q24 45.5 26.5 44' fill='none' stroke='%23161a30' stroke-width='1.6' stroke-linecap='round'/%3E%3Cpath d='M15 13 C19 10.5 24 10.5 27 12' fill='none' stroke='%23fff' stroke-width='1.6' stroke-linecap='round' opacity='.55'/%3E%3C/svg%3E") center 46% / 66% auto no-repeat,
+    radial-gradient(circle at 12% 14%, #ffffff 0 1.2px, rgba(255,255,255,0) 1.8px), radial-gradient(circle at 84% 20%, #ffffff 0 1px, rgba(255,255,255,0) 1.6px),
+    radial-gradient(circle at 76% 86%, #ffffff 0 1.2px, rgba(255,255,255,0) 1.8px), radial-gradient(circle at 18% 78%, #fff3c4 0 1px, rgba(255,255,255,0) 1.6px),
+    radial-gradient(circle at 50% 6%, #ffffff 0 0.9px, rgba(255,255,255,0) 1.5px),
+    radial-gradient(ellipse 70% 46% at 22% 24%, rgba(39,214,230,0.75), rgba(39,214,230,0) 70%),
+    radial-gradient(ellipse 66% 44% at 82% 76%, rgba(255,110,170,0.6), rgba(255,110,170,0) 70%),
+    radial-gradient(ellipse 60% 40% at 80% 16%, rgba(255,200,90,0.35), rgba(255,200,90,0) 70%),
+    linear-gradient(160deg, #0f2a5c, #071433 60%, #0a1e48); }
+:root:root:root .tf-stage.tf-space .tf-back::before, :root:root:root .tf-stage.tf-space .tf-back::after{ display:none; }
+/* a face-up card: a pale star-chart card, the drawing large on it */
+:root:root:root .tf-stage.tf-space .tf-tile.up{ background:linear-gradient(180deg, #fffef6, #eef3ff); }
+:root:root:root .tf-stage.tf-space .tf-face{ inset:9% 7%; display:none; }
+:root:root:root .tf-stage.tf-space .tf-tile.up .tf-face{ display:flex; align-items:center; justify-content:center; }
+:root:root:root .tf-stage.tf-space .tf-face svg{ width:100%; height:auto; max-height:100%; aspect-ratio:1; filter:none; }
+:root:root:root .tf-stage.tf-space .tf-pairs{ background:#071530; }
+
+/* ==== MAKEOVER job 2: FACT OR FIB on the show stage (.ff-warm, on top of .ff-lie). Warm colour family: crimson curtain, amber spotlight, brass and
+   cream - no teal terminal, no purple. A neon sign with gold bulbs (lib/neon-logos.js 'factOrFib'), the lie detector as a brass-and-cream studio dial,
+   the statement on a cream cue card in the show's own lettering, the explanation - the payoff - as big as the statement on a gold strip, and Flip
+   beside the dial working it. Still pictures only: nothing new animates (the dial's needle and wave were already transform-only). ==== */
+:root:root:root:root:root .mg-overlay.mg-factOrFib:has(.ff-warm){
+  background:
+    radial-gradient(ellipse 70% 38% at 50% 30%, rgba(255,214,120,0.42), rgba(255,214,120,0) 70%),
+    linear-gradient(180deg, rgba(0,0,0,0) 0 74%, #5a2a08 74%, #2a1204 100%),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0 13px, rgba(255,255,255,0.05) 13px 22px, rgba(0,0,0,0.08) 22px 32px),
+    linear-gradient(180deg, #8c1524 0%, #6a0f1c 45%, #3d0810 100%) !important; }
+.mg-factOrFib:has(.ff-warm) .mg-bg{ display:none !important; }
+/* the sign: the neon logo takes the plate's place */
+:root:root:root:root:root .mg-factOrFib .mg-sign.ff-neon{ background:none !important; border:0 !important; box-shadow:none !important; padding:0 !important; width:min(96%, 470px) !important; max-width:none !important; flex:none !important; margin:0 auto 2px; display:block !important; }
+.mg-factOrFib .mg-sign.ff-neon::before, .mg-factOrFib .mg-sign.ff-neon::after{ display:none !important; }
+.mg-factOrFib .mg-sign.ff-neon > .nl{ width:100%; margin:0; }
+.mg-factOrFib .mg-sign.ff-neon > :not(.nl){ display:none !important; }
+.mg-factOrFib .mg-sign.ff-neon .nl-l.md{ font-size:8.6cqw; }
+:root:root:root:root:root .mg-factOrFib:has(.ff-warm) .mg-act{ background:linear-gradient(180deg, #5a0a20, #2a030b) !important; border-color:#e6b94a !important; color:#ffe9a8 !important; }
+@media (max-height:700px){ :root:root:root:root:root .mg-factOrFib .mg-sign.ff-neon{ width:min(74%, 300px) !important; } }
+/* the label over the dial */
+.ff-warm .ff-sub{ font:900 clamp(12px, 3.4vw, 17px)/1 var(--f-display, sans-serif); letter-spacing:4px; color:#ffd98a; text-shadow:0 2px 0 #3a0810; }
+/* the dial: a brass rim, a cream face, brown ticks and needle */
+.ff-warm.ff-lie .ff-gauge{ background:radial-gradient(ellipse at 50% 90%, #fffaf0 0%, #ffe9bd 70%, #f2cf8a 100%); border:4px solid #e6b94a; box-shadow:0 0 0 3px #6a3d00, 0 0 0 5px #ffe9a8, 0 8px 0 5px #3a1a04; }
+.ff-warm .ff-gauge line{ stroke:#6a3d00; }
+.ff-warm .ff-gauge .fg-needle path{ fill:#2a1206; }
+.ff-warm .fg-l{ font:900 12px var(--f-display, sans-serif); fill:#0f7a3c; } .ff-warm .fg-l.r{ fill:#c2182f; }
+.ff-warm .fg-wave{ stroke:#e0572b; }
+.ff-warm.ff-lie .ff-gauge.lit-ok.lit-fact .fg-fact, .ff-warm.ff-lie .ff-gauge.lit-ok.lit-fib .fg-fib{ stroke:#12c25e; }
+/* the cue card: the statement in the show's lettering, dark on cream */
+:root:root:root:root .ff-stage.ff-warm .ff-bubble{ align-items:center; justify-content:center; text-align:center; background:linear-gradient(180deg, #fffdf4, #ffeecb); border:4px solid #e6b94a; border-radius:18px;
+  box-shadow:0 0 0 3px #6a3d00, 0 7px 0 3px #3a1a04; color:#2a1206; padding:16px 16px 14px; }
+.ff-stage.ff-warm .ff-bubble::after{ display:none; }
+.ff-warm .ff-in, .ff-warm .ff-cur{ display:none !important; }
+:root:root:root:root .ff-stage.ff-warm .ff-text{ display:block; font-family:var(--f-body, Inter, sans-serif); font-weight:900; color:#2a1206; text-shadow:none; line-height:1.18; }
+.ff-stage.ff-warm .ff-text::before{ content:none; }
+/* the payoff: as big as the statement, on a gold strip */
+:root:root:root:root .ff-stage.ff-warm .ff-fact{ display:block; align-self:stretch; margin-top:10px; padding:8px 10px; border:0; border-radius:10px; background:linear-gradient(180deg, #ffe27a, #ffc21a); box-shadow:inset 0 0 0 2px #a86a00;
+  font-family:var(--f-body, Inter, sans-serif); font-weight:900; line-height:1.18; color:#3a1a04; text-shadow:none; }
+:root:root:root:root .ff-stage.ff-warm .ff-fact:empty{ display:none; }
+:root:root:root:root .ff-stage.ff-warm .ff-stamp{ font-family:var(--f-display, sans-serif); }
+/* the round lamps and TRUST YOUR GUT */
+.ff-warm .ff-dots i{ background:rgba(60,8,16,0.7); box-shadow:inset 0 0 0 2px #e6b94a; }
+.ff-warm .ff-gut{ font:900 clamp(12px, 3.3vw, 16px)/1 var(--f-display, sans-serif); letter-spacing:3px; color:#ffe9a8; text-shadow:0 2px 0 #3a0810; }
+/* Flip beside the dial, working it (a still pose; he does not pop up from the bottom here) */
+:root:root:root:root .ff-warm.ff-lie .ff-host{ display:block !important; position:absolute; z-index:3; right:-2%; top:clamp(10px, 3svh, 30px); width:min(27vw, 120px); margin:0; opacity:1 !important; transform:none !important; animation:none !important; pointer-events:none; }
+:root:root:root:root .ff-warm.ff-lie .ff-gauge{ margin-right:min(16vw, 70px); width:min(calc(100% - min(18vw, 80px)), calc(25svh * 1.5625), 520px); }
+.ff-stage.ff-warm{ position:relative; }
+.mg-factOrFib .mg-head:has(.ff-neon){ width:100% !important; align-self:stretch; }
+/* (the old sign's lettering rules reach every span in the plate: the neon logo's lines take their own colours and sizes back) */
+:root:root:root:root:root:root .mg-factOrFib .mg-sign.ff-neon .nl-l{ display:block !important; color:var(--c) !important; -webkit-text-stroke:0 !important; font-family:var(--f-display, 'Big Shoulders Display', sans-serif) !important; font-weight:900 !important; line-height:0.95 !important; letter-spacing:0.5cqw !important;
+  text-shadow:0 0 0.5cqw rgba(255,255,255,0.6), 0 0 1.6cqw var(--c), 0 0 3.4cqw var(--c), 0 0 6cqw var(--c) !important; }
+:root:root:root:root:root:root .mg-factOrFib .mg-sign.ff-neon .nl-l.lg{ font-size:13.4cqw !important; }
+:root:root:root:root:root:root .mg-factOrFib .mg-sign.ff-neon .nl-l.md{ font-size:9cqw !important; }
+:root:root:root:root:root .mg-factOrFib .mg-sign.ff-neon{ width:min(80%, 400px) !important; }
+:root:root:root:root .ff-warm.ff-lie .ff-gauge{ width:min(calc(100% - min(18vw, 80px)), calc(20svh * 1.5625), 520px); }
+.ff-stage.ff-warm.ff-lie{ gap:clamp(4px, 0.9svh, 10px) !important; }
+
+/* ==== MAKEOVER job 3: PRICE PROBE on a showcase stage (.pr-show). Colour family: orange, gold and hot pink - no blue sunburst, no purple. A neon sign
+   with gold bulbs and a swinging price tag (lib/neon-logos.js 'priceProbe'), hot-pink showcase curtains at the sides, an orange-and-gold sunburst, a
+   gold stage floor under the cream tags. The MOST / LEAST switch is the loudest thing on screen: the biggest lettering, a white ring and a glow in
+   its own colour (MOST gold on hot pink, LEAST white on electric blue - the one cool colour, so the switch can never be missed). After the reveal the
+   tags you did not pick stay full-strength cream under a light shade, so they are still easy to read. Still pictures only: nothing new animates. ==== */
+:root:root:root:root:root .mg-overlay.mg-priceProbe:has(.pr-show){
+  background:
+    linear-gradient(90deg, #d6126e 0, #ff3c9d 5%, #b80d5c 9%, rgba(184,13,92,0) 9.5%, rgba(184,13,92,0) 90.5%, #b80d5c 91%, #ff3c9d 95%, #d6126e 100%),
+    linear-gradient(180deg, rgba(0,0,0,0) 0 80%, #c9820a 80%, #7a4a00 100%),
+    radial-gradient(ellipse 60% 34% at 50% 46%, rgba(255,246,190,0.75), rgba(255,246,190,0) 72%),
+    repeating-conic-gradient(from 0deg at 50% 46%, #ff9a2e 0deg 10deg, #ffb83d 10deg 20deg),
+    #ff9a2e !important; }
+.mg-priceProbe:has(.pr-show) .mg-bg{ display:none !important; }
+/* the sign: the neon logo takes the plate's place */
+.mg-priceProbe .mg-head:has(.pp-neon){ width:100% !important; align-self:stretch; }
+:root:root:root:root:root .mg-priceProbe .mg-sign.pp-neon{ background:none !important; border:0 !important; box-shadow:none !important; padding:0 !important; width:min(78%, 400px) !important; max-width:none !important; flex:none !important; margin:0 auto 2px; display:block !important; border-radius:0 !important; }
+.mg-priceProbe .mg-sign.pp-neon::before, .mg-priceProbe .mg-sign.pp-neon::after{ display:none !important; }
+.mg-priceProbe .mg-sign.pp-neon > :not(.nl){ display:none !important; }
+.mg-priceProbe .mg-sign.pp-neon > .nl{ width:100%; margin:0; }
+:root:root:root:root:root:root .mg-priceProbe .mg-sign.pp-neon .nl-l{ display:block !important; white-space:nowrap; color:var(--c) !important; -webkit-text-stroke:0 !important; font-family:var(--f-display, 'Big Shoulders Display', sans-serif) !important; font-weight:900 !important; line-height:0.95 !important;
+  text-shadow:0 0 0.5cqw rgba(255,255,255,0.6), 0 0 1.6cqw var(--c), 0 0 3.4cqw var(--c), 0 0 6cqw var(--c) !important; }
+:root:root:root:root:root:root .mg-priceProbe .mg-sign.pp-neon .nl-l.sm{ font-size:6.8cqw !important; letter-spacing:1.4cqw !important; }
+:root:root:root:root:root:root .mg-priceProbe .mg-sign.pp-neon .nl-l.lg{ font-size:13.4cqw !important; letter-spacing:0.5cqw !important; }
+@media (max-height:700px){ :root:root:root:root:root .mg-priceProbe .mg-sign.pp-neon{ width:min(62%, 260px) !important; } }
+:root:root:root:root:root .mg-priceProbe:has(.pr-show) .mg-act{ background:linear-gradient(180deg, #7a0a3e, #4a0524) !important; border-color:#ffd23f !important; color:#fff3c4 !important; }
+:root:root:root .mg-priceProbe:has(.pr-show) .mg-rule{ color:#3a1400; text-shadow:0 1px 0 rgba(255,255,255,0.45); font-weight:900; }
+/* the question, and the switch - the loudest thing on screen */
+:root:root:root .pr-stage.pr-show .pr-ask{ color:#3a1400; text-shadow:0 2px 0 rgba(255,246,190,0.7); }
+:root:root:root .pr-stage.pr-show .pr-ask b{ margin:0 4px; padding:3px 16px 5px; border-radius:14px; font-size:1.5em; letter-spacing:2px; color:#fff07a; background:linear-gradient(180deg, #ff5cb0, #e0127a);
+  border:3px solid #ffffff; box-shadow:0 0 0 3px #7a0a3e, 0 5px 0 3px #7a0a3e, 0 0 20px 6px rgba(255,60,157,0.75); text-shadow:0 2px 0 #7a0a3e; }
+:root:root:root .pr-stage.pr-show .pr-ask b.least{ color:#ffffff; background:linear-gradient(180deg, #3fd0ff, #0a78e0); box-shadow:0 0 0 3px #063a7a, 0 5px 0 3px #063a7a, 0 0 20px 6px rgba(63,208,255,0.85); text-shadow:0 2px 0 #063a7a; }
+/* the tags: gold rims on the stage; the price plate in hot pink and gold */
+:root:root:root .pr-stage.pr-show .pr-card{ border-color:#ffd23f; box-shadow:0 0 0 2px #a86a00, 0 8px 0 2px rgba(90,40,0,0.55); }
+:root:root:root .pr-stage.pr-show .pr-p{ background:#7a0a3e; color:#ffd23f; }
+/* after the reveal: the tags you did not pick stay readable (full-strength cream under a light shade - not faded to grey) */
+:root:root:root .pr-stage.pr-show .pr-card.dim{ opacity:1; }
+:root:root:root .pr-stage.pr-show .pr-card.dim::after{ content:''; position:absolute; inset:0; border-radius:inherit; background:rgba(90,40,0,0.16); pointer-events:none; }
+:root:root:root .pr-stage.pr-show .pr-card.lit{ box-shadow:0 0 0 4px #1fae4e, 0 0 22px 6px rgba(60,220,110,0.8), 0 8px 0 4px rgba(90,40,0,0.55); }
+/* the meter and the lamps in the family's colours */
+:root:root:root .pr-stage.pr-show .pr-meter{ background:#4a0524; border-color:#ffd23f; }
+:root:root:root .pr-stage.pr-show .pr-dots i{ background:rgba(74,5,36,0.75); box-shadow:inset 0 0 0 2px #ffd23f; }
+
+/* ==== MAKEOVER job 4: EMOJI DECODE, a stronger set. Colour family: deep-space teal and navy with gold, coral and cyan - the purple wash is gone.
+   A neon sign (lib/neon-logos.js 'emojiDecode', shown on the title plate), a lit stage floor under the saucers, three more planets (a ringed gold
+   one, a coral one, a small moon) and three saucers drifting round the TV. Motion: transform only, slow drifts (9-14 s); still in lite mode and
+   reduced motion. Small inline drawings and gradients only. ==== */
+:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode{ background:radial-gradient(ellipse 80% 40% at 50% 30%, #12607a 0%, rgba(18,96,122,0) 75%), linear-gradient(180deg, #06243c 0%, #041428 60%, #020a18 100%) !important; }
+.event-overlay.bb-emojiDecode .ed-space .es-gal{ opacity:0.28; }
+.ed-space .es-floor{ left:-10%; right:-10%; bottom:0; height:17%; background:
+  repeating-linear-gradient(90deg, rgba(255,210,63,0.5) 0 2px, rgba(255,210,63,0) 2px 46px),
+  linear-gradient(180deg, #0f5a6e 0%, #0a3346 45%, #041826 100%); border-top:3px solid #ffd23f; box-shadow:0 -6px 22px rgba(39,230,255,0.35); transform:perspective(300px) rotateX(38deg); transform-origin:50% 100%; }
+.ed-space .es-planet.a{ background:radial-gradient(circle at 60% 35%, #c8fbff 0%, #2bb8d8 50%, #0b4a66 100%); }
+.ed-space .es-planet.b{ background:radial-gradient(circle at 40% 35%, #ffe0cc 0%, #ff7a5a 55%, #8a2a1a 100%); }
+.ed-space .es-planet.c{ right:4%; top:9%; width:clamp(44px, 13vw, 110px); aspect-ratio:1; background:radial-gradient(circle at 38% 32%, #fff3c4 0%, #ffc23f 50%, #a86a00 100%); }
+.ed-space .es-planet.c > i{ position:absolute; left:-32%; right:-32%; top:38%; height:24%; border-radius:50%; border:3px solid #ffe9a8; border-bottom-color:rgba(255,233,168,0.25); transform:rotate(-18deg); }
+.ed-space .es-planet.d{ left:5%; top:13%; width:clamp(22px, 6.5vw, 54px); aspect-ratio:1; background:radial-gradient(circle at 36% 32%, #ffffff 0%, #c9d2e6 55%, #6a7696 100%); }
+.ed-space .es-planet.e{ left:-5%; top:38%; width:clamp(34px, 10vw, 84px); aspect-ratio:1; background:radial-gradient(circle at 60% 34%, #d8ffd0 0%, #4be683 50%, #0f6a3a 100%); }
+.ed-space .es-ufo{ position:absolute; display:block; width:clamp(46px, 14vw, 110px); height:auto; overflow:visible; will-change:transform; }
+.ed-space .es-ufo.u1{ left:3%; top:25%; animation:esDrift 11s ease-in-out infinite alternate; }
+.ed-space .es-ufo.u2{ right:2%; top:31%; width:clamp(36px, 11vw, 86px); animation:esDrift 9s ease-in-out -3s infinite alternate-reverse; }
+.ed-space .es-ufo.u3{ right:22%; top:3.5%; width:clamp(30px, 9vw, 70px); animation:esDrift 14s ease-in-out -6s infinite alternate; }
+@keyframes esDrift{ from{ transform:translate(-8px, -5px) rotate(-5deg); } to{ transform:translate(10px, 7px) rotate(6deg); } }
+:root.lite .ed-space .es-ufo{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .ed-space .es-ufo{ animation:none; } }
+.paused .ed-space .es-ufo, :root.tab-hidden .ed-space .es-ufo{ animation-play-state:paused; }
+/* (the neon sign is kept compact here so the four answers keep their room above Flip's speech bubble; the props sit in the gaps round the TV) */
+:root:root:root:root.mode-daily .event-overlay.has-plate.bb-emojiDecode .qz-plate.neon{ width:min(66%, 300px); margin-bottom:0; }
+:root:root:root:root.mode-daily .event-overlay.has-plate.bb-emojiDecode .qz-plate.neon > small{ margin-top:4px; }
+.ed-space .es-planet.c{ right:-5%; top:17.5%; }
+.ed-space .es-planet.d{ left:7%; top:21%; }
+.ed-space .es-ufo.u1{ left:-2%; top:27%; }
+.ed-space .es-ufo.u2{ right:-2%; top:34%; }
+.ed-space .es-ufo.u3{ right:15%; top:22.5%; }
+
+/* ==== REDESIGN 1: THE VS CARDS (Crowd Showdown) in the Galactic Game Night world. The cards keep their own bright colours and their pop; the world
+   comes to them: a chrome MOTHERSHIP hovers in the gap between the two cards with the gold VS as its dome, a ring of running lights and a soft beam
+   fanning up over one card and down over the other; each card is a window on space - a big ringed planet rises in one corner of the top card and a
+   cratered moon sits in a corner of the bottom one - and the drifting pattern behind the pictures is now planets, saucers, rockets and stars
+   (white, see-through, so it suits any card colour). Motion: only the two existing pattern drifts (transform) and the mothership's lights (opacity,
+   one change every 0.6 s). Lite and reduced motion: all still. ==== */
+:root.mode-daily #board .half > .dd-back{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cg fill='%23fff' opacity='.2'%3E%3Ccircle cx='52' cy='58' r='22'/%3E%3Ccircle cx='190' cy='176' r='13'/%3E%3Cpath d='M150 40 l3 9 9 3 -9 3 -3 9 -3 -9 -9 -3 9 -3z'/%3E%3Cpath d='M60 170 l4 12 12 4 -12 4 -4 12 -4 -12 -12 -4 12 -4z'/%3E%3Ccircle cx='110' cy='120' r='3'/%3E%3Ccircle cx='215' cy='70' r='2.5'/%3E%3Ccircle cx='20' cy='130' r='2.5'/%3E%3Ccircle cx='130' cy='215' r='3'/%3E%3C/g%3E%3Cg fill='none' stroke='%23fff' stroke-width='5' opacity='.2'%3E%3Cellipse cx='52' cy='58' rx='38' ry='9' transform='rotate(-20 52 58)'/%3E%3C/g%3E%3Cg fill='%23000' opacity='.07'%3E%3Ccircle cx='184' cy='172' r='4'/%3E%3Ccircle cx='195' cy='181' r='2.5'/%3E%3C/g%3E%3C/svg%3E"); }
+:root.mode-daily #board .half > .dd-front{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cg fill='%23fff' opacity='.26'%3E%3Cpath d='M30 40 q2 -14 16 -14 q14 0 16 14z'/%3E%3Cellipse cx='46' cy='44' rx='30' ry='9'/%3E%3Cpath d='M132 150 c6 -14 6 -26 0 -40 c-6 14 -6 26 0 40z M124 142 l-8 10 8 -3z M140 142 l8 10 -8 -3z'/%3E%3Cpath d='M120 40 l2.5 7.5 7.5 2.5 -7.5 2.5 -2.5 7.5 -2.5 -7.5 -7.5 -2.5 7.5 -2.5z'/%3E%3Ccircle cx='40' cy='130' r='3'/%3E%3Ccircle cx='160' cy='86' r='2.5'/%3E%3Ccircle cx='84' cy='98' r='2'/%3E%3C/g%3E%3Cpath d='M36 52 L26 84 H66 L56 52z' fill='%23fff' opacity='.1'/%3E%3C/svg%3E"); }
+/* each card is a window on space: a ringed planet rising in the top card's corner, a cratered moon in the bottom card's */
+:root.mode-daily #board .half > .gloss::before, :root.mode-daily #board .half > .gloss::after{ content:''; position:absolute; pointer-events:none; }
+:root.mode-daily #board .half.top > .gloss::before{ right:-34px; top:-30px; width:150px; height:150px; border-radius:50%;
+  background:radial-gradient(circle at 36% 34%, rgba(255,255,255,0.5), rgba(255,255,255,0.2) 55%, rgba(0,0,30,0.12) 100%); box-shadow:inset -10px -12px 0 rgba(0,0,40,0.1); }
+:root.mode-daily #board .half.top > .gloss::after{ right:-76px; top:26px; width:236px; height:44px; border-radius:50%; border:6px solid rgba(255,255,255,0.42); border-bottom-color:rgba(255,255,255,0.75); transform:rotate(-22deg); }
+:root.mode-daily #board .half.bottom > .gloss::before{ left:-40px; bottom:-44px; width:160px; height:160px; border-radius:50%;
+  background:radial-gradient(circle at 62% 30%, rgba(0,0,40,0.14) 0 9px, rgba(0,0,0,0) 10px), radial-gradient(circle at 78% 56%, rgba(0,0,40,0.12) 0 14px, rgba(0,0,0,0) 15px), radial-gradient(circle at 46% 52%, rgba(0,0,40,0.1) 0 6px, rgba(0,0,0,0) 7px),
+    radial-gradient(circle at 60% 36%, rgba(255,255,255,0.5), rgba(255,255,255,0.2) 60%, rgba(0,0,30,0.12) 100%); }
+:root.mode-daily #board .half.bottom > .gloss::after{ right:16px; bottom:18px; width:20px; height:20px; border-radius:50%; background:rgba(255,255,255,0.45); box-shadow:-26px 14px 0 -6px rgba(255,255,255,0.5), 18px -40px 0 -7px rgba(255,255,255,0.5); }
+/* the MOTHERSHIP in the gap: the gold VS is its dome; a chrome hull with a ring of running lights; a beam fans over both cards */
+:root:root:root.mode-daily #board .divider{ isolation:isolate; overflow:visible; background:none; border:0; box-shadow:none; color:#4a1d00; text-shadow:0 1px 0 rgba(255,255,255,0.6); }
+:root.mode-daily #board .divider::before{ content:''; position:absolute; z-index:-1; left:50%; top:50%; width:min(244px, 64vw); height:70px; margin:-35px 0 0 calc(min(244px, 64vw) / -2); border-radius:50%; box-sizing:border-box;
+  border:3px solid #1b1440;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0) 0 25px, #7a3d00 25.5px 28px, rgba(0,0,0,0) 28.5px),
+    radial-gradient(circle at 50% 50%, rgba(255,251,224,0) 0 19px, rgba(224,154,0,0.55) 25px, rgba(0,0,0,0) 25.5px),
+    radial-gradient(circle at 50% 50%, #fff6c2 0 8px, #ffe680 15px, #ffc21a 25px, rgba(0,0,0,0) 25.5px),
+    radial-gradient(circle, #fffbe0 0 3.2px, #ffc21a 4.2px, rgba(255,194,26,0) 5.6px) 50% 86% / 26px 12px repeat-x,
+    linear-gradient(180deg, #ffffff 0%, #e4e9f7 26%, #a3acc8 44%, #5d6686 45%, #7b85a6 68%, #3c4466 100%);
+  box-shadow:0 5px 0 #1b1440, 0 0 0 2px rgba(255,255,255,0.6), 0 0 26px 5px rgba(125,249,255,0.8); }
+:root.mode-daily #board .divider::after{ content:''; position:absolute; z-index:-2; left:50%; top:50%; width:min(330px, 86vw); height:230px; margin:-115px 0 0 calc(min(330px, 86vw) / -2); pointer-events:none;
+  clip-path:polygon(34% 50%, 4% 0, 96% 0, 66% 50%, 96% 100%, 4% 100%);
+  background:linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(210,250,255,0.3) 38%, rgba(255,255,255,0.5) 50%, rgba(210,250,255,0.3) 62%, rgba(255,255,255,0) 100%);
+  animation:vsBeam 2.4s ease-in-out infinite alternate; }
+@keyframes vsBeam{ from{ opacity:0.55; } to{ opacity:1; } }
+:root.lite.mode-daily #board .divider::after{ animation:none; opacity:0.8; }
+@media (prefers-reduced-motion: reduce){ :root.mode-daily #board .divider::after{ animation:none; opacity:0.8; } }
+.paused #board .divider::after, :root.tab-hidden #board .divider::after{ animation-play-state:paused; }
+
+/* ==== REDESIGN 2: TWIN FLIP - "the mothership's card table". The whole screen is one space scene: a chrome mothership hangs at the top with the
+   title as the neon sign on its hull, its tractor beam falls over a glass card table held in the beam, and far below a huge glowing planet curves
+   along the bottom of the screen with a thin bright rim. Colour family: electric teal and deep navy, gold lettering, coral accents - no maroon, no
+   purple. Card backs: the grey alien on its nebula inside a chrome-and-teal frame; face-up cards are bright star-chart cards. Motion: none new - the
+   scene is still (gradients and two small inline drawings), so it costs nothing while the cards flip. ==== */
+:root:root:root:root:root .mg-overlay.mg-twinFlip, :root:root:root:root:root.stage-on .mg-overlay.mg-twinFlip{
+  background:
+    radial-gradient(circle at 12% 30%, #ffffff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 88% 24%, #ffffff 0 1.4px, rgba(255,255,255,0) 2.2px),
+    radial-gradient(circle at 94% 58%, #fff3c4 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 5% 66%, #ffffff 0 1.3px, rgba(255,255,255,0) 2px),
+    radial-gradient(circle at 70% 8%, #ffffff 0 1px, rgba(255,255,255,0) 1.8px), radial-gradient(circle at 26% 12%, #bff8ff 0 1.2px, rgba(255,255,255,0) 2px),
+    radial-gradient(ellipse 140% 30% at 50% 108%, #0b3d52 0 62%, #7df9ff 63.2%, rgba(39,230,255,0.5) 66%, rgba(39,230,255,0) 84%),
+    radial-gradient(ellipse 140% 30% at 50% 108%, #1a7a8c 0 24%, #0b3d52 62%, rgba(0,0,0,0) 62.5%),
+    radial-gradient(ellipse 80% 34% at 50% 6%, rgba(39,230,255,0.4), rgba(39,230,255,0) 72%),
+    radial-gradient(ellipse 60% 30% at 86% 46%, rgba(255,110,150,0.2), rgba(255,110,150,0) 70%),
+    linear-gradient(180deg, #041a33 0%, #06243f 46%, #020d1f 100%) !important; }
+/* the scene layer: the mothership's hull across the top, and its tractor beam */
+:root:root:root:root .mg-overlay.mg-twinFlip .mg-bg{ display:block !important; background:none !important; -webkit-mask-image:none !important; mask-image:none !important; overflow:hidden; }
+.mg-twinFlip:has(.tf-space) .mg-bg > *{ display:none !important; }
+:root:root:root .mg-twinFlip:has(.tf-space) .mg-bg::before{ content:''; position:absolute; left:50%; top:-78px; width:min(132%, 680px); height:276px; margin:0 0 0 calc(min(132%, 680px) / -2); border-radius:50%; box-sizing:border-box; animation:none !important; transform:none; opacity:1;
+  border:3px solid #0c1838;
+  background:
+    radial-gradient(circle, #fffbe0 0 3.6px, #ffc21a 4.8px, rgba(255,194,26,0) 6.6px) 50% 95.5% / 30px 14px repeat-x,
+    radial-gradient(circle, #bff8ff 0 5px, #27e6ff 6.5px, #0c1838 7.5px 9px, rgba(0,0,0,0) 9.5px) 50% 71% / 46px 22px repeat-x,
+    linear-gradient(180deg, #0f1a3a 0%, #2a3760 46%, #56628a 62%, #aab3cf 80%, #e9eefb 88%, #6a7598 93%, #232e52 100%);
+  box-shadow:0 6px 0 #0c1838, 0 0 40px 6px rgba(39,230,255,0.55); }
+:root:root:root .mg-twinFlip:has(.tf-space) .mg-bg::after{ content:''; position:absolute; z-index:0; inset:192px 0 10% 0; border:0; border-radius:0; box-shadow:none; pointer-events:none;
+  clip-path:polygon(22% 0, 78% 0, 100% 100%, 0 100%);
+  background:linear-gradient(180deg, rgba(160,248,255,0.5) 0%, rgba(39,230,255,0.2) 40%, rgba(39,230,255,0.05) 100%); }
+/* the title: the neon sign on the hull */
+:root:root:root:root .tf-stage.tf-space .tf-title{ transform:none; margin:0 auto 10px; padding:8px 20px 9px; border-radius:14px; background:linear-gradient(180deg, #071530, #0b2046); border:3px solid #27e6ff;
+  box-shadow:0 0 0 2px #06102a, 0 0 14px 2px rgba(39,230,255,0.85), inset 0 0 14px rgba(39,230,255,0.35); }
+:root:root:root:root .tf-stage.tf-space .tf-title::before, :root:root:root:root .tf-stage.tf-space .tf-title::after{ display:none; }
+:root:root:root:root .tf-stage.tf-space .tf-title span{ color:#fff6c2; background:none; -webkit-text-fill-color:#fff6c2; -webkit-text-stroke:0; filter:none; letter-spacing:4px; font-size:clamp(32px, 10.4vw, 48px);
+  text-shadow:0 0 6px #ffd23f, 0 0 16px rgba(255,190,40,0.95), 0 0 30px rgba(255,150,40,0.7), 0 2px 0 #7a4a00; }
+:root:root:root:root .tf-stage.tf-space .tf-title .ts{ color:#7df9ff; text-shadow:0 0 8px #27e6ff, 0 0 16px rgba(39,230,255,0.8); font-size:18px; }
+:root:root:root:root .tf-stage.tf-space .tf-title .tw{ color:#bff8ff; }
+/* the card table: a pane of glass held in the beam, a teal neon rim, the galaxy glowing through it */
+:root:root:root:root .tf-stage.tf-space .tf-grid{ border:3px solid #7df9ff; border-radius:20px; box-shadow:0 0 0 3px #06102a, 0 0 22px 4px rgba(39,230,255,0.7), inset 0 0 26px rgba(39,230,255,0.28), 0 18px 30px -8px rgba(0,0,0,0.6); }
+/* the cards: a chrome-and-teal frame round the nebula back; a bright star-chart face */
+:root:root:root:root .tf-stage.tf-space .tf-tile, :root:root:root:root .tf-stage.tf-space .tf-tile:nth-child(n){ border:2px solid #dfe9ff; background:linear-gradient(160deg, #1d4f80, #0a1c40); box-shadow:inset 0 0 0 2px rgba(125,249,255,0.55), 0 5px 0 #030a1c, 0 0 10px rgba(39,230,255,0.35); border-radius:13px; }
+:root:root:root:root .tf-stage.tf-space .tf-tile.up{ background:radial-gradient(circle at 50% 46%, #ffffff 0%, #eafcff 55%, #bfeeff 100%); border-color:#ffffff; box-shadow:inset 0 0 0 2px rgba(39,230,255,0.5), 0 5px 0 #030a1c, 0 0 16px 2px rgba(125,249,255,0.75); }
+:root:root:root:root .tf-stage.tf-space .tf-tile.up:not(.done){ border-color:#ffd23f; box-shadow:inset 0 0 0 2px rgba(255,210,63,0.6), 0 6px 0 #030a1c, 0 0 0 3px rgba(255,210,63,0.9), 0 0 18px 4px rgba(255,210,63,0.8); }
+:root:root:root:root .tf-stage.tf-space .tf-tile.done{ border-color:#7df9ff; box-shadow:inset 0 0 0 2px rgba(39,230,255,0.5), 0 5px 0 #030a1c; }
+:root:root:root:root .tf-stage.tf-space .tf-pairs{ background:#06102a; border:2px solid #7df9ff; color:#eafcff; text-shadow:0 0 8px rgba(39,230,255,0.9); box-shadow:0 0 12px rgba(39,230,255,0.6); }
+.mg-twinFlip:has(.tf-space) .mg-rule{ color:#eafcff; text-shadow:0 2px 0 #020d1f; }
+
+/* ==== REDESIGN 3: FACT OR FIB - "the TRUTH-O-TRON". One big retro sci-fi machine stands on the show stage and the whole game happens on it: a
+   turquoise enamel cabinet with chrome trim and rivets, two antennae with glowing bulbs (green for FACT, red for FIB), the lie-detector dial as its
+   face behind a dark bezel, the statement on a cream ticket in its read-out window with the explanation on a gold strip, and the two big dome
+   buttons on its control deck. Colour family: turquoise, cream and chrome on the crimson stage - no teal terminal, no purple. Flip is not on this
+   screen (a small still figure beside the machine looked wrong). Motion: the antenna bulbs breathe (opacity only, 1.6 s); still in lite / reduced motion. ==== */
+:root:root:root:root:root .ff-warm.ff-lie .ff-host{ display:none !important; }
+:root:root:root:root .ff-stage.ff-warm.ff-lie{ position:relative; box-sizing:border-box; margin-top:34px; padding:14px 12px 16px; border-radius:40px 40px 24px 24px; border:4px solid #f2fffc; overflow:visible;
+  background:
+    radial-gradient(circle at 16px 16px, #f2fffc 0 3.5px, #0b4a44 4.5px 6px, rgba(0,0,0,0) 6.5px), radial-gradient(circle at calc(100% - 16px) 16px, #f2fffc 0 3.5px, #0b4a44 4.5px 6px, rgba(0,0,0,0) 6.5px),
+    radial-gradient(circle at 16px calc(100% - 16px), #f2fffc 0 3.5px, #0b4a44 4.5px 6px, rgba(0,0,0,0) 6.5px), radial-gradient(circle at calc(100% - 16px) calc(100% - 16px), #f2fffc 0 3.5px, #0b4a44 4.5px 6px, rgba(0,0,0,0) 6.5px),
+    linear-gradient(180deg, rgba(255,255,255,0.35) 0, rgba(255,255,255,0) 9%),
+    linear-gradient(180deg, #45e0cf 0%, #25b8a8 55%, #15857b 100%);
+  box-shadow:0 0 0 4px #0b4a44, 0 12px 0 4px #062b28, 0 26px 30px -6px rgba(0,0,0,0.55); }
+/* the antennae: steel rods with glowing bulbs */
+.ff-stage.ff-warm.ff-lie::before, .ff-stage.ff-warm.ff-lie::after{ content:''; position:absolute; top:-50px; width:34px; height:52px; pointer-events:none; animation:ffBulb 1.6s ease-in-out infinite alternate; }
+.ff-stage.ff-warm.ff-lie::before{ left:13%; background:radial-gradient(circle at 50% 15px, #ffffff 0 4px, #4dff95 6px 12px, #0a5a2a 12.6px 14.6px, rgba(0,0,0,0) 15px), linear-gradient(90deg, #7b869c, #e9eefb 45%, #7b869c) 50% 100% / 6px 30px no-repeat; }
+.ff-stage.ff-warm.ff-lie::after{ right:13%; animation-delay:-0.8s; background:radial-gradient(circle at 50% 15px, #ffffff 0 4px, #ff5a72 6px 12px, #6a0a1c 12.6px 14.6px, rgba(0,0,0,0) 15px), linear-gradient(90deg, #7b869c, #e9eefb 45%, #7b869c) 50% 100% / 6px 30px no-repeat; }
+@keyframes ffBulb{ from{ opacity:0.6; } to{ opacity:1; } }
+:root.lite .ff-stage.ff-warm.ff-lie::before, :root.lite .ff-stage.ff-warm.ff-lie::after{ animation:none; }
+@media (prefers-reduced-motion: reduce){ .ff-stage.ff-warm.ff-lie::before, .ff-stage.ff-warm.ff-lie::after{ animation:none; } }
+/* the name plate, the dial behind its bezel, the read-out window */
+:root:root:root .ff-warm .ff-sub{ align-self:center; padding:4px 14px; border-radius:99px; background:#062b28; color:#baffef; text-shadow:none; letter-spacing:3px; box-shadow:inset 0 0 0 2px #45e0cf; }
+:root:root:root:root:root .ff-warm.ff-lie .ff-gauge{ margin-right:0; width:min(92%, calc(19svh * 1.5625), 500px); border:5px solid #1a2330; box-shadow:0 0 0 3px #e9eefb, 0 0 0 5px #0b4a44, inset 0 0 18px rgba(90,40,0,0.25); }
+:root:root:root:root:root .ff-stage.ff-warm .ff-bubble{ border:4px solid #1a2330; box-shadow:0 0 0 3px #e9eefb, 0 0 0 5px #0b4a44, inset 0 6px 10px rgba(90,40,0,0.14); border-radius:14px; }
+.ff-warm .ff-dots i{ background:#062b28; box-shadow:inset 0 0 0 2px #f2fffc; }
+:root:root .ff-warm .ff-gut{ color:#062b28; text-shadow:0 1px 0 rgba(255,255,255,0.45); }
+/* the stage round it: a warmer spotlight on the machine */
+:root:root:root:root:root:root .mg-overlay.mg-factOrFib:has(.ff-warm){
+  background:
+    radial-gradient(ellipse 84% 40% at 50% 46%, rgba(255,226,150,0.5), rgba(255,226,150,0) 72%),
+    linear-gradient(180deg, rgba(0,0,0,0) 0 84%, #6a3208 84%, #2a1204 100%),
+    repeating-linear-gradient(90deg, rgba(0,0,0,0.22) 0 13px, rgba(255,255,255,0.05) 13px 22px, rgba(0,0,0,0.08) 22px 32px),
+    linear-gradient(180deg, #9a1626 0%, #6a0f1c 45%, #3d0810 100%) !important; }
+/* (fit: the cabinet's frame takes room, so the dial and the buttons are a little smaller; nothing is clipped) */
+:root:root:root:root:root .ff-stage.ff-warm.ff-lie{ overflow:visible !important; margin-top:30px; padding:10px 12px 12px; }
+:root:root:root:root:root:root .ff-warm.ff-lie .ff-gauge{ width:min(80%, calc(15.5svh * 1.5625), 440px); }
+:root:root:root:root .ff-stage.ff-warm.ff-lie .ff-btn{ width:clamp(96px, min(33vw, 14.5svh), 170px); }
+:root:root:root:root .ff-stage.ff-warm.ff-lie .ff-bubble{ min-height:clamp(96px, 16svh, 220px); }
+:root:root:root:root:root:root:root .ff-warm.ff-lie .ff-gauge{ width:min(74%, calc(13.5svh * 1.5625), 400px); }
+:root:root:root:root:root .ff-stage.ff-warm.ff-lie .ff-btn{ width:clamp(92px, min(31vw, 13svh), 160px); }
+:root:root:root:root:root .ff-stage.ff-warm.ff-lie .ff-bubble{ min-height:clamp(90px, 14svh, 200px); padding:10px 12px; }
+:root:root:root:root:root:root .ff-stage.ff-warm.ff-lie{ gap:clamp(3px, 0.7svh, 8px) !important; padding:8px 12px 12px; }
+
+/* ==== REDESIGN 4: PRICE PROBE - "the galactic shopping saucer". The three cream tags hang by their strings from a wide orange-and-gold flying
+   saucer that hovers over the showcase, and its warm beam falls over them; behind is an alien sunset - a hot-pink sky running down to gold, a huge
+   cream ringed planet rising on one side and a small coral moon on the other - between the pink showcase curtains, with a round gold display stage
+   under the tags. Colour family: orange, gold and hot pink. Still scene: gradients only, nothing new animates. ==== */
+:root:root:root:root:root:root .mg-overlay.mg-priceProbe:has(.pr-show){
+  background:
+    linear-gradient(90deg, #c40f66 0, #ff4fa8 4.5%, #a80b54 8.5%, rgba(168,11,84,0) 9%, rgba(168,11,84,0) 91%, #a80b54 91.5%, #ff4fa8 95.5%, #c40f66 100%),
+    radial-gradient(ellipse 62% 9% at 50% 86%, #ffe680 0 60%, #c9820a 61% 70%, rgba(0,0,0,0) 71%),
+    linear-gradient(180deg, rgba(0,0,0,0) 0 84%, #b8740a 84%, #6a3f00 100%),
+    radial-gradient(circle at 96% 33%, #ffd0c2 0 3.2%, #ff7a5a 6%, rgba(0,0,0,0) 6.3%),
+    radial-gradient(ellipse 34% 3.2% at 14% 22%, rgba(0,0,0,0) 0 60%, #fff6d8 63% 82%, rgba(0,0,0,0) 85%),
+    radial-gradient(circle at 14% 22%, #fffdf2 0 4%, #ffe9a8 8%, #ffb85a 11.6%, #e07a1a 12.4%, rgba(0,0,0,0) 12.8%),
+    radial-gradient(circle at 30% 12%, #ffffff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 78% 17%, #ffffff 0 1.4px, rgba(255,255,255,0) 2.2px), radial-gradient(circle at 62% 30%, #fff 0 1px, rgba(255,255,255,0) 1.8px),
+    linear-gradient(180deg, #e0127a 0%, #ff5a8a 26%, #ff9a2e 58%, #ffd23f 84%) !important; }
+/* the saucer the tags hang from, and its beam */
+:root:root:root .pr-stage.pr-show .pr-body{ position:relative; }
+.pr-stage.pr-show .pr-cards{ position:relative; z-index:1; }
+.pr-stage.pr-show .pr-body::before{ content:''; position:absolute; z-index:0; left:-2%; right:10%; top:-10px; height:46px; border-radius:50%; box-sizing:border-box; border:3px solid #5a1d00; pointer-events:none;
+  background:
+    radial-gradient(circle, #ffffff 0 3px, #ff4fa8 4.2px, rgba(255,79,168,0) 5.6px) 50% 42% / 26px 12px repeat-x,
+    linear-gradient(180deg, #fff3b0 0%, #ffc21a 26%, #ff7a2a 60%, #c9500a 100%);
+  box-shadow:0 5px 0 #5a1d00, 0 0 0 2px rgba(255,246,216,0.6), 0 0 22px 4px rgba(255,220,120,0.8); }
+.pr-stage.pr-show .pr-body::after{ content:''; position:absolute; z-index:0; left:0; right:12%; top:20px; bottom:-10px; pointer-events:none;
+  clip-path:polygon(14% 0, 86% 0, 100% 100%, 0 100%); background:linear-gradient(180deg, rgba(255,250,220,0.6) 0%, rgba(255,240,170,0.22) 55%, rgba(255,240,170,0) 100%); }
+:root:root:root:root .pr-stage.pr-show .pr-card{ margin-top:30px; }
+:root:root:root:root .pr-stage.pr-show .pr-ask{ position:relative; z-index:2; margin-bottom:6px; }
+:root:root:root:root .pr-stage.pr-show .pr-ask{ color:#ffffff; text-shadow:0 2px 0 #7a0a3e, 0 0 10px rgba(122,10,62,0.6); }
+:root:root:root:root .mg-priceProbe:has(.pr-show) .mg-rule{ color:#ffffff; text-shadow:0 1px 0 #4a0524; background:rgba(122,10,62,0.82); border-radius:12px; padding:6px 10px; box-shadow:0 0 0 2px rgba(255,210,63,0.7); }
+
+/* ==== REDESIGN 5: EMOJI DECODE - "alien TV, live from orbit". The TV is broadcasting from the surface of a small world: a cratered gold-lit moon
+   curves along the bottom of the screen under the stage floor, a huge ringed planet hangs behind the TV, and signal rings pulse out from the
+   antennae (scale and opacity only, 2.6 s; still in lite / reduced motion). Colour family: deep teal and navy, gold, coral and cyan. ==== */
+:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode{
+  background:
+    radial-gradient(ellipse 150% 22% at 50% 108%, #0f5a6e 0 58%, #ffd23f 59.5%, rgba(255,210,63,0.45) 63%, rgba(255,210,63,0) 80%),
+    radial-gradient(ellipse 74% 6.5% at 64% 33%, rgba(0,0,0,0) 0 62%, rgba(255,233,168,0.85) 64% 74%, rgba(0,0,0,0) 76%),
+    radial-gradient(circle at 64% 33%, #ffe9a8 0 6%, #ff9a5a 15%, #c9502a 21.4%, rgba(0,0,0,0) 21.8%),
+    radial-gradient(ellipse 80% 40% at 50% 30%, #12607a 0%, rgba(18,96,122,0) 75%),
+    linear-gradient(180deg, #06243c 0%, #041428 60%, #020a18 100%) !important; }
+.event-overlay.bb-emojiDecode .ed-ant::before, .event-overlay.bb-emojiDecode .ed-ant::after{ content:''; position:absolute; left:50%; bottom:70%; width:84%; aspect-ratio:2; margin-left:-42%; border-radius:50% 50% 0 0 / 100% 100% 0 0; pointer-events:none;
+  border:3px solid #7df9ff; border-bottom:0; opacity:0; transform-origin:50% 100%; animation:edSignal 2.6s ease-out infinite; }
+.event-overlay.bb-emojiDecode .ed-ant::after{ border-color:#ffd23f; animation-delay:-1.3s; }
+@keyframes edSignal{ 0%{ transform:scale(0.25); opacity:0; } 20%{ opacity:0.85; } 100%{ transform:scale(1.1); opacity:0; } }
+:root.lite .event-overlay.bb-emojiDecode .ed-ant::before, :root.lite .event-overlay.bb-emojiDecode .ed-ant::after{ animation:none; opacity:0.35; transform:scale(0.8); }
+@media (prefers-reduced-motion: reduce){ .event-overlay.bb-emojiDecode .ed-ant::before, .event-overlay.bb-emojiDecode .ed-ant::after{ animation:none; opacity:0.35; transform:scale(0.8); } }
+.paused .ed-ant::before, .paused .ed-ant::after, :root.tab-hidden .ed-ant::before, :root.tab-hidden .ed-ant::after{ animation-play-state:paused; }
+.ed-space .es-floor{ display:none; }
+.ed-space .es-planet.c{ display:none; }
+
+/* ==== NEW COMPOSITION, PRICE PROBE: "THE COSMIC BAZAAR". A new layout, not a re-skin: the three lots are stacked as wide hover-trays (the item in
+   a round porthole on the left, its name and detail in the middle, a big price plate on the right) - large, easy targets - in front of a retro
+   sci-fi sunset: a striped synth sun going down behind the domes and spires of an alien bazaar, a neon grid floor running to the horizon, a ringed
+   planet and two small saucers in the sky. Colour family: hot pink, orange and gold. One still drawing (a small inline SVG) on a gradient sky:
+   nothing animates but the game's own effects. (The earlier saucer, beam, curtains and pale planet are gone.) ==== */
+:root:root:root:root:root:root:root .mg-overlay.mg-priceProbe:has(.pr-show){
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 844' preserveAspectRatio='xMidYMax slice'%3E%3Cdefs%3E%3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff6b0'/%3E%3Cstop offset='.55' stop-color='%23ffc21a'/%3E%3Cstop offset='1' stop-color='%23ff6a3a'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='195' cy='566' r='158' fill='url(%23s)'/%3E%3Cg fill='%23ff7a5a'%3E%3Crect x='30' y='560' width='330' height='5'/%3E%3Crect x='30' y='584' width='330' height='8'/%3E%3Crect x='30' y='612' width='330' height='11'/%3E%3Crect x='30' y='644' width='330' height='15'/%3E%3Crect x='30' y='680' width='330' height='20'/%3E%3C/g%3E%3Cg fill='%237a0a3e'%3E%3Cellipse cx='84' cy='392' rx='24' ry='6'/%3E%3Cpath d='M72 390 q12 -16 24 0z'/%3E%3Cellipse cx='318' cy='432' rx='18' ry='4.5'/%3E%3Cpath d='M309 431 q9 -12 18 0z'/%3E%3Cpath d='M0 716 V676 h18 v-32 q16 -32 32 0 v32 h16 v-74 l11 -26 l11 26 v74 h20 q26 -54 52 0 h14 v-48 h14 v-32 l9 -20 l9 20 v32 h14 v48 h18 q32 -64 64 0 h12 v-84 l10 -24 l10 24 v84 h22 v-38 q17 -30 34 0 v38 h20 V716Z'/%3E%3C/g%3E%3Cg fill='%23ffe27a'%3E%3Crect x='28' y='656' width='5' height='7'/%3E%3Crect x='84' y='628' width='4' height='8'/%3E%3Crect x='84' y='650' width='4' height='8'/%3E%3Crect x='134' y='668' width='6' height='6'/%3E%3Crect x='196' y='640' width='4' height='9'/%3E%3Crect x='258' y='664' width='6' height='6'/%3E%3Crect x='296' y='620' width='4' height='9'/%3E%3Crect x='296' y='646' width='4' height='9'/%3E%3Crect x='350' y='690' width='5' height='7'/%3E%3C/g%3E%3Crect y='714' width='390' height='130' fill='%234a0524'/%3E%3Cg stroke='%23ff4fa8' stroke-width='2' opacity='.85'%3E%3Cpath d='M0 716 H390 M0 728 H390 M0 746 H390 M0 772 H390 M0 808 H390'/%3E%3Cpath d='M195 716 V844 M150 716 L60 844 M105 716 L-90 844 M240 716 L330 844 M285 716 L480 844 M60 716 L-260 844 M330 716 L650 844'/%3E%3C/g%3E%3C/svg%3E") center bottom / cover no-repeat,
+    radial-gradient(circle at 18% 9%, #ffffff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 72% 6%, #ffffff 0 1.4px, rgba(255,255,255,0) 2.2px), radial-gradient(circle at 90% 20%, #fff 0 1.1px, rgba(255,255,255,0) 1.9px), radial-gradient(circle at 8% 24%, #fff 0 1.1px, rgba(255,255,255,0) 1.9px),
+    linear-gradient(180deg, #8a0a4a 0%, #d6126e 22%, #ff4f7a 44%, #ff8a3c 66%, #ffc24a 84%) !important; }
+/* the sign and the rule on the new sky */
+:root:root:root:root:root .mg-priceProbe:has(.pr-show) .mg-rule{ background:rgba(74,5,36,0.86); box-shadow:0 0 0 2px #ffd23f; }
+/* the three lots: wide hover-trays, stacked */
+:root:root:root:root:root .pr-stage.pr-show .pr-body::before, :root:root:root:root:root .pr-stage.pr-show .pr-body::after{ display:none; }
+:root:root:root:root:root .pr-stage.pr-show .pr-cards{ flex-direction:column; gap:clamp(12px, 2.2svh, 20px); justify-content:center; }
+:root:root:root:root:root .pr-stage.pr-show .pr-card, :root:root:root:root:root .pr-stage.pr-show .pr-card:nth-child(n){ flex:1 1 0; max-height:128px; min-height:84px; margin:0; transform:none; display:grid; grid-template-columns:clamp(68px, 21vw, 104px) minmax(0, 1fr) auto; grid-template-rows:1fr auto auto 1fr; column-gap:10px; align-items:center; justify-items:start; text-align:left;
+  padding:6px 10px 6px 8px; border-radius:60px 18px 18px 60px; border:3px solid #ffffff; background:linear-gradient(180deg, #fffdf2 0%, #ffeeb8 100%);
+  box-shadow:0 0 0 3px #a80b54, 0 6px 0 3px #5a0530, 0 18px 14px -8px rgba(74,5,36,0.75), 0 0 18px 2px rgba(255,230,130,0.55); }
+:root:root:root:root:root .pr-stage.pr-show .pr-card::before{ content:''; position:absolute; left:8%; right:8%; top:auto; bottom:-17px; width:auto; height:10px; margin:0; border-radius:50%; background:radial-gradient(ellipse closest-side, rgba(255,246,190,0.95), rgba(255,246,190,0)); box-shadow:none; }
+:root:root:root:root:root .pr-stage.pr-show .pr-card::after{ display:none; }
+:root:root:root:root:root .pr-stage.pr-show .pr-g{ grid-column:1; grid-row:1 / 5; justify-self:center; margin:0 !important; width:100%; aspect-ratio:1; max-height:100%; display:flex; align-items:center; justify-content:center; border-radius:50%;
+  font-size:clamp(38px, 11.5vw, 60px); background:radial-gradient(circle at 40% 32%, #ffffff 0%, #ffe3f1 60%, #ffc2de 100%); box-shadow:inset 0 0 0 3px #ff3c9d, inset 0 0 0 6px #ffffff, 0 0 0 2px #a80b54; }
+:root:root:root:root:root .pr-stage.pr-show .pr-n{ grid-column:2; grid-row:2; font-size:clamp(19px, 5.6vw, 30px); line-height:1.05; color:#3a1400; }
+:root:root:root:root:root .pr-stage.pr-show .pr-d{ grid-column:2; grid-row:3; font-size:clamp(13px, 3.7vw, 19px); color:#a05a1a; margin-top:2px; }
+:root:root:root:root:root .pr-stage.pr-show .pr-p{ grid-column:3; grid-row:1 / 5; margin:0; min-width:clamp(74px, 22vw, 116px); min-height:clamp(44px, 12vw, 62px); padding:4px 10px; border-radius:14px; font-size:clamp(22px, 6.4vw, 36px);
+  background:linear-gradient(180deg, #a80b54, #5a0530); color:#ffe27a; box-shadow:inset 0 0 0 2px #ffd23f, 0 3px 0 #2a0218; }
+:root:root:root:root:root .pr-stage.pr-show .pr-card.lit{ background:linear-gradient(180deg, #f1ffe6, #a8f08a); box-shadow:0 0 0 4px #1fae4e, 0 6px 0 4px #0a5a2a, 0 0 24px 6px rgba(80,230,120,0.85); }
+:root:root:root:root:root .pr-stage.pr-show .pr-card.dim::after{ display:block; content:''; position:absolute; inset:0; border-radius:inherit; background:rgba(74,5,36,0.14); pointer-events:none; left:0; top:0; width:auto; height:auto; margin:0; }
+/* the meter: a slim neon tube at the side */
+:root:root:root:root:root .pr-stage.pr-show .pr-meter{ background:rgba(74,5,36,0.9); box-shadow:inset 0 0 0 2px #ffd23f, 0 0 12px rgba(255,210,63,0.6); }
+
+/* ==== NEW COMPOSITION, EMOJI DECODE: "THE DECODER DECK". A new layout: the emoji are a big HOLOGRAM (a cyan pane of light with scan lines and
+   corner brackets) projected up out of a starship's decoder console, and the four answers are the console's keys - a two-by-two block of big
+   chunky buttons in coral, gold, green and cyan, each with its letter on a round cap. The TV, its antennae and the four stacked saucers are gone.
+   Behind: the ringed planet, the moon horizon and the drifting saucers. Colour family: teal and navy with coral and gold. Motion: none new (the
+   keys' old bob is off; the hologram is still). ==== */
+.event-overlay.bb-emojiDecode .ed-ant{ display:none !important; }
+/* the hologram */
+:root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt{ width:min(92%, 560px); min-height:clamp(150px, 25svh, 320px); padding:18px 18px 44px; overflow:visible; isolation:isolate; border-radius:18px;
+  border:3px solid #7df9ff; outline:0; background-image:none;
+  background:
+    linear-gradient(#bff8ff, #bff8ff) 12px 12px / 26px 3px no-repeat, linear-gradient(#bff8ff, #bff8ff) 12px 12px / 3px 26px no-repeat,
+    linear-gradient(#bff8ff, #bff8ff) calc(100% - 12px) 12px / 26px 3px no-repeat, linear-gradient(#bff8ff, #bff8ff) calc(100% - 12px) 12px / 3px 26px no-repeat,
+    repeating-linear-gradient(180deg, rgba(125,249,255,0.12) 0 2px, rgba(125,249,255,0) 2px 6px),
+    linear-gradient(180deg, rgba(39,230,255,0.34), rgba(18,96,140,0.42));
+  box-shadow:0 0 0 2px rgba(6,16,42,0.9), 0 0 26px 4px rgba(39,230,255,0.7), inset 0 0 30px rgba(125,249,255,0.35); }
+:root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt::before{ display:none !important; }
+/* the projector beam, from the console up to the hologram */
+:root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt::after{ display:block !important; content:''; position:absolute; z-index:-1; left:6%; right:6%; top:100%; bottom:auto; width:auto; height:clamp(26px, 5svh, 54px); margin:0; border-radius:0;
+  clip-path:polygon(0 0, 100% 0, 60% 100%, 40% 100%); background:linear-gradient(180deg, rgba(125,249,255,0.55), rgba(125,249,255,0.12)); opacity:1; transform:none; animation:none; }
+/* the console: a metal deck with a neon lip, the four keys in a two-by-two block */
+:root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-grid{ display:grid; grid-template-columns:1fr 1fr; gap:clamp(10px, 1.8svh, 16px) 12px; margin-top:clamp(22px, 4.4svh, 50px); padding:clamp(14px, 2.2svh, 22px) 14px clamp(16px, 2.4svh, 24px); flex:0 0 auto; position:relative;
+  border-radius:26px 26px 18px 18px; border:3px solid #dfe9ff;
+  background:
+    radial-gradient(circle at 14px 14px, #ffd23f 0 3px, #06102a 4px 5.4px, rgba(0,0,0,0) 6px), radial-gradient(circle at calc(100% - 14px) 14px, #ffd23f 0 3px, #06102a 4px 5.4px, rgba(0,0,0,0) 6px),
+    linear-gradient(180deg, #2b4672 0%, #16284c 55%, #0a1632 100%);
+  box-shadow:0 0 0 3px #06102a, 0 -3px 16px rgba(39,230,255,0.55), 0 10px 0 3px #030814; }
+:root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-grid::before{ content:''; position:absolute; left:50%; top:-13px; width:74px; height:20px; margin-left:-37px; border-radius:50%; background:radial-gradient(ellipse closest-side, #ffffff, #7df9ff 55%, #0c4a6a 100%); border:3px solid #06102a; box-shadow:0 0 16px 4px rgba(125,249,255,0.9); }
+:root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile, :root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode:not(.bb-revealed) .event-tile{ animation-name:none; translate:none; position:relative; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; width:auto; min-height:clamp(92px, 13.4svh, 150px); margin:0; padding:22px 8px 12px;
+  border-radius:20px; border:3px solid #ffffff; background:linear-gradient(180deg, var(--k1), var(--k2)) !important; box-shadow:inset 0 3px 0 rgba(255,255,255,0.55), inset 0 -6px 0 rgba(0,0,0,0.18), 0 7px 0 var(--k3), 0 12px 10px rgba(0,0,0,0.45); touch-action:manipulation; overflow:visible; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(1){ --k1:#ff9a7a; --k2:#f0502e; --k3:#8a1f0a; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(2){ --k1:#ffe27a; --k2:#f2a800; --k3:#8a5a00; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(3){ --k1:#8dffb0; --k2:#19c25c; --k3:#0a6a2e; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(4){ --k1:#8fe9ff; --k2:#0fa8e0; --k3:#07517a; }
+.bb-emojiDecode .event-tile .ed-dome, .bb-emojiDecode .event-tile .ed-beam, .bb-emojiDecode .event-tile .ed-lights{ display:none !important; }
+:root:root:root:root:root .bb-emojiDecode .event-tile .ed-key{ position:absolute; left:50%; top:-15px; margin:0 0 0 -17px; width:34px; height:34px; display:flex; align-items:center; justify-content:center; border-radius:50%; font-size:20px; color:#06102a; background:radial-gradient(circle at 38% 30%, #ffffff, #dfe9ff 60%, #9fb0d6); border:3px solid #06102a; box-shadow:0 2px 0 #06102a; z-index:3; }
+:root:root:root:root:root .bb-emojiDecode .event-tile .bb-name{ white-space:normal !important; font-size:clamp(17px, 5vw, 26px) !important; line-height:1.04; text-align:center; color:#ffffff; text-shadow:0 2px 0 rgba(0,0,0,0.38); -webkit-text-stroke:0; max-width:100%; overflow-wrap:break-word; }
+:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile:nth-child(2) .bb-name{ color:#3a2400; text-shadow:0 1px 0 rgba(255,255,255,0.5); }
+:root:root:root:root:root .bb-emojiDecode .event-tile .ed-cover{ inset:-3px; border-radius:20px; background:linear-gradient(180deg, #3a4f80, #141f44); }
+:root:root:root:root:root .bb-emojiDecode .event-tile .ed-mark{ right:-8px; top:-12px; margin-top:0; width:36px; height:36px; }
+:root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.is-right{ box-shadow:0 0 0 4px #1fae4e, 0 0 22px 6px rgba(93,255,138,0.8), 0 7px 0 var(--k3); }
+:root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile.is-wrong{ --k1:#ff9aa8; --k2:#e01e44; --k3:#5a0414; }
+@media (max-height:700px){ :root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-prompt{ min-height:118px; padding:10px 14px 40px; } :root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-tile{ min-height:74px; padding:18px 6px 8px; } :root:root:root:root:root:root:root.mode-daily .event-overlay.stack.bb-emojiDecode .event-grid{ margin-top:20px; padding:12px 12px 14px; } }
+
+/* ==== NEW LOOK, SNAP SORT: "ALIEN RADAR". The whole screen is the scanner deck of a saucer. The field is a big round RADAR SCOPE - a chrome
+   bezel, a dark green glass face with glowing range rings and cross-hairs, and a bright sweep that turns round it (one transform, 4 s a turn). The
+   round's timer is the ring of amber lamps on the bezel. Each word is a BLIP: a glass capsule with a phosphor-green rim and a pulsing dot, flying in
+   toward the little saucer at the centre of the scope. A right tap locks the blip gold-green and it is beamed into the saucer, which pulses; a
+   wrong tap turns it red and it tumbles away while the scope flashes red. The category is the mission order: an amber marquee plate with the word
+   in big gold lettering. Colour family: phosphor green and amber on near-black, with chrome - no purple, no blue vortex photo. Nothing here tells
+   a right word from a wrong one before the tap. ==== */
+:root:root:root:root.stage-on .mg-overlay.mg-snapSort, :root:root:root:root .mg-overlay.mg-snapSort{
+  background:
+    repeating-linear-gradient(0deg, rgba(120,255,160,0.05) 0 1px, rgba(0,0,0,0) 1px 22px), repeating-linear-gradient(90deg, rgba(120,255,160,0.05) 0 1px, rgba(0,0,0,0) 1px 22px),
+    radial-gradient(ellipse 90% 46% at 50% 62%, rgba(40,200,110,0.3), rgba(40,200,110,0) 72%),
+    linear-gradient(180deg, #06140f 0%, #03100b 55%, #010705 100%) !important; }
+/* the title, the rule and the round pill: green-glass instruments */
+:root:root:root .mg-snapSort .mg-sign, :root:root:root .mg-snapSort .mg-rule{ background:linear-gradient(180deg, #0c2a1c, #051209) !important; border:2px solid #5dff9a !important; box-shadow:0 0 14px rgba(93,255,154,0.55), inset 0 1px 0 rgba(255,255,255,0.22) !important; }
+:root:root:root .mg-snapSort .mg-sign span{ color:#eafff1; text-shadow:0 0 6px #5dff9a, 0 0 16px rgba(93,255,154,0.9), 0 0 30px rgba(93,255,154,0.6); letter-spacing:3px; }
+:root:root:root .mg-snapSort .mg-rule{ color:#d6ffe4; font-weight:800; }
+:root:root:root .mg-snapSort .mg-act{ background:#051209; border:1.5px solid #ffc21a; color:#ffe9a8; box-shadow:0 0 8px rgba(255,194,26,0.45); }
+/* the mission order: the category on an amber marquee plate */
+:root:root:root .ss-stage.ss-galaxy .ss-cat{ position:relative; background:linear-gradient(180deg, #3a2600, #1c1200) !important; border:3px solid #ffc21a !important; border-radius:16px; padding:8px 14px 10px;
+  box-shadow:0 0 0 3px #0a0600, 0 0 18px rgba(255,194,26,0.65), inset 0 0 18px rgba(255,194,26,0.22) !important;
+  font:900 clamp(34px, 11vw, 60px)/1 var(--f-display, sans-serif); letter-spacing:3px; color:#fff3c4; text-shadow:0 0 6px #ffd23f, 0 0 18px rgba(255,180,40,0.95), 0 3px 0 #7a4a00; }
+:root:root:root .ss-stage.ss-galaxy .ss-cat small{ display:block; margin-bottom:4px; font:900 clamp(12px, 3.4vw, 16px)/1 var(--f-display, sans-serif); letter-spacing:5px; color:#5dff9a; text-shadow:0 0 8px rgba(93,255,154,0.9); }
+:root:root:root .ss-stage.ss-galaxy .ss-badge{ background:#5dff9a; color:#03100b; border:2px solid #03100b; box-shadow:0 0 10px rgba(93,255,154,0.8); }
+:root:root:root .ss-stage.ss-galaxy .ss-badge.medium{ background:#ffc21a; } :root:root:root .ss-stage.ss-galaxy .ss-badge.hard{ background:#ff5a4a; color:#fff; }
+/* the combo: a strip of amber lamps */
+:root:root:root .ss-stage.ss-galaxy .ss-combo{ background:#051209; border:2px solid #2a6a44; box-shadow:inset 0 0 12px rgba(93,255,154,0.2); color:#d6ffe4; }
+:root:root:root .ss-stage.ss-galaxy .ss-pips i{ background:#0c2a1c; box-shadow:inset 0 0 0 2px #2a6a44; }
+:root:root:root .ss-stage.ss-galaxy .ss-pips i.on{ background:radial-gradient(circle at 38% 32%, #ffffff, #ffd23f 45%, #e08a00); box-shadow:0 0 10px 2px rgba(255,194,26,0.9); }
+:root:root:root .ss-stage.ss-galaxy .ss-combo.hot{ border-color:#ffc21a; box-shadow:0 0 14px rgba(255,194,26,0.6); }
+/* THE SCOPE */
+:root:root:root .ss-galaxy .ss-vortex{ width:min(94vw, 58vh, 720px); }
+:root:root:root .ss-galaxy .ss-vimg{ inset:0; -webkit-mask-image:none; mask-image:none; border-radius:50%; box-sizing:border-box; border:7px solid #c9d2e6;
+  background:
+    linear-gradient(rgba(93,255,154,0.55), rgba(93,255,154,0.55)) 50% 50% / 100% 1.5px no-repeat, linear-gradient(rgba(93,255,154,0.55), rgba(93,255,154,0.55)) 50% 50% / 1.5px 100% no-repeat,
+    repeating-radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 0 17.5%, rgba(93,255,154,0.6) 17.5% 18.1%, rgba(0,0,0,0) 18.1% 25%),
+    radial-gradient(circle at 50% 50%, #0f5a36 0%, #06301d 55%, #021209 100%);
+  box-shadow:0 0 0 3px #1a2330, 0 0 0 9px #5d6686, 0 0 0 12px #1a2330, 0 0 34px 8px rgba(93,255,154,0.45), inset 0 0 40px rgba(0,0,0,0.75); }
+:root:root:root .ss-galaxy .ss-vspin{ inset:7px; -webkit-mask-image:none; mask-image:none; border-radius:50%; opacity:1;
+  background:conic-gradient(from 0deg, rgba(93,255,154,0) 0deg, rgba(93,255,154,0) 280deg, rgba(93,255,154,0.16) 320deg, rgba(160,255,200,0.75) 359deg, rgba(93,255,154,0) 360deg);
+  animation:ssVortex 4s linear infinite; will-change:transform; }
+:root:root:root .ss-galaxy .ss-ring{ inset:-4.5%; width:109%; height:109%; }
+:root:root:root .ss-galaxy .ss-ring .seg{ stroke:#ffc21a; stroke-width:4.5; filter:none; }
+:root:root:root .ss-galaxy .ss-ring .seg.off{ opacity:0.16; }
+:root:root:root .ss-late .ss-ring .seg{ stroke:#ff5a4a; filter:none; }
+/* the saucer at the centre of the scope (seen from above): a chrome disc, a gold hub, a ring of lights */
+:root:root:root .ss-galaxy .ss-core{ width:20%; margin:-10% 0 0 -10%; border:3px solid #021209; box-sizing:border-box;
+  background:radial-gradient(circle, #fffbe0 0 14%, #ffc21a 15% 27%, #7a4a00 28% 31%, #e9eefb 32% 52%, #8f98b5 53% 66%, #3c4466 67% 100%); box-shadow:0 0 0 3px rgba(160,255,200,0.7), 0 0 22px 6px rgba(93,255,154,0.75); }
+/* the blips */
+:root:root:root .ss-galaxy .ss-word{ min-height:46px; padding:8px 16px 8px 30px; position:relative; font:900 clamp(17px, 5vw, 22px)/1.05 var(--f-display, sans-serif); letter-spacing:0.8px; color:#f2fff6; touch-action:manipulation;
+  background:linear-gradient(180deg, rgba(22,70,44,0.94) 0%, rgba(4,22,12,0.96) 60%, rgba(10,40,24,0.95) 100%); border:2px solid #7dffb0; box-shadow:0 0 14px 2px rgba(93,255,154,0.65), inset 0 1px 0 rgba(255,255,255,0.3); text-shadow:0 0 6px rgba(93,255,154,0.7); }
+:root:root:root .ss-galaxy .ss-word.fits{ border-color:#7dffb0; }
+:root:root:root .ss-galaxy .ss-word::before{ content:''; position:absolute; left:11px; top:50%; width:11px; height:11px; margin-top:-5.5px; border-radius:50%; background:radial-gradient(circle, #ffffff 0 30%, #5dff9a 60%); box-shadow:0 0 8px 2px rgba(93,255,154,0.9); animation:ssBlip 1.2s ease-in-out infinite alternate; }
+@keyframes ssBlip{ from{ opacity:0.45; } to{ opacity:1; } }
+:root.lite .ss-galaxy .ss-word::before{ animation:none; } @media (prefers-reduced-motion: reduce){ .ss-galaxy .ss-word::before{ animation:none; } }
+:root:root:root .ss-galaxy .ss-trail{ background:radial-gradient(circle, #ffffff, rgba(93,255,154,0.85) 45%, rgba(93,255,154,0) 72%); }
+/* a right tap: locked on, gold and green; a wrong tap: red */
+:root:root:root .ss-galaxy .ss-fly.right{ color:#03100b; border-color:#fffbe0; background:linear-gradient(180deg, #fffbe0, #b8ff6a 50%, #2fd96b); box-shadow:0 0 0 3px #ffd23f, 0 0 26px 6px rgba(184,255,106,1); text-shadow:none; }
+:root:root:root .ss-galaxy .ss-fly.wrong{ color:#fff; border-color:#ffd0d0; background:linear-gradient(180deg, #ff9a8a, #ff3a3a 52%, #9a0a16); box-shadow:0 0 0 3px #5a0408, 0 0 26px 6px rgba(255,58,58,1); text-shadow:none; }
+:root:root:root .ss-galaxy .ss-fly.right::before, :root:root:root .ss-galaxy .ss-fly.wrong::before{ background:#03100b; box-shadow:none; animation:none; }
+:root:root:root .ss-galaxy .ss-spark{ background:#ffd23f; } :root:root:root .ss-galaxy .ss-spark.bad{ background:#ff5a4a; }
+:root:root:root .ss-galaxy .ss-glow.win{ background:radial-gradient(circle at 50% 50%, rgba(184,255,106,0.55), rgba(184,255,106,0) 62%); }
+:root:root:root .ss-galaxy .ss-glow.lose{ background:radial-gradient(circle at 50% 50%, rgba(255,58,58,0.6), rgba(255,58,58,0) 66%); }
+:root:root:root:root .ss-galaxy .ss-vortex{ width:min(90vw, 39svh, 620px); height:min(90vw, 39svh, 620px); aspect-ratio:auto; }
+:root:root:root:root .mg-snapSort .mg-rule{ padding:4px 10px; font-size:clamp(13px, 3.7vw, 17px); }
+:root:root:root:root .ss-stage.ss-galaxy .ss-cat{ font-size:clamp(30px, 9.6vw, 56px); padding:6px 12px 8px; }
+
+/* ==== VS CARDS, pushed further: the space world is now as loud as the cards. Full-colour cartoon stickers with dark outlines live on every card (the
+   same drawing style as Twin Flip's faces): on the top card a gold ringed planet in one corner and a flying saucer with its beam in the other; on
+   the bottom card a green alien peeking up over the edge and a rocket blasting off. The mothership in the gap is bigger and has a glass dome. The
+   stickers are still pictures (small inline SVGs); only the two existing pattern drifts and the beam's slow pulse move. ==== */
+:root:root.mode-daily #board .half.top > .gloss::before{ right:-18px; top:-16px; left:auto; bottom:auto; width:124px; height:124px; border-radius:0; box-shadow:none; transform:none; border:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23221a4a' stroke-width='3.4' stroke-linejoin='round' stroke-linecap='round'%3E%3Ccircle cx='52' cy='48' r='27' fill='%23ffb347'/%3E%3Cpath d='M27 40 Q52 30 77 40' stroke='%23e07a1a' stroke-width='5'/%3E%3Cpath d='M26 54 Q52 46 78 54' stroke='%23ffd9a0' stroke-width='4'/%3E%3Cg transform='rotate(-20 52 48)'%3E%3Cellipse cx='52' cy='48' rx='46' ry='11' stroke-width='10'/%3E%3Cellipse cx='52' cy='48' rx='46' ry='11' stroke='%23fff3c4' stroke-width='5'/%3E%3C/g%3E%3Ccircle cx='14' cy='16' r='4' fill='%23fff'/%3E%3C/svg%3E") center / contain no-repeat; }
+:root:root.mode-daily #board .half.top > .gloss::after{ left:6px; top:34px; right:auto; bottom:auto; width:92px; height:92px; border:0; border-radius:0; transform:rotate(-10deg);
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23221a4a' stroke-width='3.6' stroke-linejoin='round' stroke-linecap='round'%3E%3Cpath d='M36 52 L18 94 H82 L64 52Z' fill='%23fff07a' fill-opacity='.8' stroke-width='2.6'/%3E%3Cpath d='M31 40 C31 14 69 14 69 40Z' fill='%239fe8ff'/%3E%3Cellipse cx='50' cy='44' rx='44' ry='14' fill='%23e9eefb'/%3E%3Cg fill='%23ff4fa3' stroke-width='2.2'%3E%3Ccircle cx='22' cy='46' r='4.4'/%3E%3Ccircle cx='50' cy='51' r='4.4'/%3E%3Ccircle cx='78' cy='46' r='4.4'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat; }
+:root:root.mode-daily #board .half.bottom > .gloss::before{ left:auto; right:6px; bottom:-8px; top:auto; width:104px; height:104px; border-radius:0; box-shadow:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23221a4a' stroke-width='3.4' stroke-linejoin='round' stroke-linecap='round'%3E%3Cpath d='M38 30 L30 10 M62 30 L70 10'/%3E%3Ccircle cx='29' cy='8' r='5' fill='%23ffd23f'/%3E%3Ccircle cx='71' cy='8' r='5' fill='%23ffd23f'/%3E%3Cpath d='M50 22 C76 22 86 44 82 66 C80 80 74 92 70 100 H30 C26 92 20 80 18 66 C14 44 24 22 50 22Z' fill='%236fe04a'/%3E%3Cpath d='M26 56 C34 48 46 54 46 68 C36 74 26 68 26 56Z' fill='%23111'/%3E%3Cpath d='M74 56 C66 48 54 54 54 68 C64 74 74 68 74 56Z' fill='%23111'/%3E%3Ccircle cx='33' cy='59' r='3' fill='%23fff' stroke='none'/%3E%3Ccircle cx='61' cy='59' r='3' fill='%23fff' stroke='none'/%3E%3Cpath d='M43 84 Q50 89 57 84'/%3E%3C/svg%3E") center bottom / contain no-repeat; }
+:root:root.mode-daily #board .half.bottom > .gloss::after{ left:4px; top:30px; right:auto; bottom:auto; width:84px; height:84px; border-radius:0; box-shadow:none; transform:rotate(32deg);
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' fill='none' stroke='%23221a4a' stroke-width='3.6' stroke-linejoin='round' stroke-linecap='round'%3E%3Cpath d='M40 70 Q50 100 60 70Z' fill='%23ffb81f'/%3E%3Cpath d='M36 56 L20 78 L36 72Z' fill='%23ff3c5a'/%3E%3Cpath d='M64 56 L80 78 L64 72Z' fill='%23ff3c5a'/%3E%3Cpath d='M50 6 C64 20 68 42 64 70 H36 C32 42 36 20 50 6Z' fill='%23f4f6ff'/%3E%3Cpath d='M50 6 C57 13 62 21 64 30 H36 C38 21 43 13 50 6Z' fill='%23ff3c5a'/%3E%3Ccircle cx='50' cy='44' r='8' fill='%233fb6ff'/%3E%3C/svg%3E") center / contain no-repeat; }
+/* the mothership: bigger, with a glass dome over the VS */
+:root:root.mode-daily #board .divider::before{ width:min(270px, 70vw); height:76px; margin:-38px 0 0 calc(min(270px, 70vw) / -2); }
+:root:root:root:root.mode-daily #board .divider{ box-shadow:0 -14px 0 -4px rgba(190,245,255,0.55), 0 -14px 0 -1px #1b1440; border-radius:50%; }
+/* the pattern behind the pictures, a little brighter */
+:root:root.mode-daily #board .half > .dd-back, :root:root.mode-daily #board .half > .dd-front{ opacity:1; filter:none; }
+
+/* ==== TWIN FLIP, pushed further: the dark area at the top is now the MOTHERSHIP itself, drawn properly (a small inline SVG): a chrome hull with a
+   teal glass dome, three round windows with grey aliens looking down at the table, a row of gold landing lights and a glowing emitter that the
+   tractor beam comes out of. The title hangs under it as its neon sign. Matched pairs glow gold-and-teal as if held in the beam. Still picture. ==== */
+:root:root:root:root .mg-twinFlip:has(.tf-space) .mg-bg::before{ left:50%; top:0; width:min(118%, 620px); height:clamp(150px, 23svh, 230px); margin:0 0 0 calc(min(118%, 620px) / -2); border:0; border-radius:0; box-shadow:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 200' preserveAspectRatio='xMidYMin slice'%3E%3Cdefs%3E%3ClinearGradient id='h' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23f4f8ff'/%3E%3Cstop offset='.45' stop-color='%23aab6d6'/%3E%3Cstop offset='.5' stop-color='%235d6a92'/%3E%3Cstop offset='1' stop-color='%23283358'/%3E%3C/linearGradient%3E%3CradialGradient id='d' cx='.4' cy='.25' r='.9'%3E%3Cstop offset='0' stop-color='%23eaffff'/%3E%3Cstop offset='.5' stop-color='%237df9ff'/%3E%3Cstop offset='1' stop-color='%230e7a9a'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath d='M118 62 C118 -6 282 -6 282 62Z' fill='url(%23d)' stroke='%230c1838' stroke-width='4'/%3E%3Cellipse cx='200' cy='96' rx='214' ry='56' fill='url(%23h)' stroke='%230c1838' stroke-width='4'/%3E%3Cellipse cx='200' cy='78' rx='150' ry='22' fill='none' stroke='%23ffffff' stroke-opacity='.55' stroke-width='3'/%3E%3Cg stroke='%230c1838' stroke-width='3.5'%3E%3Ccircle cx='120' cy='92' r='22' fill='%23062a44'/%3E%3Ccircle cx='200' cy='98' r='24' fill='%23062a44'/%3E%3Ccircle cx='280' cy='92' r='22' fill='%23062a44'/%3E%3C/g%3E%3Cg id='a'%3E%3Cpath d='M200 82 C212 82 216 92 214 101 C212 110 205 118 200 118 C195 118 188 110 186 101 C184 92 188 82 200 82Z' fill='%23c5c9d4' stroke='%23161a30' stroke-width='2'/%3E%3Cpath d='M189 97 C193 94 198 97 198 103 C193 105 189 102 189 97Z M211 97 C207 94 202 97 202 103 C207 105 211 102 211 97Z' fill='%23101220'/%3E%3C/g%3E%3Cuse href='%23a' transform='translate(-80 -6) scale(.92) translate(17 8)'/%3E%3Cuse href='%23a' transform='translate(80 -6) scale(.92) translate(17 8)'/%3E%3Cg fill='%23ffd23f' stroke='%237a4a00' stroke-width='1.5'%3E%3Ccircle cx='40' cy='118' r='6'/%3E%3Ccircle cx='84' cy='131' r='6'/%3E%3Ccircle cx='140' cy='141' r='6'/%3E%3Ccircle cx='260' cy='141' r='6'/%3E%3Ccircle cx='316' cy='131' r='6'/%3E%3Ccircle cx='360' cy='118' r='6'/%3E%3C/g%3E%3Cellipse cx='200' cy='150' rx='40' ry='9' fill='%23eaffff' stroke='%230c1838' stroke-width='3'/%3E%3C/svg%3E") center top / 100% 100% no-repeat; }
+:root:root:root:root .mg-twinFlip:has(.tf-space) .mg-bg::after{ inset:clamp(110px, 17svh, 172px) 0 10% 0; clip-path:polygon(40% 0, 60% 0, 100% 100%, 0 100%); background:linear-gradient(180deg, rgba(200,252,255,0.75) 0%, rgba(39,230,255,0.28) 30%, rgba(39,230,255,0.06) 100%); }
+/* room for the ship above the sign */
+:root:root:root:root:root .tf-stage.tf-space .tf-title{ margin-top:clamp(52px, 9.4svh, 96px); }
+:root:root:root:root:root .tf-stage.tf-space.tf-space .tf-grid{ width:min(100%, 900px, calc((100dvh - 292px) * 0.77)); }
+@media (max-height:700px){ :root:root:root:root:root .tf-stage.tf-space .tf-title{ margin-top:44px; } :root:root:root:root:root .tf-stage.tf-space.tf-space .tf-grid{ width:min(100%, 900px, calc((100dvh - 262px) * 0.77)); } }
+/* a matched pair: held in the beam - a gold-and-teal halo */
+:root:root:root:root:root .tf-stage.tf-space .tf-tile.done{ border-color:#ffd23f; box-shadow:inset 0 0 0 2px rgba(255,210,63,0.7), 0 5px 0 #030a1c, 0 0 0 3px rgba(125,249,255,0.85), 0 0 18px 5px rgba(125,249,255,0.7); }
+:root:root:root:root:root .tf-stage.tf-space .tf-tile.done::after{ border-color:#bff8ff; box-shadow:0 0 14px 4px #27e6ff, inset 0 0 10px rgba(255,210,63,0.8); }
+
+/* ==== FACT OR FIB, layout fix and polish: the two buttons always sit wholly inside the cabinet, clear of the timer bar and the score chip. The
+   cabinet stops 20 px above the foot (room for its base), the dial and buttons keep their size, and the ticket window is the part that gives:
+   it takes whatever height is left (never less than 78 px; the text already shrinks to fit it). A chrome kick-plate with vents finishes the base. ==== */
+:root:root:root:root:root:root:root .ff-stage.ff-warm.ff-lie{ margin-bottom:20px; padding-bottom:14px; justify-content:flex-start; }
+:root:root:root:root:root:root .ff-stage.ff-warm.ff-lie .ff-bubble{ flex:1 1 0; min-height:78px; }
+:root:root:root:root:root:root .ff-stage.ff-warm.ff-lie .ff-btns{ flex:none; margin-top:2px; }
+:root:root:root:root:root:root .ff-stage.ff-warm.ff-lie .ff-gauge, :root:root:root:root:root:root .ff-stage.ff-warm.ff-lie .ff-sub, :root:root:root:root:root:root .ff-stage.ff-warm.ff-lie .ff-dots{ flex:none; }
+@media (max-height:700px){ :root:root:root:root:root:root:root:root .ff-warm.ff-lie .ff-gauge{ width:min(60%, calc(12svh * 1.5625), 300px); } :root:root:root:root:root:root .ff-stage.ff-warm.ff-lie .ff-btn{ width:clamp(84px, min(28vw, 13.5svh), 120px); } :root:root:root:root:root:root:root .ff-stage.ff-warm.ff-lie{ margin-top:24px; margin-bottom:16px; padding:6px 10px 10px; } }
+/* the buttons' deck: a darker inset panel so they read as mounted on the machine */
+:root:root:root:root:root:root .ff-stage.ff-warm.ff-lie .ff-btns{ align-self:stretch; padding:8px 6px 10px; border-radius:18px; background:linear-gradient(180deg, #0f6a60, #0a4a44); box-shadow:inset 0 3px 8px rgba(0,0,0,0.45), 0 0 0 2px #baffef; }
+
+/* ==== VS cards cleanup: no stickers on the cards (planet, saucer, alien, rocket removed); the mothership behind VS redrawn as one clean saucer -
+   a teal glass dome round the gold VS coin, a chrome hull with a dark rim and a row of gold lights; the beam stays faint. ==== */
+:root:root:root.mode-daily #board .half > .gloss::before, :root:root:root.mode-daily #board .half > .gloss::after{ display:none !important; }
+:root:root:root:root.mode-daily #board .divider{ box-shadow:none; border-radius:50%; }
+:root:root:root.mode-daily #board .divider::before{ width:min(250px, 66vw); height:58px; margin:-20px 0 0 calc(min(250px, 66vw) / -2); border:3px solid #0c1838; border-radius:50%;
+  background:
+    radial-gradient(circle, #fffbe0 0 3px, #ffc21a 4.2px, rgba(255,194,26,0) 5.8px) 50% 62% / 24px 12px repeat-x,
+    linear-gradient(180deg, #f4f8ff 0%, #c9d2e8 34%, #8692b4 50%, #4a5578 51%, #2a3458 100%);
+  box-shadow:0 4px 0 #0c1838, 0 0 20px 3px rgba(125,249,255,0.55); }
+:root:root:root.mode-daily #board .divider::after{ width:86px; height:86px; margin:-52px 0 0 -43px; clip-path:none; border-radius:50%; z-index:-1; animation:none; opacity:1;
+  background:radial-gradient(circle at 38% 30%, rgba(255,255,255,0.85) 0 8%, rgba(190,248,255,0.55) 30%, rgba(39,180,220,0.45) 70%, rgba(14,90,130,0.6) 100%);
+  border:3px solid #0c1838; box-sizing:border-box; }
+/* (VS saucer, take 2: the gold VS coin sits in front, centred on a chrome hull; a teal glass dome rises behind it out of the hull's top) */
+:root:root:root:root:root.mode-daily #board .divider{ border:3px solid #7a3d00; border-radius:50%;
+  background:radial-gradient(circle at 34% 28%, #fffbe0 0%, #ffe680 22%, #ffc21a 52%, #e09a00 86%); color:#4a1d00; text-shadow:0 1px 0 rgba(255,255,255,0.6);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,0.75), inset 0 -4px 0 rgba(122,61,0,0.35), 0 3px 0 #5a2a00, 0 0 14px rgba(255,210,63,0.7); }
+:root:root:root:root.mode-daily #board .divider::before{ width:min(270px, 70vw); height:48px; margin:-14px 0 0 calc(min(270px, 70vw) / -2); border:3px solid #0c1838;
+  background:
+    radial-gradient(circle, #fffbe0 0 3px, #ff4fa8 4.2px, rgba(255,79,168,0) 5.8px) 50% 58% / 26px 12px repeat-x,
+    linear-gradient(180deg, #ffffff 0%, #d4dcef 30%, #9aa6c6 48%, #56628a 52%, #3a4570 78%, #222b4a 100%);
+  box-shadow:0 4px 0 #0c1838, 0 0 22px 4px rgba(125,249,255,0.6); }
+:root:root:root:root.mode-daily #board .divider::after{ width:112px; height:56px; margin:-50px 0 0 -56px; border-radius:56px 56px 0 0; border:3px solid #0c1838; border-bottom:0; z-index:-2;
+  background:radial-gradient(ellipse at 36% 30%, rgba(255,255,255,0.9) 0 10%, rgba(190,248,255,0.75) 34%, #27b8dc 78%, #0e6a92 100%); }
+/* (VS saucer, take 3: the whole saucer is one drawing behind the coin - glass dome, chrome hull, pink lights - and the gold coin is drawn on top of it,
+   both under the VS lettering) */
+:root:root:root:root:root:root.mode-daily #board .divider{ background:none; border:0; box-shadow:none; }
+:root:root:root:root:root.mode-daily #board .divider::before{ width:min(290px, 76vw); height:110px; margin:-62px 0 0 calc(min(290px, 76vw) / -2); border:0; border-radius:0; box-shadow:none; z-index:-2;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 290 110'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.38' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23ffffff'/%3E%3Cstop offset='.35' stop-color='%23c8faff'/%3E%3Cstop offset='1' stop-color='%231a8fb8'/%3E%3C/radialGradient%3E%3ClinearGradient id='h' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23ffffff'/%3E%3Cstop offset='.42' stop-color='%23b7c2dc'/%3E%3Cstop offset='.5' stop-color='%23606c94'/%3E%3Cstop offset='1' stop-color='%23262f52'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M85 62 C85 4 205 4 205 62Z' fill='url(%23g)' stroke='%230c1838' stroke-width='4'/%3E%3Cpath d='M104 30 C112 18 126 13 138 13' fill='none' stroke='%23fff' stroke-width='5' stroke-linecap='round' opacity='.8'/%3E%3Cellipse cx='145' cy='70' rx='140' ry='30' fill='url(%23h)' stroke='%230c1838' stroke-width='4'/%3E%3Cpath d='M22 66 Q145 52 268 66' fill='none' stroke='%23fff' stroke-opacity='.7' stroke-width='3'/%3E%3Cg fill='%23ff4fa8' stroke='%23fff' stroke-width='2'%3E%3Ccircle cx='38' cy='76' r='5'/%3E%3Ccircle cx='70' cy='83' r='5'/%3E%3Ccircle cx='220' cy='83' r='5'/%3E%3Ccircle cx='252' cy='76' r='5'/%3E%3C/g%3E%3Cpath d='M110 99 L100 108 M180 99 L190 108' stroke='%237df9ff' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+  filter:drop-shadow(0 0 10px rgba(125,249,255,0.6)); }
+:root:root:root:root:root.mode-daily #board .divider::after{ width:58px; height:58px; margin:-29px 0 0 -29px; border-radius:50%; border:3px solid #7a3d00; box-sizing:border-box; z-index:-1; clip-path:none; opacity:1; animation:none;
+  background:radial-gradient(circle at 34% 28%, #fffbe0 0%, #ffe680 22%, #ffc21a 52%, #e09a00 86%); box-shadow:inset 0 2px 0 rgba(255,255,255,0.75), 0 3px 0 #5a2a00, 0 0 12px rgba(255,210,63,0.8); }
+
+/* ==== FACT OR FIB, new setting: the TRUTH-O-TRON stands on a moon. The red theatre curtain is gone; behind the turquoise machine is deep-space navy
+   with stars, a huge warm ringed planet rising (coral and gold - it sets the turquoise off), two retro atomic starbursts, and a pale cratered moon
+   surface along the bottom for the machine to stand on. Still picture: gradients and one small inline drawing. ==== */
+:root:root:root:root:root:root:root:root .mg-overlay.mg-factOrFib:has(.ff-warm){
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 844' preserveAspectRatio='xMidYMax slice'%3E%3Cdefs%3E%3CradialGradient id='p' cx='.36' cy='.3' r='.85'%3E%3Cstop offset='0' stop-color='%23ffe9a8'/%3E%3Cstop offset='.45' stop-color='%23ff9a5a'/%3E%3Cstop offset='1' stop-color='%23b8402a'/%3E%3C/radialGradient%3E%3ClinearGradient id='m' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23e9edf8'/%3E%3Cstop offset='1' stop-color='%237f8aa8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cg fill='%23fff'%3E%3Ccircle cx='30' cy='70' r='1.6'/%3E%3Ccircle cx='350' cy='120' r='1.4'/%3E%3Ccircle cx='70' cy='260' r='1.2'/%3E%3Ccircle cx='372' cy='300' r='1.6'/%3E%3Ccircle cx='18' cy='420' r='1.3'/%3E%3Ccircle cx='200' cy='40' r='1.2'/%3E%3Ccircle cx='300' cy='230' r='1.1'/%3E%3Ccircle cx='376' cy='520' r='1.4'/%3E%3Ccircle cx='14' cy='600' r='1.4'/%3E%3C/g%3E%3Ccircle cx='330' cy='330' r='150' fill='url(%23p)'/%3E%3Cg fill='none' stroke='%23d86a3a' stroke-width='9' opacity='.55'%3E%3Cpath d='M192 300 Q330 262 470 300'/%3E%3Cpath d='M186 352 Q330 318 474 352'/%3E%3C/g%3E%3Cellipse cx='330' cy='330' rx='236' ry='40' fill='none' stroke='%23fff3c4' stroke-width='10' opacity='.9' transform='rotate(-16 330 330)'/%3E%3Cg stroke='%23ffd23f' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M48 150 v-22 M48 150 v22 M48 150 h-22 M48 150 h22 M48 150 l-14 -14 M48 150 l14 14 M48 150 l-14 14 M48 150 l14 -14'/%3E%3Cpath d='M26 330 v-13 M26 330 v13 M26 330 h-13 M26 330 h13'/%3E%3C/g%3E%3Ccircle cx='48' cy='150' r='5' fill='%23fff6c2'/%3E%3Cpath d='M-20 760 Q195 700 410 760 V844 H-20Z' fill='url(%23m)'/%3E%3Cg fill='%236a7596' opacity='.55'%3E%3Cellipse cx='70' cy='790' rx='26' ry='8'/%3E%3Cellipse cx='300' cy='812' rx='34' ry='9'/%3E%3Cellipse cx='200' cy='768' rx='16' ry='5'/%3E%3C/g%3E%3C/svg%3E") center bottom / cover no-repeat,
+    radial-gradient(ellipse 90% 50% at 70% 36%, rgba(255,150,90,0.3), rgba(255,150,90,0) 72%),
+    linear-gradient(180deg, #071a3a 0%, #0b2a52 50%, #06142e 100%) !important; }
+:root:root:root:root:root:root .mg-factOrFib:has(.ff-warm) .mg-act{ background:#06142e !important; border-color:#45e0cf !important; color:#baffef !important; }
+
+/* ==== SNAP SORT, colour and life: "COSMIC RADAR". Layout: the category plate sits directly under the ROUND pill, the combo row under that, and the
+   scope is much bigger (the rule box is not shown here: the explainer card and the host's line carry it). Colour: the deck is deep space navy with
+   pink and teal nebula glows and stars; the scope's glass is midnight blue with cyan range rings, a magenta cross-hair and a cyan-to-pink sweep,
+   inside a chrome bezel with gold timer lamps; every blip is a bright candy capsule - pink, cyan, gold, lime, orange in turn (the colour is by
+   order only and says nothing about right or wrong). The mission plate is hot pink and gold. ==== */
+:root:root:root:root:root.stage-on .mg-overlay.mg-snapSort, :root:root:root:root:root .mg-overlay.mg-snapSort{
+  background:
+    radial-gradient(circle at 10% 12%, #fff 0 1.3px, rgba(255,255,255,0) 2px), radial-gradient(circle at 86% 8%, #fff 0 1.4px, rgba(255,255,255,0) 2.2px), radial-gradient(circle at 94% 40%, #bff8ff 0 1.2px, rgba(255,255,255,0) 2px),
+    radial-gradient(circle at 5% 52%, #fff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 70% 94%, #fff 0 1.3px, rgba(255,255,255,0) 2px), radial-gradient(circle at 22% 90%, #ffd0ec 0 1.2px, rgba(255,255,255,0) 2px),
+    radial-gradient(ellipse 70% 34% at 12% 30%, rgba(255,79,168,0.4), rgba(255,79,168,0) 72%),
+    radial-gradient(ellipse 70% 36% at 92% 70%, rgba(39,230,255,0.35), rgba(39,230,255,0) 72%),
+    radial-gradient(ellipse 60% 26% at 50% 100%, rgba(255,160,60,0.3), rgba(255,160,60,0) 72%),
+    linear-gradient(180deg, #0a1440 0%, #0b1e54 50%, #060c2a 100%) !important; }
+:root:root:root:root:root .mg-snapSort .mg-rule{ display:none !important; }
+:root:root:root:root .mg-snapSort .mg-sign{ background:linear-gradient(180deg, #101c4c, #070d2c) !important; border:2px solid #27e6ff !important; box-shadow:0 0 14px rgba(39,230,255,0.7), inset 0 1px 0 rgba(255,255,255,0.22) !important; }
+:root:root:root:root .mg-snapSort .mg-sign span{ color:#fff6c2; text-shadow:0 0 6px #ffd23f, 0 0 16px rgba(255,190,40,0.95), 0 0 30px rgba(255,120,60,0.6); }
+:root:root:root:root .mg-snapSort .mg-act{ background:#070d2c; border-color:#ff4fa8; color:#ffd0ec; box-shadow:0 0 8px rgba(255,79,168,0.5); }
+/* the mission plate: hot pink and gold */
+:root:root:root:root .ss-stage.ss-galaxy .ss-cat{ order:-2; margin-top:0; background:linear-gradient(180deg, #e0127a, #8a0a4a) !important; border:3px solid #ffd23f !important;
+  box-shadow:0 0 0 3px #3a0420, 0 0 18px rgba(255,79,168,0.75), inset 0 2px 0 rgba(255,255,255,0.35) !important; color:#fff6c2; text-shadow:0 3px 0 #5a0530, 0 0 14px rgba(255,210,63,0.7); }
+:root:root:root:root .ss-stage.ss-galaxy .ss-cat small{ color:#ffe27a; text-shadow:none; letter-spacing:4px; }
+:root:root:root:root .ss-stage.ss-galaxy .ss-combo{ order:-1; background:#070d2c; border:2px solid #27e6ff; color:#eafcff; box-shadow:0 0 10px rgba(39,230,255,0.4); }
+:root:root:root:root .ss-stage.ss-galaxy .ss-pips i{ background:#101c4c; box-shadow:inset 0 0 0 2px #27e6ff; }
+:root:root:root:root .ss-stage.ss-galaxy{ gap:8px; }
+/* the scope: bigger, midnight blue glass, cyan rings, a magenta cross-hair, a cyan-to-pink sweep */
+:root:root:root:root:root .ss-galaxy .ss-vortex{ width:min(94vw, 50svh, 700px); height:min(94vw, 50svh, 700px); }
+:root:root:root:root .ss-galaxy .ss-vimg{ border-color:#dfe9ff;
+  background:
+    linear-gradient(rgba(255,79,168,0.7), rgba(255,79,168,0.7)) 50% 50% / 100% 1.5px no-repeat, linear-gradient(rgba(255,79,168,0.7), rgba(255,79,168,0.7)) 50% 50% / 1.5px 100% no-repeat,
+    repeating-radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 0 17.5%, rgba(39,230,255,0.75) 17.5% 18.1%, rgba(0,0,0,0) 18.1% 25%),
+    radial-gradient(circle at 50% 50%, #1c4fae 0%, #0f2a78 50%, #070f3a 100%);
+  box-shadow:0 0 0 3px #1a2330, 0 0 0 9px #7b85a6, 0 0 0 12px #1a2330, 0 0 34px 8px rgba(39,230,255,0.5), inset 0 0 40px rgba(0,0,20,0.7); }
+:root:root:root:root .ss-galaxy .ss-vspin{ background:conic-gradient(from 0deg, rgba(39,230,255,0) 0deg, rgba(39,230,255,0) 270deg, rgba(39,230,255,0.22) 315deg, rgba(255,120,200,0.8) 359deg, rgba(255,120,200,0) 360deg); }
+:root:root:root:root .ss-galaxy .ss-core{ box-shadow:0 0 0 3px rgba(190,248,255,0.8), 0 0 22px 6px rgba(39,230,255,0.8); }
+/* the blips: bright candy capsules, a colour each in turn */
+:root:root:root:root .ss-galaxy .ss-word{ color:#0a1030; text-shadow:0 1px 0 rgba(255,255,255,0.5); border:2.5px solid #ffffff; background:linear-gradient(180deg, var(--b1, #ffe27a), var(--b2, #ffb81f)); box-shadow:0 4px 0 var(--b3, #8a5a00), 0 0 16px 3px var(--b4, rgba(255,210,63,0.75)); }
+:root:root:root:root .ss-galaxy .ss-word.fits{ border-color:#ffffff; }
+:root:root:root:root .ss-galaxy .ss-word::before{ background:#0a1030; box-shadow:0 0 0 2px rgba(255,255,255,0.7); }
+.ss-galaxy .ss-item:nth-child(5n+1) .ss-word{ --b1:#ff9ad0; --b2:#ff4fa8; --b3:#8a0a4a; --b4:rgba(255,79,168,0.8); }
+.ss-galaxy .ss-item:nth-child(5n+2) .ss-word{ --b1:#a8f6ff; --b2:#27d6f0; --b3:#07517a; --b4:rgba(39,230,255,0.8); }
+.ss-galaxy .ss-item:nth-child(5n+3) .ss-word{ --b1:#ffe27a; --b2:#ffb81f; --b3:#8a5a00; --b4:rgba(255,210,63,0.8); }
+.ss-galaxy .ss-item:nth-child(5n+4) .ss-word{ --b1:#c8ff8a; --b2:#5ad93a; --b3:#1a6a0a; --b4:rgba(120,255,90,0.8); }
+.ss-galaxy .ss-item:nth-child(5n+5) .ss-word{ --b1:#ffc08a; --b2:#ff7a2a; --b3:#8a3200; --b4:rgba(255,140,60,0.8); }
+:root:root:root:root .ss-galaxy .ss-trail{ background:radial-gradient(circle, #ffffff, rgba(255,160,220,0.85) 45%, rgba(255,160,220,0) 72%); }
+:root:root:root:root .ss-galaxy .ss-fly.right{ background:linear-gradient(180deg, #fffbe0, #b8ff6a 50%, #2fd96b); color:#03100b; }
+:root:root:root:root .ss-galaxy .ss-fly.wrong{ background:linear-gradient(180deg, #ff9a8a, #ff3a3a 52%, #9a0a16); color:#fff; text-shadow:none; }
+:root:root:root:root:root .ss-stage.ss-galaxy{ margin-top:-12px; }
+
+/* ==== THE GAME TITLE CARD, redesigned: "tonight's next game, live from orbit". One composition for every game, tinted by the game's own two
+   colours (--gi-a, --gi-b) so each card still looks like its game: a deep-space sky with stars and a nebula glow in the game's colour; a mothership
+   across the top that the three spotlight beams come out of; the game's icon standing on a glowing halo ring; the title as a neon sign - a dark
+   glass plate, a neon tube border and big glowing lettering in the game's colour, gold bulbs round it; and a planet horizon lit in the game's colour
+   along the bottom. Motion: unchanged (the existing beam sweep and the sign / icon pop). ==== */
+:root:root .show-card.gintro{ background:#050b24; gap:18px; }
+:root:root .show-card.gintro .gi-bg{ opacity:1;
+  background:
+    radial-gradient(circle at 12% 22%, #fff 0 1.3px, rgba(255,255,255,0) 2px), radial-gradient(circle at 84% 16%, #fff 0 1.5px, rgba(255,255,255,0) 2.3px), radial-gradient(circle at 92% 44%, #fff 0 1.1px, rgba(255,255,255,0) 1.9px),
+    radial-gradient(circle at 6% 58%, #fff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 74% 70%, #fff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 28% 78%, #fff 0 1px, rgba(255,255,255,0) 1.8px),
+    radial-gradient(ellipse 150% 24% at 50% 110%, #071230 0 60%, var(--gi-a) 61.5%, color-mix(in srgb, var(--gi-a) 45%, transparent) 65%, rgba(0,0,0,0) 84%),
+    radial-gradient(ellipse 100% 46% at 50% 46%, color-mix(in srgb, var(--gi-b) 70%, transparent) 0%, rgba(0,0,0,0) 72%),
+    radial-gradient(ellipse 70% 30% at 50% 44%, color-mix(in srgb, var(--gi-a) 38%, transparent) 0%, rgba(0,0,0,0) 70%),
+    linear-gradient(180deg, #040a22 0%, #0a1a44 48%, #040a22 100%); }
+/* the mothership the beams come from */
+:root:root .show-card.gintro .gi-bg::before{ content:''; position:absolute; left:50%; top:0; width:min(120%, 640px); height:clamp(120px, 19svh, 190px); margin-left:calc(min(120%, 640px) / -2);
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 160' preserveAspectRatio='xMidYMin slice'%3E%3Cdefs%3E%3ClinearGradient id='h' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23f4f8ff'/%3E%3Cstop offset='.45' stop-color='%23aab6d6'/%3E%3Cstop offset='.5' stop-color='%235d6a92'/%3E%3Cstop offset='1' stop-color='%23232d52'/%3E%3C/linearGradient%3E%3CradialGradient id='d' cx='.4' cy='.25' r='.9'%3E%3Cstop offset='0' stop-color='%23ffffff'/%3E%3Cstop offset='.5' stop-color='%23bff8ff'/%3E%3Cstop offset='1' stop-color='%231a8fb8'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath d='M130 40 C130 -24 270 -24 270 40Z' fill='url(%23d)' stroke='%230c1838' stroke-width='4'/%3E%3Cellipse cx='200' cy='62' rx='214' ry='50' fill='url(%23h)' stroke='%230c1838' stroke-width='4'/%3E%3Cellipse cx='200' cy='46' rx='150' ry='18' fill='none' stroke='%23fff' stroke-opacity='.55' stroke-width='3'/%3E%3Cg fill='%23ffd23f' stroke='%237a4a00' stroke-width='1.5'%3E%3Ccircle cx='40' cy='82' r='6'/%3E%3Ccircle cx='96' cy='96' r='6'/%3E%3Ccircle cx='304' cy='96' r='6'/%3E%3Ccircle cx='360' cy='82' r='6'/%3E%3C/g%3E%3Cg fill='%23eaffff' stroke='%230c1838' stroke-width='3'%3E%3Cellipse cx='60' cy='104' rx='22' ry='6'/%3E%3Cellipse cx='200' cy='112' rx='34' ry='8'/%3E%3Cellipse cx='340' cy='104' rx='22' ry='6'/%3E%3C/g%3E%3C/svg%3E") center top / 100% 100% no-repeat; }
+/* the icon on its halo */
+:root:root .show-card.gintro .gi-icon{ font-size:clamp(78px, 24vw, 118px); filter:drop-shadow(0 8px 0 rgba(0,0,20,0.4)); padding:18px 26px 6px; }
+:root:root .show-card.gintro .gi-icon::after{ content:''; position:absolute; z-index:-1; left:50%; bottom:-6px; width:clamp(150px, 46vw, 230px); height:clamp(34px, 10vw, 52px); margin-left:calc(clamp(150px, 46vw, 230px) / -2); border-radius:50%;
+  border:3px solid var(--gi-a); background:radial-gradient(ellipse closest-side, color-mix(in srgb, var(--gi-a) 75%, #ffffff) 0%, color-mix(in srgb, var(--gi-a) 35%, transparent) 60%, rgba(0,0,0,0) 100%); box-shadow:0 0 22px 4px color-mix(in srgb, var(--gi-a) 70%, transparent); }
+/* the neon sign */
+:root:root:root .show-card.gintro .gi-sign{ padding:18px 30px 20px; border-radius:20px; background:linear-gradient(180deg, #0d1a48, #050b24); border:3px solid var(--gi-a); max-width:88vw;
+  box-shadow:0 0 0 3px #03061a, 0 0 22px 4px color-mix(in srgb, var(--gi-a) 75%, transparent), inset 0 0 22px color-mix(in srgb, var(--gi-a) 30%, transparent), 0 14px 26px -8px rgba(0,0,0,0.7); }
+:root:root:root .show-card.gintro .gi-sign span{ color:#ffffff; font:900 clamp(40px, 12.4vw, 76px)/0.98 var(--f-display, sans-serif); letter-spacing:2px; -webkit-text-stroke:0; background:none; -webkit-text-fill-color:#ffffff;
+  text-shadow:0 0 6px #ffffff, 0 0 16px var(--gi-a), 0 0 34px var(--gi-a), 0 0 60px var(--gi-a), 0 3px 0 rgba(0,0,20,0.6); }
+:root:root:root .show-card.gintro .gi-line{ padding:8px 16px; border-radius:99px; background:rgba(3,6,26,0.72); box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--gi-a) 70%, transparent); color:#ffffff; font-size:clamp(18px, 5vw, 24px); text-shadow:none; }
+:root:root .gi-beam{ mix-blend-mode:screen; }
+/* (title card, pushed: a fan of light rays in the game's colour behind the sign, a bigger and brighter planet below, brighter lettering) */
+:root:root .show-card.gintro .gi-bg::after{ content:''; position:absolute; left:50%; top:52%; width:170vmax; height:170vmax; margin:-85vmax 0 0 -85vmax; border-radius:50%; pointer-events:none;
+  background:repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--gi-a) 55%, transparent) 0deg 7deg, rgba(0,0,0,0) 7deg 18deg);
+  -webkit-mask-image:radial-gradient(circle closest-side, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 28%, rgba(0,0,0,0) 62%); mask-image:radial-gradient(circle closest-side, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 28%, rgba(0,0,0,0) 62%); }
+:root:root:root .show-card.gintro .gi-bg{
+  background:
+    radial-gradient(circle at 12% 22%, #fff 0 1.3px, rgba(255,255,255,0) 2px), radial-gradient(circle at 84% 26%, #fff 0 1.5px, rgba(255,255,255,0) 2.3px), radial-gradient(circle at 92% 44%, #fff 0 1.1px, rgba(255,255,255,0) 1.9px),
+    radial-gradient(circle at 6% 58%, #fff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 74% 70%, #fff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 28% 74%, #fff 0 1px, rgba(255,255,255,0) 1.8px),
+    radial-gradient(ellipse 130% 34% at 50% 112%, color-mix(in srgb, var(--gi-a) 55%, #0a1638) 0 30%, color-mix(in srgb, var(--gi-a) 22%, #071230) 60%, #ffffff 60.6%, var(--gi-a) 62%, color-mix(in srgb, var(--gi-a) 50%, transparent) 66%, rgba(0,0,0,0) 86%),
+    radial-gradient(ellipse 100% 46% at 50% 50%, color-mix(in srgb, var(--gi-a) 42%, transparent) 0%, rgba(0,0,0,0) 72%),
+    linear-gradient(180deg, #040a22 0%, #0c1e50 50%, #050b28 100%); }
+:root:root:root:root .show-card.gintro .gi-sign span{ color:color-mix(in srgb, var(--gi-a) 30%, #ffffff); -webkit-text-fill-color:currentColor;
+  text-shadow:0 0 5px #ffffff, 0 0 14px var(--gi-a), 0 0 30px var(--gi-a), 0 0 54px var(--gi-a), 0 4px 0 rgba(0,0,20,0.7); }
+
+/* ==== ZAP WORDS, new setting: "storm planet". The flat orange sunburst becomes a place: a hot dusk sky running from deep magenta down to
+   orange and gold, a huge sun on the horizon, dark rock mesas along the bottom, two lightning bolts forking down the sides, and the letter grid
+   mounted on a dark indigo POWER BOARD with an electric-yellow rim and corner bolts so the white tiles really pop. Only colours and backgrounds
+   change: the tiles' size, spacing and positions are exactly as before (the board is a layer behind the grid, it takes no room). Still picture. ==== */
+:root:root:root:root.stage-on .mg-overlay.mg-zapWords, :root:root:root:root .mg-overlay.mg-zapWords{
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 844' preserveAspectRatio='xMidYMax slice'%3E%3Cdefs%3E%3CradialGradient id='s' cx='.5' cy='.5' r='.5'%3E%3Cstop offset='0' stop-color='%23fffbe0'/%3E%3Cstop offset='.6' stop-color='%23ffd23f'/%3E%3Cstop offset='1' stop-color='%23ff8a2e'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='195' cy='770' r='170' fill='url(%23s)'/%3E%3Cg fill='none' stroke='%23fff6a0' stroke-width='5' stroke-linejoin='round' stroke-linecap='round'%3E%3Cpath d='M30 0 L14 70 L34 78 L10 170 L26 178 L6 250' opacity='.95'/%3E%3Cpath d='M362 0 L378 60 L358 70 L382 150 L366 160 L384 236' opacity='.95'/%3E%3C/g%3E%3Cg fill='none' stroke='%2327e6ff' stroke-width='2' stroke-linejoin='round'%3E%3Cpath d='M30 0 L14 70 L34 78 L10 170 L26 178 L6 250'/%3E%3Cpath d='M362 0 L378 60 L358 70 L382 150 L366 160 L384 236'/%3E%3C/g%3E%3Cpath d='M0 844 V760 l22 -8 l10 -40 h36 l8 34 l30 10 l14 -22 h30 l10 30 l44 12 l30 -14 l16 -38 h40 l10 44 l30 6 l18 -26 h28 l12 24 V844Z' fill='%234a0a3a'/%3E%3Cpath d='M0 844 V800 l40 -12 l50 14 l60 -16 l70 18 l60 -14 l60 12 l50 -10 V844Z' fill='%232a0626'/%3E%3C/svg%3E") center bottom / cover no-repeat,
+    linear-gradient(180deg, #7a0a5a 0%, #d6126e 24%, #ff5a4a 52%, #ff9a2e 78%, #ffd23f 100%) !important; }
+:root:root:root:root .mg-overlay.mg-zapWords .mg-bg::before{ opacity:0.14; }
+/* the power board behind the grid (a layer only: it takes no room and moves nothing) */
+:root:root:root .zw-stage .zw-grid.sq{ position:relative; isolation:isolate; }
+:root:root:root .zw-stage .zw-grid.sq::before{ content:''; position:absolute; z-index:-1; inset:-9px; border-radius:22px; pointer-events:none; border:3px solid #ffe14a;
+  background:
+    radial-gradient(circle at 12px 12px, #ffe14a 0 3px, #1a0a3a 4px 5.4px, rgba(0,0,0,0) 6px), radial-gradient(circle at calc(100% - 12px) 12px, #ffe14a 0 3px, #1a0a3a 4px 5.4px, rgba(0,0,0,0) 6px),
+    radial-gradient(circle at 12px calc(100% - 12px), #ffe14a 0 3px, #1a0a3a 4px 5.4px, rgba(0,0,0,0) 6px), radial-gradient(circle at calc(100% - 12px) calc(100% - 12px), #ffe14a 0 3px, #1a0a3a 4px 5.4px, rgba(0,0,0,0) 6px),
+    linear-gradient(180deg, #2a1466 0%, #1a0a44 100%);
+  box-shadow:0 0 0 3px #1a0a3a, 0 0 22px 4px rgba(255,225,74,0.75), 0 10px 0 3px rgba(42,6,38,0.7); }
+:root:root:root:root .zw-stage .zw-grid.sq .zw-cell svg .hx{ fill:#fffdf4; stroke:#ffe14a; stroke-width:2.5; }
+:root:root:root:root .zw-stage .zw-grid.sq .zw-cell svg{ filter:drop-shadow(0 3px 0 rgba(10,2,40,0.55)); }
+.mg-zapWords .mg-rule{ text-shadow:0 2px 0 #5a0540; }
+:root:root:root:root .zw-stage .zw-grid.sq::before{ inset:-7px; box-shadow:0 0 0 3px #1a0a3a, 0 0 22px 4px rgba(255,225,74,0.75); }
+.zw-stage .zw-foot{ position:relative; z-index:2; }
+
+/* ==== SAUCER SHUFFLE, new setting: "the landing pad". The busy neon wall is gone - the three chrome saucers were lost against it. Now they hover
+   over a round landing pad on a small blue world: a deep cobalt sky with stars, a coral ringed planet high on one side, soft teal and coral nebula
+   glows, and a wide pad of concentric neon rings (gold, coral, cyan) under the saucers with a pool of light on it. Each saucer has a glow under it so
+   it reads at a glance. Colour family: cobalt, coral and gold. Still picture: gradients only. ==== */
+:root:root:root:root:root.stage-on .mg-overlay.mg-saucerShuffle, :root:root:root:root:root .mg-overlay.mg-saucerShuffle{
+  background:
+    radial-gradient(circle at 10% 14%, #fff 0 1.3px, rgba(255,255,255,0) 2px), radial-gradient(circle at 78% 10%, #fff 0 1.5px, rgba(255,255,255,0) 2.3px), radial-gradient(circle at 92% 34%, #fff 0 1.2px, rgba(255,255,255,0) 2px),
+    radial-gradient(circle at 6% 40%, #bff8ff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 60% 26%, #fff 0 1px, rgba(255,255,255,0) 1.8px), radial-gradient(circle at 34% 6%, #fff 0 1.1px, rgba(255,255,255,0) 1.9px),
+    radial-gradient(ellipse 30% 2.6% at 84% 27%, rgba(0,0,0,0) 0 60%, #fff3c4 63% 82%, rgba(0,0,0,0) 85%),
+    radial-gradient(circle at 84% 27%, #ffe0cc 0 3%, #ff7a5a 7%, #b83a22 9.6%, rgba(0,0,0,0) 10%),
+    radial-gradient(ellipse 46% 9% at 50% 66%, rgba(255,246,190,0.55), rgba(255,246,190,0) 72%),
+    radial-gradient(ellipse 62% 13% at 50% 68%, rgba(0,0,0,0) 0 54%, #ffd23f 55.5% 58%, rgba(0,0,0,0) 59.5% 68%, #ff7a5a 69.5% 72%, rgba(0,0,0,0) 73.5% 84%, #27e6ff 85.5% 88.5%, rgba(0,0,0,0) 90%),
+    radial-gradient(ellipse 70% 15% at 50% 68%, #16357a 0 88%, rgba(0,0,0,0) 89%),
+    radial-gradient(ellipse 150% 30% at 50% 108%, #0f2a66 0 62%, #27e6ff 63.2%, rgba(39,230,255,0.4) 66%, rgba(0,0,0,0) 84%),
+    radial-gradient(ellipse 70% 30% at 14% 34%, rgba(39,230,255,0.28), rgba(39,230,255,0) 72%),
+    radial-gradient(ellipse 70% 30% at 88% 52%, rgba(255,122,90,0.26), rgba(255,122,90,0) 72%),
+    linear-gradient(180deg, #06123a 0%, #0c2466 52%, #050c2c 100%) !important; }
+:root:root:root .mg-overlay.mg-saucerShuffle::before, :root:root:root .mg-overlay.mg-saucerShuffle::after{ display:none !important; }
+:root:root:root .mg-saucerShuffle .sc-curtain, :root:root:root .mg-saucerShuffle .sc-blaze.wall, :root:root:root .mg-saucerShuffle .sc-blaze.floor{ display:none !important; }
+:root:root:root .mg-saucerShuffle .sc-casino, :root:root:root .mg-saucerShuffle .sc-table{ background:none !important; border-color:transparent !important; box-shadow:none !important; }
+/* the saucers: a pool of light under each */
+:root:root .su-saucer .su-img{ filter:drop-shadow(0 0 10px rgba(190,248,255,0.85)) drop-shadow(0 10px 8px rgba(0,0,30,0.55)); }
+:root:root:root .mg-saucerShuffle .sc-panel{ background:linear-gradient(180deg, #0f2a66, #06123a); border:3px solid #ffd23f; box-shadow:0 0 16px rgba(255,210,63,0.6); }
+:root:root:root .mg-saucerShuffle .su-panels{ display:none !important; }
+
+/* ==== VS CARDS, "THE ORBIT STAGE" (first-impression pass). The two cards are two lit stages in space with the show's mothership hovering between
+   them. Behind everything: deep-space navy with stars and soft pink and teal nebula glows (no purple spotlights). Each card keeps its own bold
+   colour and the faint space pattern, and gains show lighting: a soft pool of light on the side nearest the mothership and a gentle darkening
+   toward the far corners, so the card looks lit from the ship. The picture stands on a glowing hover-pad. The name sits on a neon marquee plate
+   (dark glass, a bright white tube border, a soft glow). The mothership is redrawn - glass dome, chrome hull, a soft cyan under-glow, the gold VS
+   coin in its centre - with six rim lights that blink alternately (opacity only, one change every 0.5 s). The hint is a clear gold pill.
+   Nothing sits on top of the cards' pictures or names. ==== */
+:root:root.mode-daily .show-bg.w-vs{
+  background:
+    radial-gradient(circle at 8% 6%, #fff 0 1.3px, rgba(255,255,255,0) 2px), radial-gradient(circle at 92% 12%, #fff 0 1.4px, rgba(255,255,255,0) 2.2px), radial-gradient(circle at 96% 52%, #bff8ff 0 1.2px, rgba(255,255,255,0) 2px),
+    radial-gradient(circle at 3% 50%, #fff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 50% 98%, #fff 0 1.2px, rgba(255,255,255,0) 2px),
+    radial-gradient(ellipse 80% 30% at 0% 50%, rgba(39,230,255,0.45), rgba(39,230,255,0) 72%), radial-gradient(ellipse 80% 30% at 100% 50%, rgba(255,79,168,0.45), rgba(255,79,168,0) 72%),
+    linear-gradient(180deg, #050b28 0%, #0b1c52 50%, #050b28 100%) !important; }
+:root:root.mode-daily .show-bg.w-vs > *{ opacity:0.12; }
+/* show lighting on each card (behind the content): a pool of light toward the ship, darker far corners */
+:root:root:root:root.mode-daily #board .half > .gloss::before{ display:block !important; content:''; position:absolute; inset:0; left:0; right:0; top:0; bottom:0; width:auto; height:auto; border-radius:0; transform:none; border:0; box-shadow:none; pointer-events:none; }
+:root:root:root:root.mode-daily #board .half.top > .gloss::before{ background:radial-gradient(ellipse 70% 46% at 50% 104%, rgba(255,255,255,0.55), rgba(255,255,255,0) 72%), radial-gradient(ellipse 120% 90% at 50% 100%, rgba(0,0,30,0) 55%, rgba(0,0,40,0.34) 100%); }
+:root:root:root:root.mode-daily #board .half.bottom > .gloss::before{ background:radial-gradient(ellipse 70% 46% at 50% -4%, rgba(255,255,255,0.55), rgba(255,255,255,0) 72%), radial-gradient(ellipse 120% 90% at 50% 0%, rgba(0,0,30,0) 55%, rgba(0,0,40,0.34) 100%); }
+/* the picture on its hover-pad */
+:root.mode-daily #board .half:not(.revealed) .scene{ position:relative; }
+:root.mode-daily #board .half:not(.revealed) .scene::after{ content:''; position:absolute; z-index:-1; left:50%; bottom:-4%; width:132%; height:26%; margin-left:-66%; border-radius:50%; pointer-events:none;
+  border:3px solid rgba(255,255,255,0.9); background:radial-gradient(ellipse closest-side, rgba(255,255,255,0.75), rgba(255,255,255,0.18) 62%, rgba(255,255,255,0)); box-shadow:0 0 18px 4px rgba(255,255,255,0.55); }
+/* the name: a neon marquee plate */
+:root:root.mode-daily #board .half:not(.revealed) .content{ background:linear-gradient(180deg, rgba(13,26,72,0.94), rgba(5,11,36,0.96)); border:3px solid #ffffff; border-radius:18px;
+  box-shadow:0 0 0 3px rgba(5,11,36,0.85), 0 0 18px 3px rgba(255,255,255,0.6), inset 0 0 16px rgba(125,249,255,0.28); }
+:root:root:root.mode-daily #board .half:not(.revealed) .take{ text-shadow:0 0 10px rgba(125,249,255,0.55), 0 3px 0 rgba(0,0,30,0.7); letter-spacing:0.5px; }
+/* the mothership: one drawing with the coin in it, and a blinking layer of rim lights over it */
+:root:root:root:root:root:root.mode-daily #board .divider::before{ width:min(310px, 80vw); height:118px; margin:-66px 0 0 calc(min(310px, 80vw) / -2); z-index:-2; border:0; border-radius:0; box-shadow:none; filter:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 310 118'%3E%3Cdefs%3E%3CradialGradient id='g' cx='.38' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23fff'/%3E%3Cstop offset='.35' stop-color='%23c8faff'/%3E%3Cstop offset='1' stop-color='%231a8fb8'/%3E%3C/radialGradient%3E%3ClinearGradient id='h' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff'/%3E%3Cstop offset='.4' stop-color='%23bcc7e0'/%3E%3Cstop offset='.5' stop-color='%23606c94'/%3E%3Cstop offset='1' stop-color='%23222b4e'/%3E%3C/linearGradient%3E%3CradialGradient id='c' cx='.36' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23fffbe0'/%3E%3Cstop offset='.35' stop-color='%23ffe680'/%3E%3Cstop offset='.7' stop-color='%23ffc21a'/%3E%3Cstop offset='1' stop-color='%23d98e00'/%3E%3C/radialGradient%3E%3CradialGradient id='u'%3E%3Cstop offset='0' stop-color='%237df9ff' stop-opacity='.85'/%3E%3Cstop offset='1' stop-color='%237df9ff' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cellipse cx='155' cy='74' rx='155' ry='42' fill='url(%23u)'/%3E%3Cpath d='M93 62 C93 0 217 0 217 62Z' fill='url(%23g)' stroke='%230c1838' stroke-width='4'/%3E%3Cpath d='M112 30 C120 17 134 11 147 11' fill='none' stroke='%23fff' stroke-width='5' stroke-linecap='round' opacity='.85'/%3E%3Cellipse cx='155' cy='72' rx='146' ry='30' fill='url(%23h)' stroke='%230c1838' stroke-width='4'/%3E%3Cpath d='M26 68 Q155 52 284 68' fill='none' stroke='%23fff' stroke-opacity='.75' stroke-width='3'/%3E%3Cg fill='%237a1050' stroke='%230c1838' stroke-width='2'%3E%3Ccircle cx='34' cy='76' r='6'/%3E%3Ccircle cx='66' cy='84' r='6'/%3E%3Ccircle cx='100' cy='89' r='6'/%3E%3Ccircle cx='210' cy='89' r='6'/%3E%3Ccircle cx='244' cy='84' r='6'/%3E%3Ccircle cx='276' cy='76' r='6'/%3E%3C/g%3E%3Ccircle cx='155' cy='66' r='31' fill='url(%23c)' stroke='%237a3d00' stroke-width='4'/%3E%3Ccircle cx='155' cy='66' r='24' fill='none' stroke='%23fff6c2' stroke-opacity='.7' stroke-width='2'/%3E%3C/svg%3E") center / contain no-repeat; }
+:root:root:root:root:root:root.mode-daily #board .divider::after{ width:min(310px, 80vw); height:118px; margin:-66px 0 0 calc(min(310px, 80vw) / -2); z-index:-1; border:0; border-radius:0; box-shadow:none; clip-path:none; box-sizing:border-box;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 310 118'%3E%3Cg fill='%23fff' stroke='%23ff4fa8' stroke-width='3'%3E%3Ccircle cx='34' cy='76' r='5'/%3E%3Ccircle cx='100' cy='89' r='5'/%3E%3Ccircle cx='244' cy='84' r='5'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 310 118'%3E%3Cg fill='%23fff6a0' stroke='%23ffc21a' stroke-width='3'%3E%3Ccircle cx='66' cy='84' r='5'/%3E%3Ccircle cx='210' cy='89' r='5'/%3E%3Ccircle cx='276' cy='76' r='5'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat;
+  animation:vsRim 1s steps(1) infinite; opacity:1; }
+@keyframes vsRim{ 0%{ opacity:1; } 50%{ opacity:0.25; } }
+:root.lite.mode-daily #board .divider::after{ animation:none !important; } @media (prefers-reduced-motion: reduce){ :root.mode-daily #board .divider::after{ animation:none !important; } }
+/* the hint: a clear gold pill */
+:root:root.mode-daily .hint{ align-self:center; width:max-content; max-width:92%; margin:6px auto calc(8px + env(safe-area-inset-bottom)); padding:9px 20px; border-radius:99px; background:linear-gradient(180deg, #fff3a8, #ffc21a); color:#2a1000;
+  font:900 clamp(15px, 4.4vw, 19px)/1 var(--f-display, sans-serif); letter-spacing:1.5px; text-transform:uppercase; box-shadow:0 0 0 2px #7a4a00, 0 4px 0 2px #5a2a00, 0 0 16px rgba(255,210,63,0.6); }
+
+/* ==== THE FRAME: "the neon orbit" (the default; ?frame=bulbs brings back the old gold bulbs). One light style for the whole show: a thin
+   glowing neon tube round the screen in a strong colour from the screen's own family (--tube, set in flipstax.html syncTube), a white-hot
+   core line inside the tube, a soft static glow, and small white sparks riding the tube - the old bulbs' four groups fading in turn (opacity
+   only). The tube is 3 px wide, centred 8 px in from the edge. The marquee's states (miss, strobe, unison, disco) keep their own colours.
+   The VS cards' own edge bulbs are replaced by the same tube in white, so there is one light style on screen. ==== */
+:root.frame-new .show-frame{ border-color:transparent !important; box-shadow:none !important; background:none !important; }
+:root.frame-new .show-marquee::before{ content:''; position:fixed; inset:6.5px; border-radius:21px; pointer-events:none; border:3px solid var(--tube, var(--bulb, #ffc83a));
+  box-shadow:0 0 16px 3px var(--tube, var(--bulb, #ffc83a)), 0 0 4px 1px var(--tube, var(--bulb, #ffc83a)), inset 0 0 14px 2px var(--tube, var(--bulb, #ffc83a)); }
+:root.frame-new .show-marquee::after{ content:''; position:fixed; inset:7.5px; border-radius:20px; pointer-events:none; border:1px solid rgba(255,255,255,0.8); }
+:root.frame-new .show-marquee i{ width:6px !important; height:6px !important; margin:-3px 0 0 -3px !important; border-radius:50% !important; border:0 !important; }
+:root.frame-new .show-marquee:not(.miss):not(.strobe):not(.unison):not(.disco) i{ background:#ffffff !important; box-shadow:0 0 7px 2px rgba(255,255,255,0.85) !important; }
+:root.frame-new:has(#luckyOverlay:not(.hidden)) .show-marquee{ --tube:#ff4fb4 !important; }
+/* the VS cards: the edge bulbs go; each card is edged by one white neon tube with a soft glow */
+:root.frame-new.mode-daily #board .mq-ring{ display:none !important; }
+:root:root.frame-new.mode-daily #board .half:not(.picked)::after{ border:3px solid #ffffff; box-shadow:0 0 12px 2px rgba(255,255,255,0.7), inset 0 0 12px 1px rgba(255,255,255,0.45); }
+
+/* ==== THE RESULTS, "THE SCORECARD" (look only; the share picture is untouched). The eight candy tiles become one dark-glass scorecard edged by
+   the show's gold neon tube: a header line (GALACTIC GAME NIGHT - EPISODE #N), the final score as the hero in big gold numerals, and the six
+   other stats as quiet glass tiles, each number in its own neon colour. The small score pill above is hidden once the card shows (the card's
+   hero replaces it). Life after the confetti: a soft halo breathes behind the score, a sheen crosses it every few seconds and two stars
+   twinkle (transform and opacity only, slow). SHARE stays the one gold button; the coffee button becomes a quieter glass button. ==== */
+:root:root:root #readoutOverlay.ep.outro-on .outro.end .outro-badge{ opacity:0 !important; }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats{ position:relative; display:grid; grid-template-columns:repeat(3, 1fr); gap:7px; width:100%; max-width:372px; padding:10px 12px 12px; border-radius:22px;
+  background:linear-gradient(180deg, rgba(22,12,70,0.95), rgba(7,4,32,0.97)); border:3px solid #ffc83a; outline:1px solid rgba(255,255,255,0.75); outline-offset:-2.5px;
+  box-shadow:0 0 18px 3px rgba(255,200,58,0.65), inset 0 0 16px 1px rgba(255,200,58,0.3); }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os{ position:relative; padding:8px 2px 7px; gap:4px; border-radius:12px; border:1.5px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.07); box-shadow:none; }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os b{ font-size:30px; color:#ffe27a; text-shadow:0 2px 0 rgba(0,0,0,0.55); }
+:root:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os small{ font-size:11.5px; font-weight:800; letter-spacing:0.6px; color:rgba(255,255,255,0.92); }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.ok b{ color:#4dff95; } :root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.str b{ color:#ff8ad0; }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.flz b{ color:#cdb0ff; } :root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.ltr b{ color:#5ff4ff; }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.orb b{ color:#ffa25a; }
+/* the header line */
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.ep{ grid-column:1 / -1; order:-2; flex-direction:row; justify-content:center; align-items:baseline; gap:7px; padding:2px 0 8px; border:0; border-bottom:1.5px solid rgba(255,200,58,0.45); border-radius:0; background:none; }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.ep::before{ content:'GALACTIC GAME NIGHT \00B7'; font:800 12px/1 var(--f-body, Inter, sans-serif); letter-spacing:2px; color:#5ff4ff; white-space:nowrap; }
+:root:root:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.ep small{ order:1; font:800 12px/1 var(--f-body, Inter, sans-serif); letter-spacing:2px; color:#5ff4ff; }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.ep b{ order:2; font-size:20px; color:#ffffff; text-shadow:0 0 10px rgba(95,244,255,0.8); }
+/* the hero: the final score */
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.pts:first-child{ grid-column:1 / -1; order:-1; flex-direction:column-reverse; gap:2px; padding:8px 0 6px; border:0; background:none; overflow:hidden; }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.pts:first-child b{ position:relative; z-index:1; font-size:clamp(76px, 25vw, 104px); line-height:0.92; letter-spacing:2px; color:#ffe27a;
+  text-shadow:0 2px 0 #fff6c8, 0 6px 0 #b86400, 0 9px 0 rgba(40,10,0,0.7), 0 0 30px rgba(255,200,60,0.75); }
+:root:root:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.pts:first-child small{ position:relative; z-index:1; font-size:14px; letter-spacing:5px; color:#ffffff; text-shadow:0 0 10px rgba(255,200,58,0.9); }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.pts:first-child::before{ content:''; position:absolute; left:8%; right:8%; top:6%; bottom:0; border-radius:50%; pointer-events:none;
+  background:radial-gradient(closest-side, rgba(255,190,60,0.5), rgba(255,120,200,0.18) 60%, rgba(255,190,60,0)); animation:scHalo 3.2s ease-in-out infinite alternate; }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats .os.pts:first-child::after{ content:''; position:absolute; z-index:2; top:0; bottom:0; left:0; width:26%; pointer-events:none;
+  background:linear-gradient(100deg, rgba(255,255,255,0), rgba(255,255,255,0.4) 50%, rgba(255,255,255,0)); transform:translateX(-140%); animation:scSheen 5s ease-in-out 1.2s infinite; }
+@keyframes scHalo{ from{ opacity:0.45; transform:scale(0.92); } to{ opacity:1; transform:scale(1.06); } }
+@keyframes scSheen{ 0%{ transform:translateX(-140%); } 38%, 100%{ transform:translateX(520%); } }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats::before, :root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats::after{ content:'\2726'; position:absolute; z-index:2; top:62px; font-size:22px; line-height:1; color:#fff6c8;
+  text-shadow:0 0 10px #ffc83a; pointer-events:none; animation:scTwinkle 2.6s ease-in-out infinite; }
+:root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats::before{ left:26px; } :root:root:root #readoutOverlay.ep.outro-on .outro-end .outro-stats::after{ right:26px; top:104px; font-size:16px; animation-delay:-1.3s; }
+@keyframes scTwinkle{ 0%, 100%{ opacity:0.15; transform:scale(0.6) rotate(0deg); } 50%{ opacity:1; transform:scale(1.15) rotate(30deg); } }
+:root.lite #readoutOverlay .outro-stats::before, :root.lite #readoutOverlay .outro-stats::after, :root.lite #readoutOverlay .outro-stats .os.pts:first-child::before, :root.lite #readoutOverlay .outro-stats .os.pts:first-child::after{ animation:none !important; }
+@media (prefers-reduced-motion: reduce){ #readoutOverlay .outro-stats::before, #readoutOverlay .outro-stats::after, #readoutOverlay .outro-stats .os.pts:first-child::before, #readoutOverlay .outro-stats .os.pts:first-child::after{ animation:none !important; } }
+/* the headline a little smaller (the score is the hero), the coffee button quieter than SHARE */
+:root:root:root #readoutOverlay.ep.outro-on .outro .outro-end .outro-mid .outro-head{ font-size:clamp(24px, 7.4vw, 32px); letter-spacing:2px; color:#ffffff; text-shadow:0 0 14px rgba(95,244,255,0.85), 0 2px 0 rgba(10,4,40,0.9); }
+:root:root:root #readoutOverlay.ep.outro-on .outro.end .outro-donate{ background:linear-gradient(180deg, rgba(22,12,70,0.95), rgba(7,4,32,0.97)) !important; border:2px solid #ffc83a !important; color:#ffe27a !important; box-shadow:0 0 10px rgba(255,200,58,0.4) !important; }
+:root:root:root #readoutOverlay.ep.outro-on .outro.blue.end .outro-end{ top:calc(16.5vh + 2px + env(safe-area-inset-top)); }
+:root:root:root #readoutOverlay.ep.outro-on .outro.end .outro-donate span{ color:#ffe27a !important; text-shadow:none !important; }
+
+/* ==== THE EXPLAINER CARD ("how to play", before a game), polish pass: it was a pale paper card on a flat backdrop - the one screen that did not
+   look like the show. Now: a starfield in the game's own colours, and a dark-glass card edged by the show's neon tube (the game's colour, a white
+   core line, a soft static glow); the title glows in the game's colour, the rule is white and larger, GOT IT stays the gold button. Still. ==== */
+:root:root .show-card.explainer{ background:
+  radial-gradient(circle at 12% 14%, #fff 0 1.3px, rgba(255,255,255,0) 2px), radial-gradient(circle at 84% 9%, #fff 0 1.5px, rgba(255,255,255,0) 2.3px), radial-gradient(circle at 70% 24%, #bff8ff 0 1.1px, rgba(255,255,255,0) 2px),
+  radial-gradient(circle at 24% 78%, #fff 0 1.4px, rgba(255,255,255,0) 2.2px), radial-gradient(circle at 90% 70%, #fff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 48% 92%, #ffe9a0 0 1.3px, rgba(255,255,255,0) 2.1px),
+  radial-gradient(circle at 6% 46%, #fff 0 1px, rgba(255,255,255,0) 1.8px), radial-gradient(circle at 60% 6%, #fff 0 1px, rgba(255,255,255,0) 1.8px),
+  radial-gradient(ellipse 90% 34% at 50% 44%, color-mix(in srgb, var(--gi-a, #b06bff) 42%, transparent), rgba(0,0,0,0) 72%),
+  radial-gradient(ellipse 70% 40% at 0% 100%, color-mix(in srgb, var(--gi-b, #27e6ff) 36%, transparent), rgba(0,0,0,0) 70%),
+  linear-gradient(180deg, #070a2c 0%, #150a44 55%, #070a2c 100%); }
+:root:root:root .show-card.explainer .ex-card{ background:linear-gradient(180deg, rgba(24,14,76,0.96), rgba(8,5,34,0.97)); border:3px solid var(--gi-a, #ffc83a); border-radius:22px; outline:1px solid rgba(255,255,255,0.75); outline-offset:-2.5px;
+  box-shadow:0 0 20px 3px var(--gi-a, #ffc83a), inset 0 0 16px 1px color-mix(in srgb, var(--gi-a, #ffc83a) 45%, transparent); color:#ffffff; }
+:root:root:root .show-card.explainer .ex-card::before{ display:none; }
+:root:root:root .show-card.explainer .ex-card .ex-head{ background:none; border-bottom:1.5px solid color-mix(in srgb, var(--gi-a, #ffc83a) 60%, transparent); padding:14px 18px 12px; }
+:root:root:root .show-card.explainer .ex-card .ex-head b{ color:#ffffff; text-shadow:0 0 14px var(--gi-a, #ffc83a), 0 0 4px var(--gi-a, #ffc83a), 0 2px 0 rgba(0,0,20,0.8); }
+:root:root:root .show-card.explainer .ex-card .ex-q{ background:var(--gi-a, #ffc83a); color:#0a0626; box-shadow:0 0 10px var(--gi-a, #ffc83a); }
+:root:root:root .show-card.explainer .ex-card .ex-text{ color:#ffffff; font-size:clamp(18px, 5vw, 21px); line-height:1.4; }
+:root:root:root .show-card.explainer .ex-card .ex-skip{ color:rgba(255,255,255,0.75); }
+
+/* ==== PEAK OR PLUNGE, polish pass (look only): it was a flat pink page with a paper card - the weakest game beside its neighbours. Now "the
+   summit at dusk on an alien world": a deep indigo sky falling to a magenta and coral horizon, stars, a ringed planet, and two ranges of dark
+   peaks with snow-lit tips. The title is a neon sign (dark plate, a coral tube, a white core line, green and pink arrows). Both cards are dark
+   glass edged by a neon tube - the known number in cyan, the mystery number in pink - with white names and big glowing values. All still. ==== */
+:root:root .mg-peakOrPlunge .mg-bg{ background:
+  radial-gradient(circle at 10% 9%, #fff 0 1.3px, rgba(255,255,255,0) 2px), radial-gradient(circle at 88% 6%, #fff 0 1.4px, rgba(255,255,255,0) 2.2px), radial-gradient(circle at 64% 16%, #bff8ff 0 1.1px, rgba(255,255,255,0) 2px),
+  radial-gradient(circle at 30% 22%, #fff 0 1px, rgba(255,255,255,0) 1.8px), radial-gradient(circle at 94% 34%, #fff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 4% 40%, #ffe9a0 0 1.2px, rgba(255,255,255,0) 2px),
+  radial-gradient(ellipse 90% 26% at 50% 86%, rgba(255,150,90,0.75), rgba(255,150,90,0) 72%),
+  linear-gradient(180deg, #080a34 0%, #1c1160 34%, #5a1c86 62%, #c2386a 84%, #ff8a5a 100%) !important; }
+:root:root .mg-peakOrPlunge .mg-bg .rays{ display:none !important; }
+:root:root .mg-peakOrPlunge .mg-bg::before{ content:''; position:absolute; right:-34px; top:12%; width:150px; height:150px; pointer-events:none; opacity:0.9;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 150'%3E%3Cdefs%3E%3CradialGradient id='p' cx='.35' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23ffd0a8'/%3E%3Cstop offset='.5' stop-color='%23ff7a8a'/%3E%3Cstop offset='1' stop-color='%237a2a9a'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='75' cy='75' r='40' fill='url(%23p)'/%3E%3Cellipse cx='75' cy='75' rx='68' ry='15' fill='none' stroke='%23ffe9a0' stroke-width='4' transform='rotate(-18 75 75)' opacity='.85'/%3E%3C/svg%3E") center / contain no-repeat; }
+:root:root .mg-peakOrPlunge .mg-bg::after{ inset:auto 0 0 0; height:30%; background:
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 200' preserveAspectRatio='none'%3E%3Cpath d='M0 200V120l50-60 40 44 60-90 56 84 44-50 60 70 50-58 40 50v90z' fill='%233a1470'/%3E%3Cpath d='M150 14l-18 27 12-6 8 8 8-10 10 8z' fill='%23ffd0e8'/%3E%3Cpath d='M0 200v-50l70-56 50 44 70-64 60 60 50-40 100 76v30z' fill='%2312083c'/%3E%3Cpath d='M190 74l-16 15 12-3 6 7 7-8 9 6z' fill='%23bff8ff'/%3E%3C/svg%3E") center bottom / 100% 100% no-repeat !important; }
+/* the sign */
+:root:root:root .mg-peakOrPlunge .mg-sign{ background:linear-gradient(180deg, #160c48, #070422) !important; border:3px solid #ff7a5a !important; border-radius:18px !important; outline:1px solid rgba(255,255,255,0.75); outline-offset:-2.5px;
+  box-shadow:0 0 18px 3px rgba(255,122,90,0.8), inset 0 0 14px rgba(255,122,90,0.4) !important; padding:10px 20px 11px !important; }
+:root:root:root .mg-peakOrPlunge .mg-sign .sign-bulbs{ display:none !important; }
+:root:root:root .mg-peakOrPlunge .mg-sign > span{ color:#fff3c4 !important; text-shadow:0 0 14px #ff7a5a, 0 0 4px #ff7a5a, 0 2px 0 rgba(0,0,20,0.8) !important; letter-spacing:2px; white-space:nowrap; }
+:root:root:root .mg-peakOrPlunge .mg-sign > span::before{ content:'\25B2'; margin-right:0.4em; font-size:0.72em; color:#4dff95; text-shadow:0 0 10px #4dff95; }
+:root:root:root .mg-peakOrPlunge .mg-sign > span::after{ content:'\25BC'; margin-left:0.4em; font-size:0.72em; color:#ff6ab0; text-shadow:0 0 10px #ff6ab0; }
+/* the cards */
+:root:root .mg-peakOrPlunge .pp-card{ background:linear-gradient(180deg, rgba(22,14,80,0.94), rgba(8,5,36,0.96)); color:#ffffff; border:3px solid #5ff4ff; border-radius:20px;
+  box-shadow:0 0 16px 2px rgba(95,244,255,0.6), inset 0 0 14px rgba(95,244,255,0.25); }
+:root:root .mg-peakOrPlunge .pp-card.pp-next{ border-color:#ff6ab0; box-shadow:0 0 16px 2px rgba(255,106,176,0.6), inset 0 0 14px rgba(255,106,176,0.25); }
+:root:root .mg-peakOrPlunge .pp-card.pp-next.right{ border-color:#4dff95; box-shadow:0 0 22px 4px rgba(77,255,149,0.75), inset 0 0 14px rgba(77,255,149,0.3); }
+:root:root .mg-peakOrPlunge .pp-card.pp-next.wrong{ border-color:#ff4a5a; box-shadow:0 0 22px 4px rgba(255,74,90,0.75), inset 0 0 14px rgba(255,74,90,0.3); }
+:root:root .mg-peakOrPlunge .pp-name{ color:#ffffff; text-align:center; }
+:root:root .mg-peakOrPlunge .pp-known .pp-val b{ color:#bffcff; text-shadow:0 0 16px rgba(95,244,255,0.85), 0 3px 0 rgba(0,0,30,0.7); }
+:root:root .mg-peakOrPlunge .pp-next .pp-val b{ color:#ffe27a; text-shadow:0 0 16px rgba(255,200,60,0.8), 0 3px 0 rgba(0,0,30,0.7); }
+:root:root .mg-peakOrPlunge .pp-next .pp-val b.pp-q{ color:#ff9ad0; text-shadow:0 0 16px rgba(255,106,176,0.95); }
+:root:root .mg-peakOrPlunge .pp-vs{ color:#ffffff; text-shadow:0 0 10px rgba(255,160,110,0.95), 0 2px 0 rgba(0,0,30,0.7); }
+:root:root .mg-peakOrPlunge .pp-btn{ border-color:#ffffff; box-shadow:0 5px 0 rgba(0,0,30,0.6), 0 0 14px rgba(255,255,255,0.35); text-shadow:0 2px 0 rgba(0,0,0,0.35); }
+:root:root:root:root .mg-overlay.mg-peakOrPlunge .mg-bg{ display:block !important; }
+
+/* ==== RIDDLE ROUND, polish pass (look only): the flat lime field behind the riddle is replaced by deep space in the riddle's own colour family -
+   a near-black green sky with stars and soft lime and teal nebula glows - so the lime neon sign, the riddle board and the answer bars are the
+   bright things on screen, as in the other games. The old rays and floating marks are dimmed far back. ==== */
+:root:root.mode-daily .show-bg.w-riddle, :root:root:root:root #eventOverlay.event-overlay.quiz-riddle, :root:root:root #evBg.w-riddle, :root:root.mode-infinity .bg.w-riddle{ background:
+  radial-gradient(circle at 9% 12%, #fff 0 1.3px, rgba(255,255,255,0) 2px), radial-gradient(circle at 90% 8%, #fff 0 1.4px, rgba(255,255,255,0) 2.2px), radial-gradient(circle at 96% 46%, #d6ff7a 0 1.2px, rgba(255,255,255,0) 2px),
+  radial-gradient(circle at 4% 58%, #fff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 52% 97%, #fff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 30% 30%, #bff8ff 0 1px, rgba(255,255,255,0) 1.8px),
+  radial-gradient(ellipse 90% 30% at 50% 16%, rgba(170,255,60,0.42), rgba(170,255,60,0) 72%), radial-gradient(ellipse 80% 34% at 100% 78%, rgba(40,220,200,0.36), rgba(40,220,200,0) 72%),
+  radial-gradient(ellipse 70% 30% at 0% 92%, rgba(190,255,70,0.3), rgba(190,255,70,0) 72%),
+  linear-gradient(180deg, #04160c 0%, #0a2c1a 46%, #06231c 78%, #030f12 100%) !important; }
+:root:root.mode-daily .show-bg.w-riddle > *, :root:root:root #evBg.w-riddle > *, :root:root.mode-infinity .bg.w-riddle > *{ opacity:0.14 !important; }
+
+/* ==== BRAIN BEAM, "THE ABDUCTION BEAM" (the show's signature screen; look only - the question, the answers and their order, scoring, timing, the
+   timer bar and the right / wrong verdict colours are untouched). A big chrome saucer with a little alien in its dome hovers at the top - the
+   saucer IS the title (BRAIN BEAM on its hull, the full difficulty line on its glowing belly). Its tractor beam pours down the whole screen:
+   rays fanning from the belly, glowing particles drifting down inside it. The question sits in the beam on a dark glass plate between two
+   lines of light. The four answers are full-width alien-tech bars stacked top to bottom: glossy capsules in a chrome bezel, each its own
+   colour, a big port-hole number badge on the round end, three status lights on the square end. At the foot: the curve of a teal planet, a
+   little alien and a dish. Colours: deep violet-black space with a magenta nebula, and ONE bold accent - electric yellow (the beam, the title,
+   the edge lines). When the player taps an answer the saucer fires a quick beam down onto that bar (flipstax.html, bbShot - a look only; it
+   runs only on the player's own tap). Movement: the saucer bobs, its rim lights swap, the rays breathe, the particles drift (transform and
+   opacity only). ==== */
+:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-beam{ --sw:min(calc(100vw - 16px), 384px); padding:4px 14px 88px; background:
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 100'%3E%3Cpath d='M62 96 V60' stroke='%23dfe4ff' stroke-width='4'/%3E%3Cpath d='M40 96 H84 L78 84 H46z' fill='%236a58c4'/%3E%3Cpath d='M36 40 Q62 78 88 40z' fill='%23dfe4ff' stroke='%232c1c74' stroke-width='2' transform='rotate(-24 62 52)'/%3E%3Ccircle cx='74' cy='34' r='4' fill='%23ff3aa8'/%3E%3Cg fill='none' stroke='%23ffe83a' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M84 22a14 14 0 0 1 10 10' /%3E%3Cpath d='M88 12a26 26 0 0 1 18 18' opacity='.7'/%3E%3C/g%3E%3Cg transform='translate(0 8)'%3E%3Cpath d='M12 90 Q20 62 28 90z' fill='%2386ea5c'/%3E%3Cellipse cx='20' cy='56' rx='14' ry='12' fill='%2386ea5c'/%3E%3Cellipse cx='15' cy='56' rx='4' ry='6' fill='%230a0626' transform='rotate(16 15 56)'/%3E%3Cellipse cx='25' cy='56' rx='4' ry='6' fill='%230a0626' transform='rotate(-16 25 56)'/%3E%3Cpath d='M14 45 L10 36 M26 45 L30 36' stroke='%2386ea5c' stroke-width='2.5' stroke-linecap='round'/%3E%3Ccircle cx='10' cy='35' r='2.5' fill='%23ffe83a'/%3E%3Ccircle cx='30' cy='35' r='2.5' fill='%23ffe83a'/%3E%3Cpath d='M28 72 L40 62' stroke='%2386ea5c' stroke-width='4' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E") right 10px bottom 30px / 100px auto no-repeat,
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 110' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23b6fff0'/%3E%3Cstop offset='.1' stop-color='%232ad8c0'/%3E%3Cstop offset='.55' stop-color='%230e7a9a'/%3E%3Cstop offset='1' stop-color='%230a2a66'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0 62 Q195 16 390 62 V110 H0z' fill='url(%23g)'/%3E%3Cg fill='%23075a78' opacity='.6'%3E%3Cellipse cx='60' cy='86' rx='26' ry='6'/%3E%3Cellipse cx='210' cy='70' rx='18' ry='4'/%3E%3Cellipse cx='345' cy='92' rx='22' ry='5'/%3E%3Cellipse cx='150' cy='98' rx='12' ry='3'/%3E%3C/g%3E%3C/svg%3E") center bottom / 100% 90px no-repeat,
+  radial-gradient(circle at 6% 30%, #fff 0 1.3px, rgba(255,255,255,0) 2.1px), radial-gradient(circle at 95% 22%, #fff 0 1.4px, rgba(255,255,255,0) 2.2px), radial-gradient(circle at 3% 66%, #ffd0f4 0 1.2px, rgba(255,255,255,0) 2px),
+  radial-gradient(circle at 97% 58%, #fff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 10% 9%, #fff 0 1.3px, rgba(255,255,255,0) 2.1px), radial-gradient(circle at 90% 6%, #ffe83a 0 1.3px, rgba(255,255,255,0) 2.1px),
+  radial-gradient(circle at 20% 48%, #fff 0 1px, rgba(255,255,255,0) 1.8px), radial-gradient(circle at 80% 40%, #bff8ff 0 1px, rgba(255,255,255,0) 1.8px),
+  radial-gradient(ellipse 70% 30% at 0% 34%, rgba(255,60,190,0.42), rgba(255,60,190,0) 72%), radial-gradient(ellipse 70% 32% at 100% 66%, rgba(40,200,255,0.3), rgba(40,200,255,0) 72%),
+  linear-gradient(180deg, #080218 0%, #1a0850 42%, #2c0e72 74%, #14063e 100%) !important; }
+@media (max-height:700px){ :root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-beam{ --sw:250px; padding-bottom:56px; } }
+/* the tractor beam: rays from the saucer's belly (they breathe), and particles drifting down inside it */
+:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-beam::before{ content:''; display:block; position:absolute; z-index:4; left:0; right:0; top:calc(4px + var(--sw) * 0.3); bottom:36px; pointer-events:none; clip-path:polygon(37% 0, 63% 0, 100% 30%, 100% 100%, 0 100%, 0 30%);
+  background:repeating-conic-gradient(from 180deg at 50% 0%, rgba(255,246,150,0.5) 0deg 2.5deg, rgba(255,232,58,0.1) 2.5deg 7deg, rgba(255,240,110,0.3) 7deg 8.5deg, rgba(255,232,58,0.07) 8.5deg 13deg);
+  -webkit-mask-image:linear-gradient(180deg, #000 0%, rgba(0,0,0,0.75) 14%, rgba(0,0,0,0.5) 55%, rgba(0,0,0,0.3) 100%); mask-image:linear-gradient(180deg, #000 0%, rgba(0,0,0,0.75) 14%, rgba(0,0,0,0.5) 55%, rgba(0,0,0,0.3) 100%); animation:bbRays 3.2s ease-in-out infinite alternate; }
+@keyframes bbRays{ from{ opacity:0.72; } to{ opacity:1; } }
+:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-beam .ov-tint{ background:none !important; z-index:4; pointer-events:none; top:calc(4px + var(--sw) * 0.3); bottom:36px; overflow:hidden; clip-path:polygon(37% 0, 63% 0, 100% 30%, 100% 100%, 0 100%, 0 30%); }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .ov-tint::before, :root:root:root.mode-daily .event-overlay.stack.quiz-beam .ov-tint::after{ content:''; position:absolute; left:0; right:0; bottom:0; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .ov-tint::before{ top:-140px; background:radial-gradient(circle at 22% 18%, #fff 0 1.6px, rgba(255,240,120,0.85) 2.4px, rgba(255,232,58,0) 5px), radial-gradient(circle at 70% 52%, #fff 0 1.3px, rgba(255,240,120,0.8) 2px, rgba(255,232,58,0) 4.4px), radial-gradient(circle at 44% 84%, #fff 0 1.8px, rgba(255,240,120,0.85) 2.7px, rgba(255,232,58,0) 5.6px);
+  background-size:96px 140px; animation:bbDrift 5s linear infinite; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .ov-tint::after{ top:-210px; opacity:0.8; background:radial-gradient(circle at 60% 24%, #fff 0 2.2px, rgba(255,240,120,0.8) 3.2px, rgba(255,232,58,0) 7px), radial-gradient(circle at 14% 70%, #fff 0 1.5px, rgba(255,240,120,0.8) 2.3px, rgba(255,232,58,0) 5px);
+  background-size:150px 210px; animation:bbDrift2 9s linear infinite; }
+@keyframes bbDrift{ to{ transform:translateY(140px); } }
+@keyframes bbDrift2{ to{ transform:translateY(210px); } }
+/* the saucer (the title) */
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam.has-plate .qz-plate{ container-type:inline-size; align-self:flex-start; width:var(--sw); max-width:none; aspect-ratio:340 / 120; margin:0 0 0 calc(50% - var(--sw) / 2); padding:0; border:0; border-radius:0; outline:0; box-shadow:none; overflow:visible;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 340 120'%3E%3Cdefs%3E%3CradialGradient id='d' cx='.35' cy='.25' r='.9'%3E%3Cstop offset='0' stop-color='%23fff'/%3E%3Cstop offset='.3' stop-color='%23c8fbff'/%3E%3Cstop offset='1' stop-color='%232a8fe0'/%3E%3C/radialGradient%3E%3ClinearGradient id='h' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23fff'/%3E%3Cstop offset='.2' stop-color='%23eef0ff'/%3E%3Cstop offset='.42' stop-color='%23a9b2ea'/%3E%3Cstop offset='.58' stop-color='%236a58c4'/%3E%3Cstop offset='.8' stop-color='%232c1c74'/%3E%3Cstop offset='1' stop-color='%23120a3a'/%3E%3C/linearGradient%3E%3ClinearGradient id='b' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%232a1280'/%3E%3Cstop offset='1' stop-color='%230a0328'/%3E%3C/linearGradient%3E%3CradialGradient id='e'%3E%3Cstop offset='0' stop-color='%23fff'/%3E%3Cstop offset='.45' stop-color='%23fff6a0'/%3E%3Cstop offset='1' stop-color='%23ffe83a'/%3E%3C/radialGradient%3E%3CradialGradient id='u'%3E%3Cstop offset='0' stop-color='%23ffe83a' stop-opacity='.7'/%3E%3Cstop offset='1' stop-color='%23ffe83a' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cellipse cx='170' cy='106' rx='150' ry='14' fill='url(%23u)'/%3E%3Cpath d='M150 10 L142 0 M190 10 L198 0' stroke='%23dfe4ff' stroke-width='2.5' stroke-linecap='round'/%3E%3Ccircle cx='142' cy='2.5' r='3.5' fill='%23ff3aa8'/%3E%3Ccircle cx='198' cy='2.5' r='3.5' fill='%23ff3aa8'/%3E%3Cpath d='M116 52 C116 0 224 0 224 52z' fill='url(%23d)' stroke='%23f2fdff' stroke-width='2.5'/%3E%3Cellipse cx='170' cy='35' rx='18' ry='16' fill='%2386ea5c'/%3E%3Cellipse cx='170' cy='44' rx='10' ry='5' fill='%236ac848'/%3E%3Cellipse cx='162.5' cy='34' rx='5.5' ry='8' fill='%230a0626' transform='rotate(18 162.5 34)'/%3E%3Cellipse cx='177.5' cy='34' rx='5.5' ry='8' fill='%230a0626' transform='rotate(-18 177.5 34)'/%3E%3Ccircle cx='161' cy='31' r='1.6' fill='%23fff'/%3E%3Ccircle cx='176' cy='31' r='1.6' fill='%23fff'/%3E%3Cpath d='M165 44.5 Q170 48 175 44.5' fill='none' stroke='%230a0626' stroke-width='1.6' stroke-linecap='round'/%3E%3Cpath d='M131 26 Q146 8 170 7' fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' opacity='.85'/%3E%3Cellipse cx='170' cy='72' rx='168' ry='37' fill='url(%23h)' stroke='%23120a3a' stroke-width='1.5'/%3E%3Cpath d='M18 62 Q90 38 170 37' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' opacity='.9'/%3E%3Cpath d='M250 41 Q300 48 326 64' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' opacity='.55'/%3E%3Cellipse cx='170' cy='88' rx='152' ry='19' fill='%23120a3a' opacity='.5'/%3E%3Crect x='42' y='47' width='256' height='44' rx='22' fill='url(%23b)' stroke='%23ffe83a' stroke-width='2.5'/%3E%3Crect x='47' y='52' width='246' height='34' rx='17' fill='none' stroke='%23ffffff' stroke-width='1' opacity='.35'/%3E%3Cellipse cx='170' cy='108' rx='70' ry='11' fill='%230a0426'/%3E%3Cellipse cx='170' cy='107' rx='62' ry='8.5' fill='url(%23e)'/%3E%3C/svg%3E") center / 100% 100% no-repeat; animation:bbBob 3.4s ease-in-out infinite alternate; }
+@keyframes bbBob{ from{ transform:translateY(-3px) rotate(-0.6deg); } to{ transform:translateY(3px) rotate(0.6deg); } }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam.has-plate .qz-plate::before, :root:root:root.mode-daily .event-overlay.stack.quiz-beam.has-plate .qz-plate::after{ content:''; display:block; position:absolute; inset:0; width:auto; height:auto; margin:0; pointer-events:none; animation:bbRim 1.2s steps(1) infinite; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam.has-plate .qz-plate::before{ background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 340 120'%3E%3Cg fill='%23fff8b0' stroke='%23ffb21a' stroke-width='2'%3E%3Ccircle cx='14' cy='79.7' r='5'/%3E%3Ccircle cx='326' cy='79.7' r='5'/%3E%3Ccircle cx='50' cy='91.9' r='5'/%3E%3Ccircle cx='290' cy='91.9' r='5'/%3E%3C/g%3E%3C/svg%3E") center / 100% 100% no-repeat; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam.has-plate .qz-plate::after{ background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 340 120'%3E%3Cg fill='%23ffd0f0' stroke='%23ff3aa8' stroke-width='2'%3E%3Ccircle cx='30' cy='86.5' r='5'/%3E%3Ccircle cx='310' cy='86.5' r='5'/%3E%3Ccircle cx='76' cy='96.7' r='5'/%3E%3Ccircle cx='264' cy='96.7' r='5'/%3E%3C/g%3E%3C/svg%3E") center / 100% 100% no-repeat; animation-delay:-0.6s; }
+@keyframes bbRim{ 0%{ opacity:1; } 50%{ opacity:0.25; } }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam.has-plate .qz-plate b{ position:absolute; z-index:1; left:0; right:0; top:44%; font:400 8.8cqw/1 'FS Righteous', 'Big Shoulders Display', sans-serif; letter-spacing:0.9cqw; color:#ffe83a; text-shadow:0 0.55cqw 0 #ff3aa8, 0 1.05cqw 0 #6a0a5a, 0 0 3cqw rgba(255,232,58,0.75); }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam.has-plate .qz-plate small{ position:absolute; z-index:1; left:50%; top:81.5%; transform:translateX(-50%); margin:0; padding:0.9cqw 3cqw; border-radius:99px; overflow:visible; text-overflow:clip; white-space:nowrap; max-width:none;
+  background:#ffe83a; color:#1a0640; font:900 3.05cqw/1 var(--f-body, Inter, sans-serif); letter-spacing:0.35cqw; box-shadow:0 0 14px 4px rgba(255,232,58,0.9); }
+/* the question, in the beam */
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-prompt{ flex:1 1 auto; min-height:84px; margin:12px 0 10px; padding:14px 18px; border:0; border-radius:18px; overflow:visible; align-items:center; justify-content:center;
+  background:linear-gradient(180deg, rgba(16,6,56,0.9), rgba(8,2,34,0.92)) !important; box-shadow:0 0 0 2px rgba(255,232,58,0.9), 0 0 22px 2px rgba(255,232,58,0.55), inset 0 0 24px rgba(255,232,58,0.14); color:#ffffff; text-shadow:0 2px 0 rgba(0,0,30,0.9), 0 0 12px rgba(255,255,255,0.35); }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-prompt .kw{ color:#ffe83a; text-shadow:0 0 12px rgba(255,232,58,0.8), 0 2px 0 rgba(0,0,30,0.9); }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-prompt::before, :root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-prompt::after{ content:''; display:block; position:absolute; inset:auto; left:22%; right:22%; width:auto; height:3px; padding:0; border-radius:3px; animation:none !important; opacity:1; pointer-events:none; -webkit-mask:none; mask:none; transform:none;
+  background:#ffffff !important; box-shadow:0 0 10px 2px #ffe83a; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-prompt::before{ top:-2.5px; } :root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-prompt::after{ bottom:-2.5px; }
+/* the answer bars */
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-grid{ flex:0 0 auto; display:flex; flex-direction:column; gap:11px; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile{ --k1:#6ae6ff; --k2:#1492ea; --k3:#0a4a9e; --kg:rgba(60,200,255,0.7); flex:none; min-height:clamp(54px, 8.2vh, 70px); height:auto; padding:7px 52px 7px 74px; border-radius:999px 16px 16px 999px; font-size:clamp(21px, 6.4vw, 28px); line-height:1.02; overflow:visible; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile:nth-child(2){ --k1:#ff8ada; --k2:#e3209a; --k3:#840a5c; --kg:rgba(255,80,190,0.7); }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile:nth-child(3){ --k1:#a4f25e; --k2:#34a838; --k3:#125c1c; --kg:rgba(120,240,90,0.65); }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile:nth-child(4){ --k1:#ffc85e; --k2:#f27612; --k3:#963c02; --kg:rgba(255,160,50,0.7); }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile:not(.is-wrong):not(.gold){ border:3px solid #f4f6ff;
+  background:linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.14) 42%, rgba(255,255,255,0) 50%), linear-gradient(180deg, var(--k1), var(--k2) 56%, var(--k3)) !important; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile:not(.is-right):not(.is-wrong){ color:#ffffff; text-shadow:0 2px 0 rgba(0,0,30,0.7), 0 0 8px rgba(0,0,30,0.5);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,0.8), inset 0 -5px 0 rgba(0,0,0,0.22), 0 0 0 2px #0a0426, 0 5px 0 var(--k3), 0 5px 0 2px #0a0426, 0 0 18px 2px var(--kg); }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile .ttxt{ overflow-wrap:anywhere; }
+:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile .tkey{ left:8px; top:50%; width:50px; height:50px; margin:-25px 0 0; font-size:29px; line-height:1; border:3px solid #f4f6ff; color:#ffe83a; text-shadow:0 0 8px rgba(255,232,58,0.8);
+  background:radial-gradient(circle at 35% 28%, #4a3aa8, #1a0a56 55%, #08021e); box-shadow:0 0 0 2px #0a0426, inset 0 0 8px rgba(255,255,255,0.35), 0 2px 5px rgba(0,0,0,0.5); }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile:not(.is-right):not(.is-wrong)::before{ content:''; display:block; position:absolute; inset:auto; right:16px; top:50%; width:8px; height:34px; margin-top:-17px; border:0; border-radius:0; box-shadow:none; transform:none; animation:none; pointer-events:none; opacity:0.95;
+  background:radial-gradient(circle at 50% 4px, #fff 0 2px, rgba(255,255,255,0.5) 3px, rgba(255,255,255,0) 4px) 0 0 / 8px 13px repeat-y; }
+@media (max-height:700px){
+  :root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-prompt{ min-height:60px; margin:8px 0 8px; padding:8px 14px; }
+  :root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-grid{ gap:7px; }
+  :root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile{ min-height:47px; padding:4px 44px 4px 62px; font-size:clamp(18px, 5.6vw, 22px); }
+  :root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-tile .tkey{ width:40px; height:40px; margin-top:-20px; font-size:23px; left:7px; }
+}
+/* the tap flourish: a quick beam from the saucer onto the tapped bar, and a flash on the bar (built by bbShot in flipstax.html) */
+.bb-shot{ position:absolute; z-index:6; pointer-events:none; transform-origin:50% 0; clip-path:polygon(46% 0, 54% 0, 100% 100%, 0 100%); background:linear-gradient(180deg, #ffffff, #fff6a0 14%, rgba(255,232,58,0.8) 55%, rgba(255,232,58,0.45)); }
+.bb-hit{ position:absolute; z-index:6; pointer-events:none; border-radius:999px; background:radial-gradient(ellipse closest-side, rgba(255,255,255,0.95), rgba(255,240,120,0.7) 55%, rgba(255,232,58,0)); }
+:root.lite.mode-daily .event-overlay.quiz-beam .qz-plate, :root.lite.mode-daily .event-overlay.quiz-beam .qz-plate::before, :root.lite.mode-daily .event-overlay.quiz-beam .qz-plate::after, :root.lite.mode-daily #eventOverlay.quiz-beam::before, :root.lite.mode-daily .event-overlay.quiz-beam .ov-tint::before, :root.lite.mode-daily .event-overlay.quiz-beam .ov-tint::after{ animation:none !important; }
+@media (prefers-reduced-motion: reduce){ :root.mode-daily .event-overlay.quiz-beam .qz-plate, :root.mode-daily .event-overlay.quiz-beam .qz-plate::before, :root.mode-daily .event-overlay.quiz-beam .qz-plate::after, :root.mode-daily #eventOverlay.quiz-beam::before, :root.mode-daily .event-overlay.quiz-beam .ov-tint::before, :root.mode-daily .event-overlay.quiz-beam .ov-tint::after{ animation:none !important; } }
+
+/* ==== RIDDLE ROUND, "THE DECODER" (look only - riddles, answers and their order, the timer bar, timing and the right / wrong colours are
+   untouched). An alien decoding station that has caught something strange, in deep violet, indigo and teal with lime only as the accent (the
+   eyes, the tag, the scope trace, the key glyphs). The title is a dark monolith plate with glitching lettering, a slit-pupilled alien eye
+   watching from each side (they blink), a ticker of alien glyphs along its foot, and radio-wave rings spreading out from behind it; glyph
+   streams fall down both edges; the riddle sits on the listening-post terminal with the TRANSMISSION INTERCEPTED tag and an oscilloscope strip
+   (graticule and a lime signal wave) across its foot; the answers are angular signal keys in teal, violet, sky and pink with diamond key-caps
+   and a lime glyph each. This Daily screen has its own violet backdrop here; the shared green backdrop rule further up still serves Infinity
+   (not redesigned). Movement: the ticker and streams slide, the rings spread, the eyes blink (transform and opacity only). ==== */
+:root:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-riddle, :root:root:root.mode-daily .show-bg.w-riddle{ background:
+  radial-gradient(circle at 9% 12%, #fff 0 1.3px, rgba(255,255,255,0) 2px), radial-gradient(circle at 90% 8%, #fff 0 1.4px, rgba(255,255,255,0) 2.2px), radial-gradient(circle at 96% 46%, #b6ff3a 0 1.2px, rgba(255,255,255,0) 2px),
+  radial-gradient(circle at 4% 58%, #fff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 52% 97%, #fff 0 1.2px, rgba(255,255,255,0) 2px), radial-gradient(circle at 30% 30%, #bff8ff 0 1px, rgba(255,255,255,0) 1.8px),
+  radial-gradient(ellipse 90% 30% at 50% 12%, rgba(150,80,255,0.5), rgba(150,80,255,0) 72%), radial-gradient(ellipse 80% 34% at 100% 76%, rgba(30,220,200,0.36), rgba(30,220,200,0) 72%),
+  radial-gradient(ellipse 70% 30% at 0% 92%, rgba(90,70,255,0.4), rgba(90,70,255,0) 72%),
+  linear-gradient(180deg, #0a0428 0%, #1a0c56 44%, #0c2a5e 80%, #06183a 100%) !important; }
+:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-riddle .ov-tint{ background:
+  radial-gradient(circle at 50% 108%, rgba(0,0,0,0) 0 19%, rgba(58,255,208,0.28) 19.4% 19.9%, rgba(0,0,0,0) 20.3% 33%, rgba(160,120,255,0.26) 33.4% 33.9%, rgba(0,0,0,0) 34.3% 47%, rgba(58,255,208,0.16) 47.4% 47.9%, rgba(0,0,0,0) 48.3% 61%, rgba(160,120,255,0.14) 61.4% 61.9%, rgba(0,0,0,0) 62.3%) !important; }
+:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-riddle .rd-sky{ display:none !important; }
+/* the glyph streams down both edges */
+:root:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-riddle::before, :root:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-riddle::after{ content:''; display:block; position:absolute; z-index:-1; top:0; bottom:auto; height:calc(100% + 110px); width:11px; pointer-events:none; opacity:0.7 !important;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 160' fill='none' stroke='%233affd0' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath transform='translate(2 2)' d='M6 1a5 5 0 1 0 .01 0z M6 5.2a.8.8 0 1 0 .01 0z'/%3E%3Cpath transform='translate(2 18)' d='M6 1L11 11H1z'/%3E%3Cpath transform='translate(2 34)' d='M1 3l4 3-4 3 M7 3l4 3-4 3'/%3E%3Cpath transform='translate(2 50)' d='M2 2v8M6 2v8M10 2v5'/%3E%3Cpath transform='translate(2 66)' d='M6 11V6M6 6L2 1M6 6l4-5'/%3E%3Cpath transform='translate(2 82)' d='M1 1h10v10H1zM1 6h5'/%3E%3Cpath transform='translate(2 98)' d='M1 9a5 5 0 0 1 10 0M3.5 9a2.5 2.5 0 0 1 5 0'/%3E%3Cpath transform='translate(2 114)' d='M6 1v10M1 6h10'/%3E%3Cpath transform='translate(2 130)' d='M2 11L6 1M6 11l4-10'/%3E%3Cpath transform='translate(2 146)' d='M6 1l5 5-5 5-5-5z'/%3E%3C/svg%3E") 0 0 / 11px 110px repeat-y !important; transform:translateY(-110px); animation:rdStream 9s linear infinite; -webkit-mask:none; mask:none; border-radius:0; filter:none; }
+:root:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-riddle::before{ left:1.5px; right:auto; }
+:root:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-riddle::after{ right:1.5px; left:auto; animation-duration:12s; animation-delay:-4s; }
+@keyframes rdStream{ from{ transform:translateY(-110px); } to{ transform:translateY(0); } }
+/* the title: a monolith plate, glitching letters, two watching eyes, a glyph ticker */
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-bulbs, :root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-ghost, :root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-glow{ display:none !important; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-riddle{ aspect-ratio:4; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-panel{ inset:4% 2%; overflow:hidden; border:2.5px solid #b79cff; border-radius:4px 22px 4px 22px; padding:0 3cqw 3.2cqw;
+  background:repeating-linear-gradient(180deg, rgba(160,130,255,0.09) 0 1px, rgba(0,0,0,0) 1px 4px), linear-gradient(180deg, #24107a, #0a0430); box-shadow:0 0 16px 2px rgba(150,100,255,0.8), inset 0 0 22px rgba(58,255,208,0.2); }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-panel::after{ content:''; position:absolute; left:0; bottom:1.2cqw; width:300%; height:3.2cqw; opacity:0.85; pointer-events:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 16' fill='none' stroke='%233affd0' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath transform='translate(2 2)' d='M6 1a5 5 0 1 0 .01 0z M6 5.2a.8.8 0 1 0 .01 0z'/%3E%3Cpath transform='translate(18 2)' d='M6 1L11 11H1z'/%3E%3Cpath transform='translate(34 2)' d='M1 3l4 3-4 3 M7 3l4 3-4 3'/%3E%3Cpath transform='translate(50 2)' d='M2 2v8M6 2v8M10 2v5'/%3E%3Cpath transform='translate(66 2)' d='M6 11V6M6 6L2 1M6 6l4-5'/%3E%3Cpath transform='translate(82 2)' d='M1 1h10v10H1zM1 6h5'/%3E%3Cpath transform='translate(98 2)' d='M1 9a5 5 0 0 1 10 0M3.5 9a2.5 2.5 0 0 1 5 0'/%3E%3Cpath transform='translate(114 2)' d='M6 1v10M1 6h10'/%3E%3Cpath transform='translate(130 2)' d='M2 11L6 1M6 11l4-10'/%3E%3Cpath transform='translate(146 2)' d='M6 1l5 5-5 5-5-5z'/%3E%3C/svg%3E") 0 0 / 32cqw 100% repeat-x; animation:rdTicker 9s linear infinite; }
+@keyframes rdTicker{ to{ transform:translateX(-32cqw); } }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-icon{ flex:0 0 15%; height:60%; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Cdefs%3E%3CradialGradient id='i'%3E%3Cstop offset='0' stop-color='%23f6ffd0'/%3E%3Cstop offset='.55' stop-color='%23b6ff3a'/%3E%3Cstop offset='1' stop-color='%231f8a2a'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath d='M2 22Q22 3 42 22Q22 41 2 22z' fill='%2303140c' stroke='%23b6ff3a' stroke-width='2.5' stroke-linejoin='round'/%3E%3Ccircle cx='22' cy='22' r='9.5' fill='url(%23i)'/%3E%3Cellipse cx='22' cy='22' rx='2.6' ry='8' fill='%2303140c'/%3E%3Ccircle cx='18.5' cy='18' r='2' fill='%23fff'/%3E%3Cpath d='M8 10l3 4M22 5v5M36 10l-3 4' stroke='%23b6ff3a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat; animation:rdBlink 4.6s ease-in-out infinite; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-icon.r{ animation-delay:-2.1s; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-icon svg{ display:none !important; }
+@keyframes rdBlink{ 0%, 90%, 100%{ transform:scaleY(1); } 94%{ transform:scaleY(0.08); } }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-l{ -webkit-text-stroke:0 !important; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-l.lg{ font:400 12cqw/1 'FS Righteous', var(--f-display, sans-serif) !important; letter-spacing:1.6cqw !important; color:#ffffff !important;
+  text-shadow:-0.7cqw 0 0 rgba(255,58,208,0.8), 0.7cqw 0 0 rgba(58,255,208,0.85), 0 0 3cqw rgba(160,120,255,0.9) !important; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-l.sm{ font-size:4.6cqw !important; letter-spacing:3.2cqw !important; margin-right:-3.2cqw; color:#3affc8 !important; text-shadow:0 0 2cqw rgba(58,255,200,0.8) !important; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate > small{ color:#3affd0 !important; letter-spacing:3px !important; text-shadow:0 0 8px rgba(58,255,208,0.8); }
+/* radio-wave rings spreading from behind the title */
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate::before, :root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate::after{ content:''; display:block; position:absolute; z-index:-1; left:4%; right:4%; top:6%; bottom:6%; width:auto; height:auto; margin:0; border-radius:50%; border:2px solid #3affd0; pointer-events:none; opacity:0; animation:rdRing 3.6s ease-out infinite; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate::after{ border-color:#b79cff; animation-delay:-1.8s; }
+@keyframes rdRing{ 0%{ transform:scale(0.7, 0.8); opacity:0; } 15%{ opacity:0.75; } 100%{ transform:scale(1.22, 1.9); opacity:0; } }
+/* the terminal (the riddle) */
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-prompt{ border:2.5px solid #3affd0; border-radius:4px 20px 4px 20px; margin-top:12px; padding:26px 18px 42px; overflow:visible;
+  background:repeating-linear-gradient(180deg, rgba(120,200,255,0.07) 0 1px, rgba(0,0,0,0) 1px 4px), linear-gradient(180deg, rgba(26,14,92,0.95), rgba(8,6,44,0.97)) !important;
+  box-shadow:0 0 18px 2px rgba(58,255,208,0.6), inset 0 0 28px rgba(150,100,255,0.3); color:#ffffff; text-shadow:0 0 10px rgba(120,220,255,0.6), 0 2px 0 rgba(0,0,30,0.85); }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-prompt::before{ content:'\25CF  TRANSMISSION INTERCEPTED'; display:block; position:absolute; inset:auto; left:14px; top:-11px; width:auto; height:auto; padding:4px 11px; border-radius:2px 8px 2px 8px; animation:none !important; opacity:1;
+  background:#b6ff3a !important; color:#06200c; font:900 10.5px/1 var(--f-body, Inter, sans-serif); letter-spacing:2px; white-space:pre; text-shadow:none; box-shadow:0 0 10px rgba(182,255,58,0.9); -webkit-mask:none; mask:none; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-prompt::after{ content:''; display:block; position:absolute; inset:auto 10px 8px 10px; height:26px; border-radius:3px 10px 3px 10px; animation:none !important; opacity:1; pointer-events:none; -webkit-mask:none; mask:none; box-shadow:inset 0 0 0 1.5px rgba(58,255,208,0.6);
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 26' preserveAspectRatio='none'%3E%3Cpath d='M0 13 q5 -9 10 0 t10 0 t10 0 q4 -16 8 0 t8 0 q5 -6 10 0 t10 0 t10 0 q3 -20 6 0 t6 0 q5 -8 10 0 t10 0 t10 0 q4 -14 8 0 t8 0 q5 -7 10 0 t10 0 t10 0 q3 -18 6 0 t6 0 q5 -8 10 0 t10 0 t8 0' fill='none' stroke='%23b6ff3a' stroke-width='1.8' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat, repeating-linear-gradient(90deg, rgba(58,255,208,0.22) 0 1px, rgba(0,0,0,0) 1px 13px), linear-gradient(180deg, rgba(0,0,0,0) 12px, rgba(58,255,208,0.3) 12px 13px, rgba(0,0,0,0) 13px), #04102e !important; }
+/* the signal keys (the answers) */
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile{ --pod:#3affd0; --gx:0%; border-radius:4px 20px 4px 20px; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:nth-child(2){ --pod:#b79cff; --gx:33.3%; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:nth-child(3){ --pod:#5ac8ff; --gx:66.6%; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:nth-child(4){ --pod:#ff8ae0; --gx:100%; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:not(.is-right):not(.is-wrong){ border:3px solid var(--pod);
+  background:linear-gradient(90deg, color-mix(in srgb, var(--pod) 30%, transparent), rgba(0,0,0,0) 34%), linear-gradient(180deg, rgba(28,16,96,0.95), rgba(8,6,44,0.97)) !important;
+  box-shadow:0 0 14px 2px color-mix(in srgb, var(--pod) 70%, transparent), inset 0 0 14px color-mix(in srgb, var(--pod) 30%, transparent), inset 0 2px 0 rgba(255,255,255,0.2); color:#ffffff; text-shadow:0 0 10px var(--pod), 0 2px 0 rgba(0,0,30,0.85); }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:not(.is-right):not(.is-wrong) .tkey{ left:16px; width:42px; height:42px; margin-top:-21px; color:#0a0430; border:0; border-radius:0; clip-path:polygon(50% 0, 100% 50%, 50% 100%, 0 50%); background:linear-gradient(180deg, #ffffff, var(--pod) 60%); box-shadow:none; font-size:22px; }
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:not(.is-right):not(.is-wrong)::before{ content:''; display:block; position:absolute; inset:auto; right:16px; top:50%; width:24px; height:24px; margin-top:-12px; opacity:0.75; pointer-events:none; border:0; border-radius:0; box-shadow:none; transform:none; animation:none;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 16' fill='none' stroke='%23b6ff3a' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath transform='translate(2 2)' d='M6 1a5 5 0 1 0 .01 0z M6 5.2a.8.8 0 1 0 .01 0z'/%3E%3Cpath transform='translate(18 2)' d='M6 11V6M6 6L2 1M6 6l4-5'/%3E%3Cpath transform='translate(34 2)' d='M1 9a5 5 0 0 1 10 0M3.5 9a2.5 2.5 0 0 1 5 0'/%3E%3Cpath transform='translate(50 2)' d='M6 1l5 5-5 5-5-5z'/%3E%3C/svg%3E") var(--gx) 50% / auto 100% no-repeat; }
+/* a short screen: a smaller sign, a tighter terminal with a slimmer scope, so the four keys keep their height */
+@media (max-height:700px){
+  :root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate .nl-riddle{ width:min(64%, 250px); }
+  :root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .qz-plate > small{ display:none !important; }
+  :root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-prompt{ padding:16px 14px 26px; margin-top:8px; min-height:0; }
+  :root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-prompt::after{ height:14px; bottom:6px; background-size:100% 100%, auto, 0 0, auto !important; }
+  :root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile{ font-size:clamp(17px, 5.4vw, 22px); line-height:1; }
+  :root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:not(.is-right):not(.is-wrong) .tkey{ width:34px; height:34px; margin-top:-17px; font-size:18px; }
+}
+:root.lite.mode-daily #eventOverlay.quiz-riddle::before, :root.lite.mode-daily #eventOverlay.quiz-riddle::after, :root.lite.mode-daily .event-overlay.quiz-riddle .qz-plate .nl-panel::after, :root.lite.mode-daily .event-overlay.quiz-riddle .qz-plate .nl-icon, :root.lite.mode-daily .event-overlay.quiz-riddle .qz-plate::before, :root.lite.mode-daily .event-overlay.quiz-riddle .qz-plate::after{ animation:none !important; }
+@media (prefers-reduced-motion: reduce){ :root.mode-daily #eventOverlay.quiz-riddle::before, :root.mode-daily #eventOverlay.quiz-riddle::after, :root.mode-daily .event-overlay.quiz-riddle .qz-plate .nl-panel::after, :root.mode-daily .event-overlay.quiz-riddle .qz-plate .nl-icon, :root.mode-daily .event-overlay.quiz-riddle .qz-plate::before, :root.mode-daily .event-overlay.quiz-riddle .qz-plate::after{ animation:none !important; } }
+
+/* ==== MYSTERY WHEEL, "THE ORBITAL DIAL" (sci-fi pass; drawing only - the wedges, their order, labels, prizes and odds, the spin, how it lands, the
+   pointer's position, the SPIN button's behaviour and every payout are untouched). The black-and-gold casino stage is gone. Now the wheel is an
+   alien-tech prize dial floating over a moon: a violet-to-magenta sky with stars, a ringed planet and a blue moon, a soft halo and two orbit
+   rings behind the dial, and under it a slim light-pylon rising from a neon landing pad on the moon's lit horizon (one small drawing in place of
+   the stage photo). The gold rim becomes an indigo tech ring with a cyan inner and a magenta outer neon line, its lights cyan and pink in turn;
+   the hub is a glowing reactor core; the pointer a pink neon arrow. The title sign's border and the spins plate take the same violet and cyan,
+   the result card is dark glass, and the sweeping spotlights are cyan and pink. SPIN stays the big gold button. A small saucer circles the dial
+   on its orbit (one slow transform loop). Colour family: violet, magenta and cyan. ==== */
+:root:root:root .lucky-overlay.mw{ background:#07042a !important; }
+:root:root:root .lucky-overlay.mw .mw-bg{ background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1080 1935' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%2307042a'/%3E%3Cstop offset='.45' stop-color='%231b0b5c'/%3E%3Cstop offset='.78' stop-color='%234a1490'/%3E%3Cstop offset='1' stop-color='%23b02a9a'/%3E%3C/linearGradient%3E%3CradialGradient id='h' cx='.5' cy='.5' r='.5'%3E%3Cstop offset='0' stop-color='%237df9ff' stop-opacity='.55'/%3E%3Cstop offset='.6' stop-color='%239a5cff' stop-opacity='.25'/%3E%3Cstop offset='1' stop-color='%239a5cff' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='p' cx='.35' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23ffd0f0'/%3E%3Cstop offset='.45' stop-color='%23ff6ad0'/%3E%3Cstop offset='1' stop-color='%235a1a9a'/%3E%3C/radialGradient%3E%3CradialGradient id='m' cx='.35' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23d8fbff'/%3E%3Cstop offset='.5' stop-color='%234ac8f0'/%3E%3Cstop offset='1' stop-color='%23143a8a'/%3E%3C/radialGradient%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%23ff8ae0'/%3E%3Cstop offset='.12' stop-color='%237a2ab0'/%3E%3Cstop offset='1' stop-color='%231a0844'/%3E%3C/linearGradient%3E%3ClinearGradient id='c' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%23120a40'/%3E%3Cstop offset='.5' stop-color='%234a3ab8'/%3E%3Cstop offset='1' stop-color='%23120a40'/%3E%3C/linearGradient%3E%3ClinearGradient id='b' x1='0' y1='1' x2='0' y2='0'%3E%3Cstop offset='0' stop-color='%237df9ff' stop-opacity='.5'/%3E%3Cstop offset='1' stop-color='%237df9ff' stop-opacity='0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1080' height='1935' fill='url(%23s)'/%3E%3Cg fill='%23fff'%3E%3Ccircle cx='90' cy='330' r='4'/%3E%3Ccircle cx='1000' cy='300' r='5'/%3E%3Ccircle cx='960' cy='760' r='3.5'/%3E%3Ccircle cx='60' cy='900' r='4'/%3E%3Ccircle cx='180' cy='1180' r='3'/%3E%3Ccircle cx='930' cy='1240' r='4.5'/%3E%3Ccircle cx='1020' cy='1040' r='3'/%3E%3Ccircle cx='110' cy='620' r='3'/%3E%3Ccircle cx='840' cy='200' r='3'/%3E%3Ccircle cx='260' cy='240' r='3.5'/%3E%3Ccircle cx='70' cy='1400' r='3.5'/%3E%3Ccircle cx='1010' cy='1470' r='3'/%3E%3C/g%3E%3Ccircle cx='950' cy='1130' r='74' fill='url(%23m)'/%3E%3Cg transform='translate(120 1050)'%3E%3Ccircle r='96' fill='url(%23p)'/%3E%3Cellipse rx='168' ry='36' fill='none' stroke='%23ffe9a0' stroke-width='10' transform='rotate(-20)' opacity='.9'/%3E%3C/g%3E%3Ccircle cx='543' cy='616' r='640' fill='url(%23h)'/%3E%3Cellipse cx='543' cy='616' rx='640' ry='170' fill='none' stroke='%237df9ff' stroke-width='5' opacity='.55' transform='rotate(-16 543 616)'/%3E%3Cellipse cx='543' cy='616' rx='700' ry='250' fill='none' stroke='%23ff6ad0' stroke-width='4' opacity='.4' transform='rotate(13 543 616)'/%3E%3Ccircle cx='543' cy='616' r='500' fill='none' stroke='%237df9ff' stroke-width='6' opacity='.5'/%3E%3Cpath d='M0 1700 Q540 1560 1080 1700 V1935 H0z' fill='url(%23g)'/%3E%3Cg fill='%232a0c5a' opacity='.6'%3E%3Cellipse cx='200' cy='1790' rx='70' ry='16'/%3E%3Cellipse cx='860' cy='1830' rx='90' ry='20'/%3E%3Cellipse cx='640' cy='1760' rx='40' ry='9'/%3E%3C/g%3E%3Cpath d='M430 1640 L500 1090 H586 L656 1640z' fill='url(%23b)'/%3E%3Cpath d='M505 1090 H581 L606 1600 H480z' fill='url(%23c)'/%3E%3Crect x='536' y='1110' width='14' height='470' rx='7' fill='%237df9ff' opacity='.9'/%3E%3Cellipse cx='543' cy='1640' rx='330' ry='62' fill='%23120a40' stroke='%237df9ff' stroke-width='7'/%3E%3Cellipse cx='543' cy='1632' rx='250' ry='44' fill='%231e1266' stroke='%23ff6ad0' stroke-width='6'/%3E%3Cellipse cx='543' cy='1626' rx='160' ry='26' fill='%237df9ff' opacity='.55'/%3E%3Cg fill='%23ffe27a'%3E%3Ccircle cx='250' cy='1650' r='9'/%3E%3Ccircle cx='350' cy='1684' r='9'/%3E%3Ccircle cx='480' cy='1699' r='9'/%3E%3Ccircle cx='606' cy='1699' r='9'/%3E%3Ccircle cx='736' cy='1684' r='9'/%3E%3Ccircle cx='836' cy='1650' r='9'/%3E%3C/g%3E%3C/svg%3E") center / 100% 100% no-repeat; }
+:root:root:root .lucky-overlay.mw .mw-bg::before, :root:root:root .lucky-overlay.mw .mw-bg::after{ opacity:0.12; }
+:root:root:root .lucky-overlay.mw::after{ background:radial-gradient(60% 40% at 50% 46%, rgba(125,249,255,0.5), rgba(125,249,255,0)); }
+/* the rim: an indigo tech ring over the painted gold one (it turns with the wheel; the labels and lights sit above it) */
+.lucky-overlay.mw .mw-rot::before{ content:''; position:absolute; inset:0; z-index:1; border-radius:50%; pointer-events:none;
+  background:radial-gradient(closest-side, rgba(0,0,0,0) 83.2%, #7df9ff 83.6%, #7df9ff 84.8%, #241a7a 85.2%, #3a2cb0 89.5%, #150c50 93.8%, #ff6ad0 94.4%, #ff6ad0 95.6%, rgba(0,0,0,0) 96%); }
+.lucky-overlay.mw .mw-labels{ z-index:2; }
+:root:root .lucky-overlay.mw .mw-glow.a circle{ fill:#d8fdff; } :root:root .lucky-overlay.mw .mw-glow.b circle{ fill:#ffb0ea; }
+/* the hub: a reactor core */
+:root:root .lucky-overlay.mw .mw-cap{ background:radial-gradient(circle at 36% 30%, #ffffff, #9ffbff 30%, #2a8cff 66%, #10186a); box-shadow:0 0 0 3px #150c50, 0 0 0 5px #7df9ff, 0 0 16px 4px rgba(125,249,255,0.8); }
+/* the pointer: a pink neon arrow */
+:root:root .lucky-overlay.mw .mw-pointer{ filter:drop-shadow(0 0 5px rgba(255,106,208,0.95)); }
+:root:root .lucky-overlay.mw .mw-pointer path:first-of-type{ fill:#ffffff; stroke:#ff6ad0; }
+:root:root .lucky-overlay.mw .mw-pointer path:last-of-type{ stroke:#b0127a; }
+/* a small saucer circling the dial (one slow transform loop) */
+.lucky-overlay.mw .mw-wheel::before{ content:''; position:absolute; inset:-7%; z-index:-1; pointer-events:none; animation:mwOrbit 26s linear infinite;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 26'%3E%3Cellipse cx='22' cy='9' rx='9' ry='8' fill='%23bffcff'/%3E%3Cellipse cx='22' cy='15' rx='21' ry='7' fill='%23c9d3ee'/%3E%3Cellipse cx='22' cy='17' rx='21' ry='5.5' fill='%236a78a8'/%3E%3Ccircle cx='8' cy='16' r='2' fill='%23ffe27a'/%3E%3Ccircle cx='22' cy='19' r='2' fill='%23ff6ab0'/%3E%3Ccircle cx='36' cy='16' r='2' fill='%23ffe27a'/%3E%3C/svg%3E") 50% 0 / 9% auto no-repeat; }
+@keyframes mwOrbit{ to{ transform:rotate(360deg); } }
+:root.lite .lucky-overlay.mw .mw-wheel::before{ animation:none; } @media (prefers-reduced-motion: reduce){ .lucky-overlay.mw .mw-wheel::before{ animation:none; } }
+/* the sign, the spins plate and the result card */
+:root:root .lucky-overlay.mw .nl-lucky{ --nb:#9a6bff !important; --nbulb:#7df9ff !important; }
+:root:root:root .lucky-overlay.mw .ll-bank{ color:#ffffff; background:linear-gradient(180deg, rgba(26,16,90,0.95), rgba(8,5,40,0.96)); border:2px solid #7df9ff; box-shadow:0 0 10px rgba(125,249,255,0.7); letter-spacing:1.5px; text-shadow:0 0 8px rgba(125,249,255,0.7); }
+:root:root:root .lucky-overlay.mw .mw-pop{ background:linear-gradient(180deg, #1e1264, #09052c); border:3px solid #ff6ad0; outline:1px solid rgba(255,255,255,0.75); outline-offset:-2.5px;
+  box-shadow:0 0 22px 4px rgba(255,106,208,0.75), inset 0 0 16px rgba(255,106,208,0.3), 0 10px 24px rgba(0,0,0,0.5); color:#ffe27a; }
+:root:root:root .lucky-overlay.mw .mw-pop b{ color:#ffe27a !important; text-shadow:0 0 14px rgba(255,200,60,0.8), 0 3px 0 rgba(0,0,30,0.8); }
+:root:root:root .lucky-overlay.mw .mw-pop small{ color:#ffffff; }
+:root:root:root .lucky-overlay.mw .mw-btn{ box-shadow:0 5px 0 #8a5200, 0 0 0 3px #3a1a6a, 0 0 22px 4px rgba(255,200,60,0.6); }
+
+/* ==== OLDER SAFARI (before 16.2) has no color-mix(). A colour built with it from a custom property is not dropped at parse time - the whole
+   declaration fails when it is computed, so an earlier fallback line does not help. This block re-declares those properties without color-mix,
+   only where color-mix is not supported, at a higher specificity than the rules it covers: the title cards, the explainer card, Riddle Round's
+   keys, Twin Flip's tiles and Zap Words' found tiles. Plain solid colours stand in for the mixes. ==== */
+@supports not (color: color-mix(in srgb, red 50%, blue)){
+  :root:root:root:root:root .show-card.gintro .gi-bg{ background:radial-gradient(ellipse 130% 34% at 50% 112%, #0a1638 0 60%, #ffffff 60.6%, var(--gi-a) 62%, rgba(0,0,0,0) 70%), linear-gradient(180deg, #040a22 0%, #0c1e50 50%, #050b28 100%); }
+  :root:root:root:root:root .show-card.gintro .gi-bg::after{ background:repeating-conic-gradient(from 0deg, var(--gi-a) 0deg 7deg, rgba(0,0,0,0) 7deg 18deg); opacity:0.45; }
+  :root:root:root:root:root .show-card.gintro .gi-icon::after{ background:radial-gradient(ellipse closest-side, #ffffff 0%, var(--gi-a) 45%, rgba(0,0,0,0) 100%); box-shadow:0 0 22px 4px var(--gi-a); }
+  :root:root:root:root:root .show-card.gintro .gi-sign{ box-shadow:0 0 0 3px #03061a, 0 0 22px 4px var(--gi-a), 0 14px 26px -8px rgba(0,0,0,0.7); }
+  :root:root:root:root:root .show-card.gintro .gi-sign span{ color:#ffffff; }
+  :root:root:root:root:root .show-card.gintro .gi-line{ box-shadow:inset 0 0 0 2px var(--gi-a); }
+  :root:root:root:root:root .show-card.explainer{ background:linear-gradient(180deg, #070a2c 0%, #150a44 55%, #070a2c 100%); }
+  :root:root:root:root:root .show-card.explainer .ex-card{ box-shadow:0 0 20px 3px var(--gi-a, #ffc83a); }
+  :root:root:root:root:root .show-card.explainer .ex-card .ex-head{ border-bottom:1.5px solid var(--gi-a, #ffc83a); }
+  :root:root:root:root:root:root.mode-daily .event-overlay.stack.quiz-riddle .event-tile:not(.is-right):not(.is-wrong){ background:linear-gradient(180deg, rgba(28,16,96,0.95), rgba(8,6,44,0.97)) !important; box-shadow:0 0 14px 2px var(--pod), inset 0 2px 0 rgba(255,255,255,0.2); }
+  :root:root:root .tf-stage .tf-tile.up{ background:var(--pc); box-shadow:inset 0 3px 0 rgba(255,255,255,0.7), inset 0 -5px 0 rgba(0,0,0,0.16), 0 5px 0 rgba(0,0,0,0.45); }
+  :root:root:root .tf-stage .tf-tile.done{ box-shadow:inset 0 3px 0 rgba(255,255,255,0.7), inset 0 -5px 0 rgba(0,0,0,0.16), 0 5px 0 rgba(0,0,0,0.45); }
+  :root:root:root .zw-stage .zw-cell{ --tint:var(--tc); }
+  :root:root:root .zw-cell.found{ background:var(--wc); }
+}
+
+/* ==== finishing item 5: short screens (360x640 and the like). Price Probe: the name and the small descriptor shrink a step so a two-line name and
+   its descriptor stay inside the card (the descriptor stays on one line). VS cards: a long name (three lines) shrinks a step so the saucer between
+   the cards never covers its last line. ==== */
+@media (max-height:700px){
+  :root:root:root:root:root:root .pr-stage.pr-show .pr-n{ font-size:clamp(16px, 4.9vw, 22px); line-height:1.02; }
+  :root:root:root:root:root:root .pr-stage.pr-show .pr-d{ font-size:clamp(11px, 3.2vw, 14px); margin-top:1px; white-space:nowrap; line-height:1.1; }
+  :root:root:root:root.mode-daily .take, :root:root:root:root.mode-infinity .take{ font-size:calc(clamp(24px, 7.2vw, 36px) * var(--tk, 1)); }
+}
+
+/* ==== finishing item 7: Brain Beam readability. The question panel sits above the beam's rays and particles (its dark glass already reads as
+   lit by the beam), so the yellow highlight words and the right / wrong line are never crossed by rays; over the answer bars the rays and
+   particles are fainter, so a dimmed or red bar's text stays clean. The beam still pours down the whole screen. ==== */
+:root:root:root:root.mode-daily .event-overlay.stack.quiz-beam .event-prompt{ position:relative; z-index:5; }
+:root:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-beam::before, :root:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-beam .ov-tint{
+  -webkit-mask-image:linear-gradient(180deg, #000 0%, rgba(0,0,0,0.7) 14%, rgba(0,0,0,0.4) 38%, rgba(0,0,0,0.2) 52%, rgba(0,0,0,0.2) 100%); mask-image:linear-gradient(180deg, #000 0%, rgba(0,0,0,0.7) 14%, rgba(0,0,0,0.4) 38%, rgba(0,0,0,0.2) 52%, rgba(0,0,0,0.2) 100%); }
+
+/* ==== finishing item 10: still versions. Snap Sort's galaxy swirl and the blinking dot on each word, and the VS screen's sweeping spotlights
+   (reduced motion only - lite already stops them), stand still in lite mode and reduced motion. ==== */
+:root.lite .ss-vspin, :root.lite .ss-galaxy .ss-vimg, :root.lite .ss-galaxy .ss-word::before, :root.lite .mg-overlay.mg-snapSort::before{ animation:none !important; }
+@media (prefers-reduced-motion: reduce){
+  .ss-vspin, .ss-galaxy .ss-vimg, .ss-galaxy .ss-word::before, .mg-overlay.mg-snapSort::before, .sb-cone, .sb-cone.l, .sb-cone.r{ animation:none !important; }
+  .doodle-scatter-track{ animation:none !important; }   /* (the landing's drifting doodles behind the picture) */
+}
+
+/* ==== finishing item 11: iPhone memory. Brain Beam had three full-screen moving layers (the rays breathing, two particle layers). The rays are now
+   still (the same rays, at their full strength), and the two particle layers are one (the second layer's big sparks join the first), so only one
+   tall layer moves - the look is kept. ==== */
+:root:root:root:root:root:root.mode-daily #eventOverlay.event-overlay.stack.quiz-beam::before{ animation:none !important; opacity:1; }
+:root:root:root:root:root:root.mode-daily .event-overlay.stack.quiz-beam .ov-tint::after{ content:none !important; display:none !important; animation:none !important; }
+:root:root:root:root:root:root.mode-daily .event-overlay.stack.quiz-beam .ov-tint::before{
+  background:radial-gradient(circle at 22% 18%, #fff 0 1.6px, rgba(255,240,120,0.85) 2.4px, rgba(255,232,58,0) 5px), radial-gradient(circle at 70% 52%, #fff 0 1.3px, rgba(255,240,120,0.8) 2px, rgba(255,232,58,0) 4.4px),
+    radial-gradient(circle at 44% 84%, #fff 0 1.8px, rgba(255,240,120,0.85) 2.7px, rgba(255,232,58,0) 5.6px), radial-gradient(circle at 88% 30%, #fff 0 2.2px, rgba(255,240,120,0.8) 3.2px, rgba(255,232,58,0) 7px);
+  background-size:96px 140px; }
+
+/* iPhone fix: Emoji Decode's fitted emoji size (edFit) applies only while Emoji Decode is on screen; it used to be left on the shared
+   question box and blew up the next Brain Beam / Riddle Round / Time Warp question. */
+.event-overlay.bb-emojiDecode .event-prompt.ed-fit{ font-size:var(--ed-fit) !important; }

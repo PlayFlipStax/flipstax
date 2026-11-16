@@ -85,6 +85,11 @@
       } else if (guess && vis(guess)){
         const b = guess.querySelector('.guess-lock'); if (b && vis(b)) tapEl(b, 'crowd scan lock'); else tapEl(guess, 'crowd scan');
         next = now + rnd(1500, 2500);
+      } else if (document.getElementById('gsOverlay') && vis(document.getElementById('gsOverlay'))){   // the Game Select screen (the Mystery Portal): tap a tile, then PLAY
+        const gs = document.getElementById('gsOverlay'), play = gs.querySelector('.gs-play');
+        if (play && !play.disabled && gs.classList.contains('has-sel')) tapEl(play, 'game select PLAY');
+        else { const t = [...gs.querySelectorAll('.gs-tile:not(.locked)')].filter(x=> vis(x) && !x.disabled); if (t.length) tapEl(t[Math.floor(Math.random() * t.length)], 'game select tile'); }
+        next = now + rnd(opts.ansMin || 500, opts.ansMax || 1200);
       } else if (mg){
         const b = [...mg.querySelectorAll('button')].filter(x=> vis(x) && !x.disabled);
         if (b.length) tapEl(b[Math.floor(Math.random() * b.length)], 'mini game');

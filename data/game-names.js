@@ -78,7 +78,7 @@ window.FLIPSTAX_NAMES = {
     vs:        { full:'Pick the one YOU prefer. There\u2019s no right or wrong answer! We\u2019re learning from the coolest cats in the Milky Way.', short:'Pick the one YOU prefer!' },
     riddle:    { full:'Read the riddle, then pick the right answer. Think fast, Earthling!', short:'Solve the riddle!' },
     lucky:     { full:'Spin the Mystery Wheel, then hit STOP! Three spins for points, orbs, mystery games and a dance party - watch out for the GOOP!', short:'SPIN, then STOP!' },
-    door:      { full:'Pick a portal. Behind it hides a surprise game!', short:'Pick a portal!' },
+    door:      { full:'Pick your game! Tap any game on the screen to play it.', short:'Pick your game!' },
     zapWords:  { full:'Swipe across letters to spell words before time runs out!', short:'Spell the words!' },
     twinFlip:  { full:'Flip the cards and match every pair before time runs out!', short:'Match the pairs!' },
     orbitDrop: { full:'Drop your chips from the UFO. Land in the Mothership slot for the jackpot!', short:'Drop your chips!' },

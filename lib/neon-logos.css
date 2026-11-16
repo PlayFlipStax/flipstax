@@ -97,3 +97,11 @@
 :root:root:root .nx-sign.neon > small:empty{ display:none; }
 @media (max-height:700px){ :root:root:root .nx-sign.neon{ width:min(80%, 320px); } }
 :root:root .nl-munchMix .nl-icon{ height:48%; flex-basis:26%; }   /* (the jaws: about 40% of the sign's height) */
+
+/* ---- makeover: the three new icons' motion (transform and opacity only; still in lite mode and reduced motion via the rule above) ---- */
+.nlg-needle{ transform-box:view-box; transform-origin:50px 72px; animation:nlNeedle 1.8s ease-in-out infinite alternate; }
+@keyframes nlNeedle{ from{ transform:rotate(-38deg); } to{ transform:rotate(38deg); } }
+.nlt-swing{ transform-box:view-box; transform-origin:50px 5px; animation:nlSwing 2.2s ease-in-out infinite alternate; }
+@keyframes nlSwing{ from{ transform:rotate(-9deg); } to{ transform:rotate(9deg); } }
+.nlv-eyes{ transform-box:fill-box; transform-origin:50% 50%; animation:nlBlink 3.6s steps(1) infinite; }
+@keyframes nlBlink{ 0%, 92%{ transform:scaleY(1); } 94%, 98%{ transform:scaleY(0.12); } 100%{ transform:scaleY(1); } }
