@@ -4372,3 +4372,5 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
    the panel under it). The panel sits above the card's bottom gradient (z-index) so the title and tiles stay bright. ==== */
 :root.mode-daily .show-card.reward.art-round.rw-vid .rw-panel{ position:relative; z-index:3; }
 :root.mode-daily .show-card.reward.art-round.rw-vid::after{ z-index:1; }
+/* the ending is the finale-b.mp4 cutscene again: once the results are up, the frozen last frame is dimmed so the stat tiles, SHARE and the small links read over the bright dance floor */
+.outro:not(.studio).end .outro-video, .outro:not(.studio).end .outro-poster{ filter:brightness(0.66); }

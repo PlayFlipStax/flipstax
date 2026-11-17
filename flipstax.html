@@ -4762,7 +4762,7 @@
        when the curtain has closed on the FLIPSTAX sign, the headline, SHARE and the donation button fade in. A tap skips to that end state. -->
   <div class="outro" id="outro">
     <video class="outro-video" id="outroVideo" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
-    <img class="outro-poster" id="outroPoster" src="data/outro/poster.webp" alt="" decoding="async" draggable="false">
+    <img class="outro-poster" id="outroPoster" src="data/outro/finale-b-poster.webp" alt="" decoding="async" draggable="false">
     <div class="outro-badge" id="outroBadge" aria-live="polite"><span>FINAL SCORE</span><b id="outroScore">0</b></div>
     <button type="button" class="outro-details" id="outroDetails" aria-expanded="false">details</button>
     <div class="outro-end" id="outroEnd">
@@ -12457,7 +12457,7 @@ const SHARE_URL = 'https://playflipstax.com';
   // with one - unless the show is cutting straight here, e.g. from a resume or the TEST menu).
   // A+ job 2: the outro video (about 2 MB) starts loading as the last games begin, so it plays at once
   let outroPreloaded = false;
-  function preloadOutro(){ if (outroPreloaded || isLite() || prefersReducedMotion()) return; outroPreloaded = true; try{ fetch('data/outro/outro.mp4').catch(()=>{}); }catch(e){} }
+  function preloadOutro(){ if (outroPreloaded || isLite() || prefersReducedMotion()) return; outroPreloaded = true; try{ fetch('data/outro/finale-b.mp4').catch(()=>{}); }catch(e){} }
   // stability: nothing of Orbit Drop's jackpot (the dance video, its layer, the marquee look) is left when Word Warp's title card shows
   function orbitLeftovers(){ document.querySelectorAll('.disco.odj, .disco').forEach(d=>{ d.querySelectorAll('video').forEach(v=>{ try{ v.pause(); }catch(e){} v.removeAttribute('src'); try{ v.load(); }catch(e){} }); d.remove(); });
     try{ marquee.classList.remove('disco', 'still', 'strobe'); }catch(e){} }
@@ -17042,7 +17042,8 @@ const SHARE_URL = 'https://playflipstax.com';
   // polish pass: the goodbye video was filmed on the old stage - the ending now plays in the drawn studio instead (lib/juice.css, THE ENDING IN THE STUDIO): the
   // cast, lifted off the old picture, in front of the window, then the blast doors close under the neon FLIPSTAX sign and the results lie over them. Same length
   // as the video (10 s), same tap to skip, same quiet path for lite / reduced motion / fast test runs. The video and its poster stay in data/outro, not loaded here.
-  const OUTRO_STUDIO = true, OUTRO_STUDIO_MS = 10000;
+  // (girls pass: the ending plays data/outro/finale-b.mp4 again - the cutscene, 10 s, the cast dancing on a lit floor; OUTRO_STUDIO = false is the video path. Its last frame is data/outro/finale-b-poster.webp. The drawn-studio ending (true) stays in the code and the CSS.)
+  const OUTRO_STUDIO = false, OUTRO_STUDIO_MS = 10000;
   function outroMount(){
     const o = document.getElementById('outro'); if (!o || o.querySelector('.outro-extras')) return;
     // mega 4 item 1: no red curtains and no 'That's our show' card - the video's own blue curtain closes on the neon FLIPSTAX sign, and the results lie over
@@ -17098,7 +17099,7 @@ const SHARE_URL = 'https://playflipstax.com';
     if (OUTRO_STUDIO){ outroLater(OUTRO_STUDIO_MS, ()=> outroEnd(false, true)); return; }   // (the studio ending: as long as the video was, then the results)
     const fail = ()=>{ if (outroState !== 'playing') return; o.classList.add('poster-on'); outroClear(); outroLater(OUTRO_FALLBACK_MS, ()=> outroEnd(false)); outroLater(OUTRO_WATCHDOG_MS, ()=> outroEnd(true)); };
     try{
-      v.muted = true; v.src = 'data/outro/outro.mp4'; v.currentTime = 0;   // (mega 4: always muted - the win or lose track plays under the ending)
+      v.muted = true; v.src = 'data/outro/finale-b.mp4'; v.currentTime = 0;   // (mega 4: always muted - the win or lose track plays under the ending)
       v.onended = ()=> outroEnd(false, true); v.onerror = fail;   // (mega 4: the video plays to its end - its own blue curtain closes on the sign - then the results fade in over that last frame)
       v.ontimeupdate = null;
       let started = false; v.onplaying = ()=>{ started = true; };
