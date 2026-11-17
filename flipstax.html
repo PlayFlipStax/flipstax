@@ -12681,17 +12681,12 @@ const SHARE_URL = 'https://playflipstax.com';
     // first frame; lite mode and reduced motion get only the poster. (The round pictures themselves are on the round title cards.)
     // polish pass: the dancers' video and its poster were filmed on the old gold stage - the card now stands in the drawn studio with the three girls
     // lifted off the poster frame (same pose, a still); the video is not loaded any more (the files stay)
-    const ROUND_DONE_VIDEO = false;
-    showCard.className = 'show-card reward has-art art-round has-cast solo';   // (solo pass: Flip alone, cheering - his own pose picture, no dancers)
-    showCard.style.setProperty('--rw-art', 'url(../data/host/flip2-wave.webp)');   // (the same full-body Flip as every other beat - lib/host.js FLIP2: there is no cheer in that set, the arm-up wave is its celebratory pose; never the old big-head sprite cheer.webp)
+    // (girls pass: the dance video is back - the cutscenes stay. Lite mode and reduced motion get the lifted-girls still on the studio's hover pad instead: no motion, same three girls)
+    const ROUND_DONE_VIDEO = !isLite() && !prefersReducedMotion();
+    showCard.className = 'show-card reward has-art art-round' + (ROUND_DONE_VIDEO ? ' rw-vid' : ' has-cast');   // (girls pass: the dance video fills the card as before; lite mode and reduced motion stand the girls in the studio)
+    showCard.style.setProperty('--rw-art', ROUND_DONE_VIDEO ? 'url(../data/scenes/round/dance-poster.webp)' : 'url(../data/cast/studio/girls-dance.webp)');
     if (window.Stage) Stage.cue('close', { over:showCard, cls:'reward', sign:{ sub:'', main:'' } });
-    // solo pass: a bigger celebration for Flip alone - a slow fan of light rays behind him, two shockwave rings off the hover pad and falling confetti
-    // (lib/juice.css, ROUND DONE PARTY: transform and opacity only, nothing flashes; lite mode and reduced motion get the rays and a still scatter of confetti)
-    let party = '<div class="rw-party" aria-hidden="true"><i class="rp-rays"></i><i class="rp-ring"></i><i class="rp-ring b"></i><span class="rp-conf">';
-    for (let k = 0; k < 26; k++){ const r = (n)=> ((k * 9301 + n * 49297 + 1234) % 233280) / 233280;
-      party += '<i class="c' + (k % 5) + (k % 3 === 0 ? ' sq' : '') + '" style="left:' + (3 + r(1) * 94).toFixed(1) + '%;--y:' + (6 + r(2) * 62).toFixed(1) + 'vh;--r:' + Math.round(r(3) * 360) + 'deg;--d:' + (2.6 + r(4) * 1.8).toFixed(2) + 's;--w:' + (-r(5) * 4.4).toFixed(2) + 's"></i>'; }
-    party += '</span></div>';
-    showCard.innerHTML = party + '<i class="rw-sun" aria-hidden="true"></i><div class="rw-panel"><div class="rw-title"></div><div class="rw-frame"><i class="mq mq-a" aria-hidden="true"></i><i class="mq mq-b" aria-hidden="true"></i><div class="rw-row">' +
+    showCard.innerHTML = '<i class="rw-sun" aria-hidden="true"></i><div class="rw-panel"><div class="rw-title"></div><div class="rw-frame"><i class="mq mq-a" aria-hidden="true"></i><i class="mq mq-b" aria-hidden="true"></i><div class="rw-row">' +
       '<span class="rw-chip pts" style="--i:0"><b>+' + pts + '</b><small>points</small></span>' +
       '<span class="rw-chip letter ' + (letter || 'none') + '" style="--i:1"><b>' + (letter === 'got' ? '?' : letter === 'miss' ? '✕' : '–') + '</b><small>' + (letter === 'got' ? 'letter won' : 'no letter') + '</small></span>' +
       '<span class="rw-chip keys" style="--i:2"><b>◉ ' + keys + '</b><small>orb' + (keys === 1 ? '' : 's') + '</small></span></div></div></div>';   // (A+: only points gained, the letter won and keys - no running totals)
@@ -12717,7 +12712,7 @@ const SHARE_URL = 'https://playflipstax.com';
     // Run 4B: the round-end game was won - the presenter pops out beside the panel now and then (lib/cast.js; only
     // pictures listed in data/cast/manifest.js; never takes a tap)
     // solo pass: the presenter (Cleo) no longer pops out - Flip is the only host on the card
-    if (false && runActWon[st.act] && window.Cast) Cast.win({ side:'left', hold: Math.min(1900, cine(TIMING.REWARD_HOLD || 2200) - 300), always: CAST_ALWAYS, while: ()=> showCard.classList.contains('reward') && !showCard.classList.contains('hidden') });
+    if (runActWon[st.act] && window.Cast) Cast.win({ side:'left', hold: Math.min(1900, cine(TIMING.REWARD_HOLD || 2200) - 300), always: CAST_ALWAYS, while: ()=> showCard.classList.contains('reward') && !showCard.classList.contains('hidden') });
     const shownAt = performance.now();
     let gone = false;
     const go = (e)=>{
@@ -12748,7 +12743,7 @@ const SHARE_URL = 'https://playflipstax.com';
     const m = st.mult || a.mult || 1, line = st.announce || a.announce || '', round = st.round || a.round || 0;
     // A+ round art: Rounds 2-6 open on their own picture (data/scenes/round/, ROUND_TITLE_ART) instead of the stage's arch - the girls on top,
     // the sign, the points pill and the host's line in the dark gradient at the bottom; the host is not drawn over the picture.
-    const tArt = null;   // (solo pass: no cast picture on any round - Flip himself stands on the card)
+    const tArt = !fin && ROUND_TITLE_CAST[round] || null;   // (girls pass: rounds 2-6 stand the three girls in the studio again, as before the solo pass; Round 1 and the Grand Finale are Flip)
     showCard.className = 'show-card flipstage' + (fin ? ' finale' : '') + (tArt ? ' has-cast' : '');
     if (tArt) showCard.style.setProperty('--rw-art', 'url(../data/cast/studio/' + tArt + '.webp)'); else showCard.style.removeProperty('--rw-art');
     showCard.innerHTML = '<div class="fs-host host-full" aria-hidden="true">' + Host.html({ pose: fin ? 'cheer' : (ROUND_TITLE_POSE[round] || 'presenting') }) + '</div>' +

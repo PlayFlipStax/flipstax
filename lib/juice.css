@@ -4367,3 +4367,8 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 .outro.studio.still .os-cast{ animation:none; }
 /* (one render: ROUND DONE and the ending use data/host/flip2-wave.webp - the full-body Flip of the opener and the round cards, the same 607 x 900 canvas, so the
    same size and footing. The older big-head sprites data/host/wave.webp and cheer.webp are not used on any show beat; the files stay.) */
+/* ==== GIRLS PASS: THE GIRLS AND THE CUTSCENES ARE BACK. Rounds 2-6 stand the three girls (data/cast/studio) on the studio's hover pad again
+   (the POLISH PASS rules above), and ROUND DONE plays dance-girls.mp4 full-card as before the solo pass (the A+ rules: the video in the first grid row,
+   the panel under it). The panel sits above the card's bottom gradient (z-index) so the title and tiles stay bright. ==== */
+:root.mode-daily .show-card.reward.art-round.rw-vid .rw-panel{ position:relative; z-index:3; }
+:root.mode-daily .show-card.reward.art-round.rw-vid::after{ z-index:1; }
