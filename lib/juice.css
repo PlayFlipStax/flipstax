@@ -4351,7 +4351,7 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
    Now one size everywhere - the opener, round cards 1-6, the Grand Finale card, ROUND DONE, the ending: --flip-h tall (430 px on a tall phone,
    the screen's height less 320 px on a short one: 320 px at 360x640), standing on a 240 px hover pad, his head inside the window arch below the
    sign and the points badge. Poses still change per beat. Sizes only - nothing new moves. ==== */
-:root{ --flip-h:min(430px, calc(100vh - 320px)); --flip-w:calc(var(--flip-h) * 0.6743); }
+:root{ --flip-h:min(430px, calc(100vh - 336px)); --flip-w:calc(var(--flip-h) * 0.6743); }   /* (girls pass: 336, was 320 - on a short phone his antennae stay clear of the GRAND PRIZE pill and the sign) */
 #showCard.show-card.flipstage .fs-host, #showCard.show-card.curtain.lines.saucer .co-stage-host{ width:var(--flip-w); margin-left:calc(var(--flip-w) / -2); }
 /* the pad no longer grows with him: 240 px, as on ROUND DONE and the ending */
 #showCard.show-card.flipstage.staged .fs-host::before{ width:240px; margin-left:-120px; }
