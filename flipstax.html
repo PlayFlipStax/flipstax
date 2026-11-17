@@ -12554,6 +12554,78 @@ const SHARE_URL = 'https://playflipstax.com';
   const HOST_INTRO_BACK = NAMES_INTRO.back || 'Welcome back, Earthlings! Let’s play!';
   const HOST_OUTRO_LINE = NAMES_INTRO.outro || 'That’s our show, Earthlings! See you tomorrow!';
   const HOST_INTRO_POSES = ['wave', 'presenting', 'point', 'discoPoint'];
+  // GIRLS PASS, THE VIDEO OPENER: data/intro/intro-saucer.mp4 (10 s, 720 x 1280: the saucer's beam lowers Flip onto the pad and he waves) is the opener. It replaces the
+  // CSS saucer intro (the shrinking and growing Flip) and the old CGI intro. First visit (or ?intro=full): the whole video, then it freezes on its last frame
+  // (Flip waving), the FlipStax logo slams in like a game-show title card (a quick light burst, a short shine sweep), holds about 1.5 s and goes, then Flip's greeting
+  // bubble and the first round as before. A returning player gets the last 3 s of the video, a shorter hold and the 'welcome back' line. Muted autoplay, inline;
+  // the video's own soundtrack is not used (the intro theme plays under it, started from the ENTER tap) - set INTRO_VIDEO_SOUND to hear it instead of the theme.
+  // Lite mode and reduced motion load no video: the still last frame, the logo and the line. The CSS is lib/intro.css THE VIDEO OPENER (transform and opacity only,
+  // one flash). Tap to skip (after SKIP_MIN_MS) goes straight on, as before.
+  const INTRO_VIDEO = true, INTRO_VIDEO_SOUND = false, INTRO_VIDEO_SRC = 'data/intro/intro-saucer.mp4', INTRO_VIDEO_FIRST = 'data/intro/intro-saucer-first.webp', INTRO_VIDEO_LAST = 'data/intro/intro-saucer-last.webp';
+  function showVideoOpen(then, o){
+    const first = !!o.first, quiet = !!o.quiet, ep = o.ep;
+    const line = first ? HOST_INTRO_LINES[0] : HOST_INTRO_BACK;
+    const FROM = first ? 0 : 7.0, VIDEO_MS = first ? 10000 : 3000, SLAM_MS = 450, HOLD_MS = first ? 1500 : 800, LINE_MS = first ? 3500 : Math.max(2200, cueLineMs(line));
+    const titleAt = quiet ? 0 : VIDEO_MS, lineAt = quiet ? (first ? 1300 : 800) : VIDEO_MS + SLAM_MS + HOLD_MS, total = lineAt + LINE_MS + 200;
+    showCard.className = 'show-card curtain lines vidintro' + (quiet ? ' ci-quiet ci-ended ci-title-on' : '');
+    showCard.removeAttribute('style');
+    playIntroTheme(total);   // (the intro theme: a snippet of an existing song, for exactly as long as the intro)
+    showCard.innerHTML = '<div class="ci-stage" aria-hidden="true">' +
+        (quiet ? '' : '<video class="ci-video" muted playsinline preload="auto" disablepictureinpicture poster="' + INTRO_VIDEO_FIRST + '"></video>') +
+        '<img class="ci-last" alt="" decoding="async" src="' + INTRO_VIDEO_LAST + '"></div><i class="ci-dim" aria-hidden="true"></i>' +
+      '<div class="ci-title" aria-hidden="true"><i class="ci-burst"></i><i class="ci-rays"></i><div class="ci-logo"><img alt="" decoding="async" src="images/flipstax-lockup-800.webp"><i class="ci-shine"></i></div><b class="ci-ep">EPISODE ' + ep + '</b></div>' +
+      '<div class="fs-line co-line" aria-live="polite"><span></span></div>' +
+      '<div class="co-skip">TAP TO SKIP</div>';
+    showCard.classList.remove('hidden');
+    showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'Welcome to FlipStax, episode ' + ep + ', with your host ' + HOST_NAME + '. Tap to skip');
+    if (window.Stage) Stage.cue('close', { over:showCard, cls:'curtain', sign:{ sub:'', main:'' } });   // (the stage waits under the video, as under every card)
+    const timers = [], later = (ms, f)=> timers.push(setTimeout(f, ms));
+    const lineEl = showCard.querySelector('.co-line'), vid = showCard.querySelector('video');
+    let titled = false, gone = false;
+    const toTitle = ()=>{
+      if (titled || gone) return; titled = true;
+      try{ if (vid) vid.pause(); }catch(e){}
+      showCard.classList.add('ci-ended', 'ci-title-on');   // (the held last frame is the still: Flip waving on his pad)
+      if (!quiet){ later(SLAM_MS + HOLD_MS, ()=>{ showCard.classList.add('ci-title-off'); say(); }); }
+    };
+    let said = false;
+    const say = ()=>{ if (said || gone) return; said = true; cueLineSay(lineEl, line); sfx.chime(4); };
+    if (quiet){ later(lineAt, say); }
+    else {
+      if (vid){
+        vid.muted = !(INTRO_VIDEO_SOUND && sfxOn); vid.defaultMuted = true; vid.playsInline = true; vid.setAttribute('playsinline', ''); vid.setAttribute('webkit-playsinline', '');
+        let started = false;
+        vid.addEventListener('playing', ()=>{ started = true; showCard.classList.add('ci-playing'); });
+        vid.addEventListener('ended', toTitle);
+        vid.addEventListener('error', ()=> toTitle());
+        vid.addEventListener('timeupdate', ()=>{ if (!titled && vid.duration && vid.duration - vid.currentTime < 0.06) toTitle(); });
+        try{
+          vid.src = INTRO_VIDEO_SRC;
+          const seek = ()=>{ try{ if (FROM && Math.abs(vid.currentTime - FROM) > 0.5) vid.currentTime = FROM; }catch(e){} };
+          if (FROM){ if (vid.readyState >= 1) seek(); else vid.addEventListener('loadedmetadata', seek, { once:true }); }
+          const p = vid.play(); if (p && p.catch) p.catch(()=>{ later(0, toTitle); });   // (blocked: the held last frame and the title card instead)
+        }catch(e){ later(0, toTitle); }
+        later(4500, ()=>{ if (!started) toTitle(); });   // (never stuck on a stalled load)
+      }
+      later(VIDEO_MS + 2500, toTitle);   // (the safety net: the video is 10 s)
+    }
+    const shownAt = performance.now();
+    const go = (e)=>{
+      if (gone) return;
+      if (e && e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+      if (e && performance.now() - shownAt < SKIP_MIN_MS) return;   // a tap skips only after SKIP_AFTER (and never the tap that opened it)
+      gone = true; timers.forEach(clearTimeout); coldOpenCancel = null; endIntroTheme();
+      try{ if (vid){ vid.pause(); vid.removeAttribute('src'); vid.load(); } }catch(err){}
+      try{ localStorage.setItem(COLD_OPEN_SEEN_KEY, '1'); }catch(err){}
+      showCard.removeEventListener('click', go); document.removeEventListener('keydown', go);
+      showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden';
+      noteOverlayClosed();
+      then();
+    };
+    later(total, ()=> go());
+    showCard.addEventListener('click', go); document.addEventListener('keydown', go);
+    coldOpenCancel = ()=>{ gone = true; timers.forEach(clearTimeout); if (currentTrackKey === 'theme') endIntroTheme(); try{ if (vid){ vid.pause(); vid.removeAttribute('src'); vid.load(); } }catch(err){} showCard.removeEventListener('click', go); document.removeEventListener('keydown', go); coldOpenCancel = null; };
+  }
   function showColdOpen(then){
     if (coldOpenCancel) coldOpenCancel();
     const ep = showEpisode(runStartDate || todayStr());
@@ -12571,6 +12643,7 @@ const SHARE_URL = 'https://playflipstax.com';
     // Flip on the pad, the saucer parked above, the sign lit, the line. Transform and opacity only.
     const saucer = !afterIntro, quietCO = isLite() || prefersReducedMotion();
     const first = !seen || afterIntro || window.__introSaucer === true || INTRO_THEME_TEST >= 0; window.__introSaucer = false;   // (__introSaucer: lib/intro.js, a first visit or ?intro=1)
+    if (INTRO_VIDEO && !afterIntro){ showVideoOpen(then, { first, quiet: quietCO, ep }); return; }   // (girls pass: the video opener replaces the CSS saucer intro below, which stays in the code switched off)
     const lines = !first ? [HOST_INTRO_BACK] : HOST_INTRO_LINES.slice(0, 1);
     const T = afterIntro ? { open:0, pull:600, walk:0, walkMs:0, talk:1500 }
             : quietCO ? { open:0, pull:first ? 700 : 500, fly:0, flyMs:0, beam:-1, walk:0, walkMs:0, land:0, sign:0, talk:first ? 600 : 400, away:-1 }
