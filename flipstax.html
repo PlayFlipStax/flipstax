@@ -11935,9 +11935,9 @@ const SHARE_URL = 'https://playflipstax.com';
       autoT = setTimeout(()=>{ if (!gone() && state === 'idle') spin(); }, dt(LUCKY_AUTO_STOP_MS));
     };
     const points = (n)=>{ if (n > 0){ addRunScore(n, true); won += n; } else if (n < 0){ const take = Math.min(runScore, -n); runScore -= take; runGoopLost += take; won -= take; renderRunBanner(); saveRunSnapshot(); return take; } return n; };
-    // DANCE PARTY: the dance video full-screen (muted unless the sound is on), confetti on top, then on; the code-made disco if the file fails
+    // DANCE PARTY: the new dance video (data/wheel/dance-party-a.mp4, 10 s, replaces dance-party.mp4 - the old file stays) full-screen (muted unless the sound is on), confetti on top, then on; the code-made disco if the file fails
     const danceParty = (then)=>{
-      const v = document.createElement('div'); v.className = 'mw-dance'; v.innerHTML = '<video src="data/wheel/dance-party.mp4" playsinline autoplay preload="auto"></video><div class="mw-dance-skip">TAP TO SKIP</div>';
+      const v = document.createElement('div'); v.className = 'mw-dance'; v.innerHTML = '<video src="data/wheel/dance-party-a.mp4" playsinline autoplay muted preload="auto"></video><div class="mw-dance-skip">TAP TO SKIP</div>';
       document.body.appendChild(v); const vid = v.querySelector('video'), t0 = performance.now(); vid.muted = !sfxOn; vid.volume = Math.max(0, Math.min(1, masterVol));
       let over = false;
       // mega 3 item 9: the party fades out smoothly (the picture over 0.9 s and the sound with it) instead of cutting off; the wheel is already behind it
