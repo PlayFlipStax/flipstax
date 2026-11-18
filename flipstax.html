@@ -12661,7 +12661,7 @@ const SHARE_URL = 'https://playflipstax.com';
     // It plays whenever the video did not (the video is now only ?intro=full and the test host's 'Watch intro'). Lite mode and reduced motion get it as a still:
     // Flip on the pad, the saucer parked above, the sign lit, the line. Transform and opacity only.
     const saucer = !afterIntro, quietCO = isLite() || prefersReducedMotion();
-    const first = !seen || afterIntro || window.__introSaucer === true || INTRO_THEME_TEST >= 0; window.__introSaucer = false;   // (__introSaucer: lib/intro.js, a first visit or ?intro=1)
+    const first = !seen || afterIntro || window.__introSaucer === true || INTRO_THEME_TEST >= 0 || REPLAY; window.__introSaucer = false;   // (fix pass 3 item 6: REPLAY = ?replay=1 on the test host, which always plays the whole opener with the saucer dropping Flip off, even on a computer that has seen it before;   // (__introSaucer: lib/intro.js, a first visit or ?intro=1)
     if (INTRO_VIDEO && !afterIntro){ showVideoOpen(then, { first, quiet: quietCO, ep }); return; }   // (girls pass: the video opener replaces the CSS saucer intro below, which stays in the code switched off)
     const lines = !first ? [HOST_INTRO_BACK] : HOST_INTRO_LINES.slice(0, 1);
     const T = afterIntro ? { open:0, pull:600, walk:0, walkMs:0, talk:1500 }
