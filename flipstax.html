@@ -12642,6 +12642,7 @@ const SHARE_URL = 'https://playflipstax.com';
   };
   function showColdOpen(then){
     if (coldOpenCancel) coldOpenCancel();
+    preloadCastSlots();
     const ep = showEpisode(runStartDate || todayStr());
     let seen = false; try{ seen = !!localStorage.getItem(COLD_OPEN_SEEN_KEY); }catch(e){}
     // Run 4A: ENTER opens the curtains, then the host introduces himself in four cue lines (each up for at least
@@ -12757,6 +12758,14 @@ const SHARE_URL = 'https://playflipstax.com';
     }
     return pick;
   }
+  // fix pass items 3 + 4: the dancers stand WITH Flip now, in two fixed slots beside him (lib/juice.css, CAST SLOTS) - one left, one right, feet on the same pad line as his,
+  // a fixed share of his height, always behind his face - instead of replacing him on the card. Round 1 and the Grand Finale: Flip alone. The picture files are the same lifted
+  // jump poses as before (data/cast/studio/*-jump.webp); the old gold-stage pictures and the dance video are not used here any more (the files stay).
+  const CAST_SLOT_ART = { green:'data/cast/studio/green-jump.webp', purple:'data/cast/studio/purple-jump.webp', pink:'data/cast/studio/pink-jump.webp' };
+  const ROUND_TITLE_SLOTS = { 2:[['green', 'l']], 3:[['purple', 'r']], 4:[['pink', 'l']], 5:[['green', 'l'], ['purple', 'r']], 6:[['purple', 'l'], ['green', 'r']] };
+  const ROUND_DONE_SLOTS = [['green', 'l'], ['pink', 'r']];
+  function castSlotsHtml(list){ return (list || []).map((x, i)=> '<img class="cast-slot ' + x[1] + '" style="--n:' + i + '" alt="" decoding="async" src="' + CAST_SLOT_ART[x[0]] + '">').join(''); }
+  function preloadCastSlots(){ Object.keys(CAST_SLOT_ART).forEach(k=>{ const im = new Image(); im.decoding = 'async'; im.src = CAST_SLOT_ART[k]; }); }
   // Run 4A: the reward beat - the round's points (Orbit Drop's winnings in Round 6), its letter and its gold keys.
   function showRewardBeat(st, then){
     const a = RUNDOWN.acts[st.act] || {}, letter = runActLetter[st.act], keys = runActKeys[st.act] || 0;
@@ -12769,11 +12778,12 @@ const SHARE_URL = 'https://playflipstax.com';
     // polish pass: the dancers' video and its poster were filmed on the old gold stage - the card now stands in the drawn studio with the three girls
     // lifted off the poster frame (same pose, a still); the video is not loaded any more (the files stay)
     // (girls pass: the dance video is back - the cutscenes stay. Lite mode and reduced motion get the lifted-girls still on the studio's hover pad instead: no motion, same three girls)
-    const ROUND_DONE_VIDEO = !isLite() && !prefersReducedMotion();
-    showCard.className = 'show-card reward has-art art-round' + (ROUND_DONE_VIDEO ? ' rw-vid' : ' has-cast');   // (girls pass: the dance video fills the card as before; lite mode and reduced motion stand the girls in the studio)
-    showCard.style.setProperty('--rw-art', ROUND_DONE_VIDEO ? 'url(../data/scenes/round/dance-poster.webp)' : 'url(../data/cast/studio/girls-dance.webp)');
+    // (fix pass item 3: that video was filmed on the old gold stage, so ROUND DONE no longer plays it - Flip and two dancers stand on the new dance deck in the fixed slots, in every mode; the video and its poster stay in data/scenes/round)
+    const ROUND_DONE_VIDEO = false;
+    showCard.className = 'show-card reward has-art art-round cast2';
+    showCard.style.setProperty('--rw-art', 'none');
     if (window.Stage) Stage.cue('close', { over:showCard, cls:'reward', sign:{ sub:'', main:'' } });
-    showCard.innerHTML = '<i class="rw-sun" aria-hidden="true"></i><div class="rw-panel"><div class="rw-title"></div><div class="rw-frame"><i class="mq mq-a" aria-hidden="true"></i><i class="mq mq-b" aria-hidden="true"></i><div class="rw-row">' +
+    showCard.innerHTML = '<i class="rw-sun" aria-hidden="true"></i><div class="fs-host host-full" aria-hidden="true">' + Host.html({ pose:'cheer' }) + '</div>' + castSlotsHtml(ROUND_DONE_SLOTS) + '<div class="rw-panel"><div class="rw-title"></div><div class="rw-frame"><i class="mq mq-a" aria-hidden="true"></i><i class="mq mq-b" aria-hidden="true"></i><div class="rw-row">' +
       '<span class="rw-chip pts" style="--i:0"><b>+' + pts + '</b><small>points</small></span>' +
       '<span class="rw-chip letter ' + (letter || 'none') + '" style="--i:1"><b>' + (letter === 'got' ? '?' : letter === 'miss' ? '✕' : '–') + '</b><small>' + (letter === 'got' ? 'letter won' : 'no letter') + '</small></span>' +
       '<span class="rw-chip keys" style="--i:2"><b>◉ ' + keys + '</b><small>orb' + (keys === 1 ? '' : 's') + '</small></span></div></div></div>';   // (A+: only points gained, the letter won and keys - no running totals)
@@ -12830,10 +12840,10 @@ const SHARE_URL = 'https://playflipstax.com';
     const m = st.mult || a.mult || 1, line = st.announce || a.announce || '', round = st.round || a.round || 0;
     // A+ round art: Rounds 2-6 open on their own picture (data/scenes/round/, ROUND_TITLE_ART) instead of the stage's arch - the girls on top,
     // the sign, the points pill and the host's line in the dark gradient at the bottom; the host is not drawn over the picture.
-    const tArt = !fin && ROUND_TITLE_CAST[round] || null;   // (girls pass: rounds 2-6 stand the three girls in the studio again, as before the solo pass; Round 1 and the Grand Finale are Flip)
-    showCard.className = 'show-card flipstage' + (fin ? ' finale' : '') + (tArt ? ' has-cast' : '');
-    if (tArt) showCard.style.setProperty('--rw-art', 'url(../data/cast/studio/' + tArt + '.webp)'); else showCard.style.removeProperty('--rw-art');
-    showCard.innerHTML = '<div class="fs-host host-full" aria-hidden="true">' + Host.html({ pose: fin ? 'cheer' : (ROUND_TITLE_POSE[round] || 'presenting') }) + '</div>' +
+    const slots = !fin && ROUND_TITLE_SLOTS[round] || null;   // (fix pass item 4: rounds 2-6 stand Flip in his fixed place with the dancers in their fixed slots beside him; Round 1 and the Grand Finale are Flip alone)
+    showCard.className = 'show-card flipstage' + (fin ? ' finale' : '');
+    showCard.style.removeProperty('--rw-art');
+    showCard.innerHTML = '<div class="fs-host host-full" aria-hidden="true">' + Host.html({ pose: fin ? 'cheer' : (ROUND_TITLE_POSE[round] || 'presenting') }) + '</div>' + castSlotsHtml(slots) +
       '<div class="fs-title"><b></b><span></span></div>' +
       (m > 1 || fin ? '<div class="fs-pill ds-pill gold">' + (fin ? 'GRAND PRIZE' : 'POINTS ×' + m) + '</div>' : '') +
       '<div class="fs-line" aria-live="polite"><span></span></div>';
@@ -14294,7 +14304,7 @@ const SHARE_URL = 'https://playflipstax.com';
   // and the marquee bulbs flashing (2 a second); TAP TO SKIP after 1 s; when it ends (or is skipped) it fades and Orbit Drop carries on into the existing
   // ROUND SIX DONE flow. It replaces the older code-drawn disco here (which stays as the fallback if the video cannot play). The video is loaded only now,
   // and stopped and removed afterwards. Lite and reduced motion: a still frame of it for 2.5 s, then on. Once an episode, like the disco before it.
-  const OD_DANCE_SRC = 'media/od-dance-540.mp4';
+  const OD_DANCE_SRC = 'data/wheel/dance-party-a.mp4';   // (fix pass item 3: was media/od-dance-540.mp4, filmed on the old gold stage - the jackpot dance now plays the new dance-deck video the Mystery Wheel's DANCE PARTY uses, same 10 s, still muted; the old file stays)
   function jackpotDance(done){
     const id = (runActive || dailyOrbit) ? 'daily-' + (runStartDate || todayStr()) : 'inf-' + (infRun && infRun.startedAt || 'run');
     if (discoShownFor === id){ if (done) done(); return; }

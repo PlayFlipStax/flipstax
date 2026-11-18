@@ -4374,3 +4374,40 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 :root.mode-daily .show-card.reward.art-round.rw-vid::after{ z-index:1; }
 /* the ending is the finale-b.mp4 cutscene again: once the results are up, the frozen last frame is dimmed so the stat tiles, SHARE and the small links read over the bright dance floor */
 .outro:not(.studio).end .outro-video, .outro:not(.studio).end .outro-poster{ filter:brightness(0.66); }
+
+/* ==== FIX PASS (items 3 + 4): FLIP AND THE DANCERS STAND TOGETHER, IN FIXED PLACES ====
+   Flip is one box everywhere (--flip-h tall, centred, his feet 196 px above the bottom - 150 px on a short phone). The dancers on round cards 2-6 and ROUND DONE no longer
+   replace him: each stands in one of two slots beside him, left or right, her feet on the same line as his, 66% of his height, her inner edge 20% of his width from the
+   centre line - so at 390x844 a dancer is always at the same spot, and nobody's face is behind anybody else's. The pictures are the lifted jump poses in data/cast/studio.
+   Transform only (a small hop, a different beat for each); still in lite mode and reduced motion. ==== */
+.show-card .cast-slot{ position:absolute; z-index:4; bottom:calc(196px + env(safe-area-inset-bottom)); height:calc(var(--flip-h) * 0.66); width:auto; max-width:none; pointer-events:none;
+  transform-origin:50% 100%; animation:csHop 0.62s cubic-bezier(.3,0,.5,1) calc(var(--n, 0) * -0.31s) infinite alternate; will-change:transform; }
+.show-card .cast-slot.l{ right:calc(50% + var(--flip-w) * 0.2); }
+.show-card .cast-slot.r{ left:calc(50% + var(--flip-w) * 0.2); }
+@keyframes csHop{ from{ transform:translateY(0); } to{ transform:translateY(-14px); } }
+@media (max-height:660px){ .show-card .cast-slot{ bottom:calc(150px + env(safe-area-inset-bottom)); } }
+:root.lite .show-card .cast-slot, :root.rm .show-card .cast-slot{ animation:none; will-change:auto; }
+@media (prefers-reduced-motion: reduce){ .show-card .cast-slot{ animation:none; will-change:auto; } }
+/* ROUND DONE: the same Flip, the same pad, on the new deck (no picture or video behind the card) */
+#showCard.show-card.reward.cast2 .fs-host{ width:var(--flip-w); margin-left:calc(var(--flip-w) / -2); }
+:root.mode-daily .show-card.reward.cast2::before, .show-card.reward.cast2::before{ content:none; }
+.show-card.reward.cast2 .rw-sun{ display:none; }
+.show-card.reward.cast2 .fs-host::before, .show-card.reward.cast2 .fs-host::after{ content:''; position:absolute; z-index:-1; left:50%; border-radius:50%; pointer-events:none; box-sizing:border-box; }
+.show-card.reward.cast2 .fs-host::before{ bottom:-22px; width:240px; margin-left:-120px; height:44px; border:3px solid #ff4fd8; background:radial-gradient(ellipse closest-side, rgba(40,20,120,0.9), rgba(20,8,70,0.9)); box-shadow:0 0 16px 2px rgba(255,79,216,0.7); }
+.show-card.reward.cast2 .fs-host::after{ bottom:-13px; width:176px; margin-left:-88px; height:28px; border:2.5px solid #5ff4ff; background:radial-gradient(ellipse closest-side, rgba(234,255,255,0.85), rgba(95,244,255,0.35) 60%, rgba(95,244,255,0.1)); box-shadow:0 0 14px 2px rgba(95,244,255,0.8); }
+:root.mode-daily .show-card.reward.has-art.art-round.cast2.stage-backed{ background:linear-gradient(0deg, rgba(10,3,24,0.92) 0%, rgba(10,3,24,0.55) 22%, rgba(10,3,24,0) 40%) !important; }
+/* ROUND DONE on a short phone (360x640): Flip's pad ends at y 512, so the title and the panel are made compact enough to sit wholly below it */
+@media (max-height:660px){
+  :root.mode-daily .show-card.reward.cast2 .rw-title{ font-size:24px; line-height:1; }
+  :root.mode-daily .show-card.reward.cast2 .rw-panel{ gap:4px; }
+  :root.mode-daily .show-card.reward.cast2 .rw-frame{ padding:6px 8px; border-width:3px; border-radius:20px; }
+  .show-card.reward.cast2 .rw-nothing{ gap:2px; padding:2px 4px; }
+  .show-card.reward.cast2 .rw-nothing b{ font-size:22px; }
+  .show-card.reward.cast2 .rw-nothing small{ font-size:13px; }
+  :root.mode-daily .show-card.reward.cast2 .rw-chip{ padding:6px 4px 5px; gap:2px; border-radius:14px; }
+  :root.mode-daily .show-card.reward.cast2 .rw-chip b{ font-size:24px; }
+  :root.mode-daily .show-card.reward.cast2 .rw-chip small{ font-size:11px; }
+}
+/* ROUND DONE: the panel (and its title) always draws over Flip's pad rim, and the three chips are a little shorter so the title clears the pad on a tall phone too */
+:root.mode-daily .show-card.reward.cast2 .rw-panel{ z-index:5; }
+:root.mode-daily .show-card.reward.cast2 .rw-chip{ padding-top:8px; padding-bottom:6px; gap:3px; }
