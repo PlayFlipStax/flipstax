@@ -1857,6 +1857,9 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 @media (max-height:700px){ #readoutOverlay.ep.outro-on .outro-end .outro-artwrap{ height:30vh; } }
 .ox-face{ display:block; overflow:hidden; background:radial-gradient(circle at 50% 40%, #6a2bd8, #2a0b58); }
 .ox-face .host-rig{ width:100%; height:auto; }
+/* fix pass 3 item 4: the results' Flip line stands the standard full-body Flip (the same picture as every card, at 54 px wide) beside the line, not a round head crop */
+.ox-face{ width:54px; height:auto; aspect-ratio:607 / 900; border:0; border-radius:0; box-shadow:none; background:none; overflow:visible; align-self:flex-end; margin:-6px 0 -8px; }
+.ox-face .host-rig{ width:100%; }
 .outro.end .outro-badge{ opacity:0; pointer-events:none; transition:opacity 0.3s ease; }
 
 /* ---- fix 5: Mystery Doors - one scale for each door's closed and open picture (the open frame as tall as the closed door), the open picture anchored at the

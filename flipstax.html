@@ -17191,7 +17191,7 @@ const SHARE_URL = 'https://playflipstax.com';
     if (OUTRO_STUDIO && !o.querySelector('.outro-set')){ o.classList.add('studio'); const set = document.createElement('div'); set.className = 'outro-set'; set.setAttribute('aria-hidden', 'true');
       set.innerHTML = '<i class="os-pad"></i><i class="os-cast"></i><i class="os-door l"></i><i class="os-door r"></i><i class="os-beam"></i><b class="os-sign">FLIPSTAX</b>'; o.insertBefore(set, document.getElementById('outroBadge')); }
     const lower = o.querySelector('.outro-lower'), x = document.createElement('div'); x.className = 'outro-extras';
-    x.innerHTML = '<div class="ox-flip"><span class="ox-face">' + Host.html({ pose:'wave', kind:'head' }) + '</span><p class="ox-line" id="outroFlipLine"></p></div>';
+    x.innerHTML = '<div class="ox-flip"><span class="ox-face">' + Host.html({ pose:'wave' }) + '</span><p class="ox-line" id="outroFlipLine"></p></div>';
     const cards = document.querySelector('#epResults .epr-cards'), unl = document.getElementById('readoutUnlocks'), rid = document.getElementById('readoutRiddler');
     [rid, unl, cards].forEach(n=>{ if (n) x.appendChild(n); });
     lower.appendChild(x);
