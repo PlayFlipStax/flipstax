@@ -4351,7 +4351,13 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
    Now one size everywhere - the opener, round cards 1-6, the Grand Finale card, ROUND DONE, the ending: --flip-h tall (430 px on a tall phone,
    the screen's height less 320 px on a short one: 320 px at 360x640), standing on a 240 px hover pad, his head inside the window arch below the
    sign and the points badge. Poses still change per beat. Sizes only - nothing new moves. ==== */
-:root{ --flip-h:min(430px, calc(100vh - 336px)); --flip-w:calc(var(--flip-h) * 0.6743); }   /* (girls pass: 336, was 320 - on a short phone his antennae stay clear of the GRAND PRIZE pill and the sign) */
+:root{ --app-h:100vh; --flip-b:196px; --flip-t:218px; }
+@supports (height:100dvh){ :root{ --app-h:100dvh; } }
+/* SHORT SCREENS (fix pass 2): Flip's box is worked out from the room there is, never from a fixed 336. Banner (the stage sign) = 86..170 px from the top, 78..144 at 700 px high and
+   under; the points pill sits under it (179..207, 149..177). --flip-t is where his antennae may start (just under the pill), --flip-b where his feet are above the bottom. His height is
+   whatever fits between, up to 430 px, so at any screen size every card has the same box and his head never reaches the banner or the pill. --app-h is the visible height (dvh, so Safari's bars count). */
+@media (max-height:700px){ :root{ --flip-b:150px; --flip-t:188px; } }
+:root{ --flip-h:min(430px, calc(var(--app-h) - var(--flip-b) - var(--flip-t) - env(safe-area-inset-top) - env(safe-area-inset-bottom))); --flip-w:calc(var(--flip-h) * 0.6743); }   /* (girls pass: 336, was 320 - on a short phone his antennae stay clear of the GRAND PRIZE pill and the sign) */
 #showCard.show-card.flipstage .fs-host, #showCard.show-card.curtain.lines.saucer .co-stage-host{ width:var(--flip-w); margin-left:calc(var(--flip-w) / -2); }
 /* the pad no longer grows with him: 240 px, as on ROUND DONE and the ending */
 #showCard.show-card.flipstage.staged .fs-host::before{ width:240px; margin-left:-120px; }
@@ -4380,12 +4386,11 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
    replace him: each stands in one of two slots beside him, left or right, her feet on the same line as his, 66% of his height, her inner edge 20% of his width from the
    centre line - so at 390x844 a dancer is always at the same spot, and nobody's face is behind anybody else's. The pictures are the lifted jump poses in data/cast/studio.
    Transform only (a small hop, a different beat for each); still in lite mode and reduced motion. ==== */
-.show-card .cast-slot{ position:absolute; z-index:4; bottom:calc(196px + env(safe-area-inset-bottom)); height:calc(var(--flip-h) * 0.66); width:auto; max-width:none; pointer-events:none;
+.show-card .cast-slot{ position:absolute; z-index:4; bottom:calc(var(--flip-b) + env(safe-area-inset-bottom)); height:calc(var(--flip-h) * 0.66); width:auto; max-width:none; pointer-events:none;
   transform-origin:50% 100%; animation:csHop 0.62s cubic-bezier(.3,0,.5,1) calc(var(--n, 0) * -0.31s) infinite alternate; will-change:transform; }
 .show-card .cast-slot.l{ right:calc(50% + var(--flip-w) * 0.2); }
 .show-card .cast-slot.r{ left:calc(50% + var(--flip-w) * 0.2); }
 @keyframes csHop{ from{ transform:translateY(0); } to{ transform:translateY(-14px); } }
-@media (max-height:660px){ .show-card .cast-slot{ bottom:calc(150px + env(safe-area-inset-bottom)); } }
 :root.lite .show-card .cast-slot, :root.rm .show-card .cast-slot{ animation:none; will-change:auto; }
 @media (prefers-reduced-motion: reduce){ .show-card .cast-slot{ animation:none; will-change:auto; } }
 /* ROUND DONE: the same Flip, the same pad, on the new deck (no picture or video behind the card) */

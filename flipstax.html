@@ -2831,7 +2831,7 @@
   .fs-line span{ display:block; }
   .show-card.flipstage{ background:radial-gradient(120% 80% at 50% 30%, #3a1268, #12062a 75%); overflow:hidden; }
   :root.stage-on .show-card.flipstage.stage-backed{ background:transparent !important; }
-  .fs-host{ position:absolute; z-index:3; left:50%; bottom:calc(196px + env(safe-area-inset-bottom)); width:min(30vh * 0.6743, 44vw, 210px); margin-left:calc(min(30vh * 0.6743, 44vw, 210px) / -2); pointer-events:none;
+  .fs-host{ position:absolute; z-index:3; left:50%; bottom:calc(var(--flip-b, 196px) + env(safe-area-inset-bottom)); width:min(30vh * 0.6743, 44vw, 210px); margin-left:calc(min(30vh * 0.6743, 44vw, 210px) / -2); pointer-events:none;
     animation:fsHostIn 420ms var(--ease-pop) both; }
   .fs-host .host-rig{ width:100%; }
   @keyframes fsHostIn{ from{ transform:translateY(24px) scale(0.94); opacity:0; } to{ transform:none; opacity:1; } }
@@ -2843,7 +2843,7 @@
   /* Run 4B: up in the arch, under the marquee - well clear of the host's antennae */
   .fs-pill{ position:absolute; z-index:5; left:50%; top:calc(25% + env(safe-area-inset-top)); transform:translateX(-50%); white-space:nowrap; animation:fsPill 360ms var(--ease-pop) 200ms both; }
   @keyframes fsPill{ from{ transform:translateX(-50%) scale(0.6); opacity:0; } to{ transform:translateX(-50%); opacity:1; } }
-  @media (max-height:660px){ .fs-host{ bottom:calc(150px + env(safe-area-inset-bottom)); width:min(26vh * 0.6743, 40vw, 170px); margin-left:calc(min(26vh * 0.6743, 40vw, 170px) / -2); } .fs-line{ bottom:calc(20px + env(safe-area-inset-bottom)); }
+  @media (max-height:700px){ .fs-host{ width:min(26vh * 0.6743, 40vw, 170px); margin-left:calc(min(26vh * 0.6743, 40vw, 170px) / -2); } .fs-line{ bottom:calc(20px + env(safe-area-inset-bottom)); }   /* (short-screens fix: the bottom is --flip-b now, set once for every card in lib/juice.css; the bubble drops to 20 px at 700 px and under, not 660, so it stays under Flip's pad) */
     .fs-pill{ top:calc(23% + env(safe-area-inset-top)); } }
   /* the cold open: the caption plate above TAP TO SKIP, the host lifted clear of it */
   .curtain.lines .co-stage-host{ bottom:calc(150px + env(safe-area-inset-bottom)); width:min(30vh * 0.6743, 44vw, 210px); margin-left:calc(min(30vh * 0.6743, 44vw, 210px) / -2); }
@@ -12570,7 +12570,8 @@ const SHARE_URL = 'https://playflipstax.com';
     showCard.className = 'show-card curtain lines vidintro' + (quiet ? ' ci-quiet ci-ended ci-title-on' : '');
     showCard.removeAttribute('style');
     { const H = innerHeight, W = innerWidth;   // (fix pass item 4: the video's Flip is shrunk to the card Flip's size - lib/intro.css; a screen wider than the video's 9:16 is left as it was)
-      if (W / H <= 0.5625 + 0.002){ showCard.style.setProperty('--ci-s', (Math.min(430, H - 336) / (0.691 * H)).toFixed(4)); showCard.classList.add('ci-fit'); } }
+      if (W / H <= 0.5625 + 0.002){ const pr = document.createElement('i'); pr.style.cssText = 'position:fixed;left:0;top:0;width:1px;visibility:hidden;pointer-events:none;height:var(--flip-h)'; document.body.appendChild(pr); const fh = pr.offsetHeight || Math.min(430, H - 336); pr.remove();   // (the card Flip's real height, from --flip-h)
+        showCard.style.setProperty('--ci-s', (fh / (0.691 * H)).toFixed(4)); showCard.classList.add('ci-fit'); } }
     playIntroTheme(total);   // (the intro theme: a snippet of an existing song, for exactly as long as the intro)
     showCard.innerHTML = '<div class="ci-stage" aria-hidden="true">' +
         (quiet ? '' : '<video class="ci-video" muted playsinline preload="auto" disablepictureinpicture poster="' + INTRO_VIDEO_FIRST + '"></video>') +

@@ -285,6 +285,5 @@
    bottom, 150 px on a short phone); the stage behind shows around it through a soft edge. --ci-s is worked out in showVideoOpen (the card Flip's height / his height in the video).
    Transform and a still mask only. In the video Flip's antennae are at 19.2% and his feet at 88.3% of the picture's height. */
 .vidintro.ci-fit .ci-stage{ background:transparent; }
-.vidintro.ci-fit .ci-stage > video, .vidintro.ci-fit .ci-stage > img{ transform-origin:50% 88.3%; transform:translateY(calc(11.7% - 196px - env(safe-area-inset-bottom))) scale(var(--ci-s, 1));
+.vidintro.ci-fit .ci-stage > video, .vidintro.ci-fit .ci-stage > img{ transform-origin:50% 88.3%; transform:translateY(calc(11.7% - var(--flip-b, 196px) - env(safe-area-inset-bottom))) scale(var(--ci-s, 1));
   -webkit-mask-image:radial-gradient(ellipse 64% 58% at 50% 56%, #000 58%, rgba(0,0,0,0) 100%); mask-image:radial-gradient(ellipse 64% 58% at 50% 56%, #000 58%, rgba(0,0,0,0) 100%); }
-@media (max-height:660px){ .vidintro.ci-fit .ci-stage > video, .vidintro.ci-fit .ci-stage > img{ transform:translateY(calc(11.7% - 150px - env(safe-area-inset-bottom))) scale(var(--ci-s, 1)); } }
