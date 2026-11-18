@@ -16527,7 +16527,8 @@ const SHARE_URL = 'https://playflipstax.com';
   // paused; TAP TO SKIP after 1.5 s; at the end it fades into the goodbye and the results, unchanged. The video is loaded only when the win starts (and
   // unlocked inside the winning tap, so a phone lets it play with sound); everything (video, layers, animations, timers, listeners) is removed after.
   // Lite and reduced motion: a still WARPED IT! card for 2 s, then the goodbye. If the video cannot play, the same still card.
-  const WW_FINALE_SRC = 'media/ww-finale-540.mp4';
+  const WW_FINALE_SRC = 'data/outro/finale-b.mp4';   // (fix pass item 1: the winning ending was still this old 7 s dance video (media/ww-finale-540.mp4, filmed on the old stage; the file stays) - it now plays the new 10 s finale on the dance deck, the same file the results ending uses; WW_FINALE_PLAYED tells the results not to play it a second time)
+  let WW_FINALE_PLAYED = false;
   function wwFinaleWin(solvedAt, done){
     const still = FX.reduced() || isLite() || !Element.prototype.animate, ov = els.solveOverlay;
     const W = innerWidth, H = innerHeight, cx = W / 2, cy = H / 2;
@@ -16593,10 +16594,10 @@ const SHARE_URL = 'https://playflipstax.com';
       const fail = ()=>{ if (ended || fellBack) return; fellBack = true; clearInterval(watch);
         try{ vid.pause(); }catch(e){} try{ if (srcNode) srcNode.disconnect(); }catch(e){} if (vidLayer){ vidLayer.remove(); vidLayer = null; }
         card.remove(); if (flash.animate){ flash.animate([{ opacity:1 }, { opacity:0 }], { duration:300, fill:'forwards' }).onfinish = ()=> flash.remove(); } else flash.remove();
-        const t7 = performance.now() + 7000; discoShownFor = null; let ok = false; try{ ok = discoCelebrate('ww-finale', ()=> later(finish, Math.max(0, t7 - performance.now()))); }catch(e){}
-        if (!ok) later(finish, 7000);
-        later(finish, 9500); };   // (the scene runs the clip's length, 7 s; whatever happens the goodbye comes by 9.5 s)
-      const mark = ()=>{ if (vid && vid.currentTime > 0.05){ started = true; } };
+        const t7 = performance.now() + 10000; discoShownFor = null; let ok = false; try{ ok = discoCelebrate('ww-finale', ()=> later(finish, Math.max(0, t7 - performance.now()))); }catch(e){}
+        if (!ok) later(finish, 10000);
+        later(finish, 12500); };   // (the scene runs the clip's length, 10 s; whatever happens the goodbye comes by 12.5 s)
+      const mark = ()=>{ if (vid && vid.currentTime > 0.05){ started = true; WW_FINALE_PLAYED = true; } };
       vid.addEventListener('playing', ()=>{ lastMove = performance.now(); }); vid.addEventListener('timeupdate', mark);
       const watch = setInterval(()=>{ if (ended || fellBack || !vid){ clearInterval(watch); return; }
         const t = vid.currentTime; if (t !== lastT){ lastT = t; lastMove = performance.now(); }
@@ -16609,7 +16610,7 @@ const SHARE_URL = 'https://playflipstax.com';
         try{ vid.muted = true; const p2 = vid.play(); if (p2 && p2.catch) p2.catch(fail); }catch(e){ fail(); } });
       vid.addEventListener('error', fail);
       vid.addEventListener('ended', ()=>{ if (!fellBack) finish(); });
-      later(finish, 9000);   // (a safety net: the clip is 7 s)
+      later(finish, 12000);   // (a safety net: the clip is 10 s)
       flash.animate([{ opacity:1 }, { opacity:0 }], { duration:450, easing:'ease-out', fill:'forwards' }).onfinish = ()=> flash.remove();
       // WARPED IT! and the points over the first 2 s
       const wd = card.querySelector('.ww-mega-word'), pt = card.querySelector('.ww-mega-pts');
@@ -17154,6 +17155,7 @@ const SHARE_URL = 'https://playflipstax.com';
   }
   function startOutro(r){
     stopOutro(); loadOutroPoster(); outroMount();
+    const seenWin = WW_FINALE_PLAYED; WW_FINALE_PLAYED = false;   // (a win has just played this same finale video: the results come in over its last frame instead of playing it again)
     const o = document.getElementById('outro'), v = document.getElementById('outroVideo'); if (!o) return;
     // (solo pass: the old end-of-show group picture is not loaded any more - its box has been hidden since the blue-curtain ending; the file stays)   // (the end-of-show picture, loaded when the outro starts)
     els.readoutOverlay.classList.add('outro-on');
@@ -17165,7 +17167,7 @@ const SHARE_URL = 'https://playflipstax.com';
     document.getElementById('outroScore').textContent = shownScore(r.score).toLocaleString();
     outroState = 'playing';
     outroLater(OUTRO_WATCHDOG_MS, ()=> outroEnd(true));   // (the watchdog: whatever happens, the buttons are there within 12 s)
-    const quiet = isLite() || prefersReducedMotion() || (DEBUG_FAST && !REALTIME);   // (test runs and quiet modes: the poster, then the end state)
+    const quiet = seenWin || isLite() || prefersReducedMotion() || (DEBUG_FAST && !REALTIME);   // (test runs and quiet modes: the poster, then the end state)
     // (lite mode / reduced motion in the studio ending: Flip stands still on his pad in front of the open doors for the hold - the same big Flip, same place, as
     // the normal ending, just not moving - instead of the doors being shut from the first frame with nobody there; then the results over the closed doors as before)
     if (quiet){ o.classList.add(OUTRO_STUDIO && !(DEBUG_FAST && !REALTIME) ? 'still' : 'poster-on'); outroLater(DEBUG_FAST && !REALTIME ? 300 : OUTRO_FALLBACK_MS, ()=> outroEnd(false)); return; }
