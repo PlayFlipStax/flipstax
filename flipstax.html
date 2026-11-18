@@ -13193,10 +13193,11 @@ const SHARE_URL = 'https://playflipstax.com';
       '<button type="button" class="bd-skip">TAP TO SKIP</button>';
     showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'A little dance before the commercial break. Tap to skip');
     showCard.classList.remove('hidden');
+    document.documentElement.classList.add('bd-up');   // (the effects layer is hidden while the dance is up: a light sweep from the board underneath used to cross the picture - see lib/juice.css)
     const vid = showCard.querySelector('video'), shownAt = performance.now(), timers = [], mine = showCard.querySelector('.bd-poster');
     let over = false;
     const finish = (handBack)=>{
-      if (over) return; over = true; timers.forEach(clearTimeout); showCard.removeEventListener('click', onTap);
+      if (over) return; over = true; timers.forEach(clearTimeout); showCard.removeEventListener('click', onTap); document.documentElement.classList.remove('bd-up');
       if (vid){ try{ vid.pause(); }catch(e){} vid.removeAttribute('src'); try{ vid.load(); }catch(e){} }
       if (mine.isConnected && showCard.contains(mine)){ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; }
       if (handBack && g === Show.gen) then();

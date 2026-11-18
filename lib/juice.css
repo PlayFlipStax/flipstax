@@ -4425,3 +4425,7 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 .show-card.breakdance .bd-skip{ position:absolute; z-index:3; left:50%; bottom:calc(22px + env(safe-area-inset-bottom)); transform:translateX(-50%); opacity:0; transition:opacity 0.25s linear; pointer-events:none;
   padding:10px 22px; min-height:44px; border-radius:999px; background:#120a2c; color:#fff; border:2px solid #ffd23f; font:900 17px/1 var(--f-display, Inter, sans-serif); letter-spacing:1px; }
 .show-card.breakdance.bd-skip-on .bd-skip, .show-card.breakdance.bd-still .bd-skip{ opacity:1; }
+
+/* fix pass 2 item 3: while the break dance is up the effects layer (#showFx, z 71, above every card) is hidden. The board under the card still fires its answer effects, and a gold light sweep
+   from it crossed the dancers' picture (most visible in the 2 s lite still). */
+:root.bd-up #showFx{ visibility:hidden; }
