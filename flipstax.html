@@ -11465,7 +11465,7 @@ const SHARE_URL = 'https://playflipstax.com';
         if (!SPONSOR_BREAK_ON && !st.forced) continue;
         runPhase = 'bumper'; saveRunSnapshot();
         const g = showEnter('ad', 'sponsor');
-        showSponsor(()=> showDone(g, 'sponsor'));
+        showBreakDance(g, ()=> showSponsor(()=> showDone(g, 'sponsor')));   // (fix pass item 5: the short dance first, then the break exactly as before)
         return true;
       }
       if (st.t === 'ad'){
@@ -13178,6 +13178,42 @@ const SHARE_URL = 'https://playflipstax.com';
       if (e && performance.now() - shownAt < CB_SKIP_MS) return;
       if (stage === 'last') finish(); else lastCard(); }
     showCard.addEventListener('click', go);
+  }
+  // fix pass item 5: a short dance before the commercial break - data/break/dance-duo-a.mp4 (10 s, 720 x 1280, 2 MB, no sound track: Flip and one dancer on the dance deck),
+  // muted, inline, tap to skip after 1 s. When it ends (or is skipped, fails, or has not started after 3 s) the break starts exactly as before - the break itself is untouched.
+  // Lite mode and reduced motion: the still frame (data/break/dance-duo-a-poster.webp) for 2 s. Fast test runs (?debug=fast, not real time) go straight to the break so the
+  // break's own check is unchanged. If another screen takes the show over meanwhile (a TEST jump, a restart) the dance cleans up and hands nothing back.
+  const BREAK_DANCE_SRC = 'data/break/dance-duo-a.mp4', BREAK_DANCE_POSTER = 'data/break/dance-duo-a-poster.webp', BREAK_DANCE_MS = 10000;
+  function showBreakDance(g, then){
+    if (DEBUG_FAST && !REALTIME){ then(); return; }
+    const still = isLite() || prefersReducedMotion();
+    showCard.className = 'show-card breakdance' + (still ? ' bd-still' : '');
+    showCard.innerHTML = '<img class="bd-poster" alt="" decoding="async" src="' + BREAK_DANCE_POSTER + '">' + (still ? '' : '<video class="bd-video" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>') +
+      '<button type="button" class="bd-skip">TAP TO SKIP</button>';
+    showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'A little dance before the commercial break. Tap to skip');
+    showCard.classList.remove('hidden');
+    const vid = showCard.querySelector('video'), shownAt = performance.now(), timers = [], mine = showCard.querySelector('.bd-poster');
+    let over = false;
+    const finish = (handBack)=>{
+      if (over) return; over = true; timers.forEach(clearTimeout); showCard.removeEventListener('click', onTap);
+      if (vid){ try{ vid.pause(); }catch(e){} vid.removeAttribute('src'); try{ vid.load(); }catch(e){} }
+      if (mine.isConnected && showCard.contains(mine)){ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; }
+      if (handBack && g === Show.gen) then();
+    };
+    const end = ()=> finish(g === Show.gen);
+    const onTap = ()=>{ if (performance.now() - shownAt >= 1000) end(); };
+    showCard.addEventListener('click', onTap);
+    if (still){ timers.push(setTimeout(end, 2000)); return; }
+    vid.muted = true; vid.defaultMuted = true; vid.playsInline = true; vid.setAttribute('playsinline', ''); vid.setAttribute('webkit-playsinline', '');
+    let started = false;
+    vid.addEventListener('playing', ()=>{ started = true; showCard.classList.add('bd-on'); });
+    vid.addEventListener('ended', end); vid.addEventListener('error', end);
+    vid.addEventListener('timeupdate', ()=>{ if (!over && vid.duration && vid.duration - vid.currentTime < 0.08) end(); });
+    vid.src = BREAK_DANCE_SRC;
+    try{ const pr = vid.play(); if (pr && pr.catch) pr.catch(end); }catch(e){ end(); }
+    timers.push(setTimeout(()=>{ if (!started) end(); }, 3000));   // (never stuck on a stalled load)
+    timers.push(setTimeout(end, BREAK_DANCE_MS + 2500));            // (the safety net: the clip is 10 s)
+    timers.push(setTimeout(()=> showCard.classList.add('bd-skip-on'), 1000));
   }
   function showSponsor(done){
     if (CB_RETRO) return showSponsorRetro(done);

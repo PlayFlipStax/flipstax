@@ -4411,3 +4411,12 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 /* ROUND DONE: the panel (and its title) always draws over Flip's pad rim, and the three chips are a little shorter so the title clears the pad on a tall phone too */
 :root.mode-daily .show-card.reward.cast2 .rw-panel{ z-index:5; }
 :root.mode-daily .show-card.reward.cast2 .rw-chip{ padding-top:8px; padding-bottom:6px; gap:3px; }
+
+/* fix pass item 5: the short dance before the commercial break (showBreakDance in flipstax.html). The video fills the card over its still poster, muted; the skip pill fades in after 1 s. */
+.show-card.breakdance{ background:#05030f; overflow:hidden; }
+.show-card.breakdance .bd-poster, .show-card.breakdance .bd-video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 50%; pointer-events:none; display:block; }
+.show-card.breakdance .bd-video{ opacity:0; transition:opacity 0.3s linear; }
+.show-card.breakdance.bd-on .bd-video{ opacity:1; }
+.show-card.breakdance .bd-skip{ position:absolute; z-index:3; left:50%; bottom:calc(22px + env(safe-area-inset-bottom)); transform:translateX(-50%); opacity:0; transition:opacity 0.25s linear; pointer-events:none;
+  padding:10px 22px; min-height:44px; border-radius:999px; background:#120a2c; color:#fff; border:2px solid #ffd23f; font:900 17px/1 var(--f-display, Inter, sans-serif); letter-spacing:1px; }
+.show-card.breakdance.bd-skip-on .bd-skip, .show-card.breakdance.bd-still .bd-skip{ opacity:1; }
