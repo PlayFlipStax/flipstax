@@ -448,3 +448,13 @@ Checked: every beat at 390x844 and 360x640, normal and lite (`review-shots/fixes
 
 Old-stage places still in the normal show: the Cosmo Burger / Fizz Nova ad card (its own orange look, not the stage), the share picture (data/outro/poster.webp is its source), `stage-dim.webp` (the blurred gameplay backdrop, an old photo under the deck's CSS life; nothing gold shows), and the CSS-hidden old files (`dance-girls.mp4`, `ww-finale-540.mp4`, `od-dance-540.mp4`, `mothership-intro.mp4`, all still on disk; the last is still the code path in lib/intro.js if `__watchIntro` were missing).
 Not done / not checked: a real iPhone; true prefers-reduced-motion (only the JS side was simulated); the finale-b and dance videos keep their own framing (Flip dances at a different size inside a cutscene); the live site's headers (nothing was pushed).
+
+## Fix pass 2 (short phone screens) - rollback tag `before-short-screens-20261117`
+
+1. `67901ff` Short screens: Flip's box is now worked out from the room there is (`--app-h` = 100dvh, `--flip-b`, `--flip-t` in `lib/juice.css`), not from fixed 336 / 196 numbers with a 660 px breakpoint. One box feeds the card Flip, the dancer slots, the goodbye card and the opener video scale. Antennae stay under the banner and points pill at 390x664, 390x700, 390x844, 360x640 and 375x560.
+2. `ccdde9b` ROUND ONE DONE: the compact panel (24 px headline, tighter frame and chips) now applies at 700 px high and under (was 660), so the headline clears Flip's pad with the stats tiles showing.
+3. `7a9a999` Break dance: the gold beam was the board's glow sweep (`FX.glowSweep`, drawn on `#showFx`, above every card). `:root.bd-up #showFx{visibility:hidden}` while the dance is up.
+4. `a1d1088` Round 3 (and every card): Flip was on stage from the first frame but faded in from opacity 0 together with the sign and bubble (scene fade `sceneIn`, 600 ms, plus `hostStillIn` from 0). `sceneIn` now skips `.fs-host`, `hostStillIn` starts at 0.75, lite / reduced motion show him at full strength at once.
+5. 360x640 check: opener video plays to 10 s then holds on the logo; the break dance (`break/dance-duo-a.mp4`) plays then the sponsor card; the ending video (`outro/finale-b.mp4`) plays, then the goodbye card, then results. Stills in `review-shots/fixes2/` (`p5-*`, `_p5-*`, `before-*` / `after-*`, `_before-after-*`).
+
+Not checked: a real iPhone (dvh and Safari's bars are assumed from the 664 px figure); true prefers-reduced-motion (only the CSS rule is in place).
