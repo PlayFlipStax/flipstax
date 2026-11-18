@@ -4402,7 +4402,7 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 .show-card.reward.cast2 .fs-host::after{ bottom:-13px; width:176px; margin-left:-88px; height:28px; border:2.5px solid #5ff4ff; background:radial-gradient(ellipse closest-side, rgba(234,255,255,0.85), rgba(95,244,255,0.35) 60%, rgba(95,244,255,0.1)); box-shadow:0 0 14px 2px rgba(95,244,255,0.8); }
 :root.mode-daily .show-card.reward.has-art.art-round.cast2.stage-backed{ background:linear-gradient(0deg, rgba(10,3,24,0.92) 0%, rgba(10,3,24,0.55) 22%, rgba(10,3,24,0) 40%) !important; }
 /* ROUND DONE on a short phone (360x640): Flip's pad ends at y 512, so the title and the panel are made compact enough to sit wholly below it */
-@media (max-height:660px){
+@media (max-height:700px){
   :root.mode-daily .show-card.reward.cast2 .rw-title{ font-size:24px; line-height:1; }
   :root.mode-daily .show-card.reward.cast2 .rw-panel{ gap:4px; }
   :root.mode-daily .show-card.reward.cast2 .rw-frame{ padding:6px 8px; border-width:3px; border-radius:20px; }
