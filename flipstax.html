@@ -12569,6 +12569,8 @@ const SHARE_URL = 'https://playflipstax.com';
     const titleAt = quiet ? 0 : VIDEO_MS, lineAt = quiet ? (first ? 1300 : 800) : VIDEO_MS + SLAM_MS + HOLD_MS, total = lineAt + LINE_MS + 200;
     showCard.className = 'show-card curtain lines vidintro' + (quiet ? ' ci-quiet ci-ended ci-title-on' : '');
     showCard.removeAttribute('style');
+    { const H = innerHeight, W = innerWidth;   // (fix pass item 4: the video's Flip is shrunk to the card Flip's size - lib/intro.css; a screen wider than the video's 9:16 is left as it was)
+      if (W / H <= 0.5625 + 0.002){ showCard.style.setProperty('--ci-s', (Math.min(430, H - 336) / (0.691 * H)).toFixed(4)); showCard.classList.add('ci-fit'); } }
     playIntroTheme(total);   // (the intro theme: a snippet of an existing song, for exactly as long as the intro)
     showCard.innerHTML = '<div class="ci-stage" aria-hidden="true">' +
         (quiet ? '' : '<video class="ci-video" muted playsinline preload="auto" disablepictureinpicture poster="' + INTRO_VIDEO_FIRST + '"></video>') +

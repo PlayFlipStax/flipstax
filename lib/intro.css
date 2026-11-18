@@ -279,3 +279,12 @@
 
 /* fix pass item 2: 'Watch intro' plays the opener over the landing / Play Today screen (both are above the show card's usual layer) */
 :root.watching-intro .show-card.vidintro{ z-index:210; }
+
+/* fix pass item 4: ONE FLIP SIZE. The opener video's Flip was 69% of the screen height (the round cards' Flip is 430 px, 51% at 390x844), so the opener -> Round 1 hand-off
+   made him jump. The video (and the held last frame) is now shrunk about Flip's feet so he is exactly the card Flip's size and his feet land on the same line (196 px above the
+   bottom, 150 px on a short phone); the stage behind shows around it through a soft edge. --ci-s is worked out in showVideoOpen (the card Flip's height / his height in the video).
+   Transform and a still mask only. In the video Flip's antennae are at 19.2% and his feet at 88.3% of the picture's height. */
+.vidintro.ci-fit .ci-stage{ background:transparent; }
+.vidintro.ci-fit .ci-stage > video, .vidintro.ci-fit .ci-stage > img{ transform-origin:50% 88.3%; transform:translateY(calc(11.7% - 196px - env(safe-area-inset-bottom))) scale(var(--ci-s, 1));
+  -webkit-mask-image:radial-gradient(ellipse 64% 58% at 50% 56%, #000 58%, rgba(0,0,0,0) 100%); mask-image:radial-gradient(ellipse 64% 58% at 50% 56%, #000 58%, rgba(0,0,0,0) 100%); }
+@media (max-height:660px){ .vidintro.ci-fit .ci-stage > video, .vidintro.ci-fit .ci-stage > img{ transform:translateY(calc(11.7% - 150px - env(safe-area-inset-bottom))) scale(var(--ci-s, 1)); } }
