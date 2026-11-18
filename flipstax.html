@@ -12566,8 +12566,8 @@ const SHARE_URL = 'https://playflipstax.com';
   function showVideoOpen(then, o){
     const first = !!o.first, quiet = !!o.quiet, ep = o.ep;
     const line = first ? HOST_INTRO_LINES[0] : HOST_INTRO_BACK;
-    const FROM = first ? 0 : 7.0, VIDEO_MS = first ? 10000 : 3000, SLAM_MS = 450, HOLD_MS = first ? 1500 : 800, LINE_MS = first ? 3500 : Math.max(2200, cueLineMs(line));
-    const titleAt = quiet ? 0 : VIDEO_MS, lineAt = quiet ? (first ? 1300 : 800) : VIDEO_MS + SLAM_MS + HOLD_MS, total = lineAt + LINE_MS + 200;
+    const FROM = first ? 0 : 7.0, VIDEO_MS = first ? 10000 : 3000, SLAM_MS = 450, TITLE_EXTRA_MS = 2000, HOLD_MS = (first ? 1500 : 800) + TITLE_EXTRA_MS, LINE_MS = first ? 3500 : Math.max(2200, cueLineMs(line));   // (fix pass 4 item 4: the logo and the EPISODE line stay TITLE_EXTRA_MS (2 s) longer before Flip's greeting - 3.5 s first visit, 2.8 s returning; nothing else changes)
+    const titleAt = quiet ? 0 : VIDEO_MS, lineAt = quiet ? (first ? 1300 : 800) + TITLE_EXTRA_MS : VIDEO_MS + SLAM_MS + HOLD_MS, total = lineAt + LINE_MS + 200;
     showCard.className = 'show-card curtain lines vidintro' + (quiet ? ' ci-quiet ci-ended ci-title-on' : '');
     showCard.removeAttribute('style');
     { const H = innerHeight, W = innerWidth;   // (fix pass item 4: the video's Flip is shrunk to the card Flip's size - lib/intro.css; a screen wider than the video's 9:16 is left as it was)
