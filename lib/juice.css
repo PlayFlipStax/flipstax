@@ -4429,3 +4429,7 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 /* fix pass 2 item 3: while the break dance is up the effects layer (#showFx, z 71, above every card) is hidden. The board under the card still fires its answer effects, and a gold light sweep
    from it crossed the dancers' picture (most visible in the 2 s lite still). */
 :root.bd-up #showFx{ visibility:hidden; }
+
+/* fix pass 2 item 4: lite mode and reduced motion - Flip is simply there on the first frame (no fade) */
+:root.lite .show-card .fs-host{ animation:none !important; opacity:1 !important; transition:none !important; }
+@media (prefers-reduced-motion: reduce){ .show-card .fs-host{ animation:none !important; opacity:1 !important; transition:none !important; } }
