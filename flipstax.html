@@ -2831,10 +2831,10 @@
   .fs-line span{ display:block; }
   .show-card.flipstage{ background:radial-gradient(120% 80% at 50% 30%, #3a1268, #12062a 75%); overflow:hidden; }
   :root.stage-on .show-card.flipstage.stage-backed{ background:transparent !important; }
-  .fs-host{ position:absolute; z-index:3; left:50%; bottom:calc(196px + env(safe-area-inset-bottom)); width:min(30vh * 0.6743, 44vw, 210px); margin-left:calc(min(30vh * 0.6743, 44vw, 210px) / -2); pointer-events:none;
+  .fs-host{ position:absolute; z-index:3; left:50%; bottom:calc(var(--flip-b, 196px) + env(safe-area-inset-bottom)); width:min(30vh * 0.6743, 44vw, 210px); margin-left:calc(min(30vh * 0.6743, 44vw, 210px) / -2); pointer-events:none;
     animation:fsHostIn 420ms var(--ease-pop) both; }
   .fs-host .host-rig{ width:100%; }
-  @keyframes fsHostIn{ from{ transform:translateY(24px) scale(0.94); opacity:0; } to{ transform:none; opacity:1; } }
+  @keyframes fsHostIn{ from{ transform:translateY(16px) scale(0.96); opacity:0.7; } to{ transform:none; opacity:1; } }   /* (fix pass 2 item 4: he used to rise from opacity 0, so for the first ~70 ms of every card he was not there and for ~200 ms he was under half there while the sign and the bubble were already up; he now starts at 70% and is whole at once on the first painted frame) */
   .fs-title{ position:absolute; z-index:4; left:50%; top:calc(14% + env(safe-area-inset-top)); transform:translateX(-50%); width:max-content; max-width:92vw; padding:12px 22px; border-radius:18px; text-align:center;
     background:linear-gradient(180deg, #fff5c4, #ffd23f 50%, #f2a100); border:4px solid #fff3c4; color:#3a1500; box-shadow:0 0 0 4px #7a3d00, 0 10px 30px rgba(0,0,0,0.5); }
   .fs-title b{ display:block; font:900 clamp(32px, 10vw, 46px)/0.95 var(--f-display); letter-spacing:1.5px; }
@@ -2843,7 +2843,7 @@
   /* Run 4B: up in the arch, under the marquee - well clear of the host's antennae */
   .fs-pill{ position:absolute; z-index:5; left:50%; top:calc(25% + env(safe-area-inset-top)); transform:translateX(-50%); white-space:nowrap; animation:fsPill 360ms var(--ease-pop) 200ms both; }
   @keyframes fsPill{ from{ transform:translateX(-50%) scale(0.6); opacity:0; } to{ transform:translateX(-50%); opacity:1; } }
-  @media (max-height:660px){ .fs-host{ bottom:calc(150px + env(safe-area-inset-bottom)); width:min(26vh * 0.6743, 40vw, 170px); margin-left:calc(min(26vh * 0.6743, 40vw, 170px) / -2); } .fs-line{ bottom:calc(20px + env(safe-area-inset-bottom)); }
+  @media (max-height:700px){ .fs-host{ width:min(26vh * 0.6743, 40vw, 170px); margin-left:calc(min(26vh * 0.6743, 40vw, 170px) / -2); } .fs-line{ bottom:calc(20px + env(safe-area-inset-bottom)); }   /* (short-screens fix: the bottom is --flip-b now, set once for every card in lib/juice.css; the bubble drops to 20 px at 700 px and under, not 660, so it stays under Flip's pad) */
     .fs-pill{ top:calc(23% + env(safe-area-inset-top)); } }
   /* the cold open: the caption plate above TAP TO SKIP, the host lifted clear of it */
   .curtain.lines .co-stage-host{ bottom:calc(150px + env(safe-area-inset-bottom)); width:min(30vh * 0.6743, 44vw, 210px); margin-left:calc(min(30vh * 0.6743, 44vw, 210px) / -2); }
@@ -4762,7 +4762,7 @@
        when the curtain has closed on the FLIPSTAX sign, the headline, SHARE and the donation button fade in. A tap skips to that end state. -->
   <div class="outro" id="outro">
     <video class="outro-video" id="outroVideo" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>
-    <img class="outro-poster" id="outroPoster" src="data/outro/poster.webp" alt="" decoding="async" draggable="false">
+    <img class="outro-poster" id="outroPoster" src="data/outro/finale-b-poster.webp" alt="" decoding="async" draggable="false">
     <div class="outro-badge" id="outroBadge" aria-live="polite"><span>FINAL SCORE</span><b id="outroScore">0</b></div>
     <button type="button" class="outro-details" id="outroDetails" aria-expanded="false">details</button>
     <div class="outro-end" id="outroEnd">
@@ -5904,6 +5904,7 @@ const SHARE_URL = 'https://playflipstax.com';
     Array.from(el.children).forEach(c=>{
       const cls = c.getAttribute('class') || '';
       if (c.classList.contains('scene-ghost') || c.tagName === 'CANVAS' || SCENE_BG_RE.test(cls)) return;   // (backdrops are opaque at once)
+      if (c.classList.contains('fs-host')) return;   // (fix pass 2 item 4: Flip is there from the first frame of a card - only his own 0.35 s settle from 75% remains - so the sign and bubble never fade in over an empty stage)
       c.animate([{ opacity:0 }, { opacity:1 }], { duration:XFADE_IN_MS, easing:'ease-out' });
     });
   }
@@ -7332,6 +7333,79 @@ const SHARE_URL = 'https://playflipstax.com';
     return trackEls[key];
   }
 
+  // ---- SOLO PASS: THE INTRO THEME. There is no theme file: the intro (the saucer cold open) plays a short snippet of one of the eight songs in audio/alt/
+  // (ALT_SONGS, the music picker's songs - the files are not edited and nothing is added). The snippet starts just before a strong downbeat of the song
+  // (INTRO_THEME_HITS, seconds, measured from the files: the start of the fullest section, a crash on the one), fades in over 0.3 s so the fade ends on that
+  // beat, plays for the length of the intro and fades out over 0.6 s so it ends with it; then the run's music starts as before. Default: Alien Disco Fever.
+  // On a test host ?theme=1 ... ?theme=8 auditions the others (the order of ALT_SONGS: 1 Nebula Nights, 2 Cosmic Cruise, 3 Warp Speed Boogie, 4 Moonbase
+  // Groove, 5 Stardust Shuffle, 6 Saturn Strut, 7 Alien Disco Fever, 8 Meteor Mayhem) and always plays the full first-visit intro.
+  // Light: one <audio> element, made when the intro is about to play (preload = metadata), seeked straight to the snippet (a range request - only that part
+  // of the file is fetched), and let go of when the intro ends. It is a music track like the others (trackEls.theme): the Music switch, the volume, Pause and
+  // 'every other track stops' all apply. A phone needs a tap before sound: the element is started muted inside the ENTER / Play tap and unmuted once it has
+  // reached the snippet. The fades use the element's own Web Audio trim (a phone ignores element.volume); before routing they step element.volume.
+  const INTRO_THEME_HITS = [80.30, 47.34, 133.52, 125.11, 126.47, 112.36, 154.56, 73.08];   // (one per ALT_SONGS entry)
+  const INTRO_THEME_DEFAULT = 6;   // Alien Disco Fever
+  const INTRO_THEME_TEST = (()=>{ if (!TEST_HOST) return -1; try{ const v = parseInt(new URLSearchParams(location.search).get('theme'), 10); return v >= 1 && v <= ALT_SONGS.length ? v - 1 : -1; }catch(e){ return -1; } })();
+  const introThemeIdx = INTRO_THEME_TEST >= 0 ? INTRO_THEME_TEST : INTRO_THEME_DEFAULT;
+  const INTRO_THEME_FADE_IN = 0.3, INTRO_THEME_FADE_OUT = 0.6;
+  TRACK_SRC.theme = ALT_SONGS[introThemeIdx].src; ONE_SHOT_TRACKS.push('theme');
+  const introThemeAt = ()=> Math.max(0, INTRO_THEME_HITS[introThemeIdx] - INTRO_THEME_FADE_IN);
+  let themeT = 0, themeStepT = 0, themeGo = 0;
+  function themeEl(){
+    if (trackEls.theme) return trackEls.theme;
+    const a = new Audio(); a.preload = 'metadata'; a.loop = false; a._base = MUSIC_VOLUME; a.volume = MUSIC_VOLUME * masterVol;
+    a.addEventListener('play', ()=> musicRoute(a));
+    a.addEventListener('playing', ()=>{ if (currentTrackKey !== 'theme'){ try{ a.pause(); }catch(e){} } });
+    a.src = TRACK_SRC.theme; trackEls.theme = a; return a;
+  }
+  function themeSeek(a){
+    const at = introThemeAt(); try{ a.currentTime = at; }catch(e){}
+    if (a.readyState < 1) a.addEventListener('loadedmetadata', ()=>{ try{ if (Math.abs(a.currentTime - at) > 0.5) a.currentTime = at; }catch(e){} }, { once:true });
+  }
+  function themeGain(to, sec, from){
+    const a = trackEls.theme; if (!a) return; clearInterval(themeStepT);
+    if (a._routed && a._trim && audioCtx){ const g = a._trim.gain, t = audioCtx.currentTime;
+      try{ g.cancelScheduledValues(t); g.setValueAtTime(from != null ? from * a._base : g.value, t); g.linearRampToValueAtTime(to * a._base, t + sec); }catch(e){ try{ g.value = to * a._base; }catch(e2){} } return; }
+    const v0 = from != null ? from * a._base * masterVol : a.volume, v1 = to * a._base * masterVol, steps = Math.max(1, Math.round(sec / 0.03)); let k = 0;
+    try{ a.volume = Math.max(0, Math.min(1, v0)); }catch(e){}
+    themeStepT = setInterval(()=>{ k++; if (a._routed){ clearInterval(themeStepT); try{ a.volume = 1; }catch(e){} return; }   // (routed meanwhile: the trim carries the level)
+      try{ a.volume = Math.max(0, Math.min(1, v0 + (v1 - v0) * k / steps)); }catch(e){} if (k >= steps) clearInterval(themeStepT); }, 30);
+  }
+  // inside the ENTER tap (a phone lets an element play later only if a tap started it): start it muted at the snippet; it is paused again as soon as it plays
+  function primeIntroTheme(){
+    if (!musicOn || trackEls.theme) return;
+    try{ const a = themeEl(); a.muted = true; themeSeek(a); const p = a.play(); if (p && p.catch) p.catch(()=>{}); }catch(e){}
+  }
+  // the intro starts: `ms` is its length
+  function playIntroTheme(ms){
+    clearTimeout(themeT); clearTimeout(themeGo);
+    pauseAllTracks(); currentTrackKey = 'theme';
+    if (!musicOn) return;
+    try{
+      const a = themeEl(), at = introThemeAt(); musicRoute(a);
+      a.muted = true; themeSeek(a);
+      const p = a.play(); if (p && p.catch) p.catch(()=>{});
+      // heard only from the snippet: unmuted (and faded in) once playback is really there - never the song's own opening
+      let on = false;
+      const start = (force)=>{ if (on || currentTrackKey !== 'theme' || trackEls.theme !== a) return; if (!force && (a.paused || Math.abs(a.currentTime - at) > 2.5)) return;
+        on = true; clearTimeout(themeGo); ['playing', 'seeked', 'timeupdate'].forEach(ev=> a.removeEventListener(ev, onEv)); a.muted = false; themeGain(1, INTRO_THEME_FADE_IN, 0); };
+      const onEv = ()=> start(false);
+      ['playing', 'seeked', 'timeupdate'].forEach(ev=> a.addEventListener(ev, onEv));
+      themeGo = setTimeout(()=>{ if (Math.abs(a.currentTime - at) <= 2.5) start(true); }, 1500);   // (it never reached the snippet - a server without range requests: stay silent rather than play the wrong part)
+      themeT = setTimeout(()=>{ if (currentTrackKey === 'theme') themeGain(0, INTRO_THEME_FADE_OUT); }, Math.max(0, ms - INTRO_THEME_FADE_OUT * 1000 - 40));
+      start(false);
+    }catch(e){}
+  }
+  // the intro is over (or was skipped): stop, and let go of the file
+  function endIntroTheme(){
+    clearTimeout(themeT); clearTimeout(themeGo); clearInterval(themeStepT);
+    if (currentTrackKey === 'theme') currentTrackKey = 'run';
+    const a = trackEls.theme; if (!a) return;
+    try{ a.pause(); }catch(e){}
+    delete trackEls.theme;
+    setTimeout(()=>{ try{ a.removeAttribute('src'); a.load(); }catch(e){} }, 200);
+  }
+
   // ---- Infinity playlist: one element per song, created as it's needed.
   const infEls = [];
   const infUnlocked = [];
@@ -7470,6 +7544,11 @@ const SHARE_URL = 'https://playflipstax.com';
   // audibly playing, instead of just skipping the currentTime reset.
   function playTrack(key){
     if ((key === 'run' || key === 'infinity') && altPick >= 0) key = 'alt';   // (final polish job 2: a picked song is the gameplay music)
+    if (key === 'theme'){   // (solo pass: the intro theme, switched back on or resumed while the intro is still up - it carries on from where it was)
+      currentTrackKey = 'theme'; if (!musicOn) return;
+      try{ const a = themeEl(); a.muted = false; themeGain(1, 0.2); const p = a.play(); if (p && p.catch) p.catch(()=>{}); }catch(e){}
+      return;
+    }
     // "Already playing" only counts if it was already THE current track -
     // an element left audible by anything else must be restarted from the
     // top, not adopted mid-song.
@@ -11387,7 +11466,7 @@ const SHARE_URL = 'https://playflipstax.com';
         if (!SPONSOR_BREAK_ON && !st.forced) continue;
         runPhase = 'bumper'; saveRunSnapshot();
         const g = showEnter('ad', 'sponsor');
-        showSponsor(()=> showDone(g, 'sponsor'));
+        showBreakDance(g, ()=> showSponsor(()=> showDone(g, 'sponsor')));   // (fix pass item 5: the short dance first, then the break exactly as before)
         return true;
       }
       if (st.t === 'ad'){
@@ -11857,9 +11936,9 @@ const SHARE_URL = 'https://playflipstax.com';
       autoT = setTimeout(()=>{ if (!gone() && state === 'idle') spin(); }, dt(LUCKY_AUTO_STOP_MS));
     };
     const points = (n)=>{ if (n > 0){ addRunScore(n, true); won += n; } else if (n < 0){ const take = Math.min(runScore, -n); runScore -= take; runGoopLost += take; won -= take; renderRunBanner(); saveRunSnapshot(); return take; } return n; };
-    // DANCE PARTY: the dance video full-screen (muted unless the sound is on), confetti on top, then on; the code-made disco if the file fails
+    // DANCE PARTY: the new dance video (data/wheel/dance-party-a.mp4, 10 s, replaces dance-party.mp4 - the old file stays) full-screen (muted unless the sound is on), confetti on top, then on; the code-made disco if the file fails
     const danceParty = (then)=>{
-      const v = document.createElement('div'); v.className = 'mw-dance'; v.innerHTML = '<video src="data/wheel/dance-party.mp4" playsinline autoplay preload="auto"></video><div class="mw-dance-skip">TAP TO SKIP</div>';
+      const v = document.createElement('div'); v.className = 'mw-dance'; v.innerHTML = '<video src="data/wheel/dance-party-a.mp4" playsinline autoplay muted preload="auto"></video><div class="mw-dance-skip">TAP TO SKIP</div>';
       document.body.appendChild(v); const vid = v.querySelector('video'), t0 = performance.now(); vid.muted = !sfxOn; vid.volume = Math.max(0, Math.min(1, masterVol));
       let over = false;
       // mega 3 item 9: the party fades out smoothly (the picture over 0.9 s and the sound with it) instead of cutting off; the wheel is already behind it
@@ -12379,7 +12458,7 @@ const SHARE_URL = 'https://playflipstax.com';
   // with one - unless the show is cutting straight here, e.g. from a resume or the TEST menu).
   // A+ job 2: the outro video (about 2 MB) starts loading as the last games begin, so it plays at once
   let outroPreloaded = false;
-  function preloadOutro(){ if (outroPreloaded || isLite() || prefersReducedMotion()) return; outroPreloaded = true; try{ fetch('data/outro/outro.mp4').catch(()=>{}); }catch(e){} }
+  function preloadOutro(){ if (outroPreloaded || isLite() || prefersReducedMotion()) return; outroPreloaded = true; try{ fetch('data/outro/finale-b.mp4').catch(()=>{}); }catch(e){} }
   // stability: nothing of Orbit Drop's jackpot (the dance video, its layer, the marquee look) is left when Word Warp's title card shows
   function orbitLeftovers(){ document.querySelectorAll('.disco.odj, .disco').forEach(d=>{ d.querySelectorAll('video').forEach(v=>{ try{ v.pause(); }catch(e){} v.removeAttribute('src'); try{ v.load(); }catch(e){} }); d.remove(); });
     try{ marquee.classList.remove('disco', 'still', 'strobe'); }catch(e){} }
@@ -12476,8 +12555,98 @@ const SHARE_URL = 'https://playflipstax.com';
   const HOST_INTRO_BACK = NAMES_INTRO.back || 'Welcome back, Earthlings! Let’s play!';
   const HOST_OUTRO_LINE = NAMES_INTRO.outro || 'That’s our show, Earthlings! See you tomorrow!';
   const HOST_INTRO_POSES = ['wave', 'presenting', 'point', 'discoPoint'];
+  // GIRLS PASS, THE VIDEO OPENER: data/intro/intro-saucer.mp4 (10 s, 720 x 1280: the saucer's beam lowers Flip onto the pad and he waves) is the opener. It replaces the
+  // CSS saucer intro (the shrinking and growing Flip) and the old CGI intro. First visit (or ?intro=full): the whole video, then it freezes on its last frame
+  // (Flip waving), the FlipStax logo slams in like a game-show title card (a quick light burst, a short shine sweep), holds about 1.5 s and goes, then Flip's greeting
+  // bubble and the first round as before. A returning player gets the last 3 s of the video, a shorter hold and the 'welcome back' line. Muted autoplay, inline;
+  // the video's own soundtrack is not used (the intro theme plays under it, started from the ENTER tap) - set INTRO_VIDEO_SOUND to hear it instead of the theme.
+  // Lite mode and reduced motion load no video: the still last frame, the logo and the line. The CSS is lib/intro.css THE VIDEO OPENER (transform and opacity only,
+  // one flash). Tap to skip (after SKIP_MIN_MS) goes straight on, as before.
+  const INTRO_VIDEO = true, INTRO_VIDEO_SOUND = false, INTRO_VIDEO_SRC = 'data/intro/intro-saucer.mp4', INTRO_VIDEO_FIRST = 'data/intro/intro-saucer-first.webp', INTRO_VIDEO_LAST = 'data/intro/intro-saucer-last.webp';
+  function showVideoOpen(then, o){
+    const first = !!o.first, quiet = !!o.quiet, ep = o.ep;
+    const line = first ? HOST_INTRO_LINES[0] : HOST_INTRO_BACK;
+    const FROM = first ? 0 : 7.0, VIDEO_MS = first ? 10000 : 3000, SLAM_MS = 450, TITLE_EXTRA_MS = 2000, HOLD_MS = (first ? 1500 : 800) + TITLE_EXTRA_MS, LINE_MS = first ? 3500 : Math.max(2200, cueLineMs(line));   // (fix pass 4 item 4: the logo and the EPISODE line stay TITLE_EXTRA_MS (2 s) longer before Flip's greeting - 3.5 s first visit, 2.8 s returning; nothing else changes)
+    const titleAt = quiet ? 0 : VIDEO_MS, lineAt = quiet ? (first ? 1300 : 800) + TITLE_EXTRA_MS : VIDEO_MS + SLAM_MS + HOLD_MS, total = lineAt + LINE_MS + 200;
+    showCard.className = 'show-card curtain lines vidintro' + (quiet ? ' ci-quiet ci-ended ci-title-on' : '');
+    showCard.removeAttribute('style');
+    { const H = innerHeight, W = innerWidth;   // (fix pass item 4: the video's Flip is shrunk to the card Flip's size - lib/intro.css; a screen wider than the video's 9:16 is left as it was)
+      if (W / H <= 0.5625 + 0.002){ const pr = document.createElement('i'); pr.style.cssText = 'position:fixed;left:0;top:0;width:1px;visibility:hidden;pointer-events:none;height:var(--flip-h)'; document.body.appendChild(pr); const fh = pr.offsetHeight || Math.min(430, H - 336); pr.remove();   // (the card Flip's real height, from --flip-h)
+        showCard.style.setProperty('--ci-s', (fh / (0.691 * H)).toFixed(4)); showCard.classList.add('ci-fit'); } }
+    playIntroTheme(total);   // (the intro theme: a snippet of an existing song, for exactly as long as the intro)
+    showCard.innerHTML = '<div class="ci-stage" aria-hidden="true">' +
+        (quiet ? '' : '<video class="ci-video" muted playsinline preload="auto" disablepictureinpicture poster="' + INTRO_VIDEO_FIRST + '"></video>') +
+        '<img class="ci-last" alt="" decoding="async" src="' + INTRO_VIDEO_LAST + '"></div><i class="ci-dim" aria-hidden="true"></i>' +
+      '<div class="ci-title" aria-hidden="true"><i class="ci-burst"></i><i class="ci-rays"></i><div class="ci-logo"><img alt="" decoding="async" src="images/flipstax-lockup-800.webp"><i class="ci-shine"></i></div><b class="ci-ep">EPISODE ' + ep + '</b></div>' +
+      '<div class="fs-line co-line" aria-live="polite"><span></span></div>' +
+      '<div class="co-skip">TAP TO SKIP</div>';
+    showCard.classList.remove('hidden');
+    showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'Welcome to FlipStax, episode ' + ep + ', with your host ' + HOST_NAME + '. Tap to skip');
+    if (window.Stage) Stage.cue('close', { over:showCard, cls:'curtain', sign:{ sub:'', main:'' } });   // (the stage waits under the video, as under every card)
+    const timers = [], later = (ms, f)=> timers.push(setTimeout(f, ms));
+    const lineEl = showCard.querySelector('.co-line'), vid = showCard.querySelector('video');
+    let titled = false, gone = false;
+    const toTitle = ()=>{
+      if (titled || gone) return; titled = true;
+      try{ if (vid) vid.pause(); }catch(e){}
+      showCard.classList.add('ci-ended', 'ci-title-on');   // (the held last frame is the still: Flip waving on his pad)
+      if (!quiet){ later(SLAM_MS + HOLD_MS, ()=>{ showCard.classList.add('ci-title-off'); say(); }); }
+    };
+    let said = false;
+    const say = ()=>{ if (said || gone) return; said = true; cueLineSay(lineEl, line); sfx.chime(4); };
+    if (quiet){ later(lineAt, say); }
+    else {
+      if (vid){
+        vid.muted = !(INTRO_VIDEO_SOUND && sfxOn); vid.defaultMuted = true; vid.playsInline = true; vid.setAttribute('playsinline', ''); vid.setAttribute('webkit-playsinline', '');
+        let started = false;
+        vid.addEventListener('playing', ()=>{ started = true; showCard.classList.add('ci-playing'); });
+        vid.addEventListener('ended', toTitle);
+        vid.addEventListener('error', ()=> toTitle());
+        vid.addEventListener('timeupdate', ()=>{ if (!titled && vid.duration && vid.duration - vid.currentTime < 0.06) toTitle(); });
+        try{
+          vid.src = INTRO_VIDEO_SRC;
+          const seek = ()=>{ try{ if (FROM && Math.abs(vid.currentTime - FROM) > 0.5) vid.currentTime = FROM; }catch(e){} };
+          if (FROM){ if (vid.readyState >= 1) seek(); else vid.addEventListener('loadedmetadata', seek, { once:true }); }
+          const p = vid.play(); if (p && p.catch) p.catch(()=>{ later(0, toTitle); });   // (blocked: the held last frame and the title card instead)
+        }catch(e){ later(0, toTitle); }
+        later(4500, ()=>{ if (!started) toTitle(); });   // (never stuck on a stalled load)
+      }
+      later(VIDEO_MS + 2500, toTitle);   // (the safety net: the video is 10 s)
+    }
+    const shownAt = performance.now();
+    const go = (e)=>{
+      if (gone) return;
+      if (e && e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+      if (e && performance.now() - shownAt < SKIP_MIN_MS) return;   // a tap skips only after SKIP_AFTER (and never the tap that opened it)
+      gone = true; timers.forEach(clearTimeout); coldOpenCancel = null; endIntroTheme();
+      try{ if (vid){ vid.pause(); vid.removeAttribute('src'); vid.load(); } }catch(err){}
+      try{ localStorage.setItem(COLD_OPEN_SEEN_KEY, '1'); }catch(err){}
+      showCard.removeEventListener('click', go); document.removeEventListener('keydown', go);
+      showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden';
+      noteOverlayClosed();
+      then();
+    };
+    later(total, ()=> go());
+    showCard.addEventListener('click', go); document.addEventListener('keydown', go);
+    coldOpenCancel = ()=>{ gone = true; timers.forEach(clearTimeout); if (currentTrackKey === 'theme') endIntroTheme(); try{ if (vid){ vid.pause(); vid.removeAttribute('src'); vid.load(); } }catch(err){} showCard.removeEventListener('click', go); document.removeEventListener('keydown', go); coldOpenCancel = null; };
+  }
+  // fix pass item 2: the 'Watch intro' buttons (the landing's link and the Play Today screen's) used to run the old CGI video in lib/intro.js (data/intro/mothership-intro.mp4,
+  // a different saucer, no logo card). They now call this instead: the same opener as the show's first visit (intro-saucer.mp4, the logo title card, Flip's greeting), full length,
+  // tap to skip, then back to the screen the player was on with the menu music restored. Lite mode and reduced motion get the still version. It changes no first / returning rule.
+  window.__watchIntro = function(){
+    if (!showCard.classList.contains('hidden') || coldOpenCancel) return false;
+    const prev = currentTrackKey, ep = showEpisode(runStartDate || todayStr()), root = document.documentElement;
+    root.classList.add('watching-intro');   // (the landing and the Play Today screen sit above the show card: lib/intro.css lifts the card over them while this runs)
+    showVideoOpen(()=>{
+      root.classList.remove('watching-intro');
+      if (window.Stage && Stage.release) Stage.release();
+      if (musicOn && prev && prev !== 'theme' && prev !== 'run'){ try{ playTrack(prev); }catch(e){} }
+    }, { first:true, quiet: isLite() || prefersReducedMotion(), ep });
+    return true;
+  };
   function showColdOpen(then){
     if (coldOpenCancel) coldOpenCancel();
+    preloadCastSlots();
     const ep = showEpisode(runStartDate || todayStr());
     let seen = false; try{ seen = !!localStorage.getItem(COLD_OPEN_SEEN_KEY); }catch(e){}
     // Run 4A: ENTER opens the curtains, then the host introduces himself in four cue lines (each up for at least
@@ -12486,23 +12655,37 @@ const SHARE_URL = 'https://playflipstax.com';
     const afterIntro = window.__introCurtainsOpen === true; window.__introCurtainsOpen = false;
     // A+: 'Greetings, Earthlings!' is the whole welcome now - it advances on its own 3.5 s after the line appears (a tap still skips it)
     const COLD_OPEN_AUTO_MS = 3500;
-    const lines = seen && !afterIntro ? [HOST_INTRO_BACK] : HOST_INTRO_LINES.slice(0, 1);
+    // SOLO PASS, THE NEW INTRO (drawn in CSS, lib/intro.css THE SAUCER INTRO; no video, no pictures but Flip's own pose): the blast doors open, a saucer slides
+    // in over the window, its beam lowers Flip onto the glowing hover pad, the neon sign lights up with GALACTIC GAME NIGHT (and the EPISODE number), and Flip says
+    // his greeting - 5.9 s the first time, about 3 s for a returning player (the same lines and the same first / returning rule as before); a tap skips it.
+    // It plays whenever the video did not (the video is now only ?intro=full and the test host's 'Watch intro'). Lite mode and reduced motion get it as a still:
+    // Flip on the pad, the saucer parked above, the sign lit, the line. Transform and opacity only.
+    const saucer = !afterIntro, quietCO = isLite() || prefersReducedMotion();
+    const first = !seen || afterIntro || window.__introSaucer === true || INTRO_THEME_TEST >= 0 || REPLAY; window.__introSaucer = false;   // (fix pass 3 item 6: REPLAY = ?replay=1 on the test host, which always plays the whole opener with the saucer dropping Flip off, even on a computer that has seen it before;   // (__introSaucer: lib/intro.js, a first visit or ?intro=1)
+    if (INTRO_VIDEO && !afterIntro){ showVideoOpen(then, { first, quiet: quietCO, ep }); return; }   // (girls pass: the video opener replaces the CSS saucer intro below, which stays in the code switched off)
+    const lines = !first ? [HOST_INTRO_BACK] : HOST_INTRO_LINES.slice(0, 1);
     const T = afterIntro ? { open:0, pull:600, walk:0, walkMs:0, talk:1500 }
-            : seen ? { open:0, pull:800, walk:100, walkMs:600, talk:600 }
-                   : { open:300, pull:2200, walk:900, walkMs:1400, talk:2500 };
+            : quietCO ? { open:0, pull:first ? 700 : 500, fly:0, flyMs:0, beam:-1, walk:0, walkMs:0, land:0, sign:0, talk:first ? 600 : 400, away:-1 }
+            : !first ? { open:0, pull:500, fly:0, flyMs:450, beam:380, walk:450, walkMs:700, land:1150, sign:1150, talk:900, away:1500 }
+                     : { open:0, pull:700, fly:150, flyMs:900, beam:1000, walk:1100, walkMs:1100, land:2200, sign:2300, talk:2400, away:2800 };
     const starts = []; let at = T.talk;
-    lines.forEach(l=>{ starts.push(at); at += seen && !afterIntro ? cueLineMs(l) : COLD_OPEN_AUTO_MS; });
-    const total = Math.max(seen && !afterIntro ? ((RUNDOWN.coldOpen || {}).returningMs || 3000) : 0, at);
-    showCard.className = 'show-card curtain lines';
-    showCard.style.setProperty('--pull', T.pull + 'ms'); showCard.style.setProperty('--walk', T.walkMs + 'ms');
+    lines.forEach(l=>{ starts.push(at); at += !first ? cueLineMs(l) : COLD_OPEN_AUTO_MS; });
+    const total = Math.max(!first ? ((RUNDOWN.coldOpen || {}).returningMs || 3000) : 0, saucer && first ? 5900 : 0, at);
+    showCard.className = 'show-card curtain lines' + (saucer ? ' saucer' + (quietCO ? ' still' : '') : '');
+    playIntroTheme(total);   // (solo pass: the intro theme - a snippet of an existing song, for exactly as long as the intro)
+    showCard.style.setProperty('--pull', T.pull + 'ms'); showCard.style.setProperty('--walk', T.walkMs + 'ms'); if (saucer) showCard.style.setProperty('--fly', T.flyMs + 'ms');
     showCard.innerHTML = '<div class="studio co-studio" aria-hidden="true">' + STUDIO_HTML + '</div><i class="co-follow" aria-hidden="true"></i>' +
-      '<div class="co-stage-host host-full" aria-hidden="true">' + Host.html({ pose:'wave' }) + '</div>' +
+      (saucer ? '<i class="co-pad" aria-hidden="true"><i></i><b></b></i><i class="co-tbeam" aria-hidden="true"></i>' : '') +
+      '<div class="co-stage-host host-full" aria-hidden="true">' + Host.html({ pose: saucer && !quietCO ? 'idle' : 'wave' }) + '</div>' +
+      (saucer ? '<i class="co-ufo" aria-hidden="true"><i class="cu-ship"></i></i>' : '') +
       '<div class="fs-line co-line" aria-live="polite"><span></span></div>' +
       '<i class="co-drape l"></i><i class="co-drape r"></i><i class="co-spot"></i><i class="co-valance"></i>' +
       '<div class="co-skip">TAP TO SKIP</div>';
     showCard.classList.remove('hidden');
     showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'Welcome to FlipStax, episode ' + ep + ', with your host ' + HOST_NAME + '. Tap to skip');
-    if (window.Stage){ Stage.loadWide(); Stage.cue('wide', { over:showCard, cls:'curtain', sign:{ sub:'WELCOME TO', main:'FLIPSTAX' } }); }   // Run 3: the wide shot, then a push in
+    const ggSign = { sub:'EPISODE ' + ep, main:'GALACTIC GAME NIGHT' };
+    if (window.Stage && saucer) Stage.cue('close', { over:showCard, cls:'curtain', push:true, ms: total + 600, sign: T.sign > 0 ? { sub:'', main:'' } : ggSign });   // (the sign is dark until it lights up)
+    else if (window.Stage){ Stage.loadWide(); Stage.cue('wide', { over:showCard, cls:'curtain', sign:{ sub:'WELCOME TO', main:'FLIPSTAX' } }); }   // Run 3: the wide shot, then a push in
     const timers = [], later = (ms, f)=> timers.push(setTimeout(f, ms));
     const lineEl = showCard.querySelector('.co-line'), rig = showCard.querySelector('.co-stage-host');
     // after the intro: Flip is already on his mark (walk, no travel) behind the CLOSED curtains; the held last frame of the video fades out over 0.6 s while the two
@@ -12512,11 +12695,20 @@ const SHARE_URL = 'https://playflipstax.com';
       const Wd = innerWidth, Hd = innerHeight, kk = Math.max(Wd / 540, Hd / 960), oyy = (Hd - 960 * kk) / 2, fh = 640 * kk, fw = fh * 0.6743;
       rig.style.cssText = 'width:' + fw.toFixed(1) + 'px;margin-left:' + (-fw / 2 + 10 * kk).toFixed(1) + 'px;bottom:' + (Hd - (oyy + 850 * kk)).toFixed(1) + 'px;';
     }
-    if (afterIntro){ showCard.classList.add('walk', 'intro-curt'); window.__introOpen = ()=>{ window.__introOpen = null; showCard.classList.add('open'); }; later(1400, ()=>{ if (window.__introOpen) window.__introOpen(); }); } else later(T.open, ()=>{ showCard.classList.add('open'); if (sfx.bumper) sfx.bumper(false); });
-    later(T.walk, ()=>{ showCard.classList.add('walk'); if (window.Stage) Stage.cue('close', { over:showCard, cls:'curtain', push:true, ms: total - T.walk + 600, sign:{ sub:'TONIGHT’S SHOW', main:'EPISODE ' + ep } }); });
+    if (afterIntro){ showCard.classList.add('walk', 'intro-curt'); window.__introOpen = ()=>{ window.__introOpen = null; showCard.classList.add('open'); }; later(1400, ()=>{ if (window.__introOpen) window.__introOpen(); }); } else later(T.open, ()=>{ showCard.classList.add('open'); if (sfx.bumper && !musicOn) sfx.bumper(false); });   // (the synth bumper only when the theme is not playing)
+    if (saucer){
+      const cl = showCard.classList, root = document.documentElement.classList;
+      later(T.fly, ()=> cl.add('sc-in'));
+      if (T.beam >= 0) later(T.beam, ()=> cl.add('sc-beam'));
+      later(T.walk, ()=> cl.add('walk'));
+      later(T.land, ()=>{ cl.add('sc-land'); cl.remove('sc-beam'); });
+      if (T.sign > 0) later(T.sign, ()=>{ if (!quietCO) root.add('gg-lit'); if (window.Stage) Stage.cue('close', { over:showCard, cls:'curtain', sign: ggSign }); });   // (no push: the same shot, only the sign comes on)
+      if (T.away >= 0) later(T.away, ()=> cl.add('sc-away'));
+    }
+    else later(T.walk, ()=>{ showCard.classList.add('walk'); if (window.Stage) Stage.cue('close', { over:showCard, cls:'curtain', push:true, ms: total - T.walk + 600, sign:{ sub:'TONIGHT’S SHOW', main:'EPISODE ' + ep } }); });
     lines.forEach((l, i)=> later(starts[i], ()=>{
       cueLineSay(lineEl, l);
-      Host.pose(rig, seen ? 'wave' : HOST_INTRO_POSES[i % HOST_INTRO_POSES.length], { hold:0 });
+      Host.pose(rig, seen || saucer ? 'wave' : HOST_INTRO_POSES[i % HOST_INTRO_POSES.length], { hold:0 });
       if (i === 0) sfx.chime(4);
     }));
     let gone = false;
@@ -12525,7 +12717,7 @@ const SHARE_URL = 'https://playflipstax.com';
       if (gone) return;
       if (e && e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
       if (e && performance.now() - shownAt < SKIP_MIN_MS) return;   // G2: a tap skips only after SKIP_AFTER (and never the tap that opened it)
-      gone = true; timers.forEach(clearTimeout); coldOpenCancel = null;
+      gone = true; timers.forEach(clearTimeout); coldOpenCancel = null; document.documentElement.classList.remove('gg-lit'); endIntroTheme();
       try{ localStorage.setItem(COLD_OPEN_SEEN_KEY, '1'); }catch(err){}
       showCard.removeEventListener('click', go); document.removeEventListener('keydown', go);
       showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden';
@@ -12534,7 +12726,7 @@ const SHARE_URL = 'https://playflipstax.com';
     };
     later(total, ()=> go());
     showCard.addEventListener('click', go); document.addEventListener('keydown', go);
-    coldOpenCancel = ()=>{ gone = true; timers.forEach(clearTimeout); showCard.removeEventListener('click', go); document.removeEventListener('keydown', go); coldOpenCancel = null; };
+    coldOpenCancel = ()=>{ gone = true; timers.forEach(clearTimeout); document.documentElement.classList.remove('gg-lit'); if (currentTrackKey === 'theme') endIntroTheme(); showCard.removeEventListener('click', go); document.removeEventListener('keydown', go); coldOpenCancel = null; };
   }
   // The act cue card (reusable): the host holds up a cue card that flips in over a colour
   // sweep in the act's world, for about 1.5 s. `st` is { title, sub, world }.
@@ -12552,7 +12744,11 @@ const SHARE_URL = 'https://playflipstax.com';
   const ROUND_ART = ['scene-win-flip', 'scene-girl-green', 'scene-girl-purple', 'scene-girl-pink', 'scene-girls-pose', 'scene-all-group'];
   const ROUND_ART_FALLBACK = ['scene-win-flip', 'scene-win', 'scene-group'];
   // The round title cards (A+): Round 2 to 6 each have a different picture, no picture on two rounds running; the last round is the whole group.
-  const ROUND_TITLE_ART = { 2:'scene-girl-green', 3:'scene-girl-purple', 4:'scene-girl-pink', 5:'scene-girls-pose', 6:'scene-all-group' };
+  const ROUND_TITLE_ART = { 2:'scene-girl-green', 3:'scene-girl-purple', 4:'scene-girl-pink', 5:'scene-girls-pose', 6:'scene-all-group' };   // (the old gold-stage pictures: no longer shown, the files stay)
+  // polish pass: the same girls in the same poses, lifted off those pictures (tools/build-studio-cast.py -> data/cast/studio/), stand in the drawn studio instead
+  const ROUND_TITLE_CAST = { 2:'green-jump', 3:'purple-jump', 4:'pink-jump', 5:'girls-pose', 6:'all-group' };   // (solo pass: not used any more - the files stay)
+  // solo pass: Flip Sterling is the only host. Every round card shows him alone on his hover pad in the studio, in a different pose each round.
+  const ROUND_TITLE_POSE = { 1:'presenting', 2:'wave', 3:'think', 4:'cheer', 5:'shrug', 6:'presenting' };
   const roundArtOk = {};
   function probeRoundArt(){ ROUND_ART.forEach(n=>{ if (n in roundArtOk) return; roundArtOk[n] = null; const im = new Image(); im.onload = ()=>{ roundArtOk[n] = true; }; im.onerror = ()=>{ roundArtOk[n] = false; }; im.src = 'data/scenes/round/' + n + '.webp'; }); }
   // (the Round Done card no longer uses these pictures - probeRoundArt() is not called)
@@ -12566,6 +12762,14 @@ const SHARE_URL = 'https://playflipstax.com';
     }
     return pick;
   }
+  // fix pass items 3 + 4: the dancers stand WITH Flip now, in two fixed slots beside him (lib/juice.css, CAST SLOTS) - one left, one right, feet on the same pad line as his,
+  // a fixed share of his height, always behind his face - instead of replacing him on the card. Round 1 and the Grand Finale: Flip alone. The picture files are the same lifted
+  // jump poses as before (data/cast/studio/*-jump.webp); the old gold-stage pictures and the dance video are not used here any more (the files stay).
+  const CAST_SLOT_ART = { green:'data/cast/studio/green-jump.webp', purple:'data/cast/studio/purple-jump.webp', pink:'data/cast/studio/pink-jump.webp' };
+  const ROUND_TITLE_SLOTS = { 2:[['green', 'l']], 3:[['purple', 'r']], 4:[['pink', 'l']], 5:[['green', 'l'], ['purple', 'r']], 6:[['purple', 'l'], ['green', 'r']] };
+  const ROUND_DONE_SLOTS = [['green', 'l'], ['pink', 'r']];
+  function castSlotsHtml(list){ return (list || []).map((x, i)=> '<img class="cast-slot ' + x[1] + '" style="--n:' + i + '" alt="" decoding="async" src="' + CAST_SLOT_ART[x[0]] + '">').join(''); }
+  function preloadCastSlots(){ Object.keys(CAST_SLOT_ART).forEach(k=>{ const im = new Image(); im.decoding = 'async'; im.src = CAST_SLOT_ART[k]; }); }
   // Run 4A: the reward beat - the round's points (Orbit Drop's winnings in Round 6), its letter and its gold keys.
   function showRewardBeat(st, then){
     const a = RUNDOWN.acts[st.act] || {}, letter = runActLetter[st.act], keys = runActKeys[st.act] || 0;
@@ -12575,13 +12779,19 @@ const SHARE_URL = 'https://playflipstax.com';
     // Flip alone (data/scenes/win.webp) otherwise; a soft gradient keeps the text readable (lib/juice.css .rw-art)
     // A+ round art: the Round Done card plays dance-girls.mp4 (muted, looping, 540 px, its end faded into its start) over a still poster of its
     // first frame; lite mode and reduced motion get only the poster. (The round pictures themselves are on the round title cards.)
-    showCard.className = 'show-card reward has-art art-round';
-    showCard.style.setProperty('--rw-art', 'url(../data/scenes/round/dance-poster.webp)');
-    showCard.innerHTML = '<i class="rw-sun" aria-hidden="true"></i><div class="rw-panel"><div class="rw-title"></div><div class="rw-frame"><i class="mq mq-a" aria-hidden="true"></i><i class="mq mq-b" aria-hidden="true"></i><div class="rw-row">' +
+    // polish pass: the dancers' video and its poster were filmed on the old gold stage - the card now stands in the drawn studio with the three girls
+    // lifted off the poster frame (same pose, a still); the video is not loaded any more (the files stay)
+    // (girls pass: the dance video is back - the cutscenes stay. Lite mode and reduced motion get the lifted-girls still on the studio's hover pad instead: no motion, same three girls)
+    // (fix pass item 3: that video was filmed on the old gold stage, so ROUND DONE no longer plays it - Flip and two dancers stand on the new dance deck in the fixed slots, in every mode; the video and its poster stay in data/scenes/round)
+    const ROUND_DONE_VIDEO = false;
+    showCard.className = 'show-card reward has-art art-round cast2';
+    showCard.style.setProperty('--rw-art', 'none');
+    if (window.Stage) Stage.cue('close', { over:showCard, cls:'reward', sign:{ sub:'', main:'' } });
+    showCard.innerHTML = '<i class="rw-sun" aria-hidden="true"></i><div class="fs-host host-full" aria-hidden="true">' + Host.html({ pose:'cheer' }) + '</div>' + castSlotsHtml(ROUND_DONE_SLOTS) + '<div class="rw-panel"><div class="rw-title"></div><div class="rw-frame"><i class="mq mq-a" aria-hidden="true"></i><i class="mq mq-b" aria-hidden="true"></i><div class="rw-row">' +
       '<span class="rw-chip pts" style="--i:0"><b>+' + pts + '</b><small>points</small></span>' +
       '<span class="rw-chip letter ' + (letter || 'none') + '" style="--i:1"><b>' + (letter === 'got' ? '?' : letter === 'miss' ? '✕' : '–') + '</b><small>' + (letter === 'got' ? 'letter won' : 'no letter') + '</small></span>' +
       '<span class="rw-chip keys" style="--i:2"><b>◉ ' + keys + '</b><small>orb' + (keys === 1 ? '' : 's') + '</small></span></div></div></div>';   // (A+: only points gained, the letter won and keys - no running totals)
-    if (!prefersReducedMotion()){   // (lite mode keeps the dancers: it only stops the marquee and blur)
+    if (ROUND_DONE_VIDEO && !prefersReducedMotion()){   // (lite mode keeps the dancers: it only stops the marquee and blur)
       try{
         const vid = document.createElement('video'); vid.className = 'rw-video'; vid.muted = true; vid.loop = true; vid.playsInline = true; vid.preload = 'auto'; vid.setAttribute('aria-hidden', 'true'); vid.setAttribute('disablepictureinpicture', '');
         vid.addEventListener('playing', ()=> vid.classList.add('on'));
@@ -12602,6 +12812,7 @@ const SHARE_URL = 'https://playflipstax.com';
     }
     // Run 4B: the round-end game was won - the presenter pops out beside the panel now and then (lib/cast.js; only
     // pictures listed in data/cast/manifest.js; never takes a tap)
+    // solo pass: the presenter (Cleo) no longer pops out - Flip is the only host on the card
     if (runActWon[st.act] && window.Cast) Cast.win({ side:'left', hold: Math.min(1900, cine(TIMING.REWARD_HOLD || 2200) - 300), always: CAST_ALWAYS, while: ()=> showCard.classList.contains('reward') && !showCard.classList.contains('hidden') });
     const shownAt = performance.now();
     let gone = false;
@@ -12633,10 +12844,10 @@ const SHARE_URL = 'https://playflipstax.com';
     const m = st.mult || a.mult || 1, line = st.announce || a.announce || '', round = st.round || a.round || 0;
     // A+ round art: Rounds 2-6 open on their own picture (data/scenes/round/, ROUND_TITLE_ART) instead of the stage's arch - the girls on top,
     // the sign, the points pill and the host's line in the dark gradient at the bottom; the host is not drawn over the picture.
-    const tArt = !fin && ROUND_TITLE_ART[round] || null;
-    showCard.className = 'show-card flipstage' + (fin ? ' finale' : '') + (tArt ? ' has-art art-title' : '');
-    if (tArt) showCard.style.setProperty('--rw-art', 'url(../data/scenes/round/' + tArt + '.webp)'); else showCard.style.removeProperty('--rw-art');
-    showCard.innerHTML = '<div class="fs-host host-full" aria-hidden="true">' + Host.html({ pose: fin ? 'cheer' : 'presenting' }) + '</div>' +
+    const slots = !fin && ROUND_TITLE_SLOTS[round] || null;   // (fix pass item 4: rounds 2-6 stand Flip in his fixed place with the dancers in their fixed slots beside him; Round 1 and the Grand Finale are Flip alone)
+    showCard.className = 'show-card flipstage' + (fin ? ' finale' : '');
+    showCard.style.removeProperty('--rw-art');
+    showCard.innerHTML = '<div class="fs-host host-full" aria-hidden="true">' + Host.html({ pose: fin ? 'cheer' : (ROUND_TITLE_POSE[round] || 'presenting') }) + '</div>' + castSlotsHtml(slots) +
       '<div class="fs-title"><b></b><span></span></div>' +
       (m > 1 || fin ? '<div class="fs-pill ds-pill gold">' + (fin ? 'GRAND PRIZE' : 'POINTS ×' + m) + '</div>' : '') +
       '<div class="fs-line" aria-live="polite"><span></span></div>';
@@ -12649,8 +12860,8 @@ const SHARE_URL = 'https://playflipstax.com';
     // the title card moves on by itself after ROUND_CARD_MS (about 3 s with the zoom out), shows ONE line from the host, and a tap skips it;
     // a first-time VS explainer is a card of its own afterwards (showExplainer), not a second host line on this one
     const ROUND_CARD_MS = 2200, ms = ROUND_CARD_MS;
-    if (window.Stage && !tArt) Stage.cue('close', { over:showCard, cls:'flipstage', push:true, ms, sign:{ sub: signSub, main: signMain } });
-    showCard.classList.toggle('staged', !!(window.Stage && Stage.ready) && !tArt);
+    if (window.Stage) Stage.cue('close', { over:showCard, cls:'flipstage', push:true, ms, sign:{ sub: signSub, main: signMain } });   // (polish pass: every round card stands in the studio)
+    showCard.classList.toggle('staged', !!(window.Stage && Stage.ready));
     clearTimeout(hostSayT); document.getElementById('showSay').classList.remove('on'); document.documentElement.classList.remove('host-say');
     if (sfx.bumper) sfx.bumper(!!st.finale);
     if (fin) setTimeout(()=> sfx.drumrollLong(), 500);   // the finale: a long drumroll under the spotlight
@@ -12779,6 +12990,7 @@ const SHARE_URL = 'https://playflipstax.com';
     const gi = GAME_INTRO[key], c = gameIntroColors(key), lineMs = Math.min(3450, Math.max(3000, 1400 + readMs(explainerText(key, false) || ''))), ms = (runActive && DEBUG_FAST) ? dt(lineMs) : lineMs;
     const name = gi ? gi.name() : mysteryName(key);
     showCard.className = 'show-card gintro' + (key === 'door' ? ' gi-portal' : '');
+    if (window.Stage) Stage.cue('close', { over:showCard, cls:'gintro', sign:{ sub:'', main:'' } });   // (polish pass: the game's spotlight card stands in the studio)
     showCard.style.setProperty('--gi-a', c[0]); showCard.style.setProperty('--gi-b', c[1] || c[0]);
     showCard.innerHTML = '<i class="gi-bg" aria-hidden="true"></i><i class="gi-spot" aria-hidden="true"></i>' +
       '<div class="gi-icon" aria-hidden="true"></div><div class="gi-sign"><div class="sign-bulbs" aria-hidden="true"></div><span></span></div><p class="gi-line"></p>';
@@ -12968,6 +13180,43 @@ const SHARE_URL = 'https://playflipstax.com';
       if (e && performance.now() - shownAt < CB_SKIP_MS) return;
       if (stage === 'last') finish(); else lastCard(); }
     showCard.addEventListener('click', go);
+  }
+  // fix pass item 5: a short dance before the commercial break - data/break/dance-duo-a.mp4 (10 s, 720 x 1280, 2 MB, no sound track: Flip and one dancer on the dance deck),
+  // muted, inline, tap to skip after 1 s. When it ends (or is skipped, fails, or has not started after 3 s) the break starts exactly as before - the break itself is untouched.
+  // Lite mode and reduced motion: the still frame (data/break/dance-duo-a-poster.webp) for 2 s. Fast test runs (?debug=fast, not real time) go straight to the break so the
+  // break's own check is unchanged. If another screen takes the show over meanwhile (a TEST jump, a restart) the dance cleans up and hands nothing back.
+  const BREAK_DANCE_SRC = 'data/break/dance-duo-a.mp4', BREAK_DANCE_POSTER = 'data/break/dance-duo-a-poster.webp', BREAK_DANCE_MS = 10000;
+  function showBreakDance(g, then){
+    if (DEBUG_FAST && !REALTIME){ then(); return; }
+    const still = isLite() || prefersReducedMotion();
+    showCard.className = 'show-card breakdance' + (still ? ' bd-still' : '');
+    showCard.innerHTML = '<img class="bd-poster" alt="" decoding="async" src="' + BREAK_DANCE_POSTER + '">' + (still ? '' : '<video class="bd-video" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>') +
+      '<button type="button" class="bd-skip">TAP TO SKIP</button>';
+    showCard.setAttribute('role', 'button'); showCard.setAttribute('aria-label', 'A little dance before the commercial break. Tap to skip');
+    showCard.classList.remove('hidden');
+    document.documentElement.classList.add('bd-up');   // (the effects layer is hidden while the dance is up: a light sweep from the board underneath used to cross the picture - see lib/juice.css)
+    const vid = showCard.querySelector('video'), shownAt = performance.now(), timers = [], mine = showCard.querySelector('.bd-poster');
+    let over = false;
+    const finish = (handBack)=>{
+      if (over) return; over = true; timers.forEach(clearTimeout); showCard.removeEventListener('click', onTap); document.documentElement.classList.remove('bd-up');
+      if (vid){ try{ vid.pause(); }catch(e){} vid.removeAttribute('src'); try{ vid.load(); }catch(e){} }
+      if (mine.isConnected && showCard.contains(mine)){ showCard.classList.add('hidden'); showCard.innerHTML = ''; showCard.className = 'show-card hidden'; }
+      if (handBack && g === Show.gen) then();
+    };
+    const end = ()=> finish(g === Show.gen);
+    const onTap = ()=>{ if (performance.now() - shownAt >= 1000) end(); };
+    showCard.addEventListener('click', onTap);
+    if (still){ timers.push(setTimeout(end, 2000)); return; }
+    vid.muted = true; vid.defaultMuted = true; vid.playsInline = true; vid.setAttribute('playsinline', ''); vid.setAttribute('webkit-playsinline', '');
+    let started = false;
+    vid.addEventListener('playing', ()=>{ started = true; showCard.classList.add('bd-on'); });
+    vid.addEventListener('ended', end); vid.addEventListener('error', end);
+    vid.addEventListener('timeupdate', ()=>{ if (!over && vid.duration && vid.duration - vid.currentTime < 0.08) end(); });
+    vid.src = BREAK_DANCE_SRC;
+    try{ const pr = vid.play(); if (pr && pr.catch) pr.catch(end); }catch(e){ end(); }
+    timers.push(setTimeout(()=>{ if (!started) end(); }, 3000));   // (never stuck on a stalled load)
+    timers.push(setTimeout(end, BREAK_DANCE_MS + 2500));            // (the safety net: the clip is 10 s)
+    timers.push(setTimeout(()=> showCard.classList.add('bd-skip-on'), 1000));
   }
   function showSponsor(done){
     if (CB_RETRO) return showSponsorRetro(done);
@@ -14096,7 +14345,7 @@ const SHARE_URL = 'https://playflipstax.com';
   // and the marquee bulbs flashing (2 a second); TAP TO SKIP after 1 s; when it ends (or is skipped) it fades and Orbit Drop carries on into the existing
   // ROUND SIX DONE flow. It replaces the older code-drawn disco here (which stays as the fallback if the video cannot play). The video is loaded only now,
   // and stopped and removed afterwards. Lite and reduced motion: a still frame of it for 2.5 s, then on. Once an episode, like the disco before it.
-  const OD_DANCE_SRC = 'media/od-dance-540.mp4';
+  const OD_DANCE_SRC = 'data/wheel/dance-party-a.mp4';   // (fix pass item 3: was media/od-dance-540.mp4, filmed on the old gold stage - the jackpot dance now plays the new dance-deck video the Mystery Wheel's DANCE PARTY uses, same 10 s, still muted; the old file stays)
   function jackpotDance(done){
     const id = (runActive || dailyOrbit) ? 'daily-' + (runStartDate || todayStr()) : 'inf-' + (infRun && infRun.startedAt || 'run');
     if (discoShownFor === id){ if (done) done(); return; }
@@ -16343,7 +16592,8 @@ const SHARE_URL = 'https://playflipstax.com';
   // paused; TAP TO SKIP after 1.5 s; at the end it fades into the goodbye and the results, unchanged. The video is loaded only when the win starts (and
   // unlocked inside the winning tap, so a phone lets it play with sound); everything (video, layers, animations, timers, listeners) is removed after.
   // Lite and reduced motion: a still WARPED IT! card for 2 s, then the goodbye. If the video cannot play, the same still card.
-  const WW_FINALE_SRC = 'media/ww-finale-540.mp4';
+  const WW_FINALE_SRC = 'data/outro/finale-b.mp4';   // (fix pass item 1: the winning ending was still this old 7 s dance video (media/ww-finale-540.mp4, filmed on the old stage; the file stays) - it now plays the new 10 s finale on the dance deck, the same file the results ending uses; WW_FINALE_PLAYED tells the results not to play it a second time)
+  let WW_FINALE_PLAYED = false;
   function wwFinaleWin(solvedAt, done){
     const still = FX.reduced() || isLite() || !Element.prototype.animate, ov = els.solveOverlay;
     const W = innerWidth, H = innerHeight, cx = W / 2, cy = H / 2;
@@ -16409,10 +16659,10 @@ const SHARE_URL = 'https://playflipstax.com';
       const fail = ()=>{ if (ended || fellBack) return; fellBack = true; clearInterval(watch);
         try{ vid.pause(); }catch(e){} try{ if (srcNode) srcNode.disconnect(); }catch(e){} if (vidLayer){ vidLayer.remove(); vidLayer = null; }
         card.remove(); if (flash.animate){ flash.animate([{ opacity:1 }, { opacity:0 }], { duration:300, fill:'forwards' }).onfinish = ()=> flash.remove(); } else flash.remove();
-        const t7 = performance.now() + 7000; discoShownFor = null; let ok = false; try{ ok = discoCelebrate('ww-finale', ()=> later(finish, Math.max(0, t7 - performance.now()))); }catch(e){}
-        if (!ok) later(finish, 7000);
-        later(finish, 9500); };   // (the scene runs the clip's length, 7 s; whatever happens the goodbye comes by 9.5 s)
-      const mark = ()=>{ if (vid && vid.currentTime > 0.05){ started = true; } };
+        const t7 = performance.now() + 10000; discoShownFor = null; let ok = false; try{ ok = discoCelebrate('ww-finale', ()=> later(finish, Math.max(0, t7 - performance.now()))); }catch(e){}
+        if (!ok) later(finish, 10000);
+        later(finish, 12500); };   // (the scene runs the clip's length, 10 s; whatever happens the goodbye comes by 12.5 s)
+      const mark = ()=>{ if (vid && vid.currentTime > 0.05){ started = true; WW_FINALE_PLAYED = true; } };
       vid.addEventListener('playing', ()=>{ lastMove = performance.now(); }); vid.addEventListener('timeupdate', mark);
       const watch = setInterval(()=>{ if (ended || fellBack || !vid){ clearInterval(watch); return; }
         const t = vid.currentTime; if (t !== lastT){ lastT = t; lastMove = performance.now(); }
@@ -16425,7 +16675,7 @@ const SHARE_URL = 'https://playflipstax.com';
         try{ vid.muted = true; const p2 = vid.play(); if (p2 && p2.catch) p2.catch(fail); }catch(e){ fail(); } });
       vid.addEventListener('error', fail);
       vid.addEventListener('ended', ()=>{ if (!fellBack) finish(); });
-      later(finish, 9000);   // (a safety net: the clip is 7 s)
+      later(finish, 12000);   // (a safety net: the clip is 10 s)
       flash.animate([{ opacity:1 }, { opacity:0 }], { duration:450, easing:'ease-out', fill:'forwards' }).onfinish = ()=> flash.remove();
       // WARPED IT! and the points over the first 2 s
       const wd = card.querySelector('.ww-mega-word'), pt = card.querySelector('.ww-mega-pts');
@@ -16928,13 +17178,20 @@ const SHARE_URL = 'https://playflipstax.com';
   // that last frame (the 1d39dd0 screen: the FINAL SCORE pill, CONGRATULATIONS!, the 8 stat tiles, SHARE, the coffee button, 'Play again tomorrow'); Flip's personality
   // line, the badges and the old cards (best moment, today's personality, streak, new collectible cards, the Secret Riddler) scroll below. No red curtains.
   const OUTRO_WATCHDOG_MS = 15000, OUTRO_FALLBACK_MS = 1500, OUTRO_START_MS = 3500;
+  // polish pass: the goodbye video was filmed on the old stage - the ending now plays in the drawn studio instead (lib/juice.css, THE ENDING IN THE STUDIO): the
+  // cast, lifted off the old picture, in front of the window, then the blast doors close under the neon FLIPSTAX sign and the results lie over them. Same length
+  // as the video (10 s), same tap to skip, same quiet path for lite / reduced motion / fast test runs. The video and its poster stay in data/outro, not loaded here.
+  // (girls pass: the ending plays data/outro/finale-b.mp4 again - the cutscene, 10 s, the cast dancing on a lit floor; OUTRO_STUDIO = false is the video path. Its last frame is data/outro/finale-b-poster.webp. The drawn-studio ending (true) stays in the code and the CSS.)
+  const OUTRO_STUDIO = false, OUTRO_STUDIO_MS = 10000;
   function outroMount(){
     const o = document.getElementById('outro'); if (!o || o.querySelector('.outro-extras')) return;
     // mega 4 item 1: no red curtains and no 'That's our show' card - the video's own blue curtain closes on the neon FLIPSTAX sign, and the results lie over
     // that last frame (the 1d39dd0 screen). The old cards and badges scroll below the buttons (the same elements, so the code that fills them is unchanged).
     o.classList.add('blue');
+    if (OUTRO_STUDIO && !o.querySelector('.outro-set')){ o.classList.add('studio'); const set = document.createElement('div'); set.className = 'outro-set'; set.setAttribute('aria-hidden', 'true');
+      set.innerHTML = '<i class="os-pad"></i><i class="os-cast"></i><i class="os-door l"></i><i class="os-door r"></i><i class="os-beam"></i><b class="os-sign">FLIPSTAX</b>'; o.insertBefore(set, document.getElementById('outroBadge')); }
     const lower = o.querySelector('.outro-lower'), x = document.createElement('div'); x.className = 'outro-extras';
-    x.innerHTML = '<div class="ox-flip"><span class="ox-face">' + Host.html({ pose:'wave', kind:'head' }) + '</span><p class="ox-line" id="outroFlipLine"></p></div>';
+    x.innerHTML = '<div class="ox-flip"><span class="ox-face">' + Host.html({ pose:'wave' }) + '</span><p class="ox-line" id="outroFlipLine"></p></div>';
     const cards = document.querySelector('#epResults .epr-cards'), unl = document.getElementById('readoutUnlocks'), rid = document.getElementById('readoutRiddler');
     [rid, unl, cards].forEach(n=>{ if (n) x.appendChild(n); });
     lower.appendChild(x);
@@ -16958,13 +17215,14 @@ const SHARE_URL = 'https://playflipstax.com';
     { const d = document.getElementById('outroDetails'); d.textContent = 'details'; d.setAttribute('aria-expanded', 'false'); }
     document.documentElement.classList.remove('outro-up');
     if (!o) return;
-    o.classList.remove('end', 'instant', 'poster-on', 'closing');
+    o.classList.remove('end', 'instant', 'poster-on', 'closing', 'still');
     try{ v.pause(); }catch(e){} v.removeAttribute('src'); try{ v.load(); }catch(e){}
   }
   function startOutro(r){
     stopOutro(); loadOutroPoster(); outroMount();
+    const seenWin = WW_FINALE_PLAYED; WW_FINALE_PLAYED = false;   // (a win has just played this same finale video: the results come in over its last frame instead of playing it again)
     const o = document.getElementById('outro'), v = document.getElementById('outroVideo'); if (!o) return;
-    { const art = document.getElementById('outroArt'); if (art && !art.getAttribute('src')) art.src = 'data/scenes/round/scene-all-group.webp'; }   // (the end-of-show picture, loaded when the outro starts)
+    // (solo pass: the old end-of-show group picture is not loaded any more - its box has been hidden since the blue-curtain ending; the file stays)   // (the end-of-show picture, loaded when the outro starts)
     els.readoutOverlay.classList.add('outro-on');
     // Launch prep: one 'game_completed' analytics event per finished episode (Vercel Web Analytics; a no-op when it is blocked or in test modes),
     // and the feedback link only when FEEDBACK_URL is set.
@@ -16974,11 +17232,14 @@ const SHARE_URL = 'https://playflipstax.com';
     document.getElementById('outroScore').textContent = shownScore(r.score).toLocaleString();
     outroState = 'playing';
     outroLater(OUTRO_WATCHDOG_MS, ()=> outroEnd(true));   // (the watchdog: whatever happens, the buttons are there within 12 s)
-    const quiet = isLite() || prefersReducedMotion() || (DEBUG_FAST && !REALTIME);   // (test runs and quiet modes: the poster, then the end state)
-    if (quiet){ o.classList.add('poster-on'); outroLater(DEBUG_FAST && !REALTIME ? 300 : OUTRO_FALLBACK_MS, ()=> outroEnd(false)); return; }
+    const quiet = seenWin || isLite() || prefersReducedMotion() || (DEBUG_FAST && !REALTIME);   // (test runs and quiet modes: the poster, then the end state)
+    // (lite mode / reduced motion in the studio ending: Flip stands still on his pad in front of the open doors for the hold - the same big Flip, same place, as
+    // the normal ending, just not moving - instead of the doors being shut from the first frame with nobody there; then the results over the closed doors as before)
+    if (quiet){ o.classList.add(OUTRO_STUDIO && !(DEBUG_FAST && !REALTIME) ? 'still' : 'poster-on'); outroLater(DEBUG_FAST && !REALTIME ? 300 : OUTRO_FALLBACK_MS, ()=> outroEnd(false)); return; }
+    if (OUTRO_STUDIO){ outroLater(OUTRO_STUDIO_MS, ()=> outroEnd(false, true)); return; }   // (the studio ending: as long as the video was, then the results)
     const fail = ()=>{ if (outroState !== 'playing') return; o.classList.add('poster-on'); outroClear(); outroLater(OUTRO_FALLBACK_MS, ()=> outroEnd(false)); outroLater(OUTRO_WATCHDOG_MS, ()=> outroEnd(true)); };
     try{
-      v.muted = true; v.src = 'data/outro/outro.mp4'; v.currentTime = 0;   // (mega 4: always muted - the win or lose track plays under the ending)
+      v.muted = true; v.src = 'data/outro/finale-b.mp4'; v.currentTime = 0;   // (mega 4: always muted - the win or lose track plays under the ending)
       v.onended = ()=> outroEnd(false, true); v.onerror = fail;   // (mega 4: the video plays to its end - its own blue curtain closes on the sign - then the results fade in over that last frame)
       v.ontimeupdate = null;
       let started = false; v.onplaying = ()=>{ started = true; };
@@ -16986,6 +17247,7 @@ const SHARE_URL = 'https://playflipstax.com';
       outroLater(OUTRO_START_MS, ()=>{ if (!started) fail(); });   // (never stuck on a stalled load)
     }catch(e){ fail(); }
   }
+  if (DEBUG_FAST || REPLAY) window.__themeState = ()=>{ const a = trackEls.theme; return { key: currentTrackKey, idx: introThemeIdx, src: TRACK_SRC.theme, at: introThemeAt(), el: !!a, t: a ? +a.currentTime.toFixed(2) : null, paused: a ? a.paused : null, muted: a ? a.muted : null, vol: a ? +a.volume.toFixed(3) : null, routed: a ? !!a._routed : null, gain: a && a._trim ? +a._trim.gain.value.toFixed(3) : null, ready: a ? a.readyState : null }; };   // (tests)
   if (DEBUG_FAST || REPLAY) window.__shareNums = ()=>{ const p = prebuildDailyShare(runResultToday); return p.promise.then(q=> ({ drawn: q.canvas && q.canvas.__nums, now: shareNumbers(runResultToday), text: buildRunShareText(runResultToday) })); };
   if (DEBUG_FAST || REPLAY) window.__shareImage = ()=> prebuildDailyShare(runResultToday).promise.then(p=> p.canvas ? p.canvas.toDataURL('image/png') : null);   // (tests: the picture the share sheet would send)
   els.solveOverlay.addEventListener('pointerdown', ()=>{ if (runActive) unlockRunEndMusic(); }, true);   // (a Word Warp tap unlocks the ending's music for later)
@@ -19318,6 +19580,7 @@ const SHARE_URL = 'https://playflipstax.com';
     if (ov.classList.contains('entering')) return;
     // (the tap is the gesture phones need before any sound)
     audioKick('enter');   // (the same tap: unlock the audio and start the intro music; a blocked start is retried on the next tap)
+    if (!runResultToday || REPLAY) primeIntroTheme();   // (solo pass: the show starts straight from this tap - unlock the intro theme's element too)
     const beams = [...ov.querySelectorAll('.st-beam')], host = document.getElementById('homeHost');
     const enter = ()=>{
       ov.classList.add('hidden'); ov.classList.remove('entering');
@@ -19832,6 +20095,7 @@ const SHARE_URL = 'https://playflipstax.com';
       { label:'Round 3 card', go: roundCard(3) },
       { label:'Select Game', go: roundGame('door', 96, 3) },
       { label:'Round 5 card', go: roundCard(5) },
+      { label:'Round 2 card', go: roundCard(2) }, { label:'Round 4 card', go: roundCard(4) }, { label:'Round 6 card', go: roundCard(6) },   // (test menu only: every round card can be looked at)
       { label:'Mystery Wheel', go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = null; }) },
       ...['JACKPOT +100', 'ORB +1', 'GOOP -25', 'Mystery: Snap Sort', '+25', 'GOOP -50', 'ORB +1 (2)', 'LOSE A SPIN', 'Riddle Round', 'DANCE PARTY'].map((t, i)=> ({ label:'Wheel: ' + t, go: roundGame('lucky', 80, 2, ()=>{ window.__forceLucky = i; }) })),
       { label:'Price Probe', go: mysteryAs('priceProbe') },

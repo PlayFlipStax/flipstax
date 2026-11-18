@@ -309,3 +309,192 @@ Test scripts: `screenshots/qa/tools/finishing/` (wheel.py, snapsort.py, twinflip
 
 Look only, one commit, nothing pushed. Block `THE SHOW OPENER, "THE ORBITING STUDIO"` at the end of `lib/intro.css`; every rule is scoped with `:root:has(#showCard.curtain:not(.hidden))`, so only the opener card changes (a browser without `:has()` keeps the old theatre whole). The stage photo is hidden while the card is up (`.stg-img` display none - the file is still used by other screens) and one inline SVG on `#stage .stg-close` draws the studio. `.co-drape` are the blast doors (same opening animation), `.co-valance` the ceiling beam, `.stg-sign` the neon EPISODE plate (now both lines, below the beam), `.co-stage-host::before/::after` Flip's hover pad. No new animation. The earlier fixes that hid the sign's top line under the valance were removed (not needed now). Stills: `u0-opener-390.png` / `u1-opener-390.png`, `u0-opener-360.png` / `u1-opener-360.png`. Fast check: 3 of 3, commercial break ok.
 Not looked at: the doors fully closed before they open, the short variant after the intro video (`intro-curt`), lite / reduced motion (nothing new moves), a real phone.
+
+
+---
+
+# Polish pass (branch `polish`, from `main`): one studio for the whole show
+
+Look only. Nothing pushed. Fast check on the tip: **commercial break: ok, 3 of 3 pass**. Looked at 390x844 and 360x640 in normal mode and at 390x844 in lite mode (`?lite=1`), no console errors. Stills (local only): `review-shots/polish/` - `compare-1` to `compare-6` are before / after sheets; `b-*` are the before shots, `after-*` and `lite-*` the final ones.
+
+| Commit | What |
+|---|---|
+| `d025c54` | The drawn orbiting studio replaces the close and wide stage photos everywhere (opener from its first frame, Round 1, Grand Finale, outro card, menu, results backdrop). |
+| `5354675` | Rounds 2-6 title cards and ROUND DONE: the girls, lifted off the old gold-stage pictures, stand in the studio. |
+| `28376d0` | Mystery Game reveal: neon plate, indigo console, blast doors instead of gold frame and red curtain. |
+| `a7265f5` | The ending: the goodbye video is replaced by the cast in the studio, blast doors closing under a neon FLIPSTAX sign. |
+| `c24c2d8` | Game spotlight card: no UFO, no rays, no swinging beams - the dimmed studio, a ceiling rig, one still pool of light. |
+| `989f360` | The moving cosmos in the window (stars, galaxy, planet; transform only). |
+| `6c1bf7d` | The ringed planet is solid, ring behind the top half and in front of the bottom half. |
+
+How it is built
+- **The studio** is the block between `STUDIO:BEGIN` / `STUDIO:END` at the end of `lib/stage.css`, written by `python3 tools/build-studio-css.py` (edit the script, then run it). It restyles `#stage .stg-close` and `.stg-wide` to the same drawing, on a 390 x 844 plate that covers the screen. Back to front: sky (shot background), far stars (`.stg-plate::before`), galaxy (shot `::before`), near stars (`.stg-sweep`), planet (`.stg-glow`), the wall with a real window opening + neon + floor (`.stg-plate::after`), the neon sign (`.stg-sign`). The photos `data/stage/stage-close.webp` and `stage-wide.webp` are still downloaded by `lib/stage.js` (their `<img>` is hidden) - see "Left" below.
+- **The opener's own furniture** (blast doors, ceiling beam, lights, hover pad) is still in `lib/intro.css`.
+- **The cast** is `data/cast/studio/*.webp` (30-90 KB each), made by `tools/cutout.swift` on each old picture and then `tools/build-studio-cast.py <folder of the lifted PNGs>`. `ROUND_TITLE_CAST` in `flipstax.html` maps rounds 2-6 to them; the card class is `has-cast` (the old `has-art art-title` rules are now unused). CSS: the `POLISH PASS` blocks at the end of `lib/juice.css`.
+- **JS touched (look only)**: `showActCard` (cast picture, the stage cue for every round), `showRewardBeat` (`ROUND_DONE_VIDEO = false`, the cast still, a stage cue), `showGameIntro` (a stage cue), `outroMount` / `startOutro` (`OUTRO_STUDIO = true`: the set is built once, a 10 s timer stands in for the video's `ended`).
+
+What changed that is more than a backdrop - please confirm
+- **ROUND DONE no longer plays `dance-girls.mp4`**: the three girls are a still, lifted from the video's poster frame. The video could not be re-dressed. Set `ROUND_DONE_VIDEO = true` and drop the `has-cast` class to bring it back.
+- **The ending no longer plays `data/outro/outro.mp4`** (the cast waving, the blue curtain). Same 10 s, same skip, same results; the cast is a still with a slow bob and the doors close at 6.6 s. `OUTRO_STUDIO = false` brings the video back.
+- The Reward beat is on the "do not touch" list, but ROUND DONE was asked for by name: only its backdrop and picture changed, the panel is as it was.
+
+Left / not done
+- **The share picture** still draws on `data/outro/poster.webp` (the old stage). Not a show beat; untouched.
+- **The intro video** (`data/intro/mothership-intro.mp4`, `?intro=1` / `?intro=full`) is a rendered film; its behaviour is untouched and it was not looked at in this pass. If its last frame shows the old stage, the hand-over to the studio opener will show a change of set.
+- **The commercial break** (`data/scenes/sponsor.webp`) and the blurred stage behind gameplay (`stage-dim.webp`) still use the old photos - game screens and the break were out of scope.
+- `lib/stage.js` still loads `stage-close.webp` (156 KB) and `stage-wide.webp` (229 KB) although they are never shown now. Skipping those two loads would save memory, but `stage-on` waits on the close picture loading, so it needs a careful change and its own fast check.
+- **Reduced motion** could not be switched on in the offscreen test browser: its rules sit beside the lite rules and were checked by reading, not by eye. Lite was checked by eye and by measuring (all four sky layers report no animation).
+- Not checked: a real phone, tablets and wide screens (the plate crops like the old opener did), the opener after the intro video (`intro-curt`), browsers without `:has()` (the ending's backdrop and the reveal's cool sweep use it; without it the ending keeps a dark scrim over the studio).
+- The fast check was run on the working tree, not on a frozen copy on its own port (that needs a copy outside this folder).
+- The test stills and scripts are in `screenshots/qa/tools/` (`polish_shots.py`, `polish_sheet.py`, `polish_motion.py`, `polish_probe.py`, `cut/`), not in git.
+
+
+---
+
+# Solo pass (branch `polish`, Nov 16 2026): Flip alone, the saucer intro, the intro theme
+
+Nothing pushed. Fast check on the tip: **commercial break: ok, 3 of 3 pass**. Looked at 390x844 and 360x640, lite (`?lite=1`) and simulated reduced motion; no console errors. Stills (local only): `review-shots/solo/` - `compare-1` to `compare-5` are the before / after sheets, `before-*` / `after-*` the single shots. Test scripts: `screenshots/qa/tools/solo_shots.py`, `solo_probe.py` (the intro's timeline), `solo_theme.py` (the theme's playback state), `solo_sheet.py`.
+
+| Commit | What |
+|---|---|
+| `4c89e22` | The girls are out: round cards 2-6 show Flip on his pad (`ROUND_TITLE_POSE`: presenting, wave, think, cheer, shrug, presenting), ROUND DONE shows `data/host/cheer.webp`, the ending shows `data/host/wave.webp`, the pop-out presenter (`Cast.win`) is switched off, the old group picture is no longer loaded for the results. No files deleted. |
+| `69052c2` | ROUND DONE party (`.rw-party` in `showRewardBeat`; CSS block `ROUND DONE PARTY` at the end of `lib/juice.css`): turning rays, two shockwave rings, falling confetti, Flip bouncing. |
+| `515796e` | The saucer intro (`showColdOpen`, class `saucer`; CSS block `THE SAUCER INTRO` at the end of `lib/intro.css`). `lib/intro.js`: the first-visit welcome no longer plays the video - only `?intro=full` and the test host's Watch intro link do. |
+| `4971975` | The intro theme (block `THE INTRO THEME` in `flipstax.html`, before the Infinity playlist): `playIntroTheme(ms)` / `endIntroTheme()` / `primeIntroTheme()`, track key `theme`. |
+
+The intro's timeline (first visit, measured): doors 0 s, saucer in 0.15-1.05 s, beam 1.0 s, Flip down 1.1-2.2 s, pad lights 2.2 s, sign 2.3 s, greeting 2.4 s, saucer leaves 2.8 s, ends 5.9 s. Returning: about 3.1 s with the Welcome back line. The sign reads EPISODE N (small) over GALACTIC GAME NIGHT.
+
+The theme: default Alien Disco Fever, from 154.26 s (0.3 s before the downbeat at 154.56 s). `?theme=N` (test hosts only): 1 Nebula Nights 80.30, 2 Cosmic Cruise 47.34, 3 Warp Speed Boogie 133.52, 4 Moonbase Groove 125.11, 5 Stardust Shuffle 126.47, 6 Saturn Strut 112.36, 7 Alien Disco Fever 154.56, 8 Meteor Mayhem 73.08 (the downbeat each snippet lands on, `INTRO_THEME_HITS`). To change the default, set `INTRO_THEME_DEFAULT` (0-based).
+
+Not done / to check
+- **Nobody has listened to the theme.** The offsets were picked by measuring loudness and onsets in the files, not by ear; the harness is silent. It was checked that the element seeks to the snippet, the gain ramps up in 0.3 s and down over the last 0.6 s, and the run's music takes over. Listen to all eight and move an offset if a snippet starts in an odd place.
+- A real iPhone: the muted start inside the tap and the later unmute, and the fade (it needs the Web Audio route).
+- A local server without range requests cannot seek into the mp3; the theme then stays silent rather than play the song's opening (1.5 s guard in `playIntroTheme`).
+- After `?intro=full` the video still ends on the old stage (its last frame, `data/intro/poster.webp`) and hands over to the old door-slide opener, not the saucer.
+- Still showing the old stage (no girls in any of them): the share picture (`data/outro/poster.webp`, the blue curtain), the commercial break (`data/scenes/sponsor.webp`), the blurred backdrop behind gameplay (`data/stage/stage-dim.webp`). None is a simple CSS swap; left alone.
+- Unused now, files kept: `data/cast/studio/*`, `data/scenes/round/*`, `data/cast/purple-presenting.webp` (still listed in `data/cast/manifest.js`), `ROUND_TITLE_CAST`, the `has-cast` rules for the round cards.
+- At 360x640 the greeting bubble covers Flip's legs in the intro (three lines of text); the host's size and place there were not changed.
+
+## One Flip (Nov 16 2026, after the solo pass)
+
+Flip is one size on every show beat: block `ONE FLIP` at the end of `lib/juice.css`. `--flip-h` = min(430 px, screen height - 320 px), so 430 px at 390x844 and 320 px at 360x640; the opener (`.co-stage-host` in the saucer intro), round cards 1-6 and the Grand Finale (`.fs-host`), ROUND DONE and the ending all use it, on a 240 px pad. Sizes only: no text, timing or skip change. The test menu gained Round 2 / 4 / 6 card entries. Fast check: commercial break ok, 3 of 3. Stills: `review-shots/solo/compare-6-one-flip-390.png`, `compare-7-one-flip-360.png`, `compare-8-one-flip-still.png`.
+Known: at 360x640 the opener's bubble covers his legs (face clear); the antenna tips come close to the points badge; in the still intro the parked saucer sits right on his antennae; after `?intro=full` the old opener still places him at the video's size.
+
+## Lite / reduced-motion ending (Nov 16 2026)
+
+Measured (`screenshots/qa/tools/solo_settled.py`, cards held with `__previewHold`): Flip's box is identical in normal, lite and reduced motion on the opener, round cards 1-6, the Grand Finale card and ROUND DONE - 290 x 430 at 390x844, 216 x 320 at 360x640; no lite or reduced-motion rule changes his size or place. The one real difference was the ending: lite / reduced motion shut the doors from the first frame with Flip hidden. Now `startOutro` sets `.still` (not `.poster-on`) for the 1.5 s hold: Flip stands still on his pad in front of the open doors, then the results come in over the closed doors as before (`solo_ending.py` traces it). Fast test runs (`?debug=fast`) keep the old path. CSS reduced motion cannot be switched on in the test browser: only the script side is simulated, so ROUND DONE's still version in reduced motion is checked by reading the rules, and by eye in lite mode only.
+
+## One render (Nov 16 2026)
+
+Two sets of Flip pictures live in `data/host/`: the full-body set `flip2-idle / flip2-wave / flip2-mic / flip2-shrug` (what `lib/host.js` serves for every pose while `FLIP2` is true: cheer and discoPoint borrow the wave, think and blink the idle, presenting and laugh the mic, oops the shrug) and the older big-head sprites (`idle, wave, cheer, presenting, think, shrug, oops, laugh, blink, discoPoint .webp`). ROUND DONE and the ending had been pointed straight at the old `cheer.webp` / `wave.webp`; both now use `flip2-wave.webp`, so every show beat is the same render at the same size. There is no cheering picture in the full-body set - a new pose would have to be drawn. Stills: `review-shots/solo/compare-13-one-render-390.png`, `compare-14-one-render-360.png`.
+
+## The deck in orbit (Nov 16 2026, the show stage)
+
+Look only, one commit, nothing pushed. Rollback tag: `before-stage-life-20261116`. The stage the opener, round cards, ROUND DONE, the Grand Finale card, the ending, the Mystery Game reveal, the game spotlight card and the results backdrop stand in is no longer a violet wall with an arched window: the show stands on an open glass dance deck floating in space.
+
+- **Back to front**: the sky (magenta / violet nebula ribbon with a dark dust lane, a teal cloud, a banded planet rising behind the deck on the left with a lit rim, a teal moon, a small gold ringed planet, near stars with glints), the drifting starfield, the turning galaxy (upper left), the gliding ringed planet (upper right), two searchlights from above that slowly open and close, the dance floor (perspective glass tiles with neon joints, a pink-white-teal light wave rolling under the glass, two sets of lit tiles - magenta / teal and violet / gold - taking turns in an 8-beat pattern), two pairs of neon ring pylons (the back pair smaller: depth) with their reflections in the floor, the deck's neon rim, a breathing neon glow on the pylons and the rim, the sign.
+- **How it is built**: block `STAGE LIFE` at the end of `lib/stage.css`, written by `tools/build-stage-life.ps1` (PowerShell - this PC has no Python; edit the script, then `powershell -NoProfile -ExecutionPolicy Bypass -File tools\build-stage-life.ps1`). It overrides the `STUDIO` block above it (still written by `tools/build-studio-css.py`, unchanged). `lib/stage.js` gains five empty elements per shot (`.stg-floor` with `.sf-wave`, `.sf-glass`, `.sf-sim.a`, `.sf-sim.b`, and `.stg-pulse`); nothing else in JS changed. `.stg-sweep` (was the near stars) is now the searchlights; `.stg-plate::after` (was the wall and window) is now the pylons, rim and haze.
+- **Motion budget**: 8 moving layers on the shot on screen, 7 on ROUND DONE (its own rays; the searchlights rest). Transform and opacity only, no animated blur or shadow. Tiles change on a 0.6 s beat (each set at most one on/off cycle per 1.2 s). Measured with `document.getAnimations()`: the 8 names on the shot that is on; none in lite (`?lite=1`) or with reduced motion emulated in Chrome (`Emulation.setEmulatedMedia`, the real media query - not just the script side this time).
+- **Fixed on the way**: the old STUDIO rules gave the planet and stars `animation: ... !important`, which outranked the base "shot off screen holds still" rule, so the hidden shot kept animating; a later rule now pauses every stage layer on a shot that is not on.
+- **Still version** (lite / reduced motion): nothing moves; the floor shows both tile sets part-lit and the wave parked mid-floor, the glow at 80%.
+- **Memory**: data-URI SVGs only (about 73 KB of CSS), no images or video. The two biggest moving layers are the starfield (2 x plate width, sky height) and the searchlights (plate width, 78% height); the glow layer covers only the pylon band.
+
+Checked: opener (held at 5.2 s), Round 2 card, ROUND ONE DONE, the ending (4.5 s and the results at 13 s) at 390x844 and 360x640, the landing and the game spotlight card, lite and reduced motion; no console errors. Fast check on the working tree: **commercial break: ok** (a PowerShell / Chrome port of `tools/commercial-break-check.py`, same four modes) and **3 of 3 pass** (`tools/flow-episodes.ps1 -Normal 3 -Lite 0 -Other 0`). Stills (local only): `review-shots/stage-life/` - `compare-390x844.png`, `compare-360x640.png` (before / after per beat), `compare-still.png` (lite / reduced motion), `before-*` and `after-*` singles, `a1-*` to `a3-*` the revision passes.
+Screenshots: the dev server `.devserver.ps1` answers one request at a time, so the shots and checks ran against a 12-thread copy of it (an HttpListener with a runspace pool, serving the same folder on 8834), several headless Chromes in parallel.
+
+Not checked / left
+- A real iPhone (frame rate with 8 layers, the 2x-wide starfield's memory).
+- The opener's own blast doors park at the screen edges and hide the front pylons there - that is the intro's furniture, untouched.
+- The Grand Finale card and the Mystery Game reveal were not shot (same stage, same rules).
+- `tools/build-studio-css.py` would still rewrite only the STUDIO block; if it is run, run `build-stage-life.ps1` after it (the STAGE LIFE block is kept, but it is the one that wins).
+
+## The girls and the cutscenes are back (Nov 17 2026)
+
+Rollback tag before this pass: `before-girls-videos-20261117`. The owner decided to keep the alien girls and the CGI cutscenes; the solo-pass removals are undone and the polish work (stage, floor tiles, text-size fix, game changes) is kept. One commit per item; nothing pushed until the last step.
+
+| Item | Commit | What |
+|---|---|---|
+| videos | `8cb3e89` | ffmpeg was available (WinGet). Compressed copies, 720x1280 H.264 main profile, fast-start (moov first), 24 fps, AAC 96k: `data/intro/intro-saucer.mp4` 2.7 MB, `data/wheel/dance-party-a.mp4` 3.4 MB, `data/outro/finale-b.mp4` 3.6 MB (each 10 s). `incoming-assets/new-videos` untouched; `dance-duo-a.mp4` not used. |
+| 2 girls | `7a878a1` | Rounds 2-6 title cards: the three girls (`data/cast/studio`, lifted cutouts, the POLISH PASS layout) on the new deck again (`tArt` in `showActCard`). ROUND ONE DONE plays `dance-girls.mp4` full-card as in the A+ build (class `rw-vid`; lite and reduced motion stand the lifted girls on the pad as a still). The presenter pop-out (`Cast.win`) is back. Round 1 and the Grand Finale are Flip - they never had the girls in any version (checked against main and e30922a). The solo ROUND DONE party (rays, rings, confetti) is removed with the solo card. |
+| 3 dance | `85c6b0a` | Wheel DANCE PARTY plays `dance-party-a.mp4` (one-line src change; wedge, label, +10, odds, fade, skip, 12 s net untouched). |
+| 4 ending | `6942e5d` | `OUTRO_STUDIO = false`: the ending plays `finale-b.mp4` (muted, the run's music under it), then the results over its last frame; skip, watchdog and hand-off as before; lite / reduced motion / failure show `data/outro/finale-b-poster.webp` (its last frame) for 1.5 s. The last frame is dimmed to 66% once the results are up. The studio ending (cast on the pad, closing doors) stays in the code and CSS behind the flag. The share picture still draws from `data/outro/poster.webp`. |
+| 1 intro | `8e9df20` | The show opens on `intro-saucer.mp4` (`showVideoOpen` in `flipstax.html`, CSS block THE VIDEO OPENER in `lib/intro.css`). First visit and `?intro=full`: the whole 10 s, freeze on the last frame (`data/intro/intro-saucer-last.webp` is laid over the video so the freeze is exact), the FlipStax lockup (`images/flipstax-lockup-800.webp`) slams in (scale 2.5 -> 1 with a settle), one light burst, a fan of rays, one shine sweep through a mask of the logo, the EPISODE tag, hold 1.5 s, then Flip's greeting bubble and Round 1: 16.4 s in all (measured through the real ENTER tap). Returning visit: video from 7.0 s (3 s), hold 0.8 s, the welcome-back line: about 7 s. Lite / reduced motion: no video is loaded - the still last frame, the logo and the line, no motion (5.3 s). Tap to skip works at any moment after SKIP_MIN_MS (checked at 7 s of a `?intro=full` run). The CSS saucer intro (Flip shrinking and growing) is switched off (`INTRO_VIDEO`), the old CGI `mothership-intro.mp4` plays only from the test host's Watch intro link; the landing now warms the cache with a fetch of the new video on a first visit. |
+| fine-tune | `e69fe08` | `--flip-h` = min(430 px, screen height - 336 px): 430 on a tall phone, 304 at 360x640 (was 320) so his antennae clear the GRAND PRIZE pill. |
+
+Checked (Chrome over CDP, headless; no Python on this PC): 390x844 and 360x640, normal and lite, for the intro, rounds 1-6, ROUND ONE DONE, the grand finale, the ending and the results; the Dance Party wedge; reduced motion only as far as the lite path (the same JS branch: the OS media query was emulated for the stage in the earlier pass, not for these cards). Every wheel wedge was spun from the TEST menu: JACKPOT +100, ORB +1 (both), GOOP -25 / -50, +25, LOSE A SPIN (and the wheel closes at DONE), DANCE PARTY (+10 and the new video plays 10 s, then back to the wheel), Mystery Game (Snap Sort opens, then the wheel returns), Riddle Round (the riddle opens, the wheel is hidden behind it): each landed, paid and handed off as before. Fast check on the final code (`e69fe08`): **commercial break: ok** (the CDP port of tools/commercial-break-check.py, all four modes) and **3 of 3 pass** (tools/flow-episodes.ps1 -Normal 3 -Lite 0 -Other 0: 173, 176 and 178 s, each with the new opener and the ending video). The lite episodes were not run (as in the earlier passes).
+Tools used (kept out of git, in the session scratchpad): `shoot2.ps1` (parallel stills per beat, size, lite), `wheel.ps1` (spins every wedge), `introflow.ps1` (real ENTER flow: first / returning / `?intro=full`, skip), `cbcheck.ps1` (the commercial-break check ported to CDP), a 12-thread copy of the dev server (the repo's `.devserver.ps1` answers one request at a time). Stills (local only): `review-shots/girls-videos/` - `compare-390x844-a/b.png`, `compare-360x640-a/b.png` (before / after of the opener, rounds 1-6, ROUND DONE, finale, ending, results), `compare-dance.png`, `sheet-afterlite-*.png`, `sheet-after-*.png`; singles `before-*`, `after-*`, `afterlite-*`, `i1/i2-*` (the opener).
+
+Known / bigger
+- **Flip's size across the opener and the cards.** The opener video's Flip is about 66% of the screen height (390x844: 560 px), the code-drawn Flip on Round 1 and the Finale is 51% (430 px). The cards cannot hold a bigger one without his head meeting the sign and the pill, or the feet meeting the bubble. A bigger fix would be a re-framed (zoomed-out) intro render, or a taller Flip render on the cards with a lower sign. Not done.
+- **The video soundtracks are not used.** The intro video is muted so it does not clash with the intro theme (set `INTRO_VIDEO_SOUND = true` to hear its own track when sound is on - then also skip `playIntroTheme`); the ending video is muted as before; the dance video follows the sound switch as the old one did. Nobody has listened to the theme over the longer intro (it still starts 0.3 s before the downbeat at the start of the video, plays for the whole 16 s and fades out over 0.6 s).
+- ROUND ONE DONE in normal mode shows the dance video's own gold stage, not the new deck (a video cannot be re-dressed); only the bottom strip of the card shows the stage.
+- At 360x640 the test harness's TEST button covers the end of the greeting bubble and the round line (test mode only).
+- A real iPhone has not been tried: inline autoplay of the three videos, memory with a 2.7-3.6 MB video plus the stage's 8 moving layers, and the theme's muted start inside the tap.
+
+---
+
+# Fix pass (branch polish, rollback tag `before-fixes-20261117`)
+
+One commit per item, in this order (see `git log`): 1 the ending, 2 Watch intro, 3 ROUND DONE / round cards on the new deck, 4 one Flip on the opener, 5 the break dance, 6 cache headers.
+
+1. **Ending.** The results ending (`startOutro`) was already finale-b. The old dance people saw was a separate hard-coded video that plays first when the Word Warp is SOLVED: `WW_FINALE_SRC` = `media/ww-finale-540.mp4` (old stage, 7 s). It now plays `data/outro/finale-b.mp4` (10 s; timers 7 -> 10 s; sound at the effects volume; skip, WARPED IT! card, watchdog and disco fallback kept). `WW_FINALE_PLAYED` makes the results come in over its last frame (poster) instead of replaying it. Unsolved: finale-b plays at the results as before. The Orbit Drop jackpot dance (`OD_DANCE_SRC`) also pointed at an old-stage video; it now plays `data/wheel/dance-party-a.mp4`.
+2. **Watch intro.** Both buttons call `Intro.run(null,{force:true})`; the force branch still played `mothership-intro.mp4`. `lib/intro.js` now hands over to `window.__watchIntro` (flipstax.html), which runs `showVideoOpen` (intro-saucer + logo card + greeting) over the screen, lifted by `:root.watching-intro` (lib/intro.css), then restores the menu music. `?intro=full` through the real ENTER tap already reached the new opener (first and returning visit).
+3. **ROUND DONE and the title cards.** ROUND DONE no longer plays `dance-girls.mp4` (old gold stage). The card is `cast2`: new deck, Flip in his fixed box with his pad, two dancers in fixed slots. Round cards 2-6 use the same slots (`ROUND_TITLE_SLOTS`; round 1 and the finale are Flip alone). CSS: lib/juice.css "FIX PASS" blocks (`.cast-slot`: 66% of Flip's height, feet on his line, inner edge 20% of his width from the centre, in front of the pad, a small hop; still in lite / reduced motion). On a short phone the ROUND DONE panel is compacted so the title clears the pad.
+4. **One Flip.** Card Flip box is `[50,218,290,430]` at 390x844 and `[78,186,205,304]` at 360x640 on rounds 1-6, ROUND DONE and the finale card, normal and lite (measured). The opener video's Flip (69% of the height) is scaled about his feet by `--ci-s` (`.ci-fit`, lib/intro.css) so he overlays the Round 1 Flip.
+5. **Break dance.** `showBreakDance` runs before `showSponsor` (data/break/dance-duo-a.mp4, 2 MB, 720x1280, no audio; poster webp). Lite / reduced motion: the poster for 2 s. `?debug=fast` skips it so the break's own check is unchanged.
+6. **Cache.** No service worker anywhere. `vercel.json` now says `Cache-Control: public, max-age=0, must-revalidate` for the page, lib, data, media, images, audio.
+
+Checked: every beat at 390x844 and 360x640, normal and lite (`review-shots/fixes/_ba-*.png`, before/after sheets; `after.log` has the Flip boxes); each beat played from the TEST menu ends and moves on; `tools/commercial-break-check.py` prints `commercial break: ok`; `flow-episodes.py normal=1 lite=1 other=1 parallel=1` prints `3 of 3 pass`.
+
+Old-stage places still in the normal show: the Cosmo Burger / Fizz Nova ad card (its own orange look, not the stage), the share picture (data/outro/poster.webp is its source), `stage-dim.webp` (the blurred gameplay backdrop, an old photo under the deck's CSS life; nothing gold shows), and the CSS-hidden old files (`dance-girls.mp4`, `ww-finale-540.mp4`, `od-dance-540.mp4`, `mothership-intro.mp4`, all still on disk; the last is still the code path in lib/intro.js if `__watchIntro` were missing).
+Not done / not checked: a real iPhone; true prefers-reduced-motion (only the JS side was simulated); the finale-b and dance videos keep their own framing (Flip dances at a different size inside a cutscene); the live site's headers (nothing was pushed).
+
+## Fix pass 2 (short phone screens) - rollback tag `before-short-screens-20261117`
+
+1. `67901ff` Short screens: Flip's box is now worked out from the room there is (`--app-h` = 100dvh, `--flip-b`, `--flip-t` in `lib/juice.css`), not from fixed 336 / 196 numbers with a 660 px breakpoint. One box feeds the card Flip, the dancer slots, the goodbye card and the opener video scale. Antennae stay under the banner and points pill at 390x664, 390x700, 390x844, 360x640 and 375x560.
+2. `ccdde9b` ROUND ONE DONE: the compact panel (24 px headline, tighter frame and chips) now applies at 700 px high and under (was 660), so the headline clears Flip's pad with the stats tiles showing.
+3. `7a9a999` Break dance: the gold beam was the board's glow sweep (`FX.glowSweep`, drawn on `#showFx`, above every card). `:root.bd-up #showFx{visibility:hidden}` while the dance is up.
+4. `a1d1088` Round 3 (and every card): Flip was on stage from the first frame but faded in from opacity 0 together with the sign and bubble (scene fade `sceneIn`, 600 ms, plus `hostStillIn` from 0). `sceneIn` now skips `.fs-host`, `hostStillIn` starts at 0.75, lite / reduced motion show him at full strength at once.
+5. 360x640 check: opener video plays to 10 s then holds on the logo; the break dance (`break/dance-duo-a.mp4`) plays then the sponsor card; the ending video (`outro/finale-b.mp4`) plays, then the goodbye card, then results. Stills in `review-shots/fixes2/` (`p5-*`, `_p5-*`, `before-*` / `after-*`, `_before-after-*`).
+
+Not checked: a real iPhone (dvh and Safari's bars are assumed from the 664 px figure); true prefers-reduced-motion (only the CSS rule is in place).
+
+## Fix pass 3 (old art and videos sweep) - rollback tag `before-old-sweep-20261117`
+
+### 1. Every video the game can play (the only ones named in the HTML, JS, CSS and data files; no .webm anywhere)
+
+| File | Plays when | Where in the code |
+|---|---|---|
+| `data/intro/intro-saucer.mp4` | The show's opener: first visit and `?replay=1` / `?intro=full` / the test host's "Watch intro" play all 10 s (the saucer's beam drops Flip onto the pad); a returning player gets only its last 3 s (from 7.0 s). Lite and reduced motion: no video, a still of its last frame. | `showVideoOpen` (flipstax.html), preloaded by `lib/intro.js` |
+| `data/wheel/dance-party-a.mp4` | (a) Mystery Wheel, DANCE PARTY wedge. (b) Orbit Drop jackpot (the middle slot), once per episode. Lite / reduced motion: frame at 3 s as a still for 2.5 s on the jackpot. | wheel dance (flipstax.html ~11941); `jackpotDance` / `OD_DANCE_SRC` |
+| `data/break/dance-duo-a.mp4` | The short dance before the commercial break (10 s, tap to skip). Lite: its poster 2 s. Skipped in `?debug=fast`. | `showBreakDance` / `BREAK_DANCE_SRC` |
+| `data/outro/finale-b.mp4` | The ending. After a Word Warp WIN it plays once, right after the black hole and big bang (`WW_FINALE_SRC`, `wwFinaleWin`); then "See you tomorrow"; then the score card comes in over its last-frame still. If the Word Warp is NOT won: "See you tomorrow", then it plays once behind the score card as before (`startOutro`, `#outroVideo`). Lite / reduced motion: its still only. | `wwFinaleWin`, `startOutro`, `preloadOutro` |
+
+Files still on disk that NOTHING plays any more (kept, not deleted): `data/outro/outro.mp4` (comment only), `data/wheel/dance-party.mp4`, `data/scenes/round/dance-girls.mp4` (only behind `ROUND_DONE_VIDEO = false`), `media/od-dance-540.mp4`, `media/ww-finale-540.mp4`, `data/intro/mothership-intro.mp4` (only in `lib/intro.js` if `window.__watchIntro` were missing, which it never is).
+The one old-looking dance that can still appear is the hand-drawn disco scene (`discoCelebrate`) - only as the fall-back when `finale-b.mp4` or `dance-party-a.mp4` errors or freezes.
+
+### 2 and 3. Orbit Drop jackpot and the ending - checked, nothing left to change
+Both were fixed in the first fix pass: the Word Warp win's dance is `a3dd0ef` (`WW_FINALE_SRC` = finale-b.mp4); the jackpot dance moved to `dance-party-a.mp4` in `642178b` (`OD_DANCE_SRC`). Re-checked this pass at 390x664, 390x844 and 360x640, normal and lite: the Word Warp win plays exactly one video (`finale-b.mp4`), then the goodbye, then the score card over a still; tap on the dance goes straight to the goodbye; tap on the goodbye goes straight to the score card; lite shows WARPED IT! 2 s, the goodbye, the score card, no video. The jackpot plays `dance-party-a.mp4` (lite: its frame at 3 s). Kept as is: when the Word Warp is NOT won, the dance plays behind the score card AFTER "See you tomorrow" (one dance, new).
+
+### 4. Smaller / older Flips
+Every Flip in the normal show is the full-body `flip2-*.webp` at the one box size, except the results screen's Flip line, which was a 46 px round head crop - now the full-body Flip (54 px wide) - commit `28f6960`. Left alone: the corner host `#showAlien` (a head rig that has zero size, never visible), the neo-games `.nx-host` and Fact or Fib `.ff-host` (hidden in every game), the old big-head files `data/host/wave.webp`, `cheer.webp` etc. (not used; `lib/juice.css:4272` and the share picture use `flip2-wave`), and `images/kofi-logo.webp`, a 40 px round brand badge of Flip's face on the Buy Flip a coffee button (a picture, not a Flip rig; making it full-body would need new art).
+
+### 5. Old backdrops
+Changed (commit `54c9b38`): the blurred old arch photo `data/stage/stage-dim.webp` painted behind every game screen and the stage's dim shot; it is now `data/stage/stage-dim-deck.webp`, a render of the new deck, blurred. Left (listed): the Cosmo Burger / Fizz Nova ad cards (own look, allowed); the SHARE picture the player posts (`data/outro/poster.webp` curtain poster and `data/stage/stage-close.webp` are drawn into it - it is a generated image, not a screen, and re-composing it needs a layout pass); the old `stage-close.webp` / `stage-wide.webp` are still fetched but hidden by CSS (never visible); `data/wheel/stage.webp` is the Mystery Wheel's own dark pedestal art (hidden behind the deck in the beats checked); Orbit Drop keeps its own galaxy background (`data/orbit/bg.webp`, not an old stage).
+
+### 6. When does the UFO drop Flip off?
+Two saved flags decide, both in the browser's localStorage: `flipstax_intro_seen_v1` (lib/intro.js, set when the landing intro has played or been skipped) and `flipstax_coldopen_seen_v2` (set once the show's opener has finished). `showColdOpen` plays the full opener (`first`) when the cold-open flag is missing, or when lib/intro.js says this is a first visit (`__introSaucer`), or on `?intro=full`; otherwise it is a returning visit: only the video's last 3 s, so Flip is already standing there. The test modes (`?replay=1`, `?debug=fast`) skip lib/intro.js's hand-over, so on a computer that had seen the show `?replay=1` used to give the short version - that is what you saw. Commit `1213a8b`: `?replay=1` now always plays the whole opener. Returning players (plain URL, flags set) still get the short one. Lite / reduced motion never play the video (a still: Flip on the pad). Checked: fresh visit starts the video at 0 s, returning visit at 7 s, `?replay=1` on a returning computer at 0 s.
+
+## Fix pass 4 (round done cards, ending, Flip size, opener) - rollback tag `before-round-done-fix-20261118` (local only)
+
+Items 1, 2 and 3 were reported from a deployed preview; they do NOT reproduce in the code on `polish` (367bd45). The live preview (flipstax-git-polish-flip-stax.vercel.app, read on Nov 18 2026) was still serving a flipstax.html with `ROUND_DONE_VIDEO = !isLite() && ...` (the old dance-girls video on the gold arch) and `WW_FINALE_SRC = 'media/ww-finale-540.mp4'` (the old win dance), Last-Modified Nov 18 01:27 GMT - before the fix-pass commits (a3dd0ef, 67901ff..367bd45). So the root cause is a stale deployment, not code. Redeploy / hard-refresh the preview.
+
+Checked in REAL play-throughs (real ENTER tap, whole show played by tools/touch-episode-probe.js at real speed, `?debug=fast&replay=1&realtime=1`, a Word Warp win through the game's own `winWarp`), at 390x664, 390x700, 390x844 and 360x640, a screenshot of every beat (review-shots/round-done-fix/real-*):
+- ROUND ONE..SIX DONE all draw through `showRewardBeat` (one code path) on the new deck: `ROUND_DONE_VIDEO = false`, Flip + two girl slots, no video.
+- Win ending: WARPED IT! over finale-b.mp4 (new deck, once) -> SEE YOU TOMORROW card -> score card over the still. The old arch dance is not in the path (only `discoCelebrate`, a fall-back if finale-b.mp4 errors).
+- Flip's box is identical on every card at each size (opener card, rounds 1-6, ROUND n DONE, grand finale, see you tomorrow). Measured [left, top, right, bottom]: 390x664 85,188,305,514 (banner 78..144); 390x700 73,188,317,550 (banner 78..144); 390x844 50,218,340,648 (banner 86..170); 360x640 78,188,282,490 (banner 78..144). Antennae sit 44-48 px under the banner and 11 px under the points pill everywhere.
+
+Changed: item 4 only (`e5592ad`) - `TITLE_EXTRA_MS = 2000` in `showVideoOpen`: logo + EPISODE line hold 3.5 s on a first visit (opener 18.2 s, was 16.4), 2.8 s for a returning player (10 s, was about 7), lite mode 2 s later too. Skip, mute, theme length and the first / returning rule unchanged.
+
+Fast check: commercial break ok; 3 of 3 pass (Chrome-over-CDP port and tools/flow-episodes.ps1, no Python on this PC).
+Not checked: a real iPhone.

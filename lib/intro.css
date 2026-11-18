@@ -158,17 +158,8 @@
    row of small lights. The sign is a neon plate hanging clear below the beam: TONIGHT'S SHOW in teal, EPISODE N in white neon. Flip stands on a
    glowing hover pad that comes in with him. No new movement: the doors' own opening and the old glow's slow pulse, which lite mode and reduced
    motion already hold still. Everything is scoped to the opener card, so no other screen changes. ==== */
-:root:has(#showCard.curtain:not(.hidden)) #stage .stg-shot.stg-close{ background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 390 844' preserveAspectRatio='xMidYMid slice'%3E%3Cdefs%3E%3ClinearGradient id='w' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%230a0530'/%3E%3Cstop offset='.6' stop-color='%231c0c5c'/%3E%3Cstop offset='1' stop-color='%232a1078'/%3E%3C/linearGradient%3E%3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%2303021a'/%3E%3Cstop offset='.7' stop-color='%23140a4a'/%3E%3Cstop offset='1' stop-color='%233a1280'/%3E%3C/linearGradient%3E%3ClinearGradient id='f' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%233a1a9a'/%3E%3Cstop offset='.35' stop-color='%231c0c5c'/%3E%3Cstop offset='1' stop-color='%23070320'/%3E%3C/linearGradient%3E%3CradialGradient id='p' cx='.35' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23ffd0f0'/%3E%3Cstop offset='.45' stop-color='%23ff5ac8'/%3E%3Cstop offset='1' stop-color='%235a1a9a'/%3E%3C/radialGradient%3E%3CradialGradient id='m' cx='.35' cy='.3' r='.8'%3E%3Cstop offset='0' stop-color='%23d8fbff'/%3E%3Cstop offset='.5' stop-color='%233ad8d0'/%3E%3Cstop offset='1' stop-color='%230a4a7a'/%3E%3C/radialGradient%3E%3CradialGradient id='n'%3E%3Cstop offset='0' stop-color='%239a5cff' stop-opacity='.55'/%3E%3Cstop offset='1' stop-color='%239a5cff' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='390' height='844' fill='url(%23w)'/%3E%3Cpath d='M58 612V330A137 137 0 0 1 332 330V612Z' fill='url(%23s)'/%3E%3Cellipse cx='150' cy='470' rx='130' ry='70' fill='url(%23n)'/%3E%3Cg fill='%23fff'%3E%3Ccircle cx='92' cy='300' r='1.6'/%3E%3Ccircle cx='140' cy='250' r='1.2'/%3E%3Ccircle cx='170' cy='330' r='1.8'/%3E%3Ccircle cx='205' cy='238' r='1.3'/%3E%3Ccircle cx='300' cy='420' r='1.5'/%3E%3Ccircle cx='110' cy='470' r='1.2'/%3E%3Ccircle cx='232' cy='480' r='1.6'/%3E%3Ccircle cx='285' cy='250' r='1.1'/%3E%3Ccircle cx='150' cy='540' r='1.4'/%3E%3Ccircle cx='260' cy='560' r='1.2'/%3E%3Ccircle cx='190' cy='400' r='1.1'/%3E%3Ccircle cx='310' cy='330' r='1.3'/%3E%3Ccircle cx='84' cy='390' r='1.2'/%3E%3Ccircle cx='215' cy='300' r='1.0'/%3E%3C/g%3E%3Cg transform='translate(256 318)'%3E%3Ccircle r='44' fill='url(%23p)'/%3E%3Cellipse rx='74' ry='15' fill='none' stroke='%23ffe27a' stroke-width='5' transform='rotate(-18)' opacity='.95'/%3E%3Cpath d='M-42 -6 A44 44 0 0 1 42 -14' fill='none' stroke='url(%23p)' stroke-width='9'/%3E%3C/g%3E%3Ccircle cx='118' cy='432' r='19' fill='url(%23m)'/%3E%3Cpath d='M58 612V330A137 137 0 0 1 332 330V612' fill='none' stroke='%23ff4fd8' stroke-width='22' opacity='.22'/%3E%3Cpath d='M58 612V330A137 137 0 0 1 332 330V612' fill='none' stroke='%23ff4fd8' stroke-width='7'/%3E%3Cpath d='M58 612V330A137 137 0 0 1 332 330V612' fill='none' stroke='%23fff' stroke-width='1.6' opacity='.9'/%3E%3Cpath d='M76 612V332A119 119 0 0 1 314 332V612' fill='none' stroke='%235ff4ff' stroke-width='12' opacity='.2'/%3E%3Cpath d='M76 612V332A119 119 0 0 1 314 332V612' fill='none' stroke='%235ff4ff' stroke-width='3.5'/%3E%3Cg fill='%235ff4ff'%3E%3Crect x='20' y='236' width='5' height='350' rx='2.5'/%3E%3Crect x='365' y='236' width='5' height='350' rx='2.5'/%3E%3C/g%3E%3Cg fill='%23ff4fd8'%3E%3Crect x='36' y='270' width='4' height='316' rx='2'/%3E%3Crect x='350' y='270' width='4' height='316' rx='2'/%3E%3C/g%3E%3Cg fill='%23ffe27a'%3E%3Ccircle cx='22' cy='214' r='4'/%3E%3Ccircle cx='368' cy='214' r='4'/%3E%3C/g%3E%3Cpath d='M0 612H390V844H0Z' fill='url(%23f)'/%3E%3Cg stroke='%235ff4ff' stroke-width='1.4' opacity='.38'%3E%3Cpath d='M195 612L-140 844M195 612L-10 844M195 612L100 844M195 612L195 844M195 612L290 844M195 612L400 844M195 612L530 844'/%3E%3Cpath d='M0 640H390M0 676H390M0 724H390M0 790H390'/%3E%3C/g%3E%3Crect x='0' y='606' width='390' height='10' fill='%235ff4ff' opacity='.3'/%3E%3Crect x='0' y='609.5' width='390' height='3' fill='%23eaffff'/%3E%3Cpath d='M96 196L40 844H190Z' fill='%23bff8ff' opacity='.07'/%3E%3Cpath d='M294 196L200 844H350Z' fill='%23ffc8f4' opacity='.07'/%3E%3C/svg%3E") center / cover no-repeat, #0a0530; }
-:root:has(#showCard.curtain:not(.hidden)) #stage .stg-close .stg-plate{ left:0 !important; top:0 !important; right:auto !important; bottom:auto !important; margin:0 !important; width:100% !important; height:100% !important; aspect-ratio:auto !important; animation:none !important; transform:none !important; translate:none !important; }
-:root:has(#showCard.curtain:not(.hidden)) #stage .stg-close .stg-img, :root:has(#showCard.curtain:not(.hidden)) #stage .stg-close .stg-panel, :root:has(#showCard.curtain:not(.hidden)) #stage .stg-close .stg-sweep{ display:none !important; }
-:root:has(#showCard.curtain:not(.hidden)) #stage .stg-close .stg-glow{ left:8% !important; top:24% !important; width:84% !important; height:46% !important; background:radial-gradient(closest-side, rgba(255,79,216,0.3), rgba(95,244,255,0.12) 60%, rgba(0,0,0,0)) !important; }
-/* the sign: a neon plate, fully below the ceiling beam */
-:root:has(#showCard.curtain:not(.hidden)) #stage .stg-close .stg-sign{ left:50% !important; top:calc(86px + env(safe-area-inset-top)) !important; width:min(76vw, 300px) !important; height:84px !important; margin-left:calc(min(76vw, 300px) / -2); gap:6px; justify-content:center; box-sizing:border-box;
-  border:3px solid #ff4fd8; border-radius:18px; outline:1px solid rgba(255,255,255,0.8); outline-offset:-2.5px; background:linear-gradient(180deg, rgba(26,12,90,0.96), rgba(8,4,40,0.97));
-  box-shadow:0 0 20px 3px rgba(255,79,216,0.75), inset 0 0 16px rgba(255,79,216,0.35); }
-:root:has(#showCard.curtain:not(.hidden)) #stage .stg-close .stg-sign .stg-sub{ display:block !important; font:900 12px/1 var(--f-body, Inter, sans-serif) !important; letter-spacing:4px !important; color:#5ff4ff !important; text-shadow:0 0 8px rgba(95,244,255,0.8) !important; -webkit-text-stroke:0 !important; background:none !important; -webkit-text-fill-color:currentColor !important; }
-:root:has(#showCard.curtain:not(.hidden)) #stage .stg-close .stg-sign .stg-main{ display:block !important; font-size:40px !important; letter-spacing:3px !important; color:#ffffff !important; -webkit-text-stroke:0 !important; background:none !important; -webkit-text-fill-color:currentColor !important;
-  text-shadow:0 0 6px #ffffff, 0 0 16px #ff4fd8, 0 0 30px #ff4fd8, 0 3px 0 rgba(10,0,40,0.8) !important; }
+/* (polish pass: the studio drawing itself and the neon sign plate moved to lib/stage.css, STUDIO block, so every show beat - not only the opener -
+   stands in the same room; what is left here is the opener's own furniture: the blast doors, the ceiling beam, the lights, the hover pad) */
 /* the blast doors (they were the curtains) and the ceiling beam (it was the valance) */
 :root:has(#showCard.curtain:not(.hidden)) #showCard.curtain .co-drape{ background:repeating-linear-gradient(180deg, rgba(95,244,255,0) 0 92px, rgba(95,244,255,0.75) 92px 97px, rgba(95,244,255,0) 97px 132px), linear-gradient(90deg, #0b0534, #26138a 50%, #0f0744) !important; }
 :root:has(#showCard.curtain:not(.hidden)) #showCard.curtain .co-drape.l{ box-shadow:inset -14px 0 0 #ff4fd8, inset -19px 0 0 rgba(255,255,255,0.85), inset -40px 0 30px rgba(255,79,216,0.35), 0 0 30px rgba(0,0,20,0.7) !important; }
@@ -185,8 +176,114 @@
 :root:has(#showCard.curtain:not(.hidden)) #showCard.curtain .co-stage-host::before, :root:has(#showCard.curtain:not(.hidden)) #showCard.curtain .co-stage-host::after{ content:''; position:absolute; z-index:-1; left:50%; border-radius:50%; pointer-events:none; box-sizing:border-box; }
 :root:has(#showCard.curtain:not(.hidden)) #showCard.curtain .co-stage-host::before{ bottom:-22px; width:170%; height:44px; margin-left:-85%; border:3px solid #ff4fd8; background:radial-gradient(ellipse closest-side, rgba(40,20,120,0.9), rgba(20,8,70,0.9)); box-shadow:0 0 16px 2px rgba(255,79,216,0.7); }
 :root:has(#showCard.curtain:not(.hidden)) #showCard.curtain .co-stage-host::after{ bottom:-13px; width:124%; height:28px; margin-left:-62%; border:2.5px solid #5ff4ff; background:radial-gradient(ellipse closest-side, rgba(234,255,255,0.85), rgba(95,244,255,0.35) 60%, rgba(95,244,255,0.1)); box-shadow:0 0 14px 2px rgba(95,244,255,0.8); }
-@media (max-height:700px){
-  :root:has(#showCard.curtain:not(.hidden)) #stage .stg-close .stg-sign{ top:calc(78px + env(safe-area-inset-top)) !important; width:min(70vw, 250px) !important; height:66px !important; margin-left:calc(min(70vw, 250px) / -2); gap:4px; }
-  :root:has(#showCard.curtain:not(.hidden)) #stage .stg-close .stg-sign .stg-sub{ font-size:10px !important; letter-spacing:3px !important; }
-  :root:has(#showCard.curtain:not(.hidden)) #stage .stg-close .stg-sign .stg-main{ font-size:31px !important; }
+
+/* ==== SOLO PASS: THE SAUCER INTRO (the show's welcome, drawn here - no video, no pictures but Flip's own pose). Card classes, set on a timer by
+   showColdOpen (flipstax.html): .saucer (this intro) -> .sc-in (the saucer slides in over the window) -> .sc-beam (its beam comes down) -> .walk (Flip
+   is lowered through the beam onto the pad) -> .sc-land (the beam goes out, the pad lights up, one ring rolls off it) -> :root.gg-lit (the neon sign
+   comes on: GALACTIC GAME NIGHT) -> .sc-away (the saucer leaves). 5.9 s the first time, about 3 s for a returning player. Transform and opacity only;
+   the sign comes on with two soft dips in 0.7 s (under 3 a second) and nothing else blinks. .still (lite mode, reduced motion): everything stands in
+   its end position from the first frame - Flip on the lit pad, the saucer parked above, the sign on. ==== */
+#showCard.curtain.saucer .co-follow{ display:none; }
+:root:has(#showCard.curtain:not(.hidden)) #showCard.curtain.saucer .co-stage-host::before, :root:has(#showCard.curtain:not(.hidden)) #showCard.curtain.saucer .co-stage-host::after{ display:none; }
+/* the hover pad stays on the floor while Flip comes down (same place and size as his own pad on the other cards) */
+.curtain.lines.saucer .co-pad{ position:absolute; z-index:1; left:50%; bottom:calc(150px + env(safe-area-inset-bottom)); width:min(30vh * 0.6743, 44vw, 210px); margin-left:calc(min(30vh * 0.6743, 44vw, 210px) / -2); height:0; pointer-events:none; }
+.curtain.saucer .co-pad::before, .curtain.saucer .co-pad::after, .curtain.saucer .co-pad > *{ content:''; position:absolute; left:50%; border-radius:50%; box-sizing:border-box; pointer-events:none; }
+.curtain.saucer .co-pad::before{ bottom:-22px; width:170%; height:44px; margin-left:-85%; border:3px solid #ff4fd8; background:radial-gradient(ellipse closest-side, rgba(40,20,120,0.9), rgba(20,8,70,0.9)); box-shadow:0 0 16px 2px rgba(255,79,216,0.7); }
+.curtain.saucer .co-pad::after{ bottom:-13px; width:124%; height:28px; margin-left:-62%; border:2.5px solid #5ff4ff; background:radial-gradient(ellipse closest-side, rgba(234,255,255,0.85), rgba(95,244,255,0.35) 60%, rgba(95,244,255,0.1)); box-shadow:0 0 14px 2px rgba(95,244,255,0.8); }
+.curtain.saucer .co-pad > i{ z-index:1; bottom:-30px; width:230%; height:70px; margin-left:-115%; background:radial-gradient(ellipse closest-side, rgba(255,255,255,0.85), rgba(125,249,255,0.55) 38%, rgba(125,249,255,0) 100%); opacity:0.15; transition:opacity 0.3s ease; }
+.curtain.saucer.sc-beam .co-pad > i{ opacity:0.55; }
+.curtain.saucer.sc-land .co-pad > i{ opacity:0.9; animation:coPadGlow 1.8s ease-in-out 0.3s infinite alternate; }
+@keyframes coPadGlow{ from{ opacity:0.9; } to{ opacity:0.5; } }
+.curtain.saucer .co-pad > b{ bottom:-22px; width:170%; height:44px; margin-left:-85%; border:3px solid #eaffff; opacity:0; }
+.curtain.saucer.sc-land .co-pad > b{ animation:coPadRing 0.9s cubic-bezier(.15,.7,.3,1) both; }
+@keyframes coPadRing{ 0%{ opacity:0.9; transform:scale(1); } 100%{ opacity:0; transform:scale(2.3); } }
+/* Flip rides the beam down: small and faint under the saucer, full size on the pad */
+.curtain.lines.saucer .co-stage-host{ transform-origin:50% 100%; transform:translateY(-37vh) scale(0.28); opacity:0; transition:transform var(--walk, 1.1s) cubic-bezier(.3,.5,.3,1), opacity 0.3s ease; }
+.curtain.lines.saucer.walk .co-stage-host{ transform:none; opacity:1; }
+/* the saucer */
+.curtain.saucer .co-ufo{ position:absolute; z-index:3; left:50%; top:calc(214px + env(safe-area-inset-top)); width:150px; height:64px; margin-left:-75px; pointer-events:none; opacity:0;
+  transform:translate(-105vw, -46px) rotate(-12deg); transition:transform var(--fly, 0.9s) cubic-bezier(.2,.85,.3,1), opacity 0.2s linear; will-change:transform; }
+.curtain.saucer.sc-in .co-ufo{ transform:none; opacity:1; }
+.curtain.saucer.sc-away .co-ufo{ transform:translate(34vw, -52vh) scale(0.45) rotate(10deg); opacity:0; transition:transform 0.75s cubic-bezier(.5,0,.8,.4), opacity 0.3s linear 0.45s; }
+.cu-ship{ position:absolute; inset:0; }
+.cu-ship::before{ content:''; position:absolute; left:44px; top:0; width:62px; height:42px; border-radius:31px 31px 10px 10px; box-sizing:border-box; border:2px solid #eaffff;
+  background:radial-gradient(ellipse 60% 55% at 38% 30%, rgba(255,255,255,0.95), rgba(125,249,255,0.75) 45%, rgba(40,120,220,0.7)); }
+.cu-ship::after{ content:''; position:absolute; left:0; top:25px; width:150px; height:36px; border-radius:50%; box-sizing:border-box; border:2px solid #ff4fd8;
+  background:radial-gradient(circle, #fff 0 2.2px, #ffe27a 3.2px, rgba(255,226,122,0) 5px) 4px 58% / 23.5px 14px repeat-x, linear-gradient(180deg, #f6ecff, #c6a2ff 30%, #6a35e0 62%, #260d78);
+  box-shadow:0 0 14px 2px rgba(255,79,216,0.65), 0 7px 12px rgba(125,249,255,0.55); }
+/* the beam: a cone from the saucer's belly to the pad (scaled down from the top, then faded out) */
+.curtain.saucer .co-tbeam{ position:absolute; z-index:1; left:50%; width:230px; margin-left:-115px; top:calc(266px + env(safe-area-inset-top)); bottom:calc(138px + env(safe-area-inset-bottom)); pointer-events:none;
+  background:linear-gradient(180deg, rgba(234,255,255,0.85), rgba(125,249,255,0.4) 55%, rgba(125,249,255,0.16)); clip-path:polygon(40% 0, 60% 0, 100% 100%, 0 100%);
+  transform-origin:50% 0; transform:scaleY(0.02); opacity:0; transition:transform 0.3s ease-out, opacity 0.35s ease; }
+.curtain.saucer.sc-beam .co-tbeam{ transform:none; opacity:1; }
+.curtain.saucer.sc-land .co-tbeam{ transform:none; opacity:0; }
+@media (max-height:660px){
+  .curtain.lines.saucer .co-pad{ bottom:calc(140px + env(safe-area-inset-bottom)); width:min(26vh * 0.6743, 40vw, 170px); margin-left:calc(min(26vh * 0.6743, 40vw, 170px) / -2); }
+  .curtain.saucer .co-ufo{ top:calc(150px + env(safe-area-inset-top)); width:120px; height:52px; margin-left:-60px; }
+  .curtain.saucer .co-ufo .cu-ship{ transform:scale(0.8); transform-origin:0 0; }
+  .curtain.saucer .co-tbeam{ top:calc(192px + env(safe-area-inset-top)); bottom:calc(130px + env(safe-area-inset-bottom)); width:180px; margin-left:-90px; }
 }
+/* the neon sign comes on */
+:root.gg-lit #stage .stg-sign.on{ animation:ggLit 0.7s linear both; }
+@keyframes ggLit{ 0%{ opacity:0; } 10%{ opacity:1; } 24%{ opacity:0.3; } 40%{ opacity:1; } 55%{ opacity:0.6; } 70%, 100%{ opacity:1; } }
+/* the still version (lite mode, reduced motion): no travel, no beam, no ring */
+.curtain.saucer.still .co-stage-host, .curtain.saucer.still .co-ufo, .curtain.saucer.still .co-tbeam, .curtain.saucer.still .co-pad > i{ transition:none !important; animation:none !important; }
+.curtain.saucer.still .co-tbeam, .curtain.saucer.still .co-pad > b{ display:none; }
+@media (prefers-reduced-motion: reduce){ .curtain.saucer .co-stage-host, .curtain.saucer .co-ufo, .curtain.saucer .co-tbeam, .curtain.saucer .co-pad > i{ transition:none !important; animation:none !important; } :root.gg-lit #stage .stg-sign.on{ animation:none; } }
+:root.lite.gg-lit #stage .stg-sign.on, :root.rm.gg-lit #stage .stg-sign.on{ animation:none; }
+@media (min-height:661px){ .curtain.saucer .co-ufo .cu-ship{ transform:scale(1.22); transform-origin:50% 60%; } }
+
+/* ==== THE VIDEO OPENER (girls pass). The show opens on data/intro/intro-saucer.mp4 (10 s, 720 x 1280, covered to the screen): the saucer's beam lowers Flip onto
+   the pad and he waves. When it reaches its last frame it freezes there (the last frame is also data/intro/intro-saucer-last.webp, laid over the video so the
+   freeze is exact), the FlipStax logo slams in like a game-show title card - a quick light burst, a fan of rays, one shine sweep across the letters - holds about
+   1.5 s and goes, then Flip's greeting bubble. Placed on Flip's chest, never his face or antennae. Transform and opacity only; the burst is the one flash.
+   Lite mode and reduced motion (.ci-quiet): no video is loaded - the still last frame, the logo and the episode tag stand there without motion. ==== */
+.show-card.vidintro{ background:#04021a !important; overflow:hidden; }
+.vidintro .ci-stage{ position:absolute; inset:0; z-index:0; background:#04021a; }
+.vidintro .ci-stage > video, .vidintro .ci-stage > img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 50%; display:block; pointer-events:none; }
+.vidintro .ci-last{ opacity:0; }
+.vidintro.ci-ended .ci-last{ opacity:1; }
+.vidintro .ci-dim{ position:absolute; inset:0; z-index:1; pointer-events:none; opacity:0; transition:opacity 0.3s linear;
+  background:radial-gradient(ellipse 78% 30% at 50% 47%, rgba(6,2,28,0.62), rgba(6,2,28,0) 74%), linear-gradient(180deg, rgba(6,2,28,0) 58%, rgba(6,2,28,0.5)); }
+.vidintro.ci-title-on:not(.ci-title-off) .ci-dim{ opacity:1; }
+.vidintro .ci-title{ position:absolute; z-index:5; left:50%; top:41%; width:min(88vw, 340px); margin-left:calc(min(88vw, 340px) / -2); display:flex; flex-direction:column; align-items:center; gap:0; pointer-events:none; opacity:0; }
+.vidintro.ci-title-on .ci-title{ opacity:1; }
+.vidintro.ci-title-off .ci-title{ animation:ciOut 0.35s ease-in forwards; }
+@keyframes ciOut{ from{ opacity:1; transform:translateY(0) scale(1); } to{ opacity:0; transform:translateY(-10px) scale(0.96); } }
+.vidintro .ci-logo{ position:relative; width:100%; aspect-ratio:800 / 440; transform-origin:50% 55%; }
+.vidintro .ci-logo img{ width:100%; height:100%; display:block; filter:drop-shadow(0 6px 14px rgba(0,0,0,0.6)); }
+.vidintro .ci-shine{ position:absolute; inset:0; overflow:hidden; -webkit-mask:url(../images/flipstax-lockup-800.webp) center / 100% 100% no-repeat; mask:url(../images/flipstax-lockup-800.webp) center / 100% 100% no-repeat; }
+.vidintro .ci-shine::before{ content:''; position:absolute; top:-12%; bottom:-12%; left:0; width:30%; opacity:0; transform:translateX(-150%) skewX(-18deg);
+  background:linear-gradient(100deg, rgba(255,255,255,0), rgba(255,255,255,0.95) 50%, rgba(255,255,255,0)); }
+.vidintro .ci-ep{ margin-top:-3px; font:900 15px/1 var(--f-body, Inter, sans-serif); letter-spacing:5px; padding:7px 13px 7px 18px; border-radius:99px; color:#5ff4ff; white-space:nowrap;
+  background:rgba(8,4,40,0.9); border:2px solid #5ff4ff; box-shadow:0 0 12px rgba(95,244,255,0.7); text-shadow:0 0 8px rgba(95,244,255,0.9); }
+.vidintro .ci-burst, .vidintro .ci-rays{ position:absolute; left:50%; top:44%; opacity:0; pointer-events:none; }
+.vidintro .ci-burst{ width:170%; aspect-ratio:1; margin:-85% 0 0 -85%; border-radius:50%; transform:scale(0.15);
+  background:radial-gradient(circle, rgba(255,255,255,0.95) 0, rgba(255,230,150,0.75) 14%, rgba(255,120,220,0.38) 34%, rgba(255,120,220,0) 62%); }
+.vidintro .ci-rays{ width:230%; aspect-ratio:1; margin:-115% 0 0 -115%; transform:scale(0.4);
+  background:repeating-conic-gradient(from 0deg, rgba(255,255,255,0.6) 0 4deg, rgba(255,255,255,0) 4deg 15deg); -webkit-mask:radial-gradient(circle, #000 0, rgba(0,0,0,0) 64%); mask:radial-gradient(circle, #000 0, rgba(0,0,0,0) 64%); }
+.vidintro.ci-title-on:not(.ci-quiet) .ci-logo{ animation:ciSlam 0.45s cubic-bezier(.2,.9,.25,1) both; }
+.vidintro.ci-title-on:not(.ci-quiet) .ci-ep{ animation:ciEpIn 0.3s ease-out 0.32s both; }
+.vidintro.ci-title-on:not(.ci-quiet) .ci-burst{ animation:ciBurst 0.62s ease-out 0.1s both; }
+.vidintro.ci-title-on:not(.ci-quiet) .ci-rays{ animation:ciRays 0.95s ease-out 0.1s both; }
+.vidintro.ci-title-on:not(.ci-quiet) .ci-shine::before{ animation:ciShine 0.75s ease-in-out 0.55s both; }
+@keyframes ciSlam{ 0%{ transform:scale(2.5); opacity:0; } 35%{ opacity:1; } 68%{ transform:scale(0.93); } 86%{ transform:scale(1.035); } 100%{ transform:scale(1); opacity:1; } }
+@keyframes ciEpIn{ from{ opacity:0; transform:scale(0.8); } to{ opacity:1; transform:scale(1); } }
+@keyframes ciBurst{ 0%{ opacity:0; transform:scale(0.15); } 18%{ opacity:0.95; } 100%{ opacity:0; transform:scale(1.15); } }
+@keyframes ciRays{ 0%{ opacity:0; transform:scale(0.4) rotate(0deg); } 20%{ opacity:0.7; } 100%{ opacity:0; transform:scale(1.15) rotate(22deg); } }
+@keyframes ciShine{ from{ opacity:1; transform:translateX(-150%) skewX(-18deg); } to{ opacity:1; transform:translateX(450%) skewX(-18deg); } }
+@media (max-height:700px){ .vidintro .ci-title{ top:39%; width:min(84vw, 300px); margin-left:calc(min(84vw, 300px) / -2); } }
+.vidintro.ci-quiet .ci-burst, .vidintro.ci-quiet .ci-rays, .vidintro.ci-quiet .ci-shine{ display:none; }
+.vidintro.ci-quiet *, :root.lite .vidintro *{ animation:none !important; }
+@media (prefers-reduced-motion: reduce){ .vidintro .ci-burst, .vidintro .ci-rays, .vidintro .ci-shine{ display:none; } .vidintro *{ animation:none !important; } }
+
+/* fix pass item 2: 'Watch intro' plays the opener over the landing / Play Today screen (both are above the show card's usual layer) */
+:root.watching-intro .show-card.vidintro{ z-index:210; }
+
+/* fix pass item 4: ONE FLIP SIZE. The opener video's Flip was 69% of the screen height (the round cards' Flip is 430 px, 51% at 390x844), so the opener -> Round 1 hand-off
+   made him jump. The video (and the held last frame) is now shrunk about Flip's feet so he is exactly the card Flip's size and his feet land on the same line (196 px above the
+   bottom, 150 px on a short phone); the stage behind shows around it through a soft edge. --ci-s is worked out in showVideoOpen (the card Flip's height / his height in the video).
+   Transform and a still mask only. In the video Flip's antennae are at 19.2% and his feet at 88.3% of the picture's height. */
+.vidintro.ci-fit .ci-stage{ background:transparent; }
+.vidintro.ci-fit .ci-stage > video, .vidintro.ci-fit .ci-stage > img{ transform-origin:50% 88.3%; transform:translateY(calc(11.7% - var(--flip-b, 196px) - env(safe-area-inset-bottom))) scale(var(--ci-s, 1));
+  -webkit-mask-image:radial-gradient(ellipse 64% 58% at 50% 56%, #000 58%, rgba(0,0,0,0) 100%); mask-image:radial-gradient(ellipse 64% 58% at 50% 56%, #000 58%, rgba(0,0,0,0) 100%); }

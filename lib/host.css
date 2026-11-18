@@ -91,4 +91,5 @@
 .host-rig .hr-img{ transform:none !important; transition:opacity 0.3s ease !important; }
 .fs-host, .ir-overlay:not(.intro) .ir-host, .cue-fig{ animation:hostStillIn 0.35s ease both !important; }
 .vault-alien.pop{ animation:hostStillIn 0.4s ease both !important; }
-@keyframes hostStillIn{ from{ opacity:0; } to{ opacity:1; } }
+/* Flip never starts invisible: he is already most of the way there on the first painted frame, so a card's sign and bubble never show without him. */
+@keyframes hostStillIn{ from{ opacity:0.75; } to{ opacity:1; } }
