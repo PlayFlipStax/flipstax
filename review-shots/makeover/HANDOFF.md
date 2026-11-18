@@ -484,3 +484,17 @@ Changed (commit `54c9b38`): the blurred old arch photo `data/stage/stage-dim.web
 
 ### 6. When does the UFO drop Flip off?
 Two saved flags decide, both in the browser's localStorage: `flipstax_intro_seen_v1` (lib/intro.js, set when the landing intro has played or been skipped) and `flipstax_coldopen_seen_v2` (set once the show's opener has finished). `showColdOpen` plays the full opener (`first`) when the cold-open flag is missing, or when lib/intro.js says this is a first visit (`__introSaucer`), or on `?intro=full`; otherwise it is a returning visit: only the video's last 3 s, so Flip is already standing there. The test modes (`?replay=1`, `?debug=fast`) skip lib/intro.js's hand-over, so on a computer that had seen the show `?replay=1` used to give the short version - that is what you saw. Commit `1213a8b`: `?replay=1` now always plays the whole opener. Returning players (plain URL, flags set) still get the short one. Lite / reduced motion never play the video (a still: Flip on the pad). Checked: fresh visit starts the video at 0 s, returning visit at 7 s, `?replay=1` on a returning computer at 0 s.
+
+## Fix pass 4 (round done cards, ending, Flip size, opener) - rollback tag `before-round-done-fix-20261118` (local only)
+
+Items 1, 2 and 3 were reported from a deployed preview; they do NOT reproduce in the code on `polish` (367bd45). The live preview (flipstax-git-polish-flip-stax.vercel.app, read on Nov 18 2026) was still serving a flipstax.html with `ROUND_DONE_VIDEO = !isLite() && ...` (the old dance-girls video on the gold arch) and `WW_FINALE_SRC = 'media/ww-finale-540.mp4'` (the old win dance), Last-Modified Nov 18 01:27 GMT - before the fix-pass commits (a3dd0ef, 67901ff..367bd45). So the root cause is a stale deployment, not code. Redeploy / hard-refresh the preview.
+
+Checked in REAL play-throughs (real ENTER tap, whole show played by tools/touch-episode-probe.js at real speed, `?debug=fast&replay=1&realtime=1`, a Word Warp win through the game's own `winWarp`), at 390x664, 390x700, 390x844 and 360x640, a screenshot of every beat (review-shots/round-done-fix/real-*):
+- ROUND ONE..SIX DONE all draw through `showRewardBeat` (one code path) on the new deck: `ROUND_DONE_VIDEO = false`, Flip + two girl slots, no video.
+- Win ending: WARPED IT! over finale-b.mp4 (new deck, once) -> SEE YOU TOMORROW card -> score card over the still. The old arch dance is not in the path (only `discoCelebrate`, a fall-back if finale-b.mp4 errors).
+- Flip's box is identical on every card at each size (opener card, rounds 1-6, ROUND n DONE, grand finale, see you tomorrow). Measured [left, top, right, bottom]: 390x664 85,188,305,514 (banner 78..144); 390x700 73,188,317,550 (banner 78..144); 390x844 50,218,340,648 (banner 86..170); 360x640 78,188,282,490 (banner 78..144). Antennae sit 44-48 px under the banner and 11 px under the points pill everywhere.
+
+Changed: item 4 only (`e5592ad`) - `TITLE_EXTRA_MS = 2000` in `showVideoOpen`: logo + EPISODE line hold 3.5 s on a first visit (opener 18.2 s, was 16.4), 2.8 s for a returning player (10 s, was about 7), lite mode 2 s later too. Skip, mute, theme length and the first / returning rule unchanged.
+
+Fast check: commercial break ok; 3 of 3 pass (Chrome-over-CDP port and tools/flow-episodes.ps1, no Python on this PC).
+Not checked: a real iPhone.
