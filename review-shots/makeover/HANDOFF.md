@@ -430,3 +430,21 @@ Known / bigger
 - ROUND ONE DONE in normal mode shows the dance video's own gold stage, not the new deck (a video cannot be re-dressed); only the bottom strip of the card shows the stage.
 - At 360x640 the test harness's TEST button covers the end of the greeting bubble and the round line (test mode only).
 - A real iPhone has not been tried: inline autoplay of the three videos, memory with a 2.7-3.6 MB video plus the stage's 8 moving layers, and the theme's muted start inside the tap.
+
+---
+
+# Fix pass (branch polish, rollback tag `before-fixes-20261117`)
+
+One commit per item, in this order (see `git log`): 1 the ending, 2 Watch intro, 3 ROUND DONE / round cards on the new deck, 4 one Flip on the opener, 5 the break dance, 6 cache headers.
+
+1. **Ending.** The results ending (`startOutro`) was already finale-b. The old dance people saw was a separate hard-coded video that plays first when the Word Warp is SOLVED: `WW_FINALE_SRC` = `media/ww-finale-540.mp4` (old stage, 7 s). It now plays `data/outro/finale-b.mp4` (10 s; timers 7 -> 10 s; sound at the effects volume; skip, WARPED IT! card, watchdog and disco fallback kept). `WW_FINALE_PLAYED` makes the results come in over its last frame (poster) instead of replaying it. Unsolved: finale-b plays at the results as before. The Orbit Drop jackpot dance (`OD_DANCE_SRC`) also pointed at an old-stage video; it now plays `data/wheel/dance-party-a.mp4`.
+2. **Watch intro.** Both buttons call `Intro.run(null,{force:true})`; the force branch still played `mothership-intro.mp4`. `lib/intro.js` now hands over to `window.__watchIntro` (flipstax.html), which runs `showVideoOpen` (intro-saucer + logo card + greeting) over the screen, lifted by `:root.watching-intro` (lib/intro.css), then restores the menu music. `?intro=full` through the real ENTER tap already reached the new opener (first and returning visit).
+3. **ROUND DONE and the title cards.** ROUND DONE no longer plays `dance-girls.mp4` (old gold stage). The card is `cast2`: new deck, Flip in his fixed box with his pad, two dancers in fixed slots. Round cards 2-6 use the same slots (`ROUND_TITLE_SLOTS`; round 1 and the finale are Flip alone). CSS: lib/juice.css "FIX PASS" blocks (`.cast-slot`: 66% of Flip's height, feet on his line, inner edge 20% of his width from the centre, in front of the pad, a small hop; still in lite / reduced motion). On a short phone the ROUND DONE panel is compacted so the title clears the pad.
+4. **One Flip.** Card Flip box is `[50,218,290,430]` at 390x844 and `[78,186,205,304]` at 360x640 on rounds 1-6, ROUND DONE and the finale card, normal and lite (measured). The opener video's Flip (69% of the height) is scaled about his feet by `--ci-s` (`.ci-fit`, lib/intro.css) so he overlays the Round 1 Flip.
+5. **Break dance.** `showBreakDance` runs before `showSponsor` (data/break/dance-duo-a.mp4, 2 MB, 720x1280, no audio; poster webp). Lite / reduced motion: the poster for 2 s. `?debug=fast` skips it so the break's own check is unchanged.
+6. **Cache.** No service worker anywhere. `vercel.json` now says `Cache-Control: public, max-age=0, must-revalidate` for the page, lib, data, media, images, audio.
+
+Checked: every beat at 390x844 and 360x640, normal and lite (`review-shots/fixes/_ba-*.png`, before/after sheets; `after.log` has the Flip boxes); each beat played from the TEST menu ends and moves on; `tools/commercial-break-check.py` prints `commercial break: ok`; `flow-episodes.py normal=1 lite=1 other=1 parallel=1` prints `3 of 3 pass`.
+
+Old-stage places still in the normal show: the Cosmo Burger / Fizz Nova ad card (its own orange look, not the stage), the share picture (data/outro/poster.webp is its source), `stage-dim.webp` (the blurred gameplay backdrop, an old photo under the deck's CSS life; nothing gold shows), and the CSS-hidden old files (`dance-girls.mp4`, `ww-finale-540.mp4`, `od-dance-540.mp4`, `mothership-intro.mp4`, all still on disk; the last is still the code path in lib/intro.js if `__watchIntro` were missing).
+Not done / not checked: a real iPhone; true prefers-reduced-motion (only the JS side was simulated); the finale-b and dance videos keep their own framing (Flip dances at a different size inside a cutscene); the live site's headers (nothing was pushed).
