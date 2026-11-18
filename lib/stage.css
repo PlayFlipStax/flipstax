@@ -78,7 +78,8 @@
 :root.stage-on #readoutOverlay.stage-backed .warp-bg{ display:none; }
 :root.stage-on .fin-overlay.stage-backed{ background:linear-gradient(180deg, rgba(14,4,30,0.62), rgba(14,4,30,0.45) 40%, rgba(14,4,30,0.7)) !important; }
 
-/* gameplay: the dim shot. The VS screen and the Daily question rounds show the stage layer itself (the world layer
+/* (fix pass 3 item 5: the dim shot is data/stage/stage-dim-deck.webp - the new dance-deck stage, rendered and blurred; the old blurred arch photo stage-dim.webp is no longer used)
+   gameplay: the dim shot. The VS screen and the Daily question rounds show the stage layer itself (the world layer
    above it goes clear); the full-screen game overlays paint the same picture as their own backdrop (the same crop,
    so nothing jumps), with the same scrim and vignette. Orbit Drop keeps its own look. */
 :root.stage-on .show-bg{ background:none !important; }
@@ -86,7 +87,7 @@
 :root.stage-on :is(.mg-overlay, .lucky-overlay, .ir-overlay, .guess-overlay, .solve-overlay, .riddle-overlay),
 :root.stage-on.mode-infinity .event-overlay{
   background:radial-gradient(120% 90% at 50% 42%, rgba(8,2,20,0) 40%, rgba(8,2,20,0.65) 100%), linear-gradient(rgba(10,3,24,0.55), rgba(10,3,24,0.55)),
-    url(../data/stage/stage-dim.webp) 50% 30% / cover no-repeat, #12062a !important; }
+    url(../data/stage/stage-dim-deck.webp) 50% 30% / cover no-repeat, #12062a !important; }
 :root.stage-on :is(.mg-overlay, .ir-overlay, .guess-overlay, .solve-overlay, .event-overlay, .riddle-overlay) :is(.mg-bg, .ir-bg, .guess-bg, .warp-bg, .ev-bg){ background:none !important; }
 :root.stage-on :is(.mg-overlay, .ir-overlay, .guess-overlay, .solve-overlay, .event-overlay, .riddle-overlay) :is(.mg-bg, .ir-bg, .guess-bg, .warp-bg, .ev-bg) > :is(.rays, .glow){ display:none; }
 :root.stage-on .mg-overlay .mg-bg{ display:none; }
