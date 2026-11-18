@@ -12626,6 +12626,20 @@ const SHARE_URL = 'https://playflipstax.com';
     showCard.addEventListener('click', go); document.addEventListener('keydown', go);
     coldOpenCancel = ()=>{ gone = true; timers.forEach(clearTimeout); if (currentTrackKey === 'theme') endIntroTheme(); try{ if (vid){ vid.pause(); vid.removeAttribute('src'); vid.load(); } }catch(err){} showCard.removeEventListener('click', go); document.removeEventListener('keydown', go); coldOpenCancel = null; };
   }
+  // fix pass item 2: the 'Watch intro' buttons (the landing's link and the Play Today screen's) used to run the old CGI video in lib/intro.js (data/intro/mothership-intro.mp4,
+  // a different saucer, no logo card). They now call this instead: the same opener as the show's first visit (intro-saucer.mp4, the logo title card, Flip's greeting), full length,
+  // tap to skip, then back to the screen the player was on with the menu music restored. Lite mode and reduced motion get the still version. It changes no first / returning rule.
+  window.__watchIntro = function(){
+    if (!showCard.classList.contains('hidden') || coldOpenCancel) return false;
+    const prev = currentTrackKey, ep = showEpisode(runStartDate || todayStr()), root = document.documentElement;
+    root.classList.add('watching-intro');   // (the landing and the Play Today screen sit above the show card: lib/intro.css lifts the card over them while this runs)
+    showVideoOpen(()=>{
+      root.classList.remove('watching-intro');
+      if (window.Stage && Stage.release) Stage.release();
+      if (musicOn && prev && prev !== 'theme' && prev !== 'run'){ try{ playTrack(prev); }catch(e){} }
+    }, { first:true, quiet: isLite() || prefersReducedMotion(), ep });
+    return true;
+  };
   function showColdOpen(then){
     if (coldOpenCancel) coldOpenCancel();
     const ep = showEpisode(runStartDate || todayStr());

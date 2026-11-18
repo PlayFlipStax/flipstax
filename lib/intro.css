@@ -276,3 +276,6 @@
 .vidintro.ci-quiet .ci-burst, .vidintro.ci-quiet .ci-rays, .vidintro.ci-quiet .ci-shine{ display:none; }
 .vidintro.ci-quiet *, :root.lite .vidintro *{ animation:none !important; }
 @media (prefers-reduced-motion: reduce){ .vidintro .ci-burst, .vidintro .ci-rays, .vidintro .ci-shine{ display:none; } .vidintro *{ animation:none !important; } }
+
+/* fix pass item 2: 'Watch intro' plays the opener over the landing / Play Today screen (both are above the show card's usual layer) */
+:root.watching-intro .show-card.vidintro{ z-index:210; }
