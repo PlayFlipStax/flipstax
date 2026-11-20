@@ -186,3 +186,37 @@
 :root.rm.stage-on #stage :is(.stg-close, .stg-wide) .sf-sim.a{ opacity:.8; } :root.rm.stage-on #stage :is(.stg-close, .stg-wide) .sf-sim.b{ opacity:.45; } :root.rm.stage-on #stage :is(.stg-close, .stg-wide) .stg-pulse{ opacity:.8; }
 @media (prefers-reduced-motion: reduce){ :root.stage-on #stage :is(.stg-close, .stg-wide) .sf-wave{ opacity:.55; transform:translate3d(60%, 0, 0) skewX(-30deg); } :root.stage-on #stage :is(.stg-close, .stg-wide) .sf-sim.a{ opacity:.8; } :root.stage-on #stage :is(.stg-close, .stg-wide) .sf-sim.b{ opacity:.45; } :root.stage-on #stage :is(.stg-close, .stg-wide) .stg-pulse{ opacity:.8; } }
 /* ==== STAGE LIFE:END ==== */
+
+/* ==== polish2 item 8: ELECTRIC PILLARS. The four pylons (drawn in the STAGE LIFE plate above) are lit and electrified: a soft neon glow round each one
+   that breathes, a bright pulse of light (white-hot core, cyan halo) running up the shaft, and now and then a small electric spark at the top.
+   Pre-rendered gradients and one tiny SVG spark, transform and opacity only. The front pair runs every 2.4 s, the back pair every 3.4 s; each pillar
+   sparks once per cycle (about 1.4 sparks a second over the whole stage - never more than 3 flashes a second). Lite and reduced motion: still and lit
+   (the glow on, no pulse, no sparks). Positions are the pylons' boxes in the 390 x 844 plate. ==== */
+:root.stage-on #stage .stg-zap{ position:absolute; inset:0; z-index:6; pointer-events:none; }
+#stage .stg-zap .zp{ position:absolute; }
+#stage .stg-zap .zp.fl{ left:4.487%; top:35.071%; width:3.333%; height:41.943%; }
+#stage .stg-zap .zp.fr{ left:92.179%; top:35.071%; width:3.333%; height:41.943%; }
+#stage .stg-zap .zp.bl{ left:19.615%; top:54.976%; width:1.795%; height:18.72%; }
+#stage .stg-zap .zp.br{ left:78.590%; top:54.976%; width:1.795%; height:18.72%; }
+#stage .stg-zap .zp > b{ position:absolute; left:-140%; right:-140%; top:-3%; bottom:0; opacity:.6;
+  background:linear-gradient(90deg, rgba(125,249,255,0) 0%, rgba(125,249,255,.32) 38%, rgba(220,255,255,.55) 50%, rgba(255,106,208,.32) 62%, rgba(255,106,208,0) 100%);
+  -webkit-mask:linear-gradient(180deg, transparent 0%, #000 8%, #000 92%, transparent 100%); mask:linear-gradient(180deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  animation:zpGlow 3s ease-in-out infinite alternate; }
+#stage .stg-zap .zp > s{ position:absolute; left:-90%; right:-90%; bottom:0; height:16%; opacity:0;
+  background:radial-gradient(ellipse 50% 50% at 50% 50%, #ffffff 0%, rgba(190,252,255,.95) 22%, rgba(125,249,255,.5) 48%, rgba(125,249,255,0) 72%);
+  animation:zpRun 2.4s cubic-bezier(.45,.05,.55,.95) infinite; }
+#stage .stg-zap .zp > u{ position:absolute; left:-70%; width:240%; top:-4%; height:12%; opacity:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 40'%3E%3Cpath d='M13 1 L6 17 L13 17 L7 39 L19 13 L12 13 L18 1 Z' fill='%23ffffff' stroke='%237df9ff' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat; animation:zpSpark 2.4s linear infinite; }
+#stage .stg-zap .zp:is(.bl, .br) > s{ animation-duration:3.4s; }
+#stage .stg-zap .zp:is(.bl, .br) > u{ animation-duration:3.4s; height:14%; }
+#stage .stg-zap .zp.fr > s, #stage .stg-zap .zp.fr > u{ animation-delay:-1.2s; }
+#stage .stg-zap .zp.bl > s, #stage .stg-zap .zp.bl > u{ animation-delay:-0.6s; }
+#stage .stg-zap .zp.br > s, #stage .stg-zap .zp.br > u{ animation-delay:-2.3s; }
+#stage .stg-zap .zp.fr > b{ animation-delay:-1.5s; } #stage .stg-zap .zp.br > b{ animation-delay:-0.8s; }
+@keyframes zpGlow{ from{ opacity:.5; } to{ opacity:1; } }
+@keyframes zpRun{ 0%{ transform:translate3d(0, 0, 0); opacity:0; } 8%{ opacity:1; } 82%{ opacity:1; } 100%{ transform:translate3d(0, -560%, 0); opacity:0; } }
+@keyframes zpSpark{ 0%, 76%{ opacity:0; transform:scale(.6) rotate(0deg); } 80%{ opacity:1; transform:scale(1) rotate(-8deg); } 84%{ opacity:.7; transform:scale(.9) rotate(10deg); } 88%, 100%{ opacity:0; transform:scale(.6) rotate(0deg); } }
+:root.stage-on #stage .stg-shot:not(.on) .stg-zap .zp > *{ animation-play-state:paused; }
+:root.lite #stage .stg-zap .zp > b{ animation:none; opacity:1; } :root.lite #stage .stg-zap .zp > :is(s, u){ animation:none; display:none; }
+@media (prefers-reduced-motion: reduce){ #stage .stg-zap .zp > b{ animation:none; opacity:1; } #stage .stg-zap .zp > :is(s, u){ animation:none; display:none; } }
+:root.tab-hidden #stage .stg-zap .zp > *, .paused #stage .stg-zap .zp > *{ animation-play-state:paused; }
