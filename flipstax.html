@@ -16739,7 +16739,7 @@ const SHARE_URL = 'https://playflipstax.com';
   // still ball and WARPED IT! for 1.4 s, no spirals, particles or moving lights, then the goodbye as before.
   const CIN = { BH:400, COLLAPSE:5200, BANG:6000, BALL:6150, RISE:6900, SPOTS:7200, CARD_OFF:8600, DANCE:9400 };
   // (the three parts, one per change: item 14 the big bang and the disco ball, item 15 the lite / reduced-motion stage version and the music under it)
-  const CIN_BIG_BANG = true, CIN_LITE_STAGE = false, CIN_MUSIC_LOW = false;
+  const CIN_BIG_BANG = true, CIN_LITE_STAGE = true, CIN_MUSIC_LOW = true;
   let cinDisco = null, cinDiscoT = 0;
   function cinDiscoOn(still){
     if (cinDisco && cinDisco.isConnected) return cinDisco;
