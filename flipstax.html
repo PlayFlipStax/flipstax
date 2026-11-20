@@ -7572,6 +7572,54 @@ const SHARE_URL = 'https://playflipstax.com';
     el.play().catch(()=>{});
     if (key === 'alt') setTimeout(altArm, 600);
   }
+  // ---- polish2 item 5: THE COMMERCIAL BREAK'S OWN MUSIC. From the start of the dance before the break to CONTINUE (the dance, the sponsor cards and
+  // 'Thanks for watching'), the game music fades out (kept where it was, like Pause) and the break's song fades in; at CONTINUE it is the other way round.
+  // The break's song is one of the music picker's songs that the show plays nowhere else (not the run's music, not the intro theme, not Cosmic Cruise):
+  // ?breakmusic=1 ... 5 on a test host auditions them - 1 Saturn Strut (the default: ~110 BPM, a strutting shuffle, clearly not the game's beat),
+  // 2 Nebula Nights (~94 BPM), 3 Warp Speed Boogie (~104 BPM), 4 Stardust Shuffle (~123 BPM), 5 Moonbase Groove (~120 BPM). The files are not edited
+  // (all measure -14.5 to -14.8 dBFS RMS, the run's music -14.9, so no trim). The Music switch, the volume and 'a tap first' apply as for every track.
+  const BREAK_SONGS = [5, 0, 2, 4, 3];   // (ALT_SONGS indices)
+  const BREAK_MUSIC_PICK = (()=>{ if (!TEST_HOST) return 0; try{ const v = parseInt(new URLSearchParams(location.search).get('breakmusic'), 10); return v >= 1 && v <= BREAK_SONGS.length ? v - 1 : 0; }catch(e){ return 0; } })();
+  TRACK_SRC.brk = ALT_SONGS[BREAK_SONGS[BREAK_MUSIC_PICK]].src;
+  const BREAK_FADE_MS = 800;
+  let brkPrev = null, brkOn = false;
+  // a music element's level, faded: through its Web Audio trim once routed (a phone ignores element.volume), else element.volume in small steps
+  function musicFade(a, to, ms, done){
+    if (!a) { if (done) done(); return; }
+    clearInterval(a._fadeI); const base = a._base != null ? a._base : 1;
+    if (a._trim && audioCtx){ const g = a._trim.gain, t = audioCtx.currentTime; try{ g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(Math.max(0.0001, to * base), t + ms / 1000); }catch(e){} if (done) a._fadeI = setTimeout(done, ms + 20); return; }
+    const from = a.volume, steps = Math.max(1, Math.round(ms / 50)); let k = 0;
+    a._fadeI = setInterval(()=>{ k++; try{ a.volume = Math.max(0, Math.min(1, from + (to * base * masterVol - from) * (k / steps))); }catch(e){} if (k >= steps){ clearInterval(a._fadeI); if (done) done(); } }, 50);
+  }
+  function startBreakMusic(){
+    if (brkOn && currentTrackKey === 'brk') return; brkOn = true; brkPrev = currentTrackKey;   // (a break torn down by a restart left brkOn set: start afresh)
+    const prevEl = brkPrev ? trackEls[brkPrev] : null;
+    currentTrackKey = 'brk';
+    if (!musicOn) return;
+    if (prevEl && !prevEl.paused) musicFade(prevEl, 0, BREAK_FADE_MS, ()=>{ if (currentTrackKey === 'brk'){ try{ prevEl.pause(); }catch(e){} } });
+    clearTimeout(altT);
+    const el = getTrackEl('brk'); el.muted = false;
+    try{ if (el.currentTime < 1) el.currentTime = ALT_SONGS[BREAK_SONGS[BREAK_MUSIC_PICK]].lead; }catch(e){}
+    if (el._trim && audioCtx){ try{ el._trim.gain.setValueAtTime(0.0001, audioCtx.currentTime); }catch(e){} } else el.volume = 0;
+    const p = el.play(); if (p && p.catch) p.catch(()=>{});
+    musicRoute(el); musicFade(el, 1, BREAK_FADE_MS);
+  }
+  function endBreakMusic(){
+    if (!brkOn) return; brkOn = false;
+    const el = trackEls.brk, prev = brkPrev; brkPrev = null;
+    if (el) musicFade(el, 0, BREAK_FADE_MS, ()=>{ if (currentTrackKey !== 'brk'){ try{ el.pause(); el.currentTime = 0; }catch(e){} } });
+    if (currentTrackKey !== 'brk') return;   // (something else took the music over meanwhile - a restart, the results)
+    const back = prev && prev !== 'brk' && prev !== 'theme' ? prev : gameTrackKey();
+    currentTrackKey = back;
+    if (!musicOn) return;
+    const pe = trackEls[back];
+    if (pe && pe.currentTime > 0){   // (it was paused by the break: carry on where it was, fading back in)
+      if (pe._trim && audioCtx){ try{ pe._trim.gain.setValueAtTime(0.0001, audioCtx.currentTime); }catch(e){} } else pe.volume = 0;
+      pe.muted = false; const p = pe.play(); if (p && p.catch) p.catch(()=>{}); musicFade(pe, 1, BREAK_FADE_MS);
+      if (back === 'alt') setTimeout(altArm, 600);
+    } else playTrack(back);
+  }
+  if (DEBUG_FAST || REPLAY) window.__trk = ()=> currentTrackKey + (trackEls[currentTrackKey] ? ':' + (trackEls[currentTrackKey].currentSrc || '').split('/').pop() + (trackEls[currentTrackKey].paused ? '(paused)' : '') : '');
   // The secret riddle has its own track: the Daily theme stops (keeping its
   // place) while the riddle is up and carries on from there afterwards,
   // like Pause / Resume. Until the track's file is in TRACK_SRC, the theme
@@ -11466,7 +11514,8 @@ const SHARE_URL = 'https://playflipstax.com';
         if (!SPONSOR_BREAK_ON && !st.forced) continue;
         runPhase = 'bumper'; saveRunSnapshot();
         const g = showEnter('ad', 'sponsor');
-        showBreakDance(g, ()=> showSponsor(()=> showDone(g, 'sponsor')));   // (fix pass item 5: the short dance first, then the break exactly as before)
+        startBreakMusic();   // (polish2 item 5: the break's own music, from the dance to CONTINUE)
+        showBreakDance(g, ()=> showSponsor(()=>{ endBreakMusic(); showDone(g, 'sponsor'); }));   // (fix pass item 5: the short dance first, then the break exactly as before)
         return true;
       }
       if (st.t === 'ad'){
