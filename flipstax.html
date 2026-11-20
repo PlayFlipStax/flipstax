@@ -17337,7 +17337,8 @@ const SHARE_URL = 'https://playflipstax.com';
     runResultToday.orbitPoints = runOrbitPts; runResultToday.jackpot = runOrbitJackpot;
     runResultToday.orbit = { stage:'done', chips: runOrbit ? runOrbit.chips : [], dropped: runOrbit ? runOrbit.dropped : 0, base: runScore - runOrbitPts, done:true };
     saveRunResultToday(runResultToday);
-    showOutro(()=> showRunReadout(true));   // (the host waves the show off, then the results)
+    if (solved) showOutro(()=> showRunReadout(true));   // (the host waves the show off, then the results)
+    else showLoseVideo(()=> showRunReadout(true));   // (a loss: the full-screen loss video, then the results - no goodbye card)
   }
   // ---------- The episode's results screen (refs/results.jpg) ----------
   function mysteryName(key){
@@ -17439,7 +17440,7 @@ const SHARE_URL = 'https://playflipstax.com';
     const o = document.getElementById('outro'); if (!o || outroState === 'end') return;
     outroState = 'end'; outroClear();
     const v = document.getElementById('outroVideo');
-    if (!o.classList.contains('lose-vid') && (instant || (!v.ended && !early))){ try{ v.pause(); }catch(e){} o.classList.add('poster-on'); }   // (a skip or a failure freezes on the poster: the same last frame; the lose video plays on under the score card)
+    if (instant || (!v.ended && !early)){ try{ v.pause(); }catch(e){} o.classList.add('poster-on'); }   // (a skip or a failure freezes on the poster: the same last frame)
     o.classList.toggle('instant', !!instant);
     { const ln = document.getElementById('outroFlipLine'); if (ln) ln.textContent = els.readoutTypeBlurb.textContent || ''; }
     o.classList.add('end');
@@ -17451,26 +17452,50 @@ const SHARE_URL = 'https://playflipstax.com';
     { const d = document.getElementById('outroDetails'); d.textContent = 'details'; d.setAttribute('aria-expanded', 'false'); }
     document.documentElement.classList.remove('outro-up');
     if (!o) return;
-    o.classList.remove('end', 'instant', 'poster-on', 'closing', 'still', 'lose-vid', 'vid-on');
-    if (loseHidStage){ loseHidStage = false; document.documentElement.classList.remove('ww-fin-mem'); }
-    v.onplaying = null; v.onerror = null;
+    o.classList.remove('end', 'instant', 'poster-on', 'closing', 'still');
     try{ v.pause(); }catch(e){} v.removeAttribute('src'); try{ v.load(); }catch(e){}
   }
-  // ---- the not-won ending's video (lose video). Handled like the win's dance: one video element (#outroVideo), muted autoplay inline, the poster frame
-  // under it while it loads, a fade-in once it is really playing (no black gap or pop-in), the stage hidden once it is covered, played once and held on
-  // its last frame (no loop), released when the results close. Muted for now (its own track is music - the owner decides), so it has no sound to
-  // cut; if it is ever unmuted, give it the win dance's gain fade before release.
-  const LOSE_SRC = 'data/outro/lose-a.mp4', LOSE_POSTER = 'data/outro/lose-a-poster.webp';
-  let loseHidStage = false;
-  function playLoseVideo(o, v){
-    const pe = document.getElementById('outroPoster');
-    if (pe && pe.nextElementSibling !== v) v.parentNode.insertBefore(pe, v);   // (the poster under the video, not over it)
-    o.classList.add('poster-on', 'lose-vid'); o.classList.remove('vid-on');
-    v.loop = false; v.muted = true; v.defaultMuted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.setAttribute('webkit-playsinline', '');
-    v.onended = null; v.ontimeupdate = null; v.onerror = ()=>{ o.classList.remove('vid-on'); };   // (a failure keeps the poster still)
-    v.onplaying = ()=>{ requestAnimationFrame(()=> requestAnimationFrame(()=>{ if (!o.classList.contains('lose-vid')) return; o.classList.add('vid-on');
-      setTimeout(()=>{ if (o.classList.contains('lose-vid')){ document.documentElement.classList.add('ww-fin-mem'); loseHidStage = true; } }, 500); })); };
-    try{ v.src = LOSE_SRC; v.currentTime = 0; const p = v.play(); if (p && p.catch) p.catch(()=>{}); }catch(e){}
+  // ---- the not-won ending's video (lose video, full screen). After a missed Word Warp the answer goes red as before, then a short beat, then
+  // data/outro/lose-a.mp4 plays full screen on its own layer with nothing on top but TAP TO SKIP - the whole 10 s, once, muted - and only when it
+  // ends does the score card come up, fading in over its held last frame (data/outro/lose-a-last.webp under the results). The Flip 'See you
+  // tomorrow' card is skipped on this path. A tap skips straight to the score card; if the video has not started 1.5 s after it was asked to
+  // play (a failed load, a refused play), the score card comes then; a safety timer covers an 'ended' that never fires. Handled like the win's
+  // dance: one video element, its first frame (lose-a-poster.webp) under it while it loads, a fade-in once it is really playing, the stage hidden
+  // while it covers it, released before the results are built. Lite and reduced motion: the poster still for 2 s, then the score card.
+  // (Why the card used to cover it: the results played the video inside the score screen and a 1.5 s timer - OUTRO_FALLBACK_MS - raised the score
+  // card over it, and the FINAL SCORE pill sat on it from the start.)
+  const LOSE_SRC = 'data/outro/lose-a.mp4', LOSE_POSTER = 'data/outro/lose-a-poster.webp', LOSE_LAST = 'data/outro/lose-a-last.webp';
+  const LOSE_BEAT_MS = 0, LOSE_START_MS = 1500, LOSE_SAFETY_MS = 13000, LOSE_STILL_MS = 2000;
+  let loseJustPlayed = null;   // ('last' after the video, 'first' after the still) - startOutro shows that frame under the results and raises the card quickly
+  function showLoseVideo(then){
+    if (DEBUG_FAST && !REALTIME){ then(); return; }   // (fast test runs: straight to the results)
+    const still = isLite() || prefersReducedMotion();
+    const L = document.createElement('div'); L.className = 'lose-fin' + (still ? ' still' : ''); L.setAttribute('role', 'button'); L.setAttribute('aria-label', 'Tap to skip to your score');
+    L.style.backgroundImage = 'url(' + LOSE_POSTER + ')';
+    L.innerHTML = (still ? '' : '<video class="lose-fin-video" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video>') + '<button type="button" class="ww-fin-skip lose-fin-skip">TAP TO SKIP</button>';
+    const vid = L.querySelector('video'), timers = [], later = (ms, f)=> timers.push(setTimeout(f, ms));
+    let over = false, started = false;
+    const finish = (how)=>{
+      if (over) return; over = true; timers.forEach(clearTimeout);
+      L.style.backgroundImage = 'url(' + (how === 'ended' ? LOSE_LAST : LOSE_POSTER) + ')';   // (the held frame under the video while it is released)
+      if (vid){ try{ vid.pause(); }catch(e){} vid.removeAttribute('src'); try{ vid.load(); }catch(e){} vid.remove(); }
+      document.documentElement.classList.remove('ww-fin-mem');
+      loseJustPlayed = how === 'ended' ? 'last' : 'first';
+      then();   // (the results build underneath, on the same frame)
+      requestAnimationFrame(()=>{ L.classList.add('out'); setTimeout(()=> L.remove(), 600); });
+    };
+    L.addEventListener('click', (e)=>{ e.stopPropagation(); e.preventDefault(); if (L.classList.contains('skip-on')) finish('skip'); });
+    const begin = ()=>{ document.body.appendChild(L); requestAnimationFrame(()=> requestAnimationFrame(()=> L.classList.add('on'))); later(1000, ()=> L.classList.add('skip-on'));
+      if (still){ later(LOSE_STILL_MS, ()=> finish('still')); return; }
+      vid.loop = false; vid.muted = true; vid.defaultMuted = true; vid.playsInline = true; vid.setAttribute('webkit-playsinline', '');
+      vid.addEventListener('playing', ()=>{ if (started || over) return; started = true; requestAnimationFrame(()=> requestAnimationFrame(()=> L.classList.add('vid-on'))); later(600, ()=>{ if (!over) document.documentElement.classList.add('ww-fin-mem'); }); });
+      vid.addEventListener('ended', ()=> finish('ended'));
+      vid.addEventListener('error', ()=> later(0, ()=> finish('fail')));
+      later(LOSE_START_MS, ()=>{ if (!started) finish('fail'); });   // (never stuck: not playing 1.5 s after the ask)
+      later(LOSE_SAFETY_MS, ()=> finish(vid.ended ? 'ended' : 'safety'));   // (an 'ended' that never fires)
+      vid.src = LOSE_SRC; try{ const p = vid.play(); if (p && p.catch) p.catch(()=> later(0, ()=> finish('fail'))); }catch(e){ finish('fail'); }
+    };
+    if (LOSE_BEAT_MS) setTimeout(begin, LOSE_BEAT_MS); else begin();   // (no beat: the layer is in the page in the same task as the red answer leaves - not one frame of the board shows)
   }
   function startOutro(r){
     stopOutro(); loadOutroPoster(); outroMount();
@@ -17489,10 +17514,11 @@ const SHARE_URL = 'https://playflipstax.com';
     outroLater(OUTRO_WATCHDOG_MS, ()=> outroEnd(true));   // (the watchdog: whatever happens, the buttons are there within 12 s)
     // polish2 item 4: the dance belongs to a WIN only. When the Word Warp was not won there is no video: after 'See you tomorrow' the score card comes in
     // over a still of the new stage (data/stage/stage-still.webp, the drawn dance deck, no cast). A win keeps the dance's last frame (finale-b-poster.webp).
-    // (lose video: when the Word Warp was not won, the score card comes in over data/outro/lose-a.mp4 - the cast on the dance floor, 10 s, muted - played once
-    // and held on its last frame; its first frame, data/outro/lose-a-poster.webp, is the loading frame under it and the still for lite / reduced motion)
-    { const pe = document.getElementById('outroPoster'); if (pe){ const want = seenWin ? 'data/outro/finale-b-poster.webp' : LOSE_POSTER; if (pe.getAttribute('src') !== want) pe.setAttribute('src', want); } }
-    if (!seenWin && !isLite() && !prefersReducedMotion() && !(DEBUG_FAST && !REALTIME)){ playLoseVideo(o, v); outroLater(OUTRO_FALLBACK_MS, ()=> outroEnd(false, true)); return; }   // (the score card at the same moment as before, over the playing video)
+    // (lose video: after a loss the full-screen video has already played - showLoseVideo; the results lie over its held frame - the last one after the
+    // video, the first one after the still or a skip - and the score card fades in at once)
+    const afterLose = !seenWin ? loseJustPlayed : null; loseJustPlayed = null;
+    { const pe = document.getElementById('outroPoster'); if (pe){ const want = seenWin ? 'data/outro/finale-b-poster.webp' : (afterLose === 'last' ? LOSE_LAST : LOSE_POSTER); if (pe.getAttribute('src') !== want) pe.setAttribute('src', want); } }
+    if (afterLose){ o.classList.add('poster-on'); outroLater(250, ()=> outroEnd(false)); return; }
     const quiet = true;   // (polish2 item 4: never the video here - a win has already played it, a loss gets none; the still, then the end state)
     // (lite mode / reduced motion in the studio ending: Flip stands still on his pad in front of the open doors for the hold - the same big Flip, same place, as
     // the normal ending, just not moving - instead of the doors being shut from the first frame with nobody there; then the results over the closed doors as before)

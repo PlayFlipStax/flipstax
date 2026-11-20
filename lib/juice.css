@@ -925,8 +925,14 @@ header .logo.jc-wordmark .stax{ background-size:200% 100%; background-position:1
 #readoutOverlay.ep.outro-on .outro{ display:block; position:absolute; inset:0; z-index:2; overflow:hidden; cursor:pointer; }
 .outro-video, .outro-poster{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 50%; background:#04102e; }
 .outro-poster{ opacity:0; }
-/* (lose video: the outro's video shows only once it is really playing - it fades in over its poster frame; unused on the win path) */
-.outro .outro-video{ opacity:0; transition:opacity 0.45s ease; } .outro.lose-vid.vid-on .outro-video{ opacity:1; }
+/* (the full-screen loss video: above everything - no score card, goodbye card or test controls on top - but TAP TO SKIP; it fades in over its
+   first frame, the video fades in once it is really playing, and the whole layer fades out over the results' identical held frame) */
+.lose-fin{ position:fixed; inset:0; z-index:10050; background:#000 center / cover no-repeat; touch-action:manipulation; cursor:pointer; }   /* (a straight cut from the red answer: no fade-in, so nothing behind shows through) */
+.lose-fin.out{ opacity:0; transition:opacity 0.5s ease; pointer-events:none; }
+.lose-fin-video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity 0.35s ease; }
+.lose-fin.vid-on .lose-fin-video{ opacity:1; }
+.lose-fin .lose-fin-skip{ z-index:2; } .lose-fin.skip-on .lose-fin-skip{ opacity:1; pointer-events:auto; }
+.lose-fin.still .lose-fin-skip{ display:none; }
 .outro.poster-on .outro-poster{ opacity:1; }
 .outro-badge{ position:absolute; left:50%; top:calc(14px + env(safe-area-inset-top)); transform:translateX(-50%); z-index:3; display:flex; align-items:baseline; gap:10px; padding:6px 18px 7px; border-radius:99px; white-space:nowrap;
   background:linear-gradient(180deg, #fff3a8, #ffcb2b 55%, #ff9900); border:3px solid #fff; box-shadow:0 0 0 3px #7a4a00, 0 4px 0 3px #7a4a00; }
