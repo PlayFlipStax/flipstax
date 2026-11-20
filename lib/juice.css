@@ -4439,3 +4439,38 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 /* fix pass 2 item 4: lite mode and reduced motion - Flip is simply there on the first frame (no fade) */
 :root.lite .show-card .fs-host{ animation:none !important; opacity:1 !important; transition:none !important; }
 @media (prefers-reduced-motion: reduce){ .show-card .fs-host{ animation:none !important; opacity:1 !important; transition:none !important; } }
+
+/* ==== polish2 item 9: THE TRON LIGHT ON A VS PICK. When the player taps a card, a bright light - a white-hot head with a tail in the card's colour -
+   races once round that card's edge in 0.5 s (a pre-rendered gradient segment sliding along each edge in turn - top, right, bottom, left), then the card settles into
+   a steady lit neon outline in its own colour (the card's colour pushed to neon: cyan on a blue card, hot pink on a pink one; a static glow faded in by opacity). The other card dims
+   a little. It starts with the existing 'picked' class, inside the drumroll pause - no extra wait, the vote is untouched. Lite and reduced motion: no
+   run, the lit outline at once. (Replaces the gold pick glow on the Daily cards.) ==== */
+:root.mode-daily #board .half{ --tron:#5ff4ff; --tron-a:rgba(95,244,255,0.9); --tron-g:rgba(95,244,255,0.65); }
+:root.mode-daily #board .half.bottom{ --tron:#ff4fd8; --tron-a:rgba(255,79,216,0.9); --tron-g:rgba(255,79,216,0.6); }
+#board .half > .tron, #board .half > .tron-lit{ position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:30; opacity:0; }
+#board .half > .tron .te{ position:absolute; }
+#board .half > .tron .te.t{ left:12px; right:12px; top:0; height:9px; } #board .half > .tron .te.b{ left:12px; right:12px; bottom:0; height:9px; }
+#board .half > .tron .te.l{ top:12px; bottom:12px; left:0; width:9px; } #board .half > .tron .te.r{ top:12px; bottom:12px; right:0; width:9px; }
+#board .half > .tron .te > b{ position:absolute; display:block; border-radius:4px; box-shadow:0 0 10px 2px var(--tron-g); }
+#board .half > .tron .te:is(.t, .b) > b{ top:0; bottom:0; left:0; width:40%; opacity:0; } #board .half > .tron .te:is(.l, .r) > b{ left:0; right:0; top:0; height:40%; opacity:0; }
+#board .half > .tron .te.t > b{ background:linear-gradient(90deg, rgba(255,255,255,0), var(--tron-a) 30%, var(--tron) 66%, #ffffff 86%, #ffffff); }
+#board .half > .tron .te.r > b{ background:linear-gradient(180deg, rgba(255,255,255,0), var(--tron-a) 30%, var(--tron) 66%, #ffffff 86%, #ffffff); }
+#board .half > .tron .te.b > b{ background:linear-gradient(270deg, rgba(255,255,255,0), var(--tron-a) 30%, var(--tron) 66%, #ffffff 86%, #ffffff); }
+#board .half > .tron .te.l > b{ background:linear-gradient(0deg, rgba(255,255,255,0), var(--tron-a) 30%, var(--tron) 66%, #ffffff 86%, #ffffff); }
+#board .half > .tron-lit{ border:3px solid var(--tron); box-shadow:0 0 16px 4px var(--tron-g), 0 0 34px 8px var(--tron-g), inset 0 0 14px 2px var(--tron-g); box-sizing:border-box; }
+:root.mode-daily #board .half.picked > .tron{ animation:tronShow 0.56s linear 1 forwards; }
+:root.mode-daily #board .half.picked > .tron .te.t > b{ animation:tronT 0.5s linear 1 forwards; } :root.mode-daily #board .half.picked > .tron .te.r > b{ animation:tronR 0.5s linear 1 forwards; }
+:root.mode-daily #board .half.picked > .tron .te.b > b{ animation:tronB 0.5s linear 1 forwards; } :root.mode-daily #board .half.picked > .tron .te.l > b{ animation:tronL 0.5s linear 1 forwards; }
+:root.mode-daily #board .half.picked > .tron-lit{ animation:tronLit 0.3s ease-out 0.38s 1 forwards; }
+@keyframes tronShow{ 0%{ opacity:1; } 86%{ opacity:1; } 100%{ opacity:0; } }
+@keyframes tronT{ 0%{ transform:translate3d(0, 0, 0); opacity:1; } 27%{ transform:translate3d(150%, 0, 0); opacity:1; } 30%, 100%{ transform:translate3d(150%, 0, 0); opacity:0; } }
+@keyframes tronR{ 0%, 24%{ transform:translate3d(0, 0, 0); opacity:0; } 26%{ opacity:1; } 50%{ transform:translate3d(0, 150%, 0); opacity:1; } 53%, 100%{ transform:translate3d(0, 150%, 0); opacity:0; } }
+@keyframes tronB{ 0%, 49%{ transform:translate3d(150%, 0, 0); opacity:0; } 51%{ opacity:1; } 75%{ transform:translate3d(0, 0, 0); opacity:1; } 78%, 100%{ transform:translate3d(0, 0, 0); opacity:0; } }
+@keyframes tronL{ 0%, 74%{ transform:translate3d(0, 150%, 0); opacity:0; } 76%{ opacity:1; } 98%{ transform:translate3d(0, 0, 0); opacity:1; } 100%{ transform:translate3d(0, 0, 0); opacity:0; } }
+@keyframes tronLit{ from{ opacity:0; } to{ opacity:1; } }
+:root:root:root:root:root:root:root.mode-daily #board .half.picked{ box-shadow:none; animation:none; }
+:root:root:root:root:root:root:root.mode-daily #board .half.picked::before{ box-shadow:none; animation:none; }
+:root:root:root:root:root:root:root.mode-daily #board .half.picked::after{ border-color:var(--tron); }
+:root.mode-daily #board.vs-picked .half:not(.picked){ opacity:0.74; transition:opacity 0.3s ease; }
+:root.lite.mode-daily #board .half.picked > .tron{ animation:none; opacity:0; } :root.lite.mode-daily #board .half.picked > .tron-lit{ animation:none; opacity:1; }
+@media (prefers-reduced-motion: reduce){ :root.mode-daily #board .half.picked > .tron{ animation:none; opacity:0; } :root.mode-daily #board .half.picked > .tron-lit{ animation:none; opacity:1; } }

@@ -4390,6 +4390,7 @@
 
     <div class="half top" id="halfA">
       <i class="gloss" aria-hidden="true"></i>
+      <i class="tron" aria-hidden="true"><i class="te t"><b></b></i><i class="te r"><b></b></i><i class="te b"><b></b></i><i class="te l"><b></b></i></i><i class="tron-lit" aria-hidden="true"></i>
       <i class="dd dd-back" aria-hidden="true"></i><i class="dd dd-front" aria-hidden="true"></i>
       <div class="cat-chip" id="chipA"></div>
       <div class="scene" id="sceneA"></div>
@@ -4410,6 +4411,7 @@
     <div class="crowd-board" id="crowdBoard" aria-live="polite"><div class="cb-note"></div><div class="cb-label">CROWD SAYS</div><div class="cb-row"><span class="cb-num" id="cbA"></span><span class="cb-sep">/</span><span class="cb-num" id="cbB"></span></div></div>
     <div class="half bottom" id="halfB">
       <i class="gloss" aria-hidden="true"></i>
+      <i class="tron" aria-hidden="true"><i class="te t"><b></b></i><i class="te r"><b></b></i><i class="te b"><b></b></i><i class="te l"><b></b></i></i><i class="tron-lit" aria-hidden="true"></i>
       <i class="dd dd-back" aria-hidden="true"></i><i class="dd dd-front" aria-hidden="true"></i>
       <div class="cat-chip" id="chipB"></div>
       <div class="scene" id="sceneB"></div>
@@ -18637,6 +18639,14 @@ const SHARE_URL = 'https://playflipstax.com';
       scheduleNext(400);
     }
   }
+  // polish2 item 9: the picked card's neon colour - its own background's first colour, pushed to a bright neon of the same hue (blue -> cyan, pink -> hot pink)
+  function tronColor(h){
+    try{ const m = (getComputedStyle(h).backgroundImage.match(/rgba?\(([^)]+)\)/) || [])[1]; if (!m) return;
+      let [r, g, b] = m.split(',').map(x=> parseFloat(x) / 255); const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn; let hu = 0;
+      if (d){ hu = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; hu = Math.round(hu * 60); if (hu < 0) hu += 360; }
+      const c = 'hsl(' + hu + ', 100%, 62%)', a = (o)=> 'hsla(' + hu + ', 100%, 62%, ' + o + ')';
+      h.style.setProperty('--tron', c); h.style.setProperty('--tron-a', a(0.9)); h.style.setProperty('--tron-g', a(0.62)); }catch(e){}
+  }
   async function voteImpl(side){
     if (voted || !current) return;
     // G1: in the show, only the live VS card takes a vote (a tap during a transition does nothing).
@@ -18663,6 +18673,7 @@ const SHARE_URL = 'https://playflipstax.com';
     // the Infinity selection outline appears the instant of the tap.
     els.board.classList.remove('vs-live');   // (A+: at the pick the other bulbs go out; the picked card's flash once and stay lit)
     els.board.classList.add('vs-picked', side === 'A' ? 'pick-top' : 'pick-bottom');
+    tronColor(side === 'A' ? els.halfA : els.halfB);   // (polish2 item 9: the tron light takes the picked card's own colour, set before the class starts it)
     els.halfA.classList.toggle('picked', side === 'A');
     els.halfB.classList.toggle('picked', side === 'B');
     const points = current.bonusPoints ? (runActive ? 3 : INF_STAR_POINTS) : 1;
