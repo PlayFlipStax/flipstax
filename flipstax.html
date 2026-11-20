@@ -7018,6 +7018,63 @@ const SHARE_URL = 'https://playflipstax.com';
       });
     }),
   };
+  // ---- polish2 item 12: THE WORD WARP WIN SOUND. It was sfx.cheer() - about a second of a quiet crowd 'ooh' (gain 0.05) - and then whatever the dance
+  // video had. Now a 3.5-4 s win moment, all synthesized in Web Audio (no files): a rising whoosh, a deep low hit, a bright shimmering chord swell and
+  // a sparkle or crowd-cheer tail, through one compressor so it never clips (peak under -1 dBFS, measured offline), at the sound-effect volume, with
+  // the game music ducked under it. ?winsound=1-4 picks: 1 Supernova (the default: whoosh, sub hit, a wide C major add9 swell opening up, a long
+  // sparkle tail), 2 Arena (a shorter whoosh, a punchy hit with a snap, a brass-like Bb major stab and a crowd cheer), 3 Cosmic Choir (a slow riser,
+  // a sub drop, an A major choir pad with vibrato and a shimmering arpeggio), 4 Arcade Jackpot (a fast square-wave run up, a punch, three bright
+  // stabs and a coin cascade). Muted with everything else (the sound switch); a phone has had its tap long before the win.
+  const WIN_SOUND = (()=>{ try{ const v = parseInt(new URLSearchParams(location.search).get('winsound'), 10); return v >= 1 && v <= 4 ? v : 1; }catch(e){ return 1; } })();
+  const WIN_SOUND_MS = [0, 3800, 4000, 4000, 3600];
+  function buildWinSound(ctx, out, t, opt){
+    const bus = ctx.createGain(), comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -12; comp.knee.value = 6; comp.ratio.value = 10; comp.attack.value = 0.003; comp.release.value = 0.25;
+    bus.gain.value = 0.55; bus.connect(comp); comp.connect(out);
+    const env = (g, a, peak, hold, rel, at)=>{ g.gain.setValueAtTime(0.0001, at); g.gain.linearRampToValueAtTime(peak, at + a); g.gain.setValueAtTime(peak, at + a + hold); g.gain.exponentialRampToValueAtTime(0.0001, at + a + hold + rel); };
+    const noise = (at, dur, type, f0, f1, q, peak, a)=>{ const n = ctx.createBufferSource(); n.buffer = showNoise(ctx); n.loop = true; const f = ctx.createBiquadFilter(); f.type = type; f.Q.value = q;
+      f.frequency.setValueAtTime(f0, at); f.frequency.exponentialRampToValueAtTime(f1, at + dur); const g = ctx.createGain(); env(g, a == null ? dur * 0.85 : a, peak, 0, Math.max(0.05, dur * 0.15), at); n.connect(f); f.connect(g); g.connect(bus); n.start(at); n.stop(at + dur + 0.3); };
+    const tone = (at, type, f0, f1, glide, a, peak, hold, rel, lp)=>{ const o = ctx.createOscillator(), g = ctx.createGain(); o.type = type; o.frequency.setValueAtTime(f0, at); if (f1) o.frequency.exponentialRampToValueAtTime(f1, at + glide);
+      let last = o; if (lp){ const f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.setValueAtTime(lp[0], at); f.frequency.exponentialRampToValueAtTime(lp[1], at + (lp[2] || 1)); o.connect(f); last = f; }
+      env(g, a, peak, hold, rel, at); last.connect(g); g.connect(bus); o.start(at); o.stop(at + a + hold + rel + 0.05); return o; };
+    const hit = (at, f0, peak)=>{ tone(at, 'sine', f0, 34, 0.55, 0.004, peak, 0.05, 1.1); tone(at, 'triangle', f0 * 0.5, 30, 0.4, 0.004, peak * 0.5, 0.02, 0.6); noise(at, 0.22, 'lowpass', 260, 90, 0.7, peak * 0.6, 0.004); };
+    const chord = (at, freqs, type, a, hold, rel, peak, lp, vib)=> freqs.forEach((fq, i)=> [-6, 6].forEach(c=>{ const o = tone(at, type, fq * Math.pow(2, c / 1200), 0, 0, a, peak / freqs.length, hold, rel, lp);
+      if (vib){ const l = ctx.createOscillator(), lg = ctx.createGain(); l.frequency.value = 5 + i * 0.3; lg.gain.value = fq * 0.006; l.connect(lg); lg.connect(o.frequency); l.start(at); l.stop(at + a + hold + rel); } }));
+    const sparkle = (at, span, n, fmin, fmax, peak)=>{ for (let k = 0; k < n; k++){ const tt = at + span * (k / n) + Math.random() * span / n * 0.8; tone(tt, 'sine', fmin + Math.random() * (fmax - fmin), 0, 0, 0.004, peak * (1 - 0.5 * k / n), 0, 0.18); } };
+    const crowd = (at, dur, peak)=>{ noise(at, dur, 'bandpass', 900, 1400, 0.6, peak, dur * 0.25); for (let k = 0; k < 26; k++) noise(at + Math.random() * dur * 0.8, 0.09, 'bandpass', 1500 + Math.random() * 1500, 1800, 2, peak * 0.5, 0.01); };
+    if (opt === 2){
+      noise(t, 0.8, 'bandpass', 220, 3600, 0.9, 0.5); hit(t + 0.8, 120, 0.9); noise(t + 0.8, 0.18, 'highpass', 2200, 2600, 0.8, 0.45, 0.003);
+      chord(t + 0.8, [116.5, 174.6, 233.1, 293.7, 349.2], 'square', 0.03, 1.1, 0.9, 0.42, [700, 3200, 0.12]); crowd(t + 0.9, 3.0, 0.32);
+    } else if (opt === 3){
+      noise(t, 1.2, 'highpass', 400, 5200, 0.6, 0.4); tone(t, 'sine', 180, 1500, 1.2, 1.1, 0.12, 0, 0.1); hit(t + 1.2, 90, 0.85);
+      chord(t + 1.2, [220, 277.2, 329.6, 440, 554.4], 'triangle', 0.5, 1.4, 1.0, 0.42, null, true);
+      [1760, 2217, 2637, 3520, 2637, 2217, 3520, 4434].forEach((f, k)=> tone(t + 1.45 + k * 0.28, 'sine', f, 0, 0, 0.005, 0.07, 0, 0.35));
+    } else if (opt === 4){
+      for (let k = 0; k < 16; k++) tone(t + k * 0.045, 'square', 261.6 * Math.pow(2, k / 5.3), 0, 0, 0.003, 0.06, 0.02, 0.04, [2400, 2400, 1]);
+      noise(t, 0.75, 'bandpass', 500, 5000, 1, 0.3); hit(t + 0.75, 160, 0.85);
+      [0.75, 1.05, 1.35].forEach((d, k)=> chord(t + d, [523.3, 659.3, 784, 1046.5], 'square', 0.005, k < 2 ? 0.08 : 1.0, k < 2 ? 0.12 : 0.9, 0.36, [1800, 5200, 0.1]));
+      sparkle(t + 1.0, 2.2, 22, 2400, 5200, 0.12);
+    } else {
+      noise(t, 1.0, 'bandpass', 300, 6000, 0.8, 0.55); tone(t, 'sawtooth', 110, 440, 1.0, 0.95, 0.06, 0, 0.08, [400, 3000, 1]);
+      hit(t + 1.0, 110, 0.95);
+      chord(t + 1.0, [130.8, 196, 261.6, 329.6, 587.3, 784], 'sawtooth', 0.12, 1.3, 1.2, 0.62, [600, 5200, 1.2]);
+      sparkle(t + 1.3, 2.4, 16, 2000, 5200, 0.1);
+    }
+    return WIN_SOUND_MS[opt] || 3800;
+  }
+  function playWinSound(opt){ let ms = WIN_SOUND_MS[opt || WIN_SOUND] || 3800; withSfxCtx((ctx, t)=>{ ms = buildWinSound(ctx, ctx.destination, t + 0.02, opt || WIN_SOUND); }); return ms; }
+  // the music's level, ducked and brought back (the Music slider's gain once routed; the elements' own volume before that)
+  let duckT = 0;
+  function duckMusic(level, inMs, holdMs, outMs){
+    clearTimeout(duckT);
+    const set = (v, ms)=>{ if (musicGain && audioCtx){ const g = musicGain.gain, t = audioCtx.currentTime; try{ g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(Math.max(0.0001, v * masterVol), t + ms / 1000); }catch(e){} }
+      else Object.keys(trackEls).forEach(k=>{ const a = trackEls[k]; if (a && !a._routed) musicFade(a, v, ms); }); };
+    set(level, inMs);
+    if (holdMs != null) duckT = setTimeout(()=> set(1, outMs || 600), inMs + holdMs);
+  }
+  if (DEBUG_FAST || REPLAY) window.__winSoundRender = (opt)=>{ const C = window.OfflineAudioContext || window.webkitOfflineAudioContext; const ctx = new C(1, 44100 * 4.6, 44100); buildWinSound(ctx, ctx.destination, 0.05, opt);
+    return ctx.startRendering().then(b=>{ const d = b.getChannelData(0); let pk = 0, ss = 0; for (let i = 0; i < d.length; i++){ const v = Math.abs(d[i]); if (v > pk) pk = v; ss += d[i] * d[i]; } const lastLoud = (()=>{ for (let i = d.length - 1; i >= 0; i--) if (Math.abs(d[i]) > 0.01) return i / 44100; return 0; })();
+      return JSON.stringify({ opt, peakDb: +(20 * Math.log10(pk)).toFixed(1), rmsDb: +(10 * Math.log10(ss / d.length)).toFixed(1), audibleUntil: +lastLoud.toFixed(2) }); }); };
   const sfx = {
     // Part A job 2: a very quiet ambient pad for a game to play under itself (Star Sequence) - two soft, slightly detuned low tones (A2 and E3) through a
     // low-pass filter, fading in over 1.5 s to a level well under the game's own notes; returns { stop(ms) }, which fades it out. Nothing when sound is off.
@@ -16691,13 +16748,13 @@ const SHARE_URL = 'https://playflipstax.com';
       if (top && top.animate && !still){ setTimeout(()=>{ const a = top.animate([{ opacity:1 }, { opacity:0 }], { duration:500, easing:'ease-in', fill:'forwards' }); a.onfinish = gone; setTimeout(gone, 700); }, gap + 120); } else gone();
     };
     const stillCard = ()=>{ card.classList.add('still'); document.body.appendChild(card); fitWord(); later(finish, 2000); };
-    if (still){ ov.classList.add('ww-done'); const inner = ov.querySelector('.solve-inner'); if (inner) inner.style.opacity = '0'; sfx.solveWin && sfx.solveWin(); stillCard(); return; }
+    if (still){ ov.classList.add('ww-done'); const inner = ov.querySelector('.solve-inner'); if (inner) inner.style.opacity = '0'; { const ms = playWinSound(); duckMusic(0.3, 250, ms, 700); } stillCard(); return; }
     // the video: made now (in the winning tap) and unlocked with a quick play / pause, so it may play with sound 2 s later
     vid = document.createElement('video'); vid.className = 'ww-fin-video'; vid.setAttribute('playsinline', ''); vid.playsInline = true; vid.preload = 'auto';
     vid.muted = !sfxOn; vid.src = WW_FINALE_SRC;
     try{ const pr = vid.play(); if (pr && pr.then) pr.then(()=>{ if (vid && !vid.dataset.go) try{ vid.pause(); vid.currentTime = 0; }catch(e){} }, ()=>{}); }catch(e){}
     // 1. the real game, about 2 s: the spin-up, the lit letters, everything pulled into the centre, one flash
-    sfx.cheer();
+    { const ms = playWinSound(); duckMusic(0.3, 250, ms, 700); }   // (polish2 item 12: the big win sound, the music ducked under it - was sfx.cheer())
     wwSpinRate(5);
     const planet = document.querySelector('#wwSky .wk-planet'); if (planet) anims.push(planet.animate([{ transform:'rotate(0deg) scale(1)' }, { transform:'rotate(720deg) scale(1.15)' }], { duration:1900, easing:'cubic-bezier(.5,0,.8,.6)', fill:'forwards' }));
     Array.from(els.solveSlots.children).forEach((s, k)=> later(()=> s.classList.add('ww-lit'), k * 70));
