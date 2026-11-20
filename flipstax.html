@@ -12566,7 +12566,10 @@ const SHARE_URL = 'https://playflipstax.com';
   function showVideoOpen(then, o){
     const first = !!o.first, quiet = !!o.quiet, ep = o.ep;
     const line = first ? HOST_INTRO_LINES[0] : HOST_INTRO_BACK;
-    const FROM = first ? 0 : 7.0, VIDEO_MS = first ? 10000 : 3000, SLAM_MS = 450, TITLE_EXTRA_MS = 2000, HOLD_MS = (first ? 1500 : 800) + TITLE_EXTRA_MS, LINE_MS = first ? 3500 : Math.max(2200, cueLineMs(line));   // (fix pass 4 item 4: the logo and the EPISODE line stay TITLE_EXTRA_MS (2 s) longer before Flip's greeting - 3.5 s first visit, 2.8 s returning; nothing else changes)
+    // polish2 item 1: a returning player sees the UFO drop Flip off too - the video from 1.0 s (the saucer arrives) to 5.1 s (Flip has landed on the pad,
+    // the saucer lifting away, before the white burst at 5.5 s starts to glow), held on that frame (not the last frame), then a brief logo and EPISODE card and the
+    // welcome-back line: about 6.5 s in all, tap to skip. A first visit (and ?intro=full, ?replay=1) is the whole 10 s as before; lite / reduced motion keep the still.
+    const FROM = first ? 0 : 1.0, VIDEO_MS = first ? 10000 : 4100, SLAM_MS = 450, TITLE_EXTRA_MS = (first || quiet) ? 2000 : 0, HOLD_MS = (first ? 1500 : 250) + TITLE_EXTRA_MS, LINE_MS = first ? 3500 : quiet ? Math.max(2200, cueLineMs(line)) : 1800;   // (lite / reduced motion: the still, timed as before)   // (fix pass 4 item 4: the logo and the EPISODE line stay TITLE_EXTRA_MS (2 s) longer before Flip's greeting - 3.5 s first visit, 2.8 s returning; nothing else changes)
     const titleAt = quiet ? 0 : VIDEO_MS, lineAt = quiet ? (first ? 1300 : 800) + TITLE_EXTRA_MS : VIDEO_MS + SLAM_MS + HOLD_MS, total = lineAt + LINE_MS + 200;
     showCard.className = 'show-card curtain lines vidintro' + (quiet ? ' ci-quiet ci-ended ci-title-on' : '');
     showCard.removeAttribute('style');
@@ -12586,9 +12589,11 @@ const SHARE_URL = 'https://playflipstax.com';
     const timers = [], later = (ms, f)=> timers.push(setTimeout(f, ms));
     const lineEl = showCard.querySelector('.co-line'), vid = showCard.querySelector('video');
     let titled = false, gone = false;
+    let vidStarted = false;
     const toTitle = ()=>{
       if (titled || gone) return; titled = true;
       try{ if (vid) vid.pause(); }catch(e){}
+      if (!first && vidStarted) showCard.classList.add('ci-hold-vid');   // (polish2 item 1: the short drop holds its own frame - Flip just landed - not the 10 s video's last frame)
       showCard.classList.add('ci-ended', 'ci-title-on');   // (the held last frame is the still: Flip waving on his pad)
       if (!quiet){ later(SLAM_MS + HOLD_MS, ()=>{ showCard.classList.add('ci-title-off'); say(); }); }
     };
@@ -12599,7 +12604,8 @@ const SHARE_URL = 'https://playflipstax.com';
       if (vid){
         vid.muted = !(INTRO_VIDEO_SOUND && sfxOn); vid.defaultMuted = true; vid.playsInline = true; vid.setAttribute('playsinline', ''); vid.setAttribute('webkit-playsinline', '');
         let started = false;
-        vid.addEventListener('playing', ()=>{ started = true; showCard.classList.add('ci-playing'); });
+        vid.addEventListener('playing', ()=>{ started = true; vidStarted = true; showCard.classList.add('ci-playing'); });
+        if (!first) vid.addEventListener('timeupdate', ()=>{ if (!titled && vid.currentTime >= FROM + VIDEO_MS / 1000) toTitle(); });   // (the short drop ends at 5.1 s of the video)
         vid.addEventListener('ended', toTitle);
         vid.addEventListener('error', ()=> toTitle());
         vid.addEventListener('timeupdate', ()=>{ if (!titled && vid.duration && vid.duration - vid.currentTime < 0.06) toTitle(); });
