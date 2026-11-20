@@ -17241,7 +17241,10 @@ const SHARE_URL = 'https://playflipstax.com';
     document.getElementById('outroScore').textContent = shownScore(r.score).toLocaleString();
     outroState = 'playing';
     outroLater(OUTRO_WATCHDOG_MS, ()=> outroEnd(true));   // (the watchdog: whatever happens, the buttons are there within 12 s)
-    const quiet = seenWin || isLite() || prefersReducedMotion() || (DEBUG_FAST && !REALTIME);   // (test runs and quiet modes: the poster, then the end state)
+    // polish2 item 4: the dance belongs to a WIN only. When the Word Warp was not won there is no video: after 'See you tomorrow' the score card comes in
+    // over a still of the new stage (data/stage/stage-still.webp, the drawn dance deck, no cast). A win keeps the dance's last frame (finale-b-poster.webp).
+    { const pe = document.getElementById('outroPoster'); if (pe){ const want = seenWin ? 'data/outro/finale-b-poster.webp' : 'data/stage/stage-still.webp'; if (pe.getAttribute('src') !== want) pe.setAttribute('src', want); } }
+    const quiet = true;   // (polish2 item 4: never the video here - a win has already played it, a loss gets none; the still, then the end state)
     // (lite mode / reduced motion in the studio ending: Flip stands still on his pad in front of the open doors for the hold - the same big Flip, same place, as
     // the normal ending, just not moving - instead of the doors being shut from the first frame with nobody there; then the results over the closed doors as before)
     if (quiet){ o.classList.add(OUTRO_STUDIO && !(DEBUG_FAST && !REALTIME) ? 'still' : 'poster-on'); outroLater(DEBUG_FAST && !REALTIME ? 300 : OUTRO_FALLBACK_MS, ()=> outroEnd(false)); return; }
