@@ -13532,9 +13532,12 @@ const SHARE_URL = 'https://playflipstax.com';
   // `remainMs` of `totalMs` left.
   // The last three seconds of a countdown tick (a Brain Beam, a Brain Break, a VS card with a timer).
   let countTicks = [];
+  // polish2 item 2: the VS board deals a round behind the menus too (its round timer runs and times out every ~6 s, round after round), and its
+  // last-three-seconds ticks played over the Play Today screen like a metronome. No countdown tick while a menu, the landing or the results cover the board.
+  function menuCovers(){ return ['homeOverlay', 'modeSelectOverlay', 'readoutOverlay'].some(id=>{ const e = document.getElementById(id); return e && !e.classList.contains('hidden'); }); }
   function scheduleLastTicks(remainMs, still){
     countTicks.forEach(clearTimeout); countTicks = [];
-    [3, 2, 1].forEach(sec=>{ const at = remainMs - sec * 1000; if (at >= 0) countTicks.push(setTimeout(()=>{ if (still()) sfx.tick(sec === 1); }, at)); });
+    [3, 2, 1].forEach(sec=>{ const at = remainMs - sec * 1000; if (at >= 0) countTicks.push(setTimeout(()=>{ if (still() && !menuCovers()) sfx.tick(sec === 1); }, at)); });
   }
   function eventCountdownLive(){
     const ov = els.eventOverlay;
