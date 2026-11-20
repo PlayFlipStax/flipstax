@@ -4507,15 +4507,15 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 @keyframes cinDiskIn{ from{ opacity:0; } to{ opacity:0.95; } }
 @keyframes cinDiskTurn{ from{ rotate:0deg; } to{ rotate:-360deg; } }
 .cin-halo{ background:url(../data/blackhole/halo.webp) center / 100% 100% no-repeat; opacity:0; }
-.cin.bh-on .cin-halo{ animation:cinHalo 1.2s ease-out 0.15s forwards, cinHaloBreathe 2.6s ease-in-out 1.4s infinite alternate; }
+.cin.bh-on .cin-halo{ animation:cinHalo 0.7s ease-out forwards, cinHaloBreathe 2.6s ease-in-out 0.8s infinite alternate; }   /* (hiccup fix: the glow comes with the hole - it used to lag, leaving a bare black dot for half a second) */
 @keyframes cinHalo{ from{ opacity:0; transform:scale(0.92); } to{ opacity:1; transform:scale(1); } }
 @keyframes cinHaloBreathe{ from{ transform:scale(1); } to{ transform:scale(1.025); } }
 .cin-grow > i.cin-core{ width:calc(104vmin * 200 / 512); height:calc(104vmin * 200 / 512); margin:calc(104vmin * -100 / 512) 0 0 calc(104vmin * -100 / 512); border-radius:50%; background:#000; }
 .cin-ring{ background:url(../data/blackhole/ring.webp) center / 100% 100% no-repeat; opacity:0; }
-.cin.bh-on .cin-ring{ animation:cinRingIn 0.9s ease-out 0.3s forwards; }
+.cin.bh-on .cin-ring{ animation:cinRingIn 0.5s ease-out forwards; }
 @keyframes cinRingIn{ from{ opacity:0; } to{ opacity:1; } }
 .cin-band{ background:url(../data/blackhole/band.webp) center / 100% 100% no-repeat; opacity:0; }
-.cin.bh-on .cin-band{ animation:cinRingIn 1.1s ease-out 0.25s forwards; }
+.cin.bh-on .cin-band{ animation:cinRingIn 0.6s ease-out forwards; }
 /* debris: a few bright sparks pulled in on spiral paths (each a turning arm with a spark sliding in along it) */
 .cin-debris{ position:absolute; left:0; top:0; width:0; height:0; }
 .cin-debris > i{ position:absolute; left:0; top:0; width:0; height:0; }
@@ -4550,6 +4550,7 @@ body:has(.test-tag) .help-btn{ bottom:calc(34px + env(safe-area-inset-bottom)); 
 .cin-card{ z-index:625 !important; }
 /* the dance fades in under the ball (it is opaque once 'on') */
 .ww-fin.cin-dance{ opacity:0; transition:opacity 0.5s ease; } .ww-fin.cin-dance.on{ opacity:1; }
+.ww-fin.cin-dance.held{ background:#000 url(../data/outro/finale-b-poster.webp) center / cover no-repeat; }   /* (the dance's last frame, under the video while it is released - no black frame) */
 /* THE DISCO BALL AND ITS LIGHTS (the old disco scene's mirrored-tile ball, .dc-ball / .dc-facets in flipstax.html, reused) */
 .cin-disco{ position:fixed; inset:0; z-index:640; pointer-events:none; overflow:hidden; transition:opacity 0.6s ease; }
 .cin-disco.out{ opacity:0; }

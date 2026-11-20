@@ -7684,6 +7684,7 @@ const SHARE_URL = 'https://playflipstax.com';
       if (back === 'alt') setTimeout(altArm, 600);
     } else playTrack(back);
   }
+  if (DEBUG_FAST || REPLAY) window.__mg = ()=> musicGain ? +musicGain.gain.value.toFixed(3) : null;   // (tests: the music level, to check the ducks)
   if (DEBUG_FAST || REPLAY) window.__trk = ()=> currentTrackKey + (trackEls[currentTrackKey] ? ':' + (trackEls[currentTrackKey].currentSrc || '').split('/').pop() + (trackEls[currentTrackKey].paused ? '(paused)' : '') : '');
   // The secret riddle has its own track: the Daily theme stops (keeping its
   // place) while the riddle is up and carries on from there afterwards,
@@ -16779,7 +16780,7 @@ const SHARE_URL = 'https://playflipstax.com';
     const still = FX.reduced() || isLite() || !Element.prototype.animate, ov = els.solveOverlay;
     const W = innerWidth, H = innerHeight, cx = W / 2, cy = H / 2;
     const timers = [], anims = [], later = (fn, ms)=>{ const id = setTimeout(fn, ms); timers.push(id); return id; };
-    let ended = false, vid = null, vidLayer = null, onSkip = null, srcNode = null, danced = false, rumbleStop = null, cin = null;
+    let ended = false, vid = null, vidLayer = null, onSkip = null, srcNode = null, vidGain = null, danced = false, rumbleStop = null, cin = null;
     const points = runWarpPoints || 0, scoreEl = els.runBanner && els.runBanner.querySelector('.sp-num'), to = shownScore(runScore);
     if (scoreEl) scoreEl.textContent = to.toLocaleString();
     // the WARPED IT! card (the word and the points) - at the big bang, or alone (lite, reduced motion)
@@ -16797,8 +16798,11 @@ const SHARE_URL = 'https://playflipstax.com';
       if (CIN_BIG_BANG && (!still || CIN_LITE_STAGE)) cinDiscoOn(still);   // (the ball and the spots stay on through the goodbye; they fade when the score card comes up)
       const top = vidLayer || card;
       // stability: the video is released completely (paused, source removed, load(), element removed) BEFORE the goodbye and the results are built;
-      // the black layer stays up over the gap and then fades away over the goodbye
-      releaseVid();
+      // (hiccup fix: the layer behind it shows the dance's own last frame - finale-b-poster.webp - so the release never shows a black frame, and the
+      // video's sound fades over 0.12 s first instead of cutting off on a skip)
+      if (vidLayer) vidLayer.classList.add('held');
+      if (vidGain && audioCtx){ try{ const g = vidGain.gain, t = audioCtx.currentTime; g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(0.0001, t + 0.12); }catch(e){} }
+      const rel = releaseVid; setTimeout(rel, vidGain ? 130 : 0);
       document.documentElement.classList.remove('ww-fin-mem', 'cin-stage');
       duckMusic(1, 700);   // (the music back to full for the goodbye and the results)
       const gap = vidLayer && !still ? 140 : 0;
@@ -16857,6 +16861,7 @@ const SHARE_URL = 'https://playflipstax.com';
       document.body.appendChild(card); fitWord();
       const wd = card.querySelector('.ww-mega-word'), pt = card.querySelector('.ww-mega-pts');
       wd.animate([{ transform:'translate(-50%,-50%) scale(0.3)', opacity:0 }, { transform:'translate(-50%,-50%) scale(1.12)', opacity:1, offset:0.6 }, { transform:'translate(-50%,-50%) scale(1)', opacity:1 }], { duration:600, delay:250, easing:'ease-out', fill:'both' });
+      pt.animate([{ opacity:0 }, { opacity:1 }], { duration:300, delay:400, fill:'both' });   // (hiccup fix: the points come in with the word - '+0 pts' used to show alone first)
       if (points){ const t0 = performance.now() + 250; (function f(now){ if (ended || !pt.isConnected) return; const k = Math.max(0, Math.min(1, (now - t0) / 1200)); pt.textContent = '+' + Math.round(points * (1 - Math.pow(1 - k, 3))) + ' pts'; if (k < 1) requestAnimationFrame(f); })(performance.now()); }
     }, CIN.BANG);
     if (CIN_BIG_BANG){
@@ -16875,15 +16880,16 @@ const SHARE_URL = 'https://playflipstax.com';
       document.documentElement.classList.add('cin-stage');
       anims.forEach(a=>{ try{ a.cancel(); }catch(e){} }); ov.style.transform = '';
       if (card.isConnected && skipped) card.remove();
+      else if (card.isConnected && card.animate){ const a = card.animate([{ opacity:getComputedStyle(card).opacity }, { opacity:0 }], { duration:300, fill:'forwards' }); a.onfinish = ()=> card.remove(); }   // (hiccup fix: a skip after the big bang used to leave WARPED IT! over the dancers until 9.1 s)
       if (cin){ const c = cin; cin = null; c.classList.add('gone'); setTimeout(()=> c.remove(), 450); }
       vidLayer = document.createElement('div'); vidLayer.className = 'ww-fin cin-dance'; vidLayer.appendChild(vid);
       const skip = document.createElement('button'); skip.type = 'button'; skip.className = 'ww-fin-skip'; skip.textContent = 'TAP TO SKIP'; vidLayer.appendChild(skip);
       document.body.appendChild(vidLayer);
       // its sound: at the sound-effect volume (through the effects gain when it is running - a phone ignores a video's own volume); the music stays, low
       vid.muted = !sfxOn;
-      try{ const ctx = sfxOn ? getAudioCtx() : null; if (ctx && masterGain && ctx.state === 'running'){ srcNode = ctx.createMediaElementSource(vid); srcNode.connect(masterGain); vid.volume = 1; } else vid.volume = Math.max(0, Math.min(1, sfxVol)); }catch(e){ vid.volume = Math.max(0, Math.min(1, sfxVol)); }
+      try{ const ctx = sfxOn ? getAudioCtx() : null; if (ctx && masterGain && ctx.state === 'running'){ srcNode = ctx.createMediaElementSource(vid); vidGain = ctx.createGain(); srcNode.connect(vidGain); vidGain.connect(masterGain); vid.volume = 1; } else vid.volume = Math.max(0, Math.min(1, sfxVol)); }catch(e){ vid.volume = Math.max(0, Math.min(1, sfxVol)); }
       if (CIN_MUSIC_LOW) duckMusic(0.25, 800, null); else pauseAllTracks();   // (item 15: the music stays, low, under the dance)
-      vid.dataset.go = '1'; try{ vid.currentTime = 0; }catch(e){}
+      vid.dataset.go = '1';
       // the finale must always reach the goodbye: if the clip errors, is refused, has not started 1.5 s after the cue, or freezes, the old
       // hand-drawn disco scene plays instead, then on to the goodbye
       let started = false, fellBack = false, lastT = -1, lastMove = performance.now();
@@ -16893,15 +16899,21 @@ const SHARE_URL = 'https://playflipstax.com';
         if (!ok) later(finish, 10000);
         later(finish, 12500); };
       const mark = ()=>{ if (vid && vid.currentTime > 0.05){ started = true; WW_FINALE_PLAYED = true; } };
-      vid.addEventListener('playing', ()=>{ lastMove = performance.now(); vidLayer && vidLayer.classList.add('on'); later(()=>{ if (!ended) document.documentElement.classList.add('ww-fin-mem'); }, 520); });
+      vid.addEventListener('playing', ()=>{ lastMove = performance.now(); const L = vidLayer; if (L){ void L.offsetWidth; requestAnimationFrame(()=> requestAnimationFrame(()=> L.classList.add('on'))); } later(()=>{ if (!ended) document.documentElement.classList.add('ww-fin-mem'); }, 600); });   // (hiccup fix: 'on' a frame after the layer is painted, so the stage really fades to the dance - it used to pop in)
       vid.addEventListener('timeupdate', mark);
       const watch = setInterval(()=>{ if (ended || fellBack || !vid){ clearInterval(watch); return; }
         const t = vid.currentTime; if (t !== lastT){ lastT = t; lastMove = performance.now(); }
         else if (started && vid && !vid.ended && performance.now() - lastMove > 1500) fail();
       }, 400);
       later(()=>{ if (vid && !started && !vid.ended) fail(); }, 1500);
-      const pr = vid.play();
-      if (pr && pr.catch) pr.catch(()=>{ if (ended || fellBack) return; try{ vid.muted = true; const p2 = vid.play(); if (p2 && p2.catch) p2.catch(fail); }catch(e){ fail(); } });
+      // (hiccup fix: the unlock at the winning tap can leave the clip a few hundredths in; it is rewound BEFORE it plays - a rewind while playing landed
+      // 0.1-0.2 s into the dance and made it jump)
+      let playing = false;
+      const startPlay = ()=>{ if (playing || ended || fellBack) return; playing = true;
+        const pr = vid.play();
+        if (pr && pr.catch) pr.catch(()=>{ if (ended || fellBack) return; try{ vid.muted = true; const p2 = vid.play(); if (p2 && p2.catch) p2.catch(fail); }catch(e){ fail(); } }); };
+      try{ vid.pause(); }catch(e){}
+      if (vid.currentTime > 0.02){ vid.addEventListener('seeked', startPlay, { once:true }); later(startPlay, 400); try{ vid.currentTime = 0; }catch(e){ startPlay(); } } else startPlay();
       vid.addEventListener('error', fail);
       vid.addEventListener('ended', ()=>{ if (!fellBack) finish(); });
       later(finish, 12000);   // (a safety net: the clip is 10 s)
