@@ -16721,97 +16721,187 @@ const SHARE_URL = 'https://playflipstax.com';
   // Lite and reduced motion: a still WARPED IT! card for 2 s, then the goodbye. If the video cannot play, the same still card.
   const WW_FINALE_SRC = 'data/outro/finale-b.mp4';   // (fix pass item 1: the winning ending was still this old 7 s dance video (media/ww-finale-540.mp4, filmed on the old stage; the file stays) - it now plays the new 10 s finale on the dance deck, the same file the results ending uses; WW_FINALE_PLAYED tells the results not to play it a second time)
   let WW_FINALE_PLAYED = false;
+  // ---- polish2 items 13-15: THE WINNING CINEMATIC (replaces the 2 s pull-in and flash). From the winning answer to the dance, about 9.4 s, skippable
+  // anywhere (a tap jumps straight to the dance):
+  //   0.0 s  the win sound (item 12) and the lit letters; the music ducks under the black hole
+  //   0.4    THE BLACK HOLE (4.8 s): a dark core grows with a glowing accretion disc and a photon ring; two spirals of light streaks turn and are pulled
+  //          inward; the stars stretch toward the centre; the board, tiles, keys, logo and banners shrink and spin into the centre one after another; a
+  //          slow camera push-in (the Word Warp screen scales up); a low rumble rises with it (Web Audio, on the same clock)
+  //   5.2    the core collapses to a point; the rumble stops
+  //   5.5    half a second of silence on black
+  //   6.0    THE BIG BANG: one soft white bloom (opacity ramped up and down - one flash, never a strobe), a shockwave ring, 30 sparkles flying out;
+  //          the bloom clears onto the lit new stage; WARPED IT! and the points
+  //   6.15   a DISCO BALL forms in the centre of the burst (the old disco scene's mirrored-tile ball, reused), then rises to the top on a thin line and
+  //          spins slowly, with three small glints; soft coloured spots (cyan, pink, gold, violet) start sweeping the floor, walls and pillars
+  //   9.4    the dance (finale-b.mp4) fades in under the ball and the spots; the music comes back low under it
+  // The ball and the spots stay through the dance and SEE YOU TOMORROW and fade when the score card comes up (cinDiscoOff in startOutro). Pre-rendered
+  // gradients and SVG, transform and opacity only (lib/juice.css WINNING CINEMATIC). Lite and reduced motion: a quick fade to the lit stage with the
+  // still ball and WARPED IT! for 1.4 s, no spirals, particles or moving lights, then the goodbye as before.
+  const CIN = { BH:400, COLLAPSE:5200, BANG:6000, BALL:6150, RISE:6900, SPOTS:7200, CARD_OFF:8600, DANCE:9400 };
+  // (the three parts, one per change: item 14 the big bang and the disco ball, item 15 the lite / reduced-motion stage version and the music under it)
+  const CIN_BIG_BANG = false, CIN_LITE_STAGE = false, CIN_MUSIC_LOW = false;
+  let cinDisco = null, cinDiscoT = 0;
+  function cinDiscoOn(still){
+    if (cinDisco && cinDisco.isConnected) return cinDisco;
+    const d = document.createElement('div'); d.className = 'cin-disco' + (still ? ' still' : ''); d.setAttribute('aria-hidden', 'true');
+    d.innerHTML = '<div class="cin-spots"><i class="c1"></i><i class="c2"></i><i class="c3"></i><i class="c4"></i></div>' +
+      '<div class="cin-rig"><i class="cin-line"></i><div class="cin-ballwrap"><div class="dc-ball"><i class="dc-facets"></i></div><b class="g1"></b><b class="g2"></b><b class="g3"></b></div></div>';
+    document.body.appendChild(d); cinDisco = d;
+    if (window.Stage) Stage.cue('close', { z:-3, sign:{ sub:'', main:'' }, until:()=> !!d.isConnected && !d.classList.contains('out') });   // (the lit stage - the close shot, an empty sign - under everything while the ball is up)
+    clearTimeout(cinDiscoT); cinDiscoT = setTimeout(cinDiscoOff, 90000);   // (a safety net: never left on screen)
+    return d;
+  }
+  function cinDiscoOff(){
+    clearTimeout(cinDiscoT); const d = cinDisco; cinDisco = null; if (!d || !d.isConnected) return;
+    d.classList.add('out'); setTimeout(()=> d.remove(), 700);
+  }
+  // the rumble under the black hole: low filtered noise and two low sines, rising together, cut at the collapse (the silence)
+  function cinRumble(ms){
+    let stop = ()=>{};
+    withSfxCtx((ctx, t)=>{
+      const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.5, t + ms / 1000); g.connect(ctx.destination);
+      const n = ctx.createBufferSource(); n.buffer = showNoise(ctx); n.loop = true; const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.setValueAtTime(70, t); lp.frequency.linearRampToValueAtTime(160, t + ms / 1000);
+      const ng = ctx.createGain(); ng.gain.value = 0.9; n.connect(lp); lp.connect(ng); ng.connect(g); n.start(t);
+      const os = [38, 55].map((f, i)=>{ const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.setValueAtTime(f, t); o.frequency.linearRampToValueAtTime(f * 1.35, t + ms / 1000); const og = ctx.createGain(); og.gain.value = i ? 0.25 : 0.45; o.connect(og); og.connect(g); o.start(t); return o; });
+      stop = (fade)=>{ try{ const now = ctx.currentTime; g.gain.cancelScheduledValues(now); g.gain.setValueAtTime(g.gain.value, now); g.gain.linearRampToValueAtTime(0.0001, now + (fade || 0.08)); n.stop(now + (fade || 0.08) + 0.05); os.forEach(o=> o.stop(now + (fade || 0.08) + 0.05)); }catch(e){} };
+    });
+    return (f)=> stop(f);
+  }
+  // the bloom's sound: a soft low 'whoomp' and a short high shimmer, quiet
+  function cinBloomSound(){
+    withSfxCtx((ctx, t)=>{
+      const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.42, t + 0.12); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.6); g.connect(ctx.destination);
+      const o = ctx.createOscillator(); o.type = 'sine'; o.frequency.setValueAtTime(70, t); o.frequency.exponentialRampToValueAtTime(32, t + 1.2); o.connect(g); o.start(t); o.stop(t + 1.7);
+      [1568, 2093, 2637, 3136].forEach((f, k)=>{ const s = ctx.createOscillator(), sg = ctx.createGain(); s.type = 'sine'; s.frequency.value = f; sg.gain.setValueAtTime(0.0001, t + 0.05 + k * 0.06); sg.gain.linearRampToValueAtTime(0.035, t + 0.12 + k * 0.06); sg.gain.exponentialRampToValueAtTime(0.0001, t + 1.4 + k * 0.1); s.connect(sg); sg.connect(ctx.destination); s.start(t + 0.05 + k * 0.06); s.stop(t + 1.6 + k * 0.1); });
+    });
+  }
   function wwFinaleWin(solvedAt, done){
     const still = FX.reduced() || isLite() || !Element.prototype.animate, ov = els.solveOverlay;
     const W = innerWidth, H = innerHeight, cx = W / 2, cy = H / 2;
     const timers = [], anims = [], later = (fn, ms)=>{ const id = setTimeout(fn, ms); timers.push(id); return id; };
-    let ended = false, vid = null, vidLayer = null, onSkip = null, srcNode = null;
+    let ended = false, vid = null, vidLayer = null, onSkip = null, srcNode = null, danced = false, rumbleStop = null, cin = null;
     const points = runWarpPoints || 0, scoreEl = els.runBanner && els.runBanner.querySelector('.sp-num'), to = shownScore(runScore);
     if (scoreEl) scoreEl.textContent = to.toLocaleString();
-    // the WARPED IT! card (the word and the points) - over the video, or alone (lite, reduced motion, no video)
-    const card = document.createElement('div'); card.className = 'ww-fin-card'; card.setAttribute('aria-live', 'polite');
+    // the WARPED IT! card (the word and the points) - at the big bang, or alone (lite, reduced motion)
+    const card = document.createElement('div'); card.className = 'ww-fin-card cin-card'; card.setAttribute('aria-live', 'polite');
     card.innerHTML = '<b class="ww-mega-word">WARPED IT!</b><span class="ww-mega-pts">' + (points ? '+' + points + ' pts' : '') + '</span>';
-    const fitWord = ()=>{ const w = card.querySelector('.ww-mega-word'); let fs = 100; w.style.fontSize = fs + 'px'; for (let k = 0; k < 3; k++){ const ww = w.scrollWidth || w.getBoundingClientRect().width; if (!ww) break; fs = fs * W * 0.88 / ww; w.style.fontSize = fs.toFixed(1) + 'px'; } };
+    const fitWord = ()=>{ const w = card.querySelector('.ww-mega-word'); let fs = 100; w.style.fontSize = fs + 'px'; for (let k = 0; k < 3; k++){ const ww = w.scrollWidth || w.getBoundingClientRect().width; if (!ww) break; fs = fs * W * 0.88 / ww; w.style.fontSize = Math.max(28, Math.min(150, fs)) + 'px'; } };
+    const releaseVid = ()=>{ if (vid){ try{ vid.pause(); }catch(e){} try{ if (srcNode) srcNode.disconnect(); }catch(e){} srcNode = null; vid.removeAttribute('src'); try{ vid.load(); }catch(e){} vid.remove(); vid = null; } };
     const finish = ()=>{
       if (ended) return; ended = true; timers.forEach(clearTimeout); anims.forEach(a=>{ try{ a.cancel(); }catch(e){} }); wwSpinRate(1);
+      if (rumbleStop){ rumbleStop(0.2); rumbleStop = null; }
       if (onSkip && vidLayer) vidLayer.removeEventListener('click', onSkip);
       const inner = ov.querySelector('.solve-inner'); if (inner) inner.style.opacity = '0';
-      ov.classList.remove('celebrating', 'ww-done'); ov.querySelectorAll('.ww-flash').forEach(n=> n.remove());
+      ov.classList.remove('celebrating', 'ww-done'); ov.querySelectorAll('.ww-flash').forEach(n=> n.remove()); ov.style.transform = ''; ov.style.opacity = '';
+      if (cin){ cin.remove(); cin = null; }
+      if (CIN_BIG_BANG && (!still || CIN_LITE_STAGE)) cinDiscoOn(still);   // (the ball and the spots stay on through the goodbye; they fade when the score card comes up)
       const top = vidLayer || card;
       // stability: the video is released completely (paused, source removed, load(), element removed) BEFORE the goodbye and the results are built;
       // the black layer stays up over the gap and then fades away over the goodbye
-      if (vid){ try{ vid.pause(); }catch(e){} try{ if (srcNode) srcNode.disconnect(); }catch(e){} srcNode = null; vid.removeAttribute('src'); try{ vid.load(); }catch(e){} vid.remove(); vid = null; }
-      document.documentElement.classList.remove('ww-fin-mem');
+      releaseVid();
+      document.documentElement.classList.remove('ww-fin-mem', 'cin-stage');
+      duckMusic(1, 700);   // (the music back to full for the goodbye and the results)
       const gap = vidLayer && !still ? 140 : 0;
       setTimeout(()=>{ done(); }, gap);   // (the goodbye and the results build underneath, then the black layer or the card fades away over them)
-      const gone = ()=>{ if (vid){ try{ vid.pause(); }catch(e){} try{ if (srcNode) srcNode.disconnect(); }catch(e){} vid.removeAttribute('src'); try{ vid.load(); }catch(e){} } if (vidLayer) vidLayer.remove(); card.remove(); };
+      const gone = ()=>{ releaseVid(); if (vidLayer) vidLayer.remove(); card.remove(); };
       if (top && top.animate && !still){ setTimeout(()=>{ const a = top.animate([{ opacity:1 }, { opacity:0 }], { duration:500, easing:'ease-in', fill:'forwards' }); a.onfinish = gone; setTimeout(gone, 700); }, gap + 120); } else gone();
     };
-    const stillCard = ()=>{ card.classList.add('still'); document.body.appendChild(card); fitWord(); later(finish, 2000); };
-    if (still){ ov.classList.add('ww-done'); const inner = ov.querySelector('.solve-inner'); if (inner) inner.style.opacity = '0'; { const ms = playWinSound(); duckMusic(0.3, 250, ms, 700); } stillCard(); return; }
-    // the video: made now (in the winning tap) and unlocked with a quick play / pause, so it may play with sound 2 s later
+    { const ms = playWinSound(); duckMusic(0.3, 250, still ? ms : null, 700); }   // (item 12: the big win sound, the music ducked under it)
+    // LITE / REDUCED MOTION: a quick fade to the lit stage, the still ball and WARPED IT! for 1.4 s, then the goodbye
+    if (still && !CIN_LITE_STAGE){ ov.classList.add('ww-done'); const inner = ov.querySelector('.solve-inner'); if (inner) inner.style.opacity = '0'; card.classList.add('still'); document.body.appendChild(card); fitWord(); later(finish, 2000); return; }   // (the old still card)
+    if (still){
+      ov.classList.add('ww-done'); const inner = ov.querySelector('.solve-inner'); if (inner) inner.style.opacity = '0';
+      wwTeardown(); ov.style.opacity = '0'; document.documentElement.classList.add('cin-stage');
+      cinDiscoOn(true); card.classList.add('still'); document.body.appendChild(card); fitWord(); later(finish, 1400); return;
+    }
+    // the video: made now (in the winning tap) and unlocked with a quick play / pause, so it may play with sound later
     vid = document.createElement('video'); vid.className = 'ww-fin-video'; vid.setAttribute('playsinline', ''); vid.playsInline = true; vid.preload = 'auto';
     vid.muted = !sfxOn; vid.src = WW_FINALE_SRC;
     try{ const pr = vid.play(); if (pr && pr.then) pr.then(()=>{ if (vid && !vid.dataset.go) try{ vid.pause(); vid.currentTime = 0; }catch(e){} }, ()=>{}); }catch(e){}
-    // 1. the real game, about 2 s: the spin-up, the lit letters, everything pulled into the centre, one flash
-    { const ms = playWinSound(); duckMusic(0.3, 250, ms, 700); }   // (polish2 item 12: the big win sound, the music ducked under it - was sfx.cheer())
+    // the black hole layer: tap anywhere to skip to the dance
+    cin = document.createElement('div'); cin.className = 'cin'; cin.setAttribute('aria-hidden', 'true');
+    let sparks = ''; for (let k = 0; k < 30; k++){ const a = (k / 30) * Math.PI * 2 + (k % 3) * 0.17, d = 0.22 + ((k * 37) % 23) / 23 * 0.42; sparks += '<i style="--dx:' + (Math.cos(a) * d * 100).toFixed(1) + 'vmax;--dy:' + (Math.sin(a) * d * 100).toFixed(1) + 'vmax;--dl:' + ((k % 5) * 40) + 'ms;--s:' + (0.6 + (k % 4) * 0.25).toFixed(2) + '"></i>'; }
+    cin.innerHTML = '<i class="cin-dark"></i><i class="cin-stars s1"></i><i class="cin-stars s2"></i><div class="cin-bh"><i class="cin-disc"></i><i class="cin-spiral p1"></i><i class="cin-spiral p2"></i><i class="cin-core"></i><i class="cin-ring"></i></div>' +
+      '<i class="cin-bloom"></i><i class="cin-wave"></i><div class="cin-sparks">' + sparks + '</div><button type="button" class="cin-skip">TAP TO SKIP</button>';
+    document.body.appendChild(cin);
+    const step = (cls, ms)=> later(()=>{ if (!ended && !danced && cin) cin.classList.add(cls); }, ms);
+    // 1. the lit letters, the spin-up
     wwSpinRate(5);
-    const planet = document.querySelector('#wwSky .wk-planet'); if (planet) anims.push(planet.animate([{ transform:'rotate(0deg) scale(1)' }, { transform:'rotate(720deg) scale(1.15)' }], { duration:1900, easing:'cubic-bezier(.5,0,.8,.6)', fill:'forwards' }));
     Array.from(els.solveSlots.children).forEach((s, k)=> later(()=> s.classList.add('ww-lit'), k * 70));
-    const pieces = [].concat(Array.from(els.solveSlots.children), Array.from(els.solveRack.children), Array.from(ov.querySelectorAll('.ww-logo .wl-t, .ww-logo .wl-swirl, .solve-buttons .daily-btn, .solve-attempts, .solve-header, .solve-bar, .solve-keyboard .solve-kb-key'))).filter(e=> e.getBoundingClientRect().width);
+    // 2. THE BLACK HOLE
+    later(()=>{ if (ended || danced) return; if (CIN_MUSIC_LOW) duckMusic(0.18, 600, null); rumbleStop = cinRumble(CIN.COLLAPSE - CIN.BH); }, CIN.BH);
+    step('bh-on', CIN.BH); step('skip-on', 1500);
+    { const planet = document.querySelector('#wwSky .wk-planet'); if (planet) anims.push(planet.animate([{ transform:'rotate(0deg) scale(1)' }, { transform:'rotate(900deg) scale(0.2)' }], { duration:CIN.COLLAPSE - CIN.BH, delay:CIN.BH, easing:'cubic-bezier(.5,0,.8,.6)', fill:'forwards' })); }
+    anims.push(ov.animate([{ transform:'scale(1)' }, { transform:'scale(1.12)' }], { duration:CIN.COLLAPSE - CIN.BH, delay:CIN.BH, easing:'ease-in', fill:'forwards' }));   // (the camera push-in)
+    const pieces = [].concat(Array.from(ov.querySelectorAll('.ww-logo .wl-t, .ww-logo .wl-swirl, .solve-header, .solve-bar, .solve-attempts')), Array.from(els.solveSlots.children), Array.from(els.solveRack.children), Array.from(ov.querySelectorAll('.solve-buttons .daily-btn, .solve-keyboard .solve-key')), [els.runBanner].filter(Boolean));
+    const span = 3400, n = pieces.length || 1;
     pieces.forEach((e, k)=>{
-      const r = e.getBoundingClientRect(), dx = cx - (r.left + r.width / 2), dy = cy - (r.top + r.height / 2), dir = dx >= 0 ? 1 : -1, d = 550 + (k * 23) % 260;
-      const mx = dx * 0.4 - dy * 0.3 * dir, my = dy * 0.4 + dx * 0.3 * dir;
-      anims.push(e.animate([{ transform:'translate(0,0) rotate(0deg) scale(1)', opacity:1 }, { transform:'translate(' + mx.toFixed(0) + 'px,' + my.toFixed(0) + 'px) rotate(' + (200 * dir) + 'deg) scale(0.7)', opacity:1, offset:0.5 },
-        { transform:'translate(' + dx.toFixed(0) + 'px,' + dy.toFixed(0) + 'px) rotate(' + (540 * dir) + 'deg) scale(0.05)', opacity:0 }], { duration:1000, delay:d, easing:'cubic-bezier(.45,0,.75,.9)', fill:'forwards' }));
+      const r = e.getBoundingClientRect(), dx = cx - (r.left + r.width / 2), dy = cy - (r.top + r.height / 2), dir = dx >= 0 ? 1 : -1, d = CIN.BH + 300 + Math.round(span * k / n) + (k * 37) % 180;
+      const mx = dx * 0.45 - dy * 0.35 * dir, my = dy * 0.45 + dx * 0.35 * dir;
+      anims.push(e.animate([{ transform:'translate(0,0) rotate(0deg) scale(1)', opacity:1 }, { transform:'translate(' + mx.toFixed(0) + 'px,' + my.toFixed(0) + 'px) rotate(' + (240 * dir) + 'deg) scale(0.6)', opacity:1, offset:0.55 },
+        { transform:'translate(' + dx.toFixed(0) + 'px,' + dy.toFixed(0) + 'px) rotate(' + (620 * dir) + 'deg) scale(0.02)', opacity:0 }], { duration:1300, delay:Math.min(d, CIN.COLLAPSE - 1300), easing:'cubic-bezier(.45,0,.75,.9)', fill:'forwards' }));
     });
-    const flash = document.createElement('i'); flash.className = 'ww-flash'; flash.setAttribute('aria-hidden', 'true'); document.body.appendChild(flash);
-    later(()=>{ anims.push(flash.animate([{ opacity:0 }, { opacity:1 }], { duration:160, easing:'ease-out', fill:'forwards' })); }, 1780);   // (the one bright flash)
-    // 2. the video, from the explosion, under the flash as it clears
-    later(()=>{
-      ov.classList.add('ww-done');
-      if (ended) return;
-      vidLayer = document.createElement('div'); vidLayer.className = 'ww-fin'; vidLayer.appendChild(vid);
+    // 3. the collapse, then silence
+    later(()=>{ if (ended || danced) return; if (rumbleStop){ rumbleStop(0.12); rumbleStop = null; } cin.classList.add('collapse'); }, CIN.COLLAPSE);
+    // 4. THE BIG BANG onto the lit stage
+    if (CIN_BIG_BANG) later(()=>{ if (ended || danced) return;
+      ov.classList.add('ww-done'); wwTeardown(); ov.style.opacity = '0'; document.documentElement.classList.add('cin-stage');   // (the Word Warp screen and the board are hidden under the bloom: the lit stage is behind them)
+      cin.classList.add('bang'); cinBloomSound();
+      document.body.appendChild(card); fitWord();
+      const wd = card.querySelector('.ww-mega-word'), pt = card.querySelector('.ww-mega-pts');
+      wd.animate([{ transform:'translate(-50%,-50%) scale(0.3)', opacity:0 }, { transform:'translate(-50%,-50%) scale(1.12)', opacity:1, offset:0.6 }, { transform:'translate(-50%,-50%) scale(1)', opacity:1 }], { duration:600, delay:250, easing:'ease-out', fill:'both' });
+      if (points){ const t0 = performance.now() + 250; (function f(now){ if (ended || !pt.isConnected) return; const k = Math.max(0, Math.min(1, (now - t0) / 1200)); pt.textContent = '+' + Math.round(points * (1 - Math.pow(1 - k, 3))) + ' pts'; if (k < 1) requestAnimationFrame(f); })(performance.now()); }
+    }, CIN.BANG);
+    if (CIN_BIG_BANG){
+      later(()=>{ if (ended || danced) return; cinDiscoOn(false).classList.add('form'); }, CIN.BALL);
+      later(()=>{ if (ended || danced || !cinDisco) return; cinDisco.classList.add('rise'); }, CIN.RISE);
+      later(()=>{ if (ended || danced || !cinDisco) return; cinDisco.classList.add('lights'); }, CIN.SPOTS);
+      later(()=>{ if (card.animate && card.isConnected) card.animate([{ opacity:1 }, { opacity:0 }], { duration:500, fill:'forwards' }); }, CIN.CARD_OFF);
+    }
+    // 5. THE DANCE: the video fades in under the ball and the spots
+    const toDance = ()=>{
+      if (ended || danced) return; danced = true;
+      if (rumbleStop){ rumbleStop(0.15); rumbleStop = null; }
+      const skipped = !cinDisco || !cinDisco.classList.contains('lights');
+      if (CIN_BIG_BANG){ const d = cinDiscoOn(false); d.classList.add('form', 'rise', 'lights'); if (skipped) d.classList.add('settled'); }
+      if (!ov.classList.contains('ww-done')){ ov.classList.add('ww-done'); wwTeardown(); ov.style.opacity = '0'; }
+      document.documentElement.classList.add('cin-stage');
+      anims.forEach(a=>{ try{ a.cancel(); }catch(e){} }); ov.style.transform = '';
+      if (card.isConnected && skipped) card.remove();
+      if (cin){ const c = cin; cin = null; c.classList.add('gone'); setTimeout(()=> c.remove(), 450); }
+      vidLayer = document.createElement('div'); vidLayer.className = 'ww-fin cin-dance'; vidLayer.appendChild(vid);
       const skip = document.createElement('button'); skip.type = 'button'; skip.className = 'ww-fin-skip'; skip.textContent = 'TAP TO SKIP'; vidLayer.appendChild(skip);
-      vidLayer.appendChild(card); document.body.appendChild(vidLayer); fitWord();
-      // its sound: at the sound-effect volume (through the effects gain when it is running - a phone ignores a video's own volume); the music pauses
+      document.body.appendChild(vidLayer);
+      // its sound: at the sound-effect volume (through the effects gain when it is running - a phone ignores a video's own volume); the music stays, low
       vid.muted = !sfxOn;
       try{ const ctx = sfxOn ? getAudioCtx() : null; if (ctx && masterGain && ctx.state === 'running'){ srcNode = ctx.createMediaElementSource(vid); srcNode.connect(masterGain); vid.volume = 1; } else vid.volume = Math.max(0, Math.min(1, sfxVol)); }catch(e){ vid.volume = Math.max(0, Math.min(1, sfxVol)); }
-      pauseAllTracks();
+      if (CIN_MUSIC_LOW) duckMusic(0.25, 800, null); else pauseAllTracks();   // (item 15: the music stays, low, under the dance)
       vid.dataset.go = '1'; try{ vid.currentTime = 0; }catch(e){}
-      wwTeardown();   // (stability: the Word Warp screen behind the video is dismantled - see wwTeardown)
-      // the finale must always reach the goodbye: if the clip errors, is refused, has not started 1.5 s after the flash, or freezes, the old
-      // hand-drawn disco scene (mirror ball, lights, dancers) plays instead, then on to the goodbye
+      // the finale must always reach the goodbye: if the clip errors, is refused, has not started 1.5 s after the cue, or freezes, the old
+      // hand-drawn disco scene plays instead, then on to the goodbye
       let started = false, fellBack = false, lastT = -1, lastMove = performance.now();
       const fail = ()=>{ if (ended || fellBack) return; fellBack = true; clearInterval(watch);
         try{ vid.pause(); }catch(e){} try{ if (srcNode) srcNode.disconnect(); }catch(e){} if (vidLayer){ vidLayer.remove(); vidLayer = null; }
-        card.remove(); if (flash.animate){ flash.animate([{ opacity:1 }, { opacity:0 }], { duration:300, fill:'forwards' }).onfinish = ()=> flash.remove(); } else flash.remove();
         const t7 = performance.now() + 10000; discoShownFor = null; let ok = false; try{ ok = discoCelebrate('ww-finale', ()=> later(finish, Math.max(0, t7 - performance.now()))); }catch(e){}
         if (!ok) later(finish, 10000);
-        later(finish, 12500); };   // (the scene runs the clip's length, 10 s; whatever happens the goodbye comes by 12.5 s)
+        later(finish, 12500); };
       const mark = ()=>{ if (vid && vid.currentTime > 0.05){ started = true; WW_FINALE_PLAYED = true; } };
-      vid.addEventListener('playing', ()=>{ lastMove = performance.now(); }); vid.addEventListener('timeupdate', mark);
+      vid.addEventListener('playing', ()=>{ lastMove = performance.now(); vidLayer && vidLayer.classList.add('on'); later(()=>{ if (!ended) document.documentElement.classList.add('ww-fin-mem'); }, 520); });
+      vid.addEventListener('timeupdate', mark);
       const watch = setInterval(()=>{ if (ended || fellBack || !vid){ clearInterval(watch); return; }
         const t = vid.currentTime; if (t !== lastT){ lastT = t; lastMove = performance.now(); }
-        else if (started && vid && !vid.ended && performance.now() - lastMove > 1500) fail();   // (froze part-way)
+        else if (started && vid && !vid.ended && performance.now() - lastMove > 1500) fail();
       }, 400);
-      later(()=>{ if (vid && !started && !vid.ended) fail(); }, 1300);   // (nothing playing 1.5 s after the flash)
+      later(()=>{ if (vid && !started && !vid.ended) fail(); }, 1500);
       const pr = vid.play();
-      if (pr && pr.catch) pr.catch(()=>{ if (ended || fellBack) return;
-        // refused with sound (a phone that wants a tap): try once more silent before giving up
-        try{ vid.muted = true; const p2 = vid.play(); if (p2 && p2.catch) p2.catch(fail); }catch(e){ fail(); } });
+      if (pr && pr.catch) pr.catch(()=>{ if (ended || fellBack) return; try{ vid.muted = true; const p2 = vid.play(); if (p2 && p2.catch) p2.catch(fail); }catch(e){ fail(); } });
       vid.addEventListener('error', fail);
       vid.addEventListener('ended', ()=>{ if (!fellBack) finish(); });
       later(finish, 12000);   // (a safety net: the clip is 10 s)
-      flash.animate([{ opacity:1 }, { opacity:0 }], { duration:450, easing:'ease-out', fill:'forwards' }).onfinish = ()=> flash.remove();
-      // WARPED IT! and the points over the first 2 s
-      const wd = card.querySelector('.ww-mega-word'), pt = card.querySelector('.ww-mega-pts');
-      wd.animate([{ transform:'translate(-50%,-50%) scale(0.3)', opacity:0 }, { transform:'translate(-50%,-50%) scale(1.15)', opacity:1, offset:0.6 }, { transform:'translate(-50%,-50%) scale(1)', opacity:1 }], { duration:550, easing:'ease-out', fill:'both' });
-      if (points){ const t0 = performance.now(); (function f(now){ if (ended || !pt.isConnected) return; const k = Math.min(1, (now - t0) / 1200); pt.textContent = '+' + Math.round(points * (1 - Math.pow(1 - k, 3))) + ' pts'; if (k < 1) requestAnimationFrame(f); })(t0); }
-      later(()=>{ if (card.animate) card.animate([{ opacity:1 }, { opacity:0 }], { duration:400, fill:'forwards' }); }, 2000);
-      // TAP TO SKIP after 1.5 s
       later(()=>{ skip.classList.add('on'); onSkip = (e)=>{ e.stopPropagation(); e.preventDefault(); finish(); }; vidLayer && vidLayer.addEventListener('click', onSkip); }, 1500);
-    }, 1950);
+    };
+    later(toDance, CIN_BIG_BANG ? CIN.DANCE : CIN.COLLAPSE + 450);
+    cin.addEventListener('click', (e)=>{ e.stopPropagation(); e.preventDefault(); if (cin && cin.classList.contains('skip-on')) toDance(); });
   }
   // stability (finale memory fix): when the finale video starts, everything of the Word Warp screen behind it is removed - the hyperspace starfield, the nebulae, the
   // planet, the constellations, the galaxy picture, the logo, the tiles and keys, and their animations - plus the landing picture, which is not needed any more.
@@ -16822,7 +16912,7 @@ const SHARE_URL = 'https://playflipstax.com';
       document.getAnimations().forEach(a=>{ const t = a.effect && a.effect.target; if (t && t.closest && t.closest('#solveOverlay, #wwSky, .ww-galaxy')) try{ a.cancel(); }catch(e){} });
       const sky = document.getElementById('wwSky'); if (sky) sky.remove();
       const gi = document.querySelector('.ww-galaxy i'); if (gi){ gi.style.backgroundImage = 'none'; gi.classList.remove('gal-pic'); gi.innerHTML = ''; delete gi.dataset.gal; gi.style.display = 'none'; }
-      document.documentElement.classList.add('ww-fin-mem');   // (the stage behind is hidden while the video plays; finish() brings it back before the goodbye)
+      // (polish2 items 13-15: the stage stays - the big bang clears onto it; it is hidden once the dance video covers it, see toDance)
       wwGalaxyUrl = null; wwGalaxyP = null;
       const logo = document.getElementById('wwLogo'); if (logo) logo.remove();
       [els.solveSlots, els.solveRack].forEach(e=>{ if (e) e.innerHTML = ''; });
@@ -17347,6 +17437,7 @@ const SHARE_URL = 'https://playflipstax.com';
   }
   function startOutro(r){
     stopOutro(); loadOutroPoster(); outroMount();
+    cinDiscoOff();   // (polish2 item 14: the disco ball and its light spots fade away as the score card comes up)
     const seenWin = WW_FINALE_PLAYED; WW_FINALE_PLAYED = false;   // (a win has just played this same finale video: the results come in over its last frame instead of playing it again)
     const o = document.getElementById('outro'), v = document.getElementById('outroVideo'); if (!o) return;
     // (solo pass: the old end-of-show group picture is not loaded any more - its box has been hidden since the blue-curtain ending; the file stays)   // (the end-of-show picture, loaded when the outro starts)
