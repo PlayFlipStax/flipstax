@@ -16821,7 +16821,9 @@ const SHARE_URL = 'https://playflipstax.com';
     // the black hole layer: tap anywhere to skip to the dance
     cin = document.createElement('div'); cin.className = 'cin'; cin.setAttribute('aria-hidden', 'true');
     let sparks = ''; for (let k = 0; k < 30; k++){ const a = (k / 30) * Math.PI * 2 + (k % 3) * 0.17, d = 0.22 + ((k * 37) % 23) / 23 * 0.42; sparks += '<i style="--dx:' + (Math.cos(a) * d * 100).toFixed(1) + 'vmax;--dy:' + (Math.sin(a) * d * 100).toFixed(1) + 'vmax;--dl:' + ((k % 5) * 40) + 'ms;--s:' + (0.6 + (k % 4) * 0.25).toFixed(2) + '"></i>'; }
-    cin.innerHTML = '<i class="cin-dark"></i><i class="cin-stars s1"></i><i class="cin-stars s2"></i><div class="cin-bh"><i class="cin-disc"></i><i class="cin-spiral p1"></i><i class="cin-spiral p2"></i><i class="cin-core"></i><i class="cin-ring"></i></div>' +
+    let debris = ''; for (let k = 0; k < 9; k++) debris += '<i style="--a:' + (k * 40 + (k % 3) * 13) + 'deg;--d:' + (1.7 + (k % 4) * 0.35).toFixed(2) + 's;--dl:' + (-(k * 0.37)).toFixed(2) + 's"><b></b></i>';
+    cin.innerHTML = '<i class="cin-dark"></i><i class="cin-stars s1"></i><i class="cin-stars s2"></i><i class="cin-vig"></i>' +
+      '<div class="cin-bh"><div class="cin-grow"><div class="cin-tilt"><i></i></div><i class="cin-halo"></i><i class="cin-core"></i><i class="cin-ring"></i><i class="cin-band"></i><div class="cin-debris">' + debris + '</div></div></div>' +
       '<i class="cin-bloom"></i><i class="cin-wave"></i><div class="cin-sparks">' + sparks + '</div><button type="button" class="cin-skip">TAP TO SKIP</button>';
     document.body.appendChild(cin);
     const step = (cls, ms)=> later(()=>{ if (!ended && !danced && cin) cin.classList.add(cls); }, ms);
@@ -16833,13 +16835,18 @@ const SHARE_URL = 'https://playflipstax.com';
     step('bh-on', CIN.BH); step('skip-on', 1500);
     { const planet = document.querySelector('#wwSky .wk-planet'); if (planet) anims.push(planet.animate([{ transform:'rotate(0deg) scale(1)' }, { transform:'rotate(900deg) scale(0.2)' }], { duration:CIN.COLLAPSE - CIN.BH, delay:CIN.BH, easing:'cubic-bezier(.5,0,.8,.6)', fill:'forwards' })); }
     anims.push(ov.animate([{ transform:'scale(1)' }, { transform:'scale(1.12)' }], { duration:CIN.COLLAPSE - CIN.BH, delay:CIN.BH, easing:'ease-in', fill:'forwards' }));   // (the camera push-in)
+    { const kf = []; for (let k = 0; k <= 40; k++){ const amp = 0.3 + 4.2 * Math.pow(k / 40, 1.6), a = k * 2.399; kf.push({ transform:'translate(' + (Math.cos(a) * amp).toFixed(2) + 'px,' + (Math.sin(a * 1.3) * amp).toFixed(2) + 'px)' }); }
+      kf[40] = { transform:'translate(0px,0px)' };   // (a tiny rising shake - a few pixels, transform only - on the black hole and the screen falling into it)
+      [cin.querySelector('.cin-bh'), ov.querySelector('.solve-inner')].filter(Boolean).forEach(el=> anims.push(el.animate(kf, { duration:CIN.COLLAPSE - CIN.BH, delay:CIN.BH, easing:'linear', fill:'none' }))); }
     const pieces = [].concat(Array.from(ov.querySelectorAll('.ww-logo .wl-t, .ww-logo .wl-swirl, .solve-header, .solve-bar, .solve-attempts')), Array.from(els.solveSlots.children), Array.from(els.solveRack.children), Array.from(ov.querySelectorAll('.solve-buttons .daily-btn, .solve-keyboard .solve-key')), [els.runBanner].filter(Boolean));
     const span = 3400, n = pieces.length || 1;
     pieces.forEach((e, k)=>{
       const r = e.getBoundingClientRect(), dx = cx - (r.left + r.width / 2), dy = cy - (r.top + r.height / 2), dir = dx >= 0 ? 1 : -1, d = CIN.BH + 300 + Math.round(span * k / n) + (k * 37) % 180;
-      const mx = dx * 0.45 - dy * 0.35 * dir, my = dy * 0.45 + dx * 0.35 * dir;
-      anims.push(e.animate([{ transform:'translate(0,0) rotate(0deg) scale(1)', opacity:1 }, { transform:'translate(' + mx.toFixed(0) + 'px,' + my.toFixed(0) + 'px) rotate(' + (240 * dir) + 'deg) scale(0.6)', opacity:1, offset:0.55 },
-        { transform:'translate(' + dx.toFixed(0) + 'px,' + dy.toFixed(0) + 'px) rotate(' + (620 * dir) + 'deg) scale(0.02)', opacity:0 }], { duration:1300, delay:Math.min(d, CIN.COLLAPSE - 1300), easing:'cubic-bezier(.45,0,.75,.9)', fill:'forwards' }));
+      const mx = dx * 0.45 - dy * 0.35 * dir, my = dy * 0.45 + dx * 0.35 * dir, th = Math.atan2(dy, dx) * 180 / Math.PI;
+      // (black hole look: each piece is stretched along its fall toward the centre and squashed across it - rotate to the fall line, scale, rotate back - more and more as it nears the hole)
+      const T = (x, y, sx, sy, spin)=> 'translate(' + x.toFixed(0) + 'px,' + y.toFixed(0) + 'px) rotate(' + th.toFixed(1) + 'deg) scale(' + sx + ',' + sy + ') rotate(' + (spin - th).toFixed(1) + 'deg)';
+      anims.push(e.animate([{ transform:T(0, 0, 1, 1, th), opacity:1 }, { transform:T(mx * 0.5, my * 0.5, 1.12, 0.9, th + 70 * dir), opacity:1, offset:0.3 }, { transform:T(mx, my, 1.55, 0.55, th + 240 * dir), opacity:1, offset:0.6 },
+        { transform:T(dx, dy, 2.6, 0.06, th + 620 * dir), opacity:0 }], { duration:1300, delay:Math.min(d, CIN.COLLAPSE - 1300), easing:'cubic-bezier(.45,0,.75,.9)', fill:'forwards' }));
     });
     // 3. the collapse, then silence
     later(()=>{ if (ended || danced) return; if (rumbleStop){ rumbleStop(0.12); rumbleStop = null; } cin.classList.add('collapse'); }, CIN.COLLAPSE);
