@@ -7284,7 +7284,13 @@ const SHARE_URL = 'https://playflipstax.com';
     { name:'Meteor Mayhem',     src:'audio/alt/meteor-mayhem.mp3',     lead:0.06, out:176.75 },   // (Victory_Lap.mp3)
   ];
   const MUSIC_PICK_KEY = 'flipstax_music_pick_v1';
-  let altPick = (()=>{ const v = parseInt(lsGet(MUSIC_PICK_KEY), 10); return v >= 0 && v < ALT_SONGS.length ? v : -1; })();   // (-1: Flip's Theme)
+  // polish2 item 11: Cosmic Cruise (ALT_SONGS[1]) is the gameplay music by default, in place of Flip's Theme (Top Score Carousel, the run's own track,
+  // which stays in the project). It plays through the picker's seamless two-element loop (lead / out), so the file's tail silence never plays.
+  // Flip's Theme: ?music=flip (any host), or picking it in the speaker panel (saved as -1). Loudness: Cosmic Cruise measures -14.7 dBFS RMS against
+  // Top Score Carousel's -14.9, so it plays at the same MUSIC_VOLUME with no trim. Mute, the volume and 'a tap first' apply as before.
+  const DEFAULT_GAME_SONG = 1;   // (Cosmic Cruise)
+  const MUSIC_PARAM = (()=>{ try{ return new URLSearchParams(location.search).get('music'); }catch(e){ return null; } })();
+  let altPick = (()=>{ if (MUSIC_PARAM === 'flip') return -1; const raw = lsGet(MUSIC_PICK_KEY); if (raw == null) return DEFAULT_GAME_SONG; const v = parseInt(raw, 10); return v >= 0 && v < ALT_SONGS.length ? v : -1; })();   // (-1: Flip's Theme)
   const altEls = [null, null]; let altCur = 0, altT = 0, altSrcIdx = -1;
   function altEl(k){
     if (altSrcIdx !== altPick){ altEls.forEach(a=>{ if (a){ try{ a.pause(); a.removeAttribute('src'); a.load(); }catch(e){} } }); altEls[0] = altEls[1] = null; altSrcIdx = altPick; altCur = 0; }
