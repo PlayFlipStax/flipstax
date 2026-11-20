@@ -11991,6 +11991,7 @@ const SHARE_URL = 'https://playflipstax.com';
     const danceParty = (then)=>{
       const v = document.createElement('div'); v.className = 'mw-dance'; v.innerHTML = '<video src="data/wheel/dance-party-a.mp4" playsinline autoplay muted preload="auto"></video><div class="mw-dance-skip">TAP TO SKIP</div>';
       document.body.appendChild(v); const vid = v.querySelector('video'), t0 = performance.now(); vid.muted = !sfxOn; vid.volume = Math.max(0, Math.min(1, masterVol));
+      const on = ()=> v.classList.add('on'); vid.addEventListener('playing', on, { once:true }); setTimeout(on, 900);   // (polish2 item 10: it fades in once the picture is moving - no black frame first)
       let over = false;
       // mega 3 item 9: the party fades out smoothly (the picture over 0.9 s and the sound with it) instead of cutting off; the wheel is already behind it
       const end = ()=>{ if (over) return; over = true; clearTimeout(cap); const still = isLite() || FX.reduced(), ms = still ? 300 : 900; v.style.transition = 'opacity ' + ms + 'ms ease-in-out'; void v.offsetWidth; v.classList.add('out');
@@ -14416,21 +14417,24 @@ const SHARE_URL = 'https://playflipstax.com';
     d.innerHTML = '<video class="odj-video" muted playsinline preload="auto" disablepictureinpicture aria-hidden="true"></video><i class="odj-veil"></i><div class="dc-spots">' + spots + '</div>' +
       '<button type="button" class="odj-skip">TAP TO SKIP</button>';   // (no mirror ball over the dancers' faces)
     const vid = d.querySelector('video'); vid.muted = true; vid.playsInline = true;
-    document.body.appendChild(d); document.documentElement.classList.add('ww-fin-mem');   // (stability: the stage's big pictures are hidden while the dance video plays)
+    document.body.appendChild(d);
+    // polish2 item 10: the stage (its dancers, its sweep) is hidden only once this layer is fully over it, so nothing pops out underneath while it fades in
+    const hideStage = ()=>{ if (!over) document.documentElement.classList.add('ww-fin-mem'); };   // (stability: the stage's big pictures are hidden while the dance video plays)
+    const showOn = ()=>{ if (over || d.classList.contains('on')) return; d.classList.add('on'); timers.push(setTimeout(hideStage, 340)); };
     marquee.classList.remove('strobe'); marquee.classList.add('disco'); marquee.classList.toggle('still', still);
     let over = false; const t0 = performance.now(), timers = [];
     const end = ()=>{ if (over) return; over = true; document.documentElement.classList.remove('ww-fin-mem'); timers.forEach(clearTimeout); marquee.classList.remove('disco', 'still'); d.classList.add('out');
-      try{ vid.pause(); }catch(e){} vid.removeAttribute('src'); try{ vid.load(); }catch(e){}   // (the video is released at once; only the empty layer fades)
-      setTimeout(()=>{ d.remove(); }, 350); if (done) done(); };
+      try{ vid.pause(); }catch(e){}   // (polish2 item 10: the paused last frame fades out with the layer - it used to be unloaded first, so the fade showed a black frame)
+      setTimeout(()=>{ vid.removeAttribute('src'); try{ vid.load(); }catch(e){} d.remove(); }, 360); if (done) done(); };
     const fallback = ()=>{ if (over) return; over = true; document.documentElement.classList.remove('ww-fin-mem'); timers.forEach(clearTimeout); marquee.classList.remove('disco', 'still'); try{ vid.pause(); }catch(e){} vid.removeAttribute('src'); d.remove(); discoShownFor = null; discoCelebrate('mothership', done); };
     d.addEventListener('click', (e)=>{ e.stopPropagation(); if (performance.now() - t0 >= 1000) end(); });
     vid.addEventListener('error', fallback);
-    if (still){ vid.preload = 'metadata'; vid.src = OD_DANCE_SRC + '#t=3'; requestAnimationFrame(()=> d.classList.add('on')); timers.push(setTimeout(end, 2500)); return; }
+    if (still){ vid.preload = 'metadata'; vid.src = OD_DANCE_SRC + '#t=3'; vid.addEventListener('loadeddata', showOn, { once:true }); timers.push(setTimeout(showOn, 600)); timers.push(setTimeout(end, 2500)); return; }
     vid.src = OD_DANCE_SRC;
     vid.addEventListener('ended', end);
     vid.addEventListener('timeupdate', ()=>{ if (!over && vid.duration && vid.duration - vid.currentTime < 0.5) end(); });
     const pr = vid.play(); if (pr && pr.catch) pr.catch(fallback);
-    requestAnimationFrame(()=> d.classList.add('on'));
+    vid.addEventListener('playing', showOn, { once:true }); timers.push(setTimeout(showOn, 900));   // (polish2 item 10: the layer fades in once the picture is moving - no black frame first)
     timers.push(setTimeout(()=> d.classList.add('skip-on'), 1000));
     timers.push(setTimeout(end, 12000));   // (a safety net: the clip is 10 s)
   }
